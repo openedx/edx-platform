@@ -38,7 +38,7 @@ $base-font-color: rgb(60,60,60);
 $baseFontColor: rgb(60,60,60);
 $base-font-color: rgb(60,60,60);
 $lighter-base-font-color: rgb(100,100,100);
-$very-light-text: #fff;
+$very-light-text: rgb(255,255,255); // #ffffff
 
 // ====================
 
@@ -145,58 +145,58 @@ $dark-gray: rgb(51, 51, 51);
 $border-color: rgb(200, 200, 200);
 $sidebar-color: rgb(246, 246, 246);
 $outer-border-color: rgb(170, 170, 170);
-$light-gray: #ddd;
+$light-gray: rgb(221,221,221); // #dddddd
 
 // used by descriptor css
-$lightGrey: #edf1f5;
-$darkGrey: #8891a1;
+$lightGrey: rgb(237,241,245); // #edf1f5
+$darkGrey: rgb(136,145,161); // #8891a1
 $lightGrey1: $gray-l3;
 $blue-d1: shade($blue,20%);
 $blue-d2: shade($blue,40%);
 $blue-d4: shade($blue,80%);
 
 // edx.org marketing site variables
-$m-gray: #8A8C8F;
-$m-gray-l1: #97999B;
-$m-gray-l2: #A4A6A8;
-$m-gray-l3: #B1B2B4;
-$m-gray-l4: #F5F5F5;
-$m-gray-d1: #7D7F83;
-$m-gray-d2: #707276;
-$m-gray-d3: #646668;
-$m-gray-d4: #050505;
+$m-gray: rgb(138,140,143); // #8A8C8F
+$m-gray-l1: rgb(151,153,155); // #97999B
+$m-gray-l2: rgb(164,166,168); // #A4A6A8
+$m-gray-l3: rgb(177,178,180); // #B1B2B4
+$m-gray-l4: rgb(245,245,245); // #F5F5F5
+$m-gray-d1: rgb(125,127,131); // #7D7F83
+$m-gray-d2: rgb(112,114,118); // #707276
+$m-gray-d3: rgb(100,102,104); // #646668
+$m-gray-d4: rgb(5,5,5); // #050505
 $m-gray-t0: rgba($m-gray,0.125);
 $m-gray-t1: rgba($m-gray,0.25);
 $m-gray-t2: rgba($m-gray,0.50);
 $m-gray-t3: rgba($m-gray,0.75);
 
-$m-blue: #1AA1DE;
-$m-blue-l1: #2BACE6;
-$m-blue-l2: #42B5E9;
-$m-blue-l3: #59BEEC;
+$m-blue: rgb(26,161,222); // #1AA1DE
+$m-blue-l1: rgb(43,172,230); // #2BACE6
+$m-blue-l2: rgb(66,181,233); // #42B5E9
+$m-blue-l3: rgb(89,190,236); // #59BEEC
 $m-blue-l4: tint($m-blue,90%);
 $m-blue-l5: tint($m-blue,95%);
 $m-blue-l6: #4bb4fb;
-$m-blue-d1: #1790C7;
-$m-blue-d2: #1580B0;
-$m-blue-d3: #126F9A;
-$m-blue-d4: #0A4A67;
-$m-blue-d5: #009EE7;
+$m-blue-d1: rgb(23,144,199); // #1790C7
+$m-blue-d2: rgb(21,128,176); // #1580B0
+$m-blue-d3: rgb(18,111,154); // #126F9A
+$m-blue-d4: rgb(10,74,103); // #0A4A67
+$m-blue-d5: rgb(0,158,231); // #009EE7
 $m-blue-d6: #256A97;
 $m-blue-t0: rgba($m-blue,0.125);
 $m-blue-t1: rgba($m-blue,0.25);
 $m-blue-t2: rgba($m-blue,0.50);
 $m-blue-t3: rgba($m-blue,0.75);
 
-$m-pink: #B52A67;
-$m-pink-l1: #CA2F73;
-$m-pink-l2: #D33F80;
-$m-pink-l3: #D7548E;
+$m-pink: rgb(181,42,103); // #B52A67
+$m-pink-l1: rgb(202,47,115); //#CA2F73
+$m-pink-l2: rgb(211,63,128); //#D33F80
+$m-pink-l3: rgb(215,84,142); //#D7548E
 $m-pink-l4: tint($m-pink,75%);
 $m-pink-l5: tint($m-pink,85%);
-$m-pink-d1: #A0255B;
-$m-pink-d2: #8C204F;
-$m-pink-d3: #771C44;
+$m-pink-d1: rgb(160,37,91); // #A0255B
+$m-pink-d2: rgb(140,32,79); // #8C204F
+$m-pink-d3: rgb(119,28,68); // #771C44
 
 $m-green: rgb(0, 136, 1);
 $m-green-s1: rgb(96, 188, 97);
@@ -238,16 +238,16 @@ $body-bg: rgb(250,250,250);
 $container-bg: $white;
 $header-image: linear-gradient(-90deg, rgba(255,255,255, 1), rgba(230,230,230, 0.9));
 $header-bg: $white;
-$courseware-header-image: linear-gradient(top, #fff, #eee);
+$courseware-header-image: linear-gradient(top, rgb(255,255,255), rgb(238,238,238));
 $courseware-header-bg: transparent;
 $footer-bg: $white;
 $courseware-footer-border: none;
 $courseware-footer-shadow: none;
-$courseware-footer-margin: 0;
-$courseware-border-bottom-color: #44a2de;
-$courseware-button-border-color: #e6e6e6;
-$courseware-hover-color: #333435;
-$courseware-navigation-color: #009ee7;
+$courseware-footer-margin: 0px;
+$courseware-border-bottom-color: rgb(68,162,222); // #44a2de
+$courseware-button-border-color: rgb(230,230,230); // #e6e6e6
+$courseware-hover-color: rgb(51,52,53); // #333435
+$courseware-navigation-color: rgb(0,158,231); // #009ee7
 
 // ====================
 
@@ -277,7 +277,7 @@ $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 // ====================
 
 // ACTIONS: general
-$button-bg-image: linear-gradient(#fff 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
+$button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
 $button-bg-hover-color: $white;
 
@@ -361,6 +361,7 @@ $dashboard-course-cover-border: $light-gray;
 // MISC: course assets
 $content-wrapper-bg: $white;
 $course-bg-color: #f2f2f2;
+$course-bg-image: url(../images/bg-texture.png);
 $account-content-wrapper-bg: shade($body-bg, 2%);
 $course-profile-bg: rgb(245,245,245);
 $course-header-bg: rgba(255,255,255, 0.93);
@@ -384,7 +385,7 @@ $link-color-d1: $m-blue-d2;
 $link-hover: $pink;
 $site-status-color: $pink;
 $button-color: $blue;
-$button-archive-color: #eee;
+$button-archive-color: rgb(238,238,238); // #eeeeee
 
 // MISC: shadow, form, modal
 $shadow-color: $blue;
@@ -394,8 +395,8 @@ $modal-bg-color: rgb(245,245,245);
 // MISC: sidebar
 $sidebar-chapter-bg-top: rgba(255, 255, 255, .6);
 $sidebar-chapter-bg-bottom: rgba(255, 255, 255, 0);
-$sidebar-chapter-bg: #eee;
-$sidebar-active-image: linear-gradient(top, #e6e6e6, #d6d6d6);
+$sidebar-chapter-bg: rgb(238,238,238); // #eeeeee
+$sidebar-active-image: linear-gradient(top, rgb(230,230,230), rgb(214,214,214));
 
 // TOP HEADER IMAGE MARGIN
 $header_image_margin: -69px;
@@ -438,16 +439,15 @@ $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 $msg-bg: $action-primary-bg;
 
 
-// New Shopping Cart
-
-$dark-gray1: #4a4a4a;
-$light-gray1: #f2f2f2;
-$light-gray2: #ababab;
-$dark-gray2: #979797;
-$blue1: #4A90E2;
-$blue2: #00A1E5;
-$green1: #61A12E;
-$red1: #D0021B;
+$dark-gray1: rgb(74,74,74); // #
+$light-gray1: rgb(242,242,242); // #f2f2f2
+$light-gray2: rgb(171,171,171); // #ababab
+$light-gray3: rgb(249,249,249); // #f9f9f9
+$dark-gray2: rgb(151,151,151); // #979797
+$blue1: rgb(74,144,226); // #4A90E2
+$blue2: rgb(0,161,229); // #00A1E5
+$green1: rgb(97,161,46); // #61A12E
+$red1: rgb(208,2,27); // #D0021B
 
 // +case: search/result highlight
 // --------------------
