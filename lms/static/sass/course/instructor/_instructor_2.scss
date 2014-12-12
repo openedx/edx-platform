@@ -424,7 +424,6 @@ section.instructor-dashboard-content-2 {
 }
 
 // view - membership
-// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
 
   .membership-section {
@@ -1736,3 +1735,5 @@ input[name="subject"] {
   left: 2em;
   right: auto;
 }
+
+@import '_cohort-management';
