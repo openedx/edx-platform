@@ -28,14 +28,16 @@ from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from student.tests.factories import UserFactory
+from student.tests.factories import UserFactory, UserProfileFactory, UserStandingFactory
 from courseware.tests.factories import StaffFactory, InstructorFactory, BetaTesterFactory
 from student.roles import CourseBetaTesterRole
 from microsite_configuration import microsite
 from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 
-from student.models import CourseEnrollment, CourseEnrollmentAllowed
+from student.models import CourseEnrollment, CourseEnrollmentAllowed, UserStanding
 from courseware.models import StudentModule
+from survey.models import SurveySubmission
+from survey.tests.factories import SurveySubmissionFactory
 
 # modules which are mocked in test cases.
 import instructor_task.api
@@ -2918,3 +2920,133 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestInstructorAPISurveyDownload(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test instructor survey endpoint.
+    """
+    def setUp(self):
+        class _UserProfileFactory(UserProfileFactory):
+            year_of_birth = None
+
+        self.course = CourseFactory.create()
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.user1 = UserFactory.create(
+            profile__gender='m',
+            profile__year_of_birth=1980,
+            profile__level_of_education='p',
+        )
+        self.user1_standing = UserStandingFactory.create(
+            user=self.user1,
+            account_status=UserStanding.ACCOUNT_ENABLED,
+            changed_by=self.user1,
+        )
+        self.user2 = UserFactory.create(
+            profile__gender='foo',
+            profile__year_of_birth=None,
+            profile__level_of_education='bar',
+        )
+        self.user2_standing = UserStandingFactory.create(
+            user=self.user2,
+            account_status=UserStanding.ACCOUNT_DISABLED,
+            changed_by=self.user2,
+        )
+        self.user3 = UserFactory.create(
+            profile__gender=None,
+            profile__year_of_birth=None,
+            profile__level_of_education=None,
+        )
+        self.user4 = UserFactory.create()
+
+        self.submission1 = {
+            'course_id': self.course.id,
+            'unit_id': '11111111111111111111111111111111',
+            'user': self.user1,
+            'survey_name': 'survey #1',
+            'survey_answer': '{"Q1": "1", "Q2": ["1", "2"], "Q3": "submission #1"}',
+        }
+        self.submission2 = {
+            'course_id': self.course.id,
+            'unit_id': '11111111111111111111111111111111',
+            'user': self.user2,
+            'survey_name': 'survey #1',
+            'survey_answer': '{"Q3": "submission #2", "Q1": "1", "Q2": "2"}',
+        }
+        self.submission3 = {
+            'course_id': self.course.id,
+            'unit_id': '22222222222222222222222222222222',
+            'user': self.user3,
+            'survey_name': 'survey #2',
+            'survey_answer': '{"Q1": "", "Q2": "", "Q3": "", "Q4": "extra"}',
+        }
+        self.submission4 = {
+            'course_id': SlashSeparatedCourseKey('edX', 'test', 'dummy'),
+            'unit_id': '22222222222222222222222222222222',
+            'user': self.user4,
+            'survey_name': 'survey #2',
+            'survey_answer': '{"Q1": "1", "Q2": "2", "Q3": "submission #4"}',
+        }
+
+    def test_get_survey(self):
+        """
+        Test the CSV output for the survey result.
+        """
+        submission1 = SurveySubmissionFactory.create(**self.submission1)
+        submission2 = SurveySubmissionFactory.create(**self.submission2)
+        submission3 = SurveySubmissionFactory.create(**self.submission3)
+        submission4 = SurveySubmissionFactory.create(**self.submission4)
+
+        url = reverse('get_survey', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.rstrip('\n').replace('\r', '')
+        rows = body.split('\n')
+        self.assertEqual(4, len(rows))
+        #Note(EDX-501): Modified temporarily.
+        #self.assertEqual(rows[0], '"Unit ID","Survey Name","Created","User Name","Gender","Year of Birth","Level of Education","Disabled","Q1","Q2","Q3","Q4"')
+        #self.assertEqual(
+        #    rows[1],
+        #    '"11111111111111111111111111111111","survey #1","%s","%s","Male","1980","Doctorate","","1","1,2","submission #1",""'
+        #    % (submission1.created, submission1.user.username)
+        #)
+        #self.assertEqual(
+        #    rows[2],
+        #    '"11111111111111111111111111111111","survey #1","%s","%s","foo","","bar","disabled","1","2","submission #2",""'
+        #    % (submission2.created, submission2.user.username)
+        #)
+        #self.assertEqual(
+        #    rows[3],
+        #    '"22222222222222222222222222222222","survey #2","%s","%s","","","","","","","","extra"'
+        #    % (submission3.created, submission3.user.username)
+        #)
+        self.assertEqual(rows[0], '"Unit ID","Survey Name","Created","User Name","Disabled","Q1","Q2","Q3","Q4"')
+        self.assertEqual(
+            rows[1],
+            '"11111111111111111111111111111111","survey #1","%s","%s","","1","1,2","submission #1",""'
+            % (submission1.created, submission1.user.username)
+        )
+        self.assertEqual(
+            rows[2],
+            '"11111111111111111111111111111111","survey #1","%s","%s","disabled","1","2","submission #2",""'
+            % (submission2.created, submission2.user.username)
+        )
+        self.assertEqual(
+            rows[3],
+            '"22222222222222222222222222222222","survey #2","%s","%s","","","","","extra"'
+            % (submission3.created, submission3.user.username)
+        )
+
+    def test_get_survey_when_data_is_empty(self):
+        url = reverse('get_survey', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        response = self.client.get(url, {})
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.rstrip('\n').replace('\r', '')
+        rows = body.split('\n')
+        self.assertEqual(1, len(rows))
+        #Note(EDX-501): Modified temporarily.
+        #self.assertEqual(rows[0], '"Unit ID","Survey Name","Created","User Name","Gender","Year of Birth","Level of Education","Disabled"')
+        self.assertEqual(rows[0], '"Unit ID","Survey Name","Created","User Name","Disabled"')

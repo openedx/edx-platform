@@ -1,0 +1,239 @@
+---
+metadata:
+    display_name: Survey Unit
+data: |
+      <div class="message">
+        <div id="survey-init-message">
+          <p>アンケート情報を取得中<span class="loading-animation"></span></p>
+        </div>
+        <div id="survey-error-message" class="error-message is-disabled">
+          <p>ページを表示できません。恐れ入りますが、再読み込みしてください。</p>
+        </div>
+        <div id="survey-already-submitted-message" class="error-message is-disabled">
+          <p>このアンケートは既に回答済みです。</p>
+        </div>
+        <div id="survey-inputcheck-message" class="error-message is-disabled">
+          <p></p>
+        </div>
+        <div id="survey-complete-message" class="info-message is-disabled">
+          <p>ご回答ありがとうございました。</p>
+        </div>
+      </div>
+
+      <form id="survey-form" class="is-disabled">
+
+        <!----- アンケートここから ----->
+        <h2>アンケート</h2>
+        <input type="hidden" id="survey_name" name="survey_name" value="アンケートその1">
+
+        <div id="Q1" title="問1" class="question required">
+          <p>問1.　参加しようと思った動機は何ですか？（複数回答可）</p>
+          <label><input type="checkbox" name="Q1" value="1"> 1．面白そうだから</label>
+          <label><input type="checkbox" name="Q1" value="2"> 2．講座テーマが好き（または得意）だから</label>
+          <label><input type="checkbox" name="Q1" value="3"> 3．友人に勧められたから</label>
+          <label><input type="checkbox" name="Q1" value="4"> 4．親に勧められたから</label>
+          <label><input type="checkbox" name="Q1" value="5"> 5．進学に役立ちそうだから</label>
+          <label><input type="checkbox" name="Q1" value="6"> 6．仕事に役立ちそうだから</label>
+        </div>
+
+        <div id="Q2" title="問2" class="question required">
+          <p>問2.　本講座に参加したことで、あなたの学習意欲・能力が高まったと思いますか？</p>
+          <label><input type="radio" name="Q2" value="1"> 1．強くそう思う</label>
+          <label><input type="radio" name="Q2" value="2"> 2．そう思う</label>
+          <label><input type="radio" name="Q2" value="3"> 3．あまり思わない</label>
+          <label><input type="radio" name="Q2" value="4"> 4．全く思わない</label>
+          <label><input type="radio" name="Q2" value="5"> 5．不明・無回答</label>
+        </div>
+
+        <div id="Q3" title="問3" class="question required">
+          <p>問3.　また参加したいですか？</p>
+          <select name="Q3">
+            <option value="">------</option>
+            <option value="yes">はい</option>
+            <option value="no">いいえ</option>
+          </select>
+        </div>
+
+        <div id="Q4" title="問4" class="question required">
+          <p>問4.　ご意見・ご感想がありましたらお聞かせください。</p>
+          <textarea name="Q4" rows="10" cols="40"></textarea>
+        </div>
+        <!----- アンケートここまで ----->
+
+        <button type="button" id="survey-submit-button" class="action">回答を送信する</button>
+      </form>
+
+      <style type="text/css">
+      <!--
+        div.question {
+          margin-bottom: 40px;
+        }
+        .is-disabled {
+          display: none;
+        }
+        .required > p:after {
+          margin-left: 0.5em;
+          content: " * 必須";
+          background-color: #ffffe0;
+          color: #ff0000;
+          font-weight: bold;
+        }
+        .error-message {
+          margin-bottom: 20px;
+          padding: 20px 20px 0 20px;
+          box-shadow: inset 0 -1px 2px 0 #f3d9db;
+          border-bottom: 3px solid #a0050e;
+          background-color: #fbf2f3;
+        }
+        #survey-inputcheck-message ul {
+          list-style: none;
+        }
+        .info-message {
+          margin-bottom: 20px;
+          padding: 20px 20px 0 20px;
+          box-shadow: inset 0 -1px 2px 0 #f0f6fa;
+          border-bottom: 3px solid #0d72a2;
+          background-color: #f0faf9;
+        }
+        textarea {
+          height: auto;
+        }
+      -->
+      </style>
+      <script type="text/javascript">
+        $(function() {
+          var MAX_CHARACTER_LENGTH = 1000;
+          var course_id_matches = location.href.match(/^.+\/courses\/([^/+]+[/|\+][^/+]+[/|\+][^/]+)\/courseware\/.+$/);
+          var course_id = (course_id_matches)? course_id_matches[1] : '';
+          var is_lms = (course_id_matches != null);
+          var usage_id = $('.xblock.xblock-student_view.xmodule_display.xmodule_VerticalModule').data('usage-id');
+          var unit_id = (usage_id)? usage_id.match(/^.+(?:;_vertical;_|\+block@)([0-9a-f]+)$/)[1] : '';
+          // survey_init
+          if (is_lms) {
+            $.ajax({
+              url: '/survey_init',
+              type: 'POST',
+              dataType: 'json',
+              contentType: 'application/json',
+              data: {'course_id': course_id,
+                     'unit_id': unit_id},
+            }).done(function(data) {
+              if (data.success) {
+                // not yet submitted
+                show_init();
+              } else {
+                // already submitted
+                show_already_submitted();
+                $.each(data.survey_answer, function(i, v) {
+                  v = (v instanceof Array) ? v : [v];
+                  $('#survey-form').find('*[name=' + i + ']').val(v);
+                });
+              }
+            }).fail(function() {
+              show_error();
+            });
+          } else {
+            // you're in Studio
+            show_init();
+          }
+
+          // survey_ajax
+          $('#survey-submit-button').on('click', function() {
+            var form = $('#survey-form');
+            var param = {};
+            $(form.find('input:visible,textarea,select')).each(function() {
+              // set default
+              param[$(this).attr('name')] = '';
+            });
+            $(form.find('input:visible,textarea,select').serializeArray()).each(function(i, v) {
+              var last_value = param[v.name];
+              if (last_value == '') {
+                param[v.name] = v.value;
+              } else {
+                last_value = (last_value instanceof Array) ? last_value : [last_value];
+                last_value.push(v.value);
+                param[v.name] = last_value;
+              }
+            });
+            var data = {
+              'course_id': course_id,
+              'unit_id': unit_id,
+              'survey_name': $("#survey_name").val(),
+              'survey_answer': JSON.stringify(param)
+            };
+            $.ajax({
+              url: '/survey_ajax',
+              type: 'POST',
+              dataType: 'json',
+              contentType: 'application/json',
+              data: data,
+              beforeSend: function(xhr) {
+                var err_msgs = [];
+                // require check
+                $(form.find('.required')).each(function() {
+                  var id = $(this).attr('id');
+                  if (param[id].length == 0) {
+                    err_msgs.push($(this).attr('title') + " は必須入力です。");
+                  }
+                });
+                // textarea maxlength check
+                $(form.find('textarea')).each(function() {
+                  var name = $(this).attr('name');
+                  if (param[name].length > MAX_CHARACTER_LENGTH) {
+                    err_msgs.push($(this).parent('div[title]').get(0).title + " は" + MAX_CHARACTER_LENGTH + "字以下で入力してください。");
+                  }
+                });
+                if (err_msgs.length > 0) {
+                    $('#survey-inputcheck-message').removeClass('is-disabled');
+                    $('#survey-inputcheck-message p').html('<ul><li>' + err_msgs.join('</li><li>') + '</li></ul>');
+                    xhr.abort();
+                    window.scrollTo(0, 0);
+                }
+              }
+            }).done(function(data) {
+              if (data.success) {
+                // complete
+                $('#survey-init-message').addClass('is-disabled');
+                $('#survey-error-message').addClass('is-disabled');
+                $('#survey-already-submitted-message').addClass('is-disabled');
+                $('#survey-inputcheck-message').addClass('is-disabled');
+                $('#survey-complete-message').removeClass('is-disabled');
+                $('#survey-form').removeClass('is-disabled');
+                $('#survey-submit-button').addClass('disabled');
+              } else {
+                // already submitted
+                show_already_submitted();
+              }
+              window.scrollTo(0, 0);
+            }).fail(function() {
+              show_error();
+              window.scrollTo(0, 0);
+            });
+          });
+          function show_init() {
+            $('#survey-init-message').addClass('is-disabled');
+            $('#survey-error-message').addClass('is-disabled');
+            $('#survey-already-submitted-message').addClass('is-disabled');
+            $('#survey-inputcheck-message').addClass('is-disabled');
+            $('#survey-complete-message').addClass('is-disabled');
+            $('#survey-form').removeClass('is-disabled');
+          }
+          function show_already_submitted() {
+            $('#survey-init-message').addClass('is-disabled');
+            $('#survey-error-message').addClass('is-disabled');
+            $('#survey-already-submitted-message').removeClass('is-disabled');
+            $('#survey-inputcheck-message').addClass('is-disabled');
+            $('#survey-complete-message').addClass('is-disabled');
+            $('#survey-form').removeClass('is-disabled');
+            $('#survey-submit-button').addClass('disabled');
+          }
+          function show_error() {
+            $('#survey-init-message').addClass('is-disabled');
+            $('#survey-error-message').removeClass('is-disabled');
+            $('#survey-already-submitted-message').addClass('is-disabled');
+            $('#survey-inputcheck-message').addClass('is-disabled');
+            $('#survey-complete-message').addClass('is-disabled');
+            $('#survey-form').addClass('is-disabled');
+          }
+        });
+      </script>

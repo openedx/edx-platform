@@ -81,4 +81,7 @@ urlpatterns = patterns('',  # nopep8
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+
+    url(r'^get_survey$',
+        'instructor.views.api.get_survey', name="get_survey"),
 )

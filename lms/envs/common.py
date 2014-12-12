@@ -1381,7 +1381,10 @@ INSTALLED_APPS = (
     'edx_jsme',    # Molecular Structure
 
     # Country list
-    'django_countries'
+    'django_countries',
+
+    # Entrance/Exit Survey
+    'survey',
 )
 
 ######################### MARKETING SITE ###############################
