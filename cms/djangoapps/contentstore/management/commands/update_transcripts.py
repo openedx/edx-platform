@@ -17,9 +17,10 @@ from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore, ModuleI18nService
-from xmodule.modulestore import Location
 from xmodule.video_module import transcripts_utils
 from xmodule.video_module.transcripts_utils import GetTranscriptsFromYouTubeException
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 
 
 log = logging.getLogger(__name__)
@@ -62,7 +63,7 @@ class Command(BaseCommand):
     Usage: python manage.py cms --settings=aws update_transcripts edX/DemoX/Demo_Course
 
     Args:
-        course_id: 'org/course/run'
+        course_id: 'org/course/run' or 'course-v1:org+course+run'
     """
     help = """Usage: update_transcripts [<course_id>]"""
 
@@ -78,9 +79,9 @@ class Command(BaseCommand):
         course_id = args[0] if len(args) > 0 else None
         if course_id:
             try:
-                Location.parse_course_id(course_id)
-            except ValueError:
-                raise CommandError("The course_id is not of the right format. It should be like 'org/course/name'")
+                course_id = CourseLocator.from_string(course_id)
+            except InvalidKeyError:
+                raise CommandError("The course_id is not of the right format. It should be like 'org/course/run' or 'course-v1:org+course+run'")
         print "course_id=%s" % course_id
 
         # S3 store
@@ -94,13 +95,8 @@ class Command(BaseCommand):
         output.align = 'l'
 
         # Find courses
-        tag = 'i4x'
         if course_id:
-            course_dict = Location.parse_course_id(course_id)
-            org = course_dict['org']
-            course = course_dict['course']
-            name = course_dict['name']
-            course_items = modulestore().get_items(Location(tag, org, course, 'course', name))
+            course_items = modulestore().get_items(course_id, qualifiers={'category': 'course'})
             if course_items:
                 print "The specified course actually exists."
             else:
@@ -117,23 +113,22 @@ class Command(BaseCommand):
                 output.add_row([course_item.id, "", "", "Skipped", "This course has already ended"])
                 continue
             # Find video items
-            video_items = modulestore().get_items(Location(course_item.location.tag, course_item.location.org, course_item.location.course, category='video'))
+            video_items = modulestore().get_items(course_item.id, qualifiers={'category': 'video'})
             print "%s video item(s) found." % len(video_items)
             for video_item in video_items:
-                print "video_item.id=%s" % video_item.id
                 youtube_id = video_item.youtube_id_1_0
                 print "youtube_id=%s" % youtube_id
 
                 # Get transcript from YouTube
                 try:
-                    youtube_transcript = YoutubeTranscript(video_item.location, youtube_id)
+                    youtube_transcript = YoutubeTranscript(course_item.id, youtube_id)
                 except Exception as e:
                     log.warn(str(e))
                     output.add_row([course_item.id, youtube_id, video_item.display_name, "Failed", "Can't receive transcripts from YouTube"])
                     continue
                 # Get transcript from local assets
                 filename = youtube_transcript.filename
-                current_transcript_data = get_data_from_local(course_item.location, filename)
+                current_transcript_data = get_data_from_local(course_item.id, filename)
 
                 # Note: Update local assets only when anything changed on YouTube
                 if current_transcript_data is None or youtube_transcript.subs != json.loads(current_transcript_data):
@@ -173,8 +168,8 @@ class YoutubeTranscript(object):
     """
     Transcript for YouTube
     """
-    def __init__(self, old_location, youtube_id):
-        self.old_location = old_location
+    def __init__(self, course_key, youtube_id):
+        self.course_key = course_key
         self.youtube_id = youtube_id
         self.lang = None
 
@@ -198,7 +193,7 @@ class YoutubeTranscript(object):
 
     # Note: cribbed from cms/djangoapps/contentstore/views/assets.py _upload_asset()
     def upload_to_local(self):
-        content_loc = StaticContent.compute_location(self.old_location.org, self.old_location.course, self.filename)
+        content_loc = StaticContent.compute_location(self.course_key, self.filename)
         mime_type = 'application/json'
         # Note: cribbed from common/lib/xmodule/xmodule/video_module/transcripts_utils.py save_subs_to_store()
         filedata = json.dumps(self.subs, indent=2)
@@ -223,13 +218,13 @@ def subs_backup_filename(filename, t):
     return u'{0}.{1}'.format(filename, time.strftime('%y%m%d%H%M%S', t))
 
 
-def get_data_from_local(old_location, filename):
+def get_data_from_local(course_key, filename):
     """
     Get transcripts from local assets.
 
     Return None, if no such file exist on local assets
     """
-    content_loc = StaticContent.compute_location(old_location.org, old_location.course, filename)
+    content_loc = StaticContent.compute_location(course_key, filename)
     try:
         data = contentstore().find(content_loc).data
     except NotFoundError:

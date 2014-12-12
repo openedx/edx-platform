@@ -13,22 +13,19 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test.utils import override_settings
 
-from contentstore.tests.modulestore_config import TEST_MODULESTORE
 from contentstore.management.commands.update_transcripts import Command
-TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore, _CONTENTSTORE
 from xmodule.exceptions import NotFoundError
-from xmodule.modulestore import Location
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.django import modulestore, loc_mapper, clear_existing_modulestores
-from xmodule.modulestore.locator import CourseLocator
+from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.video_module import transcripts_utils
 from xmodule.video_module.transcripts_utils import GetTranscriptsFromYouTubeException
 
 
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 TRANSCRIPTS_BACKUP_BUCKET_NAME = 'dummy_bucket'
 TRANSCRIPTS_BACKUP_DIR = 'dummy_dir'
 AWS_ACCESS_KEY_ID = 'DUMMY_KEY_ID'
@@ -89,7 +86,7 @@ class TestArgParsing(ModuleStoreTestCase):
                    TRANSCRIPTS_BACKUP_DIR=TRANSCRIPTS_BACKUP_DIR,
                    AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID,
                    AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY)
-@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE, MODULESTORE=TEST_MODULESTORE)
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class TestUpdateTranscripts(ModuleStoreTestCase):
     """
     Tests for the process of the `update_transcripts` command
@@ -147,9 +144,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         }
         subs_id = 'p2Q6BrNhdh8'
         filename = 'subs_{0}.srt.sjson'.format(subs_id)
-        self.content_location = StaticContent.compute_location(
-            self.course2.location.org, self.course2.location.course, filename
-        )
+        self.content_location = StaticContent.compute_location(self.course2.id, filename)
         transcripts_utils.save_subs_to_store(self.subs, subs_id, self.course2)
 
         # Ended course
@@ -172,7 +167,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         self.logger_info = patcher_logger_info.start()
         self.addCleanup(patcher_logger_info.stop)
 
-        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections, 'split')
+        self.addCleanup(ModuleStoreTestCase.drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)
 
     def tearDown(self):
@@ -192,7 +187,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         """
         Tests for the case when no transcripts exist on the local store
         """
-        call_command('update_transcripts', self.course.location.course_id)
+        call_command('update_transcripts', self.course.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
 
@@ -205,7 +200,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         """
         self.mock_get_transcripts.side_effect = GetTranscriptsFromYouTubeException()
 
-        call_command('update_transcripts', self.course.location.course_id)
+        call_command('update_transcripts', self.course.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
         self.assertEqual(2, self.mock_get_transcripts.call_count)
@@ -220,7 +215,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         """
         mock_get_data.return_value = json.dumps(self.changed_subs)
 
-        call_command('update_transcripts', self.course2.location.course_id)
+        call_command('update_transcripts', self.course2.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
         self.mock_get_transcripts.assert_called_once_with(ANY, ANY, ANY)
@@ -236,7 +231,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         """
         mock_get_data.return_value = json.dumps(self.subs)
 
-        call_command('update_transcripts', self.course2.location.course_id)
+        call_command('update_transcripts', self.course2.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
         self.mock_get_transcripts.assert_called_once_with(ANY, ANY, ANY)
@@ -253,7 +248,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         mock_get_data.return_value = json.dumps(self.changed_subs)
         self.mock_conn_class.return_value.get_bucket.side_effect = S3ResponseError(404, "Not found.")
 
-        call_command('update_transcripts', self.course2.location.course_id)
+        call_command('update_transcripts', self.course2.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
         self.mock_get_transcripts.assert_called_once_with(ANY, ANY, ANY)
@@ -267,7 +262,7 @@ class TestUpdateTranscripts(ModuleStoreTestCase):
         """
         Tests for the case when processing the ended course
         """
-        call_command('update_transcripts', self.course3.location.course_id)
+        call_command('update_transcripts', self.course3.id.to_deprecated_string())
 
         self.mock_conn_class.assert_called_once_with(ANY, ANY)
 
