@@ -577,8 +577,10 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
             response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
 
         request = Request.blank('/translation/uk', POST={'file': ('filename.srt', SRT_content.decode('utf8').encode('cp1251'))})
-        with self.assertRaises(UnicodeDecodeError):  # Non-UTF8 file content encoding.
-            response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
+        # Non-UTF8 file content encoding.
+        response = self.item_descriptor.studio_transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.body, "Invalid encoding type, transcripts should be UTF-8 encoded.")
 
         # No language is passed.
         request = Request.blank('/translation', POST={'file': ('filename', SRT_content)})
