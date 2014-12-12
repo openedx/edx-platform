@@ -1077,23 +1077,53 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(course_enrollment.mode, u'verified')
 
         # now re-enroll the student through the instructor dash
-        url = reverse(
-            'students_update_enrollment',
-            kwargs={'course_id': self.course.id.to_deprecated_string()},
-        )
-        params = {
-            'identifiers': self.enrolled_student.email,
-            'action': 'enroll',
-            'email_students': True,
-        }
-        response = self.client.post(url, params)
-        self.assertEqual(response.status_code, 200)
+        self._change_student_enrollment(self.enrolled_student, self.course, 'enroll')
 
         # affirm that the student is still in "verified" mode
         course_enrollment = CourseEnrollment.objects.get(
             user=self.enrolled_student, course_id=self.course.id
         )
         self.assertEqual(course_enrollment.mode, u"verified")
+
+    def test_unenroll_and_enroll_verified(self):
+        """
+        Test that unenrolling and enrolling a student from a verified track
+        results in that student being in an honor track
+        """
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        # upgrade enrollment
+        course_enrollment.mode = u'verified'
+        course_enrollment.save()
+        self.assertEqual(course_enrollment.mode, u'verified')
+
+        self._change_student_enrollment(self.enrolled_student, self.course, 'unenroll')
+
+        self._change_student_enrollment(self.enrolled_student, self.course, 'enroll')
+
+        course_enrollment = CourseEnrollment.objects.get(
+            user=self.enrolled_student, course_id=self.course.id
+        )
+        self.assertEqual(course_enrollment.mode, u'honor')
+
+    def _change_student_enrollment(self, user, course, action):
+        """
+        Helper function that posts to 'students_update_enrollment' to change
+        a student's enrollment
+        """
+        url = reverse(
+            'students_update_enrollment',
+            kwargs={'course_id': course.id.to_deprecated_string()},
+        )
+        params = {
+            'identifiers': user.email,
+            'action': action,
+            'email_students': True,
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+        return response
 
 
 @ddt.ddt
