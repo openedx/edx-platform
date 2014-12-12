@@ -50,8 +50,7 @@ class LibraryRoot(XBlock):
 
     def render_children(self, context, fragment, can_reorder=False, can_add=False):  # pylint: disable=unused-argument
         """
-        Renders the children of the module with HTML appropriate for Studio. If can_reorder is True,
-        then the children will be rendered to support drag and drop.
+        Renders the children of the module with HTML appropriate for Studio. Reordering is not supported.
         """
         contents = []
 
@@ -77,7 +76,7 @@ class LibraryRoot(XBlock):
 
             contents.append({
                 'id': unicode(child.location),
-                'content': rendered_child.content
+                'content': rendered_child.content,
             })
 
         fragment.add_content(
