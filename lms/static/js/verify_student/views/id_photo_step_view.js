@@ -14,6 +14,7 @@ var edx = edx || {};
             new edx.verify_student.WebcamPhotoView({
                 el: $("#idcam"),
                 model: this.model,
+                modelAttribute: 'identificationImage',
                 submitButton: '#next_step_button'
             }).render();
 
