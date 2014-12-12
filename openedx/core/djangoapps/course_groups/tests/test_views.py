@@ -319,7 +319,8 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         self.assertEqual(response_dict.get("num_pages"), expected_num_pages)
 
         returned_users = User.objects.filter(username__in=[user.get("username") for user in response_dict.get("users")])
-        self.assertItemsEqual(returned_users, expected_users)
+        self.assertEqual(len(returned_users), len(expected_users))
+        self.assertEqual(set(returned_users), set(expected_users))
         self.assertTrue(set(returned_users).issubset(cohort.users.all()))
 
     def test_non_staff(self):
