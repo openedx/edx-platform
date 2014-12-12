@@ -124,13 +124,8 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
             if not has_access(user, "load", item, course_key=course.id):
                 continue
 
-            try:
-                (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
-            except (NoPathToItem, ValueError):
-                continue
-
             unit = get_ancestor(store, usage_key)
-            unit_dict = get_ancestor_context(store, course, unit)
+            unit_dict = get_ancestor_context(course, unit)
 
             model.update({
                 u"text": markupsafe.escape(model["text"]),
@@ -140,10 +135,15 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
             })
 
             if add_course_structure:
+                try:
+                    # pylint: disable=unused-variable
+                    (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+                except (NoPathToItem, ValueError):
+                    continue
                 chapter = store.get_item(chapter)
-                chapter_dict = get_ancestor_context(store, course, chapter, course)
+                chapter_dict = get_ancestor_context(course, chapter, course)
                 section = store.get_item(section)
-                section_dict = get_ancestor_context(store, course, section)
+                section_dict = get_ancestor_context(course, section)
                 model.update({
                     u"chapter": chapter_dict,
                     u"section": section_dict,
@@ -204,7 +204,7 @@ def get_ancestor(store, usage_key):
         return
 
 
-def get_ancestor_context(store, course, item, ancestor=None):
+def get_ancestor_context(course, item, ancestor=None):
     """
     Returns dispay_name and url for the parent module.
     """
