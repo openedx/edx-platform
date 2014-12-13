@@ -100,9 +100,9 @@ class TestDefaultGradingPolicy(TestGradebook):
         # One use at top of the page [1]
         self.assertEquals(22, self.response.content.count('grade_F'))
 
-        # All other grades are None [29 categories * 11 users - 27 non-empty grades = 292]
+        # All other grades are None [30 categories * 11 users - 27 non-empty grades = 303]
         # One use at the top of the page [1]
-        self.assertEquals(293, self.response.content.count('grade_None'))
+        self.assertEquals(304, self.response.content.count('grade_None'))
 
 
 class TestLetterCutoffPolicy(TestGradebook):

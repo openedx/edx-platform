@@ -4,7 +4,7 @@ import warnings
 
 from lxml import etree
 
-from xblock.fields import Integer, Scope
+from xblock.fields import Integer, Scope, Boolean
 from xblock.fragment import Fragment
 from pkg_resources import resource_string
 
@@ -43,6 +43,16 @@ class SequenceFields(object):
              "date.",
         default=None,
         scope=Scope.user_state,
+    )
+
+    # Entrance Exam flag -- see cms/contentstore/views/entrance_exam.py for usage
+    is_entrance_exam = Boolean(
+        display_name=_("Is Entrance Exam"),
+        help=_(
+            "Tag this course module as an Entrance Exam.  " +
+            "Note, you must enable Entrance Exams for this course setting to take effect."
+        ),
+        scope=Scope.settings,
     )
 
 

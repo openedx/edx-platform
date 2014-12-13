@@ -56,6 +56,8 @@ reports/
 jscover.log
 jscover.log.*
 .tddium*
+django-pyfs
+test_root/uploads/*.txt
 
 ### Installation artifacts
 *.egg-info

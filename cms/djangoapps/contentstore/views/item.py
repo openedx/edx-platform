@@ -13,6 +13,7 @@ from functools import partial
 from static_replace import replace_static_urls
 from xmodule_modifiers import wrap_xblock, request_token
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, Http404
@@ -449,6 +450,15 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
 @login_required
 @expect_json
+def create_item(request):
+    """
+    Exposes internal helper method without breaking existing bindings/dependencies
+    """
+    return _create_item(request)
+
+
+@login_required
+@expect_json
 def _create_item(request):
     """View for create items."""
     usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -479,6 +489,14 @@ def _create_item(request):
         if display_name is not None:
             metadata['display_name'] = display_name
 
+        # Entrance Exams: Chapter module positioning
+        child_position = None
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            is_entrance_exam = request.json.get('is_entrance_exam')
+            if category == 'chapter' and is_entrance_exam:
+                metadata['is_entrance_exam'] = is_entrance_exam
+                child_position = 0
+
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
         if isinstance(data, basestring):
@@ -492,7 +510,31 @@ def _create_item(request):
             definition_data=data,
             metadata=metadata,
             runtime=parent.runtime,
+            position=child_position
         )
+
+        # Entrance Exams: Grader assignment
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            course = store.get_course(usage_key.course_key)
+            if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:
+                if category == 'sequential' and request.json.get('parent_locator') == course.entrance_exam_id:
+                    grader = {
+                        "type": "Entrance Exam",
+                        "min_count": 0,
+                        "drop_count": 0,
+                        "short_label": "Entrance",
+                        "weight": 0
+                    }
+                    grading_model = CourseGradingModel.update_grader_from_json(
+                        course.id,
+                        grader,
+                        request.user
+                    )
+                    CourseGradingModel.update_section_grader_type(
+                        created_block,
+                        grading_model['type'],
+                        request.user
+                    )
 
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -563,6 +605,15 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             store.update_item(parent, user.id)
 
         return dest_module.location
+
+
+@login_required
+@expect_json
+def delete_item(request, usage_key):
+    """
+    Exposes internal helper method without breaking existing bindings/dependencies
+    """
+    _delete_item(usage_key, request.user)
 
 
 def _delete_item(usage_key, user):
