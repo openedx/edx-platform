@@ -19,7 +19,9 @@ define([
                 intro_video : null,
                 effort : null,
                 course_image_name : '',
-                course_image_asset_path : ''
+                course_image_asset_path : '',
+                entrance_exam_enabled : '',
+                entrance_exam_minimum_score_pct: '50'
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
