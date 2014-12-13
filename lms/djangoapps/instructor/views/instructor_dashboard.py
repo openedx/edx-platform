@@ -18,8 +18,9 @@ from django.utils.html import escape
 from django.http import Http404
 from django.conf import settings
 from util.json_request import JsonResponse
+from mock import patch
 
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from xmodule_modifiers import wrap_xblock
 from xmodule.html_module import HtmlDescriptor
 from xmodule.modulestore.django import modulestore
@@ -323,17 +324,28 @@ def _section_data_download(course, access):
     return section_data
 
 
+def null_get_asides(block):  # pylint: disable=unused-argument
+    """
+    get_aside method for monkey-patching into descriptor_global_get_asides
+    while rendering an HtmlDescriptor for email text editing. This returns
+    an empty list.
+    """
+    return []
+
+
 def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
 
-    # This HtmlDescriptor is only being used to generate a nice text editor.
-    html_module = HtmlDescriptor(
-        course.system,
-        DictFieldData({'data': ''}),
-        ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
-    )
-    fragment = course.system.render(html_module, 'studio_view')
+    # Monkey-patch descriptor_global_get_asides to return no asides for the duration of this render
+    with patch('xmodule.x_module.descriptor_global_get_asides', null_get_asides):
+        # This HtmlDescriptor is only being used to generate a nice text editor.
+        html_module = HtmlDescriptor(
+            course.system,
+            DictFieldData({'data': ''}),
+            ScopeIds(None, None, None, course_key.make_usage_key('html', 'fake'))
+        )
+        fragment = course.system.render(html_module, 'studio_view')
     fragment = wrap_xblock(
         'LmsRuntime', html_module, 'studio_view', fragment, None,
         extra_data={"course-id": unicode(course_key)},

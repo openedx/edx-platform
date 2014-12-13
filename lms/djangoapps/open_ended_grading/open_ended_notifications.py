@@ -10,7 +10,7 @@ from xmodule.open_ended_grading_classes.controller_query_service import Controll
 from xmodule.modulestore.django import ModuleI18nService
 
 from courseware.access import has_access
-from lms.lib.xblock.runtime import LmsModuleSystem
+from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem
 from edxmako.shortcuts import render_to_string
 from student.models import unique_id_for_user
 from util.cache import cache

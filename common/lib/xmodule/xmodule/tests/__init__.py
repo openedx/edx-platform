@@ -28,6 +28,7 @@ from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
+from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.modulestore.draft_and_published import DIRECT_ONLY_CATEGORIES, ModuleStoreDraftAndPublished
 
 
@@ -51,9 +52,16 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
     """
+    def __init__(self, **kwargs):
+        id_manager = CourseLocationManager(kwargs['course_id'])
+        kwargs.setdefault('id_reader', id_manager)
+        kwargs.setdefault('id_generator', id_manager)
+        kwargs.setdefault('services', {}).setdefault('field-data', DictFieldData({}))
+        super(TestModuleSystem, self).__init__(**kwargs)
+
     def handler_url(self, block, handler, suffix='', query='', thirdparty=False):
         return '{usage_id}/{handler}{suffix}?{query}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
+            usage_id=unicode(block.scope_ids.usage_id),
             handler=handler,
             suffix=suffix,
             query=query,
@@ -61,9 +69,13 @@ class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def local_resource_url(self, block, uri):
         return 'resource/{usage_id}/{uri}'.format(
-            usage_id=block.scope_ids.usage_id.to_deprecated_string(),
+            usage_id=unicode(block.scope_ids.usage_id),
             uri=uri,
         )
+
+    # Disable XBlockAsides in most tests
+    def get_asides(self, block):
+        return []
 
 
 def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
@@ -113,13 +125,16 @@ def get_test_descriptor_system():
     """
     Construct a test DescriptorSystem instance.
     """
+    field_data = DictFieldData({})
+
     return MakoDescriptorSystem(
         load_item=Mock(),
         resources_fs=Mock(),
         error_tracker=Mock(),
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
-        field_data=DictFieldData({}),
+        field_data=field_data,
+        services={'field-data': field_data},
     )
 
 
@@ -149,13 +164,8 @@ class LogicTest(unittest.TestCase):
     raw_field_data = {}
 
     def setUp(self):
-        class EmptyClass:
-            """Empty object."""
-            url_name = ''
-            category = 'test'
-
         self.system = get_test_system()
-        self.descriptor = EmptyClass()
+        self.descriptor = Mock(name="descriptor", url_name='', category='test')
 
         self.xmodule_class = self.descriptor_class.module_class
         usage_key = self.system.course_id.make_usage_key(self.descriptor.category, 'test_loc')

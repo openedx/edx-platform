@@ -50,6 +50,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.modulestore.xml import CourseLocationManager
 
 log = logging.getLogger(__name__)
 
@@ -173,6 +174,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
+        id_manager = CourseLocationManager(course_key)
+        kwargs.setdefault('id_reader', id_manager)
+        kwargs.setdefault('id_generator', id_manager)
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
             load_item=self.load_item,

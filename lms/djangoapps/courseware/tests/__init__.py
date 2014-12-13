@@ -20,8 +20,8 @@ from opaque_keys.edx.locations import Location
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from lms.lib.xblock.field_data import LmsFieldData
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.field_data import LmsFieldData
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)

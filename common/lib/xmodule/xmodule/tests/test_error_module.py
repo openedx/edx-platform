@@ -4,7 +4,7 @@ Tests for ErrorModule and NonStaffErrorModule
 import unittest
 from xmodule.tests import get_test_system
 from xmodule.error_module import ErrorDescriptor, ErrorModule, NonStaffErrorDescriptor
-from xmodule.modulestore.xml import CourseLocationGenerator
+from xmodule.modulestore.xml import CourseLocationManager
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 from mock import MagicMock, Mock, patch
@@ -34,7 +34,7 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = ErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.course_id),
+            CourseLocationManager(self.course_id),
             self.error_msg
         )
         self.assertIsInstance(descriptor, ErrorDescriptor)
@@ -69,7 +69,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.course_id)
+            CourseLocationManager(self.course_id)
         )
         self.assertIsInstance(descriptor, NonStaffErrorDescriptor)
 
@@ -77,7 +77,7 @@ class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
             self.system,
-            CourseLocationGenerator(self.course_id)
+            CourseLocationManager(self.course_id)
         )
         descriptor.xmodule_runtime = self.system
         context_repr = self.system.render(descriptor, STUDENT_VIEW).content

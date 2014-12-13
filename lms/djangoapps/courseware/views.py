@@ -39,6 +39,8 @@ from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
 from student.views import single_course_reverification_info, is_course_blocked
@@ -444,7 +446,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course_key, user, section_descriptor, depth=None)
+                course_key, user, section_descriptor, depth=None, asides=XBlockAsidesConfig.possible_asides()
+            )
 
             # Verify that position a string is in fact an int
             if position is not None:

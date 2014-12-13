@@ -33,7 +33,7 @@ class Date(JSONField):
         result = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED1)
         result_other = dateutil.parser.parse(field, default=self.PREVENT_DEFAULT_DAY_MON_SEED2)
         if result != result_other:
-            log.warning("Field {0} is missing month or day".format(self._name, field))
+            log.warning("Field {0} is missing month or day".format(self.name))
             return None
         if result.tzinfo is None:
             result = result.replace(tzinfo=UTC)
@@ -59,7 +59,7 @@ class Date(JSONField):
             return field
         else:
             msg = "Field {0} has bad value '{1}'".format(
-                self._name, field)
+                self.name, field)
             raise TypeError(msg)
 
     def to_json(self, value):
@@ -199,7 +199,7 @@ class RelativeTime(JSONField):
         if isinstance(value, basestring):
             return self.isotime_to_timedelta(value)
 
-        msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self._name, value)
+        msg = "RelativeTime Field {0} has bad value '{1!r}'".format(self.name, value)
         raise TypeError(msg)
 
     def to_json(self, value):

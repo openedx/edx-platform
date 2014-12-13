@@ -7,7 +7,9 @@ import xblock.reference.plugins
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.api import course_tag as user_course_tag_api
+from xblock.core import XBlockAside
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -87,8 +89,8 @@ class LmsHandlerUrls(object):
             view_name = 'xblock_handler_noauth'
 
         url = reverse(view_name, kwargs={
-            'course_id': self.course_id.to_deprecated_string(),
-            'usage_id': quote_slashes(block.scope_ids.usage_id.to_deprecated_string().encode('utf-8')),
+            'course_id': unicode(self.course_id),
+            'usage_id': quote_slashes(unicode(block.scope_ids.usage_id).encode('utf-8')),
             'handler': handler_name,
             'suffix': suffix,
         })
@@ -198,4 +200,50 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
             track_function=kwargs.get('track_function', None),
         )
         services['fs'] = xblock.reference.plugins.FSService()
+        self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
+
+    def wrap_aside(self, block, aside, view, frag, context):
+        """
+        Creates a div which identifies the aside, points to the original block,
+        and writes out the json_init_args into a script tag.
+
+        The default implementation creates a frag to wraps frag w/ a div identifying the xblock. If you have
+        javascript, you'll need to override this impl
+        """
+        extra_data = {
+            'block-id': quote_slashes(unicode(block.scope_ids.usage_id)),
+            'url-selector': 'asideBaseUrl',
+            'runtime-class': 'LmsRuntime',
+        }
+        if self.request_token:
+            extra_data['request-token'] = self.request_token
+
+        return self._wrap_ele(
+            aside,
+            view,
+            frag,
+            extra_data,
+        )
+
+    def get_asides(self, block):
+        """
+        Return all of the asides which might be decorating this `block`.
+
+        Arguments:
+            block (:class:`.XBlock`): The block to render retrieve asides for.
+        """
+
+        config = XBlockAsidesConfig.current()
+
+        if not config.enabled:
+            return []
+
+        if block.scope_ids.block_type in config.disabled_blocks.split():
+            return []
+
+        return [
+            self.get_aside_of_type(block, aside_type)
+            for aside_type, __
+            in XBlockAside.load_classes()
+        ]
