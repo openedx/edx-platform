@@ -424,6 +424,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        pipeline.analytics.track = mock.MagicMock()
         request.user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username(), skip_social_auth=True)
 
@@ -558,6 +559,7 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         request, strategy = self.get_request_and_strategy(
             auth_entry=pipeline.AUTH_ENTRY_LOGIN, redirect_uri='social:complete')
         strategy.backend.auth_complete = mock.MagicMock(return_value=self.fake_auth_complete(strategy))
+        pipeline.analytics.track = mock.MagicMock()
         user = self.create_user_models_for_existing_account(
             strategy, 'user@example.com', 'password', self.get_username())
         self.assert_social_auth_exists_for_user(user, strategy)
