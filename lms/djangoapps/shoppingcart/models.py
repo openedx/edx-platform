@@ -151,6 +151,13 @@ class Order(models.Model):
         return cart_order
 
     @classmethod
+    def does_user_have_cart(cls, user):
+        """
+        Returns a boolean whether a shopping cart (Order) exists for the specified user
+        """
+        return cls.objects.filter(user=user, status='cart').exists()
+
+    @classmethod
     def user_cart_has_items(cls, user, item_types=None):
         """
         Returns true if the user (anonymous user ok) has

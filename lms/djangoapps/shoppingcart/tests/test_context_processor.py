@@ -42,7 +42,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': False})
     def test_no_enable_paid_course_registration(self):
@@ -52,7 +52,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_anonymous_user(self):
@@ -61,7 +61,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         """
         self.request.user = AnonymousUser()
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_no_items_in_cart(self):
@@ -70,7 +70,7 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         """
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertFalse(context['display_shopping_cart'])
+        self.assertFalse(context['should_display_shopping_cart_func']())
 
     @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True, 'ENABLE_PAID_COURSE_REGISTRATION': True})
     def test_items_in_cart(self):
@@ -80,4 +80,4 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
         self.add_to_cart()
         self.request.user = self.user
         context = user_has_cart_context_processor(self.request)
-        self.assertTrue(context['display_shopping_cart'])
+        self.assertTrue(context['should_display_shopping_cart_func']())
