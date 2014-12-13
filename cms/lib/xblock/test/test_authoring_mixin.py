@@ -45,7 +45,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             'Content Groups',
             'Contains Groups for Cohorted Courseware',
             groups,
-            scheme_id = 'cohort'
+            scheme_id='cohort'
         )
         self.course.user_partitions = [self.content_partition]
         self.store.update_item(self.course, self.user.id)
