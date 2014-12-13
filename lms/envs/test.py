@@ -406,3 +406,9 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+# MILESTONES
+FEATURES['MILESTONES_APP'] = True
+
+# ENTRANCE EXAMS
+FEATURES['ENTRANCE_EXAMS'] = True

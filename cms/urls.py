@@ -140,6 +140,15 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
         url(r'^auto_auth$', 'student.views.auto_auth'),
     )
 
+# enable entrance exams
+if settings.FEATURES.get('ENTRANCE_EXAMS'):
+    urlpatterns += (
+        url(r'^course/{}/entrance_exam/?$'.format(settings.COURSE_KEY_PATTERN), 'contentstore.views.entrance_exam'),
+        url(r'^course/{}/entrance_exam/create?$'.format(settings.COURSE_KEY_PATTERN), 'contentstore.views.entrance_exam_create_helper', name='entrance_exam_create_helper'),
+    )
+
+
+
 if settings.DEBUG:
     try:
         from .urls_dev import urlpatterns as dev_urlpatterns

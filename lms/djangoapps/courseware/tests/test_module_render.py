@@ -28,7 +28,7 @@ from courseware.tests.factories import StudentModuleFactory, UserFactory, Global
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE,
-    TEST_DATA_XML_MODULESTORE
+    TEST_DATA_XML_MODULESTORE,TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -40,6 +40,9 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
 from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
+
+if settings.FEATURES.get('ENTRANCE_EXAMS', False) and settings.FEATURES.get('MILESTONES_APP', False):
+    from milestones import api as milestones_api
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -1158,3 +1161,150 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_track_function.assert_called_once_with(request)
 
         mock_track_function.return_value.assert_called_once_with(event_type, event)
+
+
+# @ddt.ddt
+# @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+# class TestEntranceExamGating(LoginEnrollmentTestCase, ModuleStoreTestCase):
+#     """
+#     Tests to verify various Entrance Exam gating/ungating scenarios
+#     """
+#     if settings.FEATURES.get('ENTRANCE_EXAMS', False) and \
+#         settings.FEATURES.get('MILESTONES_APP', False):
+#         def setup_modulestore(self, default_ms, num_finds, num_sends):
+#             self.course_key = self.create_toy_course()
+#             self.chapter = 'Overview'
+#             chapter_url = '%s/%s/%s' % ('/courses', self.course_key, self.chapter)
+#             factory = RequestFactory()
+#             self.request = factory.get(chapter_url)
+#             self.request.user = UserFactory()
+#             self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
+#             with self.modulestore.bulk_operations(self.course_key):
+#                 with check_mongo_calls(num_finds, num_sends):
+#                     self.toy_course = self.store.get_course(self.toy_loc, depth=2)
+#                     self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+#                         self.toy_loc, self.request.user, self.toy_course, depth=2
+#                     )
+#                     self.entrance_exam = self.store.create_item(
+#                         self.request.user.id,
+#                         self.toy_course.id,
+#                         'chapter',
+#                         fields={
+#                             "data": "Entrance Exam",
+#                             "is_entrance_exam": True
+#                         },
+#                     )
+#                     self.entrance_exam.is_entrance_exam = True
+#                     self.toy_course.entrance_exam_enabled = True
+#                     self.toy_course.entrance_exam_id = unicode(self.entrance_exam.location)
+#                     self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+#                         self.toy_course.id,
+#                         self.user,
+#                         self.entrance_exam
+#                     )
+
+#     @ddt.data((ModuleStoreEnum.Type.mongo, 4, 1, 1), (ModuleStoreEnum.Type.split, 1, 1, 2))
+#     @ddt.unpack
+#     def test_toc_entrance_exam_gating(self, default_ms, setup_finds, setup_sends, toc_finds):
+#         with self.store.default_store(default_ms):
+#             self.setup_modulestore(default_ms, setup_finds, setup_sends)
+#             milestone = {
+#                 'name': 'Test Milestone',
+#                 'namespace': '{}.entrance_exams'.format(unicode(self.toy_course.id)),
+#                 'description': 'Testing Courseware Entrance Exam Chapter'
+#             }
+#             milestone = milestones_api.add_milestone(milestone)
+#             milestones_api.add_course_milestone(unicode(self.toy_course.id), 'requires', milestone)
+#             milestones_api.add_course_content_milestone(
+#                 unicode(self.toy_course.id),
+#                 unicode(self.entrance_exam.location),
+#                 'fulfills',
+#                 milestone
+#             )
+
+#             expected_toc = ([{'active': True, 'sections':
+#                           [{'url_name': 'Toy_Videos', 'display_name': u'Toy Videos', 'graded': True,
+#                             'format': u'Lecture Sequence', 'due': None, 'active': False},
+#                            {'url_name': 'Welcome', 'display_name': u'Welcome', 'graded': True,
+#                             'format': '', 'due': None, 'active': False},
+#                            {'url_name': 'video_123456789012', 'display_name': 'Test Video', 'graded': True,
+#                             'format': '', 'due': None, 'active': False},
+#                            {'url_name': 'video_4f66f493ac8f', 'display_name': 'Video', 'graded': True,
+#                             'format': '', 'due': None, 'active': False}],
+#                           'url_name': 'Overview', 'display_name': u'Overview'},
+#                          {'active': False, 'sections':
+#                           [{'url_name': 'toyvideo', 'display_name': 'toyvideo', 'graded': True,
+#                             'format': '', 'due': None, 'active': False}],
+#                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
+#             actual_toc = render.toc_for_course(
+#                 self.request, self.toy_course, self.entrance_exam, None, self.field_data_cache
+#             )
+#             print actual_toc
+#             self.assertEqual(len(actual_toc), 1)
+#             for toc_section in expected:
+#                 self.assertIn(toc_section, actual_toc)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
+class TestEntranceExamGating(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    if settings.FEATURES.get('ENTRANCE_EXAMS', False) and \
+        settings.FEATURES.get('MILESTONES_APP', False):
+
+        def setUp(self):
+            self.course = CourseFactory.create()
+            self.instructor_tab = ItemFactory.create(
+                category="instructor", parent_location=self.course.location,
+                data="Instructor Tab", display_name="Instructor"
+            )
+            self.extra_tab_2 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 2"
+            )
+            self.extra_tab_3 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 3"
+            )
+            self.setup_user()
+            self.enroll(self.course)
+            self.user.is_staff = True
+            factory = RequestFactory()
+            self.request = factory.get('/')
+            self.request.user = UserFactory()
+
+
+        def test_get_course_tabs_list_entrance_exam_enabled(self):
+
+            self.entrance_exam = ItemFactory.create(
+                category="chapter", parent_location=self.course.location,
+                data="Exam Data", display_name="Entrance Exam"
+            )
+            self.entrance_exam.is_entrance_exam = True
+            milestone = {
+                'name': 'Test Milestone',
+                'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+                'description': 'Testing Courseware Tabs'
+            }
+            self.course.entrance_exam_enabled = True
+            self.course.entrance_exam_id = unicode(self.entrance_exam.location)
+            self.field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.course.id,
+                self.user,
+                self.entrance_exam
+            )
+            milestone = milestones_api.add_milestone(milestone)
+            milestones_api.add_course_milestone(unicode(self.course.id), 'requires', milestone)
+            milestones_api.add_course_content_milestone(
+                unicode(self.course.id),
+                unicode(self.entrance_exam.location),
+                'fulfills',
+                milestone
+            )
+            actual_toc = render.toc_for_course(
+                self.request,
+                self.course,
+                self.entrance_exam,
+                self.entrance_exam,
+                self.field_data_cache
+            )
+            print len(actual_toc)
+            assert 0
