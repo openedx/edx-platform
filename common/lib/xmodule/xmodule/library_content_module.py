@@ -5,7 +5,6 @@ LibraryContent: The XBlock used to include blocks from a library in a course.
 from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
-import hashlib
 from .mako_module import MakoModuleDescriptor
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator
@@ -14,7 +13,6 @@ from webob import Response
 from xblock.core import XBlock
 from xblock.fields import Scope, String, List, Integer, Boolean
 from xblock.fragment import Fragment
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.validation import StudioValidationMessage, StudioValidation
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
@@ -163,29 +161,8 @@ class LibraryContentFields(object):
     has_children = True
 
 
-def _get_library(modulestore, library_key):
-    """
-    Given a library key like "library-v1:ProblemX+PR0B", return the
-    'library' XBlock with meta-information about the library.
-
-    Returns None on error.
-    """
-    if not isinstance(library_key, LibraryLocator):
-        library_key = LibraryLocator.from_string(library_key)
-    assert library_key.version_guid is None
-
-    # TODO: Is this too tightly coupled to split? May need to abstract this into a service
-    # provided by the CMS runtime.
-    try:
-        library = modulestore.get_library(library_key, remove_version=False)
-    except ItemNotFoundError:
-        return None
-    # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
-    assert library.location.library_key.version_guid is not None
-    return library
-
-
 #pylint: disable=abstract-method
+@XBlock.wants('library_tools')  # Only needed in studio
 class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     """
     An XBlock whose children are chosen dynamically from a content library.
@@ -289,10 +266,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         else:
             # When shown on a unit page, don't show any sort of preview - just the status of this block.
             library_names = []
+            lib_tools = self.runtime.service(self, 'library_tools')
             for library_key, version in self.source_libraries:  # pylint: disable=unused-variable
-                library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
-                if library is not None:
-                    library_names.append(library.display_name)
+                lib_name = lib_tools.get_library_display_name(library_key)
+                if lib_name is not None:
+                    library_names.append(lib_name)
 
             if library_names:
                 fragment.add_content(self.system.render_template('library-block-author-view.html', {
@@ -313,6 +291,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
 
 @XBlock.wants('user')
+@XBlock.wants('library_tools')  # Only needed in studio
 class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDescriptor, StudioEditableDescriptor):
     """
     Descriptor class for LibraryContentModule XBlock.
@@ -339,69 +318,10 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         If update_db is True (default), this will explicitly persist the changes
         to the modulestore by calling update_item()
         """
+        lib_tools = self.runtime.service(self, 'library_tools')
         user_service = self.runtime.service(self, 'user')
         user_id = user_service.user_id if user_service else None  # May be None when creating bok choy test fixtures
-        root_children = []
-
-        store = self.system.modulestore
-        with store.bulk_operations(self.location.course_key):
-            # Currently, ALL children are essentially deleted and then re-added
-            # in a way that preserves their block_ids (and thus should preserve
-            # student data, grades, analytics, etc.)
-            # Once course-level field overrides are implemented, this will
-            # change to a more conservative implementation.
-
-            # First, delete all our existing children to avoid block_id conflicts when we add them:
-            for child in self.children:  # pylint: disable=access-member-before-definition
-                store.delete_item(child, user_id)
-
-            # Now add all matching children, and record the library version we use:
-            new_libraries = []
-            for library_key, old_version in self.source_libraries:  # pylint: disable=unused-variable
-                library = _get_library(self.system.modulestore, library_key)  # pylint: disable=protected-access
-                if library is None:
-                    raise ValueError("Required library not found.")
-
-                def copy_children_recursively(from_block):
-                    """
-                    Internal method to copy blocks from the library recursively
-                    """
-                    new_children = []
-                    for child_key in from_block.children:
-                        child = store.get_item(child_key, depth=9)
-                        # We compute a block_id for each matching child block found in the library.
-                        # block_ids are unique within any branch, but are not unique per-course or globally.
-                        # We need our block_ids to be consistent when content in the library is updated, so
-                        # we compute block_id as a hash of three pieces of data:
-                        unique_data = "{}:{}:{}".format(
-                            self.location.block_id,  # Must not clash with other usages of the same library in this course
-                            unicode(library_key.for_version(None)).encode("utf-8"),  # The block ID below is only unique within a library, so we need this too
-                            child_key.block_id,  # Child block ID. Should not change even if the block is edited.
-                        )
-                        child_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
-                        fields = {}
-                        for field in child.fields.itervalues():
-                            if field.scope == Scope.settings and field.is_set_on(child):
-                                fields[field.name] = field.read_from(child)
-                        if child.has_children:
-                            fields['children'] = copy_children_recursively(from_block=child)
-                        new_child_info = store.create_item(
-                            user_id,
-                            self.location.course_key,
-                            child_key.block_type,
-                            block_id=child_block_id,
-                            definition_locator=child.definition_locator,
-                            runtime=self.system,
-                            fields=fields,
-                        )
-                        new_children.append(new_child_info.location)
-                    return new_children
-                root_children.extend(copy_children_recursively(from_block=library))
-                new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
-            self.source_libraries = new_libraries
-            self.children = root_children  # pylint: disable=attribute-defined-outside-init
-            if update_db:
-                self.system.modulestore.update_item(self, user_id)
+        lib_tools.update_children(self, user_id, update_db)
         return Response()
 
     def validate(self):
@@ -423,10 +343,10 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 )
             )
             return validation
+        lib_tools = self.runtime.service(self, 'library_tools')
         for library_key, version in self.source_libraries:
-            library = _get_library(self.runtime.modulestore, library_key)
-            if library is not None:
-                latest_version = library.location.library_key.version_guid
+            latest_version = lib_tools.get_library_version(library_key)
+            if latest_version is not None:
                 if version is None or version != latest_version:
                     validation.set_summary(
                         StudioValidationMessage(
