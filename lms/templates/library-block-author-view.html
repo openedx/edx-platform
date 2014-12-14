@@ -1,6 +1,10 @@
 <%!
-from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 %>
 <div class="xblock-header-secondary">
-    <p>${_('This component will be replaced by {max_count} component[s] randomly chosen from the {num_children} matching components in {lib_names}.').format(mode=mode, max_count=max_count, num_children=num_children, lib_names=', '.join(library_names))}</p>
+    <p>${ungettext(
+        'This component will be replaced by {max_count} component randomly chosen from the {num_children} matching components in {lib_names}.',
+        'This component will be replaced by {max_count} components randomly chosen from the {num_children} matching components in {lib_names}.',
+        max_count
+    ).format(max_count=max_count, num_children=num_children, lib_names=', '.join(library_names))}</p>
 </div>
