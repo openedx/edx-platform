@@ -3,6 +3,7 @@ Tests for the Shopping Cart Models
 """
 from decimal import Decimal
 import datetime
+import os
 
 import smtplib
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
@@ -233,7 +234,10 @@ class OrderTest(ModuleStoreTestCase):
         item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
         # course enrollment object should be created but still inactive
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course_key))
-        cart.purchase()
+        # the analytics client pipes output to stderr when using the default client
+        devnull = open(os.devnull, 'w')
+        with patch('sys.stderr', devnull):
+            cart.purchase()
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
 
         # test e-mail sending
