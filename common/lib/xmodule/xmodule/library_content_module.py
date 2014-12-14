@@ -264,49 +264,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
     def validate(self):
         """
-        Validates the state of this Library Content Module Instance. This
-        is the override of the general XBlock method, and it will also ask
-        its superclass to validate.
+        Validates the state of this Library Content Module Instance.
         """
-        validation = super(LibraryContentModule, self).validate()
-        if not isinstance(validation, StudioValidation):
-            validation = StudioValidation.copy(validation)
-        if not self.source_libraries:
-            validation.set_summary(
-                StudioValidationMessage(
-                    StudioValidationMessage.NOT_CONFIGURED,
-                    _(u"A library has not yet been selected."),
-                    action_class='edit-button',
-                    action_label=_(u"Select a Library")
-                )
-            )
-            return validation
-        for library_key, version in self.source_libraries:
-            library = _get_library(self.runtime.descriptor_runtime.modulestore, library_key)
-            if library is not None:
-                latest_version = library.location.library_key.version_guid
-                if version is None or version != latest_version:
-                    validation.set_summary(
-                        StudioValidationMessage(
-                            StudioValidationMessage.WARNING,
-                            _(u'This component is out of date. The library has new content.'),
-                            action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
-                            action_label=_(u"↻ Update now")
-                        )
-                    )
-                    break
-            else:
-                validation.set_summary(
-                    StudioValidationMessage(
-                        StudioValidationMessage.ERROR,
-                        _(u'Library is invalid, corrupt, or has been deleted.'),
-                        action_class='edit-button',
-                        action_label=_(u"Edit Library List")
-                    )
-                )
-                break
-
-        return validation
+        return self.descriptor.validate()
 
     def author_view(self, context):
         """
@@ -443,6 +403,52 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             if update_db:
                 self.system.modulestore.update_item(self, user_id)
         return Response()
+
+    def validate(self):
+        """
+        Validates the state of this Library Content Module Instance. This
+        is the override of the general XBlock method, and it will also ask
+        its superclass to validate.
+        """
+        validation = super(LibraryContentDescriptor, self).validate()
+        if not isinstance(validation, StudioValidation):
+            validation = StudioValidation.copy(validation)
+        if not self.source_libraries:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.NOT_CONFIGURED,
+                    _(u"A library has not yet been selected."),
+                    action_class='edit-button',
+                    action_label=_(u"Select a Library")
+                )
+            )
+            return validation
+        for library_key, version in self.source_libraries:
+            library = _get_library(self.runtime.modulestore, library_key)
+            if library is not None:
+                latest_version = library.location.library_key.version_guid
+                if version is None or version != latest_version:
+                    validation.set_summary(
+                        StudioValidationMessage(
+                            StudioValidationMessage.WARNING,
+                            _(u'This component is out of date. The library has new content.'),
+                            action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                            action_label=_(u"↻ Update now")
+                        )
+                    )
+                    break
+            else:
+                validation.set_summary(
+                    StudioValidationMessage(
+                        StudioValidationMessage.ERROR,
+                        _(u'Library is invalid, corrupt, or has been deleted.'),
+                        action_class='edit-button',
+                        action_label=_(u"Edit Library List")
+                    )
+                )
+                break
+
+        return validation
 
     def editor_saved(self, user, old_metadata, old_content):
         """
