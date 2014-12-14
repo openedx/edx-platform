@@ -14,6 +14,7 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from opaque_keys.edx.keys import UsageKey
 from xmodule.x_module import ModuleSystem
@@ -177,6 +178,7 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "i18n": ModuleI18nService(),
             "field-data": field_data,
+            "library_tools": LibraryToolsService(modulestore()),
         },
     )
 

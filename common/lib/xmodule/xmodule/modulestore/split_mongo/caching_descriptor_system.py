@@ -6,6 +6,7 @@ from lazy import lazy
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
 from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
+from xmodule.library_tools import LibraryToolsService
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -71,6 +72,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.module_data = module_data
         self.default_class = default_class
         self.local_modules = {}
+        self._services['library_tools'] = LibraryToolsService(modulestore)
 
     @lazy
     @contract(returns="dict(BlockKey: BlockKey)")
