@@ -73,6 +73,19 @@ class TestLibraries(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         return modulestore().get_item(lib_content_block.location)
 
+    def _update_item(self, usage_key, metadata):
+        """
+        Helper method: Uses the REST API to update the fields of an XBlock.
+        This will result in the XBlock's editor_saved() method being called.
+        """
+        update_url = reverse_usage_url("xblock_handler", usage_key)
+        return self.client.ajax_post(
+            update_url,
+            data={
+                'metadata': metadata,
+            }
+        )
+
     @ddt.data(
         (2, 1, 1),
         (2, 2, 2),
@@ -254,3 +267,39 @@ class TestLibraries(ModuleStoreTestCase):
 
         self.assertEqual(course_child_block.data, data_value)
         self.assertEqual(course_child_block.display_name, name_value)
+
+    def test_change_after_first_sync(self):
+        """
+        Check that nothing goes wrong if we (A) Set up a LibraryContent block
+        and use it successfully, then (B) Give it an invalid configuration.
+        No children should be deleted until the configuration is fixed.
+        """
+        # Add a block to the library:
+        data_value = "Hello world!"
+        ItemFactory.create(
+            category="html",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+            display_name="HTML BLock",
+            data=data_value,
+        )
+        # Create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add a LibraryContent block to the course:
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 1)
+
+        # Now, change the block settings to have an invalid library key:
+        resp = self._update_item(
+            lc_block.location,
+            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+        )
+        self.assertEqual(resp.status_code, 200)
+        lc_block = modulestore().get_item(lc_block.location)
+        self.assertEqual(len(lc_block.children), 1)  # Children should not be deleted due to a bad setting.
+        html_block = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block.data, data_value)
