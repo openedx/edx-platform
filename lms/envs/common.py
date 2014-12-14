@@ -1576,18 +1576,16 @@ INSTALLED_APPS = (
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
 MKTG_URLS = {}
 MKTG_URL_LINK_MAP = {
-    'ABOUT': 'about_edx',
+    'ABOUT': 'about',
     'CONTACT': 'contact',
-    'FAQ': 'help_edx',
+    'FAQ': 'help',
     'COURSES': 'courses',
     'ROOT': 'root',
     'TOS': 'tos',
     'HONOR': 'honor',
-    'PRIVACY': 'privacy_edx',
-    'JOBS': 'jobs',
-    'NEWS': 'news',
+    'PRIVACY': 'privacy',
     'PRESS': 'press',
-    'BLOG': 'edx-blog',
+    'BLOG': 'blog',
     'DONATE': 'donate',
 
     # Verified Certificates
