@@ -18,6 +18,8 @@ import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
+from django.core.urlresolvers import reverse
+
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
 FEATURES_WO_STARTDATE = settings.FEATURES.copy()
@@ -140,6 +142,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.factory = RequestFactory()
 
     @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.render_to_response', RENDER_MOCK)
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
@@ -151,13 +154,36 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
         self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
 
+        # check the /courses view
+        response = self.client.get(reverse('branding.views.courses'))
+        self.assertEqual(response.status_code, 200)
+        ((template, context), _) = RENDER_MOCK.call_args
+        self.assertEqual(template, 'courseware/courses.html')
+
+        # Now the courses will be stored in their announcement dates.
+        self.assertEqual(context['courses'][0].id, self.starting_later.id)
+        self.assertEqual(context['courses'][1].id, self.starting_earlier.id)
+        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+
     @patch('student.views.render_to_response', RENDER_MOCK)
+    @patch('courseware.views.render_to_response', RENDER_MOCK)
     @patch.dict('django.conf.settings.FEATURES', {'ENABLE_COURSE_SORTING_BY_START_DATE': True})
     def test_course_cards_sorted_by_start_date_show_earliest_first(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         ((template, context), _) = RENDER_MOCK.call_args
         self.assertEqual(template, 'index.html')
+
+        # now the courses will be sorted by their creation dates, earliest first.
+        self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
+        self.assertEqual(context['courses'][1].id, self.starting_later.id)
+        self.assertEqual(context['courses'][2].id, self.course_with_default_start_date.id)
+
+        # check the /courses view as well
+        response = self.client.get(reverse('branding.views.courses'))
+        self.assertEqual(response.status_code, 200)
+        ((template, context), _) = RENDER_MOCK.call_args
+        self.assertEqual(template, 'courseware/courses.html')
 
         # now the courses will be sorted by their creation dates, earliest first.
         self.assertEqual(context['courses'][0].id, self.starting_earlier.id)
