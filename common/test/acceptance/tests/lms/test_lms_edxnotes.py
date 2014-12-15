@@ -403,7 +403,6 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self._add_default_notes()
         self.notes_page.visit().switch_to_tab("structure")
 
-        import ipdb; ipdb.set_trace()
         notes = self.notes_page.notes
         groups = self.notes_page.groups
         self.assertEqual(len(notes), 5)

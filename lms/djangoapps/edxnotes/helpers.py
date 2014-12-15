@@ -226,7 +226,7 @@ def get_ancestor_context(course, item, ancestor=None):
         })
 
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
+        item_dict['children'] = [child.location.to_deprecated_string() for child in item.get_children()]
 
     return item_dict
 
