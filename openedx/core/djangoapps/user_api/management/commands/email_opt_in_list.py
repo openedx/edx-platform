@@ -22,6 +22,7 @@ The command will always use the read replica database if one is configured.
 import os.path
 import csv
 import time
+import datetime
 import contextlib
 import logging
 
@@ -48,12 +49,15 @@ class Command(BaseCommand):
         "full_name",
         "course_id",
         "is_opted_in_for_email",
-        "preference_set_date"
+        "preference_set_datetime"
     ]
 
     # Number of records to read at a time when making
     # multiple queries over a potentially large dataset.
     QUERY_INTERVAL = 1000
+
+    # Default datetime if the user has not set a preference
+    DEFAULT_DATETIME_STR = datetime.datetime(year=2014, month=12, day=1).isoformat(' ')
 
     def handle(self, *args, **options):
         """Execute the command.
@@ -183,6 +187,8 @@ class Command(BaseCommand):
 
         """
         writer = csv.DictWriter(file_handle, fieldnames=self.OUTPUT_FIELD_NAMES)
+        writer.writeheader()
+
         cursor = self._db_cursor()
         query = (
             u"""
@@ -207,7 +213,7 @@ class Command(BaseCommand):
                     AND `user_id`=user.`id`
                     ORDER BY modified DESC
                     LIMIT 1
-                ) AS `preference_set_date`
+                ) AS `preference_set_datetime`
             FROM
                 student_courseenrollment AS enrollment
                 LEFT JOIN auth_user AS user ON user.id=enrollment.user_id
@@ -222,13 +228,13 @@ class Command(BaseCommand):
         cursor.execute(query)
         row_count = 0
         for row in self._iterate_results(cursor):
-            email, full_name, course_id, is_opted_in, pref_set_date = row
+            email, full_name, course_id, is_opted_in, pref_set_datetime = row
             writer.writerow({
                 "email": email.encode('utf-8'),
                 "full_name": full_name.encode('utf-8'),
                 "course_id": course_id.encode('utf-8'),
                 "is_opted_in_for_email": is_opted_in if is_opted_in else "True",
-                "preference_set_date": pref_set_date,
+                "preference_set_datetime": pref_set_datetime if pref_set_datetime else self.DEFAULT_DATETIME_STR,
             })
             row_count += 1
 

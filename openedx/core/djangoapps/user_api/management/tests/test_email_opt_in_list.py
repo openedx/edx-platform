@@ -45,8 +45,10 @@ class EmailOptInListTest(ModuleStoreTestCase):
         "full_name",
         "course_id",
         "is_opted_in_for_email",
-        "preference_set_date"
+        "preference_set_datetime"
     ]
+
+    DEFAULT_DATETIME_STR = "2014-12-01 00:00:00"
 
     def setUp(self):
         self.user = UserFactory.create(
@@ -299,7 +301,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
         """
         profile_api.update_email_opt_in(user.username, org, is_opted_in)
 
-    def _latest_pref_set_date(self, user):
+    def _latest_pref_set_datetime(self, user):
         """Retrieve the latest opt-in preference for the user,
         across all orgs and preference keys.
 
@@ -307,11 +309,11 @@ class EmailOptInListTest(ModuleStoreTestCase):
             user (User): The user whos preference was set.
 
         Returns:
-            ISO-formatted date string or empty string
+            ISO-formatted datetime string or empty string
 
         """
         pref = UserOrgTag.objects.filter(user=user).order_by("-modified")
-        return pref[0].modified.isoformat(' ') if len(pref) > 0 else ""
+        return pref[0].modified.isoformat(' ') if len(pref) > 0 else self.DEFAULT_DATETIME_STR
 
     def _run_command(self, org, other_names=None, only_courses=None, query_interval=None):
         """Execute the management command to generate the email opt-in list.
@@ -374,8 +376,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             *args: Tuples of (user, course_id, opt_in_pref)
 
         Keyword Arguments:
-            expect_pref_datetime (bool): If false, expect an empty
-                string for the preference.
+            expect_pref_datetime (bool): If false, expect the default datetime.
 
         Returns:
             None
@@ -384,16 +385,27 @@ class EmailOptInListTest(ModuleStoreTestCase):
             AssertionError
 
         """
-        self.assertEqual(len(output), len(args))
+        self.assertEqual(len(output), len(args) + 1)
+
+        # Check the header row
+        self.assertEqual({
+            "email": "email",
+            "full_name": "full_name",
+            "course_id": "course_id",
+            "is_opted_in_for_email": "is_opted_in_for_email",
+            "preference_set_datetime": "preference_set_datetime"
+        }, output[0])
+
+        # Check data rows
         for user, course_id, opt_in_pref in args:
             self.assertIn({
                 "email": user.email.encode('utf-8'),
                 "full_name": user.profile.name.encode('utf-8'),
                 "course_id": unicode(course_id).encode('utf-8'),
                 "is_opted_in_for_email": unicode(opt_in_pref),
-                "preference_set_date": (
-                    self._latest_pref_set_date(self.user)
+                "preference_set_datetime": (
+                    self._latest_pref_set_datetime(self.user)
                     if kwargs.get("expect_pref_datetime", True)
-                    else ""
+                    else self.DEFAULT_DATETIME_STR
                 )
-            }, output)
+            }, output[1:])
