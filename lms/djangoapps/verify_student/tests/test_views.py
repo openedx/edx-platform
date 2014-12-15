@@ -14,7 +14,6 @@ import json
 import mock
 import urllib
 import decimal
-import unittest
 from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime
@@ -79,6 +78,10 @@ class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course registration process
     """
+
+    # Minimum size valid image data
+    IMAGE_DATA = ','
+
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
@@ -103,79 +106,61 @@ class TestCreateOrderView(ModuleStoreTestCase):
         )
 
     def test_invalid_photos_data(self):
-        """
-        Test that the invalid photo data cannot be submitted
-        """
-        create_order_post_data = {
-            'contribution': 50,
-            'course_id': self.course_id,
-            'face_image': '',
-            'photo_id_image': ''
-        }
-        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
-        json_response = json.loads(response.content)
-        self.assertFalse(json_response.get('success'))
+        self._create_order(
+            50,
+            self.course_id,
+            face_image='',
+            photo_id_image='',
+            expect_success=False
+        )
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_amount(self):
-        """
-        Test that the user cannot give invalid amount
-        """
-        create_order_post_data = {
-            'contribution': '1.a',
-            'course_id': self.course_id,
-            'face_image': ',',
-            'photo_id_image': ','
-        }
-        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
-        self.assertEquals(response.status_code, 400)
+        response = self._create_order(
+            '1.a',
+            self.course_id,
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            expect_status_code=400
+        )
         self.assertIn('Selected price is not valid number.', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_invalid_mode(self):
-        """
-        Test that the course without verified mode cannot be processed
-        """
+        # Create a course that does not have a verified mode
         course_id = 'Fake/999/Test_Course'
         CourseFactory.create(org='Fake', number='999', display_name='Test Course')
-        create_order_post_data = {
-            'contribution': '50',
-            'course_id': course_id,
-            'face_image': ',',
-            'photo_id_image': ','
-        }
-        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
-        self.assertEquals(response.status_code, 400)
+        response = self._create_order(
+            '50',
+            course_id,
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA,
+            expect_status_code=400
+        )
         self.assertIn('This course doesn\'t support verified certificates', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_fail_with_get(self):
-        """
-        Test that create_order will not work if wrong http method used
-        """
         create_order_post_data = {
             'contribution': 50,
             'course_id': self.course_id,
-            'face_image': ',',
-            'photo_id_image': ','
+            'face_image': self.IMAGE_DATA,
+            'photo_id_image': self.IMAGE_DATA,
         }
+
+        # Use the wrong HTTP method
         response = self.client.get(reverse('verify_student_create_order'), create_order_post_data)
         self.assertEqual(response.status_code, 405)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_success(self):
-        """
-        Test that the order is created successfully when given valid data
-        """
-        create_order_post_data = {
-            'contribution': 50,
-            'course_id': self.course_id,
-            'face_image': ',',
-            'photo_id_image': ','
-        }
-        response = self.client.post(reverse('verify_student_create_order'), create_order_post_data)
+        response = self._create_order(
+            50,
+            self.course_id,
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA
+        )
         json_response = json.loads(response.content)
-        self.assertTrue(json_response.get('success'))
         self.assertIsNotNone(json_response.get('orderNumber'))
 
         # Verify that the order exists and is configured correctly
@@ -199,12 +184,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         "AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING": True
     })
     def test_create_order_skip_photo_submission(self):
-        create_order_post_data = {
-            'contribution': 50,
-            'course_id': self.course_id,
-        }
-        url = reverse('verify_student_create_order')
-        response = self.client.post(url, create_order_post_data)
+        self._create_order(50, self.course_id)
 
         # Without the face image and photo id image params,
         # don't create the verification attempt.
@@ -213,11 +193,59 @@ class TestCreateOrderView(ModuleStoreTestCase):
         )
 
         # Now submit *with* the params
-        create_order_post_data['face_image'] = ','
-        create_order_post_data['photo_id_image'] = ','
-        response = self.client.post(url, create_order_post_data)
+        self._create_order(
+            50, self.course_id,
+            face_image=self.IMAGE_DATA,
+            photo_id_image=self.IMAGE_DATA
+        )
         attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
         self.assertEqual(attempt.status, "ready")
+
+    def _create_order(
+        self, contribution, course_id,
+        face_image=None,
+        photo_id_image=None,
+        expect_success=True,
+        expect_status_code=200
+    ):
+        """Create a new order.
+
+        Arguments:
+            contribution (int): The contribution amount.
+            course_id (CourseKey): The course to purchase.
+
+        Keyword Arguments:
+            face_image (string): Base-64 encoded image data
+            photo_id_image (string): Base-64 encoded image data
+            expect_success (bool): If True, verify that the response was successful.
+            expect_status_code (int): The expected HTTP status code
+
+        Returns:
+            HttpResponse
+
+        """
+        url = reverse('verify_student_create_order')
+        data = {
+            'contribution': contribution,
+            'course_id': course_id
+        }
+
+        if face_image is not None:
+            data['face_image'] = face_image
+        if photo_id_image is not None:
+            data['photo_id_image'] = photo_id_image
+
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, expect_status_code)
+
+        if expect_status_code == 200:
+            json_response = json.loads(response.content)
+            if expect_success:
+                self.assertTrue(json_response.get('success'))
+            else:
+                self.assertFalse(json_response.get('success'))
+
+        return response
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -813,7 +841,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
     def test_submit_photos(self):
         # Submit the photos
-        response = self._submit_photos(
+        self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA
         )
@@ -827,7 +855,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
     def test_submit_photos_and_change_name(self):
         # Submit the photos, along with a name change
-        response = self._submit_photos(
+        self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
             full_name=self.FULL_NAME
@@ -909,6 +937,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
         """
         info = profile_api.profile_info(self.user.username)
         self.assertEqual(info['full_name'], full_name)
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
@@ -1374,7 +1403,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         ]
 
         for page_name in pages:
-            response = self._get_page(
+            self._get_page(
                 page_name,
                 course.id,
                 expected_status_code=404
@@ -1422,7 +1451,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         for course_mode in course_modes:
             min_price = (self.MIN_PRICE if course_mode != "honor" else 0)
-            mode = CourseModeFactory(
+            CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
@@ -1534,16 +1563,20 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         }
 
     def _assert_redirects_to_dashboard(self, response):
+        """Check that the page redirects to the student dashboard. """
         self.assertRedirects(response, reverse('dashboard'))
 
     def _assert_redirects_to_start_flow(self, response, course_id):
+        """Check that the page redirects to the start of the payment/verification flow. """
         url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)
 
     def _assert_redirects_to_verify_later(self, response, course_id):
+        """Check that the page redirects to the "verify later" part of the flow. """
         url = reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)
 
     def _assert_redirects_to_upgrade(self, response, course_id):
+        """Check that the page redirects to the "upgrade" part of the flow. """
         url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)

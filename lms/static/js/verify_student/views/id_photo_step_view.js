@@ -19,7 +19,7 @@ var edx = edx || {};
                 errorModel: this.errorModel
             }).render();
 
-            $('#next_step_button').click( _.bind( this.nextStep, this ) );
+            $('#next_step_button').on( 'click', _.bind( this.nextStep, this ) );
         },
     });
 

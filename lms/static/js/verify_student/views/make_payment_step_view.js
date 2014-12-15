@@ -12,10 +12,10 @@ var edx = edx || {};
 
         postRender: function() {
             // Enable the payment button once an amount is chosen
-            $( "input[name='contribution']" ).click( _.bind( this.enablePaymentButton, this ) );
+            $( "input[name='contribution']" ).on( 'click', _.bind( this.enablePaymentButton, this ) );
 
             // Handle payment submission
-            $( "#pay_button" ).click( _.bind( this.createOrder, this ) );
+            $( "#pay_button" ).on( 'click', _.bind( this.createOrder, this ) );
         },
 
         enablePaymentButton: function() {
@@ -23,14 +23,11 @@ var edx = edx || {};
         },
 
         createOrder: function() {
-            var paymentAmount, postData;
-
-            paymentAmount = this.getPaymentAmount();
-
-            postData = {
-                'contribution': paymentAmount,
-                'course_id': this.stepData.courseKey,
-            };
+            var paymentAmount = this.getPaymentAmount(),
+                postData = {
+                    'contribution': paymentAmount,
+                    'course_id': this.stepData.courseKey,
+                };
 
             // Disable the payment button to prevent multiple submissions
             $("#pay_button").addClass("is-disabled");
@@ -51,15 +48,13 @@ var edx = edx || {};
         },
 
         handleCreateOrderResponse: function( paymentParams ) {
-            var form;
-
             // At this point, the order has been created on the server,
             // and we've received signed payment parameters.
             // We need to dynamically construct a form using
             // these parameters, then submit it to the payment processor.
             // This will send the user to a hosted order page,
             // where she can enter credit card information.
-            form = $( "#payment-processor-form" );
+            var form = $( "#payment-processor-form" );
 
             $( "input", form ).remove();
 
@@ -84,8 +79,7 @@ var edx = edx || {};
                     errorMsg: xhr.responseText,
                     shown: true
                 });
-            }
-            else {
+            } else {
                 this.errorModel.set({
                     errorTitle: gettext( 'Could not submit order' ),
                     errorMsg: gettext( 'An unexpected error occurred.  Please try again' ),
@@ -102,8 +96,7 @@ var edx = edx || {};
 
             if ( contributionInput.attr('id') === 'contribution-other' ) {
                 return $( "input[name='contribution-other-amt']", this.el ).val();
-            }
-            else {
+            } else {
                 return contributionInput.val();
             }
         }

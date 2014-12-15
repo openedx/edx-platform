@@ -29,10 +29,25 @@ var edx = edx || {};
         initialize: function( obj ) {
             this.errorModel = obj.errorModel || {};
             this.displaySteps = obj.displaySteps || [];
-            this.initializeSubviews( obj.currentStep, obj.stepInfo );
+
+            // Determine which step we're starting on
+            // Depending on how the user enters the flow,
+            // this could be anywhere in the sequence of steps.
+            this.currentStepIndex = _.indexOf(
+                _.pluck( this.displaySteps, 'name' ),
+                obj.currentStep
+            );
+
+            this.progressView = new edx.verify_student.ProgressView({
+                el: this.el,
+                displaySteps: this.displaySteps,
+                currentStepIndex: this.currentStepIndex
+            });
+
+            this.initializeStepViews( obj.stepInfo );
         },
 
-        initializeSubviews: function( currentStep, stepInfo ) {
+        initializeStepViews: function( stepInfo ) {
             var i,
                 stepName,
                 stepData,
@@ -41,14 +56,6 @@ var edx = edx || {};
                 nextStepTitle,
                 subviewConstructors,
                 verificationModel;
-
-            // Determine which step we're starting on
-            // Depending on how the user enters the flow,
-            // this could be anywhere in the sequence of steps.
-            this.currentStepIndex = _.indexOf(
-                _.pluck( this.displaySteps, 'name' ),
-                currentStep
-            );
 
             // We need to initialize this here, because
             // outside of this method the subview classes
@@ -75,8 +82,7 @@ var edx = edx || {};
 
                 if ( i < this.displaySteps.length - 1) {
                     nextStepTitle = this.displaySteps[i + 1].title;
-                }
-                else {
+                } else {
                     nextStepTitle = "";
                 }
 
@@ -115,20 +121,9 @@ var edx = edx || {};
         },
 
         render: function() {
-            this.renderProgress();
+            this.progressView.render();
             this.renderCurrentStep();
             return this;
-        },
-
-        renderProgress: function() {
-            var renderedHtml, context;
-
-            context = {
-                steps: this.steps()
-            };
-
-            renderedHtml = _.template( $(this.template).html(), context );
-            $(this.el).html(renderedHtml);
         },
 
         renderCurrentStep: function() {
@@ -168,22 +163,6 @@ var edx = edx || {};
             }
         },
 
-        steps: function() {
-            var i,
-                stepDescription,
-                steps = [];
-
-            for ( i = 0; i < this.displaySteps.length; i++ ) {
-                stepDescription = {
-                    title: this.displaySteps[i].title,
-                    isCurrent: (i === this.currentStepIndex ),
-                    isComplete: (i < this.currentStepIndex )
-                };
-                steps.push(stepDescription);
-            }
-
-            return steps;
-        }
     });
 
 })(jQuery, _, Backbone, gettext);

@@ -101,7 +101,7 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         # a "verified" track.
         url(
             r'^start-flow/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-            views.PayAndVerifyView.as_view(),
+            views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
             name="verify_student_start_flow",
             kwargs={
                 'message': PayAndVerifyView.FIRST_TIME_VERIFY_MSG
@@ -113,7 +113,7 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         # except with slight messaging changes.
         url(
             r'^upgrade/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-            views.PayAndVerifyView.as_view(),
+            views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
             name="verify_student_upgrade_and_verify",
             kwargs={
                 'message': PayAndVerifyView.UPGRADE_MSG
@@ -128,7 +128,7 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         # to the dashboard.
         url(
             r'^verify-now/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-            views.PayAndVerifyView.as_view(),
+            views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
             name="verify_student_verify_now",
             kwargs={
                 'always_show_payment': True,
@@ -138,13 +138,13 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         ),
 
         # The user has paid and still needs to verify,
-        # but the user is NOT arriving directly from the payment flow.
+        # but the user is NOT arriving directly from the paymen104ggt flow.
         # This is equivalent to starting a new flow
         # with the payment steps and requirements hidden
         # (since the user already paid).
         url(
             r'^verify-later/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-            views.PayAndVerifyView.as_view(),
+            views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
             name="verify_student_verify_later",
             kwargs={
                 'message': PayAndVerifyView.VERIFY_LATER_MSG
@@ -156,7 +156,7 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         # once the order has been fulfilled.
         url(
             r'^payment-confirmation/{course}/$'.format(course=settings.COURSE_ID_PATTERN),
-            views.PayAndVerifyView.as_view(),
+            views.PayAndVerifyView.as_view(),  # pylint: disable=no-value-for-parameter
             name="verify_student_payment_confirmation",
             kwargs={
                 'always_show_payment': True,

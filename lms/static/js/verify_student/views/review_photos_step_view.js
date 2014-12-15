@@ -20,16 +20,16 @@ var edx = edx || {};
             // Prep the name change dropdown
             $( '.expandable-area' ).slideUp();
             $( '.is-expandable' ).addClass('is-ready');
-            $( '.is-expandable .title-expand' ).click( this.expandCallback );
+            $( '.is-expandable .title-expand' ).on( 'click', this.expandCallback );
 
             // Disable the submit button until user confirmation
-            $( '#confirm_pics_good' ).click( this.toggleSubmitEnabled );
+            $( '#confirm_pics_good' ).on( 'click', this.toggleSubmitEnabled );
 
             // Go back to the first photo step if we need to retake photos
-            $( '#retake_photos_button' ).click( _.bind( this.retakePhotos, this ) );
+            $( '#retake_photos_button' ).on( 'click', _.bind( this.retakePhotos, this ) );
 
             // When moving to the next step, submit photos for verification
-            $( '#next_step_button' ).click( _.bind( this.submitPhotos, this ) );
+            $( '#next_step_button' ).on( 'click', _.bind( this.submitPhotos, this ) );
         },
 
         toggleSubmitEnabled: function() {
@@ -84,12 +84,7 @@ var edx = edx || {};
 
             var title = $( this ).parent();
             title.toggleClass( 'is-expanded' );
-
-            if ( title.attr( 'aria-expanded' ) === 'false' ) {
-                title.attr( 'aria-expanded', 'true' );
-            } else {
-                title.attr( 'aria-expanded', 'false' );
-            }
+            title.attr( 'aria-expanded', !title.attr('aria-expanded') );
         }
     });
 

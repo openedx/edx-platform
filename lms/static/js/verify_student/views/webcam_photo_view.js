@@ -31,7 +31,7 @@
                 },
 
                 isSupported: function() {
-                    return (this.getUserMediaFunc() !== undefined);
+                    return this.getUserMediaFunc() !== undefined;
                 },
 
                 snapshot: function() {
@@ -239,9 +239,9 @@
             });
 
             // Install event handlers
-            $( "#webcam_reset_button", this.el ).click( _.bind( this.reset, this ) );
-            $( "#webcam_capture_button", this.el ).click( _.bind( this.capture, this ) );
-            $( "#webcam_approve_button", this.el ).click( _.bind( this.approve, this ) );
+            $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
+            $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
+            $( "#webcam_approve_button", this.el ).on( 'click', _.bind( this.approve, this ) );
 
             return this;
         },

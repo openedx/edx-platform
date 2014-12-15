@@ -25,12 +25,7 @@
     edx.verify_student.StepView = Backbone.View.extend({
 
         initialize: function( obj ) {
-            this.errorModel = obj.errorModel || {};
-            this.templateUrl = obj.templateUrl || "";
-            this.stepData = obj.stepData || {};
-            this.nextStepNum = obj.nextStepNum || "";
-            this.nextStepTitle = obj.nextStepTitle || "";
-            this.model = obj.model || {};
+            _.extend( this, obj );
 
             /* Mix non-conflicting functions from underscore.string
              * (all but include, contains, and reverse) into the
@@ -48,17 +43,14 @@
                     success: this.handleResponse,
                     error: this.handleError
                 });
-            }
-            else {
+            } else {
                 $( this.el ).html( this.renderedHtml );
                 this.postRender();
             }
         },
 
         handleResponse: function( data ) {
-            var context;
-
-            context = {
+            var context = {
                 nextStepNum: this.nextStepNum,
                 nextStepTitle: this.nextStepTitle
             };
