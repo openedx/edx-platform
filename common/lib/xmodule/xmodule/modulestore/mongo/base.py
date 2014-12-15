@@ -40,7 +40,7 @@ from xblock.exceptions import InvalidScopeError
 from xblock.fields import Scope, ScopeIds, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KvsFieldData
 
-from xmodule.assetstore import AssetMetadata
+from xmodule.assetstore import AssetMetadata, CourseAssetsFromStorage
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
@@ -1473,7 +1473,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             course_key (CourseKey): course identifier
 
         Returns:
-            Dict with (at least) an '_id' key, identifying the relevant Mongo doc. If asset metadata
+            CourseAssetsFromStorage object, wrapping the relevant Mongo doc. If asset metadata
             exists, other keys will be the other asset types with values as lists of asset metadata.
         """
         # Using the course_key, find or insert the course asset metadata document.
@@ -1483,6 +1483,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'course_id': unicode(course_key)},
         )
 
+        doc_id = None if course_assets is None else course_assets['_id']
         if course_assets is None:
             # Check to see if the course is created in the course collection.
             if self.get_course(course_key) is None:
@@ -1490,22 +1491,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 # Course exists, so create matching assets document.
                 course_assets = {'course_id': unicode(course_key), 'assets': {}}
-                # Pass back 'assets' dict but add the '_id' key to it for document update purposes.
-                course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
+                doc_id = self.asset_collection.insert(course_assets)
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
             assert(len(course_assets['assets']) == 0)
             # Update the format to a dict.
             self.asset_collection.update(
-                {'_id': course_assets['_id']},
+                {'_id': doc_id},
                 {'$set': {'assets': {}}}
             )
-            course_assets['assets'] = {'_id': course_assets['_id']}
-        else:
-            course_assets['assets']['_id'] = course_assets['_id']
 
-        return course_assets['assets']
+        # Pass back wrapped 'assets' dict with the '_id' key added to it for document update purposes.
+        return CourseAssetsFromStorage(course_key, doc_id, course_assets['assets'])
 
     def _make_mongo_asset_key(self, asset_type):
         """
@@ -1554,7 +1552,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         # Update the document.
         self.asset_collection.update(
-            {'_id': course_assets['_id']},
+            {'_id': course_assets.doc_id},
             {'$set': updates_by_type}
         )
         return True
@@ -1602,9 +1600,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             dest_course_key (CourseKey): identifier of course to copy to
         """
         source_assets = self._find_course_assets(source_course_key)
-        dest_assets = source_assets.copy()
-        del dest_assets['_id']
-        dest_assets = {'assets': dest_assets}
+        dest_assets = {'assets': source_assets.asset_md.copy()}
         dest_assets['course_id'] = unicode(dest_course_key)
 
         self.asset_collection.remove({'course_id': unicode(dest_course_key)})
@@ -1629,7 +1625,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             raise ItemNotFoundError(asset_key)
 
         # Form an AssetMetadata.
-        all_assets = course_assets[asset_key.block_type]
+        all_assets = course_assets[asset_key.asset_type]
         md = AssetMetadata(asset_key, asset_key.path)
         md.from_storable(all_assets[asset_idx])
         md.update(attr_dict)
@@ -1638,8 +1634,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         all_assets[asset_idx] = md.to_storable()
 
         self.asset_collection.update(
-            {'_id': course_assets['_id']},
-            {"$set": {self._make_mongo_asset_key(asset_key.block_type): all_assets}}
+            {'_id': course_assets.doc_id},
+            {"$set": {self._make_mongo_asset_key(asset_key.asset_type): all_assets}}
         )
 
     @contract(asset_key='AssetKey')
@@ -1657,13 +1653,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if asset_idx is None:
             return 0
 
-        all_asset_info = course_assets[asset_key.block_type]
+        all_asset_info = course_assets[asset_key.asset_type]
         all_asset_info.pop(asset_idx)
 
         # Update the document.
         self.asset_collection.update(
-            {'_id': course_assets['_id']},
-            {'$set': {self._make_mongo_asset_key(asset_key.block_type): all_asset_info}}
+            {'_id': course_assets.doc_id},
+            {'$set': {self._make_mongo_asset_key(asset_key.asset_type): all_asset_info}}
         )
         return 1
 
@@ -1680,7 +1676,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # A single document exists per course to store the course asset metadata.
         try:
             course_assets = self._find_course_assets(course_key)
-            self.asset_collection.remove(course_assets['_id'])
+            self.asset_collection.remove(course_assets.doc_id)
         except ItemNotFoundError:
             # When deleting asset metadata, if a course's asset metadata is not present, no big deal.
             pass

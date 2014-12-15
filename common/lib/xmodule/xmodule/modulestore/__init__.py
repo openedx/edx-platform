@@ -376,10 +376,7 @@ class ModuleStoreAssetInterface(object):
             # Add assets of all types to the sorted list.
             all_assets = SortedListWithKey([], key=key_func)
             for asset_type, val in course_assets.iteritems():
-                # '_id' is sometimes added to the course_assets for CRUD purposes
-                # (depending on the modulestore). If it's present, skip it.
-                if asset_type != '_id':
-                    all_assets.update(val)
+                all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
             all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=key_func)
