@@ -732,8 +732,8 @@
           left: ($baseline/2);
         }
 
-        // control - take/do
-        .control-do {
+        // control - take/do, retake
+        .control-do, .control-retake {
           left: 45%;
         }
 
@@ -2183,8 +2183,8 @@
             left: ($baseline/2);
           }
 
-          // control - take/do
-          .control-do {
+          // control - take/do, retake
+          .control-do, .control-retake {
             left: 45%;
           }
 
