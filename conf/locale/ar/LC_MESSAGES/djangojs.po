@@ -68,8 +68,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-08 08:16-0500\n"
-"PO-Revision-Date: 2014-12-01 00:10+0000\n"
+"POT-Creation-Date: 2014-12-15 18:24+0000\n"
+"PO-Revision-Date: 2014-12-11 18:31+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -160,6 +160,10 @@ msgstr "حذف"
 #: cms/templates/js/asset-library.underscore
 msgid "Name"
 msgstr "الاسم "
+
+#: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
+msgid "Upload File"
+msgstr "تحميل الملف"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2333,33 +2337,6 @@ msgstr "إغلاق الآلة الحاسبة "
 msgid "Post body"
 msgstr "محتوى المنشور"
 
-#. Translators: "Distribution" refers to a grade distribution. This error
-#. message appears when there is an error getting the data on grade
-#. distribution.;
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-msgid "Error fetching distribution."
-msgstr "نأسف لخدوث خطأ في إحضار بيانات التوزيع."
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Unavailable metric display."
-msgstr "العرض المتري غير متوفّر الآن."
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Error fetching grade distributions."
-msgstr "نأسف لحدوث خطأ في إحضار بيانات توزيع الدرجات."
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "Last Updated: <%= timestamp %>"
-msgstr "التحديث الأخير: <%= timestamp %>"
-
-#: lms/static/coffee/src/instructor_dashboard/analytics.js
-#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
-msgid "<%= num_students %> students scored."
-msgstr "جرى تقييم أعمال <%= num_students %> طالبًا."
-
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error generating student profile information. Please try again."
 msgstr ""
@@ -2394,6 +2371,22 @@ msgid ""
 msgstr ""
 "يجري استحداث الروابط عند الطلب وينتهي مفعولها في غضون 5 دقائق نظرًا لحساسية "
 "معلومات الطالب."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Unavailable metric display."
+msgstr "العرض المتري غير متوفّر الآن."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Error fetching grade distributions."
+msgstr "نأسف لحدوث خطأ في إحضار بيانات توزيع الدرجات."
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "Last Updated: <%= timestamp %>"
+msgstr "التحديث الأخير: <%= timestamp %>"
+
+#: lms/static/coffee/src/instructor_dashboard/instructor_analytics.js
+msgid "<%= num_students %> students scored."
+msgstr "جرى تقييم أعمال <%= num_students %> طالبًا."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Username"
@@ -2581,6 +2574,12 @@ msgstr "يجب ملء خانة الموضوع في رسالتك عبر البر�
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your message cannot be blank."
 msgstr "لا يمكن لرسالتك عبر البريد الإلكتروني أن تكون فارغة."
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid ""
+"There are invalid keywords in your email. Please check the following "
+"keywords and try again:"
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
@@ -3239,6 +3238,36 @@ msgstr "نأسف لحدوث خطأ. يُرجى تحديث الصفحة، ثمّ 
 msgid "Please enter a name for your new cohort group."
 msgstr "يُرجى إدخال اسم لمجموعتك الجديدة."
 
+#: lms/static/js/views/cohorts.js
+msgid "Assign students to cohort groups by uploading a CSV file."
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid "Choose a .csv file"
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid "Only properly formatted .csv files will be accepted."
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid "Upload File and Assign Students"
+msgstr ""
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"Your file '{file}' has been uploaded. Please allow a few minutes for "
+"processing."
+msgstr ""
+
+#: lms/static/js/views/file_uploader.js
+msgid "Your upload of '{file}' succeeded."
+msgstr ""
+
+#: lms/static/js/views/file_uploader.js
+msgid "Your upload of '{file}' failed."
+msgstr ""
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -3603,20 +3632,38 @@ msgid "Date Added"
 msgstr "تاريخ الإضافة "
 
 #: cms/static/js/views/assets.js
-msgid "Uploading…"
-msgstr "جاري التحميل..."
+msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid ""
+"Please follow the instructions here to upload a file elsewhere and link to "
+"it: {maxFileSizeRedirectUrl}"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Max file size exceeded"
+msgstr ""
+
+#: cms/static/js/views/assets.js
+msgid "Uploading"
+msgstr ""
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
 msgstr "اختيار الملف"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "تحميل ملف جديد"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
 msgstr "تحميل ملف آخر"
 
@@ -3720,10 +3767,6 @@ msgid ""
 "File format not supported. Please upload a file with a <code>tar.gz</code> "
 "extension."
 msgstr "صيغة الملف غير مدعومة. يُرجى تحميل ملف بامتداد <code>tar.gz</code>. "
-
-#: cms/static/js/views/metadata.js
-msgid "Upload File"
-msgstr "تحميل الملف"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -4213,6 +4256,10 @@ msgid "Cohort Management"
 msgstr "إدارة المجموعة"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Assign students to cohort groups manually"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Select a cohort group to manage"
 msgstr "اختر مجموعة لإدارتها"
 
@@ -4221,12 +4268,15 @@ msgid "View Cohort Group"
 msgstr "استعراض المجموعة"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid ""
-"To review all student cohort group assignments, download course profile "
-"information on %(link_start)s the Data Download page. %(link_end)s"
+msgid "Assign students to cohort groups by uploading a CSV file"
 msgstr ""
-"لمشاهدة جميع واجبات مجموعة الطلّاب، يُرجى  تنزيل معلومات ملفّ المساق من "
-"%(link_start)s صفحة تنزيل البيانات. %(link_end)s"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid ""
+"To review student cohort group assignments or see the results of uploading a"
+" CSV file, download course profile information or cohort results on "
+"%(link_start)s the Data Download page. %(link_end)s"
+msgstr ""
 
 #: lms/templates/student_account/access.underscore
 msgid "Welcome!"

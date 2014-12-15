@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-08 08:48-0500\n"
-"PO-Revision-Date: 2014-12-08 13:50:06.083340\n"
+"POT-Creation-Date: 2014-12-15 12:26-0800\n"
+"PO-Revision-Date: 2014-12-15 20:27:42.776972\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -108,6 +108,10 @@ msgstr "Délété Ⱡ'σяєм ιρѕ#"
 #: cms/templates/js/asset-library.underscore
 msgid "Name"
 msgstr "Nämé Ⱡ'σяєм#"
+
+#: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
+msgid "Upload File"
+msgstr "Ûplöäd Fïlé Ⱡ#"
 
 #. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -2503,6 +2507,14 @@ msgid "Your message cannot be blank."
 msgstr "Ýöür méssägé çännöt ßé ßlänk. Ⱡ'σяєм #"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
+msgid ""
+"There are invalid keywords in your email. Please check the following "
+"keywords and try again:"
+msgstr ""
+"Théré äré ïnvälïd kéýwörds ïn ýöür émäïl. Pléäsé çhéçk thé föllöwïng "
+"kéýwörds änd trý ägäïn: Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
+
+#: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
 msgstr "Ýöür émäïl wäs süççéssfüllý qüéüéd för séndïng. Ⱡ'σяєм ιρѕυм #"
 
@@ -3160,6 +3172,39 @@ msgstr ""
 msgid "Please enter a name for your new cohort group."
 msgstr "Pléäsé éntér ä nämé för ýöür néw çöhört gröüp. Ⱡ'σяєм ιρѕυм #"
 
+#: lms/static/js/views/cohorts.js
+msgid "Assign students to cohort groups by uploading a CSV file."
+msgstr ""
+"Àssïgn stüdénts tö çöhört gröüps ßý üplöädïng ä ÇSV fïlé. Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/static/js/views/cohorts.js
+msgid "Choose a .csv file"
+msgstr "Çhöösé ä .çsv fïlé Ⱡ'σ#"
+
+#: lms/static/js/views/cohorts.js
+msgid "Only properly formatted .csv files will be accepted."
+msgstr "Önlý pröpérlý förmättéd .çsv fïlés wïll ßé äççéptéd. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/static/js/views/cohorts.js
+msgid "Upload File and Assign Students"
+msgstr "Ûplöäd Fïlé änd Àssïgn Stüdénts Ⱡ'σяєм ι#"
+
+#: lms/static/js/views/cohorts.js
+msgid ""
+"Your file '{file}' has been uploaded. Please allow a few minutes for "
+"processing."
+msgstr ""
+"Ýöür fïlé '{file}' häs ßéén üplöädéd. Pléäsé ällöw ä féw mïnütés för "
+"pröçéssïng. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
+
+#: lms/static/js/views/file_uploader.js
+msgid "Your upload of '{file}' succeeded."
+msgstr "Ýöür üplöäd öf '{file}' süççéédéd. Ⱡ'σяєм ι#"
+
+#: lms/static/js/views/file_uploader.js
+msgid "Your upload of '{file}' failed."
+msgstr "Ýöür üplöäd öf '{file}' fäïléd. Ⱡ'σяєм #"
+
 #: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
@@ -3532,20 +3577,41 @@ msgid "Date Added"
 msgstr "Däté Àddéd Ⱡ#"
 
 #: cms/static/js/views/assets.js
-msgid "Uploading…"
-msgstr "Ûplöädïng… Ⱡ#"
+msgid "File {filename} exceeds maximum size of {maxFileSizeInMBs} MB"
+msgstr ""
+"Fïlé {filename} éxçééds mäxïmüm sïzé öf {maxFileSizeInMBs} MB Ⱡ'σяєм ιρѕ#"
+
+#: cms/static/js/views/assets.js
+msgid ""
+"Please follow the instructions here to upload a file elsewhere and link to "
+"it: {maxFileSizeRedirectUrl}"
+msgstr ""
+"Pléäsé föllöw thé ïnstrüçtïöns héré tö üplöäd ä fïlé élséwhéré änd lïnk tö "
+"ït: {maxFileSizeRedirectUrl} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αм#"
+
+#: cms/static/js/views/assets.js
+msgid "Your file could not be uploaded"
+msgstr "Ýöür fïlé çöüld nöt ßé üplöädéd Ⱡ'σяєм ι#"
+
+#: cms/static/js/views/assets.js
+msgid "Max file size exceeded"
+msgstr "Mäx fïlé sïzé éxçéédéd Ⱡ'σяє#"
+
+#: cms/static/js/views/assets.js
+msgid "Uploading"
+msgstr "Ûplöädïng #"
 
 #: cms/static/js/views/assets.js
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Choose File"
 msgstr "Çhöösé Fïlé Ⱡ#"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 #: cms/templates/js/asset-upload-modal.underscore
 msgid "Upload New File"
 msgstr "Ûplöäd Néw Fïlé Ⱡ'#"
 
-#: cms/static/js/views/assets.js
+#: cms/static/js/views/assets.js cms/static/js/views/assets.js.c
 msgid "Load Another File"
 msgstr "Löäd Ànöthér Fïlé Ⱡ'σ#"
 
@@ -3643,10 +3709,6 @@ msgid ""
 msgstr ""
 "Fïlé förmät nöt süppörtéd. Pléäsé üplöäd ä fïlé wïth ä <code>tär.gz</code> "
 "éxténsïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
-
-#: cms/static/js/views/metadata.js
-msgid "Upload File"
-msgstr "Ûplöäd Fïlé Ⱡ#"
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -4123,6 +4185,10 @@ msgid "Cohort Management"
 msgstr "Çöhört Mänägémént Ⱡ'σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid "Assign students to cohort groups manually"
+msgstr "Àssïgn stüdénts tö çöhört gröüps mänüällý Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
 msgid "Select a cohort group to manage"
 msgstr "Séléçt ä çöhört gröüp tö mänägé Ⱡ'σяєм ι#"
 
@@ -4131,13 +4197,20 @@ msgid "View Cohort Group"
 msgstr "Vïéw Çöhört Gröüp Ⱡ'σ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
-msgid ""
-"To review all student cohort group assignments, download course profile "
-"information on %(link_start)s the Data Download page. %(link_end)s"
+msgid "Assign students to cohort groups by uploading a CSV file"
 msgstr ""
-"Tö révïéw äll stüdént çöhört gröüp ässïgnménts, döwnlöäd çöürsé pröfïlé "
-"ïnförmätïön ön %(link_start)s thé Dätä Döwnlöäd pägé. %(link_end)s Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢т#"
+"Àssïgn stüdénts tö çöhört gröüps ßý üplöädïng ä ÇSV fïlé Ⱡ'σяєм ιρѕυм ∂σł#"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore
+msgid ""
+"To review student cohort group assignments or see the results of uploading a"
+" CSV file, download course profile information or cohort results on "
+"%(link_start)s the Data Download page. %(link_end)s"
+msgstr ""
+"Tö révïéw stüdént çöhört gröüp ässïgnménts ör séé thé résülts öf üplöädïng ä"
+" ÇSV fïlé, döwnlöäd çöürsé pröfïlé ïnförmätïön ör çöhört résülts ön "
+"%(link_start)s thé Dätä Döwnlöäd pägé. %(link_end)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єł#"
 
 #: lms/templates/student_account/access.underscore
 msgid "Welcome!"
