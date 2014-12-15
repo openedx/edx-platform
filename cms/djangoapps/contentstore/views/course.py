@@ -89,7 +89,7 @@ class AccessListFallback(Exception):
     pass
 
 
-def _get_course_module(course_key, user, depth=0):
+def get_course_and_check_access(course_key, user, depth=0):
     """
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
@@ -214,7 +214,7 @@ def course_handler(request, course_key_string=None):
             if request.method == 'GET':
                 course_key = CourseKey.from_string(course_key_string)
                 with modulestore().bulk_operations(course_key):
-                    course_module = _get_course_module(course_key, request.user, depth=None)
+                    course_module = get_course_and_check_access(course_key, request.user, depth=None)
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
@@ -251,7 +251,7 @@ def course_rerun_handler(request, course_key_string):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user, depth=3)
+        course_module = get_course_and_check_access(course_key, request.user, depth=3)
         if request.method == 'GET':
             return render_to_response('course-create-rerun.html', {
                 'source_course_key': course_key,
@@ -434,7 +434,7 @@ def course_index(request, course_key):
     # A depth of None implies the whole course. The course outline needs this in order to compute has_changes.
     # A unit may not have a draft version, but one of its components could, and hence the unit itself has changes.
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user, depth=None)
+        course_module = get_course_and_check_access(course_key, request.user, depth=None)
         lms_link = get_lms_link_for_item(course_module.location)
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
@@ -662,7 +662,7 @@ def course_info_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user)
+        course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             return render_to_response(
                 'course_info.html',
@@ -745,7 +745,7 @@ def settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user)
+        course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             upload_asset_url = reverse_course_url('assets_handler', course_key)
 
@@ -800,7 +800,7 @@ def grading_handler(request, course_key_string, grader_index=None):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user)
+        course_module = get_course_and_check_access(course_key, request.user)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
             course_details = CourseGradingModel.fetch(course_key)
@@ -912,7 +912,7 @@ def advanced_settings_handler(request, course_key_string):
     """
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user)
+        course_module = get_course_and_check_access(course_key, request.user)
         if 'text/html' in request.META.get('HTTP_ACCEPT', '') and request.method == 'GET':
 
             return render_to_response('settings_advanced.html', {
@@ -1026,7 +1026,7 @@ def textbooks_list_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = _get_course_module(course_key, request.user)
+        course = get_course_and_check_access(course_key, request.user)
 
         if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
             # return HTML page
@@ -1102,7 +1102,7 @@ def textbooks_detail_handler(request, course_key_string, textbook_id):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course_module = _get_course_module(course_key, request.user)
+        course_module = get_course_and_check_access(course_key, request.user)
         matching_id = [tb for tb in course_module.pdf_textbooks
                        if unicode(tb.get("id")) == unicode(textbook_id)]
         if matching_id:
@@ -1333,7 +1333,7 @@ def group_configurations_list_handler(request, course_key_string):
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = _get_course_module(course_key, request.user)
+        course = get_course_and_check_access(course_key, request.user)
 
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
@@ -1381,7 +1381,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
     course_key = CourseKey.from_string(course_key_string)
     store = modulestore()
     with store.bulk_operations(course_key):
-        course = _get_course_module(course_key, request.user)
+        course = get_course_and_check_access(course_key, request.user)
         matching_id = [p for p in course.user_partitions
                        if unicode(p.id) == unicode(group_configuration_id)]
         if matching_id:
