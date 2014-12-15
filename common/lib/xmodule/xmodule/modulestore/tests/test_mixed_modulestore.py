@@ -979,21 +979,58 @@ class TestMixedModuleStore(CourseComparisonTest):
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
-    # Mongo reads:
-    #    First location:
-    #        - count problem (1)
-    #        - For each level of ancestors: (5)
-    #          - Count ancestor
-    #          - retrieve ancestor
-    #        - compute inheritable data
-    #    Second location:
-    #        - load vertical
-    #        - load inheritance data
+    @ddt.data('draft')
+    def test_get_parent_location_draft(self, default_ms):
+        """
+        Test that "get_parent_location" method returns first published parent
+        for a draft component, if it has many possible parents (including
+        draft parents).
+        """
+        self.initdb(default_ms)
+        course_id = self.course_locations[self.MONGO_COURSEID].course_key
 
-    # TODO: LMS-11220: Document why draft send count is 5
-    # TODO: LMS-11220: Document why draft find count is [19, 6]
-    # TODO: LMS-11220: Document why split find count is [2, 2]
-    @ddt.data(('draft', [21, 6], 0), ('split', [2, 2], 0))
+        # create parented children
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
+        # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
+        mongo_store.collection.update(
+            self.vertical_x1b.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+
+        # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
+        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+        item = self.store.get_item(self.vertical_x1a)
+        self.assertTrue(self.store.has_published_version(item))
+
+        # now problem "problem_x1a_1" has 3 parents [vertical_x1a (draft),
+        # vertical_x1a (published), vertical_x1b (published)]
+        # check that "get_parent_location" method of draft branch returns first
+        # published parent "vertical_x1a" without raising "AssertionError" for
+        # problem location revision
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)
+            self.assertEqual(parent, self.vertical_x1a)
+
+    # Draft:
+    #   Problem path:
+    #    1. Get problem
+    #    2-3. count matches definition.children called 2x?
+    #    4. get parent via definition.children query
+    #    5-7. 2 counts and 1 get grandparent via definition.children
+    #    8-10. ditto for great-grandparent
+    #    11-13. ditto for next ancestor
+    #    14. fail count query looking for parent of course (unnecessary)
+    #    15. get course record direct query (not via definition.children) (already fetched in 13)
+    #    16. get items for inheritance computation
+    #    17. get vertical (parent of problem)
+    #    18. get items for inheritance computation (why? caching should handle)
+    #    19-20. get vertical_x1b (? why? this is the only ref in trace) & items for inheritance computation
+    #   Chapter path: get chapter, count parents 2x, get parents, count non-existent grandparents
+    # Split: active_versions & structure
+    @ddt.data(('draft', [20, 5], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """
