@@ -91,7 +91,7 @@ class MakoMiddlewareTest(TestCase):
         self.assertIsNone(get_template_request_context())
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    @patch("edxmako.middleware.REQUEST_CONTEXT")
+    @patch("edxmako.middleware.REQUEST_CACHE")
     def test_render_to_string_when_no_global_context_lms(self, context_mock):
         """
         Test render_to_string() when makomiddleware has not initialized
@@ -101,7 +101,7 @@ class MakoMiddlewareTest(TestCase):
         self.assertIn("this module is temporarily unavailable", render_to_string("courseware/error-message.html", None))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'cms.urls', 'Test only valid in cms')
-    @patch("edxmako.middleware.REQUEST_CONTEXT")
+    @patch("edxmako.middleware.REQUEST_CACHE")
     def test_render_to_string_when_no_global_context_cms(self, context_mock):
         """
         Test render_to_string() when makomiddleware has not initialized

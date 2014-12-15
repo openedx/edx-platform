@@ -6,6 +6,8 @@
 define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/views/utils/view_utils",
     "js/models/xblock_info", "js/views/xblock_editor"],
     function($, _, gettext, BaseModal, ViewUtils, XBlockInfo, XBlockEditorView) {
+        "strict mode";
+
         var EditXBlockModal = BaseModal.extend({
             events : {
                 "click .action-save": "save",
@@ -91,7 +93,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                    if (!editorView.xblock.save) {
+                    if (!this.canSave()) {
                         this.disableSave();
                     }
                     this.getActionBar().show();
@@ -99,6 +101,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
                 // Resize the modal to fit the window
                 this.resize();
+            },
+
+            canSave: function() {
+                return this.editorView.xblock.save || this.editorView.xblock.collectFieldData;
             },
 
             disableSave: function() {
@@ -149,10 +155,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 var self = this,
                     editorView = this.editorView,
                     xblockInfo = this.xblockInfo,
-                    data = editorView.getXModuleData();
+                    data = editorView.getXBlockFieldData();
                 event.preventDefault();
                 if (data) {
-                    ViewUtils.runOperationShowingMessage(gettext('Saving&hellip;'),
+                    ViewUtils.runOperationShowingMessage(gettext('Saving'),
                         function() {
                             return xblockInfo.save(data);
                         }).done(function() {

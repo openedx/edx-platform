@@ -53,8 +53,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                     </ul>
                 </section>
 
-                <div class="wrapper-visibility-specific">
-
+                <div class="wrapper-visibility-specific" data-user-partition-id="${cohorted_user_partition.id}">
                     <section class="visibility-controls-secondary">
                         <div class="visibility-controls-group">
                             <h4 class="visibility-controls-title modal-subsection-title sr">Content Groups</h4>
@@ -69,14 +68,14 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
                                         missing_group_ids.remove(group.id)
                                     %>
                                     <li class="field field-checkbox field-visibility-content-group">
-                                        <input type="checkbox" id="visibility-content-group-${group.id}" name="visibility-content-group" value="" class="input input-checkbox"  ${'checked="checked"' if group.id in selected_group_ids else ''}/>
+                                        <input type="checkbox" id="visibility-content-group-${group.id}" name="visibility-content-group" value="${group.id}" class="input input-checkbox"  ${'checked="checked"' if group.id in selected_group_ids else ''}/>
                                         <label for="visibility-content-group-${group.id}" class="label">${group.name | h}</label>
                                     </li>
                                 % endfor
 
                                 % for group_id in missing_group_ids:
                                     <li class="field field-checkbox field-visibility-content-group was-removed">
-                                        <input type="checkbox" id="visibility-content-group-%{group_id}" name="visibility-content-group" value="" class="input input-checkbox" checked="checked" />
+                                        <input type="checkbox" id="visibility-content-group-%{group_id}" name="visibility-content-group" value="${group_id}" class="input input-checkbox" checked="checked" />
                                         <label for="visibility-content-group-%{group_id}" class="label">
                                             Deleted Content Group
                                             <span class="note">Content group no longer exists. Please choose another or allow access to All Students and staff</span>
