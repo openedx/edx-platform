@@ -7,7 +7,7 @@ import xblock.reference.plugins
 
 from functools import partial
 from requests.auth import HTTPBasicAuth
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 from opaque_keys import InvalidKeyError
 
 from django.conf import settings
@@ -72,6 +72,7 @@ XQUEUE_INTERFACE = XQueueInterface(
 # Some brave person should make the variable names consistently someday, but the code's
 # coupled enough that it's kind of tricky--you've been warned!
 
+
 class LmsModuleRenderError(Exception):
     """
     An exception class for exceptions thrown by module_render that don't fit well elsewhere
@@ -91,7 +92,7 @@ def make_track_function(request):
     return function
 
 
-def toc_for_course(user, request, course, active_chapter, active_section, field_data_cache):
+def toc_for_course(request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
 
@@ -116,7 +117,7 @@ def toc_for_course(user, request, course, active_chapter, active_section, field_
     '''
 
     with modulestore().bulk_operations(course.id):
-        course_module = get_module_for_descriptor(user, request, course, field_data_cache, course.id)
+        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
         if course_module is None:
             return None
 

@@ -4,7 +4,7 @@ from contracts import contract, new_contract
 from lazy import lazy
 from xblock.runtime import KvsFieldData
 from xblock.fields import ScopeIds
-from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, DefinitionLocator
+from opaque_keys.edx.locator import BlockUsageLocator, LocalId, CourseLocator, LibraryLocator, DefinitionLocator
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
 from xmodule.errortracker import exc_info_to_str
@@ -19,6 +19,8 @@ from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
 log = logging.getLogger(__name__)
 
 new_contract('BlockUsageLocator', BlockUsageLocator)
+new_contract('CourseLocator', CourseLocator)
+new_contract('LibraryLocator', LibraryLocator)
 new_contract('BlockKey', BlockKey)
 new_contract('CourseEnvelope', CourseEnvelope)
 
@@ -76,6 +78,11 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
     @contract(usage_key="BlockUsageLocator | BlockKey", course_entry_override="CourseEnvelope | None")
     def _load_item(self, usage_key, course_entry_override=None, **kwargs):
+        """
+        Instantiate the xblock fetching it either from the cache or from the structure
+
+        :param course_entry_override: the course_info with the course_key to use (defaults to cached)
+        """
         # usage_key is either a UsageKey or just the block_key. if a usage_key,
         if isinstance(usage_key, BlockUsageLocator):
 
@@ -90,23 +97,27 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     raise ItemNotFoundError
             else:
                 block_key = BlockKey.from_usage_key(usage_key)
+                version_guid = self.course_entry.course_key.version_guid
         else:
             block_key = usage_key
 
             course_info = course_entry_override or self.course_entry
             course_key = course_info.course_key
+            version_guid = course_key.version_guid
 
-        if course_entry_override:
-            structure_id = course_entry_override.structure.get('_id')
-        else:
-            structure_id = self.course_entry.structure.get('_id')
+        # look in cache
+        cached_module = self.modulestore.get_cached_block(course_key, version_guid, block_key)
+        if cached_module:
+            return cached_module
 
         json_data = self.get_module_data(block_key, course_key)
 
         class_ = self.load_block_type(json_data.get('block_type'))
-        return self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
+        block = self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
+        self.modulestore.cache_block(course_key, version_guid, block_key, block)
+        return block
 
-    @contract(block_key=BlockKey, course_key=CourseLocator)
+    @contract(block_key=BlockKey, course_key="CourseLocator | LibraryLocator")
     def get_module_data(self, block_key, course_key):
         """
         Get block from module_data adding it to module_data if it's not already there but is in the structure
@@ -169,8 +180,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if definition_id is None:
             definition_id = LocalId()
 
-        block_locator = BlockUsageLocator(
-            course_key,
+        # Construct the Block Usage Locator:
+        block_locator = course_key.make_usage_key(
             block_type=block_key.type,
             block_id=block_key.id,
         )

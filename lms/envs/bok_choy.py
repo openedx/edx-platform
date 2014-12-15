@@ -4,9 +4,9 @@ Settings for bok choy tests
 
 import os
 from path import path
+from tempfile import mkdtemp
 
-
-CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=E1120
+CONFIG_ROOT = path(__file__).abspath().dirname()  # pylint: disable=no-value-for-parameter
 TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 
 ########################## Prod-like settings ###################################
@@ -18,7 +18,7 @@ TEST_ROOT = CONFIG_ROOT.dirname().dirname() / "test_root"
 os.environ['SERVICE_VARIANT'] = 'bok_choy'
 os.environ['CONFIG_ROOT'] = CONFIG_ROOT
 
-from .aws import *  # pylint: disable=W0401, W0614
+from .aws import *  # pylint: disable=wildcard-import, unused-wildcard-import
 
 
 ######################### Testing overrides ####################################
@@ -34,13 +34,31 @@ LOG_DIR = (TEST_ROOT / "log").abspath()
 update_module_store_settings(
     MODULESTORE,
     module_store_options={
-        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=E1120
+        'fs_root': (TEST_ROOT / "data").abspath(),  # pylint: disable=no-value-for-parameter
     },
     xml_store_options={
         'data_dir': (TEST_ROOT / "data").abspath(),
     },
     default_store=os.environ.get('DEFAULT_STORE', 'draft'),
 )
+
+############################ STATIC FILES #############################
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+MEDIA_ROOT = TEST_ROOT / "uploads"
+MEDIA_URL = "/static/uploads/"
+
+################################# CELERY ######################################
+
+CELERY_ALWAYS_EAGER = True
+CELERY_RESULT_BACKEND = 'cache'
+BROKER_TRANSPORT = 'memory'
+
+###################### Grade Downloads ######################
+GRADES_DOWNLOAD = {
+    'STORAGE_TYPE': 'localfs',
+    'BUCKET': 'edx-grades',
+    'ROOT_PATH': os.path.join(mkdtemp(), 'edx-s3', 'grades'),
+}
 
 # Configure the LMS to use our stub XQueue implementation
 XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
@@ -74,6 +92,6 @@ YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YO
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
-    from .private import *      # pylint: disable=F0401
+    from .private import *      # pylint: disable=import-error
 except ImportError:
     pass

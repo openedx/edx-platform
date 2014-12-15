@@ -10,7 +10,7 @@ from django.conf import settings
 from django.db import transaction
 from django.test.client import RequestFactory
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 from courseware import courses
 from courseware.model_data import FieldDataCache
@@ -140,6 +140,7 @@ def answer_distributions(course_key):
 
     return answer_counts
 
+
 @transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):
     """
@@ -259,8 +260,10 @@ def _grade(student, request, course, keep_raw_scores):
             if graded_total.possible > 0:
                 format_scores.append(graded_total)
             else:
-                log.info("Unable to grade a section with a total possible score of zero. " +
-                              str(section_descriptor.location))
+                log.info(
+                    "Unable to grade a section with a total possible score of zero. " +
+                    str(section_descriptor.location)
+                )
 
         totaled_scores[section_format] = format_scores
 
@@ -522,7 +525,7 @@ def iterate_grades_for(course_id, students):
     request = RequestFactory().get('/')
 
     for student in students:
-        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=['action:{}'.format(course_id)]):
+        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course_id)]):
             try:
                 request.user = student
                 # Grading calls problem rendering, which calls masquerading,

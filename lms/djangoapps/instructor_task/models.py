@@ -209,6 +209,15 @@ class ReportStore(object):
         elif storage_type.lower() == "localfs":
             return LocalFSReportStore.from_config()
 
+    def _get_utf8_encoded_rows(self, rows):
+        """
+        Given a list of `rows` containing unicode strings, return a
+        new list of rows with those strings encoded as utf-8 for CSV
+        compatibility.
+        """
+        for row in rows:
+            yield [unicode(item).encode('utf-8') for item in row]
+
 
 class S3ReportStore(ReportStore):
     """
@@ -229,6 +238,7 @@ class S3ReportStore(ReportStore):
             settings.AWS_ACCESS_KEY_ID,
             settings.AWS_SECRET_ACCESS_KEY
         )
+
         self.bucket = conn.get_bucket(bucket_name)
 
     @classmethod
@@ -306,7 +316,8 @@ class S3ReportStore(ReportStore):
         """
         output_buffer = StringIO()
         gzip_file = GzipFile(fileobj=output_buffer, mode="wb")
-        csv.writer(gzip_file).writerows(rows)
+        csvwriter = csv.writer(gzip_file)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
         gzip_file.close()
 
         self.store(course_id, filename, output_buffer)
@@ -317,13 +328,10 @@ class S3ReportStore(ReportStore):
         can be plugged straight into an href
         """
         course_dir = self.key_for(course_id, '')
-        return sorted(
-            [
-                (key.key.split("/")[-1], key.generate_url(expires_in=300))
-                for key in self.bucket.list(prefix=course_dir.key)
-            ],
-            reverse=True
-        )
+        return [
+            (key.key.split("/")[-1], key.generate_url(expires_in=300))
+            for key in sorted(self.bucket.list(prefix=course_dir.key), reverse=True, key=lambda k: k.last_modified)
+        ]
 
 
 class LocalFSReportStore(ReportStore):
@@ -384,7 +392,9 @@ class LocalFSReportStore(ReportStore):
         write this data out.
         """
         output_buffer = StringIO()
-        csv.writer(output_buffer).writerows(rows)
+        csvwriter = csv.writer(output_buffer)
+        csvwriter.writerows(self._get_utf8_encoded_rows(rows))
+
         self.store(course_id, filename, output_buffer)
 
     def links_for(self, course_id):
@@ -398,10 +408,10 @@ class LocalFSReportStore(ReportStore):
         course_dir = self.path_to(course_id, '')
         if not os.path.exists(course_dir):
             return []
-        return sorted(
-            [
-                (filename, ("file://" + urllib.quote(os.path.join(course_dir, filename))))
-                for filename in os.listdir(course_dir)
-            ],
-            reverse=True
-        )
+        files = [(filename, os.path.join(course_dir, filename)) for filename in os.listdir(course_dir)]
+        files.sort(key=lambda (filename, full_path): os.path.getmtime(full_path), reverse=True)
+
+        return [
+            (filename, ("file://" + urllib.quote(full_path)))
+            for filename, full_path in files
+        ]

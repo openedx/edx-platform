@@ -141,6 +141,20 @@ class TestCreateOrderView(ModuleStoreTestCase):
         self.assertIn('This course doesn\'t support verified certificates', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
+    def test_create_order_fail_with_get(self):
+        """
+        Test that create_order will not work if wrong http method used
+        """
+        create_order_post_data = {
+            'contribution': 50,
+            'course_id': self.course_id,
+            'face_image': ',',
+            'photo_id_image': ','
+        }
+        response = self.client.get(reverse('verify_student_create_order'), create_order_post_data)
+        self.assertEqual(response.status_code, 405)
+
+    @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_success(self):
         """
         Test that the order is created successfully when given valid data
@@ -171,7 +185,7 @@ class TestVerifyView(ModuleStoreTestCase):
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_key = SlashSeparatedCourseKey('Robot', '999', 'Test_Course')
-        CourseFactory.create(org='Robot', number='999', display_name='Test Course')
+        self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         verified_mode = CourseMode(course_id=self.course_key,
                                    mode_slug="verified",
                                    mode_display_name="Verified Certificate",
@@ -186,18 +200,21 @@ class TestVerifyView(ModuleStoreTestCase):
         response = self.client.get(url)
         self.assertEquals(response.status_code, 302)
 
-    def test_valid_course_registration_text(self):
+    def test_valid_course_enrollment_text(self):
         url = reverse('verify_student_verify',
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url)
-
-        self.assertIn("You are registering for", response.content)
+        self.assertIn("You are now enrolled in", response.content)
+        # make sure org, name, and number are present
+        self.assertIn(self.course.display_org_with_default, response.content)
+        self.assertIn(self.course.display_name_with_default, response.content)
+        self.assertIn(self.course.display_number_with_default, response.content)
 
     def test_valid_course_upgrade_text(self):
         url = reverse('verify_student_verify',
                       kwargs={"course_id": unicode(self.course_key)})
         response = self.client.get(url, {'upgrade': "True"})
-        self.assertIn("You are upgrading your registration for", response.content)
+        self.assertIn("You are upgrading your enrollment for", response.content)
 
     def test_show_selected_contribution_amount(self):
         # Set the donation amount in the client's session
@@ -683,8 +700,30 @@ class TestCreateOrder(ModuleStoreTestCase):
         data = json.loads(response.content)
         self.assertEqual(data['override_custom_receipt_page'], "http://testserver/shoppingcart/postpay_callback/")
 
-        # Verify that the course ID is included in "merchant-defined data"
+        # Verify that the course ID and transaction type are included in "merchant-defined data"
         self.assertEqual(data['merchant_defined_data1'], unicode(self.course.id))
+        self.assertEqual(data['merchant_defined_data2'], "verified")
+
+    def test_create_order_already_verified_prof_ed(self):
+        # Verify the student so we don't need to submit photos
+        self._verify_student()
+
+        # Create a prof ed course
+        course = CourseFactory.create()
+        CourseModeFactory(mode_slug="professional", course_id=course.id)
+
+        # Create an order for a prof ed course
+        url = reverse('verify_student_create_order')
+        params = {
+            'course_id': unicode(course.id)
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the course ID and transaction type are included in "merchant-defined data"
+        data = json.loads(response.content)
+        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
+        self.assertEqual(data['merchant_defined_data2'], "professional")
 
     def test_create_order_set_donation_amount(self):
         # Verify the student so we don't need to submit photos

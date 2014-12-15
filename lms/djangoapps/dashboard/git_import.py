@@ -51,6 +51,7 @@ class GitImportError(Exception):
     CANNOT_BRANCH = _('Unable to switch to specified branch. Please check '
                       'your branch name.')
 
+
 def cmd_log(cmd, cwd):
     """
     Helper function to redirect stderr to stdout and log the command
@@ -123,7 +124,7 @@ def add_repo(repo, rdir_in, branch=None):
     If branch is left as None, it will fetch the most recent
     version of the current branch.
     """
-    # pylint: disable=R0915
+    # pylint: disable=too-many-statements
 
     # Set defaults even if it isn't defined in settings
     mongo_db = {

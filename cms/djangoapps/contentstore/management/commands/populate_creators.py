@@ -11,6 +11,8 @@ from django.db.utils import IntegrityError
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 #------------ to run: ./manage.py cms populate_creators --settings=dev
+
+
 class Command(BaseCommand):
     """
     Script for granting existing course instructors course creator privileges.

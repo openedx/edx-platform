@@ -5,17 +5,18 @@ from django.conf import settings
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from course_groups.models import CourseUserGroup
+from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from django_comment_common.models import Role, Permission
 from lang_pref import LANGUAGE_KEY
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notifier_api.views import NotifierUsersViewSet
+from opaque_keys.edx.locator import CourseLocator
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from user_api.models import UserPreference
-from user_api.tests.factories import UserPreferenceFactory
+from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.tests.factories import UserPreferenceFactory
 from util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import mixed_store_config, ModuleStoreTestCase
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -117,6 +118,14 @@ class NotifierUsersViewSetTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertNotIn(unicode(course_id), result["course_info"])
 
     def test_course_info_no_enrollments(self):
+        result = self._get_detail()
+        self.assertEqual(result["course_info"], {})
+
+    def test_course_info_non_existent_course_enrollment(self):
+        CourseEnrollmentFactory(
+            user=self.user,
+            course_id=CourseLocator(org="dummy", course="dummy", run="non_existent")
+        )
         result = self._get_detail()
         self.assertEqual(result["course_info"], {})
 

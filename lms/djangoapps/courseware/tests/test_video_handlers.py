@@ -58,6 +58,7 @@ def _check_asset(location, asset_name):
     else:
         return True
 
+
 def _clear_assets(location):
     """
     Clear all assets for location.
@@ -130,6 +131,7 @@ class TestVideo(BaseTestXmodule):
             {'speed': 2.0},
             {'saved_video_position': "00:00:10"},
             {'transcript_language': 'uk'},
+            {'demoo�': 'sample'}
         ]
         for sample in data:
             response = self.clients[self.users[0].username].post(
@@ -151,8 +153,12 @@ class TestVideo(BaseTestXmodule):
         self.item_descriptor.handle_ajax('save_user_state', {'transcript_language': "uk"})
         self.assertEqual(self.item_descriptor.transcript_language, 'uk')
 
+        response = self.item_descriptor.handle_ajax('save_user_state', {u'demoo�': "sample"})
+        self.assertEqual(json.loads(response)['success'], True)
+
     def tearDown(self):
         _clear_assets(self.item_descriptor.location)
+
 
 class TestTranscriptAvailableTranslationsDispatch(TestVideo):
     """
@@ -336,8 +342,9 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
             u'end': [100],
             u'start': [12],
             u'text': [
-            u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
-        ]}
+                u'\u041f\u0440\u0438\u0432\u0456\u0442, edX \u0432\u0456\u0442\u0430\u0454 \u0432\u0430\u0441.'
+            ]
+        }
         self.non_en_file.seek(0)
         _upload_file(self.non_en_file, self.item_descriptor.location, os.path.split(self.non_en_file.name)[1])
         subs_id = _get_subs_id(self.non_en_file.name)
@@ -580,7 +587,7 @@ class TestStudioTranscriptTranslationPostDispatch(TestVideo):
         # No language is passed.
         request = Request.blank('/translation', POST={'file': ('filename', SRT_content)})
         response = self.item_descriptor.studio_transcript(request=request, dispatch='translation')
-        self.assertEqual(response.status,  '400 Bad Request')
+        self.assertEqual(response.status, '400 Bad Request')
 
         # Language, good filename and good content.
         request = Request.blank('/translation/uk', POST={'file': ('filename.srt', SRT_content)})

@@ -7,7 +7,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="pagetitle">${_("About {course_id}").format(course_id=course_id)}</%block>
+<%block name="pagetitle">${_("About {course_id}").format(course_id=course_id) | h}</%block>
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 

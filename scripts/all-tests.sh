@@ -55,6 +55,10 @@ set -e
 #
 ###############################################################################
 
+# Violations thresholds for failing the build
+PYLINT_THRESHOLD=4600
+PEP8_THRESHOLD=0
+
 source $HOME/jenkins_env
 
 # Clean up previous builds
@@ -103,9 +107,11 @@ SHARD=${SHARD:="all"}
 case "$TEST_SUITE" in
 
     "quality")
-        paver run_pep8 -l 725 > pep8.log || { cat pep8.log; EXIT=1; }
-        paver run_pylint -l 4800 > pylint.log || { cat pylint.log; EXIT=1; }
-        paver run_quality
+        paver find_fixme > fixme.log || { cat fixme.log; EXIT=1; }
+        paver run_pep8 -l $PEP8_THRESHOLD > pep8.log || { cat pep8.log; EXIT=1; }
+        paver run_pylint -l $PYLINT_THRESHOLD > pylint.log || { cat pylint.log; EXIT=1; }
+        # Run quality task. Pass in the 'fail-under' percentage to diff-quality
+        paver run_quality -p 100
 
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.

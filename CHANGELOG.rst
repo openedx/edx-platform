@@ -5,6 +5,18 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Platform: Add group_access field to all xblocks.  TNL-670
+
+LMS: Add support for user partitioning based on cohort.  TNL-710
+
+Platform: Add base support for cohorted group configurations.  TNL-649
+
+LMS: Support assigning students to cohorts via a CSV file upload. TNL-735
+
+Common: Add configurable reset button to units
+
+Studio: Add support xblock validation messages on Studio unit/container page. TNL-683
+
 LMS: Support adding cohorts from the instructor dashboard. TNL-162
 
 LMS: Support adding students to a cohort via the instructor dashboard. TNL-163

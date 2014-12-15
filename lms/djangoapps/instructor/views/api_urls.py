@@ -7,6 +7,8 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('',  # nopep8
     url(r'^students_update_enrollment$',
         'instructor.views.api.students_update_enrollment', name="students_update_enrollment"),
+    url(r'^register_and_enroll_students$',
+        'instructor.views.api.register_and_enroll_students', name="register_and_enroll_students"),
     url(r'^list_course_role_members$',
         'instructor.views.api.list_course_role_members', name="list_course_role_members"),
     url(r'^modify_access$',
@@ -17,12 +19,12 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_grading_config', name="get_grading_config"),
     url(r'^get_students_features(?P<csv>/csv)?$',
         'instructor.views.api.get_students_features', name="get_students_features"),
-    url(r'^get_purchase_transaction(?P<csv>/csv)?$',
-        'instructor.views.api.get_purchase_transaction', name="get_purchase_transaction"),
     url(r'^get_user_invoice_preference$',
         'instructor.views.api.get_user_invoice_preference', name="get_user_invoice_preference"),
     url(r'^get_sale_records(?P<csv>/csv)?$',
         'instructor.views.api.get_sale_records', name="get_sale_records"),
+    url(r'^get_sale_order_records$',
+        'instructor.views.api.get_sale_order_records', name="get_sale_order_records"),
     url(r'^sale_validation_url$',
         'instructor.views.api.sale_validation', name="sale_validation"),
     url(r'^get_anon_ids$',
@@ -81,4 +83,8 @@ urlpatterns = patterns('',  # nopep8
     # spoc gradebook
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
+
+    # Cohort management
+    url(r'add_users_to_cohorts$',
+        'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
 )

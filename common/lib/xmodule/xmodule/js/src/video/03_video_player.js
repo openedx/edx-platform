@@ -397,6 +397,14 @@ function (HTML5Video, Resizer) {
                     }
                 );
             }
+            // In Html5 mode if video speed is changed before playing in firefox and
+            // changed speed is not '1.0' then manually trigger setPlaybackRate method.
+            // In browsers other than firefox like safari user can set speed to '1.0'
+            // if its not already set to '1.0' so in that case we don't have to
+            // call 'setPlaybackRate'
+            if (this.isHtml5Mode() && newSpeed != '1.0') {
+                this.videoPlayer.player.setPlaybackRate(newSpeed);
+            }
         }
     }
 

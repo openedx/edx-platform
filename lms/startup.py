@@ -5,7 +5,7 @@ Module for code that should run during LMS startup
 from django.conf import settings
 
 # Force settings to run so that the python path is modified
-settings.INSTALLED_APPS  # pylint: disable=W0104
+settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from django_startup import autostartup
 import edxmako
@@ -20,11 +20,6 @@ def run():
     """
     Executed during django startup
     """
-
-    # Patch the xml libs.
-    from safe_lxml import defuse_xml_libs
-    defuse_xml_libs()
-
     django_utils_translation.patch()
 
     autostartup()
@@ -40,7 +35,7 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
-    # Initialize Segment.io analytics module. Flushes first time a message is received and 
+    # Initialize Segment.io analytics module. Flushes first time a message is received and
     # every 50 messages thereafter, or if 10 seconds have passed since last flush
     if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
         analytics.init(settings.SEGMENT_IO_LMS_KEY, flush_at=50)

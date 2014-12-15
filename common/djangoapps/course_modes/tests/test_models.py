@@ -7,12 +7,15 @@ Replace this with more appropriate tests for your application.
 
 from datetime import datetime, timedelta
 import pytz
+import ddt
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.locator import CourseLocator
 from django.test import TestCase
 from course_modes.models import CourseMode, Mode
 
 
+@ddt.ddt
 class CourseModeModelTest(TestCase):
     """
     Tests for the CourseMode model
@@ -127,3 +130,79 @@ class CourseModeModelTest(TestCase):
         mode = CourseMode.verified_mode_for_course(self.course_key)
 
         self.assertEqual(mode.slug, 'professional')
+
+    def test_course_has_payment_options(self):
+        # Has no payment options.
+        honor, _ = self.create_mode('honor', 'Honor')
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Now we do have a payment option.
+        verified, _ = self.create_mode('verified', 'Verified', min_price=5)
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+        # Unset verified's minimum price.
+        verified.min_price = 0
+        verified.save()
+        self.assertFalse(CourseMode.has_payment_options(self.course_key))
+
+        # Finally, give the honor mode payment options
+        honor.suggested_prices = '5, 10, 15'
+        honor.save()
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+    @ddt.data(
+        ([], True),
+        ([("honor", 0), ("audit", 0), ("verified", 100)], True),
+        ([("honor", 100)], False),
+        ([("professional", 100)], False),
+    )
+    @ddt.unpack
+    def test_can_auto_enroll(self, modes_and_prices, can_auto_enroll):
+        # Create the modes and min prices
+        for mode_slug, min_price in modes_and_prices:
+            self.create_mode(mode_slug, mode_slug.capitalize(), min_price=min_price)
+
+        # Verify that we can or cannot auto enroll
+        self.assertEqual(CourseMode.can_auto_enroll(self.course_key), can_auto_enroll)
+
+    def test_all_modes_for_courses(self):
+        now = datetime.now(pytz.UTC)
+        future = now + timedelta(days=1)
+        past = now - timedelta(days=1)
+
+        # Unexpired, no expiration date
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Honor No Expiration",
+            mode_slug="honor_no_expiration",
+            expiration_datetime=None
+        )
+
+        # Unexpired, expiration date in future
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Honor Not Expired",
+            mode_slug="honor_not_expired",
+            expiration_datetime=future
+        )
+
+        # Expired
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_display_name="Verified Expired",
+            mode_slug="verified_expired",
+            expiration_datetime=past
+        )
+
+        # We should get all of these back when querying for *all* course modes,
+        # including ones that have expired.
+        other_course_key = CourseLocator(org="not", course="a", run="course")
+        all_modes = CourseMode.all_modes_for_courses([self.course_key, other_course_key])
+        self.assertEqual(len(all_modes[self.course_key]), 3)
+        self.assertEqual(all_modes[self.course_key][0].name, "Honor No Expiration")
+        self.assertEqual(all_modes[self.course_key][1].name, "Honor Not Expired")
+        self.assertEqual(all_modes[self.course_key][2].name, "Verified Expired")
+
+        # Check that we get a default mode for when no course mode is available
+        self.assertEqual(len(all_modes[other_course_key]), 1)
+        self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)

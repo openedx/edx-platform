@@ -5,7 +5,6 @@ Created on Jan 18, 2013
 @author: brian
 '''
 import openid
-import json
 from openid.fetchers import HTTPFetcher, HTTPResponse
 from urlparse import parse_qs, urlparse
 
@@ -73,7 +72,6 @@ class OpenIdProviderTest(TestCase):
     """
     Tests of the OpenId login
     """
-
     @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID') and
                 settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
                 'OpenID not enabled')
@@ -155,10 +153,10 @@ class OpenIdProviderTest(TestCase):
             # <input name="openid.return_to" type="hidden" value="http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H" />
             # <input name="openid.assoc_handle" type="hidden" value="{HMAC-SHA1}{50ff8120}{rh87+Q==}" />
 
-    def attempt_login(self, expected_code, **kwargs):
+    def attempt_login(self, expected_code, login_method='POST', **kwargs):
         """ Attempt to log in through the open id provider login """
         url = reverse('openid-provider-login')
-        post_args = {
+        args = {
             "openid.mode": "checkid_setup",
             "openid.return_to": "http://testserver/openid/complete/?janrain_nonce=2013-01-23T06%3A20%3A17ZaN7j6H",
             "openid.assoc_handle": "{HMAC-SHA1}{50ff8120}{rh87+Q==}",
@@ -180,9 +178,15 @@ class OpenIdProviderTest(TestCase):
         }
         # override the default args with any given arguments
         for key in kwargs:
-            post_args["openid." + key] = kwargs[key]
+            args["openid." + key] = kwargs[key]
 
-        resp = self.client.post(url, post_args)
+        if login_method == 'POST':
+            resp = self.client.post(url, args)
+        elif login_method == 'GET':
+            resp = self.client.get(url, args)
+        else:
+            self.fail('Invalid login method')
+
         code = expected_code
         self.assertEqual(resp.status_code, code,
                          "got code {0} for url '{1}'. Expected code {2}"
@@ -224,7 +228,8 @@ class OpenIdProviderTest(TestCase):
         request = factory.post(reverse('openid-provider-login'), post_params)
         openid_setup = {
             'request': factory.request(),
-            'url': fake_url
+            'url': fake_url,
+            'post_params': {}
         }
         request.session = {
             'openid_setup': openid_setup
@@ -285,6 +290,35 @@ class OpenIdProviderTest(TestCase):
             self.assertEquals(parsed_qs['openid.ax.type.ext0'][0], 'http://axschema.org/namePerson')
             self.assertEquals(parsed_qs['openid.ax.value.ext1.1'][0], user.email)
             self.assertEquals(parsed_qs['openid.ax.value.ext0.1'][0], user.profile.name)
+
+    @skipUnless(settings.FEATURES.get('AUTH_USE_OPENID_PROVIDER'),
+                'OpenID not enabled')
+    def test_openid_invalid_password(self):
+
+        url = reverse('openid-provider-login')
+        user = UserFactory()
+
+        # login to the client so that we can persist session information
+        for method in ['POST', 'GET']:
+            self.client.login(username=user.username, password='test')
+            self.attempt_login(200, method)
+            openid_setup = self.client.session['openid_setup']
+            self.assertIn('post_params', openid_setup)
+            post_args = {
+                'email': user.email,
+                'password': 'bad_password',
+            }
+
+            # call url again, this time with username and password
+            resp = self.client.post(url, post_args)
+            self.assertEquals(resp.status_code, 302)
+            redirect_url = resp['Location']
+            parsed_url = urlparse(redirect_url)
+            query_params = parse_qs(parsed_url[4])
+            self.assertIn('openid.return_to', query_params)
+            self.assertTrue(
+                query_params['openid.return_to'][0].startswith('http://testserver/openid/complete/')
+            )
 
 
 class OpenIdProviderLiveServerTest(LiveServerTestCase):

@@ -33,7 +33,7 @@ class AcceptanceTest(TestSuite):
     @property
     def cmd(self):
 
-        report_file = self.report_dir /  "{}.xml".format(self.system)
+        report_file = self.report_dir / "{}.xml".format(self.system)
         report_args = "--with-xunit --xunit-file {}".format(report_file)
 
         cmd = (
@@ -94,7 +94,6 @@ class AcceptanceTestSuite(TestSuite):
 
         if not self.fasttest:
             self._setup_acceptance_db()
-
 
     def _setup_acceptance_db(self):
         """

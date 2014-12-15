@@ -1,25 +1,23 @@
 """LTI integration tests"""
 
-import oauthlib
 from collections import OrderedDict
-import mock
-import urllib
 import json
+import mock
+import oauthlib
+import urllib
 
-from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.django import modulestore
+from courseware.tests import BaseTestXmodule
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from courseware.views import get_course_lti_endpoints
+from lms.lib.xblock.runtime import quote_slashes
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.x_module import STUDENT_VIEW
 
-from courseware.tests import BaseTestXmodule
-from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
-from courseware.views import get_course_lti_endpoints
-from lms.lib.xblock.runtime import quote_slashes
 
 class TestLTI(BaseTestXmodule):
     """
@@ -107,7 +105,7 @@ class TestLTI(BaseTestXmodule):
             old_parsed[u'OAuth oauth_nonce'] = mocked_nonce
             old_parsed[u'oauth_timestamp'] = mocked_timestamp
             old_parsed[u'oauth_signature'] = mocked_signature_after_sign
-            headers[u'Authorization'] = ', '.join([k+'="'+v+'"' for k, v in old_parsed.items()])
+            headers[u'Authorization'] = ', '.join([k + '="' + v + '"' for k, v in old_parsed.items()])
             return None, headers, None
 
         patcher = mock.patch.object(oauthlib.oauth1.Client, "sign", mocked_sign)
@@ -125,7 +123,7 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content, expected_content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestLTIModuleListing(ModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course

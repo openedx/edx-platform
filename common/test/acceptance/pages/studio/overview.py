@@ -307,6 +307,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
         grand_locators = [grandkid.locator for grandkid in grandkids]
         return [descendant for descendant in descendants if not descendant.locator in grand_locators]
 
+
 class CourseOutlineUnit(CourseOutlineChild):
     """
     PageObject that wraps a unit link on the Studio Course Outline page.
@@ -328,6 +329,7 @@ class CourseOutlineUnit(CourseOutlineChild):
     def children(self):
         return self.q(css=self._bounded_selector(self.BODY_SELECTOR)).map(
             lambda el: CourseOutlineUnit(self.browser, el.get_attribute('data-locator'))).results
+
 
 class CourseOutlineSubsection(CourseOutlineContainer, CourseOutlineChild):
     """
@@ -487,11 +489,15 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         click_css(self, '.wrapper-mast nav.nav-actions .button-new')
 
-    def add_section_from_bottom_button(self):
+    def add_section_from_bottom_button(self, click_child_icon=False):
         """
         Clicks the button for adding a section which resides at the bottom of the screen.
         """
-        click_css(self, self.BOTTOM_ADD_SECTION_BUTTON)
+        element_css = self.BOTTOM_ADD_SECTION_BUTTON
+        if click_child_icon:
+            element_css += " .icon-plus"
+
+        click_css(self, element_css)
 
     def toggle_expand_collapse(self):
         """

@@ -1,3 +1,6 @@
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
+
 header.global {
   border-bottom: 1px solid $m-gray;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
@@ -17,8 +20,8 @@ header.global {
   }
 
   h1.logo {
-    float: left;
-    margin: -2px 39px 0px 0px;
+    @include float(left);
+    @include margin(-2px, 39px, 0, 0);
     position: relative;
 
     a {
@@ -27,11 +30,11 @@ header.global {
   }
 
   .left {
-    float: left;
+    @include float(left);
   }
 
   .guest {
-    float: right;
+    @include float(right);
   }
 
   > li {
@@ -104,12 +107,12 @@ header.global {
   }
 
   .user {
-    float: right;
+    @include float(right);
     margin-top: 4px;
 
     > .primary {
       display: block;
-      float: left;
+      @include float(left);
       margin: 0px;
       position: relative;
 
@@ -120,14 +123,14 @@ header.global {
 
       &:last-child {
         > a {
-          border-radius: 0 4px 4px 0;
-          border-left: none;
+          @include border-radius(0, 4px, 4px, 0);
+          @include border-left(none);
           padding: 5px 8px 7px 8px;
 
           &.shopping-cart {
             border-radius: 4px;
             border: 1px solid $border-color-2;
-            margin-right: 10px;
+            @include margin-right(10px);
             padding-bottom: 6px;
           }
         }
@@ -135,7 +138,7 @@ header.global {
     }
 
     a.user-link {
-      padding: 6px 12px 8px 35px;
+      @include padding(6px, 12px, 8px, 35px);
       position: relative;
       text-transform: none;
       font-size: 14px;
@@ -145,9 +148,15 @@ header.global {
       .avatar {
         @include background-image(url('../images/small-header-home-icon.png'));
         background-repeat: no-repeat;
+
+        // CASE: right to left layout
+        @include rtl {
+          background-position: top right;
+        }
+
         height: 26px;
         display: inline-block;
-        left: 8px;
+        @include left(8px);
         opacity: 0.5;
         overflow: hidden;
         position: absolute;
@@ -171,7 +180,7 @@ header.global {
       display: none;
       padding: 5px 10px;
       position: absolute;
-      right: 0px;
+      @include right(0px);
       top: 34px;
       width: 170px;
       z-index: 3;
@@ -194,7 +203,7 @@ header.global {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        right: 12px;
+        @include right(12px);
         top: -6px;
         width: 0px;
       }
@@ -236,7 +245,7 @@ header.global {
   .nav-global {
     margin-top: ($baseline/2);
     list-style: none;
-    float: left;
+    @include float(left);
 
     li,
     div {
@@ -279,11 +288,11 @@ header.global {
   }
 
   .nav-courseware {
-    float: right;
+    @include float(right);
     margin-top: ($baseline/4);
     list-style: none;
 
-    div {
+    li, div {
       display: inline-block;
 
       .cta {
@@ -311,7 +320,6 @@ header.global {
 .view-courses .nav-global-02,
 .view-schools .nav-global-03,
 .view-register .nav-global-04 {
-
   a {
     text-decoration: none;
     color: $link-color !important;
@@ -325,8 +333,10 @@ header.global {
 // CASE: marketing/course discovery
 header.global-new {
   @extend %ui-depth1;
+  /* Temp. fix until applied globally */
+  @include box-sizing(border-box);
+
   position: relative;
-  height: ($baseline*3.75);
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
   box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
@@ -334,16 +344,16 @@ header.global-new {
 
   nav {
     @include clearfix();
-    max-width: grid-width(12);
-    min-width: 760px;
-    height: ($baseline*2);
+    @include box-sizing(border-box);
+    width: grid-width(12);
+    height: 74px;
     margin: 0 auto;
-    padding: 18px ($baseline/2) 0;
+    padding: 17px 0;
   }
 
   h1.logo {
     float: left;
-    margin: -2px 39px 0px 0px;
+    margin: -2px 39px 0 10px;
     position: relative;
 
     a {
@@ -395,7 +405,7 @@ header.global-new {
   }
 
   .primary {
-    margin-right: 5px;
+    @include margin-right(5px);
 
     > a {
       @include background-image($button-bg-image);
@@ -416,7 +426,7 @@ header.global-new {
       vertical-align: middle;
 
       &:last-child {
-        margin-right: 0px;
+        @include margin-right(0);
       }
 
       &:hover, &:focus, &:active {
@@ -431,13 +441,13 @@ header.global-new {
 
     > .primary {
       display: block;
-      float: left;
-      margin: 0px;
+      @include float(left);
+      margin: 0;
       position: relative;
 
       > a {
         margin: 0px;
-        @include border-right-radius(0px);
+        @include border-right-radius(0);
       }
 
       &:last-child {
@@ -457,7 +467,7 @@ header.global-new {
     }
 
     a.user-link {
-      padding: 6px 12px 8px 35px;
+      @include padding(6px, 12px, 8px, 35px);
       position: relative;
       text-transform: none;
       font-size: 14px;
@@ -469,7 +479,7 @@ header.global-new {
         background-repeat: no-repeat;
         height: 26px;
         display: inline-block;
-        left: 8px;
+        @include left(8px);
         opacity: 0.5;
         overflow: hidden;
         position: absolute;
@@ -493,7 +503,7 @@ header.global-new {
       display: none;
       padding: 5px 10px;
       position: absolute;
-      right: 0px;
+      @include right(0);
       top: 34px;
       width: 170px;
       z-index: 3;
@@ -516,7 +526,7 @@ header.global-new {
         height: 0px;
         position: absolute;
         @include transform(rotate(-45deg));
-        right: 12px;
+        @include right(12px);
         top: -6px;
         width: 0px;
       }
@@ -555,7 +565,7 @@ header.global-new {
     }
   }
 
-  .nav-global {
+  %default-header-nav {
     margin-top: ($baseline/4);
     list-style: none;
     float: left;
@@ -563,25 +573,21 @@ header.global-new {
     li,
     div {
       display: inline-block;
-      margin: 0 $baseline+1 0 0;
+      margin: 0;
       text-transform: uppercase;
       letter-spacing: 0 !important;
 
-      &:last-child {
-        margin-right: 0;
-      }
-
       a {
-        border-bottom: 4px solid $header-bg;
         display:block;
-        padding: ($baseline/4);
+        padding: 3px 10px;
         font-size: 18px;
-        padding-bottom: ($baseline*1.25);
-        font-weight: 600;
+        line-height: 24px;
+        font-weight: 500;
         font-family: $header-sans-serif;
         color: $courseware-navigation-color;
 
-        &:hover, &:focus{
+        &:hover,
+        &:focus {
           text-decoration: none;
           color: $courseware-hover-color;
         }
@@ -589,25 +595,26 @@ header.global-new {
     }
   }
 
+  .nav-global {
+    @extend %default-header-nav;
+  }
+
   .nav-courseware {
-    @extend .nav-global;
+    @extend %default-header-nav;
     float: right;
 
     div {
       display: inline-block;
-      margin: 0 21px 0 0;
       text-transform: uppercase;
       letter-spacing: 0!important;
       position: relative;
-      vertical-align: middle;
 
       &:last-child {
-        margin-right: 0;
+        margin-right: 10px;
       }
 
       a {
         &.nav-courseware-button {
-          padding: 5px 45px 5px 45px;
           border: 3px solid $courseware-button-border-color;
           border-radius: 5px;
           margin-top: -22px;
@@ -620,6 +627,176 @@ header.global-new {
             border-color: $courseware-button-border-color;
           }
         }
+      }
+    }
+  }
+
+  &.rwd {
+    nav {
+      max-width: 1180px;
+      width: 320px;
+    }
+
+    .mobile-menu-button {
+      display: inline;
+      float: left;
+      text-decoration: none;
+      color: $m-gray;
+      font-size: 18px;
+      margin-top: 9px;
+
+      &:hover,
+      &:active,
+      &:focus {
+        text-decoration: none;
+      }
+    }
+
+    .logo {
+      position: absolute;
+      width: 54px;
+      left: calc( 50% - 90px );
+      top: 20px;
+
+      img {
+        width: 54px;
+      }
+    }
+
+    .nav-global,
+    .nav-courseware {
+      a {
+        font-size: 14px;
+
+        &.nav-courseware-button {
+          width: 86px;
+          text-align: center;
+          margin-top: -3px;
+        }
+      }
+    }
+
+    .nav-global,
+    .nav-courseware-01 {
+      display: none;
+    }
+
+    .nav-global {
+      position: absolute;
+      top: 73px;
+      left: calc( 50% - 160px );
+      z-index: 1000;
+      width: 320px;
+      background: $m-blue-d3;
+
+      &.show {
+        display: inline;
+      }
+
+      a {
+        color: white;
+        padding: 10px;
+        font-weight: 300;
+
+        &:hover,
+        &:focus {
+          background: $m-blue-d5;
+          color: white;
+          border-bottom: none;
+        }
+      }
+
+      li {
+        display: block;
+        border-bottom: 1px solid $m-blue-d5;
+      }
+    }
+
+    .nav-courseware {
+      display: inline;
+
+      div:last-child {
+        margin-right: 0;
+      }
+    }
+
+    @include media( $desktop ) {
+      nav {
+        width: 100%;
+      }
+
+      .mobile-menu-button {
+        display: none;
+      }
+
+      .logo {
+        position: relative;
+        width: auto;
+        top: inherit;
+        left: inherit;
+        margin-left: 10px;
+
+        img {
+          width: auto;
+        }
+      }
+
+      .nav-global {
+        display: inline;
+        position: relative;
+        z-index: auto;
+        width: auto;
+        top: auto;
+        left: auto;
+        background: inherit;
+
+        a {
+          color: $courseware-navigation-color;
+          padding: 3px 10px;
+          font-weight: 500;
+
+          &:hover,
+          &:focus {
+            background: inherit;
+            color: $courseware-hover-color;
+          }
+        }
+
+        li {
+          display: inline-block;
+          border-bottom: none;
+        }
+      }
+
+      .nav-courseware {
+        div:last-child {
+          margin-right: 10px;
+        }
+      }
+
+      .nav-courseware-01 {
+        display: inline-block;
+      }
+
+      .desktop-hide {
+        display: none!important;
+      }
+    }
+
+    @include media( $xl-desktop ) {
+      nav {
+        padding: 17px 10px;
+      }
+
+      .nav-global,
+      .nav-courseware {
+        a {
+          font-size: 18px;
+        }
+      }
+
+      .logo {
+        margin-left: 0;
       }
     }
   }

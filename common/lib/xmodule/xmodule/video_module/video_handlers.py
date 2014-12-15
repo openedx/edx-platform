@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 # Disable no-member warning:
-# pylint: disable=E1101
+# pylint: disable=no-member
 
 
 class VideoStudentViewHandlers(object):
@@ -55,7 +55,7 @@ class VideoStudentViewHandlers(object):
 
         if dispatch == 'save_user_state':
             for key in data:
-                if hasattr(self, key) and key in accepted_keys:
+                if key in accepted_keys:
                     if key in conversions:
                         value = conversions[key](data[key])
                     else:

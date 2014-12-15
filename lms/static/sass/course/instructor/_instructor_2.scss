@@ -38,6 +38,20 @@
   }
 
   // system feedback - messages
+  .msg {
+
+    &.inline {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      margin: 0 0 0 $baseline;
+      padding: 0;
+    }
+
+    &.error {
+      @extend %t-copy-sub2;
+      color: $error-red;
+    }
+  }
   .wrapper-msg {
     margin-bottom: ($baseline*1.5);
   }
@@ -105,6 +119,19 @@
         margin-bottom: 0;
       }
     }
+  }
+
+  // UI: visual dividers
+  .divider-lv0 {
+    border-top: ($baseline/5) solid $gray-l4;
+  }
+
+  .divider-lv1 {
+    border-top: ($baseline/10) solid $gray-l4;
+  }
+
+  .divider-lv2 {
+    border-top: ($baseline/20) solid $gray-l4;
   }
 }
 
@@ -259,10 +286,14 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  // type - error
+  // type - warning
   .message-warning {
     border-top: 2px solid $warning-color;
     background: tint($warning-color,95%);
+
+    .message-title {
+      color: $warning-color;
+    }
   }
 
   // grandfathered
@@ -306,6 +337,12 @@ section.instructor-dashboard-content-2 {
       text-align: right;
       color: $gray;
     }
+  }
+
+  .subsection-title {
+    @extend %hd-lv5;
+    @extend %t-weight4;
+    margin-bottom: ($baseline/2);
   }
 }
 
@@ -400,8 +437,6 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-// view - membership
-// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
 
   .membership-section {
@@ -412,7 +447,165 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  // cohort management
+  .cohort-management {
+
+    .input-lg {
+      @extend %t-action1;
+      padding: ($baseline/2);
+    }
+
+    .input-block {
+      display: block;
+      width: 100%;
+    }
+
+    .has-option-unavailable {
+
+      .option-unavailable {
+        background: #ffeef5;
+        color: $error-red;
+        font-style: italic;
+      }
+    }
+
+    .has-other {
+      display: inline-block;
+
+      label {
+        display: inline-block;
+      }
+
+      .input-group-other {
+        @extend %text-sr;
+        display: inline;
+
+        &.is-visible {
+          position: relative;
+          overflow: auto;
+          width: 100%;
+          height: auto;
+          margin: 0 0 0 $baseline;
+          padding: inherit;
+          border: inherit;
+          clip: auto;
+        }
+      }
+    }
+
+    .cohort-management-nav {
+      margin-bottom: $baseline;
+
+      .action-create {
+        margin-top: $baseline;
+      }
+    }
+
+    .cohort-management-settings {
+      @include clearfix();
+      background: $gray-l5;
+
+      .group-header-title {
+        padding: $baseline;
+        margin-bottom: 0;
+        border-bottom: 1px solid $gray-l3;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .cohort-management-group-setup {
+        padding: $baseline;
+
+        .cohort-management-group-text {
+          display: inline-block;
+          width: flex-grid(9);
+        }
+
+        .cohort-management-group-actions {
+          display: inline-block;
+          width: flex-grid(3);
+          vertical-align: top;
+          text-align: right;
+        }
+      }
+
+      .wrapper-tabs {
+        @extend %ui-no-list;
+        position: relative;
+        z-index: 10;
+        top: ($baseline/5);
+        padding: 0 $baseline 0 $baseline;
+
+        .tab {
+          position: relative;
+          display: inline-block;
+
+          a {
+              display: inline-block;
+              padding: $baseline;
+          }
+
+          &.is-selected {
+
+            a {
+              padding-bottom: ($baseline+($baseline/5));
+              background: $white;
+              border-left: ($baseline/5) solid $gray-l4;
+              border-top: ($baseline/5) solid $gray-l4;
+              border-right: ($baseline/5) solid $gray-l4;
+              color: inherit;
+              cursor: default;
+            }
+          }
+        }
+      }
+
+      .cohort-management-details {
+        background: $white;
+        border-top: ($baseline/5) solid $gray-l4;
+
+        .cohort-details-name {
+          margin-bottom: ($baseline*2);
+        }
+
+        .cohort-section-header {
+          margin-top: ($baseline*1.5);
+          padding: $baseline 0 ($baseline/2) 0;
+        }
+
+        .cohort-section-header > .form-fields {
+          padding-bottom: $baseline;
+        }
+      }
+    }
+
+    .form-actions {
+
+      &.is-end {
+        margin-top: $baseline;
+
+        .action-primary {
+          @extend %btn;
+          @extend %btn-rounded;
+          @extend %btn-inherited-primary;
+          padding: 7px $baseline;
+          text-shadow: none;
+        }
+
+        .button-link {
+          
+        }
+      }
+    }
+  }
+
+  .no-margin-top {
+    @extend %no-margin-top;
+  }
+
+  %no-margin-top {
+    margin-top: 0;
+  }
+
   %cohort-management-form {
 
     .form-fields {
@@ -430,7 +623,7 @@ section.instructor-dashboard-content-2 {
       .tip {
         @extend %t-copy-sub1;
         margin-top: ($baseline/4);
-        color: $gray-l3;
+        color: $gray-l2;
       }
 
       .field-text {
@@ -444,6 +637,10 @@ section.instructor-dashboard-content-2 {
           width: 100%;
           padding: ($baseline/2) ($baseline*0.75);
         }
+      }
+
+      .input-file {
+        margin-bottom: ($baseline/2);
       }
     }
 
@@ -468,7 +665,6 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-nav {
     @include clearfix();
-    margin-bottom: $baseline;
 
     .cohort-management-nav-form {
       width: 60%;
@@ -482,10 +678,10 @@ section.instructor-dashboard-content-2 {
 
     .action-create {
       @include idashbutton($blue);
+      @extend %t-weight4;
       float: right;
       text-align: right;
       text-shadow: none;
-      font-weight: 600;
     }
 
     // STATE: is disabled
@@ -534,10 +730,6 @@ section.instructor-dashboard-content-2 {
   }
 
   // cohort group
-  .cohort-management-group {
-    border: 1px solid $gray-l5;
-  }
-
   .cohort-management-group-header {
     border-bottom: ($baseline/10) solid $gray-l4;
     background: $gray-l5;
@@ -606,6 +798,7 @@ section.instructor-dashboard-content-2 {
 
   .cohort-management-group-add {
     @extend %cohort-management-form;
+    border: 1px solid $gray-l5;
     padding: $baseline $baseline 0 $baseline;
 
     .message-title {
@@ -642,10 +835,51 @@ section.instructor-dashboard-content-2 {
     }
   }
 
+  // CSV-based file upload for auto cohort assigning
+  .toggle-cohort-management-secondary {
+    @extend %t-copy-sub1;
+  }
+
+  .cohort-management-file-upload {
+
+    .message-title {
+      @extend %t-title7;
+    }
+
+    .form-introduction {
+      @extend %t-copy-sub1;
+      margin-bottom: $baseline;
+
+      p {
+        color: $gray-l1;
+      }
+    }
+  }
+
+  .file-upload-form {
+    @extend %cohort-management-form;
+
+    .form-fields {
+      margin-bottom: $baseline;
+    }
+
+    .action-submit {
+      @include idashbutton($blue);
+      // needed to override very poor specificity and base rules for blue button
+      @include font-size(14);
+      margin-bottom: 0;
+      font-weight: 700;
+      text-shadow: none;
+    }
+  }
 
   .cohort-management-supplemental {
     @extend %t-copy-sub1;
-    margin-top: ($baseline/2);
+    margin-top: $baseline;
+    padding: ($baseline/2) $baseline;
+    background: $gray-l5;
+    border-radius: ($baseline/10);
+
 
     .icon {
       margin-right: ($baseline/4);
@@ -684,6 +918,52 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+  // Auto Enroll Csv Section
+  .auto_enroll_csv {
+    .results {
+
+    }
+    .enrollment_signup_button {
+      margin-right: ($baseline/4);
+    }
+    // Custom File upload
+    .customBrowseBtn {
+      margin: ($baseline/2) 0;
+      display: inline-block;
+      .file-browse {
+        position:relative;
+        overflow:hidden;
+        display: inline;
+        margin-left: -5px;
+        span.browse{
+          @include button(simple, $blue);
+          padding: 6px ($baseline/2);
+          font-size: 12px;
+          border-radius: 0 3px 3px 0;
+          margin-right: ($baseline);
+        }
+        input.file_field {
+          position:absolute;
+          top:0;
+          right:0;
+          margin:0;
+          padding:0;
+          cursor:pointer;
+          opacity:0;
+          filter:alpha(opacity=0);
+        }
+      }
+      & > span, & input[disabled]{
+        vertical-align: middle;
+      }
+      input[disabled] {
+        cursor: not-allowed;
+        border: 1px solid $lightGrey1;
+        border-radius: 4px 0 0 4px;
+        padding: 6px 6px 5px;
+      }
+    }
+  }
 
   .enroll-option {
     margin: ($baseline/2) 0;
@@ -698,7 +978,7 @@ section.instructor-dashboard-content-2 {
       display: none;
       position: absolute;
       top: 15px;
-      right: 0;
+      left: ($baseline*10);
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray;
@@ -785,7 +1065,6 @@ section.instructor-dashboard-content-2 {
         .info {
           @include box-sizing(border-box);
           padding: ($baseline/2);
-
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
           line-height: 1.3em;
@@ -833,7 +1112,7 @@ section.instructor-dashboard-content-2 {
         input[type="button"].add {
           @include idashbutton($blue);
           position: absolute;
-          right: $baseline;
+          @include right($baseline);
         }
       }
 
@@ -894,15 +1173,12 @@ section.instructor-dashboard-content-2 {
     line-height: 1.3em;
   }
 
-  .data-download-container {
+  .reports-download-container {
     .data-display-table {
       .slickgrid {
         height: 400px;
       }
     }
-  }
-
-  .grades-download-container {
     .report-downloads-table {
       .slickgrid {
         height: 300px;
@@ -1148,6 +1424,9 @@ input[name="subject"] {
 
 }
 #e-commerce{
+  input[name='list-order-sale-csv'] {
+    margin-right: 14px;
+  }
   input {
     margin-bottom: 1em;
     line-height: 1.3em;
@@ -1296,19 +1575,17 @@ input[name="subject"] {
     width: 650px;
     margin-left: -325px;
     border-radius: 2px;
-    input[type="submit"]#update_coupon_button{
+    input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
+    input[type="button"]#set_course_button {
       @include button(simple, $blue);
       @extend .button-reset;
-    }
-    input[type="submit"]#add_coupon_button{
-      @include button(simple, $blue);
-      @extend .button-reset;
+      display: block;
+      height: auto;
+      margin: 0 auto;
+      width: 100%;
+      white-space: normal;
     }
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $blue);
-      @extend .button-reset;
-    }
-    input[type="submit"]#set_course_button{
       @include button(simple, $blue);
       @extend .button-reset;
     }
@@ -1624,3 +1901,8 @@ input[name="subject"] {
   }
 }
 
+.rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
+.rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
+  left: 2em;
+  right: auto;
+}

@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 @require_POST
 @login_required
-def remove_coupon(request, course_id):  # pylint: disable=W0613
+def remove_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     remove the coupon against the coupon id
     set the coupon is_active flag to false
@@ -48,7 +48,7 @@ def remove_coupon(request, course_id):  # pylint: disable=W0613
 
 @require_POST
 @login_required
-def add_coupon(request, course_id):  # pylint: disable=W0613
+def add_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     add coupon in the Coupons Table
     """
@@ -62,53 +62,66 @@ def add_coupon(request, course_id):  # pylint: disable=W0613
         # check if the coupon code is in the CourseRegistrationCode Table
         course_registration_code = CourseRegistrationCode.objects.filter(code=code)
         if course_registration_code:
-            return HttpResponseNotFound(_(
-                "The code ({code}) that you have tried to define is already in use as a registration code").format(code=code)
-            )
+            return JsonResponse(
+                {'message': _("The code ({code}) that you have tried to define is already in use as a registration code").format(code=code)},
+                status=400)  # status code 400: Bad Request
 
         description = request.POST.get('description')
         course_id = request.POST.get('course_id')
         try:
             discount = int(request.POST.get('discount'))
         except ValueError:
-            return HttpResponseNotFound(_("Please Enter the Integer Value for Coupon Discount"))
+            return JsonResponse({
+                'message': _("Please Enter the Integer Value for Coupon Discount")
+            }, status=400)  # status code 400: Bad Request
+
         if discount > 100 or discount < 0:
-            return HttpResponseNotFound(_("Please Enter the Coupon Discount Value Less than or Equal to 100"))
+            return JsonResponse({
+                'message': _("Please Enter the Coupon Discount Value Less than or Equal to 100")
+            }, status=400)  # status code 400: Bad Request
         coupon = Coupon(
             code=code, description=description, course_id=course_id,
             percentage_discount=discount, created_by_id=request.user.id
         )
         coupon.save()
-        return HttpResponse(_("coupon with the coupon code ({code}) added successfully").format(code=code))
+        return JsonResponse(
+            {'message': _("coupon with the coupon code ({code}) added successfully").format(code=code)}
+        )
 
     if coupon:
-        return HttpResponseNotFound(_("coupon with the coupon code ({code}) already exists for this course").format(code=code))
+        return JsonResponse(
+            {'message': _("coupon with the coupon code ({code}) already exists for this course").format(code=code)},
+            status=400)  # status code 400: Bad Request
 
 
 @require_POST
 @login_required
-def update_coupon(request, course_id):  # pylint: disable=W0613
+def update_coupon(request, course_id):  # pylint: disable=unused-argument
     """
     update the coupon object in the database
     """
     coupon_id = request.POST.get('coupon_id', None)
     if not coupon_id:
-        return HttpResponseNotFound(_("coupon id not found"))
+        return JsonResponse({'message': _("coupon id not found")}, status=400)  # status code 400: Bad Request
 
     try:
         coupon = Coupon.objects.get(pk=coupon_id)
     except ObjectDoesNotExist:
-        return HttpResponseNotFound(_("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id))
+        return JsonResponse(
+            {'message': _("coupon with the coupon id ({coupon_id}) DoesNotExist").format(coupon_id=coupon_id)},
+            status=400)  # status code 400: Bad Request
 
     description = request.POST.get('description')
     coupon.description = description
     coupon.save()
-    return HttpResponse(_("coupon with the coupon id ({coupon_id}) updated Successfully").format(coupon_id=coupon_id))
+    return JsonResponse(
+        {'message': _("coupon with the coupon id ({coupon_id}) updated Successfully").format(coupon_id=coupon_id)}
+    )
 
 
 @require_POST
 @login_required
-def get_coupon_info(request, course_id):  # pylint: disable=W0613
+def get_coupon_info(request, course_id):  # pylint: disable=unused-argument
     """
     get the coupon information to display in the pop up form
     """

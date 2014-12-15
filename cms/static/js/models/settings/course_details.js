@@ -18,23 +18,6 @@ var CourseDetails = Backbone.Model.extend({
         course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
     },
 
-    // When init'g from html script, ensure you pass {parse: true} as an option (2nd arg to reset)
-    parse: function(attributes) {
-        if (attributes['start_date']) {
-            attributes.start_date = new Date(attributes.start_date);
-        }
-        if (attributes['end_date']) {
-            attributes.end_date = new Date(attributes.end_date);
-        }
-        if (attributes['enrollment_start']) {
-            attributes.enrollment_start = new Date(attributes.enrollment_start);
-        }
-        if (attributes['enrollment_end']) {
-            attributes.enrollment_end = new Date(attributes.enrollment_end);
-        }
-        return attributes;
-    },
-
     validate: function(newattrs) {
         // Returns either nothing (no return call) so that validate works or an object of {field: errorstring} pairs
         // A bit funny in that the video key validation is asynchronous; so, it won't stop the validation.

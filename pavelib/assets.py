@@ -8,6 +8,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import glob
 import traceback
+import os
 from .utils.envs import Env
 from .utils.cmd import cmd, django_cmd
 
@@ -16,7 +17,15 @@ from .utils.cmd import cmd, django_cmd
 COFFEE_DIRS = ['lms', 'cms', 'common']
 SASS_LOAD_PATHS = ['./common/static/sass']
 SASS_UPDATE_DIRS = ['*/static']
-SASS_CACHE_PATH = '/tmp/sass-cache'
+
+# If running at Solano labs, multiple builds could be running on the
+# same VM, so do not hard code the path to /tmp.
+# Instead use the thread-safe temp dir.
+if os.getenv('TDDIUM'):
+    SASS_CACHE_PATH = os.path.join(os.getenv('TDDIUM_TMPDIR'), 'sass-cache')
+else:
+    SASS_CACHE_PATH = '/tmp/sass-cache'
+
 
 THEME_COFFEE_PATHS = []
 THEME_SASS_PATHS = []
@@ -51,7 +60,7 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
         print('\tCHANGED:', event.src_path)
         try:
             compile_coffeescript(event.src_path)
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 
@@ -80,7 +89,7 @@ class SassWatcher(PatternMatchingEventHandler):
         print('\tCHANGED:', event.src_path)
         try:
             compile_sass()
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 
@@ -101,7 +110,7 @@ class XModuleSassWatcher(SassWatcher):
         print('\tCHANGED:', event.src_path)
         try:
             process_xmodule_assets()
-        except Exception:  # pylint: disable=W0703
+        except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
 

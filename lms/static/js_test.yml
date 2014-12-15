@@ -41,20 +41,24 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js
+    - xmodule_js/common_static/js/vendor/url.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
     - xmodule_js/common_static/coffee/src/xblock
+    - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
     - xmodule_js/src/capa/
     - xmodule_js/src/video/
     - xmodule_js/src/xmodule.js
+    - xmodule_js/common_static/js/src/
     - xmodule_js/common_static/js/vendor/underscore-min.js
+    - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
 
 # Paths to source JavaScript files
 src_paths:
     - js
     - js/common_helpers
-    - xmodule_js
-    - xmodule_js/common_static
 
 # Paths to spec (test) JavaScript files
 spec_paths:
@@ -71,6 +75,10 @@ spec_paths:
 #
 fixture_paths:
     - templates/instructor/instructor_dashboard_2
+    - templates/dashboard
+    - templates/student_account
+    - templates/student_profile
+    - templates/file-upload.underscore
 
 requirejs:
   paths:

@@ -21,7 +21,7 @@ class Command(BaseCommand):
                     dest='remove',
                     default=False,
                     help='Remove the user from the group instead of adding it'),
-        )
+    )
 
     args = '<user|email> <group>'
     help = 'Add a user to a group'

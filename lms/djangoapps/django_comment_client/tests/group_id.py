@@ -1,7 +1,6 @@
 import json
 import re
 
-from course_groups.models import CourseUserGroup
 
 class GroupIdAssertionMixin(object):
     def _data_or_params_cs_request(self, mock_request):

@@ -19,7 +19,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -41,7 +41,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -62,7 +62,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |
@@ -72,37 +72,76 @@ Feature: LMS.Answer problems
 
 
     Scenario: I can reset a problem
-        Given I am viewing a "<ProblemType>" problem
+        Given I am viewing a randomization "<Randomization>" "<ProblemType>" problem with reset button on
         And I answer a "<ProblemType>" problem "<Correctness>ly"
         When I reset the problem
         Then my "<ProblemType>" answer is marked "unanswered"
         And The "<ProblemType>" problem displays a "blank" answer
 
         Examples:
-        | ProblemType       | Correctness   |
-        | drop down         | correct       |
-        | drop down         | incorrect     |
-        | multiple choice   | correct       |
-        | multiple choice   | incorrect     |
-        | checkbox          | correct       |
-        | checkbox          | incorrect     |
-        | radio             | correct       |
-        | radio             | incorrect     |
-        | string            | correct       |
-        | string            | incorrect     |
-        | numerical         | correct       |
-        | numerical         | incorrect     |
-        | formula           | correct       |
-        | formula           | incorrect     |
-        | script            | correct       |
-        | script            | incorrect     |
-        | radio_text        | correct       |
-        | radio_text        | incorrect     |
-        | checkbox_text     | correct       |
-        | checkbox_text     | incorrect     |
-        | image             | correct       |
-        | image             | incorrect     |
+        | ProblemType       | Correctness   | Randomization |
+        | drop down         | correct       | always        |
+        | drop down         | incorrect     | always        |
+        | multiple choice   | correct       | always        |
+        | multiple choice   | incorrect     | always        |
+        | checkbox          | correct       | always        |
+        | checkbox          | incorrect     | always        |
+        | radio             | correct       | always        |
+        | radio             | incorrect     | always        |
+        #| string            | correct       | always        |
+        #| string            | incorrect     | always        |
+        | numerical         | correct       | always        |
+        | numerical         | incorrect     | always        |
+        | formula           | correct       | always        |
+        | formula           | incorrect     | always        |
+        | script            | correct       | always        |
+        | script            | incorrect     | always        |
+        | radio_text        | correct       | always        |
+        | radio_text        | incorrect     | always        |
+        | checkbox_text     | correct       | always        |
+        | checkbox_text     | incorrect     | always        |
+        | image             | correct       | always        |
+        | image             | incorrect     | always        |
 
+    Scenario: I can reset a non-randomized problem that I answer incorrectly
+        Given I am viewing a randomization "<Randomization>" "<ProblemType>" problem with reset button on
+        And I answer a "<ProblemType>" problem "<Correctness>ly"
+        When I reset the problem
+        Then my "<ProblemType>" answer is marked "unanswered"
+        And The "<ProblemType>" problem displays a "blank" answer
+
+        Examples:
+        | ProblemType       | Correctness   | Randomization   |
+        | drop down         | incorrect     | never           |
+        | multiple choice   | incorrect     | never           |
+        | checkbox          | incorrect     | never           |
+        | radio             | incorrect     | never           |
+        #| string            | incorrect     | never           |
+        | numerical         | incorrect     | never           |
+        | formula           | incorrect     | never           |
+        | script            | incorrect     | never           |
+        | radio_text        | incorrect     | never           |
+        | checkbox_text     | incorrect     | never           |
+        | image             | incorrect     | never           |
+
+    Scenario: The reset button doesn't show up
+        Given I am viewing a randomization "<Randomization>" "<ProblemType>" problem with reset button on
+        And I answer a "<ProblemType>" problem "<Correctness>ly"
+        Then The "Reset" button does not appear
+
+        Examples:
+        | ProblemType       | Correctness   | Randomization   |
+        | drop down         | correct       | never           |
+        | multiple choice   | correct       | never           |
+        | checkbox          | correct       | never           |
+        | radio             | correct       | never           |
+        #| string            | correct       | never           |
+        | numerical         | correct       | never           |
+        | formula           | correct       | never           |
+        | script            | correct       | never           |
+        | radio_text        | correct       | never           |
+        | checkbox_text     | correct       | never           |
+        | image             | correct       | never           |
 
     Scenario: I can answer a problem with one attempt correctly and not reset
         Given I am viewing a "multiple choice" problem with "1" attempt
@@ -114,6 +153,12 @@ Feature: LMS.Answer problems
         Then I should see "You have used 0 of 3 submissions" somewhere in the page
         When I answer a "multiple choice" problem "correctly"
         Then The "Reset" button does appear
+
+    Scenario: I can answer a problem with multiple attempts correctly but cannot reset because randomization is off
+        Given I am viewing a randomization "never" "multiple choice" problem with "3" attempts with reset
+        Then I should see "You have used 0 of 3 submissions" somewhere in the page
+        When I answer a "multiple choice" problem "correctly"
+        Then The "Reset" button does not appear
 
     Scenario: I can view how many attempts I have left on a problem
         Given I am viewing a "multiple choice" problem with "3" attempts
@@ -154,8 +199,8 @@ Feature: LMS.Answer problems
         | checkbox          | incorrect     | 1 point possible    | 1 point possible   |
         | radio             | correct       | 1/1 point           | 1 point possible   |
         | radio             | incorrect     | 1 point possible    | 1 point possible   |
-        | string            | correct       | 1/1 point           | 1 point possible   |
-        | string            | incorrect     | 1 point possible    | 1 point possible   |
+        #| string            | correct       | 1/1 point           | 1 point possible   |
+        #| string            | incorrect     | 1 point possible    | 1 point possible   |
         | numerical         | correct       | 1/1 point           | 1 point possible   |
         | numerical         | incorrect     | 1 point possible    | 1 point possible   |
         | formula           | correct       | 1/1 point           | 1 point possible   |
@@ -164,6 +209,34 @@ Feature: LMS.Answer problems
         | script            | incorrect     | 2 points possible   | 2 points possible  |
         | image             | correct       | 1/1 point           | 1 point possible   |
         | image             | incorrect     | 1 point possible    | 1 point possible   |
+
+    Scenario: I can see my score on a problem when I answer it and after I reset it
+        Given I am viewing a "<ProblemType>" problem with randomization "<Randomization>" with reset button on
+        When I answer a "<ProblemType>" problem "<Correctness>ly"
+        Then I should see a score of "<Score>"
+        When I reset the problem
+        Then I should see a score of "<Points Possible>"
+
+        Examples:
+        | ProblemType       | Correctness   | Score               | Points Possible    | Randomization |
+        | drop down         | correct       | 1/1 point           | 1 point possible   | never         |
+        | drop down         | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | multiple choice   | correct       | 1/1 point           | 1 point possible   | never         |
+        | multiple choice   | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | checkbox          | correct       | 1/1 point           | 1 point possible   | never         |
+        | checkbox          | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | radio             | correct       | 1/1 point           | 1 point possible   | never         |
+        | radio             | incorrect     | 1 point possible    | 1 point possible   | never         |
+        #| string            | correct       | 1/1 point           | 1 point possible   | never         |
+        #| string            | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | numerical         | correct       | 1/1 point           | 1 point possible   | never         |
+        | numerical         | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | formula           | correct       | 1/1 point           | 1 point possible   | never         |
+        | formula           | incorrect     | 1 point possible    | 1 point possible   | never         |
+        | script            | correct       | 2/2 points          | 2 points possible  | never         |
+        | script            | incorrect     | 2 points possible   | 2 points possible  | never         |
+        | image             | correct       | 1/1 point           | 1 point possible   | never         |
+        | image             | incorrect     | 1 point possible    | 1 point possible   | never         |
 
     Scenario: I can see my score on a problem to which I submit a blank answer
         Given I am viewing a "<ProblemType>" problem
@@ -176,7 +249,7 @@ Feature: LMS.Answer problems
         | multiple choice   | 1 point possible   |
         | checkbox          | 1 point possible   |
         | radio             | 1 point possible   |
-        | string            | 1 point possible   |
+        #| string            | 1 point possible   |
         | numerical         | 1 point possible   |
         | formula           | 1 point possible   |
         | script            | 2 points possible  |
@@ -197,8 +270,8 @@ Feature: LMS.Answer problems
         | drop down       | incorrect          | correct          |
         | checkbox        | correct            | incorrect        |
         | checkbox        | incorrect          | correct          |
-        | string          | correct            | incorrect        |
-        | string          | incorrect          | correct          |
+        #| string          | correct            | incorrect        |
+        #| string          | incorrect          | correct          |
         | numerical       | correct            | incorrect        |
         | numerical       | incorrect          | correct          |
         | formula         | correct            | incorrect        |
@@ -240,7 +313,7 @@ Feature: LMS.Answer problems
         | multiple choice   |
         | checkbox          |
         | radio             |
-        | string            |
+        #| string            |
         | numerical         |
         | formula           |
         | script            |

@@ -7,39 +7,11 @@
   analytics.page();
 
   % if user.is_authenticated():
-    window.identifyUser("${user.id}", "${user.email}", "${user.username}");
+    analytics.identify("${user.id}", {
+      email: "${user.email}",
+      username: "${user.username}"
+    });
   % endif
-
-  // Get current page URL
-  var url = window.location.href
-  // Match on the current url and fire the appropriate pageview event
-  if (url.indexOf("/register") > -1) {
-    // Registration page viewed
-    analytics.track("edx.bi.page.register.viewed", {
-      category: "pageview",
-      noninteraction: 1
-    });
-  } else if (url.indexOf("/login") > -1) {
-    // Login page viewed
-    analytics.track("edx.bi.page.login.viewed", {
-      category: "pageview",
-      noninteraction: 1
-    });
-  } else if (url.indexOf("/dashboard") > -1) {
-    // Dashboard viewed
-    analytics.track("edx.bi.page.dashboard.viewed", {
-      category: "pageview",
-      noninteraction: 1
-    });
-  } else {
-    // This event serves as a catch-all, firing when any other page is viewed
-    analytics.track("edx.bi.page.other.viewed", {
-      category: "pageview",
-      url: location.host + location.pathname + location.search,
-      noninteraction: 1
-    });
-  }
-
 </script>
 <!-- end Segment.io -->
 % else:

@@ -7,7 +7,7 @@ import datetime
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url, add_instructor
-from contentstore.views.access import has_course_access
+from student.auth import has_course_author_access
 from contentstore.views.course import course_outline_initial_state
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
@@ -19,6 +19,7 @@ from opaque_keys.edx.locator import CourseLocator
 from student.tests.factories import UserFactory
 from course_action_state.managers import CourseRerunUIStateManager
 from django.conf import settings
+import pytz
 
 
 class TestCourseIndex(CourseTestCase):
@@ -180,7 +181,7 @@ class TestCourseIndex(CourseTestCase):
             # delete nofications that are dismissed
             CourseRerunState.objects.get(id=rerun_state.id)
 
-        self.assertFalse(has_course_access(user2, rerun_course_key))
+        self.assertFalse(has_course_author_access(user2, rerun_course_key))
 
     def assert_correct_json_response(self, json_response):
         """
@@ -302,7 +303,7 @@ class TestCourseOutline(CourseTestCase):
         self.assertEqual(_get_release_date(response), 'Unscheduled')
         _assert_settings_link_present(response)
 
-        self.course.start = datetime.datetime(2014, 1, 1)
+        self.course.start = datetime.datetime(2014, 1, 1, tzinfo=pytz.utc)
         modulestore().update_item(self.course, ModuleStoreEnum.UserID.test)
         response = self.client.get(outline_url, {}, HTTP_ACCEPT='text/html')
 

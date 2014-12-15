@@ -88,6 +88,17 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/common_helpers/template_
                 expect(unitOutlineView.$('.list-units')).toExist();
             });
 
+            it('highlights the current unit', function() {
+                createUnitOutlineView(this,  createMockXBlockInfo('Mock Unit'));
+                $('.outline-unit').each(function(i) {
+                    if ($(this).data('locator') === model.get('id')) {
+                        expect($(this)).toHaveClass('is-current');
+                    } else {
+                        expect($(this)).not.toHaveClass('is-current');
+                    }
+                });
+            });
+
             it('can add a unit', function() {
                 var redirectSpy;
                 createUnitOutlineView(this, createMockXBlockInfo('Mock Unit'));

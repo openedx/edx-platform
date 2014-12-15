@@ -37,7 +37,7 @@ from util.date_utils import get_default_time_display
 
 from util.json_request import expect_json, JsonResponse
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
@@ -129,7 +129,7 @@ def xblock_handler(request, usage_key_string):
     if usage_key_string:
         usage_key = usage_key_with_run(usage_key_string)
 
-        if not has_course_access(request.user, usage_key.course_key):
+        if not has_course_author_access(request.user, usage_key.course_key):
             raise PermissionDenied()
 
         if request.method == 'GET':
@@ -196,7 +196,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
             the second is the resource description
     """
     usage_key = usage_key_with_run(usage_key_string)
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     accept_header = request.META.get('HTTP_ACCEPT', 'application/json')
@@ -221,11 +221,10 @@ def xblock_view_handler(request, usage_key_string, view_name):
             # catch exceptions indiscriminately, since after this point they escape the
             # dungeon and surface as uneditable, unsaveable, and undeletable
             # component-goblins.
-            except Exception as exc:                          # pylint: disable=w0703
+            except Exception as exc:                          # pylint: disable=broad-except
                 log.debug("unable to render studio_view for %r", xblock, exc_info=True)
                 fragment = Fragment(render_to_string('html_error.html', {'message': str(exc)}))
 
-            store.update_item(xblock, request.user.id)
         elif view_name in (PREVIEW_VIEWS + container_views):
             is_pages_view = view_name == STUDENT_VIEW   # Only the "Pages" view uses student view in Studio
 
@@ -284,7 +283,7 @@ def xblock_outline_handler(request, usage_key_string):
     a course.
     """
     usage_key = usage_key_with_run(usage_key_string)
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
@@ -457,7 +456,7 @@ def _create_item(request):
 
     display_name = request.json.get('display_name')
 
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     store = modulestore()
@@ -586,7 +585,7 @@ def _delete_item(usage_key, user):
         store.delete_item(usage_key, user.id)
 
 
-# pylint: disable=W0613
+# pylint: disable=unused-argument
 @login_required
 @require_http_methods(("GET", "DELETE"))
 def orphan_handler(request, course_key_string):
@@ -599,7 +598,7 @@ def orphan_handler(request, course_key_string):
     """
     course_usage_key = CourseKey.from_string(course_key_string)
     if request.method == 'GET':
-        if has_course_access(request.user, course_usage_key):
+        if has_course_author_access(request.user, course_usage_key):
             return JsonResponse([unicode(item) for item in modulestore().get_orphans(course_usage_key)])
         else:
             raise PermissionDenied()

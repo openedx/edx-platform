@@ -244,7 +244,7 @@ class FieldDataCache(object):
             assert(isinstance(key.block_scope_id, UsageKey))
             field_object, _ = StudentModule.objects.get_or_create(
                 course_id=self.course_id,
-                student=User.objects.get(id=key.user_id),
+                student_id=key.user_id,
                 module_state_key=key.block_scope_id,
                 defaults={
                     'state': json.dumps({}),
@@ -260,12 +260,12 @@ class FieldDataCache(object):
             field_object, _ = XModuleStudentPrefsField.objects.get_or_create(
                 field_name=key.field_name,
                 module_type=key.block_scope_id,
-                student=User.objects.get(id=key.user_id),
+                student_id=key.user_id,
             )
         elif key.scope == Scope.user_info:
             field_object, _ = XModuleStudentInfoField.objects.get_or_create(
                 field_name=key.field_name,
-                student=User.objects.get(id=key.user_id),
+                student_id=key.user_id,
             )
 
         cache_key = self._cache_key_from_kvs_key(key)

@@ -718,7 +718,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_sections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).toggle_staff_view()
         self.assertEqual(courseware.num_sections, 1)
 
     def test_locked_subsections_do_not_appear_in_lms(self):
@@ -737,7 +737,7 @@ class StaffLockTest(CourseOutlineTest):
         courseware = CoursewarePage(self.browser, self.course_id)
         courseware.wait_for_page()
         self.assertEqual(courseware.num_subsections, 2)
-        StaffPage(self.browser).toggle_staff_view()
+        StaffPage(self.browser, self.course_id).toggle_staff_view()
         self.assertEqual(courseware.num_subsections, 1)
 
     def test_toggling_staff_lock_on_section_does_not_publish_draft_units(self):
@@ -1002,6 +1002,19 @@ class CreateSectionsTest(CourseOutlineTest):
         """
         self.course_outline_page.visit()
         self.course_outline_page.add_section_from_bottom_button()
+        self.assertEqual(len(self.course_outline_page.sections()), 1)
+        self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
+
+    def test_create_new_section_from_bottom_button_plus_icon(self):
+        """
+        Scenario: Create new section from button plus icon at bottom of page
+            Given that I am on the course outline
+            When I click the plus icon in "+ Add section" button at the bottom of the page
+            Then I see a new section added to the bottom of the page
+            And the display name is in its editable form.
+        """
+        self.course_outline_page.visit()
+        self.course_outline_page.add_section_from_bottom_button(click_child_icon=True)
         self.assertEqual(len(self.course_outline_page.sections()), 1)
         self.assertTrue(self.course_outline_page.section_at(0).in_editable_form())
 

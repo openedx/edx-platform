@@ -15,13 +15,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import int_to_base36
 
 from mock import Mock, patch
-from textwrap import dedent
+import ddt
 
 from student.views import password_reset, password_reset_confirm_wrapper
 from student.tests.factories import UserFactory
 from student.tests.test_email import mock_render_to_string
 
 
+@ddt.ddt
 class ResetPasswordTests(TestCase):
     """ Tests that clicking reset password sends email, and doesn't activate the user
     """
@@ -88,13 +89,7 @@ class ResetPasswordTests(TestCase):
 
         cache.clear()
 
-    @unittest.skipIf(
-        settings.FEATURES.get('DISABLE_RESET_EMAIL_TEST', False),
-        dedent("""
-            Skipping Test because CMS has not provided necessary templates for password reset.
-            If LMS tests print this message, that needs to be fixed.
-        """)
-    )
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
     @patch('django.core.mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
@@ -120,6 +115,24 @@ class ResetPasswordTests(TestCase):
         self.user = User.objects.get(pk=self.user.pk)
         self.assertFalse(self.user.is_active)
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', msg).groupdict()
+
+    @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
+    @patch('django.core.mail.send_mail')
+    @ddt.data((False, 'http://'), (True, 'https://'))
+    @ddt.unpack
+    def test_reset_password_email_https(self, is_secure, protocol, send_email):
+        """
+        Tests that the right url protocol is included in the reset password link
+        """
+        req = self.request_factory.post(
+            '/password_reset/', {'email': self.user.email}
+        )
+        req.is_secure = Mock(return_value=is_secure)
+        resp = password_reset(req)
+        _, msg, _, _ = send_email.call_args[0]
+        expected_msg = "Please go to the following page and choose a new password:\n\n" + protocol
+
+        self.assertIn(expected_msg, msg)
 
     @patch('student.views.password_reset_confirm')
     def test_reset_password_bad_token(self, reset_confirm):

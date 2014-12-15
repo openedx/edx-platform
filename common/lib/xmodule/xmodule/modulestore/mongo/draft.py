@@ -155,6 +155,7 @@ class DraftModuleStore(MongoModuleStore):
         # delete all of the db records for the course
         course_query = self._course_key_to_son(course_key)
         self.collection.remove(course_query, multi=True)
+        self.delete_all_asset_metadata(course_key, user_id)
 
     def clone_course(self, source_course_id, dest_course_id, user_id, fields=None, **kwargs):
         """
@@ -677,7 +678,11 @@ class DraftModuleStore(MongoModuleStore):
                                 # So, do not delete the child.  It will be published when the new parent is published.
                                 pass
 
-            super(DraftModuleStore, self).update_item(item, user_id, isPublish=True, is_publish_root=is_root)
+            # update the published (not draft) item (ignoring that item is "draft"). The published
+            # may not exist; (if original_published is None); so, allow_not_found
+            super(DraftModuleStore, self).update_item(
+                item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
+            )
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
 
         # verify input conditions

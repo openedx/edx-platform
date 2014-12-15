@@ -9,16 +9,23 @@ from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
-from xmodule.split_test_module import ValidationMessage, ValidationMessageType
+from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
 GROUP_CONFIGURATION_JSON = {
     u'name': u'Test name',
+    u'scheme': u'random',
     u'description': u'Test description',
+    u'version': UserPartition.VERSION,
     u'groups': [
-        {u'name': u'Group A'},
-        {u'name': u'Group B'},
+        {
+            u'name': u'Group A',
+            u'version': 1,
+        }, {
+            u'name': u'Group B',
+            u'version': 1,
+        },
     ],
 }
 
@@ -229,7 +236,8 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         expected = {
             u'description': u'Test description',
             u'name': u'Test name',
-            u'version': 1,
+            u'scheme': u'random',
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'name': u'Group A', u'version': 1},
                 {u'name': u'Group B', u'version': 1},
@@ -279,15 +287,16 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
             kwargs={'group_configuration_id': cid},
         )
 
-    def test_can_create_new_group_configuration_if_it_is_not_exist(self):
+    def test_can_create_new_group_configuration_if_it_does_not_exist(self):
         """
         PUT new group configuration when no configurations exist in the course.
         """
         expected = {
             u'id': 999,
             u'name': u'Test name',
+            u'scheme': u'random',
             u'description': u'Test description',
-            u'version': 1,
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'id': 0, u'name': u'Group A', u'version': 1},
                 {u'id': 1, u'name': u'Group B', u'version': 1},
@@ -306,12 +315,12 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         self.assertEqual(content, expected)
         self.reload_course()
         # Verify that user_partitions in the course contains the new group configuration.
-        user_partititons = self.course.user_partitions
-        self.assertEqual(len(user_partititons), 1)
-        self.assertEqual(user_partititons[0].name, u'Test name')
-        self.assertEqual(len(user_partititons[0].groups), 2)
-        self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
-        self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+        user_partitions = self.course.user_partitions
+        self.assertEqual(len(user_partitions), 1)
+        self.assertEqual(user_partitions[0].name, u'Test name')
+        self.assertEqual(len(user_partitions[0].groups), 2)
+        self.assertEqual(user_partitions[0].groups[0].name, u'Group A')
+        self.assertEqual(user_partitions[0].groups[1].name, u'Group B')
 
     def test_can_edit_group_configuration(self):
         """
@@ -323,8 +332,9 @@ class GroupConfigurationsDetailHandlerTestCase(CourseTestCase, GroupConfiguratio
         expected = {
             u'id': self.ID,
             u'name': u'New Test name',
+            u'scheme': u'random',
             u'description': u'New Test description',
-            u'version': 1,
+            u'version': UserPartition.VERSION,
             u'groups': [
                 {u'id': 0, u'name': u'New Group Name', u'version': 1},
                 {u'id': 2, u'name': u'Group C', u'version': 1},
@@ -430,8 +440,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -454,8 +465,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -469,8 +481,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         }, {
             'id': 1,
             'name': 'Name 1',
+            'scheme': 'random',
             'description': 'Description 1',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -495,8 +508,9 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = [{
             'id': 0,
             'name': 'Name 0',
+            'scheme': 'random',
             'description': 'Description 0',
-            'version': 1,
+            'version': UserPartition.VERSION,
             'groups': [
                 {'id': 0, 'name': 'Group A', 'version': 1},
                 {'id': 1, 'name': 'Group B', 'version': 1},
@@ -541,87 +555,75 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
     def setUp(self):
         super(GroupConfigurationsValidationTestCase, self).setUp()
 
-    @patch('xmodule.split_test_module.SplitTestDescriptor.validation_messages')
-    def test_error_message_present(self, mocked_validation_messages):
+    @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
+    def verify_validation_add_usage_info(self, expected_result, mocked_message, mocked_validation_messages):
         """
-        Tests if validation message is present.
-        """
-        self._add_user_partitions()
-        split_test = self._create_content_experiment(cid=0, name_suffix='0')[1]
-
-        mocked_validation_messages.return_value = [
-            ValidationMessage(
-                split_test,
-                u"Validation message",
-                ValidationMessageType.error
-            )
-        ]
-        group_configuration = GroupConfiguration.add_usage_info(self.course, self.store)[0]
-        self.assertEqual(
-            group_configuration['usage'][0]['validation'],
-            {
-                'message': u'This content experiment has issues that affect content visibility.',
-                'type': 'error'
-            }
-        )
-
-    @patch('xmodule.split_test_module.SplitTestDescriptor.validation_messages')
-    def test_warning_message_present(self, mocked_validation_messages):
-        """
-        Tests if validation message is present.
+        Helper method for testing validation information present after add_usage_info.
         """
         self._add_user_partitions()
         split_test = self._create_content_experiment(cid=0, name_suffix='0')[1]
 
-        mocked_validation_messages.return_value = [
-            ValidationMessage(
-                split_test,
-                u"Validation message",
-                ValidationMessageType.warning
-            )
-        ]
+        validation = StudioValidation(split_test.location)
+        validation.add(mocked_message)
+        mocked_validation_messages.return_value = validation
+
         group_configuration = GroupConfiguration.add_usage_info(self.course, self.store)[0]
+        self.assertEqual(expected_result.to_json(), group_configuration['usage'][0]['validation'])
+
+    def test_error_message_present(self):
+        """
+        Tests if validation message is present (error case).
+        """
+        mocked_message = StudioValidationMessage(StudioValidationMessage.ERROR, u"Validation message")
+        expected_result = StudioValidationMessage(
+            StudioValidationMessage.ERROR, u"This content experiment has issues that affect content visibility."
+        )
+        self.verify_validation_add_usage_info(expected_result, mocked_message)  # pylint: disable=no-value-for-parameter
+
+    def test_warning_message_present(self):
+        """
+        Tests if validation message is present (warning case).
+        """
+        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, u"Validation message")
+        expected_result = StudioValidationMessage(
+            StudioValidationMessage.WARNING, u"This content experiment has issues that affect content visibility."
+        )
+        self.verify_validation_add_usage_info(expected_result, mocked_message)  # pylint: disable=no-value-for-parameter
+
+    @patch('xmodule.split_test_module.SplitTestDescriptor.validate_split_test')
+    def verify_validation_update_usage_info(self, expected_result, mocked_message, mocked_validation_messages):
+        """
+        Helper method for testing validation information present after update_usage_info.
+        """
+        self._add_user_partitions()
+        split_test = self._create_content_experiment(cid=0, name_suffix='0')[1]
+
+        validation = StudioValidation(split_test.location)
+        if mocked_message is not None:
+            validation.add(mocked_message)
+        mocked_validation_messages.return_value = validation
+
+        group_configuration = GroupConfiguration.update_usage_info(
+            self.store, self.course, self.course.user_partitions[0]
+        )
         self.assertEqual(
-            group_configuration['usage'][0]['validation'],
-            {
-                'message': u'This content experiment has issues that affect content visibility.',
-                'type': 'warning'
-            }
+            expected_result.to_json() if expected_result is not None else None,
+            group_configuration['usage'][0]['validation']
         )
 
-    @patch('xmodule.split_test_module.SplitTestDescriptor.validation_messages')
-    def test_update_usage_info(self, mocked_validation_messages):
+    def test_update_usage_info(self):
         """
         Tests if validation message is present when updating usage info.
         """
-        self._add_user_partitions()
-        split_test = self._create_content_experiment(cid=0, name_suffix='0')[1]
-
-        mocked_validation_messages.return_value = [
-            ValidationMessage(
-                split_test,
-                u"Validation message",
-                ValidationMessageType.warning
-            )
-        ]
-
-        group_configuration = GroupConfiguration.update_usage_info(self.store, self.course, self.course.user_partitions[0])
-
-        self.assertEqual(
-            group_configuration['usage'][0]['validation'],
-            {
-                'message': u'This content experiment has issues that affect content visibility.',
-                'type': 'warning'
-            }
+        mocked_message = StudioValidationMessage(StudioValidationMessage.WARNING, u"Validation message")
+        expected_result = StudioValidationMessage(
+            StudioValidationMessage.WARNING, u"This content experiment has issues that affect content visibility."
         )
+        # pylint: disable=no-value-for-parameter
+        self.verify_validation_update_usage_info(expected_result, mocked_message)
 
-    @patch('xmodule.split_test_module.SplitTestDescriptor.validation_messages')
-    def test_update_usage_info_no_message(self, mocked_validation_messages):
+    def test_update_usage_info_no_message(self):
         """
         Tests if validation message is not present when updating usage info.
         """
-        self._add_user_partitions()
-        self._create_content_experiment(cid=0, name_suffix='0')
-        mocked_validation_messages.return_value = []
-        group_configuration = GroupConfiguration.update_usage_info(self.store, self.course, self.course.user_partitions[0])
-        self.assertEqual(group_configuration['usage'][0]['validation'], None)
+        self.verify_validation_update_usage_info(None, None)  # pylint: disable=no-value-for-parameter

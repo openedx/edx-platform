@@ -35,7 +35,7 @@ class WikiAccessMiddleware(object):
                 # Even though we came from the course, we can't see it. So don't worry about it.
                 pass
 
-    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=W0613
+    def process_view(self, request, view_func, view_args, view_kwargs):  # pylint: disable=unused-argument
         """
         This function handles authentication logic for wiki urls and redirects from
         the "root wiki" to the "course wiki" if the user accesses the wiki from a course url
@@ -98,5 +98,5 @@ class WikiAccessMiddleware(object):
             response = self._redirect_from_referrer(request, wiki_path) or response
 
         # END HACK: _transform_url must be set to a no-op function after it's done its work
-        reverse._transform_url = lambda url: url  # pylint: disable=W0212
+        reverse._transform_url = lambda url: url  # pylint: disable=protected-access
         return response

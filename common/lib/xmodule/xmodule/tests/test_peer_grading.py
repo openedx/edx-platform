@@ -319,7 +319,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
             'use_for_single_location': True,
             'link_to_location': self.coe_location.to_deprecated_string(),
             'graded': True,
-            })
+        })
 
     @property
     def scope_ids(self):

@@ -63,12 +63,49 @@ class CourseFactory(XModuleFactory):
         run = kwargs.get('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', None)
+
         with store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
-            # Write the data to the mongo datastore
-            kwargs.update(kwargs.get('metadata', {}))
-            new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            if default_store_override is not None:
+                with store.default_store(default_store_override):
+                    new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+            else:
+                new_course = store.create_course(org, number, run, user_id, fields=kwargs)
+
             last_course.loc = new_course.location
             return new_course
+
+
+class LibraryFactory(XModuleFactory):
+    """
+    Factory for creating a content library
+    """
+    org = factory.Sequence('org{}'.format)
+    library = factory.Sequence('lib{}'.format)
+    display_name = factory.Sequence('Test Library {}'.format)
+
+    # pylint: disable=unused-argument
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        """
+        Create a library with a unique name and key.
+        All class attributes (from this class and base classes) are automagically
+        passed in via **kwargs.
+        """
+        # some of the kwargst actual field values, so pop those off for use separately:
+        org = kwargs.pop('org')
+        library = kwargs.pop('library')
+        store = kwargs.pop('modulestore')
+        user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
+
+        # Pass the metadata just as field=value pairs
+        kwargs.update(kwargs.pop('metadata', {}))
+        default_store_override = kwargs.pop('default_store', ModuleStoreEnum.Type.split)
+        with store.default_store(default_store_override):
+            new_library = store.create_library(org, library, user_id, fields=kwargs)
+            return new_library
 
 
 class ItemFactory(XModuleFactory):
@@ -272,6 +309,17 @@ def check_sum_of_calls(object_, methods, maximum_calls, minimum_calls=1):
     assert_less_equal(call_count, maximum_calls)
 
 
+def mongo_uses_error_check(store):
+    """
+    Does mongo use the error check as a separate message?
+    """
+    if hasattr(store, 'mongo_wire_version'):
+        return store.mongo_wire_version() <= 1
+    if hasattr(store, 'modulestores'):
+        return any([mongo_uses_error_check(substore) for substore in store.modulestores])
+    return False
+
+
 @contextmanager
 def check_mongo_calls(num_finds=0, num_sends=None):
     """
@@ -292,7 +340,8 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         if num_sends is not None:
             with check_sum_of_calls(
                 pymongo.message,
-                ['insert', 'update', 'delete'],
+                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
                 num_sends,
                 num_sends
             ):

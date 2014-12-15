@@ -1,23 +1,23 @@
 # pylint: disable=missing-docstring
-from django.conf import settings
+from django.core.cache import cache
 from django.test.utils import override_settings
-from django.test import TestCase
-
-from courseware.tests.tests import TEST_DATA_MIXED_MODULESTORE
 from lang_pref import LANGUAGE_KEY
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE
 from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Will also run default tests for IDTokens and UserInfo
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class BaseTestMixin(TestCase):
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
+class BaseTestMixin(ModuleStoreTestCase):
     profile = None
 
     def setUp(self):
@@ -35,8 +35,14 @@ class BaseTestMixin(TestCase):
 
 
 class IDTokenTest(BaseTestMixin, IDTokenTestCase):
+    def setUp(self):
+        super(IDTokenTest, self).setUp()
+
+        # CourseAccessHandler uses the application cache.
+        cache.clear()
+
     def test_sub_claim(self):
-        scopes, claims = self.get_new_id_token_values('openid')
+        scopes, claims = self.get_id_token_values('openid')
         self.assertIn('openid', scopes)
 
         sub = claims['sub']
@@ -45,7 +51,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertEqual(sub, expected_sub)
 
     def test_user_name_claim(self):
-        _scopes, claims = self.get_new_id_token_values('openid profile')
+        _scopes, claims = self.get_id_token_values('openid profile')
         claim_name = claims['name']
 
         user_profile = UserProfile.objects.get(user=self.user)
@@ -55,14 +61,14 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
     @override_settings(LANGUAGE_CODE='en')
     def test_user_without_locale_claim(self):
-        scopes, claims = self.get_new_id_token_values('openid profile')
+        scopes, claims = self.get_id_token_values('openid profile')
         self.assertIn('profile', scopes)
         self.assertEqual(claims['locale'], 'en')
 
     def test_user_with_locale_claim(self):
         language = 'en'
         UserPreference.set_preference(self.user, LANGUAGE_KEY, language)
-        scopes, claims = self.get_new_id_token_values('openid profile')
+        scopes, claims = self.get_id_token_values('openid profile')
 
         self.assertIn('profile', scopes)
 
@@ -70,8 +76,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
         self.assertEqual(language, locale)
 
     def test_no_special_course_access(self):
-        scopes, claims = self.get_new_id_token_values('openid course_instructor course_staff')
-
+        scopes, claims = self.get_id_token_values('openid course_instructor course_staff')
         self.assertNotIn('course_staff', scopes)
         self.assertNotIn('staff_courses', claims)
 
@@ -81,7 +86,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
     def test_course_staff_courses(self):
         CourseStaffRole(self.course_key).add_users(self.user)
 
-        scopes, claims = self.get_new_id_token_values('openid course_staff')
+        scopes, claims = self.get_id_token_values('openid course_staff')
 
         self.assertIn('course_staff', scopes)
         self.assertNotIn('staff_courses', claims)  # should not return courses in id_token
@@ -89,10 +94,41 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
     def test_course_instructor_courses(self):
         CourseInstructorRole(self.course_key).add_users(self.user)
 
-        scopes, claims = self.get_new_id_token_values('openid course_instructor')
+        scopes, claims = self.get_id_token_values('openid course_instructor')
 
         self.assertIn('course_instructor', scopes)
-        self.assertNotIn('instructor_courses', claims)   # should not return courses in id_token
+        self.assertNotIn('instructor_courses', claims)  # should not return courses in id_token
+
+    def test_course_staff_courses_with_claims(self):
+        CourseStaffRole(self.course_key).add_users(self.user)
+
+        course_id = unicode(self.course_key)
+        nonexistent_course_id = 'some/other/course'
+
+        claims = {
+            'staff_courses': {
+                'values': [course_id, nonexistent_course_id],
+                'essential': True,
+            }
+        }
+
+        scopes, claims = self.get_id_token_values(scope='openid course_staff', claims=claims)
+
+        self.assertIn('course_staff', scopes)
+        self.assertIn('staff_courses', claims)
+        self.assertEqual(len(claims['staff_courses']), 1)
+        self.assertIn(course_id, claims['staff_courses'])
+        self.assertNotIn(nonexistent_course_id, claims['staff_courses'])
+
+    def test_permissions_scope(self):
+        scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertIn('permissions', scopes)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        _scopes, claims = self.get_id_token_values('openid profile permissions')
+        self.assertTrue(claims['administrator'])
 
 
 class UserInfoTest(BaseTestMixin, UserInfoTestCase):
@@ -158,3 +194,13 @@ class UserInfoTest(BaseTestMixin, UserInfoTestCase):
         courses = claims['instructor_courses']
         self.assertIn(self.course_id, courses)
         self.assertEqual(len(courses), 1)
+
+    def test_permissions_scope(self):
+        claims = self.get_with_scope('permissions')
+        self.assertIn('administrator', claims)
+        self.assertFalse(claims['administrator'])
+
+        self.user.is_staff = True
+        self.user.save()
+        claims = self.get_with_scope('permissions')
+        self.assertTrue(claims['administrator'])

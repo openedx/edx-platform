@@ -15,7 +15,7 @@ from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import cache_control
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
 from django.core.urlresolvers import reverse
@@ -23,8 +23,11 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 import random
+import unicodecsv
+import urllib
+from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -50,6 +53,7 @@ from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
     enroll_email,
+    send_mail_to_student,
     get_email_params,
     send_beta_role_email,
     unenroll_email
@@ -60,7 +64,7 @@ import instructor_analytics.basic
 import instructor_analytics.distributions
 import instructor_analytics.csvs
 import csv
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
@@ -80,8 +84,10 @@ from .tools import (
     bulk_email_is_enabled_for_course,
     add_block_ids,
 )
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from student.models import UserProfile, Registration
 
 log = logging.getLogger(__name__)
 
@@ -91,7 +97,7 @@ def common_exceptions_400(func):
     Catches common exceptions and renders matching 400 errors.
     (decorator without arguments)
     """
-    def wrapped(request, *args, **kwargs):  # pylint: disable=C0111
+    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
         use_json = (request.is_ajax() or
                     request.META.get("HTTP_ACCEPT", "").startswith("application/json"))
         try:
@@ -125,8 +131,8 @@ def require_query_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -162,8 +168,8 @@ def require_post_params(*args, **kwargs):
     required_params += [(key, kwargs[key]) for key in kwargs]
     # required_params = e.g. [('action', 'enroll or unenroll'), ['emails', None]]
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
 
             error_response_data = {
@@ -202,8 +208,8 @@ def require_level(level):
     if level not in ['instructor', 'staff']:
         raise ValueError("unrecognized level '{}'".format(level))
 
-    def decorator(func):  # pylint: disable=C0111
-        def wrapped(*args, **kwargs):  # pylint: disable=C0111
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
             course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id']))
 
@@ -213,6 +219,194 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
+
+
+EMAIL_INDEX = 0
+USERNAME_INDEX = 1
+NAME_INDEX = 2
+COUNTRY_INDEX = 3
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def register_and_enroll_students(request, course_id):  # pylint: disable=too-many-statements
+    """
+    Create new account and Enroll students in this course.
+    Passing a csv file that contains a list of students.
+    Order in csv should be the following email = 0; username = 1; name = 2; country = 3.
+    Requires staff access.
+
+    -If the email address and username already exists and the user is enrolled in the course,
+    do nothing (including no email gets sent out)
+
+    -If the email address already exists, but the username is different,
+    match on the email address only and continue to enroll the user in the course using the email address
+    as the matching criteria. Note the change of username as a warning message (but not a failure). Send a standard enrollment email
+    which is the same as the existing manual enrollment
+
+    -If the username already exists (but not the email), assume it is a different user and fail to create the new account.
+     The failure will be messaged in a response in the browser.
+    """
+
+    if not microsite.get_value('ALLOW_AUTOMATED_SIGNUPS', settings.FEATURES.get('ALLOW_AUTOMATED_SIGNUPS', False)):
+        return HttpResponseForbidden()
+
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    warnings = []
+    row_errors = []
+    general_errors = []
+
+    if 'students_list' in request.FILES:
+        students = []
+
+        try:
+            upload_file = request.FILES.get('students_list')
+            if upload_file.name.endswith('.csv'):
+                students = [row for row in csv.reader(upload_file.read().splitlines())]
+                course = get_course_by_id(course_id)
+            else:
+                general_errors.append({
+                    'username': '', 'email': '',
+                    'response': _('Make sure that the file you upload is in CSV format with no extraneous characters or rows.')
+                })
+
+        except Exception:  # pylint: disable=broad-except
+            general_errors.append({
+                'username': '', 'email': '', 'response': _('Could not read uploaded file.')
+            })
+        finally:
+            upload_file.close()
+
+        generated_passwords = []
+        row_num = 0
+        for student in students:
+            row_num = row_num + 1
+
+            # verify that we have exactly four columns in every row but allow for blank lines
+            if len(student) != 4:
+                if len(student) > 0:
+                    general_errors.append({
+                        'username': '',
+                        'email': '',
+                        'response': _('Data in row #{row_num} must have exactly four columns: email, username, full name, and country').format(row_num=row_num)
+                    })
+                continue
+
+            # Iterate each student in the uploaded csv file.
+            email = student[EMAIL_INDEX]
+            username = student[USERNAME_INDEX]
+            name = student[NAME_INDEX]
+            country = student[COUNTRY_INDEX][:2]
+
+            email_params = get_email_params(course, True, secure=request.is_secure())
+            try:
+                validate_email(email)  # Raises ValidationError if invalid
+            except ValidationError:
+                row_errors.append({
+                    'username': username, 'email': email, 'response': _('Invalid email {email_address}.').format(email_address=email)})
+            else:
+                if User.objects.filter(email=email).exists():
+                    # Email address already exists. assume it is the correct user
+                    # and just register the user in the course and send an enrollment email.
+                    user = User.objects.get(email=email)
+
+                    # see if it is an exact match with email and username
+                    # if it's not an exact match then just display a warning message, but continue onwards
+                    if not User.objects.filter(email=email, username=username).exists():
+                        warning_message = _(
+                            'An account with email {email} exists but the provided username {username} '
+                            'is different. Enrolling anyway with {email}.'
+                        ).format(email=email, username=username)
+
+                        warnings.append({
+                            'username': username, 'email': email, 'response': warning_message})
+                        log.warning('email {email} already exist'.format(email=email))
+                    else:
+                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+
+                    # make sure user is enrolled in course
+                    if not CourseEnrollment.is_enrolled(user, course_id):
+                        CourseEnrollment.enroll(user, course_id)
+                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
+                else:
+                    # This email does not yet exist, so we need to create a new account
+                    # If username already exists in the database, then create_and_enroll_user
+                    # will raise an IntegrityError exception.
+                    password = generate_unique_password(generated_passwords)
+
+                    try:
+                        create_and_enroll_user(email, username, name, country, password, course_id)
+                    except IntegrityError:
+                        row_errors.append({
+                            'username': username, 'email': email, 'response': _('Username {user} already exists.').format(user=username)})
+                    except Exception as ex:
+                        log.exception(type(ex).__name__)
+                        row_errors.append({
+                            'username': username, 'email': email, 'response': _(type(ex).__name__)})
+                    else:
+                        # It's a new user, an email will be sent to each newly created user.
+                        email_params['message'] = 'account_creation_and_enrollment'
+                        email_params['email_address'] = email
+                        email_params['password'] = password
+                        email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
+                        send_mail_to_student(email, email_params)
+                        log.info('email sent to new created user at {email}'.format(email=email))
+
+    else:
+        general_errors.append({
+            'username': '', 'email': '', 'response': _('File is not attached.')
+        })
+
+    results = {
+        'row_errors': row_errors,
+        'general_errors': general_errors,
+        'warnings': warnings
+    }
+    return JsonResponse(results)
+
+
+def generate_random_string(length):
+    """
+    Create a string of random characters of specified length
+    """
+    chars = [
+        char for char in string.ascii_uppercase + string.digits + string.ascii_lowercase
+        if char not in 'aAeEiIoOuU1l'
+    ]
+
+    return string.join((random.choice(chars) for __ in range(length)), '')
+
+
+def generate_unique_password(generated_passwords, password_length=12):
+    """
+    generate a unique password for each student.
+    """
+
+    password = generate_random_string(password_length)
+    while password in generated_passwords:
+        password = generate_random_string(password_length)
+
+    generated_passwords.append(password)
+
+    return password
+
+
+def create_and_enroll_user(email, username, name, country, password, course_id):
+    """ Creates a user and enroll him/her in the course"""
+
+    user = User.objects.create_user(username, email, password)
+    reg = Registration()
+    reg.register(user)
+
+    profile = UserProfile(user=user)
+    profile.name = name
+    profile.country = country
+    profile.save()
+
+    # try to enroll the user in this course
+    CourseEnrollment.enroll(user, course_id)
 
 
 @ensure_csrf_cookie
@@ -303,7 +497,7 @@ def students_update_enrollment(request, course_id):
                 'invalidIdentifier': True,
             })
 
-        except Exception as exc:  # pylint: disable=W0703
+        except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
             log.exception("Error while #{}ing student")
@@ -562,7 +756,7 @@ def get_grading_config(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_sale_records(request, course_id, csv=False):  # pylint: disable=unused-argument, redefined-outer-name
     """
     return the summary of all sales records for a particular course
     """
@@ -587,7 +781,51 @@ def get_sale_records(request, course_id, csv=False):  # pylint: disable=W0613, W
         return JsonResponse(response_payload)
     else:
         header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_records.csv", header, datarows)
+        return instructor_analytics.csvs.create_csv_response("e-commerce_sale_invoice_records.csv", header, datarows)
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_sale_order_records(request, course_id):  # pylint: disable=unused-argument, redefined-outer-name
+    """
+    return the summary of all sales records for a particular course
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    query_features = [
+        ('id', 'Order Id'),
+        ('company_name', 'Company Name'),
+        ('company_contact_name', 'Company Contact Name'),
+        ('company_contact_email', 'Company Contact Email'),
+        ('total_amount', 'Total Amount'),
+        ('total_codes', 'Total Codes'),
+        ('total_used_codes', 'Total Used Codes'),
+        ('logged_in_username', 'Login Username'),
+        ('logged_in_email', 'Login User Email'),
+        ('purchase_time', 'Date of Sale'),
+        ('customer_reference_number', 'Customer Reference Number'),
+        ('recipient_name', 'Recipient Name'),
+        ('recipient_email', 'Recipient Email'),
+        ('bill_to_street1', 'Street 1'),
+        ('bill_to_street2', 'Street 2'),
+        ('bill_to_city', 'City'),
+        ('bill_to_state', 'State'),
+        ('bill_to_postalcode', 'Postal Code'),
+        ('bill_to_country', 'Country'),
+        ('order_type', 'Order Type'),
+        ('status', 'Order Item Status'),
+        ('coupon_code', 'Coupon Code'),
+        ('unit_cost', 'Unit Price'),
+        ('list_price', 'List Price'),
+        ('codes', 'Registration Codes'),
+        ('course_id', 'Course Id')
+    ]
+
+    db_columns = [x[0] for x in query_features]
+    csv_columns = [x[1] for x in query_features]
+    sale_data = instructor_analytics.basic.sale_order_record_features(course_id, db_columns)
+    header, datarows = instructor_analytics.csvs.format_dictlist(sale_data, db_columns)  # pylint: disable=unused-variable
+    return instructor_analytics.csvs.create_csv_response("e-commerce_sale_order_records.csv", csv_columns, datarows)
 
 
 @require_level('staff')
@@ -653,35 +891,7 @@ def re_validate_invoice(obj_invoice):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_purchase_transaction(request, course_id, csv=False):  # pylint: disable=W0613, W0621
-    """
-    return the summary of all purchased transactions for a particular course
-    """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    query_features = [
-        'id', 'username', 'email', 'course_id', 'list_price', 'coupon_code',
-        'unit_cost', 'purchase_time', 'orderitem_id',
-        'order_id',
-    ]
-
-    student_data = instructor_analytics.basic.purchase_transactions(course_id, query_features)
-
-    if not csv:
-        response_payload = {
-            'course_id': course_id.to_deprecated_string(),
-            'students': student_data,
-            'queried_features': query_features
-        }
-        return JsonResponse(response_payload)
-    else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("e-commerce_purchase_transactions.csv", header, datarows)
-
-
-@ensure_csrf_cookie
-@cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
-def get_students_features(request, course_id, csv=False):  # pylint: disable=W0613, W0621
+def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """
     Respond with json which contains a summary of all enrolled students profile information.
 
@@ -690,7 +900,8 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
 
     TO DO accept requests for different attribute sets.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
+    course = get_course_by_id(course_key)
 
     available_features = instructor_analytics.basic.AVAILABLE_FEATURES
 
@@ -703,8 +914,6 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
             'year_of_birth', 'gender', 'level_of_education', 'mailing_address',
             'goals'
         ]
-
-    student_data = instructor_analytics.basic.enrolled_students_features(course_id, query_features)
 
     # Provide human-friendly and translatable names for these features. These names
     # will be displayed in the table generated in data_download.coffee. It is not (yet)
@@ -723,9 +932,15 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         'goals': _('Goals'),
     }
 
+    if course.is_cohorted:
+        # Translators: 'Cohort' refers to a group of students within a course.
+        query_features.append('cohort')
+        query_features_names['cohort'] = _('Cohort')
+
     if not csv:
+        student_data = instructor_analytics.basic.enrolled_students_features(course_key, query_features)
         response_payload = {
-            'course_id': course_id.to_deprecated_string(),
+            'course_id': unicode(course_key),
             'students': student_data,
             'students_count': len(student_data),
             'queried_features': query_features,
@@ -734,14 +949,64 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=W06
         }
         return JsonResponse(response_payload)
     else:
-        header, datarows = instructor_analytics.csvs.format_dictlist(student_data, query_features)
-        return instructor_analytics.csvs.create_csv_response("enrolled_profiles.csv", header, datarows)
+        try:
+            instructor_task.api.submit_calculate_students_features_csv(request, course_key, query_features)
+            success_status = _("Your enrolled student profile report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+            return JsonResponse({"status": success_status})
+        except AlreadyRunningError:
+            already_running_status = _("An enrolled student profile report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+            return JsonResponse({"status": already_running_status})
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_POST
+@require_level('staff')
+def add_users_to_cohorts(request, course_id):
+    """
+    View method that accepts an uploaded file (using key "uploaded-file")
+    containing cohort assignments for users. This method spawns a celery task
+    to do the assignments, and a CSV file with results is provided via data downloads.
+    """
+    course_key = SlashSeparatedCourseKey.from_string(course_id)
+
+    try:
+        def validator(file_storage, file_to_validate):
+            """
+            Verifies that the expected columns are present.
+            """
+            with file_storage.open(file_to_validate) as f:
+                reader = unicodecsv.reader(UniversalNewlineIterator(f), encoding='utf-8')
+                try:
+                    fieldnames = next(reader)
+                except StopIteration:
+                    fieldnames = []
+                msg = None
+                if "cohort" not in fieldnames:
+                    msg = _("The file must contain a 'cohort' column containing cohort names.")
+                elif "email" not in fieldnames and "username" not in fieldnames:
+                    msg = _("The file must contain a 'username' column, an 'email' column, or both.")
+                if msg:
+                    raise FileValidationException(msg)
+
+        __, filename = store_uploaded_file(
+            request, 'uploaded-file', ['.csv'],
+            course_and_time_based_filename_generator(course_key, "cohorts"),
+            max_file_size=2000000,  # limit to 2 MB
+            validator=validator
+        )
+        # The task will assume the default file storage.
+        instructor_task.api.submit_cohort_students(request, course_key, filename)
+    except (FileValidationException, PermissionDenied) as err:
+        return JsonResponse({"error": unicode(err)}, status=400)
+
+    return JsonResponse()
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_coupon_codes(request, course_id):  # pylint: disable=W0613
+def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Coupons.
     """
@@ -755,7 +1020,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=W0613
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_codes(request, course_id, generated_codes_list, invoice):
+def save_registration_code(user, course_id, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -765,16 +1030,20 @@ def save_registration_codes(request, course_id, generated_codes_list, invoice):
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_code(user, course_id, invoice, order)
 
     course_registration = CourseRegistrationCode(
-        code=code, course_id=course_id.to_deprecated_string(), created_by=request.user, invoice=invoice
+        code=code,
+        course_id=course_id.to_deprecated_string(),
+        created_by=user,
+        invoice=invoice,
+        order=order
     )
     try:
         course_registration.save()
-        generated_codes_list.append(course_registration)
+        return course_registration
     except IntegrityError:
-        return save_registration_codes(request, course_id, generated_codes_list, invoice)
+        return save_registration_code(user, course_id, invoice, order)
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -801,20 +1070,15 @@ def random_code_generator():
     generate a random alphanumeric code of length defined in
     REGISTRATION_CODE_LENGTH settings
     """
-    chars = ''
-    for char in string.ascii_uppercase + string.digits + string.ascii_lowercase:
-        # removing vowel words and specific characters
-        chars += char.strip('aAeEiIoOuU1l')
-
     code_length = getattr(settings, 'REGISTRATION_CODE_LENGTH', 8)
-    return string.join((random.choice(chars) for _ in range(code_length)), '')
+    return generate_random_string(code_length)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def get_registration_codes(request, course_id):  # pylint: disable=W0613
+def get_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Registration Codes.
     """
@@ -840,7 +1104,6 @@ def generate_registration_codes(request, course_id):
     Respond with csv which contains a summary of all Generated Codes.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course_registration_codes = []
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -871,14 +1134,27 @@ def generate_registration_codes(request, course_id):
 
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
-        total_amount=sale_price, company_name=company_name, company_contact_email=company_contact_email,
-        company_contact_name=company_contact_name, course_id=course_id, recipient_name=recipient_name,
-        recipient_email=recipient_email, address_line_1=address_line_1, address_line_2=address_line_2,
-        address_line_3=address_line_3, city=city, state=state, zip=zip_code, country=country,
-        internal_reference=internal_reference, customer_reference_number=customer_reference_number
+        total_amount=sale_price,
+        company_name=company_name,
+        company_contact_email=company_contact_email,
+        company_contact_name=company_contact_name,
+        course_id=course_id,
+        recipient_name=recipient_name,
+        recipient_email=recipient_email,
+        address_line_1=address_line_1,
+        address_line_2=address_line_2,
+        address_line_3=address_line_3,
+        city=city,
+        state=state,
+        zip=zip_code,
+        country=country,
+        internal_reference=internal_reference,
+        customer_reference_number=customer_reference_number
     )
-    for _ in range(course_code_number):  # pylint: disable=W0621
-        save_registration_codes(request, course_id, course_registration_codes, sale_invoice)
+    registration_codes = []
+    for _ in range(course_code_number):  # pylint: disable=redefined-outer-name
+        generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
+        registration_codes.append(generated_registration_code)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
     course = get_course_by_id(course_id, depth=None)
@@ -905,7 +1181,8 @@ def generate_registration_codes(request, course_id):
         'discount': discount,
         'sale_price': sale_price,
         'quantity': quantity,
-        'registration_codes': course_registration_codes,
+        'registration_codes': registration_codes,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'course_url': course_url,
         'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         'dashboard_url': dashboard_url,
@@ -923,8 +1200,13 @@ def generate_registration_codes(request, course_id):
     #send_mail(subject, message, from_address, recipient_list, fail_silently=False)
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
-    for registration_code in course_registration_codes:
+    for registration_code in registration_codes:
         csv_writer.writerow([registration_code.code])
+
+    finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
+    if finance_email:
+        # append the finance email into the recipient_list
+        recipient_list.append(finance_email)
 
     # send a unique email for each recipient, don't put all email addresses in a single email
     for recipient in recipient_list:
@@ -937,14 +1219,14 @@ def generate_registration_codes(request, course_id):
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
         email.send()
 
-    return registration_codes_csv("Registration_Codes.csv", course_registration_codes)
+    return registration_codes_csv("Registration_Codes.csv", registration_codes)
 
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def active_registration_codes(request, course_id):  # pylint: disable=W0613
+def active_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Active Registration Codes.
     """
@@ -971,7 +1253,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=W0613
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_POST
-def spent_registration_codes(request, course_id):  # pylint: disable=W0613
+def spent_registration_codes(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with csv which contains a summary of all Spent(used) Registration Codes.
     """
@@ -992,7 +1274,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint:  disable=E1103
+            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1001,7 +1283,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=W0613
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_anon_ids(request, course_id):  # pylint: disable=W0613
+def get_anon_ids(request, course_id):  # pylint: disable=unused-argument
     """
     Respond with 2-column CSV output of user-id, anonymized-user-id
     """
@@ -1451,13 +1733,28 @@ def send_email(request, course_id):
     subject = request.POST.get("subject")
     message = request.POST.get("message")
 
+    # allow two branding points to come from Microsites: which CourseEmailTemplate should be used
+    # and what the 'from' field in the email should be
+    #
+    # If these are None (because we are not in a Microsite or they are undefined in Microsite config) than
+    # the system will use normal system defaults
+    template_name = microsite.get_value('course_email_template_name')
+    from_addr = microsite.get_value('course_email_from_addr')
+
     # Create the CourseEmail object.  This is saved immediately, so that
     # any transaction that has been pending up to this point will also be
     # committed.
-    email = CourseEmail.create(course_id, request.user, send_to, subject, message)
+    email = CourseEmail.create(
+        course_id,
+        request.user,
+        send_to,
+        subject, message,
+        template_name=template_name,
+        from_addr=from_addr
+    )
 
     # Submit the task, so that the correct InstructorTask object gets created (for monitoring purposes)
-    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=E1101
+    instructor_task.api.submit_bulk_course_email(request, course_id, email.id)  # pylint: disable=no-member
 
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
@@ -1546,13 +1843,15 @@ def proxy_legacy_analytics(request, course_id):
     analytics_name = request.GET.get('aname')
 
     # abort if misconfigured
-    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and hasattr(settings, 'ANALYTICS_API_KEY')):
+    if not (hasattr(settings, 'ANALYTICS_SERVER_URL') and
+            hasattr(settings, 'ANALYTICS_API_KEY') and
+            settings.ANALYTICS_SERVER_URL and settings.ANALYTICS_API_KEY):
         return HttpResponse("Analytics service not configured.", status=501)
 
     url = "{}get?aname={}&course_id={}&apikey={}".format(
         settings.ANALYTICS_SERVER_URL,
         analytics_name,
-        course_id.to_deprecated_string(),
+        urllib.quote(unicode(course_id)),
         settings.ANALYTICS_API_KEY,
     )
 
@@ -1585,7 +1884,7 @@ def proxy_legacy_analytics(request, course_id):
 
 
 @require_POST
-def get_user_invoice_preference(request, course_id):  # pylint: disable=W0613
+def get_user_invoice_preference(request, course_id):  # pylint: disable=unused-argument
     """
     Gets invoice copy user's preferences.
     """

@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import unittest
+from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -13,23 +14,24 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.utils.timezone import utc as UTC
 from django.utils.translation import ugettext as _
 import mongoengine
-from django.utils.timezone import utc as UTC
-from util.date_utils import get_time_display, DEFAULT_DATE_TIME_FORMAT
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from student.roles import CourseStaffRole, GlobalStaff
-from courseware.tests.modulestore_config import TEST_DATA_XML_MODULESTORE
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_XML_MODULESTORE
+)
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
 from external_auth.models import ExternalAuthMap
+from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.xml import XMLModuleStore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from xmodule.modulestore.xml import XMLModuleStore
 
 
 TEST_MONGODB_LOG = {
@@ -403,6 +405,7 @@ class TestSysadmin(SysadminBaseTestCase):
 
 
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'),
                      "ENABLE_SYSADMIN_DASHBOARD not set")
 class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
@@ -551,6 +554,33 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
             reverse('gitlogs_detail', kwargs={
                 'course_id': 'Not/Real/Testing'}))
         self.assertEqual(404, response.status_code)
+
+    def test_gitlog_no_logs(self):
+        """
+        Make sure the template behaves well when rendered despite there not being any logs.
+        (This is for courses imported using methods other than the git_add_course command)
+        """
+
+        self._setstaff_login()
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+
+        self._add_edx4edx()
+
+        # Simulate a lack of git import logs
+        import_logs = CourseImportLog.objects.all()
+        import_logs.delete()
+
+        response = self.client.get(
+            reverse('gitlogs_detail', kwargs={
+                'course_id': 'MITx/edx4edx/edx4edx'
+            })
+        )
+        self.assertIn(
+            'No git import logs have been recorded for this course.',
+            response.content
+        )
+
+        self._rm_edx4edx()
 
     def test_gitlog_courseteam_access(self):
         """

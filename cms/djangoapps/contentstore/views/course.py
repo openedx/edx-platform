@@ -3,7 +3,7 @@ Views related to operations on course objects
 """
 import json
 import random
-import string  # pylint: disable=W0402
+import string  # pylint: disable=deprecated-module
 import logging
 from django.utils.translation import ugettext as _
 import django.utils
@@ -22,7 +22,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
-from xmodule.partitions.partitions import UserPartition, Group
+from xmodule.partitions.partitions import UserPartition
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -47,7 +47,7 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-from .access import has_course_access
+from student.auth import has_course_author_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
@@ -94,7 +94,7 @@ def _get_course_module(course_key, user, depth=0):
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    if not has_course_access(user, course_key):
+    if not has_course_author_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
@@ -128,7 +128,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     course_key = CourseKey.from_string(course_key_string)
 
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if not has_course_access(request.user, course_key):
+        if not has_course_author_access(request.user, course_key):
             raise PermissionDenied()
         if request.method == 'GET':
             return _course_notifications_json_get(action_state_id)
@@ -218,7 +218,7 @@ def course_handler(request, course_key_string=None):
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
-            elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
+            elif not has_course_author_access(request.user, CourseKey.from_string(course_key_string)):
                 raise PermissionDenied()
             elif request.method == 'PUT':
                 raise NotImplementedError()
@@ -261,6 +261,7 @@ def course_rerun_handler(request, course_key_string):
                 'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False)
             })
 
+
 def _course_outline_json(request, course_module):
     """
     Returns a JSON representation of the course module and recursively all of its children.
@@ -289,7 +290,7 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        return has_course_access(request.user, course.id)
+        return has_course_author_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
     in_process_course_actions = [
@@ -297,7 +298,7 @@ def _accessible_courses_list(request):
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
-        if has_course_access(request.user, course.course_key)
+        if has_course_author_access(request.user, course.course_key)
     ]
     return courses, in_process_course_actions
 
@@ -386,10 +387,13 @@ def course_listing(request):
             'run': uca.course_key.run,
             'is_failed': True if uca.state == CourseRerunUIStateManager.State.FAILED else False,
             'is_in_progress': True if uca.state == CourseRerunUIStateManager.State.IN_PROGRESS else False,
-            'dismiss_link':
-                reverse_course_url('course_notifications_handler', uca.course_key, kwargs={
+            'dismiss_link': reverse_course_url(
+                'course_notifications_handler',
+                uca.course_key,
+                kwargs={
                     'action_state_id': uca.id,
-                }) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
+                },
+            ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
     # remove any courses in courses that are also in the in_process_course_actions list
@@ -455,10 +459,13 @@ def course_index(request, course_key):
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
-            'notification_dismiss_url':
-                reverse_course_url('course_notifications_handler', current_action.course_key, kwargs={
+            'notification_dismiss_url': reverse_course_url(
+                'course_notifications_handler',
+                current_action.course_key,
+                kwargs={
                     'action_state_id': current_action.id,
-                }) if current_action else None,
+                },
+            ) if current_action else None,
         })
 
 
@@ -542,7 +549,7 @@ def _create_or_rerun_course(request):
         return JsonResponse({
             'ErrMsg': _(
                 'There is already a course defined with the same '
-                'organization, course number, and course run. Please '
+                'organization and course number. Please '
                 'change either organization or course number to be unique.'
             ),
             'OrgErrMsg': _(
@@ -564,6 +571,22 @@ def _create_new_course(request, org, number, run, fields):
     Returns the URL for the course overview page.
     Raises DuplicateCourseError if the course already exists
     """
+    store_for_new_course = (
+        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
+        modulestore().default_modulestore.get_modulestore_type()
+    )
+    new_course = create_new_course_in_store(store_for_new_course, request.user, org, number, run, fields)
+    return JsonResponse({
+        'url': reverse_course_url('course_handler', new_course.id),
+        'course_key': unicode(new_course.id),
+    })
+
+
+def create_new_course_in_store(store, user, org, number, run, fields):
+    """
+    Create course in store w/ handling instructor enrollment, permissions, and defaulting the wiki slug.
+    Separated out b/c command line course creation uses this as well as the web interface.
+    """
     # Set a unique wiki_slug for newly created courses. To maintain active wiki_slugs for
     # existing xml courses this cannot be changed in CourseDescriptor.
     # # TODO get rid of defining wiki slug in this org/course/run specific way and reconcile
@@ -572,31 +595,22 @@ def _create_new_course(request, org, number, run, fields):
     definition_data = {'wiki_slug': wiki_slug}
     fields.update(definition_data)
 
-    store = modulestore()
-    store_for_new_course = (
-        settings.FEATURES.get('DEFAULT_STORE_FOR_NEW_COURSE') or
-        store.default_modulestore.get_modulestore_type()
-    )
-    with store.default_store(store_for_new_course):
+    with modulestore().default_store(store):
         # Creating the course raises DuplicateCourseError if an existing course with this org/name is found
-        new_course = store.create_course(
+        new_course = modulestore().create_course(
             org,
             number,
             run,
-            request.user.id,
+            user.id,
             fields=fields,
         )
 
     # Make sure user has instructor and staff access to the new course
-    add_instructor(new_course.id, request.user, request.user)
+    add_instructor(new_course.id, user, user)
 
     # Initialize permissions for user in the new course
-    initialize_permissions(new_course.id, request.user)
-
-    return JsonResponse({
-        'url': reverse_course_url('course_handler', new_course.id),
-        'course_key': unicode(new_course.id),
-    })
+    initialize_permissions(new_course.id, user)
+    return new_course
 
 
 def _rerun_course(request, org, number, run, fields):
@@ -607,7 +621,7 @@ def _rerun_course(request, org, number, run, fields):
     source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
 
     # verify user has access to the original course
-    if not has_course_access(request.user, source_course_key):
+    if not has_course_author_access(request.user, source_course_key):
         raise PermissionDenied()
 
     # create destination course key
@@ -688,7 +702,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     if request.method == 'GET':
@@ -1159,7 +1173,7 @@ class GroupConfiguration(object):
             configuration = json.loads(json_string)
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
-
+        configuration["version"] = UserPartition.VERSION
         return configuration
 
     def validate(self):
@@ -1210,14 +1224,7 @@ class GroupConfiguration(object):
         """
         Get user partition for saving in course.
         """
-        groups = [Group(g["id"], g["name"]) for g in self.configuration["groups"]]
-
-        return UserPartition(
-            self.configuration["id"],
-            self.configuration["name"],
-            self.configuration["description"],
-            groups
-        )
+        return UserPartition.from_json(self.configuration)
 
     @staticmethod
     def get_usage_info(course, store):
@@ -1283,10 +1290,12 @@ class GroupConfiguration(object):
                 'container_handler',
                 course.location.course_key.make_usage_key(unit.location.block_type, unit.location.name)
             )
+
+            validation_summary = split_test.general_validation_message()
             usage_info[split_test.user_partition_id].append({
                 'label': '{} / {}'.format(unit.display_name, split_test.display_name),
                 'url': unit_url,
-                'validation': split_test.general_validation_message,
+                'validation': validation_summary.to_json() if validation_summary else None,
             })
         return usage_info
 
@@ -1329,15 +1338,12 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
-
             configurations = GroupConfiguration.add_usage_info(course, store)
-
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'configurations': configurations if split_test_enabled else None,
+                'configurations': configurations if should_show_group_configurations_page(course) else None,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
@@ -1414,6 +1420,16 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             course.user_partitions.pop(index)
             store.update_item(course, request.user.id)
             return JsonResponse(status=204)
+
+
+def should_show_group_configurations_page(course):
+    """
+    Returns true if Studio should show the "Group Configurations" page for the specified course.
+    """
+    return (
+        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
+        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+    )
 
 
 def _get_course_creator_status(user):

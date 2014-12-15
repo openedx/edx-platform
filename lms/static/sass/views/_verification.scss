@@ -1,5 +1,7 @@
 // lms - views - verification flow
 // ====================
+@import '../base/grid-settings';
+@import 'neat/neat'; // lib - Neat
 
 // MISC: extends - button
 %btn-verify-primary {
@@ -12,7 +14,6 @@
 .is-expandable {
 
   .title-expand {
-
   }
 
   .expandable-icon {
@@ -355,12 +356,13 @@
   // UI: page header
   .page-header {
     width: flex-grid(12,12);
-    margin: 0 0 ($baseline/2) 0;
-    border-bottom: ($baseline/4) solid $m-gray-l4;
+    margin-bottom: 0;
+    border-bottom: none;
 
     .title {
       @include clearfix();
       width: flex-grid(12,12);
+      margin: 0;
 
       .sts-course, .sts-track {
         display: inline-block;
@@ -393,94 +395,48 @@
         }
       }
 
-      .sts-label {
-        @extend %t-title7;
+      .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
+        @extend %t-title5;
         @extend %t-weight4;
-        display: block;
-        margin-bottom: ($baseline/2);
-        border-bottom: ($baseline/10) solid $m-gray-l4;
-        padding-bottom: ($baseline/2);
-        color: $m-gray-d1;
-      }
-
-      .sts-course {
-        @extend %t-title;
-        width: flex-grid(9,12);
+        @include font-size(14);
+        @include line-height(14);
+        display: inline-block;
+        color: $gray;
         text-transform: none;
       }
 
-      .sts-course-org, .sts-course-number {
-        @extend %t-title5;
-        @extend %t-weight4;
-        display: inline-block;
+      .sts-label {
+        margin: 0;
+        border: none;
+        padding: 0;
+      }
+
+      .sts-course {
+        width: initial;
       }
 
       .sts-course-org {
-        margin-right: ($baseline/4);
+        margin-right: 0;
       }
 
-      .sts-course-name {
-        @include font-size(28);
-        @include line-height(28);
-        @extend %t-weight4;
-        display: block;
-      }
-    }
-  }
-
-  // CASE: page header - experiment variant A overrides
-  .page-header.exp-variant-A {
-    margin-bottom: 0;
-    border-bottom: none;
-
-    .title {
-      margin: 0;
-    }
-
-
-    .sts-label {
-      display: inline-block;
-      margin: 0;
-      border: none;
-      padding: 0;
-      text-transform: none;
-    }
-
-    .sts-course-org {
-      margin-right: 0;
-    }
-
-    .sts-label, .sts-course-org, .sts-course-number, .sts-course-name {
-      @extend %t-title5;
-      @extend %t-weight4;
-      @include font-size(14);
-      @include line-height(14);
-      display: inline-block;
-      color: $gray;
-      text-transform: none;
-    }
-
-    .wrapper-sts {
-      display: inline-block;
-      width: flex-grid(9,12);
-      margin-bottom: ($baseline/4);
-    }
-
-    .sts-course {
-      width: initial;
-    }
-
-    .title .sts-track {
-      display: inline-block;
-
-      .sts-track-value {
-        background: $verified-color-lvl3;
+      .wrapper-sts {
+        display: inline-block;
+        width: flex-grid(9,12);
+        margin-bottom: ($baseline/4);
       }
 
-      &.professional-ed {
+      .title .sts-track {
+        display: inline-block;
 
         .sts-track-value {
-          background-color: $professional-color-lvl1;
+          background: $verified-color-lvl3;
+        }
+
+        &.professional-ed {
+
+          .sts-track-value {
+            background-color: $professional-color-lvl1;
+          }
         }
       }
     }
@@ -1033,7 +989,7 @@
       @extend %t-weight4;
       position: absolute;
       top: -($baseline*1.25);
-      left: 45%;
+      left: calc( 50% - 46px );
       padding: ($baseline/2) ($baseline*1.5);
       background: white;
       text-align: center;
@@ -1150,10 +1106,6 @@
   // ====================
 
   // UI: main content
-  .wrapper-content-main {
-
-  }
-
   .content-main {
     width: flex-grid(12,12);
 
@@ -1177,28 +1129,37 @@
   }
 
   .content-supplementary {
-    width: flex-grid(12,12);
+    @include box-sizing(border-box);
+    @include outer-container;
+    @include span-columns(12);
 
     .list-help {
       @include clearfix();
 
       .help-item {
-        width: flex-grid(4,12);
+        @include fill-parent;
+
         float: left;
         margin-right: flex-gutter();
+        margin-bottom: 25px;
 
         &:last-child {
-          margin-right: 0
+          margin: 0;
         }
       }
     }
-  }
 
-  // CASE: supplemental content - experiment variant A overrides
-  .wrapper-content-supplementary.exp-variant-A {
+    @include media( 550px ) {
+      .list-help {
+        .help-item {
+          @include span-columns(4);
+          margin-bottom: 0;
 
-    .help-item-technical {
-      width: flex-grid(8,12);
+          &.help-item-technical {
+            @include span-columns(8);
+          }
+        }
+      }
     }
   }
 
@@ -1206,6 +1167,10 @@
 
   // VIEW: select a track
   &.step-select-track {
+    .container {
+      min-width: 0;
+      max-width: 1200px;
+    }
 
     .sts-track {
       @extend %text-sr;
@@ -1213,11 +1178,10 @@
 
     .form-register-choose {
       @include clearfix();
-      width: flex-grid(12,12);
       margin: ($baseline*2) 0;
 
       .deco-divider {
-        width: flex-grid(8,12);
+        @include fill-parent;
         float: left;
       }
     }
@@ -1227,7 +1191,7 @@
     }
 
     .register-choice {
-      width: flex-grid(8,12);
+      @include fill-parent;
       margin: 0 flex-gutter() $baseline 0;
       border-top: ($baseline/4) solid $m-gray-d4;
       padding: $baseline ($baseline*1.5);
@@ -1242,28 +1206,35 @@
         vertical-align: middle;
       }
 
-      .wrapper-copy {
-        width: flex-grid(8,8);
-      }
-
       .list-actions {
-        width: flex-grid(8,8);
+        @include fill-parent;
         text-align: right;
+        float: right;
+        margin: ($baseline/4) 0;
+        border-top: none;
+        clear: both;
       }
 
       .title {
         @extend %t-title5;
         @extend %t-weight5;
         margin-bottom: ($baseline/2);
+        width: calc( 100% - 30px );
       }
 
       .copy {
         @extend %t-copy-base;
       }
 
-      .action-select input {
-        @extend %t-weight4;
-        padding: ($baseline/2) ($baseline*0.75);
+      .action-select {
+        @include fill-parent;
+
+        input {
+          @extend %t-weight4;
+          padding: ($baseline/2) ($baseline*0.75);
+          width: 100%;
+          white-space: normal;
+        }
       }
     }
 
@@ -1278,16 +1249,10 @@
         display: block;
         width: ($baseline*2.9);
         height: ($baseline*4.2);
-        background: transparent url('../images/honor-ribbon.png') no-repeat 0 0;
-      }
-
-      .wrapper-copy {
-        width: flex-grid(8,8);
       }
 
       .list-actions {
-        width: flex-grid(8,8);
-        margin: ($baseline/3) 0;
+        margin: ($baseline) 0;
       }
 
       .action-select input {
@@ -1301,16 +1266,12 @@
 
       .deco-ribbon {
         position: absolute;
-        top: -($baseline*1.5);
+        top: -10px;
         right: $baseline;
         display: block;
-        width: ($baseline*3);
-        height: ($baseline*4);
-        background: transparent url('../images/vcert-ribbon-s.png') no-repeat 0 0;
-      }
-
-      .list-actions {
-        margin: ($baseline/3) 0;
+        width: 45px;
+        height: 45px;
+        background: transparent url('../images/verified-ribbon.png') no-repeat 0 0;
       }
 
       .action-intro, .action-select {
@@ -1319,13 +1280,9 @@
       }
 
       .action-intro {
+        @include fill-parent;
         @extend %copy-detail;
-        width: flex-grid(3,8);
         text-align: left;
-      }
-
-      .action-select {
-        width: flex-grid(5,8);
       }
 
       .action-select input {
@@ -1350,7 +1307,7 @@
     }
 
     .help-register {
-      width: flex-grid(4,12);
+      @include span-columns(4);
 
       .title {
         @extend %hd-lv4;
@@ -1382,9 +1339,16 @@
 
     .contribution-options {
       @include clearfix();
-      margin: $baseline 0;
+      @include fill-parent;
+      margin: 0;
+
+      &:after{
+        clear: none;
+        display: none;
+      }
 
       .field {
+        @include fill-parent;
         float: left;
         margin: 0 ($baseline/2) ($baseline/2) 0;
         padding: ($baseline/2) ($baseline*0.75);
@@ -1423,37 +1387,63 @@
         }
       }
     }
-  }
 
-  // CASE: select a track - experiment variant A overrides
-  .wrapper-register-choose.exp-variant-A {
+    @include media(min-width 550px max-width 768px) {
+      .contribution-options {
+        .field {
+          @include span-columns(6);
 
-    .register-choice {
-      width: flex-grid(12,12);
-    }
+          &:nth-of-type(even) {
+            margin-right: 0;
+          }
+        }
+      }
 
-    .deco-divider{
-      width: flex-grid(12,12);
-    }
+      .register-choice {
+        .list-actions {
+          float: left;
+          width: auto;
+        }
 
-    .contribution-options {
-      width: flex-grid(8,12);
-      margin: 0;
+        .action-select {
+          width: initial;
 
-      &:after{
-        clear: none;
-        display: none;
+          input {
+            width: initial;
+          }
+        }
       }
     }
 
-    .register-choice-certificate .list-actions {
-      border-top: none;
-      width: flex-grid(4,12);
-      float: right;
-      margin: ($baseline/4) 0;
+    @include media( $desktop ) {
+      .contribution-options {
+        .field {
+          width: auto;
+        }
+      }
 
-      .action-select {
-        width: initial;
+      .register-choice {
+        .list-actions {
+          @include span-columns(4);
+          width: auto;
+        }
+
+        .action-select {
+          width: initial;
+
+          input {
+            width: initial;
+          }
+        }
+      }
+    }
+
+    @include media( $xl-desktop ) {
+      .register-choice {
+        .list-actions {
+          float: right;
+          clear: none;
+        }
       }
     }
   }

@@ -10,7 +10,7 @@ sessions. Assumes structure:
 
 # We intentionally define lots of variables that aren't used, and
 # want to import all variables from base settings files
-# pylint: disable=W0401, W0614
+# pylint: disable=wildcard-import, unused-wildcard-import
 
 from .common import *
 import os
@@ -52,6 +52,8 @@ FEATURES['ALLOW_COURSE_STAFF_GRADE_DOWNLOADS'] = True
 
 # Toggles embargo on for testing
 FEATURES['EMBARGO'] = True
+
+FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
@@ -119,8 +121,8 @@ STATICFILES_DIRS += [
 # If we don't add these settings, then Django templates that can't
 # find pipelined assets will raise a ValueError.
 # http://stackoverflow.com/questions/12816941/unit-testing-with-django-pipeline
-STATICFILES_STORAGE='pipeline.storage.NonPackagingPipelineStorage'
-PIPELINE_ENABLED=False
+STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
+PIPELINE_ENABLED = False
 
 update_module_store_settings(
     MODULESTORE,
@@ -178,7 +180,7 @@ CACHES = {
 
     'mongo_metadata_inheritance': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': '/var/tmp/mongo_metadata_inheritance',
+        'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
@@ -202,6 +204,17 @@ simplefilter('ignore')  # Change to "default" to see the first instance of each 
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
+
+THIRD_PARTY_AUTH = {
+    "Google": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+    "Facebook": {
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_KEY": "test",
+        "SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET": "test",
+    },
+}
 
 ################################## OPENID #####################################
 FEATURES['AUTH_USE_OPENID'] = True
@@ -339,6 +352,10 @@ MICROSITE_CONFIGURATION = {
         "course_index_overlay_logo_file": "test_microsite/images/header-logo.png",
         "homepage_overlay_html": "<h1>This is a Test Microsite Overlay HTML</h1>",
         "ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER": False,
+        "COURSE_CATALOG_VISIBILITY_PERMISSION": "see_in_catalog",
+        "COURSE_ABOUT_VISIBILITY_PERMISSION": "see_about_page",
+        "ENABLE_SHOPPING_CART": True,
+        "ENABLE_PAID_COURSE_REGISTRATION": True,
     },
     "default": {
         "university": "default_university",
@@ -361,8 +378,8 @@ LINKEDIN_API['COMPANY_ID'] = '0000000'
 
 # Setting for the testing of Software Secure Result Callback
 VERIFY_STUDENT["SOFTWARE_SECURE"] = {
-        "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
-        "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+    "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
+    "API_SECRET_KEY": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
 }
 
 VIDEO_CDN_URL = {

@@ -18,12 +18,14 @@ __test__ = False  # do not collect
     ("suite=", "s", "Test suite to run"),
     ("mode=", "m", "dev or run"),
     ("coverage", "c", "Run test under coverage"),
+    ("port=", "p", "Port to run test server on (dev mode only)"),
 ])
 def test_js(options):
     """
     Run the JavaScript tests
     """
     mode = getattr(options, 'mode', 'run')
+    port = None
 
     if mode == 'run':
         suite = getattr(options, 'suite', 'all')
@@ -31,6 +33,7 @@ def test_js(options):
     elif mode == 'dev':
         suite = getattr(options, 'suite', None)
         coverage = False
+        port = getattr(options, 'port', None)
     else:
         sys.stderr.write("Invalid mode. Please choose 'dev' or 'run'.")
         return
@@ -43,7 +46,7 @@ def test_js(options):
         )
         return
 
-    test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage)
+    test_suite = JsTestSuite(suite, mode=mode, with_coverage=coverage, port=port)
     test_suite.run()
 
 
@@ -63,6 +66,7 @@ def test_js_run(options):
 @task
 @cmdopts([
     ("suite=", "s", "Test suite to run"),
+    ("port=", "p", "Port to run test server on"),
 ])
 def test_js_dev(options):
     """

@@ -33,7 +33,7 @@ from sys import float_info
 from collections import namedtuple
 from shapely.geometry import Point, MultiPoint
 
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 
 # specific library imports
 from calc import evaluator, UndefinedVariable
@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 
 registry = TagRegistry()
 
-CorrectMap = correctmap.CorrectMap  # pylint: disable=C0103
+CorrectMap = correctmap.CorrectMap  # pylint: disable=invalid-name
 CORRECTMAP_PY = None
 
 
@@ -715,12 +715,13 @@ class ChoiceResponse(LoncapaResponse):
         if not isinstance(student_answer, list):
             student_answer = [student_answer]
 
+        no_empty_answer = student_answer != []
         student_answer = set(student_answer)
 
         required_selected = len(self.correct_choices - student_answer) == 0
         no_extra_selected = len(student_answer - self.correct_choices) == 0
 
-        correct = required_selected & no_extra_selected
+        correct = required_selected & no_extra_selected & no_empty_answer
 
         if correct:
             return CorrectMap(self.answer_id, 'correct')
@@ -873,7 +874,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_shuffle():
                 return
-            self._has_shuffle = True  # pylint: disable=W0201
+            self._has_shuffle = True  # pylint: disable=attribute-defined-outside-init
             # Move elements from tree to list for shuffling, then put them back.
             ordering = list(choicegroup.getchildren())
             for choice in ordering:
@@ -957,7 +958,7 @@ class MultipleChoiceResponse(LoncapaResponse):
             # Both to avoid double-processing, and to feed the logs.
             if self.has_answerpool():
                 return
-            self._has_answerpool = True  # pylint: disable=W0201
+            self._has_answerpool = True  # pylint: disable=attribute-defined-outside-init
 
             choices_list = list(choicegroup.getchildren())
 
@@ -2111,10 +2112,19 @@ class CodeResponse(LoncapaResponse):
         except etree.XMLSyntaxError as _err:
             # If `html` contains attrs with no values, like `controls` in <audio controls src='smth'/>,
             # XML parser will raise exception, so wee fallback to html5parser, which will set empty "" values for such attrs.
-            parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            try:
+                parsed = html5lib.parseFragment(msg, treebuilder='lxml', namespaceHTMLElements=False)
+            except ValueError:
+                # the parsed message might contain strings that are not
+                # xml compatible, in which case, throw the error message
+                parsed = False
+
             if not parsed:
-                log.error("Unable to parse external grader message as valid"
-                      " XML: score_msg['msg']=%s", msg)
+                log.error(
+                    "Unable to parse external grader message as valid"
+                    " XML: score_msg['msg']=%s",
+                    msg,
+                )
                 return fail
 
         return (True, score_result['correct'], score_result['score'], msg)
@@ -2219,7 +2229,7 @@ class ExternalResponse(LoncapaResponse):
         cmap = CorrectMap()
         try:
             submission = [student_answers[k] for k in idset]
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error(
                 'Error %s: cannot get student answer for %s; student_answers=%s',
                 err,
@@ -2234,7 +2244,7 @@ class ExternalResponse(LoncapaResponse):
 
         try:
             rxml = self.do_external_request('get_score', extra_payload)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 cmap.set_dict(dict(zip(sorted(
@@ -2266,7 +2276,7 @@ class ExternalResponse(LoncapaResponse):
         try:
             rxml = self.do_external_request('get_answers', {})
             exans = json.loads(rxml.find('expected').text)
-        except Exception as err:  # pylint: disable=W0703
+        except Exception as err:  # pylint: disable=broad-except
             log.error('Error %s', err)
             if self.capa_system.DEBUG:
                 msg = '<span class="inline-error">%s</span>' % str(
@@ -2476,7 +2486,7 @@ class FormulaResponse(LoncapaResponse):
             name = hxml.get('name')
             correct_answer = contextualize_text(
                 hxml.get('answer'), self.context)
-            # pylint: disable=W0703
+            # pylint: disable=broad-except
             try:
                 correctness = self.check_formula(
                     correct_answer,
@@ -3151,20 +3161,23 @@ class ChoiceTextResponse(LoncapaResponse):
 # TEMPORARY: List of all response subclasses
 # FIXME: To be replaced by auto-registration
 
-# pylint: disable=E0604
-__all__ = [CodeResponse,
-           NumericalResponse,
-           FormulaResponse,
-           CustomResponse,
-           SchematicResponse,
-           ExternalResponse,
-           ImageResponse,
-           OptionResponse,
-           SymbolicResponse,
-           StringResponse,
-           ChoiceResponse,
-           MultipleChoiceResponse,
-           TrueFalseResponse,
-           JavascriptResponse,
-           AnnotationResponse,
-           ChoiceTextResponse]
+# pylint: disable=invalid-all-object
+__all__ = [
+    CodeResponse,
+    NumericalResponse,
+    FormulaResponse,
+    CustomResponse,
+    SchematicResponse,
+    ExternalResponse,
+    ImageResponse,
+    OptionResponse,
+    SymbolicResponse,
+    StringResponse,
+    ChoiceResponse,
+    MultipleChoiceResponse,
+    TrueFalseResponse,
+    JavascriptResponse,
+    AnnotationResponse,
+    ChoiceTextResponse,
+]
+# pylint: enable=invalid-all-object

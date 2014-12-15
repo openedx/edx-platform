@@ -25,6 +25,8 @@ log = logging.getLogger(__name__)
 TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
 TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
 
 @ddt.ddt
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
@@ -47,7 +49,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         import_from_xml(
-            modulestore(), self.user.id, 'common/test/data/', ['toy'],
+            modulestore(), self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=self.contentstore, verbose=True
         )
 
@@ -67,7 +69,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_unlocked)
-        self.assertEqual(resp.status_code, 200)  # pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_not_logged_in(self):
         """
@@ -76,7 +78,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.logout()
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 403)  # pylint: disable=E1103
+        self.assertEqual(resp.status_code, 403)
 
     def test_locked_asset_not_registered(self):
         """
@@ -85,7 +87,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 403)  # pylint: disable=E1103
+        self.assertEqual(resp.status_code, 403)
 
     def test_locked_asset_registered(self):
         """
@@ -97,7 +99,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client.login(username=self.non_staff_usr, password=self.non_staff_pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200)  # pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200)
 
     def test_locked_asset_staff(self):
         """
@@ -105,7 +107,7 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
         """
         self.client.login(username=self.staff_usr, password=self.staff_pwd)
         resp = self.client.get(self.url_locked)
-        self.assertEqual(resp.status_code, 200)  # pylint: disable=E1103
+        self.assertEqual(resp.status_code, 200)
 
     def test_range_request_full_file(self):
         """

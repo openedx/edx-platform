@@ -1,5 +1,5 @@
 """URL handlers related to certificate handling by LMS"""
-from dogapi import dog_stats_api
+import dogstats_wrapper as dog_stats_api
 import json
 import logging
 
@@ -92,7 +92,6 @@ def update_certificate(request):
                 #  HTTP error (reason=error(32, 'Broken pipe'), filename=None) :
                 #  certificate_agent.py:175
 
-
                 cert.error_reason = xqueue_body['error_reason']
         else:
             if cert.status in [status.generating, status.regenerating]:
@@ -105,10 +104,13 @@ def update_certificate(request):
             else:
                 logger.critical('Invalid state for cert update: {0}'.format(
                     cert.status))
-                return HttpResponse(json.dumps({
-                            'return_code': 1,
-                            'content': 'invalid cert status'}),
-                             mimetype='application/json')
+                return HttpResponse(
+                    json.dumps({
+                        'return_code': 1,
+                        'content': 'invalid cert status'
+                    }),
+                    mimetype='application/json'
+                )
 
         dog_stats_api.increment(XQUEUE_METRIC_NAME, tags=[
             u'action:update_certificate',

@@ -1,8 +1,13 @@
 import re
 
-from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=E0611
-from static_replace import (replace_static_urls, replace_course_urls,
-                            _url_replace_regex)
+from nose.tools import assert_equals, assert_true, assert_false  # pylint: disable=no-name-in-module
+from static_replace import (
+    replace_static_urls,
+    replace_course_urls,
+    _url_replace_regex,
+    process_static_urls,
+    make_static_urls_absolute
+)
 from mock import patch, Mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -25,6 +30,37 @@ def test_multi_replace():
         replace_course_urls(course_source, COURSE_KEY),
         replace_course_urls(replace_course_urls(course_source, COURSE_KEY), COURSE_KEY)
     )
+
+
+def test_process_url():
+    def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
+        return quote + 'test' + prefix + rest + quote
+
+    assert_equals('"test/static/file.png"', process_static_urls(STATIC_SOURCE, processor))
+
+
+def test_process_url_data_dir_exists():
+    base = '"/static/{data_dir}/file.png"'.format(data_dir=DATA_DIRECTORY)
+
+    def processor(original, prefix, quote, rest):  # pylint: disable=unused-argument,missing-docstring
+        return quote + 'test' + rest + quote
+
+    assert_equals(base, process_static_urls(base, processor, data_dir=DATA_DIRECTORY))
+
+
+def test_process_url_no_match():
+
+    def processor(__, prefix, quote, rest):  # pylint: disable=missing-docstring
+        return quote + 'test' + prefix + rest + quote
+
+    assert_equals('"test/static/file.png"', process_static_urls(STATIC_SOURCE, processor))
+
+
+@patch('django.http.HttpRequest')
+def test_static_urls(mock_request):
+    mock_request.build_absolute_uri = lambda url: 'http://' + url
+    result = make_static_urls_absolute(mock_request, STATIC_SOURCE)
+    assert_equals(result, '\"http:///static/file.png\"')
 
 
 @patch('static_replace.staticfiles_storage')

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pylint: disable=C0111
+# pylint: disable=missing-docstring
 
 from lettuce import world, step, before, after
 import json
@@ -104,6 +104,7 @@ class RequestHandlerWithSessionId(object):
         if value in self.headers.get(name, ''):
             return True
         return False
+
 
 def get_metadata(parent_location, player_mode, data, display_name='Video'):
     kwargs = {
@@ -316,7 +317,7 @@ def reload_the_page_with_video(_step):
 
 @step('youtube stub server (.*) YouTube API')
 def configure_youtube_api(_step, action):
-    action=action.strip()
+    action = action.strip()
     if action == 'proxies':
         world.youtube.config['youtube_api_blocked'] = False
     elif action == 'blocks':
@@ -569,7 +570,7 @@ def video_alignment(_step, transcript_visibility):
 
     set_window_dimensions(300, 600)
     real, expected = get_all_dimensions()
-    width = round(100 * real['width']/expected['width']) == wrapper_width
+    width = round(100 * real['width'] / expected['width']) == wrapper_width
 
     set_window_dimensions(600, 300)
     real, expected = get_all_dimensions()
@@ -659,7 +660,6 @@ def is_hidden_button(_step, button, state):
 def i_see_active_button(_step, button, state):
     selector = VIDEO_BUTTONS[button]
     if state == 'active':
-       assert world.css_has_class(selector, 'active')
+        assert world.css_has_class(selector, 'active')
     else:
-       assert not world.css_has_class(selector, 'active')
-
+        assert not world.css_has_class(selector, 'active')

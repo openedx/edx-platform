@@ -9,14 +9,15 @@ var CourseGrader = Backbone.Model.extend({
         "weight" : 0 // int 0..100
     },
     parse : function(attrs) {
+        // round off values while converting them to integer
         if (attrs['weight']) {
-            attrs.weight = parseInt(attrs.weight, 10);
+            attrs.weight = Math.round(attrs.weight);
         }
         if (attrs['min_count']) {
-            attrs.min_count = parseInt(attrs.min_count, 10);
+            attrs.min_count = Math.round(attrs.min_count);
         }
         if (attrs['drop_count']) {
-            attrs.drop_count = parseInt(attrs.drop_count, 10);
+            attrs.drop_count = Math.round(attrs.drop_count);
         }
         return attrs;
     },
@@ -35,7 +36,7 @@ var CourseGrader = Backbone.Model.extend({
             }
         }
         if (_.has(attrs, 'weight')) {
-            var intWeight = parseInt(attrs.weight); // see if this ensures value saved is int
+            var intWeight = Math.round(attrs.weight); // see if this ensures value saved is int
             if (!isFinite(intWeight) || /\D+/.test(attrs.weight) || intWeight < 0 || intWeight > 100) {
                 errors.weight = gettext("Please enter an integer between 0 and 100.");
             }
@@ -50,15 +51,16 @@ var CourseGrader = Backbone.Model.extend({
                 }
             }}
         if (_.has(attrs, 'min_count')) {
-            var intMinCount = parseInt(attrs.min_count, 10);
+            var intMinCount = Math.round(attrs.min_count);
             if (!isFinite(intMinCount) || /\D+/.test(attrs.min_count) || intMinCount < 1) {
                 errors.min_count = gettext("Please enter an integer greater than 0.");
             }
             else attrs.min_count = intMinCount;
         }
         if (_.has(attrs, 'drop_count')) {
-            var intDropCount = parseInt(attrs.drop_count, 10);
-            if (!isFinite(intDropCount) || /\D+/.test(attrs.drop_count) || isNaN(intDropCount) || intDropCount < 0) {
+            var dropCount = attrs.drop_count;
+            var intDropCount = Math.round(dropCount);
+            if (!isFinite(intDropCount) || /\D+/.test(dropCount) || (_.isString(dropCount) && _.isEmpty(dropCount.trim())) || intDropCount < 0) {
                 errors.drop_count = gettext("Please enter non-negative integer.");
             }
             else attrs.drop_count = intDropCount;

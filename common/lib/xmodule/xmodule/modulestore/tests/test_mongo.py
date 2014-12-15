@@ -1,6 +1,9 @@
-# pylint: disable=E1101
-# pylint: disable=W0212
-# pylint: disable=E0611
+"""
+Unit tests for the Mongo modulestore
+"""
+# pylint: disable=no-member
+# pylint: disable=protected-access
+# pylint: disable=no-name-in-module
 from nose.tools import assert_equals, assert_raises, \
     assert_not_equals, assert_false, assert_true, assert_greater, assert_is_instance, assert_is_none
 # pylint: enable=E0611
@@ -26,6 +29,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from opaque_keys.edx.locator import LibraryLocator
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -45,6 +49,7 @@ HOST = MONGO_HOST
 PORT = MONGO_PORT_NUM
 DB = 'test_mongo_%s' % uuid4().hex[:5]
 COLLECTION = 'modulestore'
+ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
 RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
@@ -60,8 +65,10 @@ class ReferenceTestXBlock(XBlock, XModuleMixin):
     reference_dict = ReferenceValueDict(scope=Scope.settings)
 
 
-class TestMongoModuleStore(unittest.TestCase):
-    '''Tests!'''
+class TestMongoModuleStoreBase(unittest.TestCase):
+    '''
+    Basic setup for all tests
+    '''
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
@@ -88,6 +95,13 @@ class TestMongoModuleStore(unittest.TestCase):
             cls.connection.close()
 
     @classmethod
+    def add_asset_collection(cls, doc_store_config):
+        """
+        No asset collection.
+        """
+        pass
+
+    @classmethod
     def initdb(cls):
         # connect to the db
         doc_store_config = {
@@ -96,6 +110,8 @@ class TestMongoModuleStore(unittest.TestCase):
             'db': DB,
             'collection': COLLECTION,
         }
+        cls.add_asset_collection(doc_store_config)
+
         # since MongoModuleStore and MongoContentStore are basically assumed to be together, create this class
         # as well
         content_store = MongoContentStore(HOST, DB, port=PORT)
@@ -136,13 +152,32 @@ class TestMongoModuleStore(unittest.TestCase):
         # Destroy the test db.
         connection.drop_database(DB)
 
-    def setUp(self):
-        # make a copy for convenience
-        self.connection = TestMongoModuleStore.connection
-        self.dummy_user = ModuleStoreEnum.UserID.test
+    @classmethod
+    def setUp(cls):
+        cls.dummy_user = ModuleStoreEnum.UserID.test
 
-    def tearDown(self):
+    @classmethod
+    def tearDown(cls):
         pass
+
+
+class TestMongoModuleStore(TestMongoModuleStoreBase):
+    '''Module store tests'''
+
+    @classmethod
+    def add_asset_collection(cls, doc_store_config):
+        """
+        No asset collection - it's not used in the tests below.
+        """
+        pass
+
+    @classmethod
+    def setupClass(cls):
+        super(TestMongoModuleStore, cls).setupClass()
+
+    @classmethod
+    def teardownClass(cls):
+        super(TestMongoModuleStore, cls).teardownClass()
 
     def test_init(self):
         '''Make sure the db loads'''
@@ -202,6 +237,16 @@ class TestMongoModuleStore(unittest.TestCase):
             assert_false(self.draft_store.has_course(mix_cased))
             assert_false(self.draft_store.has_course(mix_cased, ignore_case=True))
 
+    def test_has_course_with_library(self):
+        """
+        Test that has_course() returns False when called with a LibraryLocator.
+        This is required because MixedModuleStore will use has_course() to check
+        where a given library are stored.
+        """
+        lib_key = LibraryLocator("TestOrg", "TestLib")
+        result = self.draft_store.has_course(lib_key)
+        assert_false(result)
+
     def test_loads(self):
         assert_not_none(
             self.draft_store.get_item(Location('edX', 'toy', '2012_Fall', 'course', '2012_Fall'))
@@ -232,7 +277,6 @@ class TestMongoModuleStore(unittest.TestCase):
         assert_not_none(
             self.draft_store.get_item(Location('edX', 'test_unicode', '2012_Fall', 'chapter', 'Overview')),
         )
-
 
     def test_find_one(self):
         assert_not_none(
@@ -573,6 +617,7 @@ class TestMongoModuleStore(unittest.TestCase):
                     'published_by': published_by,
                 },
             },
+            allow_not_found=True,
         )
 
         # Retrieve the block and verify its fields
@@ -629,6 +674,33 @@ class TestMongoModuleStore(unittest.TestCase):
             export_to_xml(self.draft_store, self.content_store, interface_location.course_key, root_dir, 'test_export')
         finally:
             shutil.rmtree(root_dir)
+
+
+class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
+    '''
+    Tests a situation where no asset_collection is specified.
+    '''
+
+    @classmethod
+    def add_asset_collection(cls, doc_store_config):
+        """
+        No asset collection.
+        """
+        pass
+
+    @classmethod
+    def setupClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).setupClass()
+
+    @classmethod
+    def teardownClass(cls):
+        super(TestMongoModuleStoreWithNoAssetCollection, cls).teardownClass()
+
+    def test_no_asset_collection(self):
+        courses = self.draft_store.get_courses()
+        course = courses[0]
+        # Confirm that no specified asset collection name means empty asset metadata.
+        self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
 
 
 class TestMongoKeyValueStore(object):
