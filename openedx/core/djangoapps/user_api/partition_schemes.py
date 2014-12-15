@@ -15,13 +15,13 @@ class RandomUserPartitionScheme(object):
     RANDOM = random.Random()
 
     @classmethod
-    def get_group_for_user(cls, course_id, user, user_partition, track_function=None):
+    def get_group_for_user(cls, course_key, user, user_partition, track_function=None):
         """
         Returns the group from the specified user position to which the user is assigned.
         If the user has not yet been assigned, a group will be randomly chosen for them.
         """
         partition_key = cls._key_for_partition(user_partition)
-        group_id = course_tag_api.get_course_tag(user, course_id, partition_key)
+        group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
         group = user_partition.get_group(int(group_id)) if not group_id is None else None
         if group is None:
             if not user_partition.groups:
@@ -34,7 +34,7 @@ class RandomUserPartitionScheme(object):
             group = cls.RANDOM.choice(user_partition.groups)
 
             # persist the value as a course tag
-            course_tag_api.set_course_tag(user, course_id, partition_key, group.id)
+            course_tag_api.set_course_tag(user, course_key, partition_key, group.id)
 
             if track_function:
                 # emit event for analytics
