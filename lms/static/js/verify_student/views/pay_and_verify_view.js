@@ -30,18 +30,17 @@ var edx = edx || {};
             this.errorModel = obj.errorModel || {};
             this.displaySteps = obj.displaySteps || [];
 
-            // Determine which step we're starting on
-            // Depending on how the user enters the flow,
-            // this could be anywhere in the sequence of steps.
-            this.currentStepIndex = _.indexOf(
-                _.pluck( this.displaySteps, 'name' ),
-                obj.currentStep
-            );
-
             this.progressView = new edx.verify_student.ProgressView({
                 el: this.el,
                 displaySteps: this.displaySteps,
-                currentStepIndex: this.currentStepIndex
+
+                // Determine which step we're starting on
+                // Depending on how the user enters the flow,
+                // this could be anywhere in the sequence of steps.
+                currentStepIndex: _.indexOf(
+                    _.pluck( this.displaySteps, 'name' ),
+                    obj.currentStep
+                )
             });
 
             this.initializeStepViews( obj.stepInfo );
@@ -140,29 +139,21 @@ var edx = edx || {};
             // underscore template.
             // When the view is rendered, it will overwrite the existing
             // step in the DOM.
-            stepName = this.displaySteps[ this.currentStepIndex ].name;
+            stepName = this.displaySteps[ this.progressView.currentStepIndex ].name;
             stepView = this.subviews[ stepName ];
             stepView.el = stepEl;
             stepView.render();
         },
 
         nextStep: function() {
-            this.currentStepIndex = Math.min( this.currentStepIndex + 1, this.displaySteps.length - 1 );
+            this.progressView.nextStep();
             this.render();
         },
 
         goToStep: function( stepName ) {
-            var stepIndex = _.indexOf(
-                _.pluck( this.displaySteps, 'name' ),
-                stepName
-            );
-
-            if ( stepIndex >= 0 ) {
-                this.currentStepIndex = stepIndex;
-                this.render();
-            }
-        },
-
+            this.progressView.goToStep( stepName );
+            this.render();
+        }
     });
 
 })(jQuery, _, Backbone, gettext);

@@ -1010,6 +1010,7 @@ courseware_js = (
 base_vendor_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
+    'js/vendor/url.min.js',
     'js/vendor/underscore-min.js',
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',
