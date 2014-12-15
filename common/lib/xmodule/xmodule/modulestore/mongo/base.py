@@ -475,11 +475,6 @@ class ParentLocationCache(dict):
     def set(self, key, value):
         self[key] = value
 
-    @contract(key=unicode)
-    def delete(self, key):
-        if key in self:
-            del self[key]
-
     @contract(value="BlockUsageLocator")
     def delete_by_value(self, value):
         keys_to_delete = [k for k, v in self.iteritems() if v == value]

@@ -1,11 +1,13 @@
 """
 Provides partition support to the user service.
 """
-
+import logging
 import random
 import api.course_tag as course_tag_api
 
-from xmodule.partitions.partitions import UserPartitionError
+from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+
+log = logging.getLogger(__name__)
 
 
 class RandomUserPartitionScheme(object):
@@ -22,7 +24,22 @@ class RandomUserPartitionScheme(object):
         """
         partition_key = cls._key_for_partition(user_partition)
         group_id = course_tag_api.get_course_tag(user, course_id, partition_key)
-        group = user_partition.get_group(int(group_id)) if not group_id is None else None
+
+        group = None
+        if group_id is not None:
+            # attempt to look up the presently assigned group
+            try:
+                group = user_partition.get_group(int(group_id))
+            except NoSuchUserPartitionGroupError:
+                # jsa: we can turn off warnings here if this is an expected case.
+                log.warn(
+                    "group not found in RandomUserPartitionScheme: %r",
+                    {
+                        "requested_partition_id": user_partition.id,
+                        "requested_group_id": group_id,
+                    },
+                    exc_info=True
+                )
 
         if group is None and assign:
             if not user_partition.groups:

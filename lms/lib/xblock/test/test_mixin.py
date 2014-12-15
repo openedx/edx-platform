@@ -242,3 +242,142 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
                     old_parent_location,
                     video.get_parent().location.for_branch(None)
                 )
+
+
+class RenamedTuple(tuple):  # pylint: disable=incomplete-protocol
+    """
+    This class is only used to allow overriding __name__ on the tuples passed
+    through ddt, in order to have the generated test names make sense.
+    """
+    pass
+
+
+def ddt_named(parent, child):
+    """
+    Helper to get more readable dynamically-generated test names from ddt.
+    """
+    args = RenamedTuple([parent, child])
+    setattr(args, '__name__', 'parent_{}_child_{}'.format(parent, child))
+    return args
+
+
+@ddt.ddt
+class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
+    """
+    Test that XBlock.merged_group_access is computed correctly according to
+    our access control rules.
+    """
+
+    PARTITION_1 = 1
+    PARTITION_1_GROUP_1 = 11
+    PARTITION_1_GROUP_2 = 12
+
+    PARTITION_2 = 2
+    PARTITION_2_GROUP_1 = 21
+    PARTITION_2_GROUP_2 = 22
+
+    PARENT_CHILD_PAIRS = (
+        ddt_named('section', 'subsection'),
+        ddt_named('section', 'vertical'),
+        ddt_named('section', 'video'),
+        ddt_named('subsection', 'vertical'),
+        ddt_named('subsection', 'video'),
+    )
+
+    def setUp(self):
+        super(XBlockMergedGroupAccessTest, self).setUp()
+        self.build_course()
+
+    def set_group_access(self, block, access_dict):
+        """
+        DRY helper.
+        """
+        block.group_access = access_dict
+        block.runtime.modulestore.update_item(block, 1)
+
+    @ddt.data(*PARENT_CHILD_PAIRS)
+    @ddt.unpack
+    def test_intersecting_groups(self, parent, child):
+        """
+        When merging group_access on a block, the resulting group IDs for each
+        partition is the intersection of the group IDs defined for that
+        partition across all ancestor blocks (including this one).
+        """
+        parent_block = getattr(self, parent)
+        child_block = getattr(self, child)
+
+        self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]})
+        self.set_group_access(child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
+
+        self.assertEqual(
+            parent_block.merged_group_access,
+            {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]},
+        )
+        self.assertEqual(
+            child_block.merged_group_access,
+            {self.PARTITION_1: [self.PARTITION_1_GROUP_2]},
+        )
+
+    @ddt.data(*PARENT_CHILD_PAIRS)
+    @ddt.unpack
+    def test_disjoint_groups(self, parent, child):
+        """
+        When merging group_access on a block, if the intersection of group IDs
+        for a partition is empty, the merged value for that partition is False.
+        """
+        parent_block = getattr(self, parent)
+        child_block = getattr(self, child)
+
+        self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.set_group_access(child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
+
+        self.assertEqual(
+            parent_block.merged_group_access,
+            {self.PARTITION_1: [self.PARTITION_1_GROUP_1]},
+        )
+        self.assertEqual(
+            child_block.merged_group_access,
+            {self.PARTITION_1: False},
+        )
+
+    def test_disjoint_groups_no_override(self):
+        """
+        Special case of the above test - ensures that `False` propagates down
+        to the block being queried even if blocks further down in the hierarchy
+        try to override it.
+        """
+        self.set_group_access(self.section, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.set_group_access(self.subsection, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
+        self.set_group_access(self.vertical, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]})
+
+        self.assertEqual(
+            self.vertical.merged_group_access,
+            {self.PARTITION_1: False},
+        )
+        self.assertEqual(
+            self.video.merged_group_access,
+            {self.PARTITION_1: False},
+        )
+
+    @ddt.data(*PARENT_CHILD_PAIRS)
+    @ddt.unpack
+    def test_union_partitions(self, parent, child):
+        """
+        When merging group_access on a block, the result's keys (partitions)
+        are the union of all partitions specified across all ancestor blocks
+        (including this one).
+        """
+        parent_block = getattr(self, parent)
+        child_block = getattr(self, child)
+
+        self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.set_group_access(child_block, {self.PARTITION_2: [self.PARTITION_1_GROUP_2]})
+
+        self.assertEqual(
+            parent_block.merged_group_access,
+            {self.PARTITION_1: [self.PARTITION_1_GROUP_1]},
+        )
+        self.assertEqual(
+            child_block.merged_group_access,
+            {self.PARTITION_1: [self.PARTITION_1_GROUP_1], self.PARTITION_2: [self.PARTITION_1_GROUP_2]},
+        )
