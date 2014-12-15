@@ -5,6 +5,8 @@
       <p><%- gettext( "Make payment.  TODO: actual copy here." ) %></p>
     </div>
 
+    <div class="requirements-container"></div>
+
     <div class="wrapper-task">
       <ol class="review-tasks">
         <% if ( suggestedPrices.length > 0 ) { %>

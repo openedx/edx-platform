@@ -11,6 +11,12 @@ var edx = edx || {};
     edx.verify_student.MakePaymentStepView = edx.verify_student.StepView.extend({
 
         postRender: function() {
+            // Render requirements
+            new edx.verify_student.RequirementsView({
+                el: $( '.requirements-container', this.el ),
+                requirements: this.stepData.requirements
+            }).render();
+
             // Enable the payment button once an amount is chosen
             $( "input[name='contribution']" ).on( 'click', _.bind( this.enablePaymentButton, this ) );
 

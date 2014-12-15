@@ -41,6 +41,7 @@ var edx = edx || {};
                 requirements: el.data('requirements')
             },
             'make-payment-step': {
+                requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 minPrice: el.data('course-mode-min-price'),
                 suggestedPrices: (el.data('course-mode-suggested-prices') || "").split(","),
