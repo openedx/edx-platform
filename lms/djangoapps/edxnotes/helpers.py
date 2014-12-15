@@ -125,12 +125,15 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 continue
 
             unit = get_ancestor(store, usage_key)
-            unit_dict = get_ancestor_context(course, unit)
+            if unit:
+                unit_dict = get_ancestor_context(course, unit)
+                model.update({
+                    u"unit": unit_dict,
+                })
 
             model.update({
                 u"text": markupsafe.escape(model["text"]),
                 u"quote": markupsafe.escape(model["quote"]),
-                u"unit": unit_dict,
                 u"updated": dateutil_parse(model["updated"]),
             })
 
@@ -138,16 +141,16 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 try:
                     # pylint: disable=unused-variable
                     (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+                    chapter = store.get_item(chapter)
+                    chapter_dict = get_ancestor_context(course, chapter, course)
+                    section = store.get_item(section)
+                    section_dict = get_ancestor_context(course, section)
+                    model.update({
+                        u"chapter": chapter_dict,
+                        u"section": section_dict,
+                    })
                 except (NoPathToItem, ValueError):
                     continue
-                chapter = store.get_item(chapter)
-                chapter_dict = get_ancestor_context(course, chapter, course)
-                section = store.get_item(section)
-                section_dict = get_ancestor_context(course, section)
-                model.update({
-                    u"chapter": chapter_dict,
-                    u"section": section_dict,
-                })
 
             filtered_collection.append(model)
 
@@ -211,7 +214,6 @@ def get_ancestor_context(course, item, ancestor=None):
     item_dict = {
         'location': item.location.to_deprecated_string(),
         'display_name': item.display_name_with_default,
-
     }
 
     if item.category == 'chapter' and ancestor:
