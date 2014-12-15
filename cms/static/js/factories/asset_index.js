@@ -9,7 +9,7 @@ define([
         assets.url = config.assetCallbackUrl;
         assetsView = new AssetsView({
           collection: assets,
-          el: $('.assets-wrapper'),
+          el: $('.wrapper-assets'),
           uploadChunkSizeInMBs: config.uploadChunkSizeInMBs,
           maxFileSizeInMBs: config.maxFileSizeInMBs,
           maxFileSizeRedirectUrl: config.maxFileSizeRedirectUrl
