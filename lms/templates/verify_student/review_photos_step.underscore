@@ -66,7 +66,7 @@
           <h4 class="title"><%- gettext( "Check Your Name" ) %></h4>
 
           <div class="copy">
-              <p><%- _.sprintf( gettext( "Make sure your full name on your %(platformName)s account (%(fullName)s) matches your ID. We will also use this as the name on your certificate." ), { platformName: platformName, fullName: fullName } ) %></p>
+              <p><%- _.sprintf( gettext( "Make sure the full name on your %(platformName)s account (%(fullName)s) matches your ID. We will use this as the name on your certificate." ), { platformName: platformName, fullName: fullName } ) %></p>
           </div>
 
           <div class="msg msg-followup">
@@ -78,7 +78,7 @@
 
               <div class="copy expandable-area">
                 <p><%- gettext( "You should change the name on your account to match." ) %></p>
-                <input type="text" name="new-name" id="new-name" placeholder="New name">
+                <input type="text" name="new-name" id="new-name" placeholder=<%- fullName %>>
               </div>
             </div>
           </div>
