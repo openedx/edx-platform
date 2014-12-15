@@ -259,16 +259,6 @@ class PayAndVerifyView(View):
         ENROLLMENT_CONFIRMATION_STEP
     ]
 
-    STEPS_WITHOUT_PAYMENT = [
-        step for step in ALL_STEPS
-        if step not in PAYMENT_STEPS
-    ]
-
-    STEPS_WITHOUT_VERIFICATION = [
-        step for step in ALL_STEPS
-        if step not in VERIFICATION_STEPS
-    ]
-
     Step = namedtuple(
         'Step',
         [
@@ -395,7 +385,7 @@ class PayAndVerifyView(View):
     def get(
         self, request, course_id,
         always_show_payment=False,
-        current_step=INTRO_STEP,
+        current_step=None,
         message=FIRST_TIME_VERIFY_MSG
     ):
         """Render the pay/verify requirements page.
@@ -461,6 +451,9 @@ class PayAndVerifyView(View):
             already_paid
         )
         requirements = self._requirements(display_steps)
+
+        if current_step is None:
+            current_step = display_steps[0]['name']
 
         # Allow the caller to skip the first page
         # This is useful if we want the user to be able to
@@ -605,6 +598,10 @@ class PayAndVerifyView(View):
 
         if already_paid and not always_show_payment:
             remove_steps |= set(self.PAYMENT_STEPS)
+        else:
+            # The "make payment" step doubles as an intro step,
+            # so if we're showing the payment step, hide the intro step.
+            remove_steps |= set([self.INTRO_STEP])
 
         return [
             {
