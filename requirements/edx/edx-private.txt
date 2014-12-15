@@ -17,3 +17,7 @@
 # It is an R&D prototype, intended for roll-out one location in one course. 
 # It should not be used without learning sciences support in the current state. 
 -e git+https://github.com/pmitros/RecommenderXBlock.git@b4f3596d095d88bb4540f0d04ab81836d84edc98#egg=recommender-xblock
+
+# This repository contains schoolyourself-xblock, which is used in
+# edX's "AlgebraX" and "GeometryX" courses.
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@ae028c3c185d1abf93823f7a5d946a8e66b8e7d9#egg=schoolyourself-xblock
