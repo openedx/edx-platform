@@ -9,7 +9,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="bodyclass">register verification-process step-requirements</%block>
 <%block name="pagetitle">${messages.page_title}</%block>
 <%block name="header_extras">
-    % for template_name in ["progress", "webcam_photo", "error"]:
+    % for template_name in ["progress", "requirements", "webcam_photo", "error"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="verify_student/${template_name}.underscore" />
         </script>

@@ -1077,6 +1077,7 @@ verify_student_js = [
     'js/verify_student/views/error_view.js',
     'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/views/progress_view.js',
+    'js/verify_student/views/requirements_view.js',
     'js/verify_student/views/step_view.js',
     'js/verify_student/views/intro_step_view.js',
     'js/verify_student/views/make_payment_step_view.js',

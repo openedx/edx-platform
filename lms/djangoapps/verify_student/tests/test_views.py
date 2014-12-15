@@ -967,8 +967,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.ALL_STEPS,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
         self._assert_requirements_displayed(response, [
@@ -976,15 +976,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.WEBCAM_REQ,
             PayAndVerifyView.CREDIT_CARD_REQ,
         ])
-
-    def test_start_flow_skip_intro(self):
-        course = self._create_course("verified")
-        response = self._get_page("verify_student_start_flow", course.id, skip_first_step=True)
-        self._assert_steps_displayed(
-            response,
-            PayAndVerifyView.ALL_STEPS,
-            PayAndVerifyView.MAKE_PAYMENT_STEP
-        )
 
     @ddt.data("expired", "denied")
     def test_start_flow_expired_or_denied_verification(self, verification_status):
@@ -996,7 +987,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # Expect the same content as when the user has not verified
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_PAYMENT,
+            [PayAndVerifyView.INTRO_STEP] + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.INTRO_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
@@ -1020,8 +1011,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
         self._assert_requirements_displayed(response, [
@@ -1036,7 +1027,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_PAYMENT,
+            [PayAndVerifyView.INTRO_STEP] + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.INTRO_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
@@ -1056,8 +1047,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.CREDIT_CARD_REQ,
@@ -1074,8 +1065,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response = self._get_page('verify_student_start_flow', course.id)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.CREDIT_CARD_REQ,
@@ -1110,7 +1101,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # but we start after the payment step (because it's already completed).
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.ALL_STEPS,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.FACE_PHOTO_STEP
         )
 
@@ -1185,7 +1176,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # Expect that the payment steps are NOT displayed
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_PAYMENT,
+            [PayAndVerifyView.INTRO_STEP] + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.INTRO_STEP
         )
         self._assert_requirements_displayed(response, [
@@ -1218,7 +1209,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # but we start at the payment confirmation step
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.ALL_STEPS,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
         )
 
@@ -1246,7 +1237,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # but we start on the first verify step
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.ALL_STEPS,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
             PayAndVerifyView.FACE_PHOTO_STEP,
         )
 
@@ -1264,7 +1255,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # to the dashboard.
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
+            PayAndVerifyView.PAYMENT_STEPS,
             PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
         )
 
@@ -1283,7 +1274,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # payment confirmation step
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
+            PayAndVerifyView.PAYMENT_STEPS,
             PayAndVerifyView.PAYMENT_CONFIRMATION_STEP,
         )
 
@@ -1318,8 +1309,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_displayed_mode(response, course_mode)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.ALL_STEPS,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.UPGRADE_MSG)
         self._assert_requirements_displayed(response, [
@@ -1336,8 +1327,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response = self._get_page('verify_student_upgrade_and_verify', course.id)
         self._assert_steps_displayed(
             response,
-            PayAndVerifyView.STEPS_WITHOUT_VERIFICATION,
-            PayAndVerifyView.INTRO_STEP
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.UPGRADE_MSG)
         self._assert_requirements_displayed(response, [
