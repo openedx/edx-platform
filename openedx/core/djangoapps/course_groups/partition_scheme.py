@@ -3,6 +3,8 @@ Provides a UserPartition driver for cohorts.
 """
 import logging
 
+from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
+
 from .cohorts import get_cohort, get_partition_group_id_for_cohort
 
 log = logging.getLogger(__name__)
@@ -56,8 +58,9 @@ class CohortPartitionScheme(object):
             # fail silently
             return None
 
-        group = user_partition.get_group(group_id)
-        if group is None:
+        try:
+            return user_partition.get_group(group_id)
+        except NoSuchUserPartitionGroupError:
             # if we have a match but the group doesn't exist in the partition,
             # it means the mapping is invalid.  the previous state of the
             # partition configuration may have been modified.
@@ -67,9 +70,8 @@ class CohortPartitionScheme(object):
                     "requested_partition_id": user_partition.id,
                     "requested_group_id": group_id,
                     "cohort_id": cohort.id,
-                }
+                },
+                exc_info=True
             )
             # fail silently
             return None
-
-        return group

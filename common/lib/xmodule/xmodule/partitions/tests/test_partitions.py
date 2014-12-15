@@ -8,7 +8,9 @@ from mock import Mock
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from stevedore.extension import Extension, ExtensionManager
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError, USER_PARTITION_SCHEME_NAMESPACE
+from xmodule.partitions.partitions import (
+    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
+)
 from xmodule.partitions.partitions_service import PartitionService
 
 
@@ -258,6 +260,23 @@ class TestUserPartition(PartitionTestCase):
         }
         user_partition = UserPartition.from_json(jsonified)
         self.assertNotIn("programmer", user_partition.to_json())
+
+    def test_get_group(self):
+        """
+        UserPartition.get_group correctly returns the group referenced by the
+        `group_id` parameter, or raises NoSuchUserPartitionGroupError when
+        the lookup fails.
+        """
+        self.assertEqual(
+            self.user_partition.get_group(self.TEST_GROUPS[0].id),  # pylint: disable=no-member
+            self.TEST_GROUPS[0]
+        )
+        self.assertEqual(
+            self.user_partition.get_group(self.TEST_GROUPS[1].id),  # pylint: disable=no-member
+            self.TEST_GROUPS[1]
+        )
+        with self.assertRaises(NoSuchUserPartitionGroupError):
+            self.user_partition.get_group(3)
 
 
 class StaticPartitionService(PartitionService):
