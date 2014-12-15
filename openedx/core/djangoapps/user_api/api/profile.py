@@ -51,6 +51,7 @@ class ProfileInternalError(Exception):
 
 
 FULL_NAME_MAX_LENGTH = 255
+FULL_NAME_MIN_LENGTH = 2
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
@@ -113,7 +114,7 @@ def update_profile(username, full_name=None):
 
     if full_name is not None:
         name_length = len(full_name)
-        if name_length > FULL_NAME_MAX_LENGTH or name_length == 0:
+        if name_length > FULL_NAME_MAX_LENGTH or name_length < FULL_NAME_MIN_LENGTH:
             raise ProfileInvalidField("full_name", full_name)
         else:
             profile.update_name(full_name)
