@@ -32,12 +32,16 @@ var edx = edx || {};
             this.$el.html(_.template(this.tpl.view, {
                 totalCount: this.collection.totalCount,
                 pageSize: this.collection.pageSize,
+                hasMoreResults: this.collection.hasMoreResults(),
                 list: listHtml
             }));
         },
 
         renderNextPage: function () {
             var listHtml = this.renderSearchList();
+            if (! this.collection.hasMoreResults()) {
+                this.$el.find('.search-load-next').remove();
+            }
             this.$el.find('.search-results').append(listHtml);
             this.$el.find('.icon-spin').hide();
         },

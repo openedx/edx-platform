@@ -6,10 +6,13 @@
 <% if (totalCount > 0 ) { %>
 
     <ol class='search-results'><%= list %></ol>
-    <a class="search-load-next" href="javascript:void(0);">
-        <%- gettext("Load next %s results").replace("%s", pageSize) %>
-        <i class="icon-refresh icon-spin"></i>
-    </a>
+
+    <% if (hasMoreResults) { %>
+        <a class="search-load-next" href="javascript:void(0);">
+            <%- gettext("Load next %s results").replace("%s", pageSize) %>
+            <i class="icon-refresh icon-spin"></i>
+        </a>
+    <% } %>
 
 <% } else { %>
 
