@@ -61,9 +61,7 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         ids within the content partition.
         """
         item.group_access[self.content_partition.id] = group_ids
-        # TODO: calling this on item raises InvalidDocument when item is self.video...
-        # Are we setting group_access correctly here?
-        self.store.update_item(self.course, self.user.id)
+        self.store.update_item(item, self.user.id)
 
     def verify_visibility_view_contains(self, item, substrings):
         """

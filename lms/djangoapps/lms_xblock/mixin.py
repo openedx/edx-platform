@@ -69,7 +69,6 @@ class LmsBlockMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
-
     group_access = GroupAccessDict(
         help=_(
             "A dictionary that maps which groups can be shown this block. The keys "
