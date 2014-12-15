@@ -1,3 +1,5 @@
+# pylint: disable=no-value-for-parameter
+
 from django.conf.urls import patterns, url
 
 from verify_student import views
@@ -16,10 +18,10 @@ urlpatterns = patterns(
 
     # pylint sometimes seems to dislike the as_view() function because as_view() is
     # decorated with `classonlymethod` instead of `classmethod`.  It's inconsistent
-    # about *which* as_view() calls it grumbles about, but we disable those warnings
+    # about *which* as_view() calls it grumbles about, but we disable those warnings.
     url(
         r'^verify/{}/$'.format(settings.COURSE_ID_PATTERN),
-        views.VerifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.VerifyView.as_view(),
         name="verify_student_verify"
     ),
 
@@ -49,7 +51,7 @@ urlpatterns = patterns(
 
     url(
         r'^midcourse_reverify/{}/$'.format(settings.COURSE_ID_PATTERN),
-        views.MidCourseReverifyView.as_view(),  # pylint: disable=no-value-for-parameter
+        views.MidCourseReverifyView.as_view(),
         name="verify_student_midcourse_reverify"
     ),
 

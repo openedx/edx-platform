@@ -14,7 +14,6 @@ import json
 import mock
 import urllib
 import decimal
-import unittest
 from mock import patch, Mock
 import pytz
 from datetime import timedelta, datetime
@@ -204,7 +203,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
             'course_id': self.course_id,
         }
         url = reverse('verify_student_create_order')
-        response = self.client.post(url, create_order_post_data)
+        self.client.post(url, create_order_post_data)
 
         # Without the face image and photo id image params,
         # don't create the verification attempt.
@@ -215,7 +214,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
         # Now submit *with* the params
         create_order_post_data['face_image'] = ','
         create_order_post_data['photo_id_image'] = ','
-        response = self.client.post(url, create_order_post_data)
+        self.client.post(url, create_order_post_data)
         attempt = SoftwareSecurePhotoVerification.objects.get(user=self.user)
         self.assertEqual(attempt.status, "ready")
 
@@ -813,7 +812,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
     def test_submit_photos(self):
         # Submit the photos
-        response = self._submit_photos(
+        self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA
         )
@@ -827,7 +826,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
     def test_submit_photos_and_change_name(self):
         # Submit the photos, along with a name change
-        response = self._submit_photos(
+        self._submit_photos(
             face_image=self.IMAGE_DATA,
             photo_id_image=self.IMAGE_DATA,
             full_name=self.FULL_NAME
@@ -909,6 +908,7 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
         """
         info = profile_api.profile_info(self.user.username)
         self.assertEqual(info['full_name'], full_name)
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
@@ -1374,7 +1374,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         ]
 
         for page_name in pages:
-            response = self._get_page(
+            self._get_page(
                 page_name,
                 course.id,
                 expected_status_code=404
@@ -1422,7 +1422,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
 
         for course_mode in course_modes:
             min_price = (self.MIN_PRICE if course_mode != "honor" else 0)
-            mode = CourseModeFactory(
+            CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
                 mode_display_name=course_mode,
@@ -1534,16 +1534,20 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         }
 
     def _assert_redirects_to_dashboard(self, response):
+        """Verify that the client is redirected to the dashboard."""
         self.assertRedirects(response, reverse('dashboard'))
 
     def _assert_redirects_to_start_flow(self, response, course_id):
+        """Verify that the client is redirected to the start of the split flow."""
         url = reverse('verify_student_start_flow', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)
 
     def _assert_redirects_to_verify_later(self, response, course_id):
+        """Verify that the client is redirected to the verification step of the split flow."""
         url = reverse('verify_student_verify_later', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)
 
     def _assert_redirects_to_upgrade(self, response, course_id):
+        """Verify that the client is redirected to the start of the split flow, with "upgrade" messaging in place."""
         url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)

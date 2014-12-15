@@ -15,7 +15,6 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import (
     HttpResponse, HttpResponseBadRequest,
-    HttpResponseServerError,
     HttpResponseRedirect, Http404
 )
 from django.shortcuts import redirect
@@ -701,7 +700,7 @@ class PayAndVerifyView(View):
         return self.Message(
             **{
                 key: value.format(**context)
-                for key, value in messages._asdict().iteritems()
+                for key, value in messages._asdict().iteritems()  # pylint: disable=protected-access
             }
         )
 
