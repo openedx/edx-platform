@@ -22,6 +22,7 @@
             course_team_url = reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': unicode(course_key)})
             assets_url = reverse('contentstore.views.assets_handler', kwargs={'course_key_string': unicode(course_key)})
             textbooks_url = reverse('contentstore.views.textbooks_list_handler', kwargs={'course_key_string': unicode(course_key)})
+            videos_url = reverse('contentstore.views.videos_handler', kwargs={'course_key_string': unicode(course_key)})
             import_url = reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(course_key)})
             course_info_url = reverse('contentstore.views.course_info_handler', kwargs={'course_key_string': unicode(course_key)})
             export_url = reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(course_key)})
@@ -62,6 +63,11 @@
                   <li class="nav-item nav-course-courseware-textbooks">
                     <a href="${textbooks_url}">${_("Textbooks")}</a>
                   </li>
+                  % if context_course.video_pipeline_configured:
+                  <li class="nav-item nav-course-courseware-videos">
+                    <a href="${videos_url}">${_("Video Uploads")}</a>
+                  </li>
+                  % endif
                 </ul>
               </div>
             </div>
