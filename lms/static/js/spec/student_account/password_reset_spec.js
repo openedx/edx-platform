@@ -1,11 +1,10 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/models/PasswordResetModel',
-    'js/student_account/views/PasswordResetView',
-], function($, _, TemplateHelpers, AjaxHelpers, PasswordResetModel, PasswordResetView) {
+    'js/student_account/models/password_reset_model',
+    'js/student_account/views/password_reset_view',
+], function($, _, AjaxHelpers, PasswordResetModel, PasswordResetView) {
         describe('edx.student.account.PasswordResetView', function() {
             'use strict';
 
@@ -68,8 +67,6 @@ define([
 
             beforeEach(function() {
                 setFixtures('<div id="password-reset-wrapper"></div>');
-                TemplateHelpers.installTemplate('templates/student_account/password_reset');
-                TemplateHelpers.installTemplate('templates/student_account/form_field');
             });
 
             it('allows the user to request a new password', function() {

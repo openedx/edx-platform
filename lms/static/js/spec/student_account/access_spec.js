@@ -2,8 +2,8 @@ define([
     'jquery',
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/views/AccessView',
-    'js/student_account/views/FormView',
+    'js/student_account/views/access_view',
+    'js/student_account/views/form_view',
     'js/student_account/enrollment',
     'js/student_account/shoppingcart',
     'js/student_account/emailoptin'
@@ -117,7 +117,7 @@ define([
              * should be prefixed with '?'
              */
             var setFakeQueryParams = function( params ) {
-                spyOn( $, 'url' ).andCallFake(function( requestedParam ) {
+                spyOn( view, 'url' ).andCallFake(function( requestedParam ) {
                     if ( params.hasOwnProperty(requestedParam) ) {
                         return params[requestedParam];
                     }

@@ -1,19 +1,12 @@
-var edx = edx || {};
+define([
+        'jquery',
+        'underscore',
+        'underscore.string',
+        'gettext'
+    ],
+    function( $, _, _s, gettext ) {
+        'use strict';
 
-(function( $, _, _s, gettext ) {
-    'use strict';
-
-    /* Mix non-conflicting functions from underscore.string
-     * (all but include, contains, and reverse) into the
-     * Underscore namespace. In practice, this mixin is done
-     * by the access view, but doing it here helps keep the
-     * utility self-contained.
-     */
-    _.mixin( _.str.exports() );
-
-    edx.utils = edx.utils || {};
-
-    var utils = (function(){
         var _fn = {
             validate: {
 
@@ -178,9 +171,5 @@ var edx = edx || {};
         return {
             validate: _fn.validate.field
         };
-
-    })();
-
-    edx.utils.validate = utils.validate;
-
-})( jQuery, _, _.str, gettext );
+    }
+);

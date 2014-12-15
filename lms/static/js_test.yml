@@ -55,6 +55,7 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
+    - xmodule_js/common_static/js/vendor/text.js
 
 # Paths to source JavaScript files
 src_paths:
@@ -80,6 +81,7 @@ fixture_paths:
     - templates/student_account
     - templates/student_profile
     - templates/file-upload.underscore
+    - js/student_account/templates
 
 requirejs:
   paths:

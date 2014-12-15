@@ -1,11 +1,10 @@
 define([
     'jquery',
     'underscore',
-    'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
-    'js/student_account/models/RegisterModel',
-    'js/student_account/views/RegisterView'
-], function($, _, TemplateHelpers, AjaxHelpers, RegisterModel, RegisterView) {
+    'js/student_account/models/register_model',
+    'js/student_account/views/register_view'
+], function($, _, AjaxHelpers, RegisterModel, RegisterView) {
     'use strict';
 
     describe('edx.student.account.RegisterView', function() {
@@ -220,8 +219,6 @@ define([
 
         beforeEach(function() {
             setFixtures('<div id="register-form"></div>');
-            TemplateHelpers.installTemplate('templates/student_account/register');
-            TemplateHelpers.installTemplate('templates/student_account/form_field');
         });
 
         it('registers a new user', function() {
