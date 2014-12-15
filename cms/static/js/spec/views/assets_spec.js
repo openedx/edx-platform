@@ -20,8 +20,6 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 appendSetFixtures(uploadModalTpl);
                 appendSetFixtures(sandbox({ id: "asset_table_body" }));
 
-                spyOn($.fn, "fileupload").andReturn("");
-
                 var collection = new AssetCollection();
                 collection.url = "assets-url";
                 assetsView = new AssetsView({
@@ -57,6 +55,10 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
 
             mockFileUpload = {
                 files: [{name: 'largefile', size: 0}]
+            };
+
+            $.fn.fileupload = function() {
+                return '';
             };
 
             var event = {}

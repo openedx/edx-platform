@@ -1,2 +1,0 @@
-<h4 class="video-detail-name"><%- fileName %></h4>
-<p class="video-detail-status"><%- gettext(status) %></p>

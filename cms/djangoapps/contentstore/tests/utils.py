@@ -94,7 +94,7 @@ class CourseTestCase(ModuleStoreTestCase):
         """
         nonstaff, password = self.create_non_staff_user()
 
-        client = AjaxEnabledTestClient()
+        client = Client()
         if authenticate:
             client.login(username=nonstaff.username, password=password)
             nonstaff.is_authenticated = True

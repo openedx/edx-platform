@@ -538,7 +538,6 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 client_video_id="Thunder Cats",
                 duration=111,
                 edx_video_id="thundercats",
-                status='test',
                 encoded_videos=encoded_videos
             )
         )
