@@ -7,11 +7,12 @@ import dateutil.parser
 import pytz
 import json
 from contracts import contract, new_contract
-from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
 from lxml import etree
 
 
 new_contract('AssetKey', AssetKey)
+new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', basestring)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access, no-member
@@ -244,3 +245,57 @@ class AssetMetadata(object):
         for asset in assets:
             asset_node = etree.SubElement(node, "asset")
             asset.to_xml(asset_node)
+
+
+class CourseAssetsFromStorage(object):
+    """
+    Wrapper class for asset metadata lists returned from modulestore storage.
+    """
+    @contract(course_id='CourseKey', asset_md=dict)
+    def __init__(self, course_id, doc_id, asset_md):
+        """
+        Params:
+            course_id: Course ID for which the asset metadata is stored.
+            doc_id: ObjectId of MongoDB document
+            asset_md: Dict with asset types as keys and lists of storable asset metadata as values.
+        """
+        self.course_id = course_id
+        self._doc_id = doc_id
+        self.asset_md = asset_md
+
+    @property
+    def doc_id(self):
+        """
+        Returns the ID associated with the MongoDB document which stores these course assets.
+        """
+        return self._doc_id
+
+    def setdefault(self, item, default=None):
+        """
+        Provides dict-equivalent setdefault functionality.
+        """
+        return self.asset_md.setdefault(item, default)
+
+    def __getitem__(self, item):
+        return self.asset_md[item]
+
+    def __delitem__(self, item):
+        del self.asset_md[item]
+
+    def __len__(self):
+        return len(self.asset_md)
+
+    def __setitem__(self, key, value):
+        self.asset_md[key] = value
+
+    def get(self, item, default=None):
+        """
+        Provides dict-equivalent get functionality.
+        """
+        return self.asset_md.get(item, default)
+
+    def iteritems(self):
+        """
+        Iterates over the items of the asset dict.
+        """
+        return self.asset_md.iteritems()
