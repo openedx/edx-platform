@@ -497,8 +497,12 @@
         .sts-enrollment-value {
           @extend %ui-depth1;
           @extend %copy-badge;
+          font-size: 0.6em;
+          line-height: 1.5em;
+          font-weight: 600;
           border-radius: 0;
-          padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
+          padding: 1px ($baseline/2);
+          color: white;
         }
       }
 
@@ -515,10 +519,6 @@
 
         // course enrollment status message
         .sts-enrollment {
-          position: absolute;
-          left: 30px;
-          width: auto;
-
           .label {
             @extend %text-sr;
           }
@@ -526,7 +526,6 @@
           // status message
           .sts-enrollment-value {
             background: $professional-color-lvl3;
-            color: tint($professional-color-lvl1, 95%);
           }
         }
       }
@@ -536,16 +535,12 @@
 
         // changes to cover
         .cover {
-          border-color: $verified-color-lvl3;
+          border-color: $verified-color-lvl1;
           padding: ($baseline/10);
         }
 
         // course enrollment status message
         .sts-enrollment {
-          position: absolute;
-          left: 55px;
-          width: auto;
-
           .label {
             @extend %text-sr;
           }
@@ -554,15 +549,13 @@
             @extend %ui-depth3;
             width: 40px;
             position: absolute;
-            left: -30px;
-            top: -10px;
+            top: -4px;
+            right: -6px;
           }
 
           // status message
           .sts-enrollment-value {
-            padding: ($baseline/4) ($baseline/2) ($baseline/4) $baseline;
-            background: $verified-color-lvl3;
-            color: tint($verified-color-lvl1, 85%);
+            background: $verified-color-lvl1;
           }
         }
       }
@@ -579,7 +572,6 @@
         // status message
         .sts-enrollment-value {
           background: $honorcode-color-lvl1;
-          color: tint($honorcode-color-lvl1, 85%);
         }
       }
 
@@ -595,7 +587,6 @@
         // status message
         .sts-enrollment-value {
           background: $audit-color-lvl1;
-          color: shade($audit-color-lvl1, 33%);
         }
       }
     }
@@ -609,7 +600,7 @@
       display: none;
       z-index: 10;
       margin: $baseline 0 ($baseline/2) 0;
-      padding: ($baseline*0.75) $baseline;
+      padding: ($baseline*0.5) $baseline;
       font-family: $sans-serif;
       background: tint($yellow,70%);
       border: 1px solid #ccc;
@@ -640,8 +631,9 @@
 
       .message-title,
       .message-copy .title {
-        @extend %t-title5;
+        @extend %t-title6;
         @extend %t-weight4;
+        line-height: 1em;
         margin-bottom: ($baseline/4);
       }
 
