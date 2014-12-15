@@ -1082,14 +1082,14 @@ def get_answers_distribution(request, course_key):
     """
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    dist = grades.answer_distributions(course.id)
+    course_answer_distributions = grades.answer_distributions(course.id)
 
     dist = {}
     dist['header'] = ['url_name', 'display name', 'answer id', 'answer', 'count']
 
     dist['data'] = [
         [url_name, display_name, answer_id, a, answers[a]]
-        for (url_name, display_name, answer_id), answers in sorted(dist.items())
+        for (url_name, display_name, answer_id), answers in sorted(course_answer_distributions.items())
         for a in answers
     ]
     return dist
