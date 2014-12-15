@@ -10,7 +10,21 @@ from stevedore.extension import ExtensionManager
 
 class UserPartitionError(Exception):
     """
-    An error was found regarding user partitions.
+    Base Exception for when an error was found regarding user partitions.
+    """
+    pass
+
+
+class NoSuchUserPartitionError(UserPartitionError):
+    """
+    Exception to be raised when looking up a UserPartition by its ID fails.
+    """
+    pass
+
+
+class NoSuchUserPartitionGroupError(UserPartitionError):
+    """
+    Exception to be raised when looking up a UserPartition Group by its ID fails.
     """
     pass
 
@@ -171,9 +185,14 @@ class UserPartition(namedtuple("UserPartition", "id name description groups sche
 
     def get_group(self, group_id):
         """
-        Returns the group with the specified id.
+        Returns the group with the specified id.  Raises NoSuchUserPartitionGroupError if not found.
         """
-        for group in self.groups:    # pylint: disable=no-member
+        # pylint: disable=no-member
+
+        for group in self.groups:
             if group.id == group_id:
                 return group
-        return None
+
+        raise NoSuchUserPartitionGroupError(
+            "could not find a Group with ID [{}] in UserPartition [{}]".format(group_id, self.id)
+        )

@@ -15,6 +15,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
 
 from xblock.core import XBlock
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
@@ -301,6 +302,71 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
+def _has_group_access(descriptor, user, course_key):
+    """
+    This function returns a boolean indicating whether or not `user` has
+    sufficient group memberships to "load" a block (the `descriptor`)
+    """
+    if len(descriptor.user_partitions) == 0:
+        # short circuit the process, since there are no defined user partitions
+        return True
+
+    # use merged_group_access which takes group access on the block's
+    # parents / ancestors into account
+    merged_access = descriptor.merged_group_access
+    # check for False in merged_access, which indicates that at least one
+    # partition's group list excludes all students.
+    if False in merged_access.values():
+        log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
+        return False
+
+    # resolve the partition IDs in group_access to actual
+    # partition objects, skipping those which contain empty group directives.
+    # if a referenced partition could not be found, access will be denied.
+    try:
+        partitions = [
+            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
+            for partition_id, group_ids in merged_access.items()
+            if group_ids is not None
+        ]
+    except NoSuchUserPartitionError:
+        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+        return False
+
+    # next resolve the group IDs specified within each partition
+    partition_groups = []
+    try:
+        for partition in partitions:
+            groups = [
+                partition.get_group(group_id)
+                for group_id in merged_access[partition.id]
+            ]
+            if groups:
+                partition_groups.append((partition, groups))
+    except NoSuchUserPartitionGroupError:
+        log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
+        return False
+
+    # look up the user's group for each partition
+    user_groups = {}
+    for partition, groups in partition_groups:
+        user_groups[partition.id] = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+
+    # finally: check that the user has a satisfactory group assignment
+    # for each partition.
+    if not all(
+        user_groups.get(partition.id) in groups for partition, groups in partition_groups
+    ):
+        return False
+
+    # all checks passed.
+    return True
+
+
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -322,6 +388,12 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         """
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
+
+        # enforce group access
+        if not _has_group_access(descriptor, user, course_key):
+            # if group_access check failed, deny access unless the requestor is staff,
+            # in which case immediately grant access.
+            return _has_staff_access_to_descriptor(user, descriptor, course_key)
 
         # If start dates are off, can always load
         if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
