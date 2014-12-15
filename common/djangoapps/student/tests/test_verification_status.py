@@ -21,6 +21,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_st
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
 from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
+from util.testing import UrlResetMixin
 
 
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
@@ -33,13 +34,17 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 })
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
-class TestCourseVerificationStatus(ModuleStoreTestCase):
+class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     """Tests for per-course verification status on the dashboard. """
 
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
     def setUp(self):
+        # Invoke UrlResetMixin
+        super(TestCourseVerificationStatus, self).setUp('verify_student.urls')
+
         self.user = UserFactory(password="edx")
         self.course = CourseFactory.create()
         success = self.client.login(username=self.user.username, password="edx")

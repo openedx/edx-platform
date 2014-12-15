@@ -141,7 +141,7 @@
               % endif
             </div>
             <div class="verification-cta">
-              <a href="#" class="cta">${_('Verify Now')}</a>
+              <a href="${reverse('verify_student_verify_later', kwargs={'course_id': unicode(course.id)})}" class="cta">${_('Verify Now')}</a>
             </div>
           % elif verification_status['status'] == VERIFY_STATUS_SUBMITTED:
             <h4 class="message-title">${_('You have already verified your ID!')}</h4>
@@ -172,7 +172,11 @@
 
               <ul class="actions message-actions">
                 <li class="action-item">
-                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': course.id.to_deprecated_string()})}?upgrade=True">
+                  % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+                  <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course.id)})}">
+                  % else:
+                  <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': unicode(course.id)})}?upgrade=True">
+                  % endif
                     <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
                     <span class="wrapper-copy">
                       <span class="copy" id="upgrade-to-verified" data-course-id="${course.id | h}" data-user="${user.username | h}">${_("Upgrade to Verified Track")}</span>
