@@ -1,1 +1,50 @@
-<p>Enrollment confirmation!</p>
+<div class="wrapper-content-main">
+  <article class="content-main">
+    <h3 class="title"><%- gettext( "Congratulations!  You are now enrolled in the verified track." ) %></h3>
+    <div class="instruction">
+      <p><%- gettext( "You are now enrolled as a verified student!  Your enrollment details are below.") %></p>
+    </div>
+
+    <ul class="list-info">
+      <li class="info-item course-info">
+        <h4 class="title">
+          <%- gettext( "You are enrolled in " ) %> :
+        </h4>
+        <div class="wrapper-report">
+          <table class="report report-course">
+            <caption class="sr"><%- gettext( "A list of courses you have just enrolled in as a verified student" ) %></caption>
+            <thead>
+              <tr>
+                <th scope="col" ><%- gettext( "Course" ) %></th>
+                <th scope="col" ><%- gettext( "Status" ) %></th>
+                <th scope="col" ><span class="sr"><%- gettext( "Options" ) %></span></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td><%- courseName %></td>
+                <td>
+                   <%- _.sprintf( gettext( "Starts: %(start)s" ), { start: courseStartDate } ) %>
+                </td>
+                <td class="options">
+                <% if ( coursewareUrl ) { %>
+                      <a class="action action-course" href="<%- coursewareUrl %>"><%- gettext( "Go to Course" ) %></a>
+                <% } %>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="course-actions">
+                <td colspan="3">
+                  <a class="action action-dashboard" href="/dashboard"><%- gettext("Go to your dashboard") %></a>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </li>
+    </ul>
+  </article>
+</div>

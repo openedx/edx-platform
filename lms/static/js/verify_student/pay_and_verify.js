@@ -59,6 +59,11 @@ var edx = edx || {};
             'review-photos-step': {
                 fullName: el.data('full-name'),
                 platformName: el.data('platform-name')
+            },
+            'enrollment-confirmation-step': {
+                courseName: el.data('course-name'),
+                courseStartDate: el.data('course-start-date'),
+                coursewareUrl: el.data('courseware-url')
             }
         }
     }).render();

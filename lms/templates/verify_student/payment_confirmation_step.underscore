@@ -5,47 +5,80 @@
       <p><%- gettext( "You are now enrolled as a verified student!  Your enrollment details are below.") %></p>
     </div>
 
+    <% if ( receipt ) { %>
     <ul class="list-info">
-      <li class="info-item course-info">
-        <h4 class="title">
-          <%- gettext( "You are enrolled in " ) %> :
-        </h4>
+      <li class="info-item payment-info">
+        <h4 class="title"><%- gettext( "Payment Details" ) %></h4>
+
+        <div class="copy">
+          <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
+        </div>
+
         <div class="wrapper-report">
-          <table class="report report-course">
-            <caption class="sr"><%- gettext( "A list of courses you have just enrolled in as a verified student" ) %></caption>
+          <table class="report report-receipt">
             <thead>
               <tr>
-                <th scope="col" ><%- gettext( "Course" ) %></th>
-                <th scope="col" ><%- gettext( "Status" ) %></th>
-                <th scope="col" ><span class="sr"><%- gettext( "Options" ) %></span></th>
+                <th scope="col" ><%- gettext( "Order No." ) %></th>
+                <th scope="col" ><%- gettext( "Description" ) %></th>
+                <th scope="col" ><%- gettext( "Date" ) %></th>
+                <th scope="col" ><%- gettext( "Description" ) %></th>
               </tr>
             </thead>
 
             <tbody>
-              <tr>
-                <td><%- courseName %></td>
-                <td>
-                   <%- _.sprintf( gettext( "Starts: %(start)s" ), { start: courseStartDate } ) %>
-                </td>
-                <td class="options">
-                <% if ( coursewareUrl ) { %>
-                      <a class="action action-course" href="<%- coursewareUrl %>"><%- gettext( "Go to Course" ) %></a>
+              <% for ( var i = 0; i < receipt.items.length; i++ ) { %>
+                <% if ( receipt.isRefunded ) { %>
+                  <td><del><%- receipt.orderNum %></del></td>
+                  <td><del><%- receipt.items[i].lineDescription %></del></td>
+                  <td><del><%- receipt.purchasedDatetime %></del></td>
+                  <td><del><%- receipt.items[i].cost %> ($<%- receipt.currency.toUpperCase() %>)</del></td>
+                <% } else { %>
+                  <tr>
+                    <td><%- receipt.orderNum %></td>
+                    <td><%- receipt.items[i].lineDescription %></td>
+                    <td><%- receipt.purchasedDatetime %></td>
+                    <td><%- receipt.items[i].cost %> ($<%- receipt.currency.toUpperCase() %>)</td>
+                  </tr>
                 <% } %>
-                </td>
-              </tr>
+              <% } %>
             </tbody>
+
             <tfoot>
-              <tr class="course-actions">
-                <td colspan="3">
-                  <a class="action action-dashboard" href="/dashboard"><%- gettext("Go to your dashboard") %></a>
+              <tr>
+                <th scope="row" class="total-label" colspan="1"><%- gettext( "Total" ) %></th>
+                <td claass="total-value" colspan="3">
+                  <span class="value-amount"><%- receipt.totalCost %></span>
+                   <span class="value-currency">(<%- receipt.currency.toUpperCase() %>)</span>
                 </td>
               </tr>
             </tfoot>
           </table>
+
+          <% if ( receipt.isRefunded ) { %>
+          <div class="msg msg-refunds">
+            <h4 class="title sr"><%- gettext( "Please Note" ) %>: </h4>
+            <div class="copy">
+              <p><%- gettext( "Items with strikethough have been refunded." ) %></p>
+            </div>
+          </div>
+          <% } %>
         </div>
 
+        <div class="copy">
+          <p><%- gettext( "Billed To" ) %>:
+              <span class="name-first"><%- receipt.billedTo.firstName %></span>
+              <span class="name-last"><%- receipt.billedTo.lastName %></span>
+              (<span class="address-city"><%- receipt.billedTo.city %></span>,
+              <span class="address-state"><%- receipt.billedTo.state %></span>
+              <span class="address-postalcode"><%- receipt.billedTo.postalCode %></span>
+              <span class="address-country"><%- receipt.billedTo.country.toUpperCase() %></span>)
+          </p>
+        </div>
       </li>
     </ul>
+    <% } else { %>
+        <p><%- gettext( "No receipt available." ) %></p>
+    <% } %>
 
     <% if ( nextStepTitle ) { %>
     <nav class="nav-wizard is-ready">

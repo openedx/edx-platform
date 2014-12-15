@@ -26,6 +26,7 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from util.date_utils import get_default_time_display
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
     Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
@@ -66,6 +67,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
+@ddt.ddt
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
         patcher = patch('student.models.tracker')
@@ -800,6 +802,103 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(template, 'shoppingcart/error.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['error_html'], 'ERROR_TEST!!!')
+
+    @ddt.data(0, 1)
+    def test_show_receipt_json(self, num_items):
+        # Create the correct number of items in the order
+        for __ in range(num_items):
+            CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.cart.purchase()
+
+        self.login_user()
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url, HTTP_ACCEPT="application/json")
+
+        # Should have gotten a successful response
+        self.assertEqual(resp.status_code, 200)
+
+        # Parse the response as JSON and check the contents
+        json_resp = json.loads(resp.content)
+        self.assertEqual(json_resp.get('currency'), self.cart.currency)
+        self.assertEqual(json_resp.get('purchase_datetime'), get_default_time_display(self.cart.purchase_time))
+        self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
+        self.assertEqual(json_resp.get('status'), "purchased")
+        self.assertEqual(json_resp.get('billed_to'), {
+            'first_name': self.cart.bill_to_first,
+            'last_name': self.cart.bill_to_last,
+            'street1': self.cart.bill_to_street1,
+            'street2': self.cart.bill_to_street2,
+            'city': self.cart.bill_to_city,
+            'state': self.cart.bill_to_state,
+            'postal_code': self.cart.bill_to_postalcode,
+            'country': self.cart.bill_to_country
+        })
+
+        self.assertEqual(len(json_resp.get('items')), num_items)
+        for item in json_resp.get('items'):
+            self.assertEqual(item, {
+                'unit_cost': 40,
+                'quantity': 1,
+                'line_cost': 40,
+                'line_desc': 'Honor Code Certificate for course Test Course'
+            })
+
+    def test_show_receipt_json_multiple_items(self):
+        # Two different item types
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
+        self.cart.purchase()
+
+        self.login_user()
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url, HTTP_ACCEPT="application/json")
+
+        # Should have gotten a successful response
+        self.assertEqual(resp.status_code, 200)
+
+        # Parse the response as JSON and check the contents
+        json_resp = json.loads(resp.content)
+        self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
+
+        items = json_resp.get('items')
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0], {
+            'unit_cost': 40,
+            'quantity': 1,
+            'line_cost': 40,
+            'line_desc': 'Registration for Course: Robot Super Course'
+        })
+        self.assertEqual(items[1], {
+            'unit_cost': 40,
+            'quantity': 1,
+            'line_cost': 40,
+            'line_desc': 'Honor Code Certificate for course Test Course'
+        })
+
+    def test_receipt_json_refunded(self):
+        mock_enrollment = Mock()
+        mock_enrollment.refundable.side_effect = lambda: True
+        mock_enrollment.course_id = self.verified_course_key
+        mock_enrollment.user = self.user
+
+        CourseMode.objects.create(
+            course_id=self.verified_course_key,
+            mode_slug="verified",
+            mode_display_name="verified cert",
+            min_price=self.cost
+        )
+
+        cert = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'verified')
+        self.cart.purchase()
+        cert.refund_cert_callback(course_enrollment=mock_enrollment)
+
+        self.login_user()
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url, HTTP_ACCEPT="application/json")
+        self.assertEqual(resp.status_code, 200)
+
+        json_resp = json.loads(resp.content)
+        self.assertEqual(json_resp.get('status'), 'refunded')
 
     def test_show_receipt_404s(self):
         PaidCourseRegistration.add_to_order(self.cart, self.course_key)
