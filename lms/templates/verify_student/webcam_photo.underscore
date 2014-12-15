@@ -9,7 +9,7 @@
 
 <div class="controls photo-controls">
   <ul class="list-controls">
-    <li class="control control-redo" id="webcam_reset_button" style="display: none;">
+    <li class="control control-retake" id="webcam_reset_button" style="display: none;">
       <a class="action action-redo">
         <i class="icon-undo"></i> <span class="sr"><%- gettext( "Retake" ) %></span>
       </a>
@@ -18,12 +18,6 @@
     <li class="control control-do" id="webcam_capture_button">
       <a class="action action-do">
         <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
-      </a>
-    </li>
-
-    <li class="control control-approve" id="webcam_approve_button" style="display: none;">
-      <a class="action action-approve">
-        <i class="icon-ok"></i> <span class="sr"><%- gettext( "Looks good" ) %></span>
       </a>
     </li>
   </ul>
