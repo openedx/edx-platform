@@ -118,7 +118,7 @@
       display: block;
 
       img {
-        width: 100%;
+        max-height: ($baseline*2);
         display: block;
       }
     }

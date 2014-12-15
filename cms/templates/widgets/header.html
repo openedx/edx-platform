@@ -11,7 +11,13 @@
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
-      <h1 class="branding"><a href="/"><img src="${static.url("images/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" /></a></h1>
+      <h1 class="branding"><a href="/">
+      % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+        <img src="${static.url("images/edx-theme/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
+      % else:
+        <img src="${static.url("images/logo-placeholder.png")}" alt="${settings.STUDIO_NAME}" />
+      % endif
+      </a></h1>
 
       % if context_course:
       <%
