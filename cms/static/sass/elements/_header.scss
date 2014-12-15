@@ -118,7 +118,7 @@
       display: block;
 
       img {
-        width: 100%;
+        max-height: ($baseline*2);
         display: block;
       }
     }
@@ -237,7 +237,6 @@
   }
 
   .branding {
-    width: 20%;
     @include margin-right(2%);
   }
 
@@ -262,7 +261,6 @@
     }
 
     .branding {
-      width: 20%;
       @include margin-right(2%);
     }
 
