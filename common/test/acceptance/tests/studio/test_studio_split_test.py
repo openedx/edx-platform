@@ -20,7 +20,7 @@ from ...pages.studio.settings_group_configurations import GroupConfigurationsPag
 from ...pages.studio.utils import add_advanced_component
 from ...pages.xblock.utils import wait_for_xblock_initialization
 from ...pages.lms.courseware import CoursewarePage
-from ..helpers import UniqueCourseTest, create_user_partition_json
+from ..helpers import create_user_partition_json
 
 from base_studio_test import StudioCourseTest
 

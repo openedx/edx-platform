@@ -31,7 +31,7 @@ class StaffViewTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         )
 
-        self.populate_course_fixture(self.course_fixture)
+        self.populate_course_fixture(self.course_fixture)  # pylint: disable=no-member
 
         self.course_fixture.install()
 
@@ -234,6 +234,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
 
     def setUp(self):
         super(CourseWithContentGroupsTest, self).setUp()
+        # pylint: disable=protected-access
         self.course_fixture._update_xblock(self.course_fixture._course_location, {
             "metadata": {
                 u"user_partitions": [
@@ -247,7 +248,6 @@ class CourseWithContentGroupsTest(StaffViewTest):
                 ],
             },
         })
-
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -281,6 +281,9 @@ class CourseWithContentGroupsTest(StaffViewTest):
         )
 
     def _verify_visible_problems(self, expected_items):
+        """
+        Verify that the expected problems are visible.
+        """
         course_nav = CourseNavPage(self.browser)
         actual_items = course_nav.sequence_items
         self.assertEqual(len(actual_items), len(expected_items))

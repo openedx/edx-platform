@@ -287,4 +287,3 @@ def create_user_partition_json(partition_id, name, description, groups, scheme="
     return UserPartition(
         partition_id, name, description, groups, MockUserPartitionScheme(scheme)
     ).to_json()
-

@@ -184,7 +184,7 @@ class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
         # Verify that staff initially can see "Show Answer".
         self.verify_show_answer_present(True)
 
-         # Toggle masquerade to student
+        # Toggle masquerade to student
         self.update_masquerade(role='student')
         self.verify_show_answer_present(False)
 

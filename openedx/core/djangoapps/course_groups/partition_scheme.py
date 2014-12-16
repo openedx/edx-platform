@@ -20,6 +20,7 @@ class CohortPartitionScheme(object):
     Groups.
     """
 
+    # pylint: disable=unused-argument
     @classmethod
     def get_group_for_user(cls, course_key, user, user_partition, track_function=None):
         """

@@ -33,14 +33,13 @@ class CourseMasquerade(object):
 @expect_json
 def handle_ajax(request, course_key_string):
     """
-    Handle AJAX posts to update the current user's masquerade. Note that the masquerade is global
-    and so applies to all courses.
+    Handle AJAX posts to update the current user's masquerade for the specified course.
     """
     course_key = CourseKey.from_string(course_key_string)
     masquerade_settings = request.session.get(MASQUERADE_SETTINGS_KEY, {})
-    course_settings_json = request.json
-    role = course_settings_json.get('role', 'student')
-    group_id = course_settings_json.get('group_id', None)
+    request_json = request.json
+    role = request_json.get('role', 'student')
+    group_id = request_json.get('group_id', None)
     masquerade_settings[course_key] = CourseMasquerade(course_key, role=role, group_id=group_id)
     request.session[MASQUERADE_SETTINGS_KEY] = masquerade_settings
     return JsonResponse()
@@ -86,7 +85,7 @@ def get_masquerade_role(user, course_key):
     Returns the role that the user is masquerading as, or None if no masquerade is in effect.
     """
     course_masquerade = get_course_masquerade(user, course_key)
-    return course_masquerade.role if course_masquerade else False
+    return course_masquerade.role if course_masquerade else None
 
 
 def is_masquerading_as_student(user, course_key):

@@ -24,7 +24,7 @@ class RandomUserPartitionScheme(object):
         """
         partition_key = cls._key_for_partition(user_partition)
         group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
-        
+
         group = None
         if group_id is not None:
             # attempt to look up the presently assigned group
@@ -40,7 +40,7 @@ class RandomUserPartitionScheme(object):
                     },
                     exc_info=True
                 )
-                
+
         if group is None:
             if not user_partition.groups:
                 raise UserPartitionError('Cannot assign user to an empty user partition')
