@@ -16,13 +16,13 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from ..partition_scheme import CohortPartitionScheme
 from ..models import CourseUserGroupPartitionGroup
-from ..cohorts import add_user_to_cohort
+from ..cohorts import add_user_to_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING, include_xml=True)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -37,7 +37,8 @@ class TestCohortPartitionScheme(django.test.TestCase):
         and a student for each test.
         """
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
-        config_course_cohorts(modulestore().get_course(self.course_key), [], cohorted=True)
+        self.course = modulestore().get_course(self.course_key)
+        config_course_cohorts(self.course, [], cohorted=True)
 
         self.groups = [Group(10, 'Group 10'), Group(20, 'Group 20')]
         self.user_partition = UserPartition(
@@ -151,6 +152,30 @@ class TestCohortPartitionScheme(django.test.TestCase):
         )
         # scheme should now return nothing
         self.assert_student_in_group(None)
+
+    def test_student_lazily_assigned(self):
+        """
+        Test that the lazy assignment of students to cohorts works
+        properly when accessed via the CohortPartitionScheme.
+        """
+        # don't assign the student to any cohort initially
+        self.assert_student_in_group(None)
+
+        # get the default cohort, which is automatically created
+        # during the `get_course_cohorts` API call if it doesn't yet exist
+        cohort = get_course_cohorts(self.course)[0]
+
+        # map that cohort to a group in our partition
+        self.link_cohort_partition_group(
+            cohort,
+            self.user_partition,
+            self.groups[0],
+        )
+
+        # The student will be lazily assigned to the default cohort
+        # when CohortPartitionScheme.get_group_for_user makes its internal
+        # call to cohorts.get_cohort.
+        self.assert_student_in_group(self.groups[0])
 
     def setup_student_in_group_0(self):
         """
