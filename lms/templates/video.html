@@ -102,20 +102,10 @@
               </ul>
               <!-- Captioning/Subtitles -->
               <div class="language-control menu-container">
-                <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false"><i class="icon icon-eye-open" aria-hidden="true"></i><span class="sr">${_('Turn off captions')}</span></a>
+                <a href="#" class="hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false"><i class="icon icon-quote-left" aria-hidden="true"></i><span class="sr">${_('Turn off captions')}</span></a>
               </div>
             </div>
-            <!-- 
-            Branding
-            We only show this container if the video is hosted elsewhere, for instance in China.
-            The image src can be swapped out depending on the host.
-            The image alt can be swapped out depending on the host.
-            -->
-            <div class="branding">
-              <span class="sr">Video hosted by 学堂在线 XuetangX.com</span>
-              <img class="brand-logo" src="http://www.xuetangx.com/static/images/logo.cd8bf6335127.png" alt="Video hosted by XuetanX" />
-            </div>
-            <!-- // -->
+            <!-- Branding was here previously -->
           </div>
         </section>
 
@@ -130,45 +120,56 @@
     <a class="nav-skip sr" id="after-transcript_${id}" href="#before-transcript_${id}">${_('Go back to start of transcript.')}</a>
 
     <div class="focus_grabber last"></div>
-  <ul class="wrapper-downloads">
-    % if download_video_link:
-        <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
-        </li>
-    % endif
-    % if track:
-        <li class="video-tracks video-download-button">
-          % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
-            <div class="a11y-menu-container">
-                <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
-                <ol class="a11y-menu-list">
-                % for item in transcript_download_formats_list:
-                  % if item['value'] == transcript_download_format:
-                  <li class="a11y-menu-item active">
-                  % else:
-                  <li class="a11y-menu-item">
-                  % endif
-		      ## This is necessary so we don't scrape 'display_name' as a string.
-		      <% dname = item['display_name'] %>
-                      <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
-                        ${_(dname)}
-                      </a>
-                  </li>
-                % endfor
-                </ol>
-            </div>
-          % else:
-            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
-            }
-          % endif
-        </li>
-    % endif
-    % if handout:
-        <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
-        </li>
-    % endif
-  </ul>
+    <ul class="wrapper-downloads">
+      % if download_video_link:
+      <li class="video-sources video-download-button">
+        ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+      </li>
+      % endif
+      % if track:
+      <li class="video-tracks video-download-button">
+        % if transcript_download_format:
+          ${('<a href="%s">' + _('Download transcript') + '</a>') % track
+          }
+          <div class="a11y-menu-container">
+              <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
+              <ol class="a11y-menu-list">
+              % for item in transcript_download_formats_list:
+                % if item['value'] == transcript_download_format:
+                <li class="a11y-menu-item active">
+                % else:
+                <li class="a11y-menu-item">
+                % endif
+	      ## This is necessary so we don't scrape 'display_name' as a string.
+	      <% dname = item['display_name'] %>
+                    <a class="a11y-menu-item-link" href="#${item['value']}" title="${_(dname)}" data-value="${item['value']}">
+                      ${_(dname)}
+                    </a>
+                </li>
+              % endfor
+              </ol>
+          </div>
+        % else:
+          ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
+          }
+        % endif
+      </li>
+      % endif
+      % if handout:
+      <li class="video-handout video-download-button">
+          ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+      </li>
+      % endif
+      <li class="branding">
+        <!-- 
+        Branding
+        We only show this container if the video is hosted elsewhere, for instance in China.
+        The image src can be swapped out depending on the host.
+        The image alt can be swapped out depending on the host.
+        -->
+        <span class="sr">Video hosted by 学堂在线 XuetangX.com</span>
+        <img class="brand-logo" src="http://www.xuetangx.com/static/images/logo.cd8bf6335127.png" alt="Video hosted by XuetanX" />
+        <!-- // -->
+      </li>
+    </ul>
 </div>
