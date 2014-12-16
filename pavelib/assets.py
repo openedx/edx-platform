@@ -67,13 +67,13 @@ def collect_assets(systems, settings):
 @task
 @cmdopts([
     ('background', 'b', 'Background mode'),
-    ('systems', 's', 'Systems to run on')
+    ('systems=', 's', 'Systems to run on')
 ])
 def watch_assets(options):
     """
     Watch for changes to asset files, and regenerate js/css
     """
-    systems = getattr(options, 'systems', [])
+    systems = getattr(options, 'systems', ['lms', 'studio'])
     background = getattr(options, 'background', True)
 
     for sys in systems:
