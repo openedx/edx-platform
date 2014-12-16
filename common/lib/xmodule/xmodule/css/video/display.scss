@@ -42,6 +42,7 @@ div.video {
   .wrapper-downloads {
     margin: 0;
     padding: 0;
+    list-style: none;
 
     .video-download-button{
       display: inline-block;
@@ -64,12 +65,26 @@ div.video {
         }
       }
     }
+    
     .video-tracks {
       > a {
         border-radius: 3px 0 0 3px;
       }
       > a.external-track {
         border-radius: 3px;
+      }
+    }
+
+    .branding {
+      display: inline-block;
+      float: right;
+      margin: 15px 0 0 10px;
+      vertical-align: top;
+
+      .brand-logo {
+        max-width: 100%;
+        max-height: 35px;
+        padding: ($baseline/4);
       }
     }
   }
@@ -538,6 +553,7 @@ div.video {
           margin: 0;
           padding: 0;
           list-style: none;
+          border-right: 1px solid #666;
 
           .size-control {
             margin: 0;
@@ -603,16 +619,16 @@ div.video {
         }
       }
 
-      .branding {
-        display: block;
-        float: right;
+      // .branding {
+      //   display: block;
+      //   float: right;
 
-        .brand-logo {
-          max-width: 100%;
-          max-height: 35px;
-          padding: ($baseline/4);
-        }
-      }
+      //   .brand-logo {
+      //     max-width: 100%;
+      //     max-height: 35px;
+      //     padding: ($baseline/4);
+      //   }
+      // }
     }
 
     &:hover section.video-controls {
