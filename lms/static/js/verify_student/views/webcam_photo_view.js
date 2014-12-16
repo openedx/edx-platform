@@ -241,7 +241,6 @@
             // Install event handlers
             $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
             $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
-            $( "#webcam_approve_button", this.el ).on( 'click', _.bind( this.approve, this ) );
 
             return this;
         },
@@ -255,7 +254,6 @@
 
             // Go back to the initial button state
             $( "#webcam_reset_button", this.el ).hide();
-            $( "#webcam_approve_button", this.el ).removeClass( "approved" ).hide();
             $( "#webcam_capture_button", this.el ).show();
         },
 
@@ -263,23 +261,17 @@
             // Take a snapshot of the video
             var success = this.backend.snapshot();
 
-            // Show the reset and approve buttons
             if ( success ) {
+                // Hide the capture button, and show the reset button
                 $( "#webcam_capture_button", this.el ).hide();
                 $( "#webcam_reset_button", this.el ).show();
-                $( "#webcam_approve_button", this.el ).show();
+
+                // Save the data to the model
+                this.model.set( this.modelAttribute, this.backend.getImageData() );
+
+                // Enable the submit button
+                $( this.submitButton ).removeClass( "is-disabled" );
             }
-        },
-
-        approve: function() {
-            // Save the data to the model
-            this.model.set( this.modelAttribute, this.backend.getImageData() );
-
-            // Make the "approve" button green
-            $( "#webcam_approve_button" ).addClass( "approved" );
-
-            // Enable the submit button
-            $( this.submitButton ).removeClass( "is-disabled" );
         },
 
         chooseVideoCaptureBackend: function() {
@@ -298,7 +290,6 @@
             // Hide the buttons
             $( "#webcam_capture_button", this.el ).hide();
             $( "#webcam_reset_button", this.el ).hide();
-            $( "#webcam_approve_button", this.el ).hide();
 
             // Show the error message
             this.errorModel.set({
