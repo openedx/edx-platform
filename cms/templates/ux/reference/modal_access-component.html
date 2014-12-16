@@ -84,8 +84,17 @@
                             <input type="checkbox" id="visibility-content-group-deleted1" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-deleted" checked="checked" />
                             <label for="visibility-content-group-deleted1" class="label">
                               Deleted Content Group
-                              <span class="note">The selected group no longer exists. Choose another group or make the component visible to All Students and Staff</span>
                             </label>
+                            <span class="note">The selected group no longer exists. Choose another group or make the component visible to All Students and Staff</span>
+                          </li>
+
+                          <!-- NOTE: @andyarmstrong, here's an example of how we would treat a group that was deleted/removed - we need a .was removed class and an additional UI element called a .note -->
+                          <li class="field field-checkbox field-visibility-content-group was-removed">
+                            <input type="checkbox" id="visibility-content-group-deleted1" name="visibility-content-group" value="" class="input input-checkbox visibility-content-group-deleted" checked="checked" />
+                            <label for="visibility-content-group-deleted1" class="label">
+                              Deleted Content Group
+                            </label>
+                            <span class="note">The selected group no longer exists. Choose another group or make the component visible to All Students and Staff</span>
                           </li>
                         </ul>
                       </div>
