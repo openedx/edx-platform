@@ -7,6 +7,12 @@ window.Tender = {
   hide_kb: 'true',
   widgetToggles: document.getElementsByClassName('show-tender')
 }
-require(['tender']);
+// The domReady plugin doesn't work if the tender website is down. Wrapping the
+// require call to tender in a $().ready construct solves the issue.
+require(['jquery'], function ($) {
+    $(document).ready(function() {
+        require(['tender']);
+    });
+});
 </script>
 % endif
