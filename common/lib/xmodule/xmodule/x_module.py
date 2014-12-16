@@ -1133,15 +1133,6 @@ def descriptor_global_local_resource_url(block, uri):  # pylint: disable=invalid
     raise NotImplementedError("Applications must monkey-patch this function before using local_resource_url for studio_view")
 
 
-# pylint: disable=invalid-name
-def descriptor_global_applicable_aside_types(block):  # pylint: disable=unused-argument
-    """
-    See :meth:`xblock.runtime.Runtime.applicable_aside_types`.
-    """
-    raise NotImplementedError("Applications must monkey-patch this function before using applicable_aside_types"
-                              " from a DescriptorSystem.")
-
-
 class MetricsMixin(object):
     """
     Mixin for adding metric logging for render and handle methods in the DescriptorSystem and ModuleSystem.
@@ -1320,14 +1311,11 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         """
         See :meth:`xblock.runtime.Runtime:applicable_aside_types` for documentation.
         """
+        potential_set = set(super(DescriptorSystem, self).applicable_aside_types(block))
         if getattr(block, 'xmodule_runtime', None) is not None:
-            return block.xmodule_runtime.applicable_aside_types(block)
-        else:
-            # Currently, Modulestore is responsible for instantiating DescriptorSystems
-            # This means that LMS/CMS don't have a way to define a subclass of DescriptorSystem
-            # that implements the correct get_asides. So, for now, instead, we will reference a
-            # global function that the application can override.
-            return descriptor_global_applicable_aside_types(block)
+            application_set = set(block.xmodule_runtime.applicable_aside_types(block))
+            return list(potential_set.intersection(application_set))
+        return list(potential_set)
 
     def resource_url(self, resource):
         """
