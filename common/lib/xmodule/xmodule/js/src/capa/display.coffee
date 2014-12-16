@@ -301,12 +301,6 @@ class @Problem
 
     Logger.log 'problem_check', @answers
 
-    # Segment.io
-    analytics.track "edx.bi.course.problem.checked",
-      category: "courseware"
-      problem_id: @id
-      answers: @answers
-
     $.postWithPrefix("#{@url}/problem_check", @answers, (response) =>
       switch response.success
         when 'incorrect', 'correct'

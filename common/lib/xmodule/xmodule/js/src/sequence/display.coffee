@@ -126,15 +126,6 @@ class @Sequence
     if (1 <= new_position) and (new_position <= @num_contents)
       Logger.log "seq_goto", old: @position, new: new_position, id: @id
 
-      analytics.pageview @id
-
-      # navigation by clicking the tab directly
-      analytics.track "edx.bi.course.sequential.direct.clicked",
-        category: "courseware"
-        sequence_id: @id
-        current_sequential: @position
-        target_sequential: new_position
-
       # On Sequence change, destroy any existing polling thread
       #   for queued submissions, see ../capa/display.coffee
       if window.queuePollerID
@@ -164,18 +155,6 @@ class @Sequence
       old: @position
       new: new_position
       id: @id
-
-    analytics.pageview @id
-
-    # navigation using the next or previous arrow button.
-    tracking_messages =
-      seq_prev: "edx.bi.course.sequential.previous.clicked"
-      seq_next: "edx.bi.course.sequential.next.clicked"
-    analytics.track tracking_messages[direction],
-      category: "courseware"
-      sequence_id: @id
-      current_sequential: @position
-      target_sequential: new_position
 
     # If the bottom nav is used, scroll to the top of the page on change.
     if $(event.target).closest('nav[class="sequence-bottom"]').length > 0
