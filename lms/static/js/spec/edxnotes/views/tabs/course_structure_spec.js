@@ -59,7 +59,7 @@ define([
                 is_closable: false
             });
             expect(view.$('#structure-panel')).toExist();
-            expect(chapters).toEqual(['First Chapter', 'Second Chapter', 'Second Chapter']);
+            expect(chapters).toEqual(['First Chapter', 'Second Chapter']);
             expect(sections).toEqual(['First Section', 'Second Section', 'Third Section']);
             expect(notes).toEqual(['Note 1', 'Note 2', 'Note 3', 'Note 4', 'Note 5']);
         });

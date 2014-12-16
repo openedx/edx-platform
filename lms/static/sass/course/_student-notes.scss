@@ -191,22 +191,30 @@
     }
 
     .note-group {
-      padding-top: ($baseline*1.5);
-      border-top: 1px solid $gray-l4;
+        &, .note-section {
+          border-top: 1px solid $gray-l4;
+          padding-top: $baseline;
+        }
 
-      .group-lecture {
-        border-bottom: 2px solid $gray-l4;
-        padding-bottom: $baseline;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        // Do not add border and padding for the first .note-section
+        // in the .note-group
+        .course-title + .note-section {
+          border-top: none;
+          padding-top: 0;
+        }
+
+        .course-title, .course-subtitle {
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
 
         .course-subtitle {
           @extend %t-copy-sub1;
-          display: block;
+          border-bottom: 2px solid $gray-l4;
+          padding-bottom: $baseline;
           font-weight: $font-light;
           color: inherit;
         }
-      }
     }
   }
 }

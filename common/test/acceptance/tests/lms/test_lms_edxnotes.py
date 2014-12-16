@@ -325,10 +325,13 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         elif quote is not None:
             self.assertEqual(item.title_highlighted, "NOTED IN:")
 
-    def assertGroupContent(self, item, title=None, subtitle=None, notes_count=0):
+    def assertGroupContent(self, item, title=None, subtitles=None):
         self.assertEqual(item.title, title)
-        self.assertEqual(item.subtitle, subtitle)
-        self.assertEqual(len(item.children), notes_count)
+        self.assertEqual(item.subtitles, subtitles)
+
+    def assertSectionContent(self, item, title=None, notes=None):
+        self.assertEqual(item.title, title)
+        self.assertEqual(item.notes, notes)
 
     def test_no_content(self):
         """
@@ -397,7 +400,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         Given I have a course with 5 notes
         When I open Notes page
         And I switch to "Course Structure" view
-        Then I see 3 groups and 5 notes
+        Then I see 2 groups, 3 sections and 5 notes
         And I see correct content in the notes and groups
         """
         self._add_default_notes()
@@ -405,14 +408,21 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         notes = self.notes_page.notes
         groups = self.notes_page.groups
+        sections = self.notes_page.sections
         self.assertEqual(len(notes), 5)
-        self.assertEqual(len(groups), 3)
+        self.assertEqual(len(groups), 2)
+        self.assertEqual(len(sections), 3)
 
         self.assertGroupContent(
             groups[0],
             title=u"TEST SECTION 1",
-            subtitle=u"TEST SUBSECTION 1",
-            notes_count=3,
+            subtitles=[u"TEST SUBSECTION 1", u"TEST SUBSECTION 2"]
+        )
+
+        self.assertSectionContent(
+            sections[0],
+            title=u"TEST SUBSECTION 1",
+            notes=[u"Fifth note", u"Third note", None]
         )
 
         self.assertNoteContent(
@@ -438,11 +448,10 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             time_updated="Jan 01, 2012 at 01:01 UTC"
         )
 
-        self.assertGroupContent(
-            groups[1],
-            title=u"TEST SECTION 1",
-            subtitle=u"TEST SUBSECTION 2",
-            notes_count=1,
+        self.assertSectionContent(
+            sections[1],
+            title=u"TEST SUBSECTION 2",
+            notes=[u"Fourth note"]
         )
 
         self.assertNoteContent(
@@ -455,8 +464,14 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.assertGroupContent(
             groups[2],
             title=u"TEST SECTION 2",
-            subtitle=u"TEST SUBSECTION 3",
+            subtitles=[u"TEST SUBSECTION 3"],
             notes_count=1,
+        )
+
+        self.assertSectionContent(
+            sections[2],
+            title=u"TEST SUBSECTION 3",
+            notes=[u"First note"]
         )
 
         self.assertNoteContent(
@@ -541,7 +556,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         Then I switch to "Recent Activity" tab
         And I see all 5 notes
         Then I switch to "Course Structure" tab
-        And I see all 3 groups and 5 notes
+        And I see all 2 groups and 5 notes
         When I switch back to "Search Results" tab
         Then I can still see 4 notes found
         When I close "Search Results" tab
@@ -564,7 +579,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.notes_page.switch_to_tab("recent")
         self.assertEqual(len(self.notes_page.notes), 5)
         self.notes_page.switch_to_tab("structure")
-        self.assertEqual(len(self.notes_page.groups), 3)
+        self.assertEqual(len(self.notes_page.groups), 2)
         self.assertEqual(len(self.notes_page.notes), 5)
         self.notes_page.switch_to_tab("search")
         self.assertEqual(len(self.notes_page.notes), 4)

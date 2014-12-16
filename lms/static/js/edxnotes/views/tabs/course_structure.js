@@ -11,32 +11,34 @@ define([
 
             renderContent: function () {
                 var courseStructure = this.collection.getCourseStructure();
-                _.each(courseStructure.chapters, function (chapter) {
-                    _.each(chapter.children, function (location) {
-                        var section = courseStructure.sections[location],
-                            group;
-                        if (section) {
-                            group = this.getGroup(chapter, section);
-                            this.children.push(group);
-                            _.each(section.children, function (location) {
+                _.each(courseStructure.chapters, function (chapterInfo) {
+                    var group = this.getGroup(chapterInfo);
+                    _.each(chapterInfo.children, function (location) {
+                        var sectionInfo = courseStructure.sections[location],
+                            section;
+                        if (sectionInfo) {
+                            section = group.addChild(sectionInfo);
+                            _.each(sectionInfo.children, function (location) {
                                 var notes = courseStructure.units[location];
                                 if (notes) {
-                                    group.addChild(this.getNotes(notes))
+                                    section.addChild(this.getNotes(notes))
                                 }
                             }, this);
-                            group.render().$el.appendTo(this.$el);
                         }
                     }, this);
+                    group.render().$el.appendTo(this.$el);
                 }, this);
 
                 return this;
             },
 
             getGroup: function (chapter, section) {
-                return new NoteGroupView({
+                var group = new NoteGroupView({
                     chapter: chapter,
                     section: section
                 });
+                this.children.push(group);
+                return group;
             }
         }),
 
