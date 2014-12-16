@@ -81,7 +81,16 @@ div.video {
       margin: 15px 0 0 10px;
       vertical-align: top;
 
+      .host-tag {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 80%;
+        color: #777;
+      }
+
       .brand-logo {
+        display: inline-block;
+        vertical-align: middle;
         max-width: 100%;
         max-height: 35px;
         padding: ($baseline/4);
@@ -573,6 +582,7 @@ div.video {
 
           .quality-control {
             margin: 0;
+            height: 46px;
 
             .quality-toggle-control {
               @extend %video-button;
@@ -597,18 +607,26 @@ div.video {
         .language-control {
           display: block;
           float: left;
+          height: 46px;
           border-right: 1px solid #666;
 
-          & > a.hide-subtitles {
+          // .hide-subtitles {
+          .subtitles-control {
             @extend %video-button;
-            @include transition(none);
+            float: left;
+            padding: 0;
+            width: 46px;
             text-align: center;
             border: none;
-            padding: 0 11px;
-            width: 24px;
 
-            &.off {
-              opacity: 0.7;
+            &.active {
+              background-color: #F44;
+              color: #0ff;
+              text-decoration: none;
+            }
+
+            &.is-hidden {
+              display: none !important;
             }
           }
 
