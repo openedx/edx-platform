@@ -37,7 +37,7 @@ class CohortPartitionScheme(object):
         """
         # If the current user is masquerading as being in a group, then return it
         group_id = get_masquerading_group_id(user, course_key)
-        if group_id:
+        if group_id is not None:
             user_partition = get_cohorted_user_partition(course_key)
             return user_partition.get_group(group_id) if user_partition else None
 
