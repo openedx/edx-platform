@@ -356,6 +356,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         return xblock._edit_info.get('published_date')
 
+    def applicable_aside_types(self, block):
+        # "old" mongo does support asides yet
+        return []
+
 
 # The only thing using this w/ wildcards is contentstore.mongo for asset retrieval
 def location_to_query(location, wildcard=True, tag='i4x'):

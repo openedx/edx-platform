@@ -87,7 +87,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
-            'usage_key_string': unicode(block.location),
+            'usage_key_string': unicode(block.scope_ids.usage_id),
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
@@ -96,8 +96,14 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
-        # TODO: Implement this to enable XBlockAsides on previews in Studio
-        return []
+        """
+        Remove acid_aside
+        """
+        return [
+            aside_type
+            for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
+            if aside_type != 'acid_aside'
+        ]
 
 
 class StudioUserService(object):

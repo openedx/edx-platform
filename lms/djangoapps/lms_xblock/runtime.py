@@ -9,7 +9,6 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.api import course_tag as user_course_tag_api
-from xblock.core import XBlockAside
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
