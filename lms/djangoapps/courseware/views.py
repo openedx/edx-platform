@@ -793,6 +793,7 @@ def course_about(request, course_id):
         'registered': registered,
         'course_target': course_target,
         'registration_price': registration_price,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'in_cart': in_cart,
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,

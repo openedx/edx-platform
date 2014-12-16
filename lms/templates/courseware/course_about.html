@@ -311,6 +311,14 @@
 
           ##<li class="important-dates-item"><i class="icon icon-time"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
+          %if is_shopping_cart_enabled and registration_price:
+            <li class="important-dates-item">
+              <i class="icon icon-money"></i>
+              <p class="important-dates-item-title">${_("Price")}</p>
+              <span class="important-dates-item-text">${_("{currency_symbol}{cost}").format(currency_symbol=currency_symbol, cost=registration_price)}</span>
+            </li>
+          % endif
+
           % if get_course_about_section(course, "prerequisites"):
             <li class="important-dates-item"><i class="icon icon-book"></i><p class="important-dates-item-title">${_("Prerequisites")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
