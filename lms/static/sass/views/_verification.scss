@@ -1388,7 +1388,7 @@
       }
     }
 
-    @include media(min-width 550px max-width 768px) {
+    @include media($tablet) {
       .contribution-options {
         .field {
           @include span-columns(6);
