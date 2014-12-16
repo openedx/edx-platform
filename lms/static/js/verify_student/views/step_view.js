@@ -1,18 +1,9 @@
 /**
  * Base view for defining steps in the payment/verification flow.
  *
- * Each step view lazy-loads its underscore template.
- * This reduces the size of the initial page, since we don't
- * need to include the DOM structure for each step
- * in the initial load.
- *
  * Step subclasses are responsible for defining a template
  * and installing custom event handlers (including buttons
  * to move to the next step).
- *
- * The superclass is responsible for downloading the underscore
- * template and rendering it, using context received from
- * the server (in data attributes on the initial page load).
  *
  */
  var edx = edx || {};
@@ -35,18 +26,27 @@
         },
 
         render: function() {
-            if ( !this.renderedHtml && this.templateUrl) {
-                $.ajax({
-                    url: this.templateUrl,
-                    type: 'GET',
-                    context: this,
-                    success: this.handleResponse,
-                    error: this.handleError
-                });
-            } else {
-                $( this.el ).html( this.renderedHtml );
-                this.postRender();
-            }
+            var templateHtml = $( "#" + this.templateName + "-tpl" ).html(),
+                templateContext = {
+                    nextStepNum: this.nextStepNum,
+                    nextStepTitle: this.nextStepTitle
+                };
+
+            // Include step-specific information from the server
+            // (passed in from data- attributes to the parent view)
+            _.extend( templateContext, this.stepData );
+
+            // Allow subclasses to add additional information
+            // to the template context, perhaps asynchronously.
+            this.updateContext( templateContext ).done(
+                function( templateContext ) {
+                    // Render the template into the DOM
+                    $( this.el ).html( _.template( templateHtml, templateContext ) );
+
+                    // Allow subclasses to install custom event handlers
+                    this.postRender();
+                }
+            ).fail( _.bind( this.handleError, this ) );
         },
 
         handleResponse: function( data ) {
@@ -66,10 +66,26 @@
 
         handleError: function() {
             this.errorModel.set({
-                errorTitle: gettext("Error"),
-                errorMsg: gettext("An unexpected error occurred.  Please reload the page to try again."),
+                errorTitle: gettext( "Error" ),
+                errorMsg: gettext( "An unexpected error occurred.  Please reload the page to try again." ),
                 shown: true
             });
+        },
+
+        /**
+         * Subclasses can override this to add information to
+         * the template context.  This returns an asynchronous
+         * Promise, so the subclass can fill in the template
+         * after completing an AJAX request.
+         * The default implementation is a no-op.
+         */
+        updateContext: function( templateContext ) {
+            var view = this;
+            return $.Deferred(
+                function( defer ) {
+                    defer.resolveWith( view, [ templateContext ]);
+                }
+            ).promise();
         },
 
         postRender: function() {
