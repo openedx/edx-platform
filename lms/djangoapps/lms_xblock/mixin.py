@@ -142,26 +142,32 @@ class LmsBlockMixin(XBlockMixin):
         """
         _ = self.runtime.service(self, "i18n").ugettext  # pylint: disable=redefined-outer-name
         validation = super(LmsBlockMixin, self).validate()
+        has_invalid_user_partitions = False
+        has_invalid_groups = False
         for user_partition_id, group_ids in self.group_access.iteritems():
             try:
                 user_partition = self._get_user_partition(user_partition_id)
             except NoSuchUserPartitionError:
-                validation.add(
-                    ValidationMessage(
-                        ValidationMessage.ERROR,
-                        _(u"This xblock refers to a deleted or invalid content group configuration.")
-                    )
-                )
+                has_invalid_user_partitions = True
             else:
                 for group_id in group_ids:
                     try:
                         user_partition.get_group(group_id)
                     except NoSuchUserPartitionGroupError:
-                        validation.add(
-                            ValidationMessage(
-                                ValidationMessage.ERROR,
-                                _(u"This xblock refers to a deleted or invalid content group.")
-                            )
-                        )
+                        has_invalid_groups = True
 
+        if has_invalid_user_partitions:
+            validation.add(
+                ValidationMessage(
+                    ValidationMessage.ERROR,
+                    _(u"This xblock refers to deleted or invalid content group configurations.")
+                )
+            )
+        if has_invalid_groups:
+            validation.add(
+                ValidationMessage(
+                    ValidationMessage.ERROR,
+                    _(u"This xblock refers to deleted or invalid content groups.")
+                )
+            )
         return validation
