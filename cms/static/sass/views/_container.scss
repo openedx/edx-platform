@@ -202,7 +202,7 @@
           @extend %status-value-sub1;
 
           .icon {
-            margin-right: ($baseline/4);
+            @include margin-right($baseline/4);
           }
         }
       }

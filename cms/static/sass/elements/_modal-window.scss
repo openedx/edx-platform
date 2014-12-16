@@ -65,7 +65,7 @@
 
       .icon {
         @extend %t-icon4;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
         color: $white;
       }
 
@@ -113,7 +113,7 @@
       @extend %t-strong;
       margin-bottom: ($baseline/4);
       text-transform: uppercase;
-      letter-spacing: 0.1rem;
+      letter-spacing: 0.1;
       color: $gray-l2;
     }
 
@@ -428,23 +428,10 @@
   // MODAL TYPE: component - visibility modal
   .xblock-visibility_view {
 
-    // UI: visibility summary
-    .visibility-summary-title {
-      margin-bottom: ($baseline*0.75);
-      padding-bottom: ($baseline*0.75);
-    }
-
-    .visibility-summary-value {
-      display: inline-block;
-      vertical-align: top;
-      margin-left: ($baseline/4);
-      @extend %t-strong;
-    }
-
     .visibility-controls-secondary {
       max-height: 100%;
       overflow-y: scroll;
-      margin: ($baseline*0.75) 0 0 $baseline;
+      @include margin(($baseline*0.75), 0, 0, $baseline);
     }
 
     .visibility-controls-group {
@@ -452,41 +439,15 @@
       margin-bottom: $baseline;
     }
 
-
     // UI: form fields
     .list-fields {
 
       .field {
         @extend %wipe-last-child;
-        display: block;
-        width: 100%;
         margin-bottom: ($baseline/4);
 
         label {
           @extend %t-copy-sub1;
-          @include transition(color $tmg-f3 ease-in-out 0s);
-
-          &.is-focused {
-            color: $blue;
-          }
-        }
-
-        input, textarea {
-          @extend %t-copy-base;
-          @include transition(all $tmg-f2 ease-in-out 0s);
-          padding: ($baseline/2);
-        }
-
-        .tip {
-          @extend %t-copy-sub1;
-          @include transition(color, 0.15s, ease-in-out);
-          display: block;
-          margin-top: ($baseline/4);
-          color: $gray-l2;
-        }
-
-        .tip-warning {
-          color: $gray-d2;
         }
       }
 
@@ -494,7 +455,7 @@
       .field-radio, .field-checkbox {
 
         label {
-          margin-left: ($baseline/4);
+          @include margin-left($baseline/4);
         }
       }
     }
@@ -510,7 +471,6 @@
         @extend %t-copy-sub2;
         @extend %t-regular;
         display: block;
-        margin-top: ($baseline/4);
         color: $color-error;
       }
     }
@@ -518,7 +478,8 @@
     // CASE: no groups configured for visibility
     .is-not-configured {
       @extend %no-content;
-      text-align: left; // reset for %no-content's default styling
+      padding: ($baseline);
+      @include text-align(left); // reset for %no-content's default styling
 
       .title {
         @extend %t-title6;
@@ -542,7 +503,7 @@
         }
 
         .action {
-          margin-left: 0; // reset for %no-content's default styling
+          @include margin-left(0); // reset for %no-content's default styling
         }
       }
     }
@@ -559,7 +520,7 @@
       .field {
         display: inline-block;
         vertical-align: top;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
         margin-bottom: ($baseline/4);
 
         label {
@@ -631,7 +592,7 @@
         }
 
         .label {
-          margin-right: ($baseline/2);
+          @include margin-right($baseline/2);
         }
 
         .input {
