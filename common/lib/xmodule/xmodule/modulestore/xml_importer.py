@@ -26,6 +26,7 @@ import mimetypes
 from path import path
 import json
 import re
+from lxml import etree
 
 from .xml import XMLModuleStore, ImportSystem, ParentTracker
 from xblock.runtime import KvsFieldData, DictKeyValueStore
@@ -38,6 +39,7 @@ from xmodule.errortracker import make_error_tracker
 from .store_utilities import rewrite_nonportable_content_links
 import xblock
 from xmodule.tabs import CourseTabList
+from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore.django import ASSET_IGNORE_REGEX
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.mongo.base import MongoRevisionKey
@@ -139,7 +141,8 @@ def import_from_xml(
         default_class='xmodule.raw_module.RawDescriptor',
         load_error_modules=True, static_content_store=None,
         target_course_id=None, verbose=False,
-        do_import_static=True, create_new_course_if_not_present=False):
+        do_import_static=True, create_course_if_not_present=False,
+        raise_on_failure=False):
     """
     Import xml-based courses from data_dir into modulestore.
 
@@ -167,7 +170,7 @@ def import_from_xml(
             time the course is loaded. Static content for some courses may also be
             served directly by nginx, instead of going through django.
 
-        create_new_course_if_not_present: If True, then a new course is created if it doesn't already exist.
+        create_course_if_not_present: If True, then a new course is created if it doesn't already exist.
             Otherwise, it throws an InvalidLocationError if the course does not exist.
 
         default_class, load_error_modules: are arguments for constructing the XMLModuleStore (see its doc)
@@ -196,7 +199,7 @@ def import_from_xml(
 
         runtime = None
         # Creates a new course if it doesn't already exist
-        if create_new_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
+        if create_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
             try:
                 new_course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
                 runtime = new_course.runtime
@@ -222,6 +225,9 @@ def import_from_xml(
             _import_static_content_wrapper(
                 static_content_store, do_import_static, course_data_path, dest_course_id, verbose
             )
+
+            # Import asset metadata stored in XML.
+            _import_course_asset_metadata(store, course_data_path, dest_course_id, raise_on_failure)
 
             # STEP 3: import PUBLISHED items
             # now loop through all the modules depth first and then orphans
@@ -285,10 +291,60 @@ def import_from_xml(
     return new_courses
 
 
+def _import_course_asset_metadata(store, data_dir, course_id, raise_on_failure):
+    """
+    Read in assets XML file, parse it, and add all asset metadata to the modulestore.
+    """
+    asset_dir = path(data_dir) / AssetMetadata.EXPORTED_ASSET_DIR
+    assets_filename = AssetMetadata.EXPORTED_ASSET_FILENAME
+    asset_xml_file = asset_dir / assets_filename
+
+    def make_asset_id(course_id, asset_xml):
+        """
+        Construct an asset ID out of a complete asset XML section.
+        """
+        asset_type = None
+        asset_name = None
+        for child in asset_xml.iterchildren():
+            if child.tag == AssetMetadata.ASSET_TYPE_ATTR:
+                asset_type = child.text
+            elif child.tag == AssetMetadata.ASSET_BASENAME_ATTR:
+                asset_name = child.text
+        return course_id.make_asset_key(asset_type, asset_name)
+
+    all_assets = []
+    try:
+        xml_data = etree.parse(asset_xml_file).getroot()
+        assert(xml_data.tag == AssetMetadata.ALL_ASSETS_XML_TAG)
+        for asset in xml_data.iterchildren():
+            if asset.tag == AssetMetadata.ASSET_XML_TAG:
+                # Construct the asset key.
+                asset_key = make_asset_id(course_id, asset)
+                asset_md = AssetMetadata(asset_key)
+                asset_md.from_xml(asset)
+                all_assets.append(asset_md)
+    except IOError:
+        logging.info('No {} file is present with asset metadata.'.format(assets_filename))
+        return
+    except Exception:  # pylint: disable=W0703
+        logging.exception('Error while parsing asset xml.')
+        if raise_on_failure:
+            raise
+        else:
+            return
+
+    # Now add all asset metadata to the modulestore.
+    if len(all_assets) > 0:
+        store.save_asset_metadata_list(all_assets, all_assets[0].edited_by, import_only=True)
+
+
 def _import_course_module(
         store, runtime, user_id, data_dir, course_key, dest_course_id, source_course, do_import_static,
         verbose,
 ):
+    """
+    Import a course module.
+    """
     if verbose:
         log.debug("Scanning {0} for course module...".format(course_key))
 
@@ -534,11 +590,11 @@ def _import_course_draft(
         for child in module.get_children():
             _import_module(child)
 
-    # now walk the /vertical directory where each file in there
-    # will be a draft copy of the Vertical
+    # Now walk the /vertical directory.
+    # Each file in the directory will be a draft copy of the vertical.
 
-    # First it is necessary to order the draft items by their desired index in the child list
-    # (order os.walk returns them in is not guaranteed).
+    # First it is necessary to order the draft items by their desired index in the child list,
+    # since the order in which os.walk() returns the files is not guaranteed.
     drafts = []
     for dirname, _dirnames, filenames in os.walk(draft_dir):
         for filename in filenames:

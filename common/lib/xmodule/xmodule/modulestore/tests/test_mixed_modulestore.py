@@ -1932,7 +1932,7 @@ class TestMixedModuleStore(CourseComparisonTest):
                     self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
                     static_content_store=contentstore,
                     target_course_id=dest_course_key,
-                    create_new_course_if_not_present=True,
+                    create_course_if_not_present=True,
                 )
                 course_id = courses[0].id
                 # no need to verify course content here as test_cross_modulestore_import_export does that
@@ -1980,7 +1980,7 @@ class TestMixedModuleStore(CourseComparisonTest):
                     self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
                     static_content_store=contentstore,
                     target_course_id=dest_course_key,
-                    create_new_course_if_not_present=True,
+                    create_course_if_not_present=True,
                 )
                 course_id = courses[0].id
                 # no need to verify course content here as test_cross_modulestore_import_export does that

@@ -7,11 +7,12 @@ import dateutil.parser
 import pytz
 import json
 from contracts import contract, new_contract
-from opaque_keys.edx.keys import AssetKey
+from opaque_keys.edx.keys import CourseKey, AssetKey
 from lxml import etree
 
 
 new_contract('AssetKey', AssetKey)
+new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', basestring)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access, no-member
@@ -28,10 +29,25 @@ class AssetMetadata(object):
     EDIT_INFO_ATTRS = ['curr_version', 'prev_version', 'edited_by', 'edited_by_email', 'edited_on']
     CREATE_INFO_ATTRS = ['created_by', 'created_by_email', 'created_on']
     ATTRS_ALLOWED_TO_UPDATE = TOP_LEVEL_ATTRS + EDIT_INFO_ATTRS
-    ALL_ATTRS = ['asset_id'] + ATTRS_ALLOWED_TO_UPDATE + CREATE_INFO_ATTRS
+    ASSET_TYPE_ATTR = 'type'
+    ASSET_BASENAME_ATTR = 'filename'
+    XML_ONLY_ATTRS = [ASSET_TYPE_ATTR, ASSET_BASENAME_ATTR]
+    XML_ATTRS = XML_ONLY_ATTRS + ATTRS_ALLOWED_TO_UPDATE + CREATE_INFO_ATTRS
 
-    # Default type for AssetMetadata objects. A constant for convenience.
-    ASSET_TYPE = 'asset'
+    # Type for assets uploaded by a course author in Studio.
+    GENERAL_ASSET_TYPE = 'asset'
+
+    # Asset section XML tag for asset metadata as XML.
+    ALL_ASSETS_XML_TAG = 'assets'
+
+    # Individual asset XML tag for asset metadata as XML.
+    ASSET_XML_TAG = 'asset'
+
+    # Top-level directory name in exported course XML which holds asset metadata.
+    EXPORTED_ASSET_DIR = 'assets'
+
+    # Filename of all asset metadata exported as XML.
+    EXPORTED_ASSET_FILENAME = 'assets.xml'
 
     @contract(asset_id='AssetKey',
               pathname='basestring|None', internal_name='basestring|None',
@@ -118,6 +134,7 @@ class AssetMetadata(object):
         """
         return {
             'filename': self.asset_id.path,
+            'asset_type': self.asset_id.asset_type,
             'pathname': self.pathname,
             'internal_name': self.internal_name,
             'locked': self.locked,
@@ -169,11 +186,11 @@ class AssetMetadata(object):
         for child in node:
             qname = etree.QName(child)
             tag = qname.localname
-            if tag in self.ALL_ATTRS:
+            if tag in self.XML_ATTRS:
                 value = child.text
-                if tag == 'asset_id':
-                    # Locator.
-                    value = AssetKey.from_string(value)
+                if tag in self.XML_ONLY_ATTRS:
+                    # An AssetLocator is constructed separately from these parts.
+                    continue
                 elif tag == 'locked':
                     # Boolean.
                     value = True if value == "true" else False
@@ -197,13 +214,23 @@ class AssetMetadata(object):
         Add the asset data as XML to the passed-in node.
         The node should already be created as a top-level "asset" element.
         """
-        for attr in self.ALL_ATTRS:
+        for attr in self.XML_ATTRS:
             child = etree.SubElement(node, attr)
-            value = getattr(self, attr)
+            # Get the value.
+            if attr == self.ASSET_TYPE_ATTR:
+                value = self.asset_id.asset_type
+            elif attr == self.ASSET_BASENAME_ATTR:
+                value = self.asset_id.path
+            else:
+                value = getattr(self, attr)
+
+            # Format the value.
             if isinstance(value, bool):
                 value = "true" if value else "false"
             elif isinstance(value, datetime):
                 value = value.isoformat()
+            elif isinstance(value, dict):
+                value = json.dumps(value)
             else:
                 value = unicode(value)
             child.text = value
@@ -218,3 +245,57 @@ class AssetMetadata(object):
         for asset in assets:
             asset_node = etree.SubElement(node, "asset")
             asset.to_xml(asset_node)
+
+
+class CourseAssetsFromStorage(object):
+    """
+    Wrapper class for asset metadata lists returned from modulestore storage.
+    """
+    @contract(course_id='CourseKey', asset_md=dict)
+    def __init__(self, course_id, doc_id, asset_md):
+        """
+        Params:
+            course_id: Course ID for which the asset metadata is stored.
+            doc_id: ObjectId of MongoDB document
+            asset_md: Dict with asset types as keys and lists of storable asset metadata as values.
+        """
+        self.course_id = course_id
+        self._doc_id = doc_id
+        self.asset_md = asset_md
+
+    @property
+    def doc_id(self):
+        """
+        Returns the ID associated with the MongoDB document which stores these course assets.
+        """
+        return self._doc_id
+
+    def setdefault(self, item, default=None):
+        """
+        Provides dict-equivalent setdefault functionality.
+        """
+        return self.asset_md.setdefault(item, default)
+
+    def __getitem__(self, item):
+        return self.asset_md[item]
+
+    def __delitem__(self, item):
+        del self.asset_md[item]
+
+    def __len__(self):
+        return len(self.asset_md)
+
+    def __setitem__(self, key, value):
+        self.asset_md[key] = value
+
+    def get(self, item, default=None):
+        """
+        Provides dict-equivalent get functionality.
+        """
+        return self.asset_md.get(item, default)
+
+    def iteritems(self):
+        """
+        Iterates over the items of the asset dict.
+        """
+        return self.asset_md.iteritems()

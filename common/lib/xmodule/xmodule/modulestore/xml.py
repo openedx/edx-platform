@@ -867,18 +867,21 @@ class XMLModuleStore(ModuleStoreReadBase):
         For now this is not implemented, but others should feel free to implement using the asset.json
         which export produces.
         """
-        raise NotImplementedError()
+        log.warning("_find_course_asset request of XML modulestore - not implemented.")
+        return (None, None)
 
     def find_asset_metadata(self, asset_key, **kwargs):
         """
         For now this is not implemented, but others should feel free to implement using the asset.json
         which export produces.
         """
-        raise NotImplementedError()
+        log.warning("find_asset_metadata request of XML modulestore - not implemented.")
+        return None
 
     def get_all_asset_metadata(self, course_key, asset_type, start=0, maxresults=-1, sort=None, **kwargs):
         """
         For now this is not implemented, but others should feel free to implement using the asset.json
         which export produces.
         """
-        raise NotImplementedError()
+        log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
+        return []

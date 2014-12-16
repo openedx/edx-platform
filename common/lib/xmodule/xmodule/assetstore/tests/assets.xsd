@@ -27,7 +27,8 @@
 
 <xs:complexType name="assetType">
   <xs:all>
-    <xs:element name="asset_id" type="stringType"/>
+    <xs:element name="type" type="stringType"/>
+    <xs:element name="filename" type="stringType"/>
     <xs:element name="contenttype" type="stringType"/>
     <xs:element name="pathname" type="stringType"/>
     <xs:element name="internal_name" type="stringType"/>
