@@ -118,39 +118,41 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
-                log.warning("Module not found: %s", usage_key)
+                log.debug("Module not found: %s", usage_key)
                 continue
 
             if not has_access(user, "load", item, course_key=course.id):
+                log.debug("User %s does not have an access to %s", user, item)
                 continue
-
-            unit = get_ancestor(store, usage_key)
-            if unit:
-                unit_dict = get_ancestor_context(course, unit)
-                model.update({
-                    u"unit": unit_dict,
-                })
-
-            model.update({
-                u"text": markupsafe.escape(model["text"]),
-                u"quote": markupsafe.escape(model["quote"]),
-                u"updated": dateutil_parse(model["updated"]),
-            })
 
             if add_course_structure:
                 try:
                     # pylint: disable=unused-variable
                     (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
-                    chapter = store.get_item(chapter)
-                    chapter_dict = get_ancestor_context(course, chapter, course)
-                    section = store.get_item(section)
-                    section_dict = get_ancestor_context(course, section)
-                    model.update({
-                        u"chapter": chapter_dict,
-                        u"section": section_dict,
-                    })
                 except (NoPathToItem, ValueError):
+                    log.debug("No path to item found: %s", usage_key)
                     continue
+
+                chapter = store.get_item(chapter)
+                chapter_dict = get_module_context(course, chapter)
+                section = store.get_item(section)
+                section_dict = get_module_context(course, section)
+                model.update({
+                    u"chapter": chapter_dict,
+                    u"section": section_dict,
+                })
+
+            unit = get_ancestor(store, usage_key)
+            if unit is None:
+                log.debug("Unit not found for %s", usage_key)
+                continue
+
+            model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
+                u"updated": dateutil_parse(model["updated"]),
+                u"unit": get_module_context(course, unit),
+            })
 
             filtered_collection.append(model)
 
@@ -207,7 +209,7 @@ def get_ancestor(store, usage_key):
         return
 
 
-def get_ancestor_context(course, item, ancestor=None):
+def get_module_context(course, item):
     """
     Returns dispay_name and url for the parent module.
     """
@@ -216,8 +218,8 @@ def get_ancestor_context(course, item, ancestor=None):
         'display_name': item.display_name_with_default,
     }
 
-    if item.category == 'chapter' and ancestor:
-        ancestor_children = [child.to_deprecated_string() for child in ancestor.children]
+    if item.category == 'chapter':
+        ancestor_children = [child.to_deprecated_string() for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
         item_dict['url'] = reverse("jump_to", kwargs={

@@ -17,8 +17,9 @@ from django.core.exceptions import ImproperlyConfigured
 from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
 from xmodule.tabs import EdxNotesTab
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.search import path_to_location, NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -124,8 +125,11 @@ class EdxNotesDecoratorTest(TestCase):
         self.assertEqual("original_get_html", self.problem.get_html())
 
 
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+
+
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesHelpersTest(TestCase):
+class EdxNotesHelpersTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes helpers.
     """
@@ -133,14 +137,24 @@ class EdxNotesHelpersTest(TestCase):
         """
         Setup a dummy course content.
         """
+        super(EdxNotesHelpersTest, self).setUp()
         ClientFactory(name="edx-notes")
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+        self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
         self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
         self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
         self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+
+        # Read again so that children lists are accurate
+        self.course = self.store.get_item(self.course.location)
+        self.chapter = self.store.get_item(self.chapter.location)
+        self.chapter_2 = self.store.get_item(self.chapter_2.location)
+        self.sequential = self.store.get_item(self.sequential.location)
+        self.vertical = self.store.get_item(self.vertical.location)
+
+        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
     def _get_jump_to_url(self, vertical):
@@ -219,9 +233,21 @@ class EdxNotesHelpersTest(TestCase):
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
+                    u"chapter": {
+                        u"display_name": self.chapter.display_name_with_default,
+                        u"index": 0,
+                        u"location": unicode(self.chapter.location),
+                        u"children": [unicode(self.sequential.location)]
+                    },
+                    u"section": {
+                        u"display_name": self.sequential.display_name_with_default,
+                        u"location": unicode(self.sequential.location),
+                        u"children": [unicode(self.vertical.location)]
+                    },
                     u"unit": {
                         u"url": self._get_jump_to_url(self.vertical),
                         u"display_name": self.vertical.display_name_with_default,
+                        u"location": unicode(self.vertical.location),
                     },
                     u"usage_id": unicode(self.html_module_2.location),
                     u"updated": "Nov 19, 2014 at 08:06 UTC",
@@ -229,9 +255,21 @@ class EdxNotesHelpersTest(TestCase):
                 {
                     u"quote": u"quote text",
                     u"text": u"text",
+                    u"chapter": {
+                        u"display_name": self.chapter.display_name_with_default,
+                        u"index": 0,
+                        u"location": unicode(self.chapter.location),
+                        u"children": [unicode(self.sequential.location)]
+                    },
+                    u"section": {
+                        u"display_name": self.sequential.display_name_with_default,
+                        u"location": unicode(self.sequential.location),
+                        u"children": [unicode(self.vertical.location)]
+                    },
                     u"unit": {
                         u"url": self._get_jump_to_url(self.vertical),
                         u"display_name": self.vertical.display_name_with_default,
+                        u"location": unicode(self.vertical.location),
                     },
                     u"usage_id": unicode(self.html_module_1.location),
                     u"updated": "Nov 19, 2014 at 08:05 UTC",
@@ -289,6 +327,7 @@ class EdxNotesHelpersTest(TestCase):
                         u"unit": {
                             u"url": self._get_jump_to_url(self.vertical),
                             u"display_name": self.vertical.display_name_with_default,
+                            u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_2.location),
                         u"updated": "Nov 19, 2014 at 08:06 UTC",
@@ -299,6 +338,7 @@ class EdxNotesHelpersTest(TestCase):
                         u"unit": {
                             u"url": self._get_jump_to_url(self.vertical),
                             u"display_name": self.vertical.display_name_with_default,
+                            u"location": unicode(self.vertical.location),
                         },
                         u"usage_id": unicode(self.html_module_1.location),
                         u"updated": "Nov 19, 2014 at 08:05 UTC",
@@ -359,6 +399,7 @@ class EdxNotesHelpersTest(TestCase):
                 u"unit": {
                     u"url": self._get_jump_to_url(self.vertical),
                     u"display_name": self.vertical.display_name_with_default,
+                    u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
@@ -392,6 +433,7 @@ class EdxNotesHelpersTest(TestCase):
                 u"unit": {
                     u"url": self._get_jump_to_url(self.vertical),
                     u"display_name": self.vertical.display_name_with_default,
+                    u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
@@ -401,7 +443,7 @@ class EdxNotesHelpersTest(TestCase):
 
     def test_preprocess_collection_has_access(self):
         """
-        Tests the result if the user do not has access to some modules.
+        Tests the result if the user does not have access to some of the modules.
         """
         initial_collection = [
             {
@@ -418,7 +460,7 @@ class EdxNotesHelpersTest(TestCase):
             },
         ]
         self.html_module_2.visible_to_staff_only = True
-        modulestore().update_item(self.html_module_2, self.user.id)
+        self.store.update_item(self.html_module_2, self.user.id)
         self.assertItemsEqual(
             [{
                 u"quote": u"quote text",
@@ -426,6 +468,7 @@ class EdxNotesHelpersTest(TestCase):
                 u"unit": {
                     u"url": self._get_jump_to_url(self.vertical),
                     u"display_name": self.vertical.display_name_with_default,
+                    u"location": unicode(self.vertical.location),
                 },
                 u"usage_id": unicode(self.html_module_1.location),
                 u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000),
@@ -433,11 +476,53 @@ class EdxNotesHelpersTest(TestCase):
             helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
+    @patch("edxnotes.helpers.get_ancestor")
+    def test_preprocess_collection_no_unit(self, mock_get_ancestor):
+        """
+        Tests the result if the unit does not exist.
+        """
+        mock_get_ancestor.return_value = None
+        initial_collection = [{
+            u"quote": u"quote text",
+            u"text": u"text",
+            u"usage_id": unicode(self.html_module_1.location),
+            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
+        }]
+
+        self.assertItemsEqual(
+            [],
+            helpers.preprocess_collection(self.user, self.course, initial_collection)
+        )
+
+    @patch("edxnotes.helpers.path_to_location")
+    def test_preprocess_collection_exceptions(self, mock_path_to_location):
+        """
+        Tests the result if the unit does not exist.
+        """
+        path_to_location.side_effect = NoPathToItem
+        initial_collection = [{
+            u"quote": u"quote text",
+            u"text": u"text",
+            u"usage_id": unicode(self.html_module_1.location),
+            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
+        }]
+
+        self.assertItemsEqual(
+            [],
+            helpers.preprocess_collection(self.user, self.course, initial_collection, True)
+        )
+
+        path_to_location.side_effect = ValueError
+        self.assertItemsEqual(
+            [],
+            helpers.preprocess_collection(self.user, self.course, initial_collection, True)
+        )
+
     def test_get_ancestor(self):
         """
         Tests `test_get_ancestor` method for the successful result.
         """
-        parent = helpers.get_ancestor(modulestore(), self.html_module_1.location)
+        parent = helpers.get_ancestor(self.store, self.html_module_1.location)
         self.assertEqual(parent.location, self.vertical.location)
 
     def test_get_ancestor_no_location(self):
@@ -456,30 +541,65 @@ class EdxNotesHelpersTest(TestCase):
         store.get_item.side_effect = ItemNotFoundError
         self.assertEqual(helpers.get_ancestor(store, self.html_module_1.location), None)
 
-    def test_get_ancestor_context(self):
+    def test_get_module_context_vertical(self):
         """
-        Tests `test_get_ancestor_context` method for the successful result.
+        Tests `test_get_module_context` method for the vertical.
         """
         self.assertDictEqual(
             {
                 u"url": self._get_jump_to_url(self.vertical),
                 u"display_name": self.vertical.display_name_with_default,
+                u"location": unicode(self.vertical.location),
             },
-            helpers.get_ancestor_context(modulestore(), self.course, self.html_module_1.location)
+            helpers.get_module_context(self.course, self.vertical)
         )
 
-    # pylint: disable=unused-argument
-    @patch("edxnotes.helpers.get_ancestor", return_value=None)
-    def test_get_ancestor_context_no_parent(self, mock_get_ancestor):
+    def test_get_module_context_sequential(self):
         """
-        Tests the result if parent module is not found.
+        Tests `test_get_module_context` method for the sequential.
         """
-        self.assertEqual(
+        self.assertDictEqual(
             {
-                u"url": None,
-                u"display_name": None,
+                u"display_name": self.sequential.display_name_with_default,
+                u"location": unicode(self.sequential.location),
+                u"children": [unicode(self.vertical.location)],
             },
-            helpers.get_ancestor_context(modulestore(), self.course, self.html_module_1.location)
+            helpers.get_module_context(self.course, self.sequential)
+        )
+
+    def test_get_module_context_html_component(self):
+        """
+        Tests `test_get_module_context` method for the sequential.
+        """
+        self.assertDictEqual(
+            {
+                u"display_name": self.html_module_1.display_name_with_default,
+                u"location": unicode(self.html_module_1.location),
+            },
+            helpers.get_module_context(self.course, self.html_module_1)
+        )
+
+    def test_get_module_context_chapter(self):
+        """
+        Tests `test_get_module_context` method for the chapters.
+        """
+        self.assertDictEqual(
+            {
+                u"display_name": self.chapter.display_name_with_default,
+                u"index": 0,
+                u"location": unicode(self.chapter.location),
+                u"children": [unicode(self.sequential.location)],
+            },
+            helpers.get_module_context(self.course, self.chapter)
+        )
+        self.assertDictEqual(
+            {
+                u"display_name": self.chapter_2.display_name_with_default,
+                u"index": 1,
+                u"location": unicode(self.chapter_2.location),
+                u"children": [],
+            },
+            helpers.get_module_context(self.course, self.chapter_2)
         )
 
     @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
