@@ -45,13 +45,33 @@ class EdxNotesPageGroup(NoteChild):
         return self._get_element_text(".course-title")
 
     @property
-    def subtitle(self):
+    def subtitles(self):
+        return [section.title for section in self.children]
+
+    @property
+    def children(self):
+        children = self.q(css=self._bounded_selector('.note-section'))
+        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
+
+
+class EdxNotesPageSection(NoteChild):
+    """
+    Helper class that works with note sections on Note page of the course.
+    """
+    BODY_SELECTOR = ".note-section"
+
+    @property
+    def title(self):
         return self._get_element_text(".course-subtitle")
 
     @property
     def children(self):
         children = self.q(css=self._bounded_selector('.note'))
         return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def notes(self):
+        return [section.text for section in self.children]
 
 
 class EdxNotesPageItem(NoteChild):
@@ -257,6 +277,14 @@ class EdxNotesPage(CoursePage):
         """
         children = self.q(css='.note-group')
         return [EdxNotesPageGroup(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def sections(self):
+        """
+        Returns all sections on the page.
+        """
+        children = self.q(css='.note-section')
+        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
 
     @property
     def no_content_text(self):
