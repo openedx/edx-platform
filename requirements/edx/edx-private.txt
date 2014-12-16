@@ -13,3 +13,6 @@
 -e git+https://github.com/pmitros/AnimationXBlock.git@d2b551bb8f49a138088e10298576102164145b87#egg=animation-xblock
 -e git+https://github.com/pmitros/ProfileXBlock.git@4aeaa24aa2bc7d9cb2d2bb60d6f05def3b856be0#egg=profile-xblock
 
+# This repository contains schoolyourself-xblock, which is used in
+# edX's "AlgebraX" and "GeometryX" courses.
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@ae028c3c185d1abf93823f7a5d946a8e66b8e7d9#egg=schoolyourself-xblock
