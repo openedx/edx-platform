@@ -138,7 +138,7 @@ if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
         ),
 
         # The user has paid and still needs to verify,
-        # but the user is NOT arriving directly from the paymen104ggt flow.
+        # but the user is NOT arriving directly from the payment flow.
         # This is equivalent to starting a new flow
         # with the payment steps and requirements hidden
         # (since the user already paid).

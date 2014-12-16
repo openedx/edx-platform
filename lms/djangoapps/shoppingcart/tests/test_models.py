@@ -40,6 +40,7 @@ from shoppingcart.exceptions import (
 )
 
 from opaque_keys.edx.locator import CourseLocator
+from util.testing import UrlResetMixin
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -48,8 +49,11 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
-class OrderTest(ModuleStoreTestCase):
+class OrderTest(UrlResetMixin, ModuleStoreTestCase):
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
     def setUp(self):
+        super(OrderTest, self).setUp('verify_student.urls')
+
         self.user = UserFactory.create()
         course = CourseFactory.create()
         self.course_key = course.id
@@ -225,6 +229,7 @@ class OrderTest(ModuleStoreTestCase):
             'STORE_BILLING_INFO': True,
         }
     )
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': False})
     def test_purchase(self):
         # This test is for testing the subclassing functionality of OrderItem, but in
         # order to do this, we end up testing the specific functionality of
@@ -248,7 +253,7 @@ class OrderTest(ModuleStoreTestCase):
 
         # Assert Google Analytics event fired for purchase.
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
-            1,
+            self.user.id,
             'Completed Order',
             {
                 'orderId': 1,
@@ -268,7 +273,6 @@ class OrderTest(ModuleStoreTestCase):
             context={'Google Analytics': {'clientId': None}}
         )
 
-    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
     def test_payment_separate_from_verification_email(self):
         cart = Order.get_cart_for_user(user=self.user)
         item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
