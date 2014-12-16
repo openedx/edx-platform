@@ -262,6 +262,10 @@
             var success = this.backend.snapshot();
 
             if ( success ) {
+                // Trigger an event which parent views can use to fire a
+                // business intelligence event
+                this.trigger( 'imageCaptured' );
+
                 // Hide the capture button, and show the reset button
                 $( "#webcam_capture_button", this.el ).hide();
                 $( "#webcam_reset_button", this.el ).show();

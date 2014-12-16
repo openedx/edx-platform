@@ -22,16 +22,21 @@
         },
 
         sync: function( method, model ) {
-            var headers = { 'X-CSRFToken': $.cookie('csrftoken') },
+            var headers = { 'X-CSRFToken': $.cookie( 'csrftoken' ) },
                 data = {
-                    face_image: model.get('faceImage'),
-                    photo_id_image: model.get('identificationImage')
+                    face_image: model.get( 'faceImage' ),
+                    photo_id_image: model.get( 'identificationImage' )
                 };
 
             // Full name is an optional parameter; if not provided,
             // it won't be changed.
-            if ( !_.isNull( model.get('fullName') ) ) {
-                data.full_name = model.get('fullName');
+            if ( !_.isEmpty( model.get( 'fullName' ) ) ) {
+                data.full_name = model.get( 'fullName' );
+
+                // Track the user's decision to change the name on their account
+                window.analytics.track( 'edx.bi.user.full_name.changed', {
+                    category: 'verification'
+                });
             }
 
             // Submit the request to the server,
