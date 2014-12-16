@@ -462,10 +462,9 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         )
 
         self.assertGroupContent(
-            groups[2],
+            groups[1],
             title=u"TEST SECTION 2",
             subtitles=[u"TEST SUBSECTION 3"],
-            notes_count=1,
         )
 
         self.assertSectionContent(

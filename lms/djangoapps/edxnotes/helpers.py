@@ -125,6 +125,18 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 log.debug("User %s does not have an access to %s", user, item)
                 continue
 
+            unit = get_ancestor(store, usage_key)
+            if unit is None:
+                log.debug("Unit not found for %s", usage_key)
+                continue
+
+            model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
+                u"updated": dateutil_parse(model["updated"]),
+                u"unit": get_module_context(course, unit),
+            })
+
             if add_course_structure:
                 try:
                     # pylint: disable=unused-variable
@@ -141,18 +153,6 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                     u"chapter": chapter_dict,
                     u"section": section_dict,
                 })
-
-            unit = get_ancestor(store, usage_key)
-            if unit is None:
-                log.debug("Unit not found for %s", usage_key)
-                continue
-
-            model.update({
-                u"text": markupsafe.escape(model["text"]),
-                u"quote": markupsafe.escape(model["quote"]),
-                u"updated": dateutil_parse(model["updated"]),
-                u"unit": get_module_context(course, unit),
-            })
 
             filtered_collection.append(model)
 
