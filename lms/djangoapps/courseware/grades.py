@@ -246,6 +246,8 @@ def _grade(student, request, course, keep_raw_scores):
 
         totaled_scores[section_format] = format_scores
 
+    # Grading policy might be overriden by a POC, need to reset it
+    course.set_grading_policy(course.grading_policy)
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
     # We round the grade here, to make sure that the grade is an whole percentage and
@@ -328,6 +330,8 @@ def _progress_summary(student, request, course):
         if not course_module:
             # This student must not have access to the course.
             return None
+
+        course_module = getattr(course_module, '_x_module', course_module)
 
     submissions_scores = sub_api.get_scores(course.id.to_deprecated_string(), anonymous_id_for_user(student, course.id))
 
@@ -479,7 +483,7 @@ def manual_transaction():
         transaction.commit()
 
 
-def iterate_grades_for(course_id, students):
+def iterate_grades_for(course_or_id, students):
     """Given a course_id and an iterable of students (User), yield a tuple of:
 
     (student, gradeset, err_msg) for every student enrolled in the course.
@@ -497,7 +501,10 @@ def iterate_grades_for(course_id, students):
         make up the final grade. (For display)
     - raw_scores: contains scores for every graded module
     """
-    course = courses.get_course_by_id(course_id)
+    if isinstance(course_or_id, basestring):
+        course = courses.get_course_by_id(course_or_id)
+    else:
+        course = course_or_id
 
     # We make a fake request because grading code expects to be able to look at
     # the request. We have to attach the correct user to the request before
@@ -505,7 +512,7 @@ def iterate_grades_for(course_id, students):
     request = RequestFactory().get('/')
 
     for student in students:
-        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course_id)]):
+        with dog_stats_api.timer('lms.grades.iterate_grades_for', tags=[u'action:{}'.format(course.id)]):
             try:
                 request.user = student
                 # Grading calls problem rendering, which calls masquerading,
@@ -522,7 +529,7 @@ def iterate_grades_for(course_id, students):
                     'Cannot grade student %s (%s) in course %s because of exception: %s',
                     student.username,
                     student.id,
-                    course_id,
+                    course.id,
                     exc.message
                 )
                 yield student, {}, exc.message

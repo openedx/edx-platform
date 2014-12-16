@@ -20,6 +20,8 @@ from django.contrib.auth.models import User
 from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
 from courseware.grades import iterate_grades_for
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.roles import CoursePocCoachRole
@@ -33,6 +35,7 @@ from .overrides import (
     clear_override_for_poc,
     get_override_for_poc,
     override_field_for_poc,
+    poc_context,
 )
 from .utils import enroll_email, unenroll_email
 
@@ -290,68 +293,90 @@ def poc_gradebook(request, course):
     """
     Show the gradebook for this POC.
     """
+    # Need course module for overrides to function properly
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2)
+    course = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id)
+
     poc = get_poc_for_coach(course, request.user)
-    enrolled_students = User.objects.filter(
-        pocmembership__poc=poc,
-        pocmembership__active=1
-    ).order_by('username').select_related("profile")
+    with poc_context(poc):
+        course._field_data_cache = {}
+        course.set_grading_policy(course.grading_policy)  # this is so awful
+        enrolled_students = User.objects.filter(
+            pocmembership__poc=poc,
+            pocmembership__active=1
+        ).order_by('username').select_related("profile")
 
-    student_info = [
-        {
-            'username': student.username,
-            'id': student.id,
-            'email': student.email,
-            'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
-        }
-        for student in enrolled_students
-    ]
+        student_info = [
+            {
+                'username': student.username,
+                'id': student.id,
+                'email': student.email,
+                'grade_summary': student_grades(student, request, course),
+                'realname': student.profile.name,
+            }
+            for student in enrolled_students
+        ]
 
-    return render_to_response('courseware/gradebook.html', {
-        'students': student_info,
-        'course': course,
-        'course_id': course.id,
-        'staff_access': request.user.is_staff,
-        'ordered_grades': sorted(
-            course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
-    })
+        return render_to_response('courseware/gradebook.html', {
+            'students': student_info,
+            'course': course,
+            'course_id': course.id,
+            'staff_access': request.user.is_staff,
+            'ordered_grades': sorted(
+                course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
+        })
 
 
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def poc_grades_csv(request, course):
+    """
+    Download grades as CSV.
+    """
+    # Need course module for overrides to function properly
+    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+        course.id, request.user, course, depth=2)
+    course = get_module_for_descriptor(
+        request.user, request, course, field_data_cache, course.id)
+
     poc = get_poc_for_coach(course, request.user)
-    enrolled_students = User.objects.filter(
-        pocmembership__poc=poc,
-        pocmembership__active=1
-    ).order_by('username').select_related("profile")
-    grades = iterate_grades_for(course.id, enrolled_students)
+    with poc_context(poc):
+        course._field_data_cache = {}
+        course.set_grading_policy(course.grading_policy)  # this is so awful
+        enrolled_students = User.objects.filter(
+            pocmembership__poc=poc,
+            pocmembership__active=1
+        ).order_by('username').select_related("profile")
+        grades = iterate_grades_for(course, enrolled_students)
 
-    header = None
-    rows = []
-    for student, gradeset, err_msg in grades:
-        if gradeset:
-            # We were able to successfully grade this student for this course.
-            if not header:
-                # Encode the header row in utf-8 encoding in case there are
-                # unicode characters
-                header = [section['label'].encode('utf-8')
-                          for section in gradeset[u'section_breakdown']]
-                rows.append(["id", "email", "username", "grade"] + header)
+        header = None
+        rows = []
+        for student, gradeset, err_msg in grades:
+            if gradeset:
+                # We were able to successfully grade this student for this
+                # course.
+                if not header:
+                    # Encode the header row in utf-8 encoding in case there are
+                    # unicode characters
+                    header = [section['label'].encode('utf-8')
+                              for section in gradeset[u'section_breakdown']]
+                    rows.append(["id", "email", "username", "grade"] + header)
 
-            percents = {
-                section['label']: section.get('percent', 0.0)
-                for section in gradeset[u'section_breakdown']
-                if 'label' in section
-            }
+                percents = {
+                    section['label']: section.get('percent', 0.0)
+                    for section in gradeset[u'section_breakdown']
+                    if 'label' in section
+                }
 
-            row_percents = [percents.get(label, 0.0) for label in header]
-            rows.append([student.id, student.email, student.username,
-                         gradeset['percent']] + row_percents)
+                row_percents = [percents.get(label, 0.0) for label in header]
+                rows.append([student.id, student.email, student.username,
+                             gradeset['percent']] + row_percents)
 
-    buffer = StringIO()
-    writer = csv.writer(buffer)
-    for row in rows:
-        writer.writerow(row)
+        buffer = StringIO()
+        writer = csv.writer(buffer)
+        for row in rows:
+            writer.writerow(row)
 
-    return HttpResponse(buffer.getvalue(), content_type='text/csv')
+        return HttpResponse(buffer.getvalue(), content_type='text/plain')

@@ -5,9 +5,11 @@ import pytz
 from mock import patch
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
+from courseware.field_overrides import OverrideFieldData
 from courseware.tests.factories import StudentModuleFactory
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
 from student.roles import CoursePocCoachRole
 from student.tests.factories import (
@@ -26,7 +28,7 @@ from ..models import (
     PocMembership,
     PocFutureMembership,
 )
-from ..overrides import get_override_for_poc
+from ..overrides import get_override_for_poc, override_field_for_poc
 from .factories import (
     PocFactory,
     PocMembershipFactory,
@@ -369,9 +371,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
-USER_COUNT = 2
-
-
+@override_settings(FIELD_OVERRIDE_PROVIDERS=(
+    'pocs.overrides.PersonalOnlineCoursesOverrideProvider',))
 class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests for Personal Online Courses views.
@@ -391,39 +392,65 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             2010, 5, 12, 2, 42, tzinfo=pytz.UTC)
         chapter = ItemFactory.create(
             start=start, parent=course, category='sequential')
-        section = ItemFactory.create(
-            parent=chapter,
-            category="sequential",
-            metadata={'graded': True, 'format': 'Homework'}
-        )
+        sections = [
+            ItemFactory.create(
+                parent=chapter,
+                category="sequential",
+                metadata={'graded': True, 'format': 'Homework'})
+            for _ in xrange(4)]
 
         role = CoursePocCoachRole(self.course.id)
         role.add_users(coach)
         self.poc = poc = PocFactory(course_id=self.course.id, coach=self.coach)
 
-        self.users = [UserFactory.create() for _ in xrange(USER_COUNT)]
-        for user in self.users:
-            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
-            PocMembershipFactory(poc=poc, student=user, active=True)
+        self.student = student = UserFactory.create()
+        CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
+        PocMembershipFactory(poc=poc, student=student, active=True)
 
-        for i in xrange(USER_COUNT - 1):
-            category = "problem"
-            item = ItemFactory.create(
-                parent_location=section.location,
-                category=category,
-                data=StringResponseXMLFactory().build_xml(answer='foo'),
-                metadata={'rerandomize': 'always'}
-            )
+        for i, section in enumerate(sections):
+            for j in xrange(4):
+                item = ItemFactory.create(
+                    parent=section,
+                    category="problem",
+                    data=StringResponseXMLFactory().build_xml(answer='foo'),
+                    metadata={'rerandomize': 'always'}
+                )
 
-            for j, user in enumerate(self.users):
                 StudentModuleFactory.create(
                     grade=1 if i < j else 0,
                     max_grade=1,
-                    student=user,
+                    student=student,
                     course_id=self.course.id,
                     module_state_key=item.location
                 )
 
+        # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
+        # sure if there's a way to poke the test harness to do so.  So, we'll
+        # just inject the override field storage in this brute force manner.
+        OverrideFieldData.provider_classes = None
+        for block in iter_blocks(course):
+            block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
+                coach, block._field_data)  # pylint: disable=protected-access
+            block._field_data_cache = {}
+            visible_children(block)
+
+        patch_context = patch('pocs.views.get_course_by_id')
+        get_course = patch_context.start()
+        get_course.return_value = course
+        self.addCleanup(patch_context.stop)
+
+        override_field_for_poc(poc, course, 'grading_policy', {
+            'GRADER': [
+                {'drop_count': 0,
+                 'min_count': 2,
+                 'short_label': 'HW',
+                 'type': 'Homework',
+                 'weight': 1}
+            ],
+            'GRADE_CUTOFFS': {'Pass': 0.75},
+        })
+        override_field_for_poc(
+            poc, sections[-1], 'visible_to_staff_only', True)
 
     @patch('pocs.views.render_to_response', intercept_renderer)
     def test_gradebook(self):
@@ -433,13 +460,13 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        student_info = response.mako_context['students']
-        self.assertEqual(len(student_info), USER_COUNT)
-        self.assertEqual(student_info[0]['grade_summary']['percent'], 0.0)
-        self.assertEqual(student_info[1]['grade_summary']['percent'], 0.02)
+        student_info = response.mako_context['students'][0]
+        self.assertEqual(student_info['grade_summary']['percent'], 0.5)
         self.assertEqual(
-            student_info[1]['grade_summary']['grade_breakdown'][0]['percent'],
-            0.015)
+            student_info['grade_summary']['grade_breakdown'][0]['percent'],
+            0.5)
+        self.assertEqual(
+            len(student_info['grade_summary']['section_breakdown']), 4)
 
     def test_grades_csv(self):
         url = reverse(
@@ -448,8 +475,35 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            len(response.content.strip().split('\n')), USER_COUNT + 1)
+        headers, row = (
+            row.strip().split(',') for row in
+            response.content.strip().split('\n')
+        )
+        data = dict(zip(headers, row))
+        self.assertEqual(data['HW 01'], '0.75')
+        self.assertEqual(data['HW 02'], '0.5')
+        self.assertEqual(data['HW 03'], '0.25')
+        self.assertEqual(data['HW Avg'], '0.5')
+        self.assertTrue('HW 04' not in data)
+
+    @patch('courseware.views.render_to_response', intercept_renderer)
+    def test_student_progress(self):
+        patch_context = patch('courseware.views.get_course_with_access')
+        get_course = patch_context.start()
+        get_course.return_value = self.course
+        self.addCleanup(patch_context.stop)
+
+        self.client.login(username=self.student.username, password="test")
+        url = reverse(
+            'progress',
+            kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        grades = response.mako_context['grade_summary']
+        self.assertEqual(grades['percent'], 0.5)
+        self.assertEqual( grades['grade_breakdown'][0]['percent'], 0.5)
+        self.assertEqual(len(grades['section_breakdown']), 4)
 
 
 def flatten(seq):
@@ -457,3 +511,26 @@ def flatten(seq):
     For [[1, 2], [3, 4]] returns [1, 2, 3, 4].  Does not recurse.
     """
     return [x for sub in seq for x in sub]
+
+
+def iter_blocks(course):
+    """
+    Returns an iterator over all of the blocks in a course.
+    """
+    def visit(block):
+        yield block
+        for child in block.get_children():
+            for descendant in visit(child):  # wish they'd backport yield from
+                yield descendant
+    return visit(course)
+
+def visible_children(block):
+    block_get_children = block.get_children
+    def get_children():
+        def iter_children():
+            for child in block_get_children():
+                child._field_data_cache = {}
+                if not child.visible_to_staff_only:
+                    yield child
+        return list(iter_children())
+    block.get_children = get_children

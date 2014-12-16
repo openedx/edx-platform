@@ -3,6 +3,9 @@ API related to providing field overrides for individual students.  This is used
 by the individual due dates feature.
 """
 import json
+import threading
+
+from contextlib import contextmanager
 
 from courseware.field_overrides import FieldOverrideProvider
 
@@ -22,10 +25,41 @@ class PersonalOnlineCoursesOverrideProvider(FieldOverrideProvider):
         return default
 
 
+class _PocContext(threading.local):
+    """
+    A threading local used to implement the `with_poc` context manager, that
+    keeps track of the POC currently set as the context.
+    """
+    poc = None
+
+
+_POC_CONTEXT = _PocContext()
+
+
+@contextmanager
+def poc_context(poc):
+    """
+    A context manager which can be used to explicitly set the POC that is in
+    play for field overrides.  This mechanism overrides the standard mechanism
+    of looking in the user's session to see if they are enrolled in a POC and
+    viewing that POC.
+    """
+    prev = _POC_CONTEXT.poc
+    _POC_CONTEXT.poc = poc
+    yield
+    _POC_CONTEXT.poc = prev
+
+
 def get_current_poc(user):
     """
     TODO Needs to look in user's session
     """
+    # If poc context is explicitly set, that takes precedence over the user's
+    # session.
+    poc = _POC_CONTEXT.poc
+    if poc:
+        return poc
+
     # Temporary implementation.  Final implementation will need to look in
     # user's session so user can switch between (potentially multiple) POC and
     # MOOC views.  See courseware.courses.get_request_for_thread for idea to
