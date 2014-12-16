@@ -979,6 +979,41 @@ class TestMixedModuleStore(CourseComparisonTest):
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
+    @ddt.data('draft')
+    def test_get_parent_location_draft(self, default_ms):
+        """
+        Test that "get_parent_location" method returns first published parent
+        for a draft component, if it has many possible parents (including
+        draft parents).
+        """
+        self.initdb(default_ms)
+        course_id = self.course_locations[self.MONGO_COURSEID].course_key
+
+        # create parented children
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
+        # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
+        mongo_store.collection.update(
+            self.vertical_x1b.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+
+        # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
+        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+        item = self.store.get_item(self.vertical_x1a)
+        self.assertTrue(self.store.has_published_version(item))
+
+        # now problem "problem_x1a_1" has 3 parents [vertical_x1a (draft),
+        # vertical_x1a (published), vertical_x1b (published)]
+        # check that "get_parent_location" method of draft branch returns first
+        # published parent "vertical_x1a" without raising "AssertionError" for
+        # problem location revision
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)
+            self.assertEqual(parent, self.vertical_x1a)
+
     # Draft:
     #   Problem path:
     #    1. Get problem

@@ -1306,7 +1306,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ancestor_loc = parent_loc
             while ancestor_loc is not None:
                 current_loc = ancestor_loc
-                ancestor_loc = self._get_raw_parent_location(current_loc, revision)
+                ancestor_loc = self._get_raw_parent_location(as_published(current_loc), revision)
                 if ancestor_loc is None:
                     bulk_record.dirty = True
                     # The parent is an orphan, so remove all the children including
