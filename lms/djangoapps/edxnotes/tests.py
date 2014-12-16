@@ -18,6 +18,7 @@ from oauth2_provider.tests.factories import ClientFactory
 from provider.oauth2.models import Client
 from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location, NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -123,9 +124,6 @@ class EdxNotesDecoratorTest(TestCase):
         """
         self.problem.system.is_author_mode = True
         self.assertEqual("original_get_html", self.problem.get_html())
-
-
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
