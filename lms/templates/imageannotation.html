@@ -27,12 +27,12 @@
     % endif
     <div class="annotatable-section">
         <div class="annotatable-content">
-            <div id="imageHolder" class="openseadragon1"> 
+            <div id="imageHolder" class="openseadragon1">
                 <%namespace name='static' file='/static_content.html'/>
-                ${static.css(group='style-vendor-tinymce-content', raw=True)}
-                ${static.css(group='style-vendor-tinymce-skin', raw=True)}
-                ${static.css(group='style-xmodule-annotations', raw=True)}
-            </div> 
+                <link rel="stylesheet" href="${static.url('css/lms-style-vendor-tinymce-content.css')}" type="text/css" media="all" />
+                <link rel="stylesheet" href="${static.url('css/lms-style-vendor-tinymce-skin.css')}" type="text/css" media="all" />
+                <link rel="stylesheet" href="${static.url('css/lms-style-xmodule-annotations.css')}" type="text/css" media="all" />
+            </div>
             <div id="catchDIV">
                 <div class="annotationListContainer">${_('Note: only instructors may annotate.')}</div>
             </div>
