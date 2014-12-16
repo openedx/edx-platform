@@ -16,9 +16,10 @@ from courseware.tests.factories import UserStateSummaryFactory
 from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 
 from xblock.fields import Scope, BlockScope, ScopeIds
+from xblock.exceptions import KeyValueMultiSaveError
+from xblock.core import XBlock
 from django.test import TestCase
 from django.db import DatabaseError
-from xblock.exceptions import KeyValueMultiSaveError
 
 
 def mock_field(scope, name):
@@ -29,7 +30,7 @@ def mock_field(scope, name):
 
 
 def mock_descriptor(fields=[]):
-    descriptor = Mock()
+    descriptor = Mock(entry_point=XBlock.entry_point)
     descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
     descriptor.module_class.fields.values.return_value = fields
     descriptor.fields.values.return_value = fields

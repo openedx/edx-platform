@@ -12,6 +12,53 @@ from .utils.envs import Env
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
+])
+def find_fixme(options):
+    """
+    Run pylint on system code, only looking for fixme items.
+    """
+    num_fixme = 0
+    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+
+    for system in systems:
+        # Directory to put the pylint report in.
+        # This makes the folder if it doesn't already exist.
+        report_dir = (Env.REPORT_DIR / system).makedirs_p()
+
+        apps = [system]
+
+        for directory in ['djangoapps', 'lib']:
+            dirs = os.listdir(os.path.join(system, directory))
+            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
+
+        apps_list = ' '.join(apps)
+
+        pythonpath_prefix = (
+            "PYTHONPATH={system}:{system}/lib"
+            "common/djangoapps:common/lib".format(
+                system=system
+            )
+        )
+
+        sh(
+            "{pythonpath_prefix} pylint --disable R,C,W,E --enable=fixme "
+            "-f parseable {apps} | tee {report_dir}/pylint_fixme.report".format(
+                pythonpath_prefix=pythonpath_prefix,
+                apps=apps_list,
+                report_dir=report_dir
+            )
+        )
+
+        num_fixme += _count_pylint_violations(
+            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
+
+    print("Number of pylint fixmes: " + str(num_fixme))
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
+@cmdopts([
+    ("system=", "s", "System to act on"),
     ("errors", "e", "Check for errors only"),
     ("limit=", "l", "limit for number of acceptable violations"),
 ])
@@ -36,7 +83,7 @@ def run_pylint(options):
 
         apps = [system]
 
-        for directory in ['djangoapps', 'lib']:
+        for directory in ['lib']:
             dirs = os.listdir(os.path.join(system, directory))
             apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
 
@@ -126,14 +173,16 @@ def _count_pep8_violations(report_file):
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
+    ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
 ])
 def run_quality(options):
     """
     Build the html diff quality reports, and print the reports to the console.
+    :param: b, the branch to compare against, defaults to origin/master
     :param: p, diff-quality will fail if the quality percentage calculated is
         below this percentage. For example, if p is set to 80, and diff-quality finds
-        quality of the branch vs master is less than 80%, then this task will fail.
+        quality of the branch vs the compare branch is less than 80%, then this task will fail.
         This threshold would be applied to both pep8 and pylint.
     """
 
@@ -141,6 +190,12 @@ def run_quality(options):
     # This makes the folder if it doesn't already exist.
     dquality_dir = (Env.REPORT_DIR / "diff_quality").makedirs_p()
     diff_quality_percentage_failure = False
+
+    # Set the string, if needed, to be used for the diff-quality --compare-branch switch.
+    compare_branch = getattr(options, 'compare_branch', None)
+    compare_branch_string = ''
+    if compare_branch:
+        compare_branch_string = '--compare-branch={0}'.format(compare_branch)
 
     # Set the string, if needed, to be used for the diff-quality --fail-under switch.
     diff_threshold = int(getattr(options, 'percentage', -1))
@@ -158,9 +213,10 @@ def run_quality(options):
     try:
         sh(
             "diff-quality --violations=pep8 {pep8_reports} {percentage_string} "
-            "--html-report {dquality_dir}/diff_quality_pep8.html".format(
+            "{compare_branch_string} --html-report {dquality_dir}/diff_quality_pep8.html".format(
                 pep8_reports=pep8_reports,
                 percentage_string=percentage_string,
+                compare_branch_string=compare_branch_string,
                 dquality_dir=dquality_dir
             )
         )
@@ -185,14 +241,13 @@ def run_quality(options):
     try:
         sh(
             "{pythonpath_prefix} diff-quality --violations=pylint "
-            "{pylint_reports} {percentage_string} "
-            "--html-report {dquality_dir}/diff_quality_pylint.html "
-            "--options='{pylint_options}'".format(
+            "{pylint_reports} {percentage_string} {compare_branch_string} "
+            "--html-report {dquality_dir}/diff_quality_pylint.html ".format(
                 pythonpath_prefix=pythonpath_prefix,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
+                compare_branch_string=compare_branch_string,
                 dquality_dir=dquality_dir,
-                pylint_options="--disable=fixme",
             )
         )
     except BuildFailure, error_message:

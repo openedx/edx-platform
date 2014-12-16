@@ -33,7 +33,7 @@ from importlib import import_module
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.locator import CourseLocator, LibraryLocator
 
 from xblock.core import XBlock
 from xblock.exceptions import InvalidScopeError
@@ -50,6 +50,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
+from xmodule.modulestore.xml import CourseLocationManager
 
 log = logging.getLogger(__name__)
 
@@ -173,6 +174,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         render_template: a function for rendering templates, as per
             MakoDescriptorSystem
         """
+        id_manager = CourseLocationManager(course_key)
+        kwargs.setdefault('id_reader', id_manager)
+        kwargs.setdefault('id_generator', id_manager)
         super(CachingDescriptorSystem, self).__init__(
             field_data=None,
             load_item=self.load_item,
@@ -875,6 +879,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         otherwise, do a case sensitive search
         """
         assert(isinstance(course_key, CourseKey))
+        if isinstance(course_key, LibraryLocator):
+            return None  # Libraries require split mongo
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         if ignore_case:
@@ -1300,7 +1306,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ancestor_loc = parent_loc
             while ancestor_loc is not None:
                 current_loc = ancestor_loc
-                ancestor_loc = self._get_raw_parent_location(current_loc, revision)
+                ancestor_loc = self._get_raw_parent_location(as_published(current_loc), revision)
                 if ancestor_loc is None:
                     bulk_record.dirty = True
                     # The parent is an orphan, so remove all the children including
@@ -1476,12 +1482,31 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {'course_id': unicode(course_key)},
         )
 
+        # Pass back 'assets' dict but add the '_id' key to it for document update purposes.
         if course_assets is None:
             # Not found, so create.
-            course_assets = {'course_id': unicode(course_key), 'storage': 'FILLMEIN-TMP', 'assets': []}
-            course_assets['_id'] = self.asset_collection.insert(course_assets)
+            course_assets = {'course_id': unicode(course_key), 'assets': {}}
+            course_assets['assets']['_id'] = self.asset_collection.insert(course_assets)
+        elif isinstance(course_assets['assets'], list):
+            # This record is in the old course assets format.
+            # Ensure that no data exists before updating the format.
+            assert(len(course_assets['assets']) == 0)
+            # Update the format to a dict.
+            self.asset_collection.update(
+                {'_id': course_assets['_id']},
+                {'$set': {'assets': {}}}
+            )
+            course_assets['assets'] = {'_id': course_assets['_id']}
+        else:
+            course_assets['assets']['_id'] = course_assets['_id']
 
-        return course_assets
+        return course_assets['assets']
+
+    def _make_mongo_asset_key(self, asset_type):
+        """
+        Given a asset type, form a key needed to update the proper embedded field in the Mongo doc.
+        """
+        return 'assets.{}'.format(asset_type)
 
     @contract(asset_metadata='AssetMetadata')
     def save_asset_metadata(self, asset_metadata, user_id):
@@ -1513,7 +1538,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Update the document.
         self.asset_collection.update(
             {'_id': course_assets['_id']},
-            {'$set': {asset_metadata.asset_id.block_type: all_assets.as_list()}}
+            {'$set': {self._make_mongo_asset_key(asset_metadata.asset_id.block_type): all_assets.as_list()}}
         )
         return True
 
@@ -1530,8 +1555,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         source_assets = self._find_course_assets(source_course_key)
         dest_assets = source_assets.copy()
-        dest_assets['course_id'] = unicode(dest_course_key)
         del dest_assets['_id']
+        dest_assets = {'assets': dest_assets}
+        dest_assets['course_id'] = unicode(dest_course_key)
 
         self.asset_collection.remove({'course_id': unicode(dest_course_key)})
         # Update the document.
@@ -1563,7 +1589,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Generate a Mongo doc from the metadata and update the course asset info.
         all_assets[asset_idx] = md.to_storable()
 
-        self.asset_collection.update({'_id': course_assets['_id']}, {"$set": {asset_key.block_type: all_assets}})
+        self.asset_collection.update(
+            {'_id': course_assets['_id']},
+            {"$set": {self._make_mongo_asset_key(asset_key.block_type): all_assets}}
+        )
 
     @contract(asset_key='AssetKey')
     def delete_asset_metadata(self, asset_key, user_id):
@@ -1586,7 +1615,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Update the document.
         self.asset_collection.update(
             {'_id': course_assets['_id']},
-            {'$set': {asset_key.block_type: all_asset_info}}
+            {'$set': {self._make_mongo_asset_key(asset_key.block_type): all_asset_info}}
         )
         return 1
 

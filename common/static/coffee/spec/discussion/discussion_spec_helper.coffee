@@ -470,12 +470,15 @@ browser and pasting the output.  When that file changes, this one should be rege
 
 <script type="text/template" id="forum-action-vote">
     <li class="actions-item">
+        <span aria-hidden="true" class="display-vote" style="display: none;">
+          <span class="vote-count"></span>
+        </span>
         <a href="#" class="action-button action-vote" role="checkbox" aria-checked="false">
             <span class="sr">Vote</span>
             <span class="sr js-sr-vote-count"></span>
 
             <span class="action-label" aria-hidden="true">
-              <span class="js-visual-vote-count"></span>
+              <span class="vote-count"></span>
             </span>
 
             <span class="action-icon" aria-hidden="true">

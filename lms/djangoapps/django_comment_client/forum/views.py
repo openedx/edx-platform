@@ -11,7 +11,12 @@ import newrelic.agent
 
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
-from course_groups.cohorts import is_course_cohorted, get_cohort_id, get_course_cohorts, is_commentable_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import (
+    is_course_cohorted,
+    get_cohort_id,
+    get_course_cohorts,
+    is_commentable_cohorted
+)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -114,8 +119,8 @@ def get_threads(request, course_key, discussion_id=None, per_page=THREADS_PER_PA
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
 
     for thread in threads:
-        #patch for backward compatibility to comments service
-        if not 'pinned' in thread:
+        # patch for backward compatibility to comments service
+        if 'pinned' not in thread:
             thread['pinned'] = False
 
     query_params['page'] = page
@@ -281,8 +286,8 @@ def single_thread(request, course_id, discussion_id, thread_id):
             add_courseware_context(threads, course)
 
         for thread in threads:
-            #patch for backward compatibility with comments service
-            if not "pinned" in thread:
+            # patch for backward compatibility with comments service
+            if "pinned" not in thread:
                 thread["pinned"] = False
 
         threads = [utils.prepare_content(thread, course_key, is_staff) for thread in threads]

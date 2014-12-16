@@ -480,50 +480,60 @@ class PasswordHistory(models.Model):
         """
         Returns whether the configuration which limits password reuse has been turned on
         """
-        return settings.FEATURES['ADVANCED_SECURITY'] and \
-            settings.ADVANCED_SECURITY_CONFIG.get(
-                'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
-            ) > 0
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
+            'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE', 0
+        )
+        return min_diff_pw > 0
 
     @classmethod
     def is_staff_password_reuse_restricted(cls):
         """
         Returns whether the configuration which limits password reuse has been turned on
         """
-        return settings.FEATURES['ADVANCED_SECURITY'] and \
-            settings.ADVANCED_SECURITY_CONFIG.get(
-                'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
-            ) > 0
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+        min_diff_pw = settings.ADVANCED_SECURITY_CONFIG.get(
+            'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE', 0
+        )
+        return min_diff_pw > 0
 
     @classmethod
     def is_password_reset_frequency_restricted(cls):
         """
         Returns whether the configuration which limits the password reset frequency has been turned on
         """
-        return settings.FEATURES['ADVANCED_SECURITY'] and \
-            settings.ADVANCED_SECURITY_CONFIG.get(
-                'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS', None
-            )
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
+            'MIN_TIME_IN_DAYS_BETWEEN_ALLOWED_RESETS'
+        )
+        return min_days_between_reset
 
     @classmethod
     def is_staff_forced_password_reset_enabled(cls):
         """
         Returns whether the configuration which forces password resets to occur has been turned on
         """
-        return settings.FEATURES['ADVANCED_SECURITY'] and \
-            settings.ADVANCED_SECURITY_CONFIG.get(
-                'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS', None
-            )
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+        min_days_between_reset = settings.ADVANCED_SECURITY_CONFIG.get(
+            'MIN_DAYS_FOR_STAFF_ACCOUNTS_PASSWORD_RESETS'
+        )
+        return min_days_between_reset
 
     @classmethod
     def is_student_forced_password_reset_enabled(cls):
         """
         Returns whether the configuration which forces password resets to occur has been turned on
         """
-        return settings.FEATURES['ADVANCED_SECURITY'] and \
-            settings.ADVANCED_SECURITY_CONFIG.get(
-                'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS', None
-            )
+        if not settings.FEATURES['ADVANCED_SECURITY']:
+            return False
+        min_days_pw_reset = settings.ADVANCED_SECURITY_CONFIG.get(
+            'MIN_DAYS_FOR_STUDENT_ACCOUNTS_PASSWORD_RESETS'
+        )
+        return min_days_pw_reset
 
     @classmethod
     def should_user_reset_password_now(cls, user):
@@ -798,6 +808,17 @@ class CourseEnrollment(models.Model):
         return enrollment_number
 
     @classmethod
+    def is_enrollment_closed(cls, user, course):
+        """
+        Returns a boolean value regarding whether the user has access to enroll in the course. Returns False if the
+        enrollment has been closed.
+        """
+        # Disable the pylint error here, as per ormsbee. This local import was previously
+        # in CourseEnrollment.enroll
+        from courseware.access import has_access  # pylint: disable=import-error
+        return not has_access(user, 'enroll', course)
+
+    @classmethod
     def is_course_full(cls, course):
         """
         Returns a boolean value regarding whether a course has already reached it's max enrollment
@@ -932,8 +953,6 @@ class CourseEnrollment(models.Model):
 
         Also emits relevant events for analytics purposes.
         """
-        from courseware.access import has_access
-
         # All the server-side checks for whether a user is allowed to enroll.
         try:
             course = modulestore().get_course(course_key)
@@ -949,7 +968,7 @@ class CourseEnrollment(models.Model):
         if check_access:
             if course is None:
                 raise NonExistentCourseError
-            if not has_access(user, 'enroll', course):
+            if CourseEnrollment.is_enrollment_closed(user, course):
                 log.warning(
                     "User {0} failed to enroll in course {1} because enrollment is closed".format(
                         user.username,

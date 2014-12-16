@@ -13,6 +13,8 @@ from path import path
 from tempdir import mkdtemp_clean
 from textwrap import dedent
 from uuid import uuid4
+from functools import wraps
+from unittest import SkipTest
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -58,6 +60,26 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
+def requires_pillow_jpeg(func):
+    """
+    A decorator to indicate that the function requires JPEG support for Pillow,
+    otherwise it cannot be run
+    """
+    @wraps(func)
+    def decorated_func(*args, **kwargs):
+        """
+        Execute the function if we have JPEG support in Pillow.
+        """
+        try:
+            from PIL import Image
+        except ImportError:
+            raise SkipTest("Pillow is not installed (or not found)")
+        if not getattr(Image.core, "jpeg_decoder", False):
+            raise SkipTest("Pillow cannot open JPEG files")
+        return func(*args, **kwargs)
+    return decorated_func
+
+
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class ContentStoreTestCase(CourseTestCase):
     """
@@ -100,6 +122,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         effort = self.store.get_item(course_key.make_usage_key('about', 'end_date'))
         self.assertEqual(effort.data, 'TBD')
 
+    @requires_pillow_jpeg
     def test_asset_import(self):
         '''
         This test validates that an image asset is imported and a thumbnail was generated for a .gif
@@ -117,37 +140,16 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.assertGreater(len(all_assets), 0)
 
         # make sure we have some thumbnails in our contentstore
-        content_store.get_all_content_thumbnails_for_course(course.id)
+        all_thumbnails = content_store.get_all_content_thumbnails_for_course(course.id)
+        self.assertGreater(len(all_thumbnails), 0)
 
-        #
-        # cdodge: temporarily comment out assertion on thumbnails because many environments
-        # will not have the jpeg converter installed and this test will fail
-        #
-        #
-        # self.assertGreater(len(all_thumbnails), 0)
-
-        content = None
-        try:
-            location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/sample_static.txt')
-            content = content_store.find(location)
-        except NotFoundError:
-            pass
-
+        location = AssetLocation.from_deprecated_string('/c4x/edX/toy/asset/just_a_test.jpg')
+        content = content_store.find(location)
         self.assertIsNotNone(content)
 
-        #
-        # cdodge: temporarily comment out assertion on thumbnails because many environments
-        # will not have the jpeg converter installed and this test will fail
-        #
-        # self.assertIsNotNone(content.thumbnail_location)
-        #
-        # thumbnail = None
-        # try:
-        #    thumbnail = content_store.find(content.thumbnail_location)
-        # except:
-        #    pass
-        #
-        # self.assertIsNotNone(thumbnail)
+        self.assertIsNotNone(content.thumbnail_location)
+        thumbnail = content_store.find(content.thumbnail_location)
+        self.assertIsNotNone(thumbnail)
 
     def test_course_info_updates_import_export(self):
         """
@@ -258,6 +260,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         # and assert that they contain the created modules
         self.assertIn(self.DRAFT_HTML + ".xml", draft_dir.listdir('html'))
         self.assertIn(self.DRAFT_VIDEO + ".xml", draft_dir.listdir('video'))
+        # and assert the child of the orphaned draft wasn't exported
+        self.assertNotIn(self.ORPHAN_DRAFT_HTML + ".xml", draft_dir.listdir('html'))
 
         # check for grading_policy.json
         filesystem = OSFS(root_dir / 'test_export/policies/2012_Fall')
@@ -461,6 +465,41 @@ class ImportRequiredTestCases(ContentStoreTestCase):
             }
         )
         self.assertEqual(len(items), 1)
+
+    def test_export_course_no_xml_attributes(self):
+        """
+        Test that a module without an `xml_attributes` attr will still be
+        exported successfully
+        """
+        content_store = contentstore()
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
+        vertical = verticals[0]
+
+        # create OpenAssessmentBlock:
+        open_assessment = ItemFactory.create(
+            parent_location=vertical.location,
+            category="openassessment",
+            display_name="untitled",
+        )
+        # convert it to draft
+        draft_open_assessment = self.store.convert_to_draft(
+            open_assessment.location, self.user.id
+        )
+
+        # note that it has no `xml_attributes` attribute
+        self.assertFalse(hasattr(draft_open_assessment, "xml_attributes"))
+
+        # export should still complete successfully
+        root_dir = path(mkdtemp_clean())
+        export_to_xml(
+            self.store,
+            content_store,
+            course_id,
+            root_dir,
+            'test_no_xml_attributes'
+        )
 
 
 class MiscCourseTests(ContentStoreTestCase):

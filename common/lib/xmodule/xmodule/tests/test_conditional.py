@@ -8,7 +8,7 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 from xmodule.error_module import NonStaffErrorDescriptor
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, Location
-from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationGenerator
+from xmodule.modulestore.xml import ImportSystem, XMLModuleStore, CourseLocationManager
 from xmodule.conditional_module import ConditionalDescriptor
 from xmodule.tests import DATA_DIR, get_test_system, get_test_descriptor_system
 from xmodule.x_module import STUDENT_VIEW
@@ -60,7 +60,7 @@ class ConditionalFactory(object):
             source_descriptor = NonStaffErrorDescriptor.from_xml(
                 'some random xml data',
                 system,
-                id_generator=CourseLocationGenerator(SlashSeparatedCourseKey('edX', 'conditional_test', 'test_run')),
+                id_generator=CourseLocationManager(source_location.course_key),
                 error_msg='random error message'
             )
         else:

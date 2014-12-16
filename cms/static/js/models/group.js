@@ -7,8 +7,9 @@ define([
         defaults: function() {
             return {
                 name: '',
-                version: null
-            };
+                version: 1,
+                order: null
+             };
         },
 
         isEmpty: function() {

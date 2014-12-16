@@ -10,7 +10,7 @@ from django.core.exceptions import PermissionDenied
 from django_future.csrf import ensure_csrf_cookie
 from django.utils.translation import ugettext as _
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 import contentstore.git_export_utils as git_export_utils
 from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
@@ -26,7 +26,7 @@ def export_git(request, course_key_string):
     This method serves up the 'Export to Git' page
     """
     course_key = CourseKey.from_string(course_key_string)
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)

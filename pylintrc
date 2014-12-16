@@ -47,6 +47,9 @@ disable=
 # W0232: Class has no __init__ method
     W0232,
 
+# Disable 'fixme' so that quality builds don't fail due to them
+    W0511,
+
 # Might use these when the code is in better shape
 # C0302: Too many lines in module
 # R0201: Method could be a function
@@ -134,6 +137,8 @@ generated-members=
     category,
     name,
     revision,
+# For django models
+    _meta,
 
 [BASIC]
 
@@ -230,7 +235,7 @@ additional-builtins=
 [IMPORTS]
 
 # Deprecated modules which should not be used, separated by a comma
-deprecated-modules=regsub,string,TERMIOS,Bastion,rexec
+deprecated-modules=regsub,string,TERMIOS,Bastion,rexec,track.views
 
 # Create a graph of every (i.e. internal and external) dependencies in the
 # given file (report RP0402 must not be disabled)

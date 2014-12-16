@@ -12,6 +12,7 @@
 # brunojm <brunojm@gmail.com>, 2014
 # rqllira <contato@raquellira.com>, 2014
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
+# Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
@@ -66,6 +67,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # G <glaucogm@ufpr.br>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
@@ -89,7 +91,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-11-05 14:53+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"

@@ -79,8 +79,8 @@ class AutoEnrollmentWithCSVTest(UniqueCourseTest):
             Given that I am on the Membership tab on the Instructor Dashboard
             When I select an image file (a non-csv file) and click the Upload Button
             Then I should be shown an Error Notification
-            And The Notification message should read 'Could not read uploaded file.'
+            And The Notification message should read 'Make sure that the file you upload is in CSV..'
         """
         self.auto_enroll_section.upload_non_csv_file()
         self.assertTrue(self.auto_enroll_section.is_notification_displayed(section_type=self.auto_enroll_section.NOTIFICATION_ERROR))
-        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Could not read uploaded file.")
+        self.assertEqual(self.auto_enroll_section.first_notification_message(section_type=self.auto_enroll_section.NOTIFICATION_ERROR), "Make sure that the file you upload is in CSV format with no extraneous characters or rows.")

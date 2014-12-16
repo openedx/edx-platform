@@ -20,6 +20,8 @@ require.config({
         "jquery.scrollTo": "js/vendor/jquery.scrollTo-1.4.2-min",
         "jquery.flot": "js/vendor/flot/jquery.flot.min",
         "jquery.fileupload": "js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+        "jquery.fileupload-process": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
+        "jquery.fileupload-validate": "js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate",
         "jquery.iframe-transport": "js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "coffee/src/jquery.immediateDescendents",
@@ -33,6 +35,7 @@ require.config({
         "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min",
         "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
         "xmodule": "/xmodule/xmodule",
+        "xblock/core": "js/xblock/core",
         "xblock": "coffee/src/xblock",
         "utility": "js/src/utility",
         "accessibility": "js/src/accessibility_tools",
@@ -128,8 +131,14 @@ require.config({
             exports: "jQuery.fn.plot"
         },
         "jquery.fileupload": {
-            deps: ["jquery.iframe-transport"],
+            deps: ["jquery.ui", "jquery.iframe-transport"],
             exports: "jQuery.fn.fileupload"
+        },
+        "jquery.fileupload-process": {
+            deps: ["jquery.fileupload"]
+        },
+        "jquery.fileupload-validate": {
+            deps: ["jquery.fileupload"]
         },
         "jquery.inputnumber": {
             deps: ["jquery"],

@@ -16,8 +16,8 @@ from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
 import third_party_auth
 
-from user_api.api import account as account_api
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from student_account.helpers import auth_pipeline_urls
@@ -285,13 +285,16 @@ def _third_party_auth_context(request):
     }
 
     course_id = request.GET.get("course_id")
+    email_opt_in = request.GET.get('email_opt_in')
     login_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_LOGIN_2,
-        course_id=course_id
+        course_id=course_id,
+        email_opt_in=email_opt_in
     )
     register_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_REGISTER_2,
-        course_id=course_id
+        course_id=course_id,
+        email_opt_in=email_opt_in
     )
 
     if third_party_auth.is_enabled():

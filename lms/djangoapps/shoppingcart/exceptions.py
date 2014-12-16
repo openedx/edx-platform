@@ -41,6 +41,10 @@ class RegCodeAlreadyExistException(InvalidCartItem):
     pass
 
 
+class ItemNotAllowedToRedeemRegCodeException(InvalidCartItem):
+    pass
+
+
 class ItemDoesNotExistAgainstRegCodeException(InvalidCartItem):
     pass
 
@@ -50,4 +54,12 @@ class ReportException(Exception):
 
 
 class ReportTypeDoesNotExistException(ReportException):
+    pass
+
+
+class InvalidStatusToRetire(Exception):
+    pass
+
+
+class UnexpectedOrderItemStatus(Exception):
     pass

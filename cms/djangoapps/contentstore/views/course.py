@@ -22,7 +22,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
-from xmodule.partitions.partitions import UserPartition, Group
+from xmodule.partitions.partitions import UserPartition
 from xmodule.modulestore import EdxJSONEncoder
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError
 from opaque_keys import InvalidKeyError
@@ -47,7 +47,7 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-from .access import has_course_access
+from student.auth import has_course_author_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
@@ -94,7 +94,7 @@ def _get_course_module(course_key, user, depth=0):
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    if not has_course_access(user, course_key):
+    if not has_course_author_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
@@ -128,7 +128,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     course_key = CourseKey.from_string(course_key_string)
 
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if not has_course_access(request.user, course_key):
+        if not has_course_author_access(request.user, course_key):
             raise PermissionDenied()
         if request.method == 'GET':
             return _course_notifications_json_get(action_state_id)
@@ -218,7 +218,7 @@ def course_handler(request, course_key_string=None):
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
-            elif not has_course_access(request.user, CourseKey.from_string(course_key_string)):
+            elif not has_course_author_access(request.user, CourseKey.from_string(course_key_string)):
                 raise PermissionDenied()
             elif request.method == 'PUT':
                 raise NotImplementedError()
@@ -290,7 +290,7 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        return has_course_access(request.user, course.id)
+        return has_course_author_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
     in_process_course_actions = [
@@ -298,7 +298,7 @@ def _accessible_courses_list(request):
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
-        if has_course_access(request.user, course.course_key)
+        if has_course_author_access(request.user, course.course_key)
     ]
     return courses, in_process_course_actions
 
@@ -621,7 +621,7 @@ def _rerun_course(request, org, number, run, fields):
     source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
 
     # verify user has access to the original course
-    if not has_course_access(request.user, source_course_key):
+    if not has_course_author_access(request.user, source_course_key):
         raise PermissionDenied()
 
     # create destination course key
@@ -702,7 +702,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_access(request.user, usage_key.course_key):
+    if not has_course_author_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     if request.method == 'GET':
@@ -1028,7 +1028,7 @@ def textbooks_list_handler(request, course_key_string):
     with store.bulk_operations(course_key):
         course = _get_course_module(course_key, request.user)
 
-        if not "application/json" in request.META.get('HTTP_ACCEPT', 'text/html'):
+        if "application/json" not in request.META.get('HTTP_ACCEPT', 'text/html'):
             # return HTML page
             upload_asset_url = reverse_course_url('assets_handler', course_key)
             textbook_url = reverse_course_url('textbooks_list_handler', course_key)
@@ -1050,7 +1050,7 @@ def textbooks_list_handler(request, course_key_string):
 
             tids = set(t["id"] for t in textbooks if "id" in t)
             for textbook in textbooks:
-                if not "id" in textbook:
+                if "id" not in textbook:
                     tid = assign_textbook_id(textbook, tids)
                     textbook["id"] = tid
                     tids.add(tid)
@@ -1173,7 +1173,7 @@ class GroupConfiguration(object):
             configuration = json.loads(json_string)
         except ValueError:
             raise GroupConfigurationsValidationError(_("invalid JSON"))
-
+        configuration["version"] = UserPartition.VERSION
         return configuration
 
     def validate(self):
@@ -1224,14 +1224,7 @@ class GroupConfiguration(object):
         """
         Get user partition for saving in course.
         """
-        groups = [Group(g["id"], g["name"]) for g in self.configuration["groups"]]
-
-        return UserPartition(
-            self.configuration["id"],
-            self.configuration["name"],
-            self.configuration["description"],
-            groups
-        )
+        return UserPartition.from_json(self.configuration)
 
     @staticmethod
     def get_usage_info(course, store):
@@ -1345,19 +1338,16 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            split_test_enabled = SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
-
             configurations = GroupConfiguration.add_usage_info(course, store)
-
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'configurations': configurations if split_test_enabled else None,
+                'configurations': configurations if should_show_group_configurations_page(course) else None,
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
-            # create a new group configuration for the course
+                # create a new group configuration for the course
                 try:
                     new_configuration = GroupConfiguration(request.body, course).get_user_partition()
                 except GroupConfigurationsValidationError as err:
@@ -1430,6 +1420,16 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             course.user_partitions.pop(index)
             store.update_item(course, request.user.id)
             return JsonResponse(status=204)
+
+
+def should_show_group_configurations_page(course):
+    """
+    Returns true if Studio should show the "Group Configurations" page for the specified course.
+    """
+    return (
+        SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
+        SPLIT_TEST_COMPONENT_TYPE in course.advanced_modules
+    )
 
 
 def _get_course_creator_status(user):

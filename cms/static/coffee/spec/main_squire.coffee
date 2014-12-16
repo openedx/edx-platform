@@ -14,6 +14,8 @@ requirejs.config({
         "jquery.cookie": "xmodule_js/common_static/js/vendor/jquery.cookie",
         "jquery.qtip": "xmodule_js/common_static/js/vendor/jquery.qtip.min",
         "jquery.fileupload": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload",
+        "jquery.fileupload-process": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-process",
+        "jquery.fileupload-validate": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload-validate",
         "jquery.iframe-transport": "xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport",
         "jquery.inputnumber": "xmodule_js/common_static/js/vendor/html5-input-polyfills/number-polyfill",
         "jquery.immediateDescendents": "xmodule_js/common_static/coffee/src/jquery.immediateDescendents",
@@ -28,6 +30,7 @@ requirejs.config({
         "jquery.tinymce": "xmodule_js/common_static/js/vendor/tinymce/js/tinymce/jquery.tinymce",
         "xmodule": "xmodule_js/src/xmodule",
         "xblock/cms.runtime.v1": "coffee/src/xblock/cms.runtime.v1",
+        "xblock/core": "xmodule_js/common_static/js/xblock/core",
         "xblock": "xmodule_js/common_static/coffee/src/xblock",
         "utility": "xmodule_js/common_static/js/src/utility",
         "sinon": "xmodule_js/common_static/js/vendor/sinon-1.7.1",
@@ -84,8 +87,14 @@ requirejs.config({
             exports: "jQuery.fn.qtip"
         },
         "jquery.fileupload": {
-            deps: ["jquery.iframe-transport"],
+            deps: ["jquery.ui", "jquery.iframe-transport"],
             exports: "jQuery.fn.fileupload"
+        },
+        "jquery.fileupload-process": {
+            deps: ["jquery.fileupload"]
+        },
+        "jquery.fileupload-validate": {
+            deps: ["jquery.fileupload"]
         },
         "jquery.inputnumber": {
             deps: ["jquery"],

@@ -39,6 +39,7 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
+from xmodule.modulestore.tests.utils import create_modulestore_instance
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 
@@ -977,6 +978,41 @@ class TestMixedModuleStore(CourseComparisonTest):
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.draft_preferred),
             (child_to_delete_location, None, ModuleStoreEnum.RevisionOption.published_only),
         ])
+
+    @ddt.data('draft')
+    def test_get_parent_location_draft(self, default_ms):
+        """
+        Test that "get_parent_location" method returns first published parent
+        for a draft component, if it has many possible parents (including
+        draft parents).
+        """
+        self.initdb(default_ms)
+        course_id = self.course_locations[self.MONGO_COURSEID].course_key
+
+        # create parented children
+        self._create_block_hierarchy()
+        self.store.publish(self.course.location, self.user_id)
+
+        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
+        # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
+        mongo_store.collection.update(
+            self.vertical_x1b.to_deprecated_son('_id.'),
+            {'$push': {'definition.children': unicode(self.problem_x1a_1)}}
+        )
+
+        # convert first parent (unit) "vertical_x1a" of problem "problem_x1a_1" to draft
+        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+        item = self.store.get_item(self.vertical_x1a)
+        self.assertTrue(self.store.has_published_version(item))
+
+        # now problem "problem_x1a_1" has 3 parents [vertical_x1a (draft),
+        # vertical_x1a (published), vertical_x1b (published)]
+        # check that "get_parent_location" method of draft branch returns first
+        # published parent "vertical_x1a" without raising "AssertionError" for
+        # problem location revision
+        with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+            parent = mongo_store.get_parent_location(self.problem_x1a_1)
+            self.assertEqual(parent, self.vertical_x1a)
 
     # Draft:
     #   Problem path:
@@ -1967,35 +2003,3 @@ class TestMixedModuleStore(CourseComparisonTest):
                 with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
                     published_vertical = self.store.get_item(vertical_loc)
                 self.assertEqual(draft_vertical.display_name, published_vertical.display_name)
-
-# ============================================================================================================
-# General utils for not using django settings
-# ============================================================================================================
-
-
-def load_function(path):
-    """
-    Load a function by name.
-
-    path is a string of the form "path.to.module.function"
-    returns the imported python object `function` from `path.to.module`
-    """
-    module_path, _, name = path.rpartition('.')
-    return getattr(import_module(module_path), name)
-
-
-# pylint: disable=unused-argument
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None, fs_service=None):
-    """
-    This will return a new instance of a modulestore given an engine and options
-    """
-    class_ = load_function(engine)
-
-    if issubclass(class_, ModuleStoreDraftAndPublished):
-        options['branch_setting_func'] = lambda: ModuleStoreEnum.Branch.draft_preferred
-
-    return class_(
-        doc_store_config=doc_store_config,
-        contentstore=contentstore,
-        **options
-    )

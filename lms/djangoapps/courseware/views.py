@@ -11,6 +11,7 @@ from datetime import datetime
 from collections import defaultdict
 from django.utils import translation
 from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
 
 from django.conf import settings
 from django.core.context_processors import csrf
@@ -37,6 +38,8 @@ from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
+
+from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 
 from open_ended_grading import open_ended_notifications
 from student.models import UserTestGroup, CourseEnrollment
@@ -117,9 +120,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
     Returns the html string
     """
     # grab the table of contents
-    user = User.objects.prefetch_related("groups").get(id=request.user.id)
-    request.user = user	 # keep just one instance of User
-    toc = toc_for_course(user, request, course, chapter, section, field_data_cache)
+    toc = toc_for_course(request, course, chapter, section, field_data_cache)
 
     context = dict([
         ('toc', toc),
@@ -324,10 +325,15 @@ def index(request, course_id, chapter=None, section=None,
 
     request.user = user  # keep just one instance of User
     with modulestore().bulk_operations(course_key):
-        return _index_bulk_op(request, user, course_key, chapter, section, position)
+        return _index_bulk_op(request, course_key, chapter, section, position)
 
 
-def _index_bulk_op(request, user, course_key, chapter, section, position):
+# pylint: disable=too-many-statements
+def _index_bulk_op(request, course_key, chapter, section, position):
+    """
+    Render the index page for the specified course.
+    """
+    user = request.user
     course = get_course_with_access(user, 'load', course_key, depth=2)
 
     staff_access = has_access(user, 'staff', course)
@@ -440,7 +446,8 @@ def _index_bulk_op(request, user, course_key, chapter, section, position):
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
             section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course_key, user, section_descriptor, depth=None)
+                course_key, user, section_descriptor, depth=None, asides=XBlockAsidesConfig.possible_asides()
+            )
 
             # Verify that position a string is in fact an int
             if position is not None:
@@ -786,6 +793,7 @@ def course_about(request, course_id):
         'registered': registered,
         'course_target': course_target,
         'registration_price': registration_price,
+        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'in_cart': in_cart,
         'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
         'show_courseware_link': show_courseware_link,
@@ -803,7 +811,7 @@ def course_about(request, course_id):
 
 
 @ensure_csrf_cookie
-@cache_if_anonymous('organization_full_name')
+@cache_if_anonymous('org')
 @ensure_valid_course_key
 def mktg_course_about(request, course_id):
     """This is the button that gets put into an iframe on the Drupal site."""
@@ -844,10 +852,37 @@ def mktg_course_about(request, course_id):
     }
 
     if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-        # Drupal will pass the organization's full name as a GET parameter. If no full name
-        # is provided, the marketing iframe won't show the email opt-in checkbox.
-        organization_full_name = request.GET.get('organization_full_name')
-        context['organization_full_name'] = cgi.escape(organization_full_name) if organization_full_name else organization_full_name
+        # Drupal will pass organization names using a GET parameter, as follows:
+        #     ?org=Harvard
+        #     ?org=Harvard,MIT
+        # If no full names are provided, the marketing iframe won't show the
+        # email opt-in checkbox.
+        org = request.GET.get('org')
+        if org:
+            org_list = org.split(',')
+            # HTML-escape the provided organization names
+            org_list = [cgi.escape(org) for org in org_list]
+            if len(org_list) > 1:
+                if len(org_list) > 2:
+                    # Translators: The join of three or more institution names (e.g., Harvard, MIT, and Dartmouth).
+                    org_name_string = _("{first_institutions}, and {last_institution}").format(
+                        first_institutions=u", ".join(org_list[:-1]),
+                        last_institution=org_list[-1]
+                    )
+                else:
+                    # Translators: The join of two institution names (e.g., Harvard and MIT).
+                    org_name_string = _("{first_institution} and {second_institution}").format(
+                        first_institution=org_list[0],
+                        second_institution=org_list[1]
+                    )
+            else:
+                org_name_string = org_list[0]
+
+            context['checkbox_label'] = ungettext(
+                "I would like to receive email from {institution_series} and learn about its other programs.",
+                "I would like to receive email from {institution_series} and learn about their other programs.",
+                len(org_list)
+            ).format(institution_series=org_name_string)
 
     # The edx.org marketing site currently displays only in English.
     # To avoid displaying a different language in the register / access button,

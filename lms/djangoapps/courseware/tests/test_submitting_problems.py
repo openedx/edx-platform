@@ -21,13 +21,13 @@ from courseware import grades
 from courseware.models import StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.partitions.partitions import Group, UserPartition
-from user_api.tests.factories import UserCourseTagFactory
+from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
@@ -333,18 +333,20 @@ class TestCourseGrader(TestSubmittingProblems):
         """
 
         grading_policy = {
-            "GRADER": [{
-                "type": "Homework",
-                "min_count": 1,
-                "drop_count": 0,
-                "short_label": "HW",
-                "weight": 0.25
-            }, {
-                "type": "Final",
-                "name": "Final Section",
-                "short_label": "Final",
-                "weight": 0.75
-            }]
+            "GRADER": [
+                {
+                    "type": "Homework",
+                    "min_count": 1,
+                    "drop_count": 0,
+                    "short_label": "HW",
+                    "weight": 0.25
+                }, {
+                    "type": "Final",
+                    "name": "Final Section",
+                    "short_label": "Final",
+                    "weight": 0.75
+                }
+            ]
         }
         self.add_grading_policy(grading_policy)
 
@@ -361,13 +363,14 @@ class TestCourseGrader(TestSubmittingProblems):
 
         grading_policy = {
             "GRADER": [
-            {
-                "type": "Homework",
-                "min_count": 3,
-                "drop_count": 1,
-                "short_label": "HW",
-                "weight": 1
-            }]
+                {
+                    "type": "Homework",
+                    "min_count": 3,
+                    "drop_count": 1,
+                    "short_label": "HW",
+                    "weight": 1
+                }
+            ]
         }
         self.add_grading_policy(grading_policy)
 

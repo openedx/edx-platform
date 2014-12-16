@@ -38,10 +38,17 @@ from xmodule_django.models import CourseKeyField
 from verify_student.models import SoftwareSecurePhotoVerification
 
 from .exceptions import (
-    InvalidCartItem, PurchasedCallbackException, ItemAlreadyInCartException,
-    AlreadyEnrolledInCourseException, CourseDoesNotExistException,
-    MultipleCouponsNotAllowedException, RegCodeAlreadyExistException,
-    ItemDoesNotExistAgainstRegCodeException
+    InvalidCartItem,
+    PurchasedCallbackException,
+    ItemAlreadyInCartException,
+    AlreadyEnrolledInCourseException,
+    CourseDoesNotExistException,
+    MultipleCouponsNotAllowedException,
+    RegCodeAlreadyExistException,
+    ItemDoesNotExistAgainstRegCodeException,
+    ItemNotAllowedToRedeemRegCodeException,
+    InvalidStatusToRetire,
+    UnexpectedOrderItemStatus,
 )
 
 from microsite_configuration import microsite
@@ -62,7 +69,21 @@ ORDER_STATUSES = (
 
     # The user's order has been refunded.
     ('refunded', 'refunded'),
+
+    # The user's order went through, but the order was erroneously left
+    # in 'cart'.
+    ('defunct-cart', 'defunct-cart'),
+
+    # The user's order went through, but the order was erroneously left
+    # in 'paying'.
+    ('defunct-paying', 'defunct-paying'),
 )
+
+# maps order statuses to their defunct states
+ORDER_STATUS_MAP = {
+    'cart': 'defunct-cart',
+    'paying': 'defunct-paying',
+}
 
 # we need a tuple to represent the primary key of various OrderItem subclasses
 OrderItemSubclassPK = namedtuple('OrderItemSubclassPK', ['cls', 'pk'])  # pylint: disable=invalid-name
@@ -130,6 +151,13 @@ class Order(models.Model):
         return cart_order
 
     @classmethod
+    def does_user_have_cart(cls, user):
+        """
+        Returns a boolean whether a shopping cart (Order) exists for the specified user
+        """
+        return cls.objects.filter(user=user, status='cart').exists()
+
+    @classmethod
     def user_cart_has_items(cls, user, item_types=None):
         """
         Returns true if the user (anonymous user ok) has
@@ -151,6 +179,15 @@ class Order(models.Model):
                     return True
 
         return False
+
+    @classmethod
+    def remove_cart_item_from_order(cls, item):
+        """
+        Removes the item from the cart if the item.order.status == 'cart'.
+        """
+        if item.order.status == 'cart':
+            log.info("Item {0} removed from the user cart".format(item.id))
+            item.delete()
 
     @property
     def total_cost(self):
@@ -223,6 +260,7 @@ class Order(models.Model):
                 is_order_type_business = True
 
         items_to_delete = []
+        old_to_new_id_map = []
         if is_order_type_business:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'paidcourseregistration'):
@@ -232,6 +270,7 @@ class Order(models.Model):
                     course_reg_code_item.unit_cost = cart_item.unit_cost
                     course_reg_code_item.save()
                     items_to_delete.append(cart_item)
+                    old_to_new_id_map.append({"oldId": cart_item.id, "newId": course_reg_code_item.id})
         else:
             for cart_item in cart_items:
                 if hasattr(cart_item, 'courseregcodeitem'):
@@ -241,12 +280,14 @@ class Order(models.Model):
                     paid_course_registration.unit_cost = cart_item.unit_cost
                     paid_course_registration.save()
                     items_to_delete.append(cart_item)
+                    old_to_new_id_map.append({"oldId": cart_item.id, "newId": paid_course_registration.id})
 
         for item in items_to_delete:
             item.delete()
 
         self.order_type = OrderTypes.BUSINESS if is_order_type_business else OrderTypes.PERSONAL
         self.save()
+        return old_to_new_id_map
 
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
@@ -297,7 +338,7 @@ class Order(models.Model):
                 'email_from_address',
                 settings.PAYMENT_SUPPORT_EMAIL
             )
-            # send a unique email for each recipient, don't put all email addresses in a single email
+            # Send a unique email for each recipient. Don't put all email addresses in a single email.
             for recipient in recipient_list:
                 message = render_to_string(
                     'emails/business_order_confirmation_email.txt' if is_order_type_business else 'emails/order_confirmation_email.txt',
@@ -324,8 +365,7 @@ class Order(models.Model):
                     to=[recipient[1]]
                 )
 
-                # only the business order is HTML formatted
-                # the single seat is simple text
+                # Only the business order is HTML formatted. A single seat order confirmation is plain text.
                 if is_order_type_business:
                     email.content_subtype = "html"
 
@@ -471,6 +511,39 @@ class Order(models.Model):
             instruction_set.update(set_of_html)
         return instruction_dict, instruction_set
 
+    def retire(self):
+        """
+        Method to "retire" orders that have gone through to the payment service
+        but have (erroneously) not had their statuses updated.
+        This method only works on orders that satisfy the following conditions:
+        1) the order status is either "cart" or "paying" (otherwise we raise
+           an InvalidStatusToRetire error)
+        2) the order's order item's statuses match the order's status (otherwise
+           we throw an UnexpectedOrderItemStatus error)
+        """
+        # if an order is already retired, no-op:
+        if self.status in ORDER_STATUS_MAP.values():
+            return
+
+        if self.status not in ORDER_STATUS_MAP.keys():
+            raise InvalidStatusToRetire(
+                "order status {order_status} is not 'paying' or 'cart'".format(
+                    order_status=self.status
+                )
+            )
+
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
+            if item.status != self.status:
+                raise UnexpectedOrderItemStatus(
+                    "order_item status is different from order status"
+                )
+
+        self.status = ORDER_STATUS_MAP[self.status]
+        self.save()
+
+        for item in self.orderitem_set.all():  # pylint: disable=no-member
+            item.retire()
+
 
 class OrderItem(TimeStampedModel):
     """
@@ -579,7 +652,7 @@ class OrderItem(TimeStampedModel):
         """
         Individual instructions for this order item.
 
-        Currently, only used for e-mails.
+        Currently, only used for emails.
         """
         return ''
 
@@ -602,6 +675,15 @@ class OrderItem(TimeStampedModel):
             'quantity': self.qty,
             'category': 'N/A',
         }
+
+    def retire(self):
+        """
+        Called by the `retire` method defined in the `Order` class. Retires
+        an order item if its (and its order's) status was erroneously not
+        updated to "purchased" after the order was processed.
+        """
+        self.status = ORDER_STATUS_MAP[self.status]
+        self.save()
 
 
 class Invoice(models.Model):
@@ -690,6 +772,10 @@ class RegistrationCodeRedemption(models.Model):
         for item in cart_items:
             if getattr(item, 'course_id'):
                 if item.course_id == course_reg_code.course_id:
+                    # If the item qty is greater than 1 then the registration code should not be allowed to
+                    # redeem
+                    if item.qty > 1:
+                        raise ItemNotAllowedToRedeemRegCodeException
                     # If another account tries to use a existing registration code before the student checks out, an
                     # error message will appear.The reg code is un-reusable.
                     code_redemption = cls.objects.filter(registration_code=course_reg_code)
@@ -850,9 +936,10 @@ class PaidCourseRegistration(OrderItem):
 
         Returns the order item
         """
-        # First a bunch of sanity checks
-        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
-                                                # throw errors if it doesn't
+        # First a bunch of sanity checks:
+        # actually fetch the course to make sure it exists, use this to
+        # throw errors if it doesn't.
+        course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
@@ -998,9 +1085,10 @@ class CourseRegCodeItem(OrderItem):
 
         Returns the order item
         """
-        # First a bunch of sanity checks
-        course = modulestore().get_course(course_id)  # actually fetch the course to make sure it exists, use this to
-                                                # throw errors if it doesn't
+        # First a bunch of sanity checks:
+        # actually fetch the course to make sure it exists, use this to
+        # throw errors if it doesn't.
+        course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
                       .format(order.user.email, course_id, order.id))
@@ -1278,11 +1366,28 @@ class CertificateItem(OrderItem):
 
     @property
     def additional_instruction_text(self):
-        return _("Note - you have up to 2 weeks into the course to unenroll from the Verified Certificate option "
-                 "and receive a full refund. To receive your refund, contact {billing_email}. "
-                 "Please include your order number in your e-mail. "
-                 "Please do NOT include your credit card information.").format(
-                     billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+        refund_reminder = _(
+            "You have up to two weeks into the course to unenroll from the Verified Certificate option "
+            "and receive a full refund. To receive your refund, contact {billing_email}. "
+            "Please include your order number in your email. "
+            "Please do NOT include your credit card information."
+        ).format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)
+
+        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+            domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
+            verification_url = "http://{domain}{path}".format(domain=domain, path=path)
+
+            verification_reminder = _(
+                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
+            ).format(verification_url=verification_url)
+
+            return "{verification_reminder} {refund_reminder}".format(
+                verification_reminder=verification_reminder,
+                refund_reminder=refund_reminder
+            )
+        else:
+            return refund_reminder
 
     @classmethod
     def verified_certificates_count(cls, course_id, status):

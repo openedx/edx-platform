@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test for lms courseware app, module render unit
 """
@@ -30,9 +31,10 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_XML_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.lib.xblock.runtime import quote_slashes
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.models import anonymous_id_for_user
 from xmodule.lti_module import LTIDescriptor
+
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -175,6 +177,44 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
         self.assertEquals('Unauthenticated', response.content)
+
+    def test_missing_position_handler(self):
+        """
+        Test that sending POST request without or invalid position argument don't raise server error
+        """
+        self.client.login(username=self.mock_user.username, password="test")
+        dispatch_url = reverse(
+            'xblock_handler',
+            args=[
+                self.course_key.to_deprecated_string(),
+                quote_slashes(self.course_key.make_usage_key('videosequence', 'Toy_Videos').to_deprecated_string()),
+                'xmodule_handler',
+                'goto_position'
+            ]
+        )
+        response = self.client.post(dispatch_url)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': ''})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': '-1'})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': "string"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': u"Φυσικά"})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
+
+        response = self.client.post(dispatch_url, {'position': None})
+        self.assertEqual(200, response.status_code)
+        self.assertEqual(json.loads(response.content), {'success': True})
 
     @ddt.data('pure', 'vertical')
     @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
@@ -394,7 +434,7 @@ class TestTOC(ModuleStoreTestCase):
 
             with check_mongo_calls(toc_finds):
                 actual = render.toc_for_course(
-                    self.request.user, self.request, self.toy_course, self.chapter, None, self.field_data_cache
+                    self.request, self.toy_course, self.chapter, None, self.field_data_cache
                 )
         for toc_section in expected:
             self.assertIn(toc_section, actual)
@@ -432,7 +472,9 @@ class TestTOC(ModuleStoreTestCase):
                           'url_name': 'secret:magic', 'display_name': 'secret:magic'}])
 
             with check_mongo_calls(toc_finds):
-                actual = render.toc_for_course(self.request.user, self.request, self.toy_course, self.chapter, section, self.field_data_cache)
+                actual = render.toc_for_course(
+                    self.request, self.toy_course, self.chapter, section, self.field_data_cache
+                )
             for toc_section in expected:
                 self.assertIn(toc_section, actual)
 

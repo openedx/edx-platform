@@ -78,7 +78,7 @@ class PaymentFakeView(View):
         """
         new_status = request.body
 
-        if not new_status in ["success", "failure"]:
+        if new_status not in ["success", "failure"]:
             return HttpResponseBadRequest()
 
         else:

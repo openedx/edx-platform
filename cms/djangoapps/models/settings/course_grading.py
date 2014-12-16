@@ -205,6 +205,9 @@ class CourseGradingModel(object):
 
     @staticmethod
     def jsonize_grader(i, grader):
+        # Warning: converting weight to integer might give unwanted results due
+        # to the reason how floating point arithmetic works
+        # e.g, "0.29 * 100 = 28.999999999999996"
         return {
             "id": i,
             "type": grader["type"],

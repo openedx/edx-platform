@@ -29,7 +29,8 @@ from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
     RegCodeAlreadyExistException, ItemDoesNotExistAgainstRegCodeException,
-    MultipleCouponsNotAllowedException, InvalidCartItem
+    MultipleCouponsNotAllowedException, InvalidCartItem,
+    ItemNotAllowedToRedeemRegCodeException
 )
 from .models import (
     Order, OrderTypes,
@@ -84,13 +85,24 @@ def add_course_to_cart(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # All logging from here handled by the model
     try:
-        PaidCourseRegistration.add_to_order(cart, course_key)
+        paid_course_item = PaidCourseRegistration.add_to_order(cart, course_key)
     except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
     except ItemAlreadyInCartException:
         return HttpResponseBadRequest(_('The course {0} is already in your cart.'.format(course_id)))
     except AlreadyEnrolledInCourseException:
         return HttpResponseBadRequest(_('You are already registered in course {0}.'.format(course_id)))
+    else:
+        # in case a coupon redemption code has been applied, new items should also get a discount if applicable.
+        order = paid_course_item.order
+        order_items = order.orderitem_set.all().select_subclasses()
+        redeemed_coupons = CouponRedemption.objects.filter(order=order)
+        for redeemed_coupon in redeemed_coupons:
+            if Coupon.objects.filter(code=redeemed_coupon.coupon.code, course_id=course_key, is_active=True).exists():
+                coupon = Coupon.objects.get(code=redeemed_coupon.coupon.code, course_id=course_key, is_active=True)
+                CouponRedemption.add_coupon_redemption(coupon, order, order_items)
+                break  # Since only one code can be applied to the cart, we'll just take the first one and then break.
+
     return HttpResponse(_("Course added to cart."))
 
 
@@ -121,9 +133,10 @@ def update_user_cart(request):
 
         item.qty = qty
         item.save()
-        item.order.update_order_type()
+        old_to_new_id_map = item.order.update_order_type()
         total_cost = item.order.total_cost
-        return JsonResponse({"total_cost": total_cost}, 200)
+
+        return JsonResponse({"total_cost": total_cost, "oldToNewIdMap": old_to_new_id_map}, 200)
 
     return HttpResponseBadRequest('Order item not found in request.')
 
@@ -135,16 +148,16 @@ def show_cart(request):
     This view shows cart items.
     """
     cart = Order.get_cart_for_user(request.user)
-    total_cost = cart.total_cost
-    cart_items = cart.orderitem_set.all().select_subclasses()
-    shoppingcart_items = []
-    for cart_item in cart_items:
-        course_key = getattr(cart_item, 'course_id')
-        if course_key:
-            course = get_course_by_id(course_key, depth=0)
-            shoppingcart_items.append((cart_item, course))
-
+    is_any_course_expired, expired_cart_items, expired_cart_item_names, valid_cart_item_tuples = \
+        verify_for_closed_enrollment(request.user, cart)
     site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+
+    if is_any_course_expired:
+        for expired_item in expired_cart_items:
+            Order.remove_cart_item_from_order(expired_item)
+        cart.update_order_type()
+
+    appended_expired_course_names = ", ".join(expired_cart_item_names)
 
     callback_url = request.build_absolute_uri(
         reverse("shoppingcart.views.postpay_callback")
@@ -152,8 +165,10 @@ def show_cart(request):
     form_html = render_purchase_form_html(cart, callback_url=callback_url)
     context = {
         'order': cart,
-        'shoppingcart_items': shoppingcart_items,
-        'amount': total_cost,
+        'shoppingcart_items': valid_cart_item_tuples,
+        'amount': cart.total_cost,
+        'is_course_enrollment_closed': is_any_course_expired,
+        'appended_expired_course_names': appended_expired_course_names,
         'site_name': site_name,
         'form_html': form_html,
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
@@ -367,6 +382,8 @@ def use_registration_code(course_reg, user):
         return HttpResponseBadRequest(_("Oops! The code '{0}' you entered is either invalid or expired".format(course_reg.code)))
     except ItemDoesNotExistAgainstRegCodeException:
         return HttpResponseNotFound(_("Code '{0}' is not valid for any course in the shopping cart.".format(course_reg.code)))
+    except ItemNotAllowedToRedeemRegCodeException:
+        return HttpResponseNotFound(_("Cart item quantity should not be greater than 1 when applying activation code"))
 
     return HttpResponse(json.dumps({'response': 'success'}), content_type="application/json")
 
@@ -544,8 +561,7 @@ def billing_details(request):
     """
 
     cart = Order.get_cart_for_user(request.user)
-    cart_items = cart.orderitem_set.all()
-
+    cart_items = cart.orderitem_set.all().select_subclasses()
     if getattr(cart, 'order_type') != OrderTypes.BUSINESS:
         raise Http404('Page not found!')
 
@@ -574,9 +590,63 @@ def billing_details(request):
 
         cart.add_billing_details(company_name, company_contact_name, company_contact_email, recipient_name,
                                  recipient_email, customer_reference_number)
+
+        is_any_course_expired, __, __, __ = verify_for_closed_enrollment(request.user)
+
         return JsonResponse({
-            'response': _('success')
+            'response': _('success'),
+            'is_course_enrollment_closed': is_any_course_expired
         })  # status code 200: OK by default
+
+
+def verify_for_closed_enrollment(user, cart=None):
+    """
+    A multi-output helper function.
+    inputs:
+        user: a user object
+        cart: If a cart is provided it uses the same object, otherwise fetches the user's cart.
+    Returns:
+        is_any_course_expired: True if any of the items in the cart has it's enrollment period closed. False otherwise.
+        expired_cart_items: List of courses with enrollment period closed.
+        expired_cart_item_names: List of names of the courses with enrollment period closed.
+        valid_cart_item_tuples: List of courses which are still open for enrollment.
+    """
+    if cart is None:
+        cart = Order.get_cart_for_user(user)
+    expired_cart_items = []
+    expired_cart_item_names = []
+    valid_cart_item_tuples = []
+    cart_items = cart.orderitem_set.all().select_subclasses()
+    is_any_course_expired = False
+    for cart_item in cart_items:
+        course_key = getattr(cart_item, 'course_id', None)
+        if course_key is not None:
+            course = get_course_by_id(course_key, depth=0)
+            if CourseEnrollment.is_enrollment_closed(user, course):
+                is_any_course_expired = True
+                expired_cart_items.append(cart_item)
+                expired_cart_item_names.append(course.display_name)
+            else:
+                valid_cart_item_tuples.append((cart_item, course))
+
+    return is_any_course_expired, expired_cart_items, expired_cart_item_names, valid_cart_item_tuples
+
+
+@require_http_methods(["GET"])
+@login_required
+@enforce_shopping_cart_enabled
+def verify_cart(request):
+    """
+    Called when the user clicks the button to transfer control to CyberSource.
+    Returns a JSON response with is_course_enrollment_closed set to True if any of the courses has its
+    enrollment period closed. If all courses are still valid, is_course_enrollment_closed set to False.
+    """
+    is_any_course_expired, __, __, __ = verify_for_closed_enrollment(request.user)
+    return JsonResponse(
+        {
+            'is_course_enrollment_closed': is_any_course_expired
+        }
+    )  # status code 200: OK by default
 
 
 @login_required

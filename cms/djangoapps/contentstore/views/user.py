@@ -13,7 +13,7 @@ from util.json_request import JsonResponse, expect_json
 from student.roles import CourseInstructorRole, CourseStaffRole
 from course_creators.views import user_requested_access
 
-from .access import has_course_access
+from student.auth import has_course_author_access
 
 from student.models import CourseEnrollment
 from django.http import HttpResponseNotFound
@@ -50,7 +50,7 @@ def course_team_handler(request, course_key_string=None, email=None):
         json: remove a particular course team member from the course team (email is required).
     """
     course_key = CourseKey.from_string(course_key_string) if course_key_string else None
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     if 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
@@ -66,7 +66,7 @@ def _manage_users(request, course_key):
     This view will return all CMS users who are editors for the specified course
     """
     # check that logged in user has permissions to this item
-    if not has_course_access(request.user, course_key):
+    if not has_course_author_access(request.user, course_key):
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
@@ -78,7 +78,7 @@ def _manage_users(request, course_key):
         'context_course': course_module,
         'staff': staff,
         'instructors': instructors,
-        'allow_actions': has_course_access(request.user, course_key, role=CourseInstructorRole),
+        'allow_actions': has_course_author_access(request.user, course_key, role=CourseInstructorRole),
     })
 
 
@@ -88,10 +88,10 @@ def _course_team_user(request, course_key, email):
     Handle the add, remove, promote, demote requests ensuring the requester has authority
     """
     # check that logged in user has permissions to this item
-    if has_course_access(request.user, course_key, role=CourseInstructorRole):
+    if has_course_author_access(request.user, course_key, role=CourseInstructorRole):
         # instructors have full permissions
         pass
-    elif has_course_access(request.user, course_key, role=CourseStaffRole) and email == request.user.email:
+    elif has_course_author_access(request.user, course_key, role=CourseStaffRole) and email == request.user.email:
         # staff can only affect themselves
         pass
     else:
@@ -145,7 +145,7 @@ def _course_team_user(request, course_key, email):
         return JsonResponse({"error": _("`role` is required")}, 400)
 
     if role == "instructor":
-        if not has_course_access(request.user, course_key, role=CourseInstructorRole):
+        if not has_course_author_access(request.user, course_key, role=CourseInstructorRole):
             msg = {
                 "error": _("Only instructors may create other instructors")
             }

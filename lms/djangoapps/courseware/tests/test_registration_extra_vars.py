@@ -19,7 +19,7 @@ class TestSortedCountryList(TestCase):
         super(TestSortedCountryList, self).setUp()
         self.url = reverse('register_user')
 
-    def find_option_by_code(self, options, code):
+    def find_option_by_code(self, options, code):  # pylint: disable=missing-docstring
         for index, option in enumerate(options):
             if option.attrs['value'] == code:
                 return (index, option)

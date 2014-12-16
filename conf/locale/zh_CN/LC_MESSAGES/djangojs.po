@@ -35,6 +35,7 @@
 # youjialin <hackeris@qq.com>, 2014
 # 刘知远 <liuliudong@163.com>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
+# 亚仑 <fl_meng@163.com>, 2014
 # 刘洋 <liuyang2011@tsinghua.edu.cn>, 2013
 # 张太红 <zth@xjau.edu.cn>, 2014
 # 沈世奇 <vicapple22@gmail.com>, 2013
@@ -94,7 +95,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-10-08 18:08+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"

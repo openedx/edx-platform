@@ -99,7 +99,8 @@ define([
                         'id': 10,
                         'name': 'My Group Configuration',
                         'description': 'Some description',
-                        'version': 1,
+                        'version': 2,
+                        'scheme': 'random',
                         'groups': [
                             {
                                 'version': 1,
@@ -114,9 +115,10 @@ define([
                         'id': 10,
                         'name': 'My Group Configuration',
                         'description': 'Some description',
+                        'scheme': 'random',
                         'showGroups': false,
                         'editing': false,
-                        'version': 1,
+                        'version': 2,
                         'groups': [
                             {
                                 'version': 1,

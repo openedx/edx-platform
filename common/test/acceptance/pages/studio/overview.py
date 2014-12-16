@@ -305,7 +305,7 @@ class CourseOutlineChild(PageObject, CourseOutlineItem):
             grandkids.extend(descendant.children)
 
         grand_locators = [grandkid.locator for grandkid in grandkids]
-        return [descendant for descendant in descendants if not descendant.locator in grand_locators]
+        return [descendant for descendant in descendants if descendant.locator not in grand_locators]
 
 
 class CourseOutlineUnit(CourseOutlineChild):

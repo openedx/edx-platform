@@ -14,7 +14,7 @@ from third_party_auth import (  # pylint: disable=unused-import
 from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
 
 
-def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None):
+def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None, email_opt_in=None):
     """Retrieve URLs for each enabled third-party auth provider.
 
     These URLs are used on the "sign up" and "sign in" buttons
@@ -39,6 +39,10 @@ def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None):
             if the course has a payment option.
             Note that `redirect_url` takes precedence over the redirect
             to the track selection page.
+
+        email_opt_in (unicode): The user choice to opt in for organization wide emails. If set to 'true'
+            (case insensitive), user will be opted into organization-wide email. All other values will
+            be treated as False, and the user will be opted out of organization-wide email.
 
     Returns:
         dict mapping provider names to URLs
@@ -72,6 +76,7 @@ def auth_pipeline_urls(auth_entry, redirect_url=None, course_id=None):
         provider.NAME: pipeline.get_login_url(
             provider.NAME, auth_entry,
             enroll_course_id=course_id,
+            email_opt_in=email_opt_in,
             redirect_url=pipeline_redirect
         )
         for provider in provider.Registry.enabled()

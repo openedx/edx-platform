@@ -34,7 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
-from lms.lib.xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -272,6 +272,11 @@ FEATURES = {
     # redirected to the dashboard - this is default Open edX behavior. Set to
     # False to not redirect the user
     'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER': True,
+
+    # When a user goes to the homepage ('/') the user see the
+    # courses listed in the announcement dates order - this is default Open edX behavior.
+    # Set to True to change the course sorting behavior by their start dates, latest first.
+    'ENABLE_COURSE_SORTING_BY_START_DATE': False,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -540,6 +545,7 @@ if FEATURES.get('ENABLE_SQL_TRACKING_LOGS'):
 
 TRACKING_SEGMENTIO_WEBHOOK_SECRET = None
 TRACKING_SEGMENTIO_ALLOWED_TYPES = ['track']
+TRACKING_SEGMENTIO_DISALLOWED_SUBSTRING_NAMES = ['.bi.']
 TRACKING_SEGMENTIO_SOURCE_MAP = {
     'analytics-android': 'mobile',
     'analytics-ios': 'mobile',
@@ -939,7 +945,7 @@ MIDDLEWARE_CLASSES = (
 
     # Adds user tags to tracking events
     # Must go before TrackMiddleware, to get the context set up
-    'user_api.middleware.UserTagsEventContextMiddleware',
+    'openedx.core.djangoapps.user_api.middleware.UserTagsEventContextMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
@@ -1012,35 +1018,17 @@ courseware_js = (
 base_vendor_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
-    'js/vendor/underscore-min.js'
+    'js/vendor/underscore-min.js',
+    'js/vendor/require.js',
+    'js/RequireJS-namespace-undefine.js',
 ]
 
 main_vendor_js = base_vendor_js + [
-    'js/vendor/require.js',
-    'js/RequireJS-namespace-undefine.js',
     'js/vendor/json2.js',
     'js/vendor/jquery-ui.min.js',
     'js/vendor/jquery.qtip.min.js',
     'js/vendor/swfobject/swfobject.js',
     'js/vendor/jquery.ba-bbq.min.js',
-    'js/vendor/ova/annotator-full.js',
-    'js/vendor/ova/annotator-full-firebase-auth.js',
-    'js/vendor/ova/video.dev.js',
-    'js/vendor/ova/vjs.youtube.js',
-    'js/vendor/ova/rangeslider.js',
-    'js/vendor/ova/share-annotator.js',
-    'js/vendor/ova/richText-annotator.js',
-    'js/vendor/ova/reply-annotator.js',
-    'js/vendor/ova/tags-annotator.js',
-    'js/vendor/ova/flagging-annotator.js',
-    'js/vendor/ova/diacritic-annotator.js',
-    'js/vendor/ova/grouping-annotator.js',
-    'js/vendor/ova/jquery-Watch.js',
-    'js/vendor/ova/openseadragon.js',
-    'js/vendor/ova/OpenSeaDragonAnnotation.js',
-    'js/vendor/ova/ova.js',
-    'js/vendor/ova/catch/js/catch.js',
-    'js/vendor/ova/catch/js/handlebars-1.1.2.js',
     'js/vendor/URI.min.js',
 ]
 
@@ -1058,7 +1046,15 @@ instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/ins
 student_account_js = [
     'js/utils/rwd_header_footer.js',
     'js/utils/edx.utils.validate.js',
+    'js/form.ext.js',
+    'js/my_courses_dropdown.js',
+    'js/toggle_login_modal.js',
+    'js/sticky_filter.js',
+    'js/query-params.js',
     'js/src/utility.js',
+    'js/src/accessibility_tools.js',
+    'js/src/ie_shim.js',
+    'js/src/string_utils.js',
     'js/student_account/enrollment.js',
     'js/student_account/emailoptin.js',
     'js/student_account/shoppingcart.js',
@@ -1074,6 +1070,33 @@ student_account_js = [
 ]
 
 student_profile_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/student_profile/**/*.js'))
+
+verify_student_js = [
+    'js/form.ext.js',
+    'js/my_courses_dropdown.js',
+    'js/toggle_login_modal.js',
+    'js/sticky_filter.js',
+    'js/query-params.js',
+    'js/src/utility.js',
+    'js/src/accessibility_tools.js',
+    'js/src/ie_shim.js',
+    'js/src/string_utils.js',
+    'js/verify_student/models/verification_model.js',
+    'js/verify_student/views/error_view.js',
+    'js/verify_student/views/webcam_photo_view.js',
+    'js/verify_student/views/progress_view.js',
+    'js/verify_student/views/requirements_view.js',
+    'js/verify_student/views/step_view.js',
+    'js/verify_student/views/intro_step_view.js',
+    'js/verify_student/views/make_payment_step_view.js',
+    'js/verify_student/views/payment_confirmation_step_view.js',
+    'js/verify_student/views/face_photo_step_view.js',
+    'js/verify_student/views/id_photo_step_view.js',
+    'js/verify_student/views/review_photos_step_view.js',
+    'js/verify_student/views/enrollment_confirmation_step_view.js',
+    'js/verify_student/views/pay_and_verify_view.js',
+    'js/verify_student/pay_and_verify.js',
+]
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1185,7 +1208,7 @@ PIPELINE_JS = {
     'application': {
 
         # Application will contain all paths not in courseware_only_js
-        'source_filenames': sorted(common_js) + sorted(project_js) + [
+        'source_filenames': ['js/xblock/core.js'] + sorted(common_js) + sorted(project_js) + [
             'js/form.ext.js',
             'js/my_courses_dropdown.js',
             'js/toggle_login_modal.js',
@@ -1254,6 +1277,10 @@ PIPELINE_JS = {
         'source_filenames': student_profile_js,
         'output_filename': 'js/student_profile.js'
     },
+    'verify_student': {
+        'source_filenames': verify_student_js,
+        'output_filename': 'js/verify_student.js'
+    }
 }
 
 PIPELINE_DISABLE_WRAPPER = True
@@ -1446,7 +1473,7 @@ INSTALLED_APPS = (
     'open_ended_grading',
     'psychometrics',
     'licenses',
-    'course_groups',
+    'openedx.core.djangoapps.course_groups',
     'bulk_email',
 
     # External auth (OpenID, shib)
@@ -1490,7 +1517,7 @@ INSTALLED_APPS = (
 
     # User API
     'rest_framework',
-    'user_api',
+    'openedx.core.djangoapps.user_api',
 
     # Shopping cart
     'shoppingcart',
@@ -1536,6 +1563,8 @@ INSTALLED_APPS = (
 
     # Surveys
     'survey',
+
+    'lms.djangoapps.lms_xblock',
 )
 
 ######################### MARKETING SITE ###############################

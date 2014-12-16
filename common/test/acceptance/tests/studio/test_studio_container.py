@@ -324,29 +324,41 @@ class UnitPublishingTest(ContainerBase):
                     )
                 )
             ),
-            XBlockFixtureDesc('chapter', 'Unlocked Section',
-                              metadata={'start': past_start_date.isoformat()}).add_children(
-                                  XBlockFixtureDesc('sequential', 'Unlocked Subsection').add_children(
-                                      XBlockFixtureDesc('vertical', 'Unlocked Unit').add_children(
-                                          XBlockFixtureDesc('problem', '<problem></problem>', data=self.html_content)
-                                      )
-                                  )
-                              ),
-            XBlockFixtureDesc('chapter', 'Section With Locked Unit').add_children(
-                XBlockFixtureDesc('sequential', 'Subsection With Locked Unit',
-                                  metadata={'start': past_start_date.isoformat()}).add_children(
-                                      XBlockFixtureDesc('vertical', 'Locked Unit',
-                                                        metadata={'visible_to_staff_only': True}).add_children(
-                                                            XBlockFixtureDesc('discussion', '', data=self.html_content)
-                                                        )
-                                  )
+            XBlockFixtureDesc(
+                'chapter',
+                'Unlocked Section',
+                metadata={'start': past_start_date.isoformat()}
+            ).add_children(
+                XBlockFixtureDesc('sequential', 'Unlocked Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Unlocked Unit').add_children(
+                        XBlockFixtureDesc('problem', '<problem></problem>', data=self.html_content)
+                    )
+                )
             ),
-            XBlockFixtureDesc('chapter', 'Unreleased Section',
-                              metadata={'start': future_start_date.isoformat()}).add_children(
-                                  XBlockFixtureDesc('sequential', 'Unreleased Subsection').add_children(
-                                      XBlockFixtureDesc('vertical', 'Unreleased Unit')
-                                  )
-                              )
+            XBlockFixtureDesc('chapter', 'Section With Locked Unit').add_children(
+                XBlockFixtureDesc(
+                    'sequential',
+                    'Subsection With Locked Unit',
+                    metadata={'start': past_start_date.isoformat()}
+                ).add_children(
+                    XBlockFixtureDesc(
+                        'vertical',
+                        'Locked Unit',
+                        metadata={'visible_to_staff_only': True}
+                    ).add_children(
+                        XBlockFixtureDesc('discussion', '', data=self.html_content)
+                    )
+                )
+            ),
+            XBlockFixtureDesc(
+                'chapter',
+                'Unreleased Section',
+                metadata={'start': future_start_date.isoformat()}
+            ).add_children(
+                XBlockFixtureDesc('sequential', 'Unreleased Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Unreleased Unit')
+                )
+            )
         )
 
     def test_publishing(self):
@@ -678,7 +690,7 @@ class UnitPublishingTest(ContainerBase):
         """
         Verifies that the browser is on the staff page and returns a StaffPage.
         """
-        page = StaffPage(self.browser)
+        page = StaffPage(self.browser, self.course_id)
         EmptyPromise(page.is_browser_on_page, 'Browser is on staff page in LMS').fulfill()
         return page
 

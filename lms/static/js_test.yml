@@ -41,8 +41,11 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/flot/jquery.flot.js
     - xmodule_js/common_static/js/vendor/CodeMirror/codemirror.js
     - xmodule_js/common_static/js/vendor/URI.min.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.fileupload.js
+    - xmodule_js/common_static/js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js
     - xmodule_js/common_static/js/vendor/url.min.js
     - xmodule_js/common_static/coffee/src/jquery.immediateDescendents.js
+    - xmodule_js/common_static/js/xblock
     - xmodule_js/common_static/coffee/src/xblock
     - xmodule_js/common_static/js/vendor/sinon-1.7.1.js
     - xmodule_js/src/capa/
@@ -76,6 +79,7 @@ fixture_paths:
     - templates/dashboard
     - templates/student_account
     - templates/student_profile
+    - templates/file-upload.underscore
 
 requirejs:
   paths:

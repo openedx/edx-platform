@@ -7,6 +7,8 @@ import pytz
 from tempfile import mkdtemp
 from uuid import uuid4
 
+from mock import patch
+
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
@@ -276,10 +278,14 @@ class ModuleStoreTestCase(TestCase):
         return updated_course
 
     @staticmethod
-    def drop_mongo_collections():
+    @patch('xmodule.modulestore.django.create_modulestore_instance')
+    def drop_mongo_collections(mock_create):
         """
         If using a Mongo-backed modulestore & contentstore, drop the collections.
         """
+        # Do not create the modulestore if it does not exist.
+        mock_create.return_value = None
+
         module_store = modulestore()
         if hasattr(module_store, '_drop_database'):
             module_store._drop_database()  # pylint: disable=protected-access
@@ -302,7 +308,6 @@ class ModuleStoreTestCase(TestCase):
         """
         Flush the ModuleStore.
         """
-
         # Flush the Mongo modulestore
         self.drop_mongo_collections()
 
@@ -336,7 +341,6 @@ class ModuleStoreTestCase(TestCase):
             block_info_tree = default_block_info_tree
 
         with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, None):
-#             with self.store.bulk_operations(self.store.make_course_key(org, course, run)):
             course = self.store.create_course(org, course, run, self.user.id, fields=course_fields)
             self.course_loc = course.location  # pylint: disable=attribute-defined-outside-init
 

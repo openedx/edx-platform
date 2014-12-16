@@ -11,15 +11,15 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from textwrap import dedent
 
 
-class StaffDebugTest(UniqueCourseTest):
+class StaffViewTest(UniqueCourseTest):
     """
-    Tests that verify the staff debug info.
+    Tests that verify the staff view.
     """
     USERNAME = "STAFF_TESTER"
     EMAIL = "johndoe@example.com"
 
     def setUp(self):
-        super(StaffDebugTest, self).setUp()
+        super(StaffViewTest, self).setUp()
 
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
 
@@ -59,10 +59,31 @@ class StaffDebugTest(UniqueCourseTest):
         Open staff page with assertion
         """
         self.courseware_page.visit()
-        staff_page = StaffPage(self.browser)
+        staff_page = StaffPage(self.browser, self.course_id)
         self.assertEqual(staff_page.staff_status, 'Staff view')
         return staff_page
 
+
+class StaffViewToggleTest(StaffViewTest):
+    """
+    Tests for the staff view toggle button.
+    """
+    def test_instructor_tab_visibility(self):
+        """
+        Test that the instructor tab is hidden when viewing as a student.
+        """
+
+        course_page = self._goto_staff_page()
+        self.assertTrue(course_page.has_tab('Instructor'))
+        course_page.toggle_staff_view()
+        self.assertEqual(course_page.staff_status, 'Student view')
+        self.assertFalse(course_page.has_tab('Instructor'))
+
+
+class StaffDebugTest(StaffViewTest):
+    """
+    Tests that verify the staff debug info.
+    """
     def test_reset_attempts_empty(self):
         """
         Test that we reset even when there is no student state
@@ -107,10 +128,7 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.rescore()
         msg = staff_debug_page.idash_msg[0]
-        # Since we aren't running celery stuff, this will fail badly
-        # for now, but is worth excercising that bad of a response
-        self.assertEqual(u'Failed to rescore problem. '
-                         'Unknown Error Occurred.', msg)
+        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
 
     def test_student_state_delete(self):
         """
@@ -176,10 +194,7 @@ class StaffDebugTest(UniqueCourseTest):
         staff_debug_page = staff_page.open_staff_debug_info()
         staff_debug_page.rescore()
         msg = staff_debug_page.idash_msg[0]
-        # Since we aren't running celery stuff, this will fail badly
-        # for now, but is worth excercising that bad of a response
-        self.assertEqual(u'Failed to rescore problem. '
-                         'Unknown Error Occurred.', msg)
+        self.assertEqual(u'Successfully rescored problem for user STAFF_TESTER', msg)
 
     def test_student_state_delete_for_problem_loaded_via_ajax(self):
         """

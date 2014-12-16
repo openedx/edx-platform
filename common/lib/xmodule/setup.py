@@ -44,6 +44,9 @@ XMODULES = [
     "crowdsource_hinter = xmodule.crowdsource_hinter:CrowdsourceHinterDescriptor",
     "lti = xmodule.lti_module:LTIDescriptor",
 ]
+XBLOCKS = [
+    "library = xmodule.library_root_xblock:LibraryRoot",
+]
 
 setup(
     name="XModule",
@@ -64,7 +67,7 @@ setup(
     # See http://guide.python-distribute.org/creation.html#entry-points
     # for a description of entry_points
     entry_points={
-        'xblock.v1': XMODULES,
+        'xblock.v1': XMODULES + XBLOCKS,
         'xmodule.v1': XMODULES,
         'console_scripts': [
             'xmodule_assets = xmodule.static_content:main',

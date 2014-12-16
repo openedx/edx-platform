@@ -13,6 +13,7 @@
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # LIU,SHU-HAO <jeremy55662004@gmail.com>, 2014
 # bhsfmiao <mkr_mkr@163.com>, 2014
+# Nicholas Ou <oldmonou@gmail.com>, 2014
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013
 # Sarina Canelake <sarina@edx.org>, 2014
 # hymnsf <singmoonson@gmail.com>, 2014
@@ -70,7 +71,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-01 11:35-0500\n"
+"POT-Creation-Date: 2014-12-08 08:16-0500\n"
 "PO-Revision-Date: 2014-10-15 15:41+0000\n"
 "Last-Translator: Xaver Y.R. Chen <yrchen@atcity.org>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"

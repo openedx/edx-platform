@@ -15,8 +15,9 @@ sessions. Assumes structure:
 from .common import *
 import os
 from path import path
-from warnings import filterwarnings, simplefilter
+from tempfile import mkdtemp
 from uuid import uuid4
+from warnings import filterwarnings, simplefilter
 
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
@@ -130,7 +131,7 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     xml_store_options={
-        'data_dir': COMMON_TEST_DATA_ROOT,
+        'data_dir': mkdtemp(),  # never inadvertently load all the XML courses
     },
     doc_store_settings={
         'host': MONGO_HOST,
@@ -199,8 +200,9 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 
 # Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
 # https://docs.python.org/2/library/warnings.html#the-warnings-filter
-simplefilter('ignore')  # Change to "default" to see the first instance of each hit
-                        # or "error" to convert all into errors
+# Change to "default" to see the first instance of each hit
+# or "error" to convert all into errors
+simplefilter('ignore')
 
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True

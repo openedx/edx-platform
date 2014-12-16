@@ -36,7 +36,7 @@ from lms.envs.common import (
 from path import path
 from warnings import simplefilter
 
-from lms.lib.xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from dealer.git import git
 from xmodule.modulestore.edit_info import EditInfoMixin
 
@@ -575,7 +575,7 @@ INSTALLED_APPS = (
     'contentstore',
     'course_creators',
     'student',  # misleading name due to sharing with lms
-    'course_groups',  # not used in cms (yet), but tests run
+    'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
 
     # Tracking
     'track',
@@ -607,7 +607,7 @@ INSTALLED_APPS = (
     'reverification',
 
     # User preferences
-    'user_api',
+    'openedx.core.djangoapps.user_api',
     'django_openid_auth',
 
     'embargo',
@@ -733,6 +733,16 @@ INSTALLED_APPS = INSTALLED_APPS + (
 ### External auth usage -- prefixes for ENROLLMENT_DOMAIN
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
+
+### Size of chunks into which asset uploads will be divided
+UPLOAD_CHUNK_SIZE_IN_MB = 10
+
+### Max size of asset uploads to GridFS
+MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
+
+# FAQ url to direct users to if they upload
+# a file that exceeds the above size
+MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 

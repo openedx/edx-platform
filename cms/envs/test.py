@@ -19,7 +19,8 @@ from warnings import filterwarnings, simplefilter
 from uuid import uuid4
 
 # import settings from LMS for consistent behavior with CMS
-from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME)
+# pylint: disable=unused-import
+from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME, DEFAULT_FILE_STORAGE, MEDIA_ROOT, MEDIA_URL)
 
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
@@ -157,8 +158,9 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 
 # Ignore deprecation warnings (so we don't clutter Jenkins builds/production)
 # https://docs.python.org/2/library/warnings.html#the-warnings-filter
-simplefilter('ignore')  # Change to "default" to see the first instance of each hit
-                        # or "error" to convert all into errors
+# Change to "default" to see the first instance of each hit
+# or "error" to convert all into errors
+simplefilter('ignore')
 
 ################################# CELERY ######################################
 

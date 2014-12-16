@@ -69,7 +69,7 @@ from xmodule.modulestore import ModuleStoreEnum
 
 from collections import namedtuple
 
-from courseware.courses import get_courses, sort_by_announcement
+from courseware.courses import get_courses, sort_by_announcement, sort_by_start_date  # pylint: disable=import-error
 from courseware.access import has_access
 
 from django_comment_common.models import Role
@@ -82,7 +82,7 @@ import external_auth.views
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from shoppingcart.models import DonationConfiguration
-from user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
 
 import track.views
@@ -108,7 +108,7 @@ from student.helpers import (
 )
 from xmodule.error_module import ErrorDescriptor
 from shoppingcart.models import CourseRegistrationCode
-from user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 import analytics
 from eventtracking import tracker
@@ -151,7 +151,11 @@ def index(request, extra_context=None, user=AnonymousUser()):
         domain = request.META.get('HTTP_HOST')
 
     courses = get_courses(user, domain=domain)
-    courses = sort_by_announcement(courses)
+    if microsite.get_value("ENABLE_COURSE_SORTING_BY_START_DATE",
+                           settings.FEATURES["ENABLE_COURSE_SORTING_BY_START_DATE"]):
+        courses = sort_by_start_date(courses)
+    else:
+        courses = sort_by_announcement(courses)
 
     context = {'courses': courses}
 
@@ -370,14 +374,16 @@ def signin_user(request):
         return redirect(reverse('dashboard'))
 
     course_id = request.GET.get('course_id')
+    email_opt_in = request.GET.get('email_opt_in')
     context = {
         'course_id': course_id,
+        'email_opt_in': email_opt_in,
         'enrollment_action': request.GET.get('enrollment_action'),
         # Bool injected into JS to submit form if we're inside a running third-
         # party auth pipeline; distinct from the actual instance of the running
         # pipeline, if any.
         'pipeline_running': 'true' if pipeline.running(request) else 'false',
-        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id),
+        'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, course_id=course_id, email_opt_in=email_opt_in),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -400,14 +406,16 @@ def register_user(request, extra_context=None):
         return external_auth.views.redirect_with_get('root', request.GET)
 
     course_id = request.GET.get('course_id')
+    email_opt_in = request.GET.get('email_opt_in')
 
     context = {
         'course_id': course_id,
+        'email_opt_in': email_opt_in,
         'email': '',
         'enrollment_action': request.GET.get('enrollment_action'),
         'name': '',
         'running_pipeline': None,
-        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id),
+        'pipeline_urls': auth_pipeline_urls(pipeline.AUTH_ENTRY_REGISTER, course_id=course_id, email_opt_in=email_opt_in),
         'platform_name': microsite.get_value(
             'platform_name',
             settings.PLATFORM_NAME
@@ -783,8 +791,10 @@ def try_change_enrollment(request):
 
 def _update_email_opt_in(request, username, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
-    email_opt_in = request.POST.get('email_opt_in') == 'true'
-    profile_api.update_email_opt_in(username, org, email_opt_in)
+    email_opt_in = request.POST.get('email_opt_in')
+    if email_opt_in is not None:
+        email_opt_in_boolean = email_opt_in == 'true'
+        profile_api.update_email_opt_in(username, org, email_opt_in_boolean)
 
 
 @require_POST
@@ -906,6 +916,7 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
+# pylint: disable=fixme
 # TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
 # It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
 # seems Probably Incorrect
@@ -1004,7 +1015,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 _("Use your {platform_name} username and password to log into {platform_name} below, "
                   "and then link your {platform_name} account with {provider_name} from your dashboard.").format(
                       platform_name=settings.PLATFORM_NAME, provider_name=requested_provider.NAME
-                  )
+                )
                 + "<br/><br/>" +
                 _("If you don't have an {platform_name} account yet, click <strong>Register Now</strong> at the top of the page.").format(
                     platform_name=settings.PLATFORM_NAME

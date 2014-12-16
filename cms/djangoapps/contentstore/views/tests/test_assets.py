@@ -5,6 +5,7 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
+from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
 from contentstore.utils import reverse_course_url
@@ -16,9 +17,13 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml_importer import import_from_xml
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from django.conf import settings
+import mock
+from ddt import ddt
+from ddt import data
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+
+MAX_FILE_SIZE = settings.MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB * 1000 ** 2
 
 
 class AssetsTestCase(CourseTestCase):
@@ -33,9 +38,14 @@ class AssetsTestCase(CourseTestCase):
         """
         Post to the asset upload url
         """
+        f = self.get_sample_asset(name)
+        return self.client.post(self.url, {"name": name, "file": f})
+
+    def get_sample_asset(self, name):
+        """Returns an in-memory file with the given name for testing"""
         f = BytesIO(name)
         f.name = name + ".txt"
-        return self.client.post(self.url, {"name": name, "file": f})
+        return f
 
 
 class BasicAssetsTestCase(AssetsTestCase):
@@ -132,6 +142,7 @@ class PaginationTestCase(AssetsTestCase):
             self.assertGreaterEqual(name2, name3)
 
 
+@ddt
 class UploadTestCase(AssetsTestCase):
     """
     Unit tests for uploading a file
@@ -147,6 +158,24 @@ class UploadTestCase(AssetsTestCase):
     def test_no_file(self):
         resp = self.client.post(self.url, {"name": "file.txt"}, "application/json")
         self.assertEquals(resp.status_code, 400)
+
+    @data(
+        (int(MAX_FILE_SIZE / 2.0), "small.file.test", 200),
+        (MAX_FILE_SIZE, "justequals.file.test", 200),
+        (MAX_FILE_SIZE + 90, "large.file.test", 413),
+    )
+    @mock.patch('contentstore.views.assets.get_file_size')
+    def test_file_size(self, case, get_file_size):
+        max_file_size, name, status_code = case
+
+        get_file_size.return_value = max_file_size
+
+        f = self.get_sample_asset(name=name)
+        resp = self.client.post(self.url, {
+            "name": name,
+            "file": f
+        })
+        self.assertEquals(resp.status_code, status_code)
 
 
 class DownloadTestCase(AssetsTestCase):

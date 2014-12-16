@@ -121,7 +121,7 @@ class PollModule(PollFields, XModule):
         # Now we use this hack.
         temp_poll_answers = self.poll_answers
 
-         # Fill self.poll_answers, prepare data for template context.
+        # Fill self.poll_answers, prepare data for template context.
         for answer in self.answers:
             # Set default count for answer = 0.
             if answer['id'] not in temp_poll_answers:
