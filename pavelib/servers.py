@@ -99,8 +99,8 @@ def devstack(args):
     """
     parser = argparse.ArgumentParser(prog='paver devstack')
     parser.add_argument('system', type=str, nargs=1, help="lms or studio")
-    parser.add_argument('--fast', action='store_true', default=False, help="Watch assets modifications")
-    parser.add_argument('--watch', action='store_true', default=False, help="Skip updating assets")
+    parser.add_argument('--fast', action='store_true', default=False, help="Skip updating assets")
+    parser.add_argument('--watch', action='store_true', default=False, help="Watch assets modifications")
     parser.add_argument(
         '--no-contracts',
         action='store_true',
