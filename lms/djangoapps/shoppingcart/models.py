@@ -438,15 +438,23 @@ class Order(models.Model):
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
         self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
-        self._emit_purchase_event(orderitems)
+        self._emit_order_event('Completed Order', orderitems)
 
-    def _emit_purchase_event(self, orderitems):
+    def refund(self):
         """
-        Emit an analytics purchase event for this Order. Will iterate over all associated
+        Refund the given order. As of right now, this just marks the order as refunded.
+        """
+        self.status = 'refunded'
+        self.save()
+        orderitems = OrderItem.objects.filter(order=self).select_subclasses()
+        self._emit_order_event('Refunded Order', orderitems)
+
+    def _emit_order_event(self, event_name, orderitems):
+        """
+        Emit an analytics event with the given name for this Order. Will iterate over all associated
         OrderItems and add them as products in the event as well.
 
         """
-        event_name = 'Completed Order'  # Required event name by Segment
         try:
             if settings.FEATURES.get('SEGMENT_IO_LMS') and settings.SEGMENT_IO_LMS_KEY:
                 tracking_context = tracker.get_tracker().resolve_context()
@@ -1243,8 +1251,8 @@ class CertificateItem(OrderItem):
         target_cert.status = 'refunded'
         target_cert.refund_requested_time = datetime.now(pytz.utc)
         target_cert.save()
-        target_cert.order.status = 'refunded'
-        target_cert.order.save()
+
+        target_cert.order.refund()
 
         order_number = target_cert.order_id
         # send billing an email so they can handle refunding
