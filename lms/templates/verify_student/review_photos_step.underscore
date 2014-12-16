@@ -78,7 +78,7 @@
 
               <div class="copy expandable-area">
                 <p><%- gettext( "You should change the name on your account to match." ) %></p>
-                <input type="text" name="new-name" id="new-name" placeholder=<%- fullName %>>
+                <input type="text" name="new-name" id="new-name" placeholder=<%= fullName %>>
               </div>
             </div>
           </div>

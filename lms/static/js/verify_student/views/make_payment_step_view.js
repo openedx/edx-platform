@@ -75,6 +75,11 @@ var edx = edx || {};
                 }).appendTo(form);
             });
 
+            // Marketing needs a way to tell the difference between users
+            // leaving for the payment processor and users dropping off on
+            // this page. A virtual pageview can be used to do this.
+            window.analytics.page( 'verification', 'payment_processor_step' );
+
             form.submit();
         },
 

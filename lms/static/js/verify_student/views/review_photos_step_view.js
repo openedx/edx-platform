@@ -14,8 +14,8 @@ var edx = edx || {};
             var model = this.model;
 
             // Load the photos from the previous steps
-            $( "#face_image")[0].src = this.model.get('faceImage');
-            $( "#photo_id_image")[0].src = this.model.get('identificationImage');
+            $( '#face_image' )[0].src = this.model.get('faceImage');
+            $( '#photo_id_image' )[0].src = this.model.get('identificationImage');
 
             // Prep the name change dropdown
             $( '.expandable-area' ).slideUp();
@@ -37,12 +37,17 @@ var edx = edx || {};
         },
 
         retakePhotos: function() {
+            // Track the user's intent to retake their photos
+            window.analytics.track( 'edx.bi.user.verification_images.retaken', {
+                category: 'verification'
+            });
+
             this.goToStep( 'face-photo-step' );
         },
 
         submitPhotos: function() {
             // Disable the submit button to prevent duplicate submissions
-            $( "#next_step_button" ).addClass( "is-disabled" );
+            $( '#next_step_button' ).addClass( 'is-disabled' );
 
             // On success, move on to the next step
             this.listenToOnce( this.model, 'sync', _.bind( this.nextStep, this ) );
@@ -57,8 +62,8 @@ var edx = edx || {};
 
         handleSubmissionError: function( xhr ) {
             // Re-enable the submit button to allow the user to retry
-            var isConfirmChecked = $( "#confirm_pics_good" ).prop('checked');
-            $( "#next_step_button" ).toggleClass( "is-disabled", !isConfirmChecked );
+            var isConfirmChecked = $( '#confirm_pics_good' ).prop( 'checked' );
+            $( '#next_step_button' ).toggleClass( 'is-disabled', !isConfirmChecked );
 
             // Display the error
             if ( xhr.status === 400 ) {
@@ -77,14 +82,14 @@ var edx = edx || {};
             }
         },
 
-        expandCallback: function(event) {
+        expandCallback: function( event ) {
             event.preventDefault();
 
             $(this).next('.expandable-area' ).slideToggle();
 
             var title = $( this ).parent();
             title.toggleClass( 'is-expanded' );
-            title.attr( 'aria-expanded', !title.attr('aria-expanded') );
+            title.attr( 'aria-expanded', !title.attr( 'aria-expanded' ) );
         }
     });
 
