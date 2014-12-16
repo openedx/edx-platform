@@ -1241,6 +1241,30 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.FACE_PHOTO_STEP,
         )
 
+    def test_payment_cannot_skip(self):
+        """
+         Simple test to verify that certain steps cannot be skipped. This test sets up
+         a scenario where the user should be on the MAKE_PAYMENT_STEP, but is trying to
+         skip it. Despite setting the parameter, the current step should still be
+         MAKE_PAYMENT_STEP.
+        """
+        course = self._create_course("verified")
+        response = self._get_page(
+            'verify_student_start_flow',
+            course.id,
+            skip_first_step=True
+        )
+
+        self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
+
+        # Expect that *all* steps are displayed,
+        # but we start on the first verify step
+        self._assert_steps_displayed(
+            response,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP,
+        )
+
     def test_payment_confirmation_already_verified(self):
         course = self._create_course("verified")
         self._enroll(course.id, "verified")

@@ -259,6 +259,12 @@ class PayAndVerifyView(View):
         ENROLLMENT_CONFIRMATION_STEP
     ]
 
+    # These are steps that can be skipped, since there are no barring requirements.
+    SKIP_STEPS = [
+        INTRO_STEP,
+        PAYMENT_CONFIRMATION_STEP
+    ]
+
     Step = namedtuple(
         'Step',
         [
@@ -458,7 +464,8 @@ class PayAndVerifyView(View):
         # Allow the caller to skip the first page
         # This is useful if we want the user to be able to
         # use the "back" button to return to the previous step.
-        if request.GET.get('skip-first-step'):
+        # This parameter should only work for known skip-able steps
+        if request.GET.get('skip-first-step') and current_step in self.SKIP_STEPS:
             display_step_names = [step['name'] for step in display_steps]
             current_step_idx = display_step_names.index(current_step)
             if (current_step_idx + 1) < len(display_steps):
