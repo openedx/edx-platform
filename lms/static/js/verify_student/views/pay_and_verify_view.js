@@ -96,7 +96,7 @@ var edx = edx || {};
 
                     subviewConfig = {
                         errorModel: this.errorModel,
-                        templateUrl: this.displaySteps[i].templateUrl,
+                        templateName: this.displaySteps[i].templateName,
                         nextStepNum: (i + 2), // Next index, starting from 1
                         nextStepTitle: nextStepTitle,
                         stepData: stepData

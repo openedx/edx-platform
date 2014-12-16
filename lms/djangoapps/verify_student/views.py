@@ -25,8 +25,6 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 
-from staticfiles.storage import staticfiles_storage
-
 from openedx.core.djangoapps.user_api.api import profile as profile_api
 
 from course_modes.models import CourseMode
@@ -270,31 +268,31 @@ class PayAndVerifyView(View):
     STEP_INFO = {
         INTRO_STEP: Step(
             title=ugettext_lazy("Intro"),
-            template_name="verify_student/intro_step.underscore"
+            template_name="intro_step"
         ),
         MAKE_PAYMENT_STEP: Step(
             title=ugettext_lazy("Make Payment"),
-            template_name="verify_student/make_payment_step.underscore"
+            template_name="make_payment_step"
         ),
         PAYMENT_CONFIRMATION_STEP: Step(
             title=ugettext_lazy("Payment Confirmation"),
-            template_name="verify_student/payment_confirmation_step.underscore"
+            template_name="payment_confirmation_step"
         ),
         FACE_PHOTO_STEP: Step(
             title=ugettext_lazy("Take Face Photo"),
-            template_name="verify_student/face_photo_step.underscore"
+            template_name="face_photo_step"
         ),
         ID_PHOTO_STEP: Step(
             title=ugettext_lazy("ID Photo"),
-            template_name="verify_student/id_photo_step.underscore"
+            template_name="id_photo_step"
         ),
         REVIEW_PHOTOS_STEP: Step(
             title=ugettext_lazy("Review Photos"),
-            template_name="verify_student/review_photos_step.underscore"
+            template_name="review_photos_step"
         ),
         ENROLLMENT_CONFIRMATION_STEP: Step(
             title=ugettext_lazy("Enrollment Confirmation"),
-            template_name="verify_student/enrollment_confirmation_step.underscore"
+            template_name="enrollment_confirmation_step"
         ),
     }
 
@@ -607,33 +605,11 @@ class PayAndVerifyView(View):
             {
                 'name': step,
                 'title': unicode(self.STEP_INFO[step].title),
-                'templateUrl': self._template_url(self.STEP_INFO[step].template_name)
+                'templateName': self.STEP_INFO[step].template_name
             }
             for step in display_steps
             if step not in remove_steps
         ]
-
-    def _template_url(self, template_name):
-        """Determine the path to a template.
-
-        This uses staticfiles, so the path will include MD5
-        hashes when used in production.  This is really important,
-        because otherwise the JavaScript won't be able to find
-        the templates!
-
-        Arguments:
-            template_name (str): The name of the template, relative
-                to the "static/templates" directory.
-
-        Returns:
-            string
-
-        """
-        template_path = u"templates/{name}".format(name=template_name)
-        return (
-            staticfiles_storage.url(template_path)
-            if template_name is not None else ""
-        )
 
     def _requirements(self, display_steps):
         """Determine which requirements to show the user.
