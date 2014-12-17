@@ -220,5 +220,3 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
                     old_parent_location,
                     video.get_parent().location.for_branch(None)
                 )
-
-
