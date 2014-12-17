@@ -23,16 +23,6 @@ class CreateLibraryTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-    def test_subheader(self):
-        """
-        From the home page:
-            Verify that subheader is correct
-        """
-        self.auth_page.visit()
-        self.dashboard_page.visit()
-
-        self.assertIn("courses and libraries", self.dashboard_page.page_subheader)
-
     def test_create_library(self):
         """
         From the home page:

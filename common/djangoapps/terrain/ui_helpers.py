@@ -48,7 +48,7 @@ REQUIREJS_WAIT = {
         "js/base", "js/models/course", "js/models/location", "js/models/section"],
 
     # Dashboard
-    re.compile('^My Courses \|'): [
+    re.compile('^Studio Home \|'): [
         "js/sock", "gettext", "js/base",
         "jquery.ui", "coffee/src/main", "underscore"],
 

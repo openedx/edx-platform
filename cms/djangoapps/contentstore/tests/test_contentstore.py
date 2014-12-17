@@ -1166,11 +1166,10 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
-        # Create a course so there is something to view
         resp = self.client.get_html('/home/')
         self.assertContains(
             resp,
-            '<h1 class="page-header">My Courses</h1>',
+            '<h1 class="page-header">Studio Home</h1>',
             status_code=200,
             html=True
         )
