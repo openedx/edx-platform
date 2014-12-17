@@ -25,6 +25,10 @@ from pkg_resources import resource_string
 _ = lambda text: text
 
 
+ANY_CAPA_TYPE_VALUE = 'any'
+CAPA_BLOCK_TYPE = 'problem'
+
+
 def enum(**enums):
     """ enum helper in lieu of enum34 """
     return type('Enum', (), enums)
@@ -32,6 +36,7 @@ def enum(**enums):
 
 def _get_capa_types():
     capa_types = {
+        ANY_CAPA_TYPE_VALUE: _('Any Type'),
         'annotationinput': _('Annotation'),
         'checkboxgroup': _('Checkbox Group'),
         'checkboxtextgroup': _('Checkbox Text Group'),
@@ -185,8 +190,8 @@ class LibraryContentFields(object):
     capa_type = String(
         display_name=_("Problem Type"),
         help=_("The type of components to include in this block"),
-        default="any",
-        values=[{"display_name": _("Any Type"), "value": "any"}] + _get_capa_types(),
+        default=ANY_CAPA_TYPE_VALUE,
+        values=_get_capa_types(),
         scope=Scope.settings,
     )
     filters = String(default="")  # TBD
@@ -215,6 +220,21 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     as children of this block, but only a subset of those children are shown to
     any particular student.
     """
+    def _filter_children(self, child_locator):
+        if self.capa_type == ANY_CAPA_TYPE_VALUE:
+            return True
+
+        if child_locator.block_type != CAPA_BLOCK_TYPE:
+            return False
+
+        block = self.runtime.get_block(child_locator)
+
+        if not hasattr(block, 'lcp'):
+            return True
+
+        return any(self.capa_type in capa_input.tags for capa_input in block.lcp.inputs.values())
+
+
     def selected_children(self):
         """
         Returns a set() of block_ids indicating which of the possible children
@@ -231,7 +251,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             return self._selected_set  # pylint: disable=access-member-before-definition
         # Determine which of our children we will show:
         selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples
-        valid_block_keys = set([(c.block_type, c.block_id) for c in self.children])  # pylint: disable=no-member
+        valid_block_keys = set([(c.block_type, c.block_id) for c in self.children if self._filter_children(c)])  # pylint: disable=no-member
         # Remove any selected blocks that are no longer valid:
         selected -= (selected - valid_block_keys)
         # If max_count has been decreased, we may have to drop some previously selected blocks:
@@ -407,7 +427,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         If source_libraries has been edited, refresh_children automatically.
         """
         old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
-        if set(old_source_libraries) != set(self.source_libraries):
+        if (set(old_source_libraries) != set(self.source_libraries) or
+            old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
                 self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
             except ValueError:
