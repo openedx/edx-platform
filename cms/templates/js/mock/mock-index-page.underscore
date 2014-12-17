@@ -1,6 +1,6 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
-    <h1 class="page-header">My Courses</h1>
+    <h1 class="page-header">Studio Home</h1>
     <nav class="nav-actions">
       <h3 class="sr">Page Actions</h3>
       <ul>
@@ -20,13 +20,6 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
-
-      <div class="introduction">
-        <h2 class="title">Welcome, user!</h2>
-        <div class="copy">
-          <p>Here are all of the courses you currently have access to in Studio:</p>
-        </div>
-      </div>
 
       <div class="wrapper-create-element wrapper-create-course">
         <form class="form-create create-course course-info" id="create-course-form" name="create-course-form">
@@ -106,14 +99,14 @@
                 <li class="field text required" id="field-organization">
                   <label for="new-library-org">Organization</label>
                   <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
-                  <span class="tip">The name of the organization sponsoring the library.  <strong>Note: This is part of your library URL, so no spaces or special characters are allowed.</strong> This cannot be changed.</span>
+                  <span class="tip">The public organization name for your library. This cannot be changed.</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
 
                 <li class="field text required" id="field-library-number">
-                  <label for="new-library-number">Library Code/Number</label>
-                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" placeholder="e.g. CSPROB" />
-                  <span class="tip">The unique code that identifies this library. <strong>Note: This is part of your library URL, so no spaces or special characters are allowed and it cannot be changed.</strong></span>
+                  <label for="new-library-number">Major Version Number</label>
+                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" value="1" />
+                  <span class="tip">The <strong>major version number</strong> of your library. Minor revisions are tracked as edits happen within a library.</span>
                   <span class="tip tip-error is-hiding"></span>
                 </li>
               </ol>
