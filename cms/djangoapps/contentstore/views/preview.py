@@ -33,6 +33,7 @@ from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
+from cms.djangoapps.xblock_config.models import StudioConfig
 
 __all__ = ['preview_handler']
 
@@ -97,8 +98,10 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def applicable_aside_types(self, block):
         """
-        Remove acid_aside
+        Remove acid_aside and honor the config record
         """
+        if not StudioConfig.asides_enabled(block.scope_ids.block_type):
+            return []
         return [
             aside_type
             for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
