@@ -419,6 +419,7 @@ class DiscussionUserProfileTest(UniqueCourseTest):
         current_page = 1
         total_pages = max(num_threads - 1, 1) / self.PAGE_SIZE + 1
         all_pages = range(1, total_pages + 1)
+        return page
 
         def _check_page():
             # ensure the page being displayed as "current" is the expected one
@@ -478,6 +479,12 @@ class DiscussionUserProfileTest(UniqueCourseTest):
 
     def test_151_threads(self):
         self.check_pages(151)
+
+    def test_pagination_window_reposition(self):
+        page = self.check_pages(50)
+        page.click_next_page()
+        page.wait_for_ajax()
+        self.assertTrue(page.is_window_on_top())
 
 
 @attr('shard_1')

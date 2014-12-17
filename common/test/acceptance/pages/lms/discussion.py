@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 
+from bok_choy.javascript import wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise, Promise
 
@@ -342,6 +343,10 @@ class DiscussionUserProfilePage(CoursePage):
             and
             self.q(css='section.user-profile div.sidebar-username').text[0] == self.username
         )
+
+    @wait_for_js
+    def is_window_on_top(self):
+        return self.browser.execute_script("return $('html, body').offset().top") == 0
 
     def get_shown_thread_ids(self):
         elems = self.q(css="article.discussion-thread")
