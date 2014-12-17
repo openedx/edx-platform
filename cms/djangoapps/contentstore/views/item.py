@@ -45,7 +45,7 @@ from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primar
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
-from cms.lib.xblock.runtime import handler_url, local_resource_url, get_asides
+from cms.lib.xblock.runtime import handler_url, local_resource_url, applicable_aside_types
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
@@ -64,7 +64,7 @@ ALWAYS = lambda x: True
 # TODO: Remove this code when Runtimes are no longer created by modulestores
 xmodule.x_module.descriptor_global_handler_url = handler_url
 xmodule.x_module.descriptor_global_local_resource_url = local_resource_url
-xmodule.x_module.descriptor_global_get_asides = get_asides
+xmodule.x_module.descriptor_global_applicable_aside_types = applicable_aside_types
 
 
 def hash_resource(resource):

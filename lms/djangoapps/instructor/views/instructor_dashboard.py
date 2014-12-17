@@ -324,9 +324,9 @@ def _section_data_download(course, access):
     return section_data
 
 
-def null_get_asides(block):  # pylint: disable=unused-argument
+def null_applicable_aside_types(block):  # pylint: disable=unused-argument
     """
-    get_aside method for monkey-patching into descriptor_global_get_asides
+    get_aside method for monkey-patching into descriptor_global_applicable_aside_types
     while rendering an HtmlDescriptor for email text editing. This returns
     an empty list.
     """
@@ -337,8 +337,8 @@ def _section_send_email(course, access):
     """ Provide data for the corresponding bulk email section """
     course_key = course.id
 
-    # Monkey-patch descriptor_global_get_asides to return no asides for the duration of this render
-    with patch('xmodule.x_module.descriptor_global_get_asides', null_get_asides):
+    # Monkey-patch descriptor_global_applicable_aside_types to return no asides for the duration of this render
+    with patch('xmodule.x_module.descriptor_global_applicable_aside_types', null_applicable_aside_types):
         # This HtmlDescriptor is only being used to generate a nice text editor.
         html_module = HtmlDescriptor(
             course.system,
