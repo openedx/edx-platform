@@ -44,7 +44,7 @@
       @include clearfix();
       margin: 0;
       padding: ($baseline*1.5) 0;
-      border-top: 1px solid $gray-l4;
+      border-top: 1px dotted $gray-l4;
       border-bottom: none;
 
       .wrapper-note-excerpts {
@@ -190,31 +190,38 @@
       }
     }
 
-    .note-group {
-        &, .note-section {
-          border-top: 1px solid $gray-l4;
-          padding-top: $baseline;
-        }
+    .note-group {      
 
-        // Do not add border and padding for the first .note-section
-        // in the .note-group
-        .course-title + .note-section {
-          border-top: none;
-          padding-top: 0;
-        }
+      &, .note-section {
+        border-top: 2px solid $gray-l4;
+        padding-top: $baseline;
+      }
 
-        .course-title, .course-subtitle {
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
+      & > .note {
+        border-top: 0;
+      }
 
-        .course-subtitle {
-          @extend %t-copy-sub1;
-          border-bottom: 2px solid $gray-l4;
-          padding-bottom: $baseline;
-          font-weight: $font-light;
-          color: inherit;
-        }
+
+
+      // Do not add border and padding for the first .note-section
+      // in the .note-group
+      .course-title + .note-section {
+        border-top: none;
+        padding-top: 0;
+      }
+
+      .course-title, .course-subtitle {
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .course-subtitle {
+        @extend %t-copy-sub1;
+        border-bottom: 1px dotted $gray-l4;
+        padding-bottom: $baseline;
+        font-weight: $font-light;
+        color: inherit;
+      }
     }
   }
 }
@@ -223,6 +230,10 @@
 
   .tab-panel, .inline-error, .ui-loading {
     outline: none;
+  }
+
+  .tab-panel.note-group {
+    padding-top: 0;
   }
 
   .inline-error {
@@ -234,6 +245,8 @@
 
   .tab-list {
     @include clearfix();
+    position: relative;
+    top: 2px;
 
     .tabs-label {
       @extend %t-copy-base;
