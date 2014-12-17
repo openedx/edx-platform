@@ -15,7 +15,7 @@ from django.contrib.auth.models import User
 
 from student.models import UserProfile
 
-#from cities.models import City
+from cities.models import City
 
 
 def import_user(u):
@@ -30,7 +30,7 @@ def import_user(u):
                 "is_superuser","last_login", "date_joined"]
 
     up_keys = ["id","user_id","name","cedula","year_of_birth",
-               "gender","level_of_education", "country"]
+               "gender","level_of_education","city", "country"]
 
 #    user_keys = ['id', 'username', 'email', 'password', 'is_staff',
 #                 'is_active', 'is_superuser', 'last_login', 'date_joined',
@@ -50,7 +50,12 @@ def import_user(u):
     up = UserProfile()
     up.user = u
     for key in up_keys:
-        up.__setattr__(key, up_info[key])
+        valor = up_info[key]
+        if key == 'city':
+            city = City.objects.get(name__iexact=up_info[key])
+            valor = city
+        up.__setattr__(key, valor)
+    up.year_of_birth = False
     up.save()
 
 
