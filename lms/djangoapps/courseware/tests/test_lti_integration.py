@@ -163,7 +163,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             parent_location=self.section2.location,
             display_name="lti draft",
             category="lti",
-            location=self.course.id.make_usage_key('lti', 'lti_published'),
+            location=self.course.id.make_usage_key('lti', 'lti_draft'),
             publish_item=False,
         )
 
@@ -199,7 +199,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
             "lti_1_1_result_service_xml_endpoint": self.expected_handler_url('grade_handler'),
             "lti_2_0_result_service_json_endpoint":
             self.expected_handler_url('lti_2_0_result_rest_handler') + "/user/{anon_user_id}",
-            "display_name": self.lti_draft.display_name
+            "display_name": self.lti_published.display_name,
         }
         self.assertEqual([expected], json.loads(response.content))
 

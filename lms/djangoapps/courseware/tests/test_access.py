@@ -105,7 +105,7 @@ class AccessTestCase(TestCase):
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         user = Mock()
-        descriptor = Mock()
+        descriptor = Mock(user_partitions=[])
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(user, 'load', descriptor))
@@ -118,7 +118,7 @@ class AccessTestCase(TestCase):
         """
         Tests that "visible_to_staff_only" overrides start date.
         """
-        mock_unit = Mock()
+        mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
 
         def verify_access(student_should_have_access):
