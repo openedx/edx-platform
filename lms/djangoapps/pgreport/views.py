@@ -15,7 +15,8 @@ import StringIO
 import gzip
 
 from .models import ProgressModules
-from xmodule.modulestore import Location
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from gridfs.errors import GridFSError
@@ -243,7 +244,7 @@ class ProgressReport(object):
                     continue
 
                 for loc in self.location_list[category]:
-                    module = get_module_for_student(student, self.course, loc)
+                    module = get_module_for_student(student, loc)
 
                     if module is None:
                         log.debug(" * No state found: %s" % (student))
@@ -307,7 +308,7 @@ class ProgressReport(object):
 
                 for loc in self.location_list[category]:
                     log.debug(" * Active location: {}".format(loc))
-                    module = get_module_for_student(student, self.course, loc)
+                    module = get_module_for_student(student, loc)
 
                     if module is None:
                         log.debug(" * No state found: %s" % (student))
@@ -333,14 +334,12 @@ class ProgressReport(object):
 
 def get_pgreport_csv(course_id):
     """Get progress of students."""
-    tag = "i4x"
-    org, course, category = course_id.split('/')
-    loc = Location(tag, org, course, category="pgreport", name="progress_students.csv.gz")
+    location = StaticContent.compute_location(course_id, "progress_students.csv.gz")
     store = contentstore()
 
     try:
         gzipfile = StringIO.StringIO()
-        content = store.find(loc, throw_on_not_found=True, as_stream=True)
+        content = store.find(location, throw_on_not_found=True, as_stream=True)
         for gzipdata in content.stream_data():
             gzipfile.write(gzipdata)
 
@@ -360,10 +359,9 @@ def get_pgreport_csv(course_id):
 
 def create_pgreport_csv(course_id, update_state=None):
     """Create CSV of progress to MongoDB."""
-    tag = "i4x"
-    org, course, category = course_id.split('/')
-    loc = Location(tag, org, course, category="pgreport", name="progress_students.csv.gz")
-    content = StaticContent(loc, "progress_students.csv.gz", "application/x-gzip", "dummy-data")
+    location = StaticContent.compute_location(course_id, "progress_students.csv.gz")
+    store = contentstore()
+    content = store.find(location)
     content_id = content.get_id()
 
     try:
@@ -379,11 +377,10 @@ def create_pgreport_csv(course_id, update_state=None):
         gzipcsv.close()
 
     try:
-        store = contentstore()
         store.delete(content_id)
 
         with store.fs.new_file(
-            _id=content_id, filename=content.get_url_path(),
+            _id=content_id, filename=unicode(content.location),
             content_type=content.content_type, displayname=content.name,
             thumbnail_location=content.thumbnail_location,
             import_path=content.import_path,
@@ -403,11 +400,9 @@ def create_pgreport_csv(course_id, update_state=None):
 
 def delete_pgreport_csv(course_id):
     """Delete CSV of progress to MongoDB."""
-    tag = "i4x"
-    org, course, category = course_id.split('/')
-    loc = Location(tag, org, course, category="pgreport", name="progress_students.csv.gz")
-    content = StaticContent(loc, "progress_students.csv.gz", "application/x-gzip", "dummy-data")
+    location = StaticContent.compute_location(course_id, "progress_students.csv.gz")
     store = contentstore()
+    content = store.find(location)
     store.delete(content.get_id())
 
 
@@ -427,10 +422,6 @@ def get_pgreport_table(course_id):
 
 def update_pgreport_table(course_id, update_state=None):
     """Update table of progress_modules."""
-    match = Location.COURSE_ID_RE.match(course_id)
-    if match is None:
-        raise ValueError("{} is not of form ORG/COURSE/NAME".format(course_id))
-
     progress = ProgressReport(course_id, update_state)
     modules = progress.get_raw(command="modules")
 

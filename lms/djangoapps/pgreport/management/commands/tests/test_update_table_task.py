@@ -21,9 +21,8 @@ class UpdateTableTaskCommandTestCase(TestCase):
         pass
 
     @patch('pgreport.management.commands.update_table_task.TaskState')
-    @patch('pgreport.management.commands.update_table_task.check_course_id')
     @patch('pgreport.management.commands.update_table_task.ProgressReportTask')
-    def test_handle(self, pg_mock, check_mock, state_mock):
+    def test_handle(self, pg_mock, state_mock):
         ut.Command().handle(*self.args_update, **self.options_course_id)
         pg_mock().send_task.assert_called_once_with(self.options_course_id["course_id"])
 

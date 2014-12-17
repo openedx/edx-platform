@@ -3063,12 +3063,12 @@ class TestInstructorAPIProgressModules(ModuleStoreTestCase):
     """
     def setUp(self):
         self.course = CourseFactory.create()
-        self.instructor = InstructorFactory(course=self.course.location)
+        self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 
     def test_create_pgreport_url(self):
         """ Test create url generation. """
-        create_url = reverse('create_pgreport_csv', kwargs={'course_id': self.course.id})
+        create_url = reverse('create_pgreport_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         with patch('instructor_task.api.submit_create_pgreport_csv') as mock_task:
             mock_task.return_value = True
@@ -3089,7 +3089,7 @@ class TestInstructorAPIProgressModules(ModuleStoreTestCase):
 
     def test_get_pgreport_url(self):
         """ Test get url generation. """
-        get_url = reverse('get_pgreport_csv', kwargs={'course_id': self.course.id})
+        get_url = reverse('get_pgreport_csv', kwargs={'course_id': self.course.id.to_deprecated_string()})
         cstore_mock = Mock()
         content_mock = Mock()
         content_mock.stream_data.return_value = ["row1", "row2", "row3"]

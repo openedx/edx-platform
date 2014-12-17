@@ -3,9 +3,11 @@
 """
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
 from pgreport.views import get_pgreport_csv, delete_pgreport_csv
-from pgreport.tasks import check_course_id
 from xmodule.exceptions import NotFoundError
+from xmodule.modulestore.django import modulestore
 from django.core.management import call_command
 
 
@@ -40,12 +42,20 @@ class Command(BaseCommand):
                 'Cannot specify "-c" option and "-d" option at the same time.')
 
         course_id = args[0]
-        check_course_id(course_id)
+        try:
+            course_id = CourseLocator.from_string(course_id)
+        except InvalidKeyError:
+            raise CommandError("'{}' is an invalid course_id".format(course_id))
+        if not modulestore().get_course(course_id):
+            raise CommandError("The specified course does not exist.")
 
         if delete_report:
-            delete_pgreport_csv(course_id)
+            try:
+                delete_pgreport_csv(course_id)
+            except NotFoundError:
+                raise CommandError("CSV not found.")
         elif create_report:
-            call_command('create_report_task', *['create'], **{'course_id': course_id})
+            call_command('create_report_task', *['create'], **{'course_id': course_id.to_deprecated_string()})
         else:
             try: 
                 get_pgreport_csv(course_id)

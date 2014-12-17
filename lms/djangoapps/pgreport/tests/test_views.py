@@ -9,6 +9,7 @@ from pgreport.views import (
 from pgreport.models import ProgressModules, ProgressModulesHistory
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from opaque_keys.edx.locator import CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -54,8 +55,8 @@ class ProgressReportTestCase(ModuleStoreTestCase):
             UserFactory.create(username='student3'),
             UserFactory.create(username='student4'),
             UserFactory.create(username='student5'),
-            StaffFactory.create(username='staff1', course=self.course.location),
-            InstructorFactory.create(username='instructor1', course=self.course.location),
+            StaffFactory.create(username='staff1', course_key=self.course.id),
+            InstructorFactory.create(username='instructor1', course_key=self.course.id),
         ]
         UserStandingFactory.create(
             user=self.students[4],
@@ -119,7 +120,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
 
         for problem in self.problems:
             problem.correct_map = {
-                problem.location.url() + "_2_1": {
+                unicode(problem.location) + "_2_1": {
                     "hint": "",
                     "hintmode": "",
                     "correctness": "correct",
@@ -127,7 +128,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
                     "msg": "",
                     "queuestate": ""
                 },
-                problem.location.url() + "_2_2": {
+                unicode(problem.location) + "_2_2": {
                     "hint": "",
                     "hintmode": "",
                     "correctness": "incorrect",
@@ -138,13 +139,13 @@ class ProgressReportTestCase(ModuleStoreTestCase):
             }
 
             problem.student_answers = {
-                problem.location.url() + "_2_1": "Correct",
-                problem.location.url() + "_2_2": "Incorrect"
+                unicode(problem.location) + "_2_1": "Correct",
+                unicode(problem.location) + "_2_2": "Incorrect"
             }
 
             problem.input_state = {
-                problem.location.url() + "_2_1": {},
-                problem.location.url() + "_2_2": {}
+                unicode(problem.location) + "_2_1": {},
+                unicode(problem.location) + "_2_2": {}
             }
 
         self.course.save()
@@ -213,28 +214,28 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         corrects = self.pgreport._get_correctmap(self.problems[0])
         self.assertEquals(
             corrects, {
-                self.problems[0].location.url() + "_2_1": 1,
-                self.problems[0].location.url() + "_2_2": 0
+                unicode(self.problems[0].location) + "_2_1": 1,
+                unicode(self.problems[0].location) + "_2_2": 0
             }
         )
 
     def test_get_student_answers(self):
         answers1 = self.pgreport._get_student_answers(self.problems[0])
         self.problems[1].student_answers = {
-            self.problems[1].location.url() + "_2_1": ["answer1", "answer2", 5]
+            unicode(self.problems[1].location) + "_2_1": ["answer1", "answer2", 5]
         }
         answers2 = self.pgreport._get_student_answers(self.problems[1])
 
         self.assertEquals(
             answers1, {
-                self.problems[0].location.url() + "_2_1": {"Correct": 1},
-                self.problems[0].location.url() + "_2_2": {"Incorrect": 1}
+                unicode(self.problems[0].location) + "_2_1": {"Correct": 1},
+                unicode(self.problems[0].location) + "_2_2": {"Incorrect": 1}
             }
         )
         self.assertEquals(answers2, {
-            self.problems[1].location.url() + "_2_1": ANY})
+            unicode(self.problems[1].location) + "_2_1": ANY})
         self.assertEquals(
-            answers2[self.problems[1].location.url() + "_2_1"],
+            answers2[unicode(self.problems[1].location) + "_2_1"],
             {"answer1": 1, 5: 1, "answer2": 1}
         )
 
@@ -253,7 +254,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         })
 
     def test_increment_student_answers(self):
-        name = self.problems[0].location.url()
+        name = unicode(self.problems[0].location)
         unit_id1 = name + "_2_1"
         unit_id2 = name + "_2_2"
         unit_id3 = name + "_2_3"
@@ -272,7 +273,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
             unit_id3: {"Correct": 1}})
 
     def test_increment_student_correctmap(self):
-        name = self.problems[0].location.url()
+        name = unicode(self.problems[0].location)
         unit_id1 = name + "_2_1"
         unit_id2 = name + "_2_2"
         unit_id3 = name + "_2_3"
@@ -311,11 +312,11 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         module_mock.is_submitted.return_value = False
         module_data = {
             "student_answers": {
-                module_mock.location.url() + "_2_1": {"Correct": 1},
-                module_mock.location.url() + "_2_2": [{"answer1": 1}, {"answer2": 2}]},
+                unicode(module_mock.location) + "_2_1": {"Correct": 1},
+                unicode(module_mock.location) + "_2_2": [{"answer1": 1}, {"answer2": 2}]},
             "correct_map": {
-                module_mock.location.url() + "_2_1": 1,
-                module_mock.location.url() + "_2_2": 2}
+                unicode(module_mock.location) + "_2_1": 1,
+                unicode(module_mock.location) + "_2_2": 2}
         }
 
         with patch(
@@ -336,8 +337,8 @@ class ProgressReportTestCase(ModuleStoreTestCase):
                 'submit_count': 1,
                 'start': module_mock.start,
                 'student_answers': {
-                    module_mock.location.url() + '_2_1': {'Correct': 1},
-                    module_mock.location.url() + '_2_2': {'answer1': 1, 'answer2': 2}
+                    unicode(module_mock.location) + '_2_1': {'Correct': 1},
+                    unicode(module_mock.location) + '_2_2': {'answer1': 1, 'answer2': 2}
                 },
                 'max_score': 4.0,
                 'correct_map': module_data["correct_map"]
@@ -387,7 +388,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
             return csvrows
 
         grmock.grade.assert_called_with(ANY, ANY, ANY)
-        gemock.assert_called_with(ANY, ANY, ANY)
+        gemock.assert_called_with(ANY, ANY)
         self.assertEquals(rows, create_csvrow([csvheader]))
 
     """
@@ -536,22 +537,25 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         gzipdata.write("row1\nrow2\nrow3\n")
         gzipdata.close()
 
+        scontent_mock = MagicMock()
         cstore_mock = MagicMock()
         content_mock = MagicMock()
         content_mock.stream_data.return_value = self.gzipfile.getvalue()
         cstore_mock.find.return_value = content_mock
 
         with nested(
+            patch('pgreport.views.StaticContent', return_value=scontent_mock),
             patch('pgreport.views.contentstore', return_value=cstore_mock),
             patch('sys.stdout', new_callable=StringIO.StringIO)
-        ) as (pmock, smock):
+        ) as (smock, cmock, stdmock):
 
             get_pgreport_csv(self.course.id)
 
-        pmock.assert_called_once_with()
-        cstore_mock.find.assert_called_once_with(ANY, throw_on_not_found=True, as_stream=True)
+        smock.compute_location.assert_called_once_with(ANY, "progress_students.csv.gz")
+        cmock.assert_called_once_with()
+        cmock.return_value.find.assert_called_once_with(ANY, throw_on_not_found=True, as_stream=True)
         content_mock.stream_data.assert_called_once_with()
-        self.assertEquals(smock.getvalue(), 'row1\nrow2\nrow3\n')
+        self.assertEquals(stdmock.getvalue(), 'row1\nrow2\nrow3\n')
 
         cstore_mock.find.side_effect = NotFoundError()
         with patch('pgreport.views.contentstore', return_value=cstore_mock):
@@ -561,8 +565,8 @@ class ProgressReportTestCase(ModuleStoreTestCase):
     def test_create_pgreport_csv(self):
         rows = [
             ["username", "loc", "last_login"],
-            [self.students[0].username, self.problems[0].location.url(), "2014/1/1"],
-            [self.students[1].username, self.problems[1].location.url(), "2014/1/1"],
+            [self.students[0].username, unicode(self.problems[0].location), "2014/1/1"],
+            [self.students[1].username, unicode(self.problems[1].location), "2014/1/1"],
         ]
 
         progress_mock = MagicMock()
@@ -578,13 +582,10 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         ) as (smock, cmock, pmock):
             create_pgreport_csv(self.course.id)
 
-        smock.assert_called_once_with(
-            ANY, "progress_students.csv.gz",
-            "application/x-gzip", "dummy-data"
-        )
+        smock.compute_location.assert_called_once_with(ANY, "progress_students.csv.gz")
         cmock.assert_called_once_with()
-        scontent_mock.get_id.assert_called_once_with()
-        scontent_mock.get_url_path.assert_called_once_with()
+        cmock.return_value.find.assert_called_once_with(ANY)
+        cmock.return_value.find.return_value.get_id.assert_called_once_with()
 
         progress_mock.get_raw.return_value = rows
         cstore_mock.fs.new_file().__enter__().write.side_effect = GridFSError()
@@ -606,15 +607,14 @@ class ProgressReportTestCase(ModuleStoreTestCase):
         ) as (scmock, csmock):
             delete_pgreport_csv(self.course.id)
 
-        scmock.assert_called_once_with(
-            ANY, "progress_students.csv.gz",
-            "application/x-gzip", "dummy-data"
-        )
+        scmock.compute_location.assert_called_once_with(ANY, "progress_students.csv.gz")
         csmock.assert_called_once_with()
+        csmock.return_value.find.assert_called_once_with(ANY)
+        csmock.return_value.delete.assert_called_once_with(ANY)
 
     def test_get_pgreport_table(self):
         module_summary = {
-            'location': self.problems[0].location.url(),
+            'location': unicode(self.problems[0].location),
             'count': 1,
             'display_name': "display_name",
             'weight': "weight",
@@ -647,7 +647,7 @@ class ProgressReportTestCase(ModuleStoreTestCase):
                 {self.problems[1].location: [u'Week 1', u'Lesson 1', u'Unit1']}
             ]
         })
-        self.assertEquals(modules, {self.problems[0].location.url(): module_summary})
+        self.assertEquals(modules, {unicode(self.problems[0].location): module_summary})
 
     def test_update_pgreport_table(self):
         with patch('pgreport.views.ProgressModules') as pmock:
@@ -736,7 +736,7 @@ class ProgressModulesTestCase(TestCase):
 
     def test_get_by_course_id(self):
         loc = "i4x://org/cn/problem/unitid"
-        modules = ProgressModules.get_by_course_id("org/cn/run")
+        modules = ProgressModules.get_by_course_id(CourseLocator.from_string("org/cn/run"))
         self.assertEquals(modules[loc]["count"], 2)
         self.assertEquals(modules[loc]["display_name"], u'problem unit')
         self.assertEquals(modules[loc]["weight"], None)

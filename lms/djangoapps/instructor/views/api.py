@@ -81,6 +81,7 @@ from .tools import (
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.exceptions import NotFoundError
 
@@ -1799,8 +1800,9 @@ def get_survey(request, course_id):  # pylint: disable=W0613
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def create_pgreport_csv(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        instructor_task.api.submit_create_pgreport_csv(request, course_id)
+        instructor_task.api.submit_create_pgreport_csv(request, course_key)
         success_status = _("Report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
@@ -1816,10 +1818,8 @@ def create_pgreport_csv(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 def get_pgreport_csv(request, course_id):
-    """"""
-    tag = "i4x"
-    org, course, category = course_id.split('/')
-    loc = Location(tag, org, course, category="pgreport", name="progress_students.csv.gz")
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    loc = StaticContent.compute_location(course_key, "progress_students.csv.gz")
     store = contentstore()
     try:
         content = store.find(loc, throw_on_not_found=True, as_stream=True)

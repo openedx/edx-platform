@@ -6,11 +6,12 @@ from mock import Mock, MagicMock, patch, ANY, call
 from contextlib import nested
 from django.test.utils import override_settings
 from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from opaque_keys import InvalidKeyError
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from pgreport.tasks import (
     update_table_task, create_report_task, update_table_task_for_active_course,
-    check_course_id, ProgressreportException, ProgressReportTask, TaskState,
+    ProgressreportException, ProgressReportTask, TaskState,
     BaseProgressReportTask
 )
 from pgreport.views import UserDoesNotExists
@@ -122,16 +123,6 @@ class ProgressReportTaskTestCase(ModuleStoreTestCase):
     def tearDown(self):
         pass
 
-    @patch('pgreport.tasks.Location')
-    def test_check_course_id(self, loc_mock):
-        check_course_id(self.course1.id)
-        loc_mock.COURSE_ID_RE.match.assert_called_once_with(self.course1.id)
-        
-        loc_mock.COURSE_ID_RE.match.return_value = None
-        msg = "^{} is not of form ORG/COURSE/NAME$".format("wrong-course-id")
-        with self.assertRaisesRegexp(ProgressreportException, msg):
-            check_course_id("wrong-course-id")
-
     def test_ProgressReportTask_init(self):
         task = ProgressReportTask(self.func_mock)
 
@@ -150,7 +141,7 @@ class ProgressReportTaskTestCase(ModuleStoreTestCase):
         ts_mock.assert_called_with(task.task_name, self.course1.id)
         ts_mock().set_task_state.assert_called_once_with()
         self.func_mock.apply_async.assert_called_with(
-            args=(ANY, self.course1.id), task_id=ANY, expires=23.5*60*60, retry=False
+            args=(ANY, unicode(self.course1.id)), task_id=ANY, expires=23.5*60*60, retry=False
         )
         self.assertEquals(std_mock.getvalue(),
             "Send task (task_id: %s)\n" % (self.func_mock.apply_async().id)
@@ -195,7 +186,7 @@ class ProgressReportTaskTestCase(ModuleStoreTestCase):
             task.show_task_status("task_id")
 
         self.assertEquals(std_mock.getvalue(),
-            "Curent State: {}, {}\n".format(result_mock.state, result_mock.info)
+            "Current State: {}, {}\n".format(result_mock.state, result_mock.info)
         )
 
     def test_show_task_list(self):
@@ -241,12 +232,10 @@ class ProgressReportTaskTestCase(ModuleStoreTestCase):
 
     @patch('pgreport.tasks.os')
     @patch('pgreport.tasks.socket')
-    @patch('pgreport.tasks.check_course_id')
     @patch('pgreport.tasks.update_pgreport_table')
-    def test_update_table_task(self, update_mock, check_mock, socket_mock, os_mock):
+    def test_update_table_task(self, update_mock, socket_mock, os_mock):
         result = update_table_task(self.task_id, self.course1.id)
         update_mock.assert_called_once_with(self.course1.id, ANY)
-        check_mock.assert_called_once_with(self.course1.id)
         socket_mock.gethostname.assert_called_once_with()
         os_mock.getpid.assert_called_once_with()
         self.assertEquals(result, "Update complete!!! (%s)" % self.course1.id)
@@ -258,12 +247,10 @@ class ProgressReportTaskTestCase(ModuleStoreTestCase):
 
     @patch('pgreport.tasks.os')
     @patch('pgreport.tasks.socket')
-    @patch('pgreport.tasks.check_course_id')
     @patch('pgreport.tasks.create_pgreport_csv')
-    def test_create_report_task(self, create_mock, check_mock, socket_mock, os_mock):
+    def test_create_report_task(self, create_mock, socket_mock, os_mock):
         result = create_report_task(self.task_id, self.course1.id)
         create_mock.assert_called_once_with(self.course1.id, ANY)
-        check_mock.assert_called_once_with(self.course1.id)
         socket_mock.gethostname.assert_called_once_with()
         os_mock.getpid.assert_called_once_with()
         self.assertEquals(result, "Create complete!!! (%s)" % self.course1.id)

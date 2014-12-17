@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.management.base import CommandError
 from mock import patch
+from opaque_keys.edx.locator import CourseLocator
 from pgreport.management.commands import progress_report as pr
 from xmodule.exceptions import NotFoundError
 
@@ -19,19 +20,18 @@ class ProgressReportCommandTestCase(TestCase):
         pass
 
     @patch('pgreport.management.commands.progress_report.call_command')
-    @patch('pgreport.management.commands.progress_report.check_course_id')
     @patch('pgreport.management.commands.progress_report.delete_pgreport_csv')
     @patch('pgreport.management.commands.progress_report.get_pgreport_csv')
-    def test_handle(self, get_mock, del_mock, check_mock, call_mock):
+    def test_handle(self, get_mock, del_mock, call_mock):
         pr.Command().handle(*self.args, **self.options_get)
-        get_mock.assert_called_once_with(*self.args)
+        get_mock.assert_called_once_with(*[CourseLocator.from_string(arg) for arg in self.args])
 
         pr.Command().handle(*self.args, **self.options_create)
         call_mock.assert_called_once_with(
             'create_report_task', *['create'], **{'course_id': self.args[0]})
 
         pr.Command().handle(*self.args, **self.options_delete)
-        del_mock.assert_called_once_with(*self.args)
+        del_mock.assert_called_once_with(*[CourseLocator.from_string(arg) for arg in self.args])
 
         msg = '^"course_id" is not specified$'
         with self.assertRaisesRegexp(CommandError, msg):

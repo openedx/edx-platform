@@ -426,17 +426,17 @@ def _section_survey(course_key, access):
     return section_data
 
 
-def _section_progress_report(course_id, access):
+def _section_progress_report(course_key, access):
     """Report progress"""
-    course = get_course_by_id(course_id, depth=None)
-    summary, modules = get_pgreport_table(course_id)
+    course = get_course_by_id(course_key, depth=None)
+    summary, modules = get_pgreport_table(course_key)
     module_tree = summary.pop("module_tree")
     graded = cache.get('progress_summary')
 
     if graded is not None:
         summary["graded_count"] = int(graded)
     store = contentstore()
-    org, cnum, _dummy = course_id.split('/')
+    org, cnum, _dummy = course_key.to_deprecated_string().split('/')
 
     try:
         content = store.fs.get_last_version('/i4x/{}/{}/{}/progress_students.csv.gz'.format(
@@ -457,8 +457,8 @@ def _section_progress_report(course_id, access):
         'modules': modules,
         'module_tree': module_tree,
         'current_csv': current_csv,
-        'progress_report_url': reverse('create_pgreport_csv', kwargs={'course_id': course_id}),
-        'progress_csv_url': reverse('get_pgreport_csv', kwargs={'course_id': course_id}),
-        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_id}),
+        'progress_report_url': reverse('create_pgreport_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'progress_csv_url': reverse('get_pgreport_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': course_key.to_deprecated_string()}),
     }
     return section_data

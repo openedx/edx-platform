@@ -3,7 +3,10 @@
 """
 from optparse import make_option
 from django.core.management.base import BaseCommand, CommandError
-from pgreport.tasks import create_report_task, ProgressReportTask, check_course_id, TaskState
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.locator import CourseLocator
+from pgreport.tasks import create_report_task, ProgressReportTask, TaskState
+from xmodule.modulestore.django import modulestore
 
 
 class Command(BaseCommand):
@@ -32,7 +35,12 @@ class Command(BaseCommand):
         task_id = options['task_id']
 
         if course_id is not None:
-            check_course_id(course_id)
+            try:
+                course_id = CourseLocator.from_string(course_id)
+            except InvalidKeyError:
+                raise CommandError("'{}' is an invalid course_id".format(course_id))
+            if not modulestore().get_course(course_id):
+                raise CommandError("The specified course does not exist.")
 
         if len(args) != 1:
             raise CommandError(

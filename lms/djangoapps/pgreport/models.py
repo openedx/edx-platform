@@ -6,6 +6,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import logging
 
+from xmodule_django.models import CourseKeyField
+
 log = logging.getLogger("models.progressmodules")
 
 
@@ -17,7 +19,7 @@ class ProgressModules(models.Model):
         "weight", "start", "due", "correct_map", "student_answers"
     ]
     location = models.CharField(max_length=255, db_index=True, primary_key=True)
-    course_id = models.CharField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     created = models.DateTimeField(auto_now=True)
     display_name = models.CharField(max_length=255)
     module_type = models.CharField(max_length=255, default="problem")
