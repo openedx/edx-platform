@@ -6,6 +6,10 @@ define([
     var NotesCollection = Backbone.Collection.extend({
         model: NoteModel,
 
+        /**
+         * Returns course structure from the list of notes.
+         * @return {Object}
+         */
         getCourseStructure: (function () {
             var courseStructure = null;
             return function () {
