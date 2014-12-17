@@ -33,6 +33,7 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
+from dealer.git import git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -683,6 +684,11 @@ PRESS_EMAIL = 'press@example.com'
 FINANCE_EMAIL = ''
 ADMINS = ()
 MANAGERS = ADMINS
+
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+
+if not EDX_PLATFORM_REVISION:
+    EDX_PLATFORM_REVISION = git.revision
 
 # Static content
 STATIC_URL = '/static/'
