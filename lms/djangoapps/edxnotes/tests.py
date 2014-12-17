@@ -249,7 +249,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"section": {
                         u"display_name": self.sequential.display_name_with_default,
                         u"location": unicode(self.sequential.location),
-                        u"children": [unicode(self.vertical.location)]
+                        u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
                         u"url": self._get_jump_to_url(self.vertical),
@@ -271,7 +271,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"section": {
                         u"display_name": self.sequential.display_name_with_default,
                         u"location": unicode(self.sequential.location),
-                        u"children": [unicode(self.vertical.location)]
+                        u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
                         u"url": self._get_jump_to_url(self.vertical),
@@ -483,10 +483,16 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    def test_preprocess_collection_no_unit(self):
+    @patch("edxnotes.helpers.has_access")
+    @patch("edxnotes.helpers.modulestore")
+    def test_preprocess_collection_no_unit(self, mock_modulestore, mock_has_access):
         """
         Tests the result if the unit does not exist.
         """
+        store = MagicMock()
+        store.get_item().get_parent.return_value = None
+        mock_modulestore.return_value = store
+        mock_has_access.return_value = True
         initial_collection = [{
             u"quote": u"quote text",
             u"text": u"text",
@@ -529,7 +535,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             {
                 u"display_name": self.sequential.display_name_with_default,
                 u"location": unicode(self.sequential.location),
-                u"children": [unicode(self.vertical.location)],
+                u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)],
             },
             helpers.get_module_context(self.course, self.sequential)
         )
