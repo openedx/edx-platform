@@ -127,6 +127,22 @@ class BaseInstructorTask(Task):
             entry.save_now()
 
 
+class EmailWidgetTask(Task):     # pylint: disable=abstract-method
+    """
+    Base task class for use with EmailWidgetTask models.
+    """
+    abstract = True
+    serializer = 'pickle'
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        """
+        Basic logging to keep the error trace in failed tasks
+        """
+        TASK_LOG.debug(u'Task %s: failure returned', task_id)
+        TASK_LOG.warning(u"Task (%s) failed", task_id, exc_info=True)
+
+
+
 class UpdateProblemModuleStateError(Exception):
     """
     Error signaling a fatal condition while updating problem modules.

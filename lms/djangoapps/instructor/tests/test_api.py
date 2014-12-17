@@ -39,6 +39,9 @@ from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
+from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
+from instructor.views.data_access import purge_temporary_queries, get_group_query_students
+from instructor.views.data_access_constants import TEMPORARY_QUERY_LIFETIME
 
 # modules which are mocked in test cases.
 import instructor_task.api
@@ -134,6 +137,462 @@ class TestCommonExceptions400(unittest.TestCase):
         self.assertEqual(resp.status_code, 400)
         result = json.loads(resp.content)
         self.assertIn("Task is already running", result["error"])
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Ensures the backend logic is sound for instructor email widget
+    """
+
+    OPEN = "opened"
+    COMPLETED = "completed"
+    NOT_OPEN = "not opened"
+    NOT_COMPLETED = "not completed"
+
+    def setUp(self):
+        self.course = CourseFactory.create(
+            org="edX",
+            number="emailToy",
+            run="2015_Winter",
+        )
+        self.course_key = self.course.id
+        self.instructor = InstructorFactory(course_key=self.course_key)
+        self.client.login(username=self.instructor.username, password='test')
+        self.open_user = UserFactory()
+        self.completed_user = UserFactory()
+        self.not_opened_user = UserFactory()
+        self.inactive_user = UserFactory()
+        self.problem = self.course_key.make_usage_key('problem', '123')
+        StudentModule.objects.create(student=self.open_user,
+                                     course_id=self.course_key,
+                                     module_state_key=self.problem,
+                                     )
+        StudentModule.objects.create(student=self.completed_user,
+                                     course_id=self.course_key,
+                                     module_state_key=self.problem,
+                                     grade=5,
+                                     )
+        for user in [self.open_user, self.completed_user, self.not_opened_user]:
+            CourseEnrollment.objects.create(
+                user=user,
+                course_id=self.course_key,
+                is_active=True,
+            )
+
+        CourseEnrollment.objects.create(
+            user=self.inactive_user,
+            course_id=self.course_key,
+            is_active=False,
+        )
+
+    def _make_query(self, query_type, joining="OR"):
+        """
+        Issues a query to the backend
+        """
+
+        url = reverse('get_single_query', kwargs={'course_id': self.course_key})
+        function_args = [joining, 'Problem', self.problem.block_type, self.problem.block_id]
+        single_args = {
+            'filter': query_type,
+            "entityName": 'Introduction',
+        }
+        encoded_args = '/'.join(function_args)
+        query_url = '/'.join([url, encoded_args])
+        _unused_response = self.client.get(query_url, single_args)
+
+    def _get_temp_query_ids(self):
+        """
+        Returns all the current queries in flight
+        """
+
+        get_temp_url = reverse('get_temp_queries', kwargs={'course_id': self.course_key})
+        temp_response = self.client.get(get_temp_url)
+        queries = json.loads(temp_response.content)['queries']
+        if len(queries) > 0:
+            prev_query_ids = [
+                str(query['id'])
+                for query in queries
+            ]
+            return prev_query_ids
+        else:
+            return []
+
+    def _get_query_students(self, csv=False):
+        """
+        Returns all the students returned by merging the temporary queries
+        """
+
+        prev_query_ids = self._get_temp_query_ids()
+        if len(prev_query_ids) == 0:
+            return None
+        get_all_url = reverse('get_all_students', kwargs={'course_id': self.course_key})
+        all_args = {
+            'existing': ','.join(prev_query_ids),
+        }
+        if csv:
+            get_all_url += "/csv"
+        all_response = self.client.get(get_all_url, all_args)
+        if csv:
+            return all_response.content
+        students = json.loads(all_response.content)['data']
+        return prev_query_ids, students
+
+    def _delete_temp_query(self, query_id):
+        """
+        Deletes a single temporary query
+        """
+
+        delete_url = reverse('delete_temp_query', kwargs={'course_id': self.course_key})
+        use_delete_url = '/'.join([delete_url, str(query_id)])
+        response = self.client.get(use_delete_url)
+        return response
+
+    def _delete_bulk_temp_query(self, query_ids):
+        """
+        Deletes temporary queries en masse
+        """
+
+        delete_url = reverse('delete_bulk_temp_query', kwargs={'course_id': self.course_key})
+        delete_args = {
+            'existing': ','.join(query_ids),
+        }
+        response = self.client.get(delete_url, delete_args)
+        return response
+
+    def _check_against_students(self, students, correct_list):
+        """
+        Constructs two sets and checks if they are the same
+        """
+
+        student_names = set()
+        student_mails = set()
+        for student in students:
+            student_names.add(student['profileName'])
+            student_mails.add(student['email'])
+
+        check_names = set()
+        check_mails = set()
+        for correct in correct_list:
+            check_names.add(correct.profile.name)
+            check_mails.add(correct.email)
+        self.assertSetEqual(student_names, check_names)
+        self.assertSetEqual(student_mails, check_mails)
+
+    def _get_query_results(self, query_type, joining="OR"):
+        """
+        Issues a query and checks to see if the outcome is as desired
+        """
+
+        self._make_query(query_type, joining=joining)
+        query_ids, students = self._get_query_students()
+        if len(query_ids) != 1:
+            return None
+        query_id = query_ids[0]
+        if query_type == self.OPEN:
+            user = self.open_user
+        elif query_type == self.NOT_OPEN:
+            user = self.not_opened_user
+        else:
+            user = self.completed_user
+        if query_type == self.NOT_COMPLETED:
+            self._check_against_students(students, [self.not_opened_user, self.open_user])
+        elif query_type == self.OPEN:
+            self._check_against_students(students, [self.open_user, self.completed_user])
+        else:
+            student = students[0]
+            self.assertEqual(student['profileName'], user.profile.name)
+            self.assertEqual(student['email'], user.email)
+        success = json.loads(self._delete_temp_query(query_id).content)['success']
+        self.assertEquals(success, True)
+        temp = self._get_temp_query_ids()
+        self.assertEquals(len(temp), 0)
+        self.assertEquals(len(StudentsForQuery.objects.all()), 0)
+        return query_id
+
+    def _save_query(self, existing):
+        """
+        Save a group query
+        """
+
+        save_url = reverse('save_query', kwargs={'course_id': self.course_key})
+        save_args = {
+            'existing': ','.join(existing),
+        }
+        response = self.client.get(save_url, save_args)
+        return response
+
+    def _delete_saved_query(self, query_id):
+        """
+        Deletes a group query
+        """
+
+        delete_url = reverse('delete_saved_query', kwargs={'course_id': self.course_key})
+        use_delete_url = '/'.join([delete_url, str(query_id)])
+        response = self.client.get(use_delete_url)
+        return response
+
+    def _get_saved_queries(self):
+        """
+        Retrieve saved group queries
+        """
+
+        get_saved_url = reverse('get_saved_queries', kwargs={'course_id': self.course_key})
+        temp_response = self.client.get(get_saved_url)
+        queries = json.loads(temp_response.content)['queries']
+        return queries
+
+    def test_make_open_query(self):
+        """
+        Ensures the logic is sound for "opened" students
+        """
+
+        self._get_query_results(self.OPEN, "AND")
+
+    def test_make_closed_query(self):
+        """
+        Ensures the logic is sound for "completed" students
+        """
+        self._get_query_results(self.COMPLETED)
+
+    def test_make_not_opened_query(self):
+        """
+        Ensures the logic is sound for "not opened" students
+        """
+
+        self._get_query_results(self.NOT_OPEN, "AND")
+
+    def test_make_not_completed_query(self):
+        """
+        Ensures the logic is sound for "not completed" students
+        """
+
+        self._get_query_results(self.NOT_COMPLETED)
+
+    def test_make_all_query(self):
+        """
+        Ensures the logic is sound for aggregating students
+        """
+
+        self.assertEquals(len(self._get_temp_query_ids()), 0)
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        queries, students = self._get_query_students()
+        self._check_against_students(students, [self.open_user, self.completed_user, self.not_opened_user])
+        self._delete_bulk_temp_query(queries)
+        self.assertEquals(len(self._get_temp_query_ids()), 0)
+        self._make_query(self.OPEN, joining="AND")
+        self._make_query(self.NOT_COMPLETED, joining="AND")
+        queries2, students2 = self._get_query_students()
+        csv_string = self._get_query_students(csv=True)
+        to_match = '"email","name"\r\n"{email}","{name}"\r\n'.format(
+            email=self.open_user.email,
+            name=self.open_user.profile.name,
+        )
+        self.assertEquals(to_match, csv_string)
+        self._check_against_students(students2, [self.open_user])
+        self._delete_bulk_temp_query(queries2)
+
+    def test_bulk_delete(self):
+        """
+        Ensures the logic is sound for bulk deleted queries
+        """
+
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        temp_ids_before = self._get_temp_query_ids()
+        self._delete_bulk_temp_query(temp_ids_before)
+        temp_ids_after = self._get_temp_query_ids()
+        self.assertNotEquals(len(temp_ids_before), 0)
+        self.assertEquals(len(temp_ids_after), 0)
+
+    def test_saving_queries(self):
+        """
+        Ensures we can save grouped queries
+        """
+
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        temp_ids = self._get_temp_query_ids()
+        self._save_query(temp_ids)
+        saved_queries = self._get_saved_queries()
+        self.assertEquals(len(saved_queries), 2)
+        query_group = saved_queries[0]['group']
+        self._delete_saved_query(query_group)
+        post_delete_queries = self._get_saved_queries()
+        self.assertEquals(len(post_delete_queries), 0)
+
+    def test_get_group_query(self):
+        """
+        Ensures the logic for getting students associated with a group query
+        """
+
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        temp_ids = self._get_temp_query_ids()
+        self._save_query(temp_ids)
+        saved_queries = self._get_saved_queries()
+        self.assertEquals(len(saved_queries), 2)
+        query_group = saved_queries[0]['group']
+        students = get_group_query_students(self.course_key, query_group)
+        correct_students = set()
+        for student in [self.open_user, self.completed_user, self.not_opened_user]:
+            correct_students.add(student.profile.name)
+        check_students = set()
+        for student in students:
+            check_students.add(student.profile.name)
+        self.assertSetEqual(correct_students, check_students)
+
+    def test_purge(self):
+        """
+        Ensures the deletion of old temporary queries
+        """
+
+        self._make_query(self.OPEN)
+        self._make_query(self.COMPLETED)
+        query_obj = TemporaryQuery.objects.all()
+        self.assertNotEqual(len(query_obj), 0)
+        minutes60ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME * 2)
+        minutes15ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME / 2)
+        query_obj[0].created = minutes60ago
+        query_obj[1].created = minutes15ago
+        query_obj[0].save()
+        query_obj[1].save()
+        purge_temporary_queries()
+        query_obj = TemporaryQuery.objects.all()
+        self.assertEquals(len(query_obj), 1)
+
+    def test_no_existing(self):
+        """
+        Ensures the code doesn't break if there aren't existing queries
+        """
+
+        resp1 = self._delete_bulk_temp_query([])
+        result1 = json.loads(resp1.content)['success']
+        resp2 = self._save_query([])
+        result2 = json.loads(resp2.content)['success']
+        self.assertFalse(result1)
+        self.assertFalse(result2)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
+class TestCourseTreeLookup(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Ensure appropriate access and format of course information
+    """
+
+    def setUp(self):
+        self.course = CourseFactory.create(
+            org="edX",
+            number="emailToy2",
+            run="2015_Winter",
+        )
+        self.course_key = self.course.id
+        self.instructor = InstructorFactory(course_key=self.course_key)
+        CourseEnrollment.enroll(self.instructor, self.course_key)
+        self.client.login(username=self.instructor.username, password='test')
+
+        section = ItemFactory.create(
+            parent_location=self.course.location,
+            category="chapter",
+            display_name=u"Section 1",
+        )
+
+        section2 = ItemFactory.create(
+            parent_location=self.course.location,
+            category="chapter",
+            display_name=u"Section 2",
+        )
+
+        sub_section = ItemFactory.create(
+            parent_location=section.location,
+            category="sequential",
+            display_name=u"Subsection 1",
+        )
+
+        sub_section2 = ItemFactory.create(
+            parent_location=section2.location,
+            category="sequential",
+            display_name=u"Subsection 2",
+        )
+
+        ItemFactory.create(
+            parent_location=sub_section.location,
+            category="problem",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"Multiple Choice",
+        )
+
+        ItemFactory.create(
+            parent_location=sub_section2.location,
+            category="problem",
+            metadata={'graded': True, 'format': 'Homework'},
+            display_name=u"Numerical Input",
+        )
+
+    def test_list_course_tree(self):
+        """
+        Ensures a user can extract the course tree
+        """
+
+        url = reverse('list_course_tree', kwargs={'course_id': self.course_key})
+        stuff = self.client.get(url)
+        response = json.loads(stuff.content)['data']
+        block_ids = {
+            u'Numerical_Input',
+            u'Subsection_1',
+            u'Multiple_Choice',
+            u'Subsection_2',
+            u'Section_2',
+            u'Section_1',
+        }
+        check_ids = set()
+        for block in response:
+            check_ids.add(block['block_id'])
+            while block['sub'] != []:
+                #the fanout is only 1 on all of these cases so it's ok to just get the 0 index
+                block = block['sub'][0]
+                check_ids.add(block['block_id'])
+        self.assertSetEqual(block_ids, check_ids)
+
+    def test_list_course_problems(self):
+        """
+        Ensures a user can extract the problems from a course
+        """
+
+        url = reverse('list_course_problems', kwargs={'course_id': self.course_key})
+        stuff = self.client.get(url)
+        response = json.loads(stuff.content)['data']
+        problem_names = set([u'Multiple Choice', u'Numerical Input'])
+        problem_parents = set([u'Section 1/Subsection 1', u'Section 2/Subsection 2'])
+
+        check_names = set()
+        check_parents = set()
+        for prob in response:
+            check_names.add(prob['display_name'])
+            check_parents.add(prob['parents'])
+        self.assertSetEqual(problem_names, check_names)
+        self.assertSetEqual(problem_parents, check_parents)
+
+    def test_list_course_sections(self):
+        """
+        Ensures a user can extract the sections from a course
+        """
+
+        url = reverse('list_course_sections', kwargs={'course_id': self.course_key})
+        stuff = self.client.get(url)
+        response = json.loads(stuff.content)['data']
+        section_names = set([u'Section 1', u'Section 2'])
+        subsection_names = set([u'Subsection 1', u'Subsection 2'])
+        check_sections = set()
+        check_subsections = set()
+        name_key = 'display_name'
+        for secs in response:
+            check_sections.add(secs[name_key])
+            for subsecs in secs['sub']:
+                check_subsections.add(subsecs[name_key])
+        self.assertSetEqual(section_names, check_sections)
+        self.assertSetEqual(subsection_names, check_subsections)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
