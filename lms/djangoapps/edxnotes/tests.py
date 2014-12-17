@@ -3,6 +3,7 @@ Tests for the EdxNotes app.
 """
 import json
 import jwt
+from copy import deepcopy
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
@@ -20,7 +21,7 @@ from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location, NoPathToItem
+from xmodule.modulestore.search import NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -488,16 +489,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         }]
 
         self.assertItemsEqual(
-            [],
-            helpers.preprocess_collection(self.user, self.course, initial_collection)
+            [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    @patch("edxnotes.helpers.path_to_location")
-    def test_preprocess_collection_exceptions(self, mock_path_to_location):
+    def test_preprocess_collection_exceptions(self):
         """
         Tests the result if the unit does not exist.
         """
-        path_to_location.side_effect = NoPathToItem
         initial_collection = [{
             u"quote": u"quote text",
             u"text": u"text",
@@ -505,16 +503,15 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
         }]
 
-        self.assertItemsEqual(
-            [],
-            helpers.preprocess_collection(self.user, self.course, initial_collection, True)
-        )
+        with patch("edxnotes.helpers.path_to_location", side_effect=NoPathToItem):
+            self.assertItemsEqual(
+                [], helpers.preprocess_collection(self.user, self.course, deepcopy(initial_collection), True)
+            )
 
-        path_to_location.side_effect = ValueError
-        self.assertItemsEqual(
-            [],
-            helpers.preprocess_collection(self.user, self.course, initial_collection, True)
-        )
+        with patch("edxnotes.helpers.path_to_location", side_effect=ValueError):
+            self.assertItemsEqual(
+                [], helpers.preprocess_collection(self.user, self.course, deepcopy(initial_collection), True)
+            )
 
     def test_get_ancestor(self):
         """
@@ -840,7 +837,7 @@ class EdxNotesViewsTest(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token(self):
         """
-        Test generation of ID Token
+        Test generation of ID Token.
         """
         response = self.client.get(self.get_token_url)
         self.assertEqual(response.status_code, 200)
@@ -850,7 +847,7 @@ class EdxNotesViewsTest(TestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": True})
     def test_get_id_token_anonymous(self):
         """
-        Test that generation of ID Token does not work for anonymous user
+        Test that generation of ID Token does not work for anonymous user.
         """
         self.client.logout()
         response = self.client.get(self.get_token_url)
