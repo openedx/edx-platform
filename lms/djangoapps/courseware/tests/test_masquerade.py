@@ -4,17 +4,20 @@ Unit tests for masquerade.
 import json
 from mock import patch
 from datetime import datetime
-from django.utils.timezone import UTC
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.utils.timezone import UTC
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from courseware.masquerade import handle_ajax, setup_masquerade
 from courseware.tests.factories import StaffFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase, get_request_for_user
 from student.tests.factories import UserFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
+from xmodule.partitions.partitions import Group, UserPartition
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
@@ -132,9 +135,9 @@ class NormalStudentVisibilityTest(MasqueradeTestCase):
         self.verify_show_answer_present(False)
 
 
-class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
+class StaffMasqueradeTestCase(MasqueradeTestCase):
     """
-    Check for staff being able to masquerade as student.
+    Base class for tests of the masquerade behavior for a staff member.
     """
     def create_test_user(self):
         """
@@ -160,6 +163,30 @@ class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
         self.assertEqual(response.status_code, 204)
         return response
 
+
+class NormalStaffVisibilityTest(StaffMasqueradeTestCase):
+    """
+    Verify the course displays as expected for a staff member.
+    """
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_staff_debug_visible(self):
+        """
+        Tests that staff debug control is not present for a student.
+        """
+        self.verify_staff_debug_present(True)
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_show_answer_visible(self):
+        """
+        Tests that "Show Answer" is not visible for a student.
+        """
+        self.verify_show_answer_present(True)
+
+
+class TestStaffMasqueradeAsStudent(StaffMasqueradeTestCase):
+    """
+    Check for staff being able to masquerade as student.
+    """
     @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
     def test_staff_debug_with_masquerade(self):
         """
@@ -191,3 +218,45 @@ class TestStaffMasqueradeAsStudent(MasqueradeTestCase):
         # Toggle masquerade back to staff
         self.update_masquerade(role='staff')
         self.verify_show_answer_present(True)
+
+
+class TestMasqueradeAsHavingGroup(StaffMasqueradeTestCase):
+    """
+    Check for staff being able to masquerade as belonging to a group.
+    """
+    def setUp(self):
+        super(TestMasqueradeAsHavingGroup, self).setUp()
+        self.user_partition = UserPartition(
+            0, 'Test User Partition', '',
+            [Group(0, 'Group 1'), Group(1, 'Group 2')],
+            scheme_id='cohort'
+        )
+        self.course.user_partitions.append(self.user_partition)
+        modulestore().update_item(self.course, self.test_user.id)
+
+    def _create_mock_json_request(self, user, body):
+        """
+        Returns a mock JSON request for the specified user
+        """
+        request = get_request_for_user(user)
+        request.method = 'POST'
+        request.META = {'CONTENT_TYPE': ['application/json']}
+        request.body = body
+        request.session = {}
+        return request
+
+    @patch.dict('django.conf.settings.FEATURES', {'DISABLE_START_DATES': False})
+    def test_group_masquerade(self):
+        """
+        Tests that a staff member can masquerade as being in a particular group.
+        """
+        request = self._create_mock_json_request(
+            self.test_user,
+            body='{"role": "student", "group_id": 1}'
+        )
+        handle_ajax(request, unicode(self.course.id))
+        setup_masquerade(request, self.test_user, True)
+        self.assertEqual(
+            self.user_partition.scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
+            self.user_partition.groups[1]
+        )
