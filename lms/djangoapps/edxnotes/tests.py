@@ -504,15 +504,20 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    def test_get_unit(self):
+    def test_get_parent_unit(self):
         """
-        Tests `test_get_unit` method for the successful result.
+        Tests `test_get_parent_unit` method for the successful result.
         """
-        parent = helpers.get_unit(self.html_module_1)
+        parent = helpers.get_parent_unit(self.html_module_1)
         self.assertEqual(parent.location, self.vertical.location)
 
-        parent = helpers.get_unit(self.child_html_module)
+        parent = helpers.get_parent_unit(self.child_html_module)
         self.assertEqual(parent.location, self.vertical_with_container.location)
+
+        self.assertIsNone(helpers.get_parent_unit(None))
+        self.assertIsNone(helpers.get_parent_unit(self.course))
+        self.assertIsNone(helpers.get_parent_unit(self.chapter))
+        self.assertIsNone(helpers.get_parent_unit(self.sequential))
 
     def test_get_module_context_vertical(self):
         """

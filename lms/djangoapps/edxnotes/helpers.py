@@ -102,6 +102,21 @@ def send_request(user, course_id, path="", query_string=""):
     return response
 
 
+def get_parent_unit(xblock):
+    """
+    Find vertical that is a unit, not just some container
+    """
+    while xblock:
+        xblock = xblock.get_parent()
+        if xblock is None:
+            return None
+        parent = xblock.get_parent()
+        if parent is None:
+            return None
+        if parent.category == 'sequential':
+            return xblock
+
+
 def preprocess_collection(user, course, collection, add_course_structure=False):
     """
     Reprocess provided `collection(list)`: adds information about ancestor,
@@ -110,6 +125,8 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
     Raises:
         ItemNotFoundError - when appropriate module is not found.
     """
+
+
     store = modulestore()
     filtered_collection = list()
     with store.bulk_operations(course.id):
@@ -125,7 +142,7 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 log.debug("User %s does not have an access to %s", user, item)
                 continue
 
-            unit = item.get_parent()
+            unit = get_parent_unit(item)
             if unit is None:
                 log.debug("Unit not found for %s", usage_key)
                 continue
