@@ -21,7 +21,6 @@ from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -145,6 +144,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
         self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+        self.vertical_with_container = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
+        self.child_container = ItemFactory.create(category='split_test', parent_location=self.vertical_with_container.location)
+        self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
+        self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
         # Read again so that children lists are accurate
         self.course = self.store.get_item(self.course.location)
@@ -152,6 +155,11 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.chapter_2 = self.store.get_item(self.chapter_2.location)
         self.sequential = self.store.get_item(self.sequential.location)
         self.vertical = self.store.get_item(self.vertical.location)
+
+        self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
+        self.child_container = self.store.get_item(self.child_container.location)
+        self.child_vertical = self.store.get_item(self.child_vertical.location)
+        self.child_html_module = self.store.get_item(self.child_html_module.location)
 
         self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
@@ -475,12 +483,10 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    @patch("edxnotes.helpers.get_ancestor")
-    def test_preprocess_collection_no_unit(self, mock_get_ancestor):
+    def test_preprocess_collection_no_unit(self):
         """
         Tests the result if the unit does not exist.
         """
-        mock_get_ancestor.return_value = None
         initial_collection = [{
             u"quote": u"quote text",
             u"text": u"text",
@@ -492,49 +498,15 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
 
-    def test_preprocess_collection_exceptions(self):
+    def test_get_unit(self):
         """
-        Tests the result if the unit does not exist.
+        Tests `test_get_unit` method for the successful result.
         """
-        initial_collection = [{
-            u"quote": u"quote text",
-            u"text": u"text",
-            u"usage_id": unicode(self.html_module_1.location),
-            u"updated": datetime(2014, 11, 19, 8, 5, 16, 00000).isoformat(),
-        }]
-
-        with patch("edxnotes.helpers.path_to_location", side_effect=NoPathToItem):
-            self.assertItemsEqual(
-                [], helpers.preprocess_collection(self.user, self.course, deepcopy(initial_collection), True)
-            )
-
-        with patch("edxnotes.helpers.path_to_location", side_effect=ValueError):
-            self.assertItemsEqual(
-                [], helpers.preprocess_collection(self.user, self.course, deepcopy(initial_collection), True)
-            )
-
-    def test_get_ancestor(self):
-        """
-        Tests `test_get_ancestor` method for the successful result.
-        """
-        parent = helpers.get_ancestor(self.store, self.html_module_1.location)
+        parent = helpers.get_unit(self.html_module_1)
         self.assertEqual(parent.location, self.vertical.location)
 
-    def test_get_ancestor_no_location(self):
-        """
-        Tests the result if parent location is not found.
-        """
-        store = MagicMock()
-        store.get_parent_location.return_value = None
-        self.assertEqual(helpers.get_ancestor(store, self.html_module_1.location), None)
-
-    def test_get_ancestor_no_parent(self):
-        """
-        Tests the result if ancestor module is not found.
-        """
-        store = MagicMock()
-        store.get_item.side_effect = ItemNotFoundError
-        self.assertEqual(helpers.get_ancestor(store, self.html_module_1.location), None)
+        parent = helpers.get_unit(self.child_html_module)
+        self.assertEqual(parent.location, self.vertical_with_container.location)
 
     def test_get_module_context_vertical(self):
         """
