@@ -33,11 +33,3 @@ def local_resource_url(block, uri):
         'block_type': block.scope_ids.block_type,
         'uri': uri,
     })
-
-
-def applicable_aside_types(block):  # pylint: disable=unused-argument
-    """
-    Get the application-relative list of aside types for this type of block.
-    """
-    # TODO: Implement this method to make XBlockAsides for editing views in Studio
-    return []
