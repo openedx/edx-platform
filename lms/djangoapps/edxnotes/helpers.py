@@ -18,7 +18,7 @@ from django.utils.translation import ugettext as _
 
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location, NoPathToItem
+from xmodule.modulestore.search import NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
@@ -125,7 +125,7 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 log.debug("User %s does not have an access to %s", user, item)
                 continue
 
-            unit = get_ancestor(store, usage_key)
+            unit = item.get_parent()
             if unit is None:
                 log.debug("Unit not found for %s", usage_key)
                 continue
@@ -139,24 +139,45 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
 
             if add_course_structure:
                 try:
-                    # pylint: disable=unused-variable
-                    (course_key, chapter, section, position) = path_to_location(store, usage_key, False)
+                    section = unit.get_parent()
+                    chapter = section.get_parent()
                 except (NoPathToItem, ValueError):
                     log.debug("No path to item found: %s", usage_key)
                     continue
 
-                chapter = store.get_item(chapter)
-                chapter_dict = get_module_context(course, chapter)
-                section = store.get_item(section)
-                section_dict = get_module_context(course, section)
                 model.update({
-                    u"chapter": chapter_dict,
-                    u"section": section_dict,
+                    u"chapter": get_module_context(course, chapter),
+                    u"section": get_module_context(course, section),
                 })
 
             filtered_collection.append(model)
 
     return filtered_collection
+
+
+def get_module_context(course, item):
+    """
+    Returns dispay_name and url for the parent module.
+    """
+    item_dict = {
+        'location': item.location.to_deprecated_string(),
+        'display_name': item.display_name_with_default,
+    }
+
+    if item.category == 'chapter':
+        ancestor_children = [child.to_deprecated_string() for child in course.children]
+        item_dict['index'] = ancestor_children.index(item_dict['location'])
+    elif item.category == 'vertical':
+        item_dict['url'] = reverse("jump_to", kwargs={
+            "course_id": course.id.to_deprecated_string(),
+            "location": item.location.to_deprecated_string(),
+        })
+
+    if item.category in ('chapter', 'sequential'):
+        item_dict['children'] = [child.location.to_deprecated_string() for child in item.get_children()]
+
+    return item_dict
+
 
 
 def search(user, course, query_string):
@@ -192,45 +213,6 @@ def get_notes(user, course):
         return None
 
     return json.dumps(preprocess_collection(user, course, collection, add_course_structure=True), cls=NoteJSONEncoder)
-
-
-def get_ancestor(store, usage_key):
-    """
-    Returns ancestor module for the passed `usage_key`.
-    """
-    location = store.get_parent_location(usage_key)
-    if not location:
-        log.warning("Parent location for the module not found: %s", usage_key)
-        return
-    try:
-        return store.get_item(location)
-    except ItemNotFoundError:
-        log.warning("Parent module not found: %s", location)
-        return
-
-
-def get_module_context(course, item):
-    """
-    Returns dispay_name and url for the parent module.
-    """
-    item_dict = {
-        'location': item.location.to_deprecated_string(),
-        'display_name': item.display_name_with_default,
-    }
-
-    if item.category == 'chapter':
-        ancestor_children = [child.to_deprecated_string() for child in course.children]
-        item_dict['index'] = ancestor_children.index(item_dict['location'])
-    elif item.category == 'vertical':
-        item_dict['url'] = reverse("jump_to", kwargs={
-            "course_id": course.id.to_deprecated_string(),
-            "location": item.location.to_deprecated_string(),
-        })
-
-    if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [child.location.to_deprecated_string() for child in item.get_children()]
-
-    return item_dict
 
 
 def get_endpoint(path=""):
