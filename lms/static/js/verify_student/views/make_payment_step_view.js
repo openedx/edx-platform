@@ -17,6 +17,12 @@ var edx = edx || {};
                 requirements: this.stepData.requirements
             }).render();
 
+            // Update the contribution amount with the amount the user
+            // selected in a previous screen.
+            if ( this.stepData.contributionAmount ) {
+                this.selectPaymentAmount( this.stepData.contributionAmount );
+            }
+
             // Enable the payment button once an amount is chosen
             $( "input[name='contribution']" ).on( 'click', _.bind( this.enablePaymentButton, this ) );
 
@@ -105,6 +111,31 @@ var edx = edx || {};
             } else {
                 return contributionInput.val();
             }
+        },
+
+        selectPaymentAmount: function( amount ) {
+            var amountFloat = parseFloat( amount ),
+                foundPrice;
+
+            // Check if we have a suggested price that matches the amount
+            foundPrice = _.find(
+                this.stepData.suggestedPrices,
+                function( price ) {
+                    return parseFloat( price ) === amountFloat;
+                }
+            );
+
+            // If we've found an option for the price, select it.
+            if ( foundPrice ) {
+                $( '#contribution-' + foundPrice, this.el ).prop( 'checked', true );
+            } else {
+                // Otherwise, enter the value into the text box
+                $( '#contribution-other-amt', this.el ).val( amount );
+                $( '#contribution-other', this.el ).prop( 'checked', true );
+            }
+
+            // In either case, enable the payment button
+            this.enablePaymentButton();
         }
 
     });
