@@ -3,9 +3,12 @@ Provides a UserPartition driver for cohorts.
 """
 import logging
 
+from courseware import courses
+from courseware.masquerade import get_masquerading_group_id
 from xmodule.partitions.partitions import NoSuchUserPartitionGroupError
 
 from .cohorts import get_cohort, get_partition_group_id_for_cohort
+
 
 log = logging.getLogger(__name__)
 
@@ -17,8 +20,9 @@ class CohortPartitionScheme(object):
     Groups.
     """
 
+    # pylint: disable=unused-argument
     @classmethod
-    def get_group_for_user(cls, course_id, user, user_partition, track_function=None):
+    def get_group_for_user(cls, course_key, user, user_partition, track_function=None):
         """
         Returns the Group from the specified user partition to which the user
         is assigned, via their cohort membership and any mappings from cohorts
@@ -32,7 +36,13 @@ class CohortPartitionScheme(object):
         If the user has no cohort mapping, or there is no (valid) cohort ->
         partition group mapping found, the function returns None.
         """
-        cohort = get_cohort(user, course_id)
+        # If the current user is masquerading as being in a group, then return it
+        group_id = get_masquerading_group_id(user, course_key)
+        if group_id is not None:
+            user_partition = get_cohorted_user_partition(course_key)
+            return user_partition.get_group(group_id) if user_partition else None
+
+        cohort = get_cohort(user, course_key)
         if cohort is None:
             # student doesn't have a cohort
             return None
@@ -75,3 +85,17 @@ class CohortPartitionScheme(object):
             )
             # fail silently
             return None
+
+
+def get_cohorted_user_partition(course_key):
+    """
+    Returns the first user partition from the specified course which uses the CohortPartitionScheme,
+    or None if one is not found. Note that it is currently recommended that each course have only
+    one cohorted user partition.
+    """
+    course = courses.get_course_by_id(course_key)
+    for user_partition in course.user_partitions:
+        if user_partition.scheme == CohortPartitionScheme:
+            return user_partition
+
+    return None

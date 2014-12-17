@@ -14,7 +14,8 @@ from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.django_utils import mixed_store_config
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from ..partition_scheme import CohortPartitionScheme
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
 from ..cohorts import add_user_to_cohort
 from .helpers import CohortFactory, config_course_cohorts
@@ -22,7 +23,7 @@ from .helpers import CohortFactory, config_course_cohorts
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
+TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING, include_xml=True)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
@@ -255,3 +256,52 @@ class TestExtension(django.test.TestCase):
         self.assertEqual(UserPartition.get_scheme('cohort'), CohortPartitionScheme)
         with self.assertRaisesRegexp(UserPartitionError, 'Unrecognized scheme'):
             UserPartition.get_scheme('other')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestGetCohortedUserPartition(django.test.TestCase):
+    """
+    Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
+    """
+    def setUp(self):
+        """
+        Regenerate a course with cohort configuration, partition and groups,
+        and a student for each test.
+        """
+        self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
+        self.course = modulestore().get_course(self.course_key)
+        self.student = UserFactory.create()
+
+        random_user_partition = UserPartition(
+            1,
+            'Random Partition',
+            'Should not be returned',
+            [Group(0, 'Group 0'), Group(1, 'Group 1')],
+            scheme=RandomUserPartitionScheme
+        )
+
+        self.cohort_user_partition = UserPartition(
+            0,
+            'Cohort Partition 1',
+            'Should be returned',
+            [Group(10, 'Group 10'), Group(20, 'Group 20')],
+            scheme=CohortPartitionScheme
+        )
+
+        second_cohort_user_partition = UserPartition(
+            2,
+            'Cohort Partition 2',
+            'Should not be returned',
+            [Group(10, 'Group 10'), Group(1, 'Group 1')],
+            scheme=CohortPartitionScheme
+        )
+
+        self.course.user_partitions.append(random_user_partition)
+        self.course.user_partitions.append(self.cohort_user_partition)
+        self.course.user_partitions.append(second_cohort_user_partition)
+
+    def test_get_cohorted_user_partition(self):
+        """
+        Test get_cohorted_user_partition.
+        """
+        self.assertEqual(self.cohort_user_partition, get_cohorted_user_partition(self.course_key))
