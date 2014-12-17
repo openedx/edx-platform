@@ -1,4 +1,4 @@
-<div class="wrapper-content-main">
+<div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title"><%- gettext( "Congratulations!  You are now enrolled in the verified track." ) %></h3>
     <div class="instruction">

@@ -1,4 +1,4 @@
-<div id="wrapper-review" class="wrapper-view">
+<div id="wrapper-review" class="wrapper-view review-photos-step">
   <div class="review view">
     <h3 class="title"><%- gettext( "Verify Your Submission" ) %></h3>
     <div class="instruction">

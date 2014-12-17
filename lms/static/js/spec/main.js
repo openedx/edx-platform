@@ -384,7 +384,116 @@
                     'js/student_account/enrollment',
                     'js/student_account/shoppingcart',
                 ]
-            }
+            },
+            'js/verify_student/models/verification_model': {
+                exports: 'edx.verify_student.VerificationModel',
+                deps: [ 'jquery', 'underscore', 'backbone', 'jquery.cookie' ]
+            },
+            'js/verify_student/views/error_view': {
+                exports: 'edx.verify_student.ErrorView',
+                deps: [ 'jquery', 'underscore', 'backbone' ]
+            },
+            'js/verify_student/views/webcam_photo_view': {
+                exports: 'edx.verify_student.WebcamPhotoView',
+                deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
+            },
+            'js/verify_student/views/progress_view': {
+                exports: 'edx.verify_student.ProgressView',
+                deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
+            },
+            'js/verify_student/views/requirements_view': {
+                exports: 'edx.verify_student.RequirementsView',
+                deps: [ 'jquery', 'backbone', 'underscore', 'gettext' ]
+            },
+            'js/verify_student/views/step_view': {
+                exports: 'edx.verify_student.StepView',
+                deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ]
+            },
+            'js/verify_student/views/intro_step_view': {
+                exports: 'edx.verify_student.IntroStepView',
+                deps: [
+                    'jquery',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/requirements_view'
+                ]
+            },
+            'js/verify_student/views/make_payment_step_view': {
+                exports: 'edx.verify_student.MakePaymentStepView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
+                    'jquery.cookie',
+                    'jquery.url',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/requirements_view'
+                ]
+            },
+            'js/verify_student/views/payment_confirmation_step_view': {
+                exports: 'edx.verify_student.PaymentConfirmationStepView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/requirements_view'
+                ]
+            },
+            'js/verify_student/views/face_photo_step_view': {
+                exports: 'edx.verify_student.FacePhotoStepView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/webcam_photo_view'
+                ]
+            },
+            'js/verify_student/views/id_photo_step_view': {
+                exports: 'edx.verify_student.IDPhotoStepView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/webcam_photo_view'
+                ]
+            },
+            'js/verify_student/views/review_photos_step_view': {
+                exports: 'edx.verify_student.ReviewPhotosStepView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'gettext',
+                    'js/verify_student/views/step_view',
+                    'js/verify_student/views/webcam_photo_view'
+                ]
+            },
+            'js/verify_student/views/enrollment_confirmation_step_view': {
+                exports: 'edx.verify_student.EnrollmentConfirmationStepView',
+                deps: [
+                    'jquery',
+                    'js/verify_student/views/step_view',
+                ]
+            },
+            'js/verify_student/views/pay_and_verify_view': {
+                exports: 'edx.verify_student.PayAndVerifyView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'js/verify_student/models/verification_model',
+                    'js/verify_student/views/progress_view',
+                    'js/verify_student/views/intro_step_view',
+                    'js/verify_student/views/make_payment_step_view',
+                    'js/verify_student/views/payment_confirmation_step_view',
+                    'js/verify_student/views/face_photo_step_view',
+                    'js/verify_student/views/id_photo_step_view',
+                    'js/verify_student/views/review_photos_step_view',
+                    'js/verify_student/views/enrollment_confirmation_step_view'
+                ]
+            },
         }
     });
 
@@ -406,7 +515,11 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
-        'lms/include/js/spec/student_profile/profile_spec.js'
+        'lms/include/js/spec/student_profile/profile_spec.js',
+        'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
+        'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
+        'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
+        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js'
     ]);
 
 }).call(this, requirejs, define);

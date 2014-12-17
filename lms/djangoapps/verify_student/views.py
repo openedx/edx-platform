@@ -512,7 +512,7 @@ class PayAndVerifyView(View):
             'disable_courseware_js': True,
             'display_steps': display_steps,
             'contribution_amount': contribution_amount,
-            'is_active': request.user.is_active,
+            'is_active': json.dumps(request.user.is_active),
             'messages': self._messages(
                 message,
                 course.display_name,
