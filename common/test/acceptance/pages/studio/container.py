@@ -236,11 +236,18 @@ class ContainerPage(PageObject):
         # Click the confirmation dialog button
         confirm_prompt(self)
 
-    def edit(self):
+    def edit(self, source_index=0):
         """
         Clicks the "edit" button for the first component on the page.
         """
-        return _click_edit(self)
+        return _click_edit(self, source_index=source_index)
+
+    def edit_visibility(self, source_index=0):
+        """
+        Clicks the "edit visibility" button for the item with index source_index
+        (based on vertical placement in page).
+        """
+        return _click_edit(self, source_index=source_index)
 
     def add_missing_groups(self):
         """
@@ -397,11 +404,11 @@ class XBlockWrapper(PageObject):
         return self.q(css=self._bounded_selector('span.message-text a')).first.text[0]
 
 
-def _click_edit(page_object, bounded_selector=lambda(x): x):
+def _click_edit(page_object, source_index=0, bounded_selector=lambda(x): x):
     """
     Click on the first edit button found and wait for the Studio editor to be present.
     """
-    page_object.q(css=bounded_selector('.edit-button')).first.click()
+    click_css(page_object, bounded_selector('.edit-button'), source_index, require_notification=False)
     EmptyPromise(
         lambda: page_object.q(css='.xblock-studio_view').present,
         'Wait for the Studio editor to be present'

@@ -1,12 +1,12 @@
 """
 Acceptance tests for Studio related to the container page.
-The container page is used both for display units, and for
-displaying containers within units.
+The container page is used both for displaying units, and
+for displaying containers within units.
 """
 from nose.plugins.attrib import attr
 
 from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.component_editor import ComponentEditorView
+from ...pages.studio.component_editor import ComponentEditorView, VisibilityEditorView
 from ...pages.studio.html_component_editor import HtmlComponentEditorView
 from ...pages.studio.utils import add_discussion, drag
 from ...pages.lms.courseware import CoursewarePage
@@ -287,6 +287,26 @@ class EditContainerTest(NestedVerticalTest):
         """
         container = self.go_to_nested_container_page()
         self.modify_display_name_and_verify(container)
+
+
+@attr('shard_1')
+class EditXBlockVisibilityTest(NestedVerticalTest):
+    """
+    Tests of editing the visibility of an XBlock.
+    """
+
+    def test_edit_visibility_with_no_groups(self):
+        """
+        Test the "edit" button on a container appearing on the unit page.
+        """
+        unit = self.go_to_unit_page()
+        component = unit.xblocks[1]
+        component.edit_visibility()
+        editor = VisibilityEditorView(self.browser, component.locator)
+        self.assertEqual(
+            editor.visibility_summary_title,
+            'You have not set up any groups to manage visibility with.'
+        )
 
 
 @attr('shard_1')

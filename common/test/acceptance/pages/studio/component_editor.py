@@ -97,3 +97,16 @@ class ComponentEditorView(PageObject):
         Clicks cancel button.
         """
         click_css(self, 'a.action-cancel', require_notification=False)
+
+
+class VisibilityEditorView(ComponentEditorView):
+    """
+    A view representing the XBlock visibility modal.
+    """
+
+    @property
+    def visibility_summary_title(self):
+        """
+        Returns the title of the visibility summary.
+        """
+        return self.q(css=self._bounded_selector('.visibility-summary .title')).text
