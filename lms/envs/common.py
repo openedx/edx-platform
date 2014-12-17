@@ -1009,7 +1009,6 @@ courseware_js = (
 # Courseware Search
 # TODO: add conditional
 courseware_js += (
-    'js/vendor/sinon-1.7.1.js',
     'js/search/models/result.js',
     'js/search/collections/collection.js',
     'js/search/views/form.js',
