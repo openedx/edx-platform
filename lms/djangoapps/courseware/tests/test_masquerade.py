@@ -256,7 +256,8 @@ class TestMasqueradeAsHavingGroup(StaffMasqueradeTestCase):
         )
         handle_ajax(request, unicode(self.course.id))
         setup_masquerade(request, self.test_user, True)
+        scheme = self.user_partition.scheme    # pylint: disable=no-member
         self.assertEqual(
-            self.user_partition.scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
-            self.user_partition.groups[1]
+            scheme.get_group_for_user(self.course.id, self.test_user, self.user_partition),
+            self.user_partition.groups[1]    # pylint: disable=no-member
         )
