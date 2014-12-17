@@ -18,7 +18,6 @@ from django.utils.translation import ugettext as _
 
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import NoPathToItem
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
@@ -155,11 +154,13 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
             })
 
             if add_course_structure:
-                try:
-                    section = unit.get_parent()
-                    chapter = section.get_parent()
-                except (NoPathToItem, ValueError):
-                    log.debug("No path to item found: %s", usage_key)
+                section = unit.get_parent()
+                if not section:
+                    log.debug("Section not found: %s", usage_key)
+                    continue
+                chapter = section.get_parent()
+                if not chapter:
+                    log.debug("Chapter not found: %s", usage_key)
                     continue
 
                 model.update({
