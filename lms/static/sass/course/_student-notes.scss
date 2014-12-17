@@ -201,8 +201,6 @@
         border-top: 0;
       }
 
-
-
       // Do not add border and padding for the first .note-section
       // in the .note-group
       .course-title + .note-section {
@@ -217,7 +215,7 @@
 
       .course-subtitle {
         @extend %t-copy-sub1;
-        border-bottom: 1px dotted $gray-l4;
+        // border-bottom: 1px dotted $gray-l4;
         padding-bottom: $baseline;
         font-weight: $font-light;
         color: inherit;
