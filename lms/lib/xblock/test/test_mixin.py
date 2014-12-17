@@ -121,3 +121,25 @@ class XBlockGroupAccessTest(LmsXBlockMixinTestCase):
         self.video.group_access[self.user_partition.id] = [self.group2.id, 999]    # pylint: disable=no-member
         self.assertFalse(self.video.is_visible_to_group(self.user_partition, self.group1))
         self.assertTrue(self.video.is_visible_to_group(self.user_partition, self.group2))
+
+
+class OpenAssessmentBlockMixinTestCase(ModuleStoreTestCase):
+    """
+    Tests for OpenAssessmentBlock mixin.
+    """
+
+    def setUp(self):
+        super(OpenAssessmentBlockMixinTestCase, self).setUp()
+        self.course = CourseFactory.create()
+        self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        self.open_assessment = ItemFactory.create(
+            parent=self.section,
+            category="openassessment",
+            display_name="untitled",
+        )
+
+    def test_has_score(self):
+        """
+        Test has_score is true for ora2 problems.
+        """
+        self.assertTrue(self.open_assessment.has_score)
