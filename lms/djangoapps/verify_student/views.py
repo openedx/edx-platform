@@ -483,6 +483,12 @@ class PayAndVerifyView(View):
             else ""
         )
 
+        # If the user set a contribution amount on another page,
+        # use that amount to pre-fill the price selection form.
+        contribution_amount = request.session.get(
+            'donation_for_course', {}
+        ).get(unicode(course_key), '')
+
         # Render the top-level page
         context = {
             'user_full_name': full_name,
@@ -493,6 +499,7 @@ class PayAndVerifyView(View):
             'current_step': current_step,
             'disable_courseware_js': True,
             'display_steps': display_steps,
+            'contribution_amount': contribution_amount,
             'is_active': request.user.is_active,
             'messages': self._messages(
                 message,

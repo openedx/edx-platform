@@ -48,6 +48,7 @@ var edx = edx || {};
                 courseKey: el.data('course-key'),
                 minPrice: el.data('course-mode-min-price'),
                 suggestedPrices: (el.data('course-mode-suggested-prices') || "").split(","),
+                contributionAmount: el.data('contribution-amount'),
                 currency: el.data('course-mode-currency'),
                 purchaseEndpoint: el.data('purchase-endpoint')
             },
