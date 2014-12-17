@@ -5,6 +5,7 @@ LibraryContent: The XBlock used to include blocks from a library in a course.
 from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
+
 from .mako_module import MakoModuleDescriptor
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator
@@ -19,6 +20,7 @@ from xmodule.studio_editable import StudioEditableModule, StudioEditableDescript
 from .xml_module import XmlDescriptor
 from pkg_resources import resource_string
 
+
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
@@ -26,6 +28,40 @@ _ = lambda text: text
 def enum(**enums):
     """ enum helper in lieu of enum34 """
     return type('Enum', (), enums)
+
+
+def _get_capa_types():
+    capa_types = {
+        'annotationinput': _('Annotation'),
+        'checkboxgroup': _('Checkbox Group'),
+        'checkboxtextgroup': _('Checkbox Text Group'),
+        'chemicalequationinput': _('Chemical Equation'),
+        'choicegroup': _('Choice Group'),
+        'codeinput': _('Code Input'),
+        'crystallography': _('Crystallography'),
+        'designprotein2dinput': _('Design Protein 2D'),
+        'drag_and_drop_input': _('Drag and Drop'),
+        'editageneinput': _('Edit A Gene'),
+        'editamoleculeinput': _('Edit A Molecule'),
+        'filesubmission': _('File Submission'),
+        'formulaequationinput': _('Formula Equation'),
+        'imageinput': _('Image'),
+        'javascriptinput': _('Javascript Input'),
+        'jsinput': _('JS Input'),
+        'matlabinput': _('Matlab'),
+        'optioninput': _('Select option'),
+        'radiogroup': _('Radio Group'),
+        'radiotextgroup': _('Radio Text Group'),
+        'schematic': _('Schematic'),
+        'textbox': _('Code Text Input'),
+        'textline': _('Text Line'),
+        'vsepr_input': _('VSEPR'),
+    }
+
+    return sorted([
+        {'value': capa_type, 'display_name': caption}
+        for capa_type, caption in capa_types.items()
+    ], key=lambda item: item.get('display_name'))
 
 
 class LibraryVersionReference(namedtuple("LibraryVersionReference", "library_id version")):
@@ -144,6 +180,13 @@ class LibraryContentFields(object):
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student."),
         default=1,
+        scope=Scope.settings,
+    )
+    capa_type = String(
+        display_name=_("Problem Type"),
+        help=_("The type of components to include in this block"),
+        default="any",
+        values=[{"display_name": _("Any Type"), "value": "any"}] + _get_capa_types(),
         scope=Scope.settings,
     )
     filters = String(default="")  # TBD
