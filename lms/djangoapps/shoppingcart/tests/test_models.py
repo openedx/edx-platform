@@ -1,6 +1,7 @@
 """
 Tests for the Shopping Cart Models
 """
+import ddt
 from decimal import Decimal
 import datetime
 import sys
@@ -46,7 +47,7 @@ from util.testing import UrlResetMixin
 # that disables the XML modulestore.
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-
+@ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class OrderTest(UrlResetMixin, ModuleStoreTestCase):
@@ -587,16 +588,17 @@ class CertificateItemTest(ModuleStoreTestCase):
         enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
         self.assertEquals(enrollment.mode, u'verified')
 
-    def test_single_item_template(self):
+    @ddt.data(
+        ('honor', ''),
+        ('audit', ''),
+        ('verified', 'redirect_url Will gives me'),
+        ('professional', 'redirect_url Will gives me'),
+    )
+    @ddt.unpack
+    def test_redirect_url(self, certificate, redirect_url):
         cart = Order.get_cart_for_user(user=self.user)
-        cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
-
-        self.assertEquals(cert_item.single_item_receipt_template,
-                          'shoppingcart/verified_cert_receipt.html')
-
-        cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        self.assertEquals(cert_item.single_item_receipt_template,
-                          'shoppingcart/receipt.html')
+        cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, certificate)
+        self.assertEquals(cert_item.redirect_url, redirect_url)
 
     def test_refund_cert_callback_no_expiration(self):
         # When there is no expiration date on a verified mode, the user can always get a refund
