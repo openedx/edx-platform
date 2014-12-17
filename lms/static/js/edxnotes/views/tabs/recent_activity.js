@@ -7,6 +7,12 @@ define([
         PanelConstructor: TabPanelView.extend({
             id: 'recent-panel',
             title: 'Recent Activity',
+            className: function () {
+                return [
+                    TabPanelView.prototype.className,
+                    'note-group'
+                ].join(' ')
+            },
             renderContent: function () {
                 this.$el.append(this.getNotes(this.collection.toArray()));
                 return this;

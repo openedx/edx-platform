@@ -8,6 +8,12 @@ define([
         PanelConstructor: TabPanelView.extend({
             id: 'search-results-panel',
             title: 'Search Results',
+            className: function () {
+                return [
+                    TabPanelView.prototype.className,
+                    'note-group'
+                ].join(' ')
+            },
             highlightMatchedText: true,
             renderContent: function () {
                 this.$el.append(this.getNotes(this.collection.toArray()));
@@ -26,6 +32,12 @@ define([
         NoResultsViewConstructor: TabPanelView.extend({
             id: 'no-results-panel',
             title: 'No results found',
+            className: function () {
+                return [
+                    TabPanelView.prototype.className,
+                    'note-group'
+                ].join(' ')
+            },
             renderContent: function () {
                 var message = gettext('No results found for "%(query_string)s".');
 
