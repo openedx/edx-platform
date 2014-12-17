@@ -125,7 +125,6 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
         ItemNotFoundError - when appropriate module is not found.
     """
 
-
     store = modulestore()
     filtered_collection = list()
     with store.bulk_operations(course.id):
@@ -195,7 +194,6 @@ def get_module_context(course, item):
         item_dict['children'] = [child.location.to_deprecated_string() for child in item.get_children()]
 
     return item_dict
-
 
 
 def search(user, course, query_string):
