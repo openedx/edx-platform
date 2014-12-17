@@ -153,6 +153,56 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
 
 
 @attr('shard_1')
+class DiscussionOpenClosedThreadTest(UniqueCourseTest):
+    """
+    Tests for checking the display of attributes on open and closed threads
+    """
+
+    def setUp(self):
+        super(DiscussionOpenClosedThreadTest, self).setUp()
+
+        # Create a course to register for
+        CourseFixture(**self.course_info).install()
+        self.thread_id = "test_thread_{}".format(uuid4().hex)
+
+    def setup_user(self, roles=[]):
+        roles_str = ','.join(roles)
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
+
+    def setup_view(self, **thread_kwargs):
+        view = SingleThreadViewFixture(
+            Thread(id=self.thread_id, **thread_kwargs)
+        )
+        view.addResponse(Response(id="response1"))
+        view.push()
+
+    def setup_openclosed_thread_page(self, closed=False):
+        self.setup_user(roles=['Moderator'])
+        if closed:
+            self.setup_view(closed=True)
+        else:
+            self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.thread_id)
+        page.visit()
+        page.close_open_thread()
+        return page
+
+    def test_originally_open_thread_vote_display(self):
+        page = self.setup_openclosed_thread_page()
+        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
+        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertFalse(page._is_element_visible('.response_response1 .action-vote'))
+        self.assertTrue(page._is_element_visible('.response_response1 .display-vote'))
+
+    def test_originally_closed_thread_vote_display(self):
+        page = self.setup_openclosed_thread_page(True)
+        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
+        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
+        self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
+
+
+@attr('shard_1')
 class DiscussionCommentDeletionTest(UniqueCourseTest):
     """
     Tests for deleting comments displayed beneath responses in the single thread view.
