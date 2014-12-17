@@ -33,8 +33,8 @@ def i_create_a_course(step):
     create_a_course()
 
 
-@step('I click the course link in My Courses$')
-def i_click_the_course_link_in_my_courses(step):
+@step('I click the course link in Studio Home$')
+def i_click_the_course_link_in_studio_home(step):
     course_css = 'a.course-link'
     world.css_click(course_css)
 
@@ -52,8 +52,8 @@ def courseware_page_has_loaded_in_studio(step):
     assert world.is_css_present(course_title_css)
 
 
-@step('I see the course listed in My Courses$')
-def i_see_the_course_in_my_courses(step):
+@step('I see the course listed in Studio Home$')
+def i_see_the_course_in_studio_home(step):
     course_css = 'h3.class-title'
     assert world.css_has_text(course_css, world.scenario_dict['COURSE'].display_name)
 
