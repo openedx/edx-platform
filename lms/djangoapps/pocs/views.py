@@ -8,6 +8,7 @@ import json
 import logging
 import pytz
 
+from copy import deepcopy
 from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
@@ -77,6 +78,8 @@ def dashboard(request, course):
     """
     poc = get_poc_for_coach(course, request.user)
     schedule = get_poc_schedule(course, poc)
+    grading_policy = get_override_for_poc(poc, course, 'grading_policy',
+                                          course.grading_policy)
     context = {
         'course': course,
         'poc': poc,
@@ -87,6 +90,9 @@ def dashboard(request, course):
                                  kwargs={'course_id': course.id}),
         'grades_csv_url': reverse('poc_grades_csv',
                                   kwargs={'course_id': course.id}),
+        'grading_policy': json.dumps(grading_policy, indent=4),
+        'grading_policy_url': reverse('poc_set_grading_policy',
+                                      kwargs={'course_id': course.id}),
     }
     if not poc:
         context['create_poc_url'] = reverse(
@@ -135,7 +141,7 @@ def save_poc(request, course):
     """
     poc = get_poc_for_coach(course, request.user)
 
-    def override_fields(parent, data, earliest=None):
+    def override_fields(parent, data, graded, earliest=None):
         """
         Recursively apply POC schedule data to POC by overriding the
         `visible_to_staff_only`, `start` and `due` fields for units in the
@@ -161,18 +167,55 @@ def save_poc(request, course):
             else:
                 clear_override_for_poc(poc, block, 'due')
 
+            if not unit['hidden'] and block.graded:
+               graded[block.format] = graded.get(block.format, 0) + 1
+
             children = unit.get('children', None)
             if children:
-                override_fields(block, children, earliest)
+                override_fields(block, children, graded, earliest)
         return earliest
 
-    earliest = override_fields(course, json.loads(request.body))
+    graded = {}
+    earliest = override_fields(course, json.loads(request.body), graded)
     if earliest:
         override_field_for_poc(poc, course, 'start', earliest)
 
+    # Attempt to automatically adjust grading policy
+    changed = False
+    policy = get_override_for_poc(
+        poc, course, 'grading_policy', course.grading_policy
+    )
+    policy = deepcopy(policy)
+    grader = policy['GRADER']
+    for section in grader:
+        count = graded.get(section.get('type'), 0)
+        if count < section['min_count']:
+            changed = True
+            section['min_count'] = count
+    if changed:
+        override_field_for_poc(poc, course, 'grading_policy', policy)
+
     return HttpResponse(
-        json.dumps(get_poc_schedule(course, poc)),
-        content_type='application/json')
+        json.dumps({
+            'schedule': get_poc_schedule(course, poc),
+            'grading_policy': json.dumps(policy, indent=4)}),
+        content_type='application/json',
+    )
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
+def set_grading_policy(request, course):
+    """
+    Set grading policy for the POC.
+    """
+    poc = get_poc_for_coach(course, request.user)
+    override_field_for_poc(
+        poc, course, 'grading_policy', json.loads(request.POST['policy']))
+
+    url = reverse('poc_coach_dashboard', kwargs={'course_id': course.id})
+    return redirect(url)
 
 
 def parse_date(datestring):

@@ -28,7 +28,11 @@ from ..models import (
     PocMembership,
     PocFutureMembership,
 )
-from ..overrides import get_override_for_poc, override_field_for_poc
+from ..overrides import (
+    get_override_for_poc,
+    override_field_for_poc,
+    poc_context,
+)
 from .factories import (
     PocFactory,
     PocMembershipFactory,
@@ -73,13 +77,18 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
                     for _ in xrange(2)]
         sequentials = flatten([
             [ItemFactory.create(parent=chapter) for _ in xrange(2)]
-            for chapter in chapters])
+            for chapter in chapters]
+        )
         verticals = flatten([
-            [ItemFactory.create(due=due, parent=sequential) for _ in xrange(2)]
-            for sequential in sequentials])
+            [ItemFactory.create(
+                due=due, parent=sequential, graded=True, format='Homework')
+                for _ in xrange(2)]
+            for sequential in sequentials]
+        )
         blocks = flatten([
             [ItemFactory.create(parent=vertical) for _ in xrange(2)]
-            for vertical in verticals])
+            for vertical in verticals]
+        )
 
     def make_coach(self):
         role = CoursePocCoachRole(self.course.id)
@@ -140,7 +149,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(re.search('id="poc-schedule"', response.content))
 
     @patch('pocs.views.render_to_response', intercept_renderer)
-    @patch('pocs.views.today')
+    @patch('pocs.views.TODAY')
     def test_edit_schedule(self, today):
         """
         Get POC schedule, modify it, save it.
@@ -166,14 +175,23 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'save_poc',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
 
-        schedule[0]['hidden'] = False
+        def unhide(unit):
+            """
+            Recursively unhide a unit and all of its children in the POC
+            schedule.
+            """
+            unit['hidden'] = False
+            for child in unit.get('children', ()):
+                unhide(child)
+
+        unhide(schedule[0])
         schedule[0]['start'] = u'2014-11-20 00:00'
         schedule[0]['children'][0]['due'] = u'2014-12-25 00:00'  # what a jerk!
         response = self.client.post(
             url, json.dumps(schedule), content_type='application/json'
         )
 
-        schedule = json.loads(response.content)
+        schedule = json.loads(response.content)['schedule']
         self.assertEqual(schedule[0]['hidden'], False)
         self.assertEqual(schedule[0]['start'], u'2014-11-20 00:00')
         self.assertEqual(
@@ -185,6 +203,18 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         poc = PersonalOnlineCourse.objects.get()
         course_start = get_override_for_poc(poc, self.course, 'start')
         self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
+
+        # Make sure grading policy adjusted
+        policy = get_override_for_poc(poc, self.course, 'grading_policy',
+                                      self.course.grading_policy)
+        self.assertEqual(policy['GRADER'][0]['type'], 'Homework')
+        self.assertEqual(policy['GRADER'][0]['min_count'], 4)
+        self.assertEqual(policy['GRADER'][1]['type'], 'Lab')
+        self.assertEqual(policy['GRADER'][1]['min_count'], 0)
+        self.assertEqual(policy['GRADER'][2]['type'], 'Midterm Exam')
+        self.assertEqual(policy['GRADER'][2]['min_count'], 0)
+        self.assertEqual(policy['GRADER'][3]['type'], 'Final Exam')
+        self.assertEqual(policy['GRADER'][3]['min_count'], 0)
 
     def test_enroll_member_student(self):
         """enroll a list of students who are members of the class
@@ -498,12 +528,15 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'progress',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        grades = response.mako_context['grade_summary']
-        self.assertEqual(grades['percent'], 0.5)
-        self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
-        self.assertEqual(len(grades['section_breakdown']), 4)
+
+        with poc_context(self.poc):
+
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            grades = response.mako_context['grade_summary']
+            self.assertEqual(grades['percent'], 0.5)
+            self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
+            self.assertEqual(len(grades['section_breakdown']), 4)
 
 
 def flatten(seq):

@@ -1,0 +1,10 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<h2>${_("Grading Policy")}</h2>
+
+<form action="${grading_policy_url}" method="POST">
+  <input type="hidden" name="csrfmiddlewaretoken" value="${csrf_token}"/>
+  <textarea cols="80" style="height: 500px;"
+    name="policy" id="grading-policy">${grading_policy}</textarea><br/>
+  <button type="submit">${_("Save Grading Policy")}</button>
+</form>

@@ -436,10 +436,14 @@ var poc_schedule = (function () {
         contentType: 'application/json',
         data: JSON.stringify(this.schedule),
         success: function(data, textStatus, jqXHR) {
-          self.schedule = data;
+          self.schedule = data.schedule;
           self.dirty = false;
           self.render();
           button.prop('disabled', false).text('${_("Save changes")}');
+          
+          // Update textarea with grading policy JSON, since grading policy
+          // may have changed.  
+          $('#grading-policy').text(data.grading_policy);
         },
         error: function(jqXHR, textStatus, error) {
           console.log(jqXHR.responseText);
