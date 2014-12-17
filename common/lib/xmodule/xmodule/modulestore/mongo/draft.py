@@ -543,6 +543,8 @@ class DraftModuleStore(MongoModuleStore):
             )
         self._delete_subtree(location, as_functions)
 
+        self.do_index(location, delete=True)
+
     def _delete_subtree(self, location, as_functions):
         """
         Internal method for deleting all of the subtree whose revisions match the as_functions
@@ -618,6 +620,53 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
+    def do_index(self, location, delete=False):
+        # TODO - inline for now, need to move this out to a celery task
+        INDEX_NAME = "courseware_index"
+        DOCUMENT_TYPE = "courseware_content"
+
+        searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        location_info = {
+            "course": unicode(location.course_key),
+        }
+
+        def _fetch_item(item_location):
+            try:
+                item = self.get_item(item_location)
+            except:
+                log.warning('Cannot find: %s', item_location)
+                return None
+
+            return item
+
+        def index_item_location(item_location):
+            item = _fetch_item(item_location)
+            if item:
+                if item.has_children:
+                    for child_loc in item.children:
+                        index_item_location(child_loc)
+
+                item_index = {}
+                item_index.update(location_info)
+                item_index.update(item.index_view())
+                item_index.update({
+                    'id': unicode(item.scope_ids.usage_id),
+                })
+                searcher.index(DOCUMENT_TYPE, item_index)
+
+        def remove_index_item_location(item_location):
+            item = _fetch_item(item_location)
+            if item:
+                if item.has_children:
+                    for child_loc in item.children:
+                        remove_index_item_location(child_loc)
+                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+
+        if delete:
+            remove_index_item_location(location)
+        else:
+            index_item_location(location)
+
     def publish(self, location, user_id, **kwargs):
         """
         Publish the subtree rooted at location to the live course and remove the drafts.
@@ -635,22 +684,6 @@ class DraftModuleStore(MongoModuleStore):
         # and the second to do the publishing on the drafts looking for the published in the cached
         # list of published ones.)
         to_be_deleted = []
-
-        searcher = SearchEngine.get_search_engine("courseware_index")
-        location_info = {
-            "course": unicode(location.course_key),
-        }
-
-        def index_item(item):
-            item_index = {}
-            item_index.update(location_info)
-            item_index.update(item.index_view())
-            item_index.update({
-                'id': unicode(item.scope_ids.usage_id),
-            })
-            searcher.index("courseware_content", item_index)
-
-        index_items = []
 
         def _internal_depth_first(item_location, is_root):
             """
@@ -701,7 +734,6 @@ class DraftModuleStore(MongoModuleStore):
             super(DraftModuleStore, self).update_item(
                 item, user_id, isPublish=True, is_publish_root=is_root, allow_not_found=True
             )
-            index_items.append(item)
             to_be_deleted.append(as_draft(item_location).to_deprecated_son())
 
         # verify input conditions
@@ -714,13 +746,9 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
 
-        published_item = self.get_item(as_published(location))
-        index_item(published_item)
+        self.do_index(location)
 
-        for item in index_items:
-            index_item(item)
-
-        return published_item
+        return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
         """
