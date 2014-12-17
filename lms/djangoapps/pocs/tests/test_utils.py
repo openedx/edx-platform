@@ -308,7 +308,6 @@ class TestEnrollEmail(ModuleStoreTestCase):
         # ensure there are still no emails in the outbox now
         self.assertEqual(len(self.outbox), 0)
 
-
     def test_enroll_non_member_no_email(self):
         """register a non-member but send no email"""
         self.create_user()

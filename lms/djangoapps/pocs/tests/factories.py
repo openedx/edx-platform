@@ -13,5 +13,6 @@ class PocMembershipFactory(DjangoModelFactory):
     FACTORY_FOR = PocMembership
     active = False
 
+
 class PocFutureMembershipFactory(DjangoModelFactory):
     FACTORY_FOR = PocFutureMembership

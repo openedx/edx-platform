@@ -502,7 +502,7 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(response.status_code, 200)
         grades = response.mako_context['grade_summary']
         self.assertEqual(grades['percent'], 0.5)
-        self.assertEqual( grades['grade_breakdown'][0]['percent'], 0.5)
+        self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
@@ -524,8 +524,10 @@ def iter_blocks(course):
                 yield descendant
     return visit(course)
 
+
 def visible_children(block):
     block_get_children = block.get_children
+
     def get_children():
         def iter_children():
             for child in block_get_children():

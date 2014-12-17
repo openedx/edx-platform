@@ -1,3 +1,6 @@
+"""
+Views related to the Personal Online Courses feature.
+"""
 import csv
 import datetime
 import functools
@@ -40,7 +43,7 @@ from .overrides import (
 from .utils import enroll_email, unenroll_email
 
 log = logging.getLogger(__name__)
-today = datetime.datetime.today  # for patching in tests
+TODAY = datetime.datetime.today  # for patching in tests
 
 
 def coach_dashboard(view):
@@ -51,6 +54,10 @@ def coach_dashboard(view):
     """
     @functools.wraps(view)
     def wrapper(request, course_id):
+        """
+        Wraps the view function, performing access check, loading the course,
+        and modifying the view's call signature.
+        """
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         role = CoursePocCoachRole(course_key)
         if not role.has_user(request.user):
@@ -79,7 +86,7 @@ def dashboard(request, course):
         'gradebook_url': reverse('poc_gradebook',
                                  kwargs={'course_id': course.id}),
         'grades_csv_url': reverse('poc_grades_csv',
-                                 kwargs={'course_id': course.id}),
+                                  kwargs={'course_id': course.id}),
     }
     if not poc:
         context['create_poc_url'] = reverse(
@@ -102,7 +109,7 @@ def create_poc(request, course):
     poc.save()
 
     # Make sure start/due are overridden for entire course
-    start = today().replace(tzinfo=pytz.UTC)
+    start = TODAY().replace(tzinfo=pytz.UTC)
     override_field_for_poc(poc, course, 'start', start)
     override_field_for_poc(poc, course, 'due', None)
 
@@ -124,11 +131,16 @@ def create_poc(request, course):
 @coach_dashboard
 def save_poc(request, course):
     """
-    Save changes to POC
+    Save changes to POC.
     """
     poc = get_poc_for_coach(course, request.user)
 
     def override_fields(parent, data, earliest=None):
+        """
+        Recursively apply POC schedule data to POC by overriding the
+        `visible_to_staff_only`, `start` and `due` fields for units in the
+        course.
+        """
         blocks = {
             str(child.location): child
             for child in parent.get_children()}
@@ -163,16 +175,17 @@ def save_poc(request, course):
         content_type='application/json')
 
 
-def parse_date(s):
-    if s:
-        try:
-            date, time = s.split(' ')
-            year, month, day = map(int, date.split('-'))
-            hour, minute = map(int, time.split(':'))
-            return datetime.datetime(
-                year, month, day, hour, minute, tzinfo=pytz.UTC)
-        except:
-            log.warn("Unable to parse date: " + s)
+def parse_date(datestring):
+    """
+    Generate a UTC datetime.datetime object from a string of the form
+    'YYYY-MM-DD HH:MM'.  If string is empty or `None`, returns `None`.
+    """
+    if datestring:
+        date, time = datestring.split(' ')
+        year, month, day = map(int, date.split('-'))
+        hour, minute = map(int, time.split(':'))
+        return datetime.datetime(
+            year, month, day, hour, minute, tzinfo=pytz.UTC)
 
     return None
 
@@ -192,8 +205,12 @@ def get_poc_for_coach(course, coach):
 
 def get_poc_schedule(course, poc):
     """
+    Generate a JSON serializable POC schedule.
     """
     def visit(node, depth=1):
+        """
+        Recursive generator function which yields POC schedule nodes.
+        """
         for child in node.get_children():
             start = get_override_for_poc(poc, child, 'start', None)
             if start:
@@ -301,8 +318,11 @@ def poc_gradebook(request, course):
 
     poc = get_poc_for_coach(course, request.user)
     with poc_context(poc):
-        course._field_data_cache = {}
-        course.set_grading_policy(course.grading_policy)  # this is so awful
+        # The grading policy for the MOOC is probably already cached.  We need
+        # to make sure we have the POC grading policy loaded.
+        course._field_data_cache = {}  # pylint: disable=protected-access
+        course.set_grading_policy(course.grading_policy)
+
         enrolled_students = User.objects.filter(
             pocmembership__poc=poc,
             pocmembership__active=1
@@ -343,8 +363,11 @@ def poc_grades_csv(request, course):
 
     poc = get_poc_for_coach(course, request.user)
     with poc_context(poc):
-        course._field_data_cache = {}
-        course.set_grading_policy(course.grading_policy)  # this is so awful
+        # The grading policy for the MOOC is probably already cached.  We need
+        # to make sure we have the POC grading policy loaded.
+        course._field_data_cache = {}  # pylint: disable=protected-access
+        course.set_grading_policy(course.grading_policy)
+
         enrolled_students = User.objects.filter(
             pocmembership__poc=poc,
             pocmembership__active=1
@@ -353,7 +376,7 @@ def poc_grades_csv(request, course):
 
         header = None
         rows = []
-        for student, gradeset, err_msg in grades:
+        for student, gradeset, __ in grades:
             if gradeset:
                 # We were able to successfully grade this student for this
                 # course.
@@ -374,9 +397,9 @@ def poc_grades_csv(request, course):
                 rows.append([student.id, student.email, student.username,
                              gradeset['percent']] + row_percents)
 
-        buffer = StringIO()
-        writer = csv.writer(buffer)
+        buf = StringIO()
+        writer = csv.writer(buf)
         for row in rows:
             writer.writerow(row)
 
-        return HttpResponse(buffer.getvalue(), content_type='text/plain')
+        return HttpResponse(buf.getvalue(), content_type='text/plain')
