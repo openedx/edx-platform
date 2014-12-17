@@ -6,7 +6,7 @@ var edx = edx || {};
     edx.search = edx.search || {};
 
     edx.search.Form = Backbone.View.extend({
-        el: '#couserware-search',
+        el: '#courseware-search',
         events: {
             'submit form': 'submitForm',
             'click .cancel-button': 'clearSearch',
