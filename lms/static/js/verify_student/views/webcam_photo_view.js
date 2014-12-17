@@ -13,9 +13,10 @@
 
         template: "#webcam_photo-tpl",
 
-        videoCaptureBackend: {
+        backends: [
+            {
+                name: "html5",
 
-            html5: {
                 initialize: function( obj ) {
                     this.URL = (window.URL || window.webkitURL);
                     this.video = obj.video || "";
@@ -90,7 +91,9 @@
                 }
             },
 
-            flash: {
+            {
+                name: "flash",
+
                 initialize: function( obj ) {
                     this.wrapper = obj.wrapper || "";
                     this.imageData = "";
@@ -193,15 +196,18 @@
                     // so we don't need to keep checking.
                 }
             }
-        },
-
-        videoBackendPriority: ['html5', 'flash'],
+        ],
 
         initialize: function( obj ) {
             this.submitButton = obj.submitButton || "";
             this.modelAttribute = obj.modelAttribute || "";
-            this.errorModel = obj.errorModel || {};
-            this.backend = this.chooseVideoCaptureBackend();
+            this.errorModel = obj.errorModel || null;
+            this.backend = _.find(
+                obj.backends || this.backends,
+                function( backend ) {
+                    return backend.isSupported();
+                }
+            );
 
             if ( !this.backend ) {
                 this.handleError(
@@ -232,15 +238,20 @@
             // Initialize the video capture backend
             // We need to do this after rendering the template
             // so that the backend has the opportunity to modify the DOM.
-            this.backend.initialize({
-                wrapper: "#camera",
-                video: '#photo_id_video',
-                canvas: '#photo_id_canvas'
-            });
+            if ( this.backend ) {
+                this.backend.initialize({
+                    wrapper: "#camera",
+                    video: '#photo_id_video',
+                    canvas: '#photo_id_canvas'
+                });
 
-            // Install event handlers
-            $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
-            $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
+                // Install event handlers
+                $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
+                $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
+
+                // Show the capture button
+                $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
+            }
 
             return this;
         },
@@ -252,9 +263,12 @@
             // Reset the video capture
             this.backend.reset();
 
+            // Reset data on the model
+            this.model.set( this.modelAttribute, "" );
+
             // Go back to the initial button state
-            $( "#webcam_reset_button", this.el ).hide();
-            $( "#webcam_capture_button", this.el ).show();
+            $( "#webcam_reset_button", this.el ).addClass('is-hidden');
+            $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
         },
 
         capture: function() {
@@ -267,8 +281,8 @@
                 this.trigger( 'imageCaptured' );
 
                 // Hide the capture button, and show the reset button
-                $( "#webcam_capture_button", this.el ).hide();
-                $( "#webcam_reset_button", this.el ).show();
+                $( "#webcam_capture_button", this.el ).addClass('is-hidden');
+                $( "#webcam_reset_button", this.el ).removeClass('is-hidden');
 
                 // Save the data to the model
                 this.model.set( this.modelAttribute, this.backend.getImageData() );
@@ -278,29 +292,19 @@
             }
         },
 
-        chooseVideoCaptureBackend: function() {
-            var i, backendName, backend;
-
-            for ( i = 0; i < this.videoBackendPriority.length; i++ ) {
-                backendName = this.videoBackendPriority[i];
-                backend = this.videoCaptureBackend[backendName];
-                if ( backend.isSupported() ) {
-                    return backend;
-                }
-            }
-        },
-
         handleError: function( errorTitle, errorMsg ) {
             // Hide the buttons
-            $( "#webcam_capture_button", this.el ).hide();
-            $( "#webcam_reset_button", this.el ).hide();
+            $( "#webcam_capture_button", this.el ).addClass('is-hidden');
+            $( "#webcam_reset_button", this.el ).addClass('is-hidden');
 
             // Show the error message
-            this.errorModel.set({
-                errorTitle: errorTitle,
-                errorMsg: errorMsg,
-                shown: true
-            });
+            if ( this.errorModel ) {
+                this.errorModel.set({
+                    errorTitle: errorTitle,
+                    errorMsg: errorMsg,
+                    shown: true
+                });
+            }
         }
     });
 

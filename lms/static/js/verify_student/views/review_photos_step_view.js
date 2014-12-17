@@ -10,9 +10,14 @@ var edx = edx || {};
 
     edx.verify_student.ReviewPhotosStepView = edx.verify_student.StepView.extend({
 
-        postRender: function() {
-            var model = this.model;
+        defaultContext: function() {
+            return {
+                platformName: "",
+                fullName: "",
+            };
+        },
 
+        postRender: function() {
             // Load the photos from the previous steps
             $( '#face_image' )[0].src = this.model.get('faceImage');
             $( '#photo_id_image' )[0].src = this.model.get('identificationImage');
@@ -49,6 +54,8 @@ var edx = edx || {};
         },
 
         submitPhotos: function() {
+            var fullName = $( '#new-name' ).val();
+
             // Disable the submit button to prevent duplicate submissions
             $( '#next_step_button' ).addClass( 'is-disabled' );
 
@@ -59,30 +66,28 @@ var edx = edx || {};
             this.listenToOnce( this.model, 'error', _.bind( this.handleSubmissionError, this ) );
 
             // Submit
-            this.model.set( 'fullName', $( '#new-name' ).val() );
+            if ( fullName ) {
+                this.model.set( 'fullName', fullName );
+            }
             this.model.save();
         },
 
         handleSubmissionError: function( xhr ) {
+            var isConfirmChecked = $( "#confirm_pics_good" ).prop('checked'),
+                errorMsg = gettext( 'An unexpected error occurred.  Please try again later.' );
+
             // Re-enable the submit button to allow the user to retry
-            var isConfirmChecked = $( '#confirm_pics_good' ).prop( 'checked' );
             $( '#next_step_button' ).toggleClass( 'is-disabled', !isConfirmChecked );
 
-            // Display the error
             if ( xhr.status === 400 ) {
-                this.errorModel.set({
-                    errorTitle: gettext( 'Could not submit photos' ),
-                    errorMsg: xhr.responseText,
-                    shown: true
-                });
+                errorMsg = xhr.responseText;
             }
-            else {
-                this.errorModel.set({
-                    errorTitle: gettext( 'Could not submit photos' ),
-                    errorMsg: gettext( 'An unexpected error occurred.  Please try again later.' ),
-                    shown: true
-                });
-            }
+
+            this.errorModel.set({
+                errorTitle: gettext( 'Could not submit photos' ),
+                errorMsg: errorMsg,
+                shown: true
+            });
         },
 
         expandCallback: function( event ) {

@@ -1,4 +1,4 @@
-<div id="wrapper-review" class="wrapper-view">
+<div id="wrapper-review" class="wrapper-view make-payment-step">
   <div class="review view">
     <h3 class="title"><%- gettext( "Make Payment" ) %></h3>
     <div class="instruction">
@@ -7,7 +7,7 @@
 
     <div class="requirements-container"></div>
 
-    <% if ( isActive == "True" ) { %>
+    <% if ( isActive ) { %>
       <div class="wrapper-task">
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
@@ -79,13 +79,15 @@
   <nav class="nav-wizard is-ready">
     <ol class="wizard-steps">
       <li class="wizard-step">
+        <% if ( isActive ) { %>
         <a class="next action-primary is-disabled" id="pay_button">
-          <% if ( isActive == "False" ) { %>
-            <%- gettext( "Activate Your Account" ) %>
-          <% } else { %>
-            <%- gettext( "Go to payment" ) %>
-          <% } %>
+          <%- gettext( "Go to payment" ) %>
         </a>
+        <% } else { %>
+        <a class="next action-primary is-disabled" id="activate_button">
+          <%- gettext( "Activate Your Account" ) %>
+        </a>
+        <% } %>
       </li>
     </ol>
   </nav>

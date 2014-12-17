@@ -10,6 +10,14 @@ var edx = edx || {};
 
     edx.verify_student.IntroStepView = edx.verify_student.StepView.extend({
 
+        defaultContext: function() {
+            return {
+                introTitle: '',
+                introMsg: '',
+                isActive: false
+            };
+        },
+
         // Currently, this view doesn't need to install any custom event handlers,
         // since the button in the template reloads the page with a
         // ?skip-intro=1 GET parameter.  The reason for this is that we

@@ -15,6 +15,14 @@ var edx = edx || {};
         postRender: function() {
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'verification', this.templateName );
+        },
+
+        defaultContext: function() {
+            return {
+                courseName: '',
+                courseStartDate: '',
+                coursewareUrl: ''
+            };
         }
     });
 

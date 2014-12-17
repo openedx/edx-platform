@@ -26,19 +26,11 @@
         },
 
         render: function() {
-            var templateHtml = $( "#" + this.templateName + "-tpl" ).html(),
-                templateContext = {
-                    nextStepNum: this.nextStepNum,
-                    nextStepTitle: this.nextStepTitle
-                };
-
-            // Include step-specific information from the server
-            // (passed in from data- attributes to the parent view)
-            _.extend( templateContext, this.stepData );
+            var templateHtml = $( "#" + this.templateName + "-tpl" ).html();
 
             // Allow subclasses to add additional information
             // to the template context, perhaps asynchronously.
-            this.updateContext( templateContext ).done(
+            this.updateContext( this.templateContext() ).done(
                 function( templateContext ) {
                     // Render the template into the DOM
                     $( this.el ).html( _.template( templateHtml, templateContext ) );
@@ -47,6 +39,8 @@
                     this.postRender();
                 }
             ).fail( _.bind( this.handleError, this ) );
+
+            return this;
         },
 
         handleResponse: function( data ) {
@@ -58,10 +52,8 @@
             // Include step-specific information
             _.extend( context, this.stepData );
 
-            this.renderedHtml = _.template( data, context );
-            $( this.el ).html( this.renderedHtml );
-
-            this.postRender();
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
         },
 
         handleError: function( errorTitle, errorMsg ) {
@@ -70,6 +62,26 @@
                 errorMsg: errorMsg || gettext( "An unexpected error occurred.  Please reload the page to try again." ),
                 shown: true
             });
+        },
+
+        templateContext: function() {
+            var context = {
+                nextStepNum: this.nextStepNum,
+                nextStepTitle: this.nextStepTitle
+            };
+            return _.extend( context, this.defaultContext(), this.stepData );
+        },
+
+        /**
+         * Provide default values for the template context.
+         * Subclasses can use this to fill in values that
+         * the underscore templates expect to be defined.
+         * This is especially useful for testing, so that the
+         * tests can pass in only the values relevant
+         * to the test.
+         */
+        defaultContext: function() {
+            return {};
         },
 
         /**
