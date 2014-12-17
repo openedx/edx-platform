@@ -10,7 +10,10 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 
+from courseware.courses import get_course_about_section
+from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from microsite_configuration import microsite
 
@@ -214,3 +217,31 @@ def send_mail_to_student(student, param_dict):
             [student],
             fail_silently=False
         )
+
+
+def get_all_pocs_for_user(user):
+    """return all POCS to which the user is registered
+
+    Returns a list of dicts: {
+        poc_name: <formatted title of POC course>
+        poc_url: <url to view this POC>
+    }
+    """
+    if user.is_anonymous():
+        return []
+    active_poc_memberships = PocMembership.objects.filter(
+        student=user, active__exact=True
+    )
+    memberships = []
+    for membership in active_poc_memberships:
+        course = get_course_by_id(membership.poc.course_id)
+        title = 'POC: {}'.format(get_course_about_section(course, 'title'))
+        url = reverse(
+            'switch_active_poc',
+            args=[course.id.to_deprecated_string(), membership.poc.id]
+        )
+        memberships.append({
+            'poc_name': title,
+            'poc_url': url
+        })
+    return memberships

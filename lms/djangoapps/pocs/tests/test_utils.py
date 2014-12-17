@@ -11,6 +11,8 @@ from student.roles import CoursePocCoachRole
 from student.tests.factories import (
     AdminFactory,
     UserFactory,
+    CourseEnrollmentFactory,
+    AnonymousUserFactory,
 )
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -481,3 +483,66 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.check_enrollment_state(before, True, self.user, True)
         # no email was sent to the student
         self.assertEqual(len(self.outbox), 0)
+
+
+class TestUserPocList(ModuleStoreTestCase):
+    """Unit tests for poc.utils.get_all_pocs_for_user"""
+
+    def setUp(self):
+        """Create required infrastructure for tests"""
+        self.course = CourseFactory.create()
+        coach = AdminFactory.create()
+        role = CoursePocCoachRole(self.course.id)
+        role.add_users(coach)
+        self.poc = PocFactory(course_id=self.course.id, coach=coach)
+        enrollment = CourseEnrollmentFactory.create(course_id=self.course.id)
+        self.user = enrollment.user
+        self.anonymous = AnonymousUserFactory.create()
+
+    def register_user_in_poc(self, active=False):
+        """create registration of self.user in self.poc
+
+        registration will be inactive unless active=True
+        """
+        PocMembershipFactory(poc=self.poc, student=self.user, active=active)
+
+    def get_course_title(self):
+        from courseware.courses import get_course_about_section
+        return get_course_about_section(self.course, 'title')
+
+    def call_FUT(self, user):
+        from pocs.utils import get_all_pocs_for_user
+        return get_all_pocs_for_user(user)
+
+    def test_anonymous_sees_no_pocs(self):
+        memberships = self.call_FUT(self.anonymous)
+        self.assertEqual(len(memberships), 0)
+
+    def test_unenrolled_sees_no_pocs(self):
+        memberships = self.call_FUT(self.user)
+        self.assertEqual(len(memberships), 0)
+
+    def test_enrolled_inactive_sees_no_pocs(self):
+        self.register_user_in_poc()
+        memberships = self.call_FUT(self.user)
+        self.assertEqual(len(memberships), 0)
+
+    def test_enrolled_sees_a_poc(self):
+        self.register_user_in_poc(active=True)
+        memberships = self.call_FUT(self.user)
+        self.assertEqual(len(memberships), 1)
+
+    def test_data_structure(self):
+        self.register_user_in_poc(active=True)
+        memberships = self.call_FUT(self.user)
+        this_membership = memberships[0]
+        self.assertTrue(this_membership)
+        # structure contains the expected keys
+        for key in ['poc_name', 'poc_url']:
+            self.assertTrue(key in this_membership.keys())
+        url_parts = [self.course.id.to_deprecated_string(), str(self.poc.id)]
+        # all parts of the poc url are present
+        for part in url_parts:
+            self.assertTrue(part in this_membership['poc_url'])
+        actual_name = self.get_course_title()
+        self.assertTrue(actual_name in this_membership['poc_name'])
