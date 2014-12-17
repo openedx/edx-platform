@@ -1,11 +1,11 @@
 var edx = edx || {};
 
-(function ($, Backbone) {
+(function (Backbone) {
     'use strict'
 
     edx.search = edx.search || {};
 
-    edx.search.SearchResult = Backbone.Model.extend({
+    edx.search.Result = Backbone.Model.extend({
         defaults: {
             location: {},
             content_type: '',
@@ -13,4 +13,4 @@ var edx = edx || {};
         }
     });
 
-})(jQuery, Backbone);
+})(Backbone);

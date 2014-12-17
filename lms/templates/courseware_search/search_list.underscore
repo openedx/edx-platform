@@ -1,11 +1,11 @@
 <div class="search-info">
-    Searching Course
-    <span class="search-count"><%- totalCount %> results</span>
+    <%- gettext("Searching Course") %>
+    <span class="search-count"><%- totalCount %>  <%- gettext("results") %></span>
 </div>
 
 <% if (totalCount > 0 ) { %>
 
-    <ol class='search-results'><%= list %></ol>
+    <ol class='search-results'></ol>
 
     <% if (hasMoreResults) { %>
         <a class="search-load-next" href="javascript:void(0);">
