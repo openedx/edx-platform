@@ -16,30 +16,41 @@ import threading
 from django.template import RequestContext
 from util.request import safe_get_host
 
-REQUEST_CONTEXT = threading.local()
+# Thread local cache of the current request and its associated context
+REQUEST_CACHE = threading.local()
 
 
 class MakoMiddleware(object):
 
     def process_request(self, request):
         """ Process the middleware request. """
-        REQUEST_CONTEXT.request = request
+        # Store the request for the duration of its processing
+        REQUEST_CACHE.request = request
+        # Clear the cached request context so that it will be recomputed when first needed
+        REQUEST_CACHE.context = None
 
     def process_response(self, __, response):
         """ Process the middleware response. """
-        REQUEST_CONTEXT.request = None
+        # Clear the cached request and context now that the response has completed
+        REQUEST_CACHE.request = None
+        REQUEST_CACHE.context = None
         return response
 
 
 def get_template_request_context():
     """
     Returns the template processing context to use for the current request,
-    or returns None if there is not a current request.
+    or returns None if there is not a current request. Note that the result
+    is cached for the duration of the request as a single page response can
+    require tens or even hundreds of templates to be rendered.
     """
-    request = getattr(REQUEST_CONTEXT, "request", None)
+    request = getattr(REQUEST_CACHE, "request", None)
     if not request:
         return None
-    context = RequestContext(request)
-    context['is_secure'] = request.is_secure()
-    context['site'] = safe_get_host(request)
+    context = getattr(REQUEST_CACHE, "context", None)
+    if not context:
+        context = RequestContext(request)
+        context['is_secure'] = request.is_secure()
+        context['site'] = safe_get_host(request)
+        REQUEST_CACHE.context = context
     return context
