@@ -286,9 +286,7 @@ class CourseWithContentGroupsTest(StaffViewTest):
         """
         course_nav = CourseNavPage(self.browser)
         actual_items = course_nav.sequence_items
-        self.assertEqual(len(actual_items), len(expected_items))
-        for expected in expected_items:
-            self.assertIn(expected, actual_items)
+        self.assertItemsEqual(expected_items, actual_items)
 
     def test_staff_sees_all_problems(self):
         """
