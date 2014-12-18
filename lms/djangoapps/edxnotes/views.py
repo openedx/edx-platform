@@ -4,9 +4,9 @@ Views related to EdxNotes.
 import json
 import logging
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
@@ -32,16 +32,12 @@ def edxnotes(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=0
-    )
-    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
 
     if not is_feature_enabled(course):
         raise Http404
 
     try:
-        notes = get_notes(request.user, course_module)
+        notes = get_notes(request.user, course)
     except EdxNotesServiceUnavailable:
         raise Http404
 
@@ -54,6 +50,10 @@ def edxnotes(request, course_id):
     }
 
     if not notes:
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2
+        )
+        course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
         position = get_course_position(course_module)
         if position:
             context.update({
@@ -70,10 +70,6 @@ def search_notes(request, course_id):
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     course = get_course_with_access(request.user, "load", course_key)
-    field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-        course.id, request.user, course, depth=0
-    )
-    course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
 
     if not is_feature_enabled(course):
         raise Http404
@@ -83,7 +79,7 @@ def search_notes(request, course_id):
 
     query_string = request.GET["text"]
     try:
-        search_results = search(request.user, course_module, query_string)
+        search_results = search(request.user, course, query_string)
     except (EdxNotesParseError, EdxNotesServiceUnavailable) as err:
         return JsonResponseBadRequest({"error": err.message}, status=500)
 
@@ -99,6 +95,7 @@ def get_token(request, course_id):
     return HttpResponse(get_id_token(request.user), content_type='text/plain')
 
 
+@login_required
 def edxnotes_visibility(request, course_id):
     """
     Handle ajax call from "Show notes" checkbox.

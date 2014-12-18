@@ -103,7 +103,7 @@ def send_request(user, course_id, path="", query_string=""):
 
 def get_parent_unit(xblock):
     """
-    Find vertical that is a unit, not just some container
+    Find vertical that is a unit, not just some container.
     """
     while xblock:
         xblock = xblock.get_parent()
@@ -154,7 +154,7 @@ def preprocess_collection(user, course, collection):
 
             unit = get_parent_unit(item)
             if unit is None:
-                log.debug("Unit not found for %s", usage_key)
+                log.debug("Unit not found: %s", usage_key)
                 continue
             if unit in cache:
                 model.update(cache[unit])
@@ -200,17 +200,18 @@ def get_module_context(course, item):
         'display_name': item.display_name_with_default,
     }
 
-    if item.category == 'chapter':
+    if item.category == 'chapter' and item.get_parent():
+        course = item.get_parent()
         ancestor_children = [child.to_deprecated_string() for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
-        item_dict['url'] = reverse("jump_to", kwargs={
+        item_dict['url'] = reverse("jump_to_id", kwargs={
             "course_id": course.id.to_deprecated_string(),
-            "location": item.location.to_deprecated_string(),
+            "module_id": item.url_name,
         })
 
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [child.location.to_deprecated_string() for child in item.get_children()]
+        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
 
     return item_dict
 
