@@ -26,6 +26,86 @@ class NoteChild(PageObject):
             selector,
         )
 
+    def _get_element_text(self, selector):
+        element = self.q(css=self._bounded_selector(selector)).first
+        if element:
+            return element.text[0]
+        else:
+            return None
+
+
+class EdxNotesPageGroup(NoteChild):
+    """
+    Helper class that works with note groups on Note page of the course.
+    """
+    BODY_SELECTOR = ".note-group"
+
+    @property
+    def title(self):
+        return self._get_element_text(".course-title")
+
+    @property
+    def subtitles(self):
+        return [section.title for section in self.children]
+
+    @property
+    def children(self):
+        children = self.q(css=self._bounded_selector('.note-section'))
+        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
+
+
+class EdxNotesPageSection(NoteChild):
+    """
+    Helper class that works with note sections on Note page of the course.
+    """
+    BODY_SELECTOR = ".note-section"
+
+    @property
+    def title(self):
+        return self._get_element_text(".course-subtitle")
+
+    @property
+    def children(self):
+        children = self.q(css=self._bounded_selector('.note'))
+        return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def notes(self):
+        return [section.text for section in self.children]
+
+
+class EdxNotesPageItem(NoteChild):
+    """
+    Helper class that works with note items on Note page of the course.
+    """
+    BODY_SELECTOR = ".note"
+    UNIT_LINK_SELECTOR = "a.reference-unit-link"
+
+    def go_to_unit(self, unit_page=None):
+        self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()
+        if unit_page is not None:
+            unit_page.wait_for_page()
+
+    @property
+    def unit_name(self):
+        return self._get_element_text(self.UNIT_LINK_SELECTOR)
+
+    @property
+    def text(self):
+        return self._get_element_text(".note-comments")
+
+    @property
+    def quote(self):
+        return self._get_element_text(".note-excerpt")
+
+    @property
+    def time_updated(self):
+        return self._get_element_text(".reference-updated-date")
+
+    @property
+    def title_highlighted(self):
+        return self._get_element_text(".reference-title")
+
 
 class EdxNotesPageView(PageObject):
     """
@@ -35,6 +115,7 @@ class EdxNotesPageView(PageObject):
     BODY_SELECTOR = ".tab-panel"
     TAB_SELECTOR = ".tab"
     CHILD_SELECTOR = ".note"
+    CHILD_CLASS = EdxNotesPageItem
 
     @unguarded
     def visit(self):
@@ -79,7 +160,7 @@ class EdxNotesPageView(PageObject):
         Returns all notes on the page.
         """
         children = self.q(css=self.CHILD_SELECTOR)
-        return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
+        return [self.CHILD_CLASS(self.browser, child.get_attribute("id")) for child in children]
 
 
 class RecentActivityView(EdxNotesPageView):
@@ -88,6 +169,16 @@ class RecentActivityView(EdxNotesPageView):
     """
     BODY_SELECTOR = "#recent-panel"
     TAB_SELECTOR = ".tab#view-recent-activity"
+
+
+class CourseStructureView(EdxNotesPageView):
+    """
+    Helper class for Course Structure view.
+    """
+    BODY_SELECTOR = "#structure-panel"
+    TAB_SELECTOR = ".tab#view-course-structure"
+    CHILD_SELECTOR = ".note-group"
+    CHILD_CLASS = EdxNotesPageGroup
 
 
 class SearchResultsView(EdxNotesPageView):
@@ -105,6 +196,7 @@ class EdxNotesPage(CoursePage):
     url_path = "edxnotes"
     MAPPING = {
         "recent": RecentActivityView,
+        "structure": CourseStructureView,
         "search": SearchResultsView,
     }
 
@@ -138,6 +230,8 @@ class EdxNotesPage(CoursePage):
         # Frontend will automatically switch to Search results tab when search
         # is running, so the view also needs to be changed.
         self.current_view = self.MAPPING["search"](self.browser)
+        if text.strip():
+            self.current_view.wait_for_page()
 
     @property
     def tabs(self):
@@ -169,11 +263,28 @@ class EdxNotesPage(CoursePage):
             return None
 
     @property
-    def children(self):
+    def notes(self):
         """
         Returns all notes on the page.
         """
-        return self.current_view.children
+        children = self.q(css='.note')
+        return [EdxNotesPageItem(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def groups(self):
+        """
+        Returns all groups on the page.
+        """
+        children = self.q(css='.note-group')
+        return [EdxNotesPageGroup(self.browser, child.get_attribute("id")) for child in children]
+
+    @property
+    def sections(self):
+        """
+        Returns all sections on the page.
+        """
+        children = self.q(css='.note-section')
+        return [EdxNotesPageSection(self.browser, child.get_attribute("id")) for child in children]
 
     @property
     def no_content_text(self):
@@ -185,46 +296,6 @@ class EdxNotesPage(CoursePage):
             return element.text[0]
         else:
             return None
-
-
-class EdxNotesPageItem(NoteChild):
-    """
-    Helper class that works with note items on Note page of the course.
-    """
-    BODY_SELECTOR = ".note"
-    UNIT_LINK_SELECTOR = "a.reference-unit-link"
-
-    def _get_element_text(self, selector):
-        element = self.q(css=self._bounded_selector(selector)).first
-        if element:
-            return element.text[0]
-        else:
-            return None
-
-    def go_to_unit(self, unit_page=None):
-        self.q(css=self._bounded_selector(self.UNIT_LINK_SELECTOR)).click()
-        if unit_page is not None:
-            unit_page.wait_for_page()
-
-    @property
-    def unit_name(self):
-        return self._get_element_text(self.UNIT_LINK_SELECTOR)
-
-    @property
-    def text(self):
-        return self._get_element_text(".note-comments")
-
-    @property
-    def quote(self):
-        return self._get_element_text(".note-excerpt")
-
-    @property
-    def time_updated(self):
-        return self._get_element_text(".reference-updated-date")
-
-    @property
-    def title_highlighted(self):
-        return self._get_element_text(".reference-title")
 
 
 class EdxNotesUnitPage(CoursePage):

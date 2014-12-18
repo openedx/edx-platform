@@ -4,9 +4,9 @@ Views related to EdxNotes.
 import json
 import logging
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest, Http404
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from courseware.courses import get_course_with_access
@@ -50,7 +50,9 @@ def edxnotes(request, course_id):
     }
 
     if not notes:
-        field_data_cache = FieldDataCache([course], course_key, request.user)
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course.id, request.user, course, depth=2
+        )
         course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course_key)
         position = get_course_position(course_module)
         if position:
@@ -93,6 +95,7 @@ def get_token(request, course_id):
     return HttpResponse(get_id_token(request.user), content_type='text/plain')
 
 
+@login_required
 def edxnotes_visibility(request, course_id):
     """
     Handle ajax call from "Show notes" checkbox.

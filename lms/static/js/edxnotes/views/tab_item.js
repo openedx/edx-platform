@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
 'use strict';
-define(['gettext', 'underscore', 'backbone'],
-function (gettext, _, Backbone) {
+define(['gettext', 'underscore', 'backbone', 'js/edxnotes/utils/template'],
+function (gettext, _, Backbone, templateUtils) {
     var TabItemView = Backbone.View.extend({
         tagName: 'li',
         className: 'tab',
@@ -14,14 +14,7 @@ function (gettext, _, Backbone) {
         },
 
         initialize: function (options) {
-            var templateSelector = '#tab-item-tpl',
-                templateText = $(templateSelector).text();
-
-            if (!templateText) {
-                console.error('Failed to load tab-item template');
-            }
-
-            this.template = _.template(templateText);
+            this.template = templateUtils.loadTemplate('tab-item');
             this.$el.attr('id', this.model.get('identifier'));
             this.listenTo(this.model, {
                 'change:is_active': function (model, value) {
