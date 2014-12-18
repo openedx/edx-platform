@@ -685,6 +685,11 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         created_user = self.get_user_by_email(strategy, email)
         self.assert_password_overridden_by_pipeline(overridden_password, created_user.username)
 
+        # force the user to be active so we can check login afterwards
+        # TODO: test path when user is not active
+        strategy.request.user.is_active = True
+        strategy.request.user.save()
+
         # At this point the user object exists, but there is no associated
         # social auth.
         self.assert_social_auth_does_not_exist_for_user(created_user, strategy)
