@@ -122,10 +122,13 @@ class AcceptanceTestSuite(TestSuite):
 
             # Run migrations to update the db, starting from its cached state
             sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
+            sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
         else:
             # If no cached database exists, syncdb before migrating, then create the cache
             sh("./manage.py lms --settings acceptance syncdb --traceback --noinput")
+            sh("./manage.py cms --settings acceptance syncdb --traceback --noinput")
             sh("./manage.py lms --settings acceptance migrate --traceback --noinput")
+            sh("./manage.py cms --settings acceptance migrate --traceback --noinput")
 
             # Create the cache if it doesn't already exist
             sh("cp {db} {db_cache}".format(db_cache=self.db_cache, db=self.db))

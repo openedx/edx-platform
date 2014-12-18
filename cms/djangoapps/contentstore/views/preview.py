@@ -33,6 +33,7 @@ from .session_kv_store import SessionKeyValueStore
 from .helpers import render_from_lms
 
 from contentstore.views.access import get_user_role
+from cms.djangoapps.xblock_config.models import StudioConfig
 
 __all__ = ['preview_handler']
 
@@ -87,7 +88,7 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
 
     def handler_url(self, block, handler_name, suffix='', query='', thirdparty=False):
         return reverse('preview_handler', kwargs={
-            'usage_key_string': unicode(block.location),
+            'usage_key_string': unicode(block.scope_ids.usage_id),
             'handler': handler_name,
             'suffix': suffix,
         }) + '?' + query
@@ -96,8 +97,16 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         return local_resource_url(block, uri)
 
     def applicable_aside_types(self, block):
-        # TODO: Implement this to enable XBlockAsides on previews in Studio
-        return []
+        """
+        Remove acid_aside and honor the config record
+        """
+        if not StudioConfig.asides_enabled(block.scope_ids.block_type):
+            return []
+        return [
+            aside_type
+            for aside_type in super(PreviewModuleSystem, self).applicable_aside_types(block)
+            if aside_type != 'acid_aside'
+        ]
 
 
 class StudioUserService(object):
