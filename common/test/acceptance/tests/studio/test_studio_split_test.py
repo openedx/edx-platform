@@ -8,7 +8,7 @@ from unittest import skip
 from nose.plugins.attrib import attr
 from selenium.webdriver.support.ui import Select
 
-from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.partitions.partitions import Group
 from bok_choy.promise import Promise, EmptyPromise
 
 from ...fixtures.course import XBlockFixtureDesc
