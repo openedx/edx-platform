@@ -44,12 +44,12 @@
 
         %if len(courses) > 0:
         <div class="copy">
-          <p>${_("Here are all of the courses you currently have access to in Studio:")}</p>
+          <p>${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_NAME)}</p>
         </div>
 
         %else:
         <div class="copy">
-          <p>${_("You currently aren't associated with any Studio Courses.")}</p>
+          <p>${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_NAME)}</p>
         </div>
         %endif
       </div>
@@ -252,9 +252,9 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
         <div class="notice-item">
           <div class="msg">
-            <h3 class="title">${_("Are you staff on an existing Studio course?")}</h3>
+            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_NAME)}</h3>
             <div class="copy">
-              <p>${_('You will need to be added to the course in Studio by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.')}</p>
+              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_NAME)}</p>
             </div>
           </div>
         </div>
@@ -283,12 +283,13 @@
       %if course_creator_status == "unrequested":
       <div class="wrapper wrapper-creationrights">
         <h3 class="title">
-          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in Studio')}</span> <i class="icon-remove-sign"></i></a>
+          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in {studio_name}').format(studio_name=settings.STUDIO_NAME)}</span> <i class="icon-remove-sign"></i></a>
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team will evaluate your request and provide you feedback within 24 hours during the work week.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team will evaluate your request and provide you feedback within 24 hours during the work week.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME)}</p>
           </div>
 
           <div class="status status-creationrights is-unrequested">
@@ -311,7 +312,9 @@
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is has completed evaluating your request.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team is has completed evaluating your request.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME,
+            )}</p>
           </div>
 
           <div class="status status-creationrights has-status is-denied">
@@ -322,7 +325,7 @@
               <dd class="value">
                 <span class="status-indicator"></span>
                 <span class="value-formal">${_('Denied')}</span>
-                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by edX Staff.')}</span>
+                <span class="value-description">${_('Your request did not meet the criteria/guidelines specified by {platform_name} Staff.').format(platform_name=settings.PLATFORM_NAME)}</span>
               </dd>
             </dl>
           </div>
@@ -337,7 +340,9 @@
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
           <div class="copy">
-            <p>${_('edX Studio is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by edX. Our team is currently  evaluating your request.')}</p>
+            <p>${_('{studio_name} is a hosted solution for our xConsortium partners and selected guests. Courses for which you are a team member appear above for you to edit, while course creator privileges are granted by {platform_name}. Our team is currently  evaluating your request.').format(
+              studio_name=settings.STUDIO_NAME, platform_name=settings.PLATFORM_NAME,
+            )}</p>
           </div>
 
           <div class="status status-creationrights has-status is-pending">
@@ -348,7 +353,9 @@
               <dd class="value">
                 <span class="status-indicator"></span>
                 <span class="value-formal">${_('Pending')}</span>
-                <span class="value-description">${_('Your request is currently being reviewed by edX staff and should be updated shortly.')}</span>
+                <span class="value-description">
+                  ${_('Your request is currently being reviewed by {platform_name} staff and should be updated shortly.').format(platform_name=settings.PLATFORM_NAME)}
+                </span>
               </dd>
             </dl>
           </div>
@@ -359,24 +366,26 @@
     </article>
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
-        <h3 class="title title-3">${_('New to edX Studio?')}</h3>
-        <p>${_('Click Help in the upper-right corner to get more information about the Studio page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other Studio resources.')}</p>
+        <h3 class="title title-3">${_('New to {studio_name}?').format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_NAME)}</p>
 
         <ol class="list-actions">
           <li class="action-item">
 
-            <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with edX Studio")}</a>
+            <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank">${_("Getting Started with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</a>
           </li>
           <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with edX Studio")}</a>
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</a>
           </li>
         </ol>
       </div>
 
       % if course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
       <div class="bit">
-        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
-        <p>${_("In order to create courses in Studio, you must {link_start}contact edX staff to help you create a course{link_end}.").format(
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_("In order to create courses in {studio_name}, you must {link_start}contact {platform_name} staff to help you create a course{link_end}.").format(
+            studio_name=settings.STUDIO_NAME,
+            platform_name=settings.PLATFORM_NAME,
             link_start='<a href="mailto:{email}">'.format(email=settings.FEATURES.get('STUDIO_REQUEST_EMAIL','')),
             link_end="</a>",
           )}</p>
@@ -385,14 +394,16 @@
 
       % if course_creator_status == "unrequested":
       <div class="bit">
-        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
-        <p>${_('In order to create courses in Studio, you must have course creator privileges to create your own course.')}</p>
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_('In order to create courses in {studio_name}, you must have course creator privileges to create your own course.').format(studio_name=settings.STUDIO_NAME)}</p>
       </div>
 
       % elif course_creator_status == "denied":
       <div class="bit">
-        <h3 class="title title-3">${_("Can I create courses in Studio?")}</h3>
-        <p>${_("Your request to author courses in Studio has been denied. Please {link_start}contact edX Staff with further questions{link_end}.").format(
+        <h3 class="title title-3">${_("Can I create courses in {studio_name}?").format(studio_name=settings.STUDIO_NAME)}</h3>
+        <p>${_("Your request to author courses in {studio_name} has been denied. Please {link_start}contact {platform_name} Staff with further questions{link_end}.").format(
+            studio_name=settings.STUDIO_NAME,
+            platform_name=settings.PLATFORM_NAME,
             link_start='<a href="{url}" class="show-tender">'.format(
               url="http://help.edge.edx.org/discussion/new",
             ),
@@ -429,7 +440,7 @@
 
         <ol class='list-actions'>
           <li class="action-item">
-            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with your Studio account")}</a>
+            <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}</a>
           </li>
         </ol>
       </div>

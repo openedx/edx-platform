@@ -12,15 +12,15 @@ from django.utils.translation import ugettext as _
 <div class="wrapper-content wrapper">
   <section class="content">
     <header>
-      <h1 class="title title-1">${_("Sign In to edX Studio")}</h1>
-      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a Studio Account? Sign up!")}</a>
+      <h1 class="title title-1">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h1>
+      <a href="${reverse('signup')}" class="action action-signin">${_("Don't have a {studio_name} Account? Sign up!").format(studio_name=settings.STUDIO_NAME)}</a>
     </header>
 
     <article class="content-primary" role="main">
       <form id="login_form" method="post" action="login_post">
 
         <fieldset>
-          <legend class="sr">${_("Required Information to Sign In to edX Studio")}</legend>
+          <legend class="sr">${_("Required Information to Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</legend>
 
           <ol class="list-input">
             <li class="field text required" id="field-email">
@@ -37,7 +37,7 @@ from django.utils.translation import ugettext as _
         </fieldset>
 
         <div class="form-actions">
-          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Sign In to edX Studio")}</button>
+          <button type="submit" id="submit" name="submit" class="action action-primary">${_("Sign In to {studio_name}").format(studio_name=settings.STUDIO_NAME)}</button>
         </div>
 
         <!-- no honor code for CMS, but need it because we're using the lms student object -->
@@ -46,7 +46,7 @@ from django.utils.translation import ugettext as _
     </article>
 
     <aside class="content-supplementary" role="complementary">
-      <h2 class="sr">${_("Studio Support")}</h2>
+      <h2 class="sr">${_("{studio_name} Support").format(studio_name=settings.STUDIO_NAME)}</h2>
 
       <div class="bit">
         <h3 class="title-3">${_("Need Help?")}</h3>

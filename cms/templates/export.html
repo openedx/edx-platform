@@ -40,7 +40,9 @@
         <h2 class="title">${_("About Exporting Courses")}</h2>
         <div class="copy">
           ## Translators: ".tar.gz" is a file extension, and should not be translated
-          <p>${_("You can export courses and edit them outside of Studio. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(em_start='<strong>', em_end="</strong>")}</p>
+          <p>${_("You can export courses and edit them outside of {studio_name}. The exported file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains the course structure and content. You can also re-import courses that you've exported.").format(
+            studio_name=settings.STUDIO_NAME, em_start='<strong>', em_end="</strong>"
+          )}</p>
           <p>${_("{em_start}Caution:{em_end} When you export a course, information such as MATLAB API keys, LTI passports, annotation secret token strings, and annotation storage URLs are included in the exported data. If you share your exported files, you may also be sharing sensitive or license-specific information.").format(em_start='<strong>', em_end="</strong>")}</p>
         </div>
       </div>
@@ -87,7 +89,9 @@
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title-3">${_("Why export a course?")}</h3>
-        <p>${_("You may want to edit the XML in your course directly, outside of Studio. You may want to create a backup copy of your course. Or, you may want to create a copy of your course that you can later import into another course instance and customize.")}</p>
+        <p>${_("You may want to edit the XML in your course directly, outside of {studio_name}. You may want to create a backup copy of your course. Or, you may want to create a copy of your course that you can later import into another course instance and customize.").format(
+            studio_name=settings.STUDIO_NAME,
+          )}</p>
       </div>
 
       <div class="bit">
