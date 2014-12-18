@@ -169,8 +169,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                         var error = gettext("File {filename} exceeds maximum size of {maxFileSizeInMBs} MB")
                                     .replace("{filename}", filename)
                                     .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
-                        
-                        // disable second part of message for any falsy value, 
+
+                        // disable second part of message for any falsy value,
                         // which can be null or an empty string
                         if(self.maxFileSizeRedirectUrl) {
                             var instructions = gettext("Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}")
@@ -269,17 +269,19 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var filterColumn = this.$el.find('.filterable-column');
                 var resetFilter = filterColumn.find('.reset-filter');
                 var title = filterColumn.find('.title');
+                var assettype = $(event.currentTarget).data('assetfilter');
                 if($(event.currentTarget).data('assetfilter') == this.allLabel){
                     collection.assetType = '';
                     resetFilter.hide();
                     title.removeClass('column-selected-link');
                 }
                 else{
-                    collection.assetType = $(event.currentTarget).data('assetfilter');
+                    collection.assetType = assettype;
                     resetFilter.show();
                     title.addClass('column-selected-link');
                 }
 
+                this.filterableColumns['js-asset-type-col'].displayName = assettype;
                 this.selectFilter('js-asset-type-col');
                 this.closeFilterPopup(event);
             },

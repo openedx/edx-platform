@@ -5,6 +5,7 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
+import os
 from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
@@ -148,15 +149,15 @@ class PaginationTestCase(AssetsTestCase):
         """
         Get from the url w/ a filter option and ensure items honor that filter
         """
-        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTER.get(filter_value, None)
+        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(filter_value, None)
         resp = self.client.get(url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
         if filter_value is not '':
-            extensions = [asset['display_name'].split('.')[-1].upper() for asset in assets_response]
+            extensions = [os.path.splitext(asset['display_name'])[1][1:].upper() for asset in assets_response]
             if filter_value is 'OTHER':
                 all_file_type_extensions = []
-                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTER:
+                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTERS:
                     all_file_type_extensions.extend(file_type)
                 for extension in extensions:
                     self.assertNotIn(extension, all_file_type_extensions)

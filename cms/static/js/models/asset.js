@@ -5,6 +5,7 @@ define(["backbone"], function(Backbone) {
   var Asset = Backbone.Model.extend({
     defaults: {
       display_name: "",
+      content_type: "",
       thumbnail: "",
       date_added: "",
       url: "",

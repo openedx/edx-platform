@@ -33,14 +33,14 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
         messageHtml: function() {
             var message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ');
             if (this.view.collection.assetType){
-                message = gettext(message + 'filtered by %(asset_type)s, ');
+                message = message + gettext('filtered by %(asset_type)s, ');
             }
             if (this.view.collection.sortDirection === 'asc') {
                 // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                message = gettext(message + 'sorted by %(sort_name)s ascending');
+                message = message + gettext('sorted by %(sort_name)s ascending');
             } else {
                 // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                message = gettext(message + 'sorted by %(sort_name)s descending');
+                message = message + gettext('sorted by %(sort_name)s descending');
             }
             return '<p>' + interpolate(message, {
                 current_item_range: this.currentItemRangeLabel(),
