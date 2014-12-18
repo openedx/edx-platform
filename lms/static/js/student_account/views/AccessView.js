@@ -6,13 +6,21 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
+    // Bind to StateChange Event
+    History.Adapter.bind( window, 'statechange', function() {
+        /* Note: We are using History.getState() for legacy browser (IE) support
+         * using History.js plugin instead of the native event.state
+         */
+        var State = History.getState();
+    });
+
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
 
         tpl: '#access-tpl',
 
         events: {
-            'change .form-toggle': 'toggleForm'
+            'click .form-toggle': 'toggleForm'
         },
 
         subview: {
@@ -37,7 +45,14 @@ var edx = edx || {};
                 currentProvider: null,
                 providers: []
             };
+
             this.platformName = obj.platformName;
+
+            // The login view listens for 'sync' events from the reset model
+            this.resetModel = new edx.student.account.PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
 
             this.render();
         },
@@ -55,7 +70,6 @@ var edx = edx || {};
         postRender: function() {
             // Load the default form
             this.loadForm( this.activeForm );
-            this.$header = $(this.el).find('.js-login-register-header');
         },
 
         loadForm: function( type ) {
@@ -72,6 +86,7 @@ var edx = edx || {};
                 context.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
+                    resetModel: context.resetModel,
                     thirdPartyAuth: context.thirdPartyAuth,
                     platformName: context.platformName
                 });
@@ -85,15 +100,16 @@ var edx = edx || {};
             },
 
             reset: function( data, context ) {
-                var model = new edx.student.account.PasswordResetModel({}, {
-                    method: data.method,
-                    url: data.submit_url
-                });
+                context.resetModel.ajaxType = data.method;
+                context.resetModel.urlRoot = data.submit_url;
 
                 context.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
-                    model: model
+                    model: context.resetModel
                 });
+
+                // Listen for 'password-email-sent' event to toggle sub-views
+                context.listenTo( context.subview.passwordHelp, 'password-email-sent', context.passwordEmailSent );
             },
 
             register: function( data, context ) {
@@ -133,15 +149,20 @@ var edx = edx || {};
             });
         },
 
+        passwordEmailSent: function() {
+            this.element.hide( $(this.el).find('#password-reset-anchor') );
+            this.element.show( $('#login-anchor') );
+            this.element.scrollTop( $('#login-anchor') );
+        },
+
         resetPassword: function() {
             window.analytics.track('edx.bi.password_reset_form.viewed', {
                 category: 'user-engagement'
             });
 
-            this.element.hide( this.$header );
-            this.element.hide( $(this.el).find('.form-type') );
+            this.element.hide( $(this.el).find('#login-anchor') );
             this.loadForm('reset');
-            this.element.scrollTop( $('#password-reset-wrapper') );
+            this.element.scrollTop( $('#password-reset-anchor') );
         },
 
         showFormError: function() {
@@ -149,9 +170,11 @@ var edx = edx || {};
         },
 
         toggleForm: function( e ) {
-            var type = $(e.currentTarget).val(),
+            var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
                 $anchor = $('#' + type + '-anchor');
+
+            e.preventDefault();
 
             window.analytics.track('edx.bi.' + type + '_form.toggled', {
                 category: 'user-engagement'
@@ -161,9 +184,14 @@ var edx = edx || {};
                 this.loadForm( type );
             }
 
+            this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
             this.element.scrollTop( $anchor );
+
+            // Update url without reloading page
+            History.pushState( null, document.title, '/account/' + type + '/' );
+            analytics.page( 'login_and_registration', type );
         },
 
         /**
@@ -291,8 +319,7 @@ var edx = edx || {};
          */
         element: {
             hide: function( $el ) {
-                $el.addClass('hidden')
-                   .attr('aria-hidden', true);
+                $el.addClass('hidden');
             },
 
             scrollTop: function( $el ) {
@@ -303,8 +330,7 @@ var edx = edx || {};
             },
 
             show: function( $el ) {
-                $el.removeClass('hidden')
-                   .attr('aria-hidden', false);
+                $el.removeClass('hidden');
             }
         }
     });

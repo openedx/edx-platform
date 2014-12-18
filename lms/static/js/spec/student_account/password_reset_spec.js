@@ -67,7 +67,7 @@ define([
             };
 
             beforeEach(function() {
-                setFixtures('<div id="password-reset-wrapper"></div>');
+                setFixtures('<div id="password-reset-form" class="form-wrapper hidden"></div>');
                 TemplateHelpers.installTemplate('templates/student_account/password_reset');
                 TemplateHelpers.installTemplate('templates/student_account/form_field');
             });
@@ -90,6 +90,12 @@ define([
 
                 // Verify that the success message is visible
                 expect($('.js-reset-success')).not.toHaveClass('hidden');
+
+                // Verify that login form has loaded
+                expect($('#login-form')).not.toHaveClass('hidden');
+
+                // Verify that password reset view has been removed
+                expect($( view.el ).html().length).toEqual(0);
             });
 
             it('validates the email field', function() {

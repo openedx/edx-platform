@@ -3,12 +3,19 @@
 // }
 
 html, body {
-  background: $body-bg;
   font-family: $sans-serif;
   font-size: 1em;
   font-style: normal;
   line-height: 1em;
   //-webkit-font-smoothing: antialiased;
+}
+
+html{
+  background: white;
+}
+
+body {
+  background: $body-bg;
 }
 
 h1, h2, h3, h4, h5, h6 {
