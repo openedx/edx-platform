@@ -7,6 +7,14 @@ window.Tender = {
   hide_kb: 'true',
   widgetToggles: document.getElementsByClassName('show-tender')
 }
-require(['tender']);
+require(['domReady'], function (domReady) {
+  domReady(function () {
+    var body= document.getElementsByTagName('body')[0];
+    var script= document.createElement('script');
+    script.type= 'text/javascript';
+    script.src= 'https://edxedge.tenderapp.com/tender_widget.js';
+    body.appendChild(script);
+  });
+});
 </script>
 % endif

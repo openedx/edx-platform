@@ -64,14 +64,6 @@ require.config({
         "catch": 'js/vendor/ova/catch/js/catch',
         "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
         // end of Annotation tool files
-
-        // externally hosted files
-        "tender": [
-            "//edxedge.tenderapp.com/tender_widget",
-            // if tender fails to load, fallback on a local file
-            // so that require doesn't fall over
-            "js/src/tender_fallback"
-        ],
         "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": [
             // youtube URL does not end in ".js". We add "?noext" to the path so
@@ -165,9 +157,6 @@ require.config({
         "backbone.paginator": {
             deps: ["backbone"],
             exports: "Backbone.Paginator"
-        },
-        "tender": {
-            exports: 'Tender'
         },
         "youtube": {
             exports: "YT"
