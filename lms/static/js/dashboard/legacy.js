@@ -31,23 +31,51 @@
      */
     edx.dashboard.legacy.init = function(urls) {
 
-        // On initialization, set focus to the first notification available
-        // for screen readers.
-        var notifications = $('.dashboard-notifications');
-        if (notifications.children().length > 0) {
+        var notifications = $('.dashboard-notifications'),
+            upgradeButtonLinks = $('.action-upgrade'),
+            verifyButtonLinks = $('.verification-cta > .cta');
+
+        // On initialization, set focus to the first notification available for screen readers.
+        if ( notifications.children().length > 0 ) {
             notifications.focus();
         }
 
         $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
 
-        function toggleExpandMessage(e) {
-            (e).preventDefault();
+        // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
+        // a `track` call whenever a bound link is clicked. Usually the page would change before
+        // `track` had time to execute; `trackLink` inserts a small timeout to give the `track`
+        // call enough time to fire. The clicked link element is passed to `generateProperties`.
+        window.analytics.trackLink(upgradeButtonLinks, 'edx.bi.dashboard.upgrade_button.clicked', generateProperties);
+
+        // Track clicks of the "verify now" button.
+        window.analytics.trackLink(verifyButtonLinks, 'edx.bi.user.verification.resumed', generateProperties);
+
+        // Generate the properties object to be passed along with business intelligence events.
+        function generateProperties(element) {
+            var $el = $(element),
+                properties = {};
+
+            if ( $el.hasClass('action-upgrade') ) {
+                properties.category = 'upgrade';
+            } else if ( $el.hasClass('cta') ) {
+                properties.category = 'verification';
+            }
+
+            properties.label = $el.data('course-id');
+
+            return properties;
+        }
+
+        function toggleExpandMessage(event) {
+            var course = $(event.target).closest('.message-upsell').find('.action-upgrade').data('course-id');
+
+            event.preventDefault();
 
             $(this).closest('.message.is-expandable').toggleClass('is-expanded');
 
-            var course = $("#upgrade-to-verified").data("course-id");
-            analytics.track('edx.bi.dashboard.upsell_copy.clicked', {
-                category: 'user-engagement',
+            window.analytics.track('edx.bi.dashboard.upgrade_copy.expanded', {
+                category: 'upgrade',
                 label: course
             });
         }
@@ -61,8 +89,9 @@
         });
 
         $("#upgrade-to-verified").click(function(event) {
-            var user = $(event.target).data("user");
-            var course = $(event.target).data("course-id");
+            var user = $(event.target).closest(".action-upgrade").data("user"),
+                course = $(event.target).closest(".action-upgrade").data("course-id");
+
             Logger.log('edx.course.enrollment.upgrade.clicked', [user, course], null);
         });
 
