@@ -43,6 +43,7 @@ class BokChoyTestSuite(TestSuite):
         self.har_dir.makedirs_p()
         self.report_dir.makedirs_p()
         test_utils.clean_reports_dir()
+        test_utils.clean_test_files()
 
         msg = colorize('green', "Checking for mongo, memchache, and mysql...")
         print(msg)
