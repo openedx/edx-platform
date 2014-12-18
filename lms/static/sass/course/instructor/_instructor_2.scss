@@ -17,7 +17,6 @@
 
 .instructor-dashboard-wrapper-2 {
   position: relative;
-  // display: table;
 
   .olddash-button-wrapper {
     position: absolute;
@@ -54,6 +53,14 @@
     .copy {
       font-weight: 600;
     }
+  }
+
+  // TYPE: inline
+  .msg-inline {
+    @extend %t-copy-sub2;
+    display: inline-block;
+    margin: 0 0 0 $baseline;
+    padding: 0;
   }
 
   // TYPE: warning
@@ -125,15 +132,10 @@
 
 // instructor dashboard 2
 // ====================
-section.instructor-dashboard-content-2 {
+.instructor-dashboard-content-2 {
   @extend .content;
-  // position: relative;
   padding: 40px;
   width: 100%;
-
-  // .has-event-handler-for-click {
-  //   border: 1px solid blue;
-  // }
 
   .wrap-instructor-info {
     display: inline;
@@ -222,6 +224,7 @@ section.instructor-dashboard-content-2 {
 
   // messages
   .message {
+    margin-top: $baseline;
     margin-bottom: $baseline;
     display: block;
     border-radius: 1px;
@@ -426,6 +429,7 @@ section.instructor-dashboard-content-2 {
 }
 
 // view - membership
+// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
 
   .membership-section {
@@ -538,10 +542,16 @@ section.instructor-dashboard-content-2 {
   }
 
   // create or edit cohort group
-  .cohort-management-create, .cohort-management-edit {
+  .cohort-management-settings,
+  .cohort-management-edit {
     @extend %cohort-management-form;
     border: 1px solid $gray-l5;
     margin-bottom: $baseline;
+
+    .message {
+      margin-left: $baseline;
+      margin-right: $baseline;
+    }
 
     .form-title {
       @extend %t-title5;
@@ -551,7 +561,7 @@ section.instructor-dashboard-content-2 {
       padding: $baseline;
     }
 
-    .form-fields {
+    .form-field {
       padding: $baseline;
     }
 
@@ -640,6 +650,9 @@ section.instructor-dashboard-content-2 {
       @extend %t-title6;
       @extend %t-weight4;
       margin-bottom: ($baseline/4);
+      border: none;
+      background: transparent;
+      padding: 0;
     }
 
     .form-introduction {
@@ -957,7 +970,148 @@ section.instructor-dashboard-content-2 {
       }
     }
   }
+
+  /*
+   * Begin additional/override styles for cohort management.
+   * Placed for merge, but will need to be cleaned up and
+   * refactored in this stylesheet.
+   */
+
+  .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
+    display: inline-block;
+
+    label {
+      display: inline-block;
+    }
+
+    .input-group-other {
+      display: inline;
+      position: relative;
+      overflow: auto;
+      width: 100%;
+      height: auto;
+      margin: 0 0 0 $baseline;
+      padding: inherit;
+      border: inherit;
+      clip: auto;
+
+      &.is-hidden {
+        display: none;
+      }
+
+      .input-cohort-group-association {
+        display: inline;
+      }
+    }
+  }
+
+  .cohort-management-nav {
+    margin-bottom: $baseline;
+  }
+
+  .cohort-management-settings {
+    @include clearfix();
+    background: $gray-l5;
+
+    .cohort-management-group-header {
+      padding: 0;
+      border-bottom: 0;
+
+      .group-header-title {
+        padding: $baseline;
+        margin-bottom: 0;
+        border-bottom: 1px solid $gray-l3;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .cohort-management-group-setup {
+        padding: $baseline;
+
+        .cohort-management-group-text {
+          display: inline-block;
+          width: flex-grid(9);
+        }
+
+        .cohort-management-group-actions {
+          display: inline-block;
+          width: flex-grid(3);
+          vertical-align: top;
+          text-align: right;
+        }
+      }
+    }
+
+    .cohort-management-details,
+    .cohort-management-group-add {
+      border-top: ($baseline/5) solid $gray-l4;
+      background: $white;
+
+      .cohort-management-settings {
+        margin-bottom: 0;
+        border-top: 0;
+        background: $white;
+      }
+
+      .cohort-details-name {
+        @extend %t-action1;
+        display: block;
+        width: 100%;
+        padding: ($baseline/2);
+        margin-bottom: ($baseline*2);
+      }
+
+      .cohort-section-header {
+        margin-top: ($baseline*1.5);
+        padding: $baseline 0 ($baseline/2) 0;
+      }
+
+      .cohort-section-header > .form-field {
+        padding-bottom: $baseline;
+      }
+    }
+  }
+
+  .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
+    @extend %ui-no-list;
+    @extend %ui-depth1;
+    position: relative;
+    top: (($baseline/5));
+    padding: 0 $baseline;
+
+    .tab {
+      position: relative;
+      display: inline-block;
+
+      a {
+        display: inline-block;
+        padding: $baseline;
+        -webkit-transition: none;
+        -moz-transition: none;
+        -ms-transition: none;
+        -o-transition: none;
+        transition: none;
+      }
+
+      &.is-selected { // Active or selected tabs (<li>) get this class. Also useful for aria stuff if ever implemented in the future.
+
+        a {
+          padding-bottom: ($baseline+($baseline/5));
+          border-style: solid;
+          border-width: ($baseline/5) ($baseline/5) 0 ($baseline/5);
+          border-color: $gray-l4;
+          background: $white;
+          color: inherit;
+          cursor: default;
+        }
+      }
+    }
+  }
 }
+/*
+ * End of additions/overrides
+ * Don't forget to refactor.
+ */
 
 // view - student admin
 // --------------------
@@ -1771,5 +1925,3 @@ input[name="subject"] {
   left: 2em;
   right: auto;
 }
-
-@import '_cohort-management';
