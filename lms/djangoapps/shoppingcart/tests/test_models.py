@@ -636,12 +636,12 @@ class CertificateItemTest(ModuleStoreTestCase):
     )
     def test_refund_cert_callback_no_expiration(self):
         # When there is no expiration date on a verified mode, the user can always get a refund
-        CourseEnrollment.enroll(self.user, self.course_key, 'verified')
-        cart = Order.get_cart_for_user(user=self.user)
-        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
 
         # need to prevent analytics errors from appearing in stderr
         with patch('sys.stderr', sys.stdout.write):
+            CourseEnrollment.enroll(self.user, self.course_key, 'verified')
+            cart = Order.get_cart_for_user(user=self.user)
+            CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
             cart.purchase()
             CourseEnrollment.unenroll(self.user, self.course_key)
 
@@ -689,12 +689,11 @@ class CertificateItemTest(ModuleStoreTestCase):
                                  expiration_datetime=(datetime.datetime.now(pytz.utc) + many_days))
         course_mode.save()
 
-        CourseEnrollment.enroll(self.user, self.course_key, 'verified')
-        cart = Order.get_cart_for_user(user=self.user)
-        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
-
         # need to prevent analytics errors from appearing in stderr
         with patch('sys.stderr', sys.stdout.write):
+            CourseEnrollment.enroll(self.user, self.course_key, 'verified')
+            cart = Order.get_cart_for_user(user=self.user)
+            CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
             cart.purchase()
             CourseEnrollment.unenroll(self.user, self.course_key)
 
