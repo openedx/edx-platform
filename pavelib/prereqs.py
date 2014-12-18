@@ -6,6 +6,7 @@ import os
 import hashlib
 from distutils import sysconfig
 from paver.easy import *
+import subprocess
 from .utils.envs import Env
 
 
@@ -134,7 +135,25 @@ def python_prereqs_installation():
     """
     Installs Python prerequisites
     """
-    for req_file in PYTHON_REQ_FILES:
+
+    try:
+        subprocess.check_call(
+            "pip-accel --version",
+            stdout=file("/dev/null"),
+            stderr=file("/dev/null"),
+            shell=True
+        )
+        executable = 'pip-accel'
+    except subprocess.CalledProcessError:
+        executable = 'pip'
+
+    sh("rm -rf /edx/app/edxapp/venvs/edxapp/build/*")
+    for req_file in PYTHON_REQ_FILES:        
+        sh("{ex} install -q --exists-action=w -r {req_file}".format(
+            ex=executable,
+            req_file=req_file,
+            )
+        )
         sh("rm -rf /edx/app/edxapp/venvs/edxapp/build/*")
         sh("pip install -q --exists-action w -r {req_file}".format(req_file=req_file))
 
