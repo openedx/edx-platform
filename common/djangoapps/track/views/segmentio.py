@@ -157,6 +157,15 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
     ):
         raise EventValidationError(WARNING_IGNORED_TYPE)
 
+    # create and populate application field if it doesn't exist
+    app_context = segment_properties.get('context', {})
+    if 'application' not in app_context:
+        context['application'] = {
+            'name': app_context.get('app_name', ''),
+            'version': '' if not segment_context else segment_context.get('app', {}).get('version', '')
+        }
+    app_context.pop('app_name', None)
+
     if segment_context:
         # copy the entire segment's context dict as a sub-field of our custom context dict
         context['client'] = dict(segment_context)
@@ -168,7 +177,7 @@ def track_segmentio_event(request):  # pylint: disable=too-many-statements
                 del context['client'][field]
 
     # Overlay any context provided in the properties
-    context.update(segment_properties.get('context', {}))
+    context.update(app_context)
 
     user_id = full_segment_event.get('userId')
     if not user_id:

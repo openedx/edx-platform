@@ -122,6 +122,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 'data': kwargs.get('data', {}),
                 'context': {
                     'course_id': kwargs.get('course_id') or '',
+                    'app_name': 'edx.mobile.android',
                 }
             },
             "channel": 'server',
@@ -129,6 +130,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 "library": {
                     "name": kwargs.get('library_name', 'test-app'),
                     "version": "unknown"
+                },
+                "app": {
+                    "version": "1.0.1",
                 },
                 'userAgent': str(sentinel.user_agent),
             },
@@ -197,6 +201,10 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                 'time': datetime.strptime("2014-08-27T16:33:39.215Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 'host': 'testserver',
                 'context': {
+                    'application': {
+                        'name': 'edx.mobile.android',
+                        'version': '1.0.1',
+                    },
                     'user_id': USER_ID,
                     'course_id': course_id,
                     'org_id': 'foo',
@@ -205,7 +213,10 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                         'library': {
                             'name': 'test-app',
                             'version': 'unknown'
-                        }
+                        },
+                        'app': {
+                            'version': '1.0.1',
+                        },
                     },
                     'received_at': datetime.strptime("2014-08-27T16:33:39.100Z", "%Y-%m-%dT%H:%M:%S.%fZ"),
                 },
@@ -360,6 +371,9 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                         'library': {
                             'name': 'test-app',
                             'version': 'unknown'
+                        },
+                        'app': {
+                            'version': '1.0.1',
                         },
                     },
                     'application': {
