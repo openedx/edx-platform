@@ -433,7 +433,8 @@
         'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
         'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
-        'lms/include/js/spec/edxnotes/models/note_spec.js'
+        'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/scroller_spec.js'
     ]);
 
 }).call(this, requirejs, define);

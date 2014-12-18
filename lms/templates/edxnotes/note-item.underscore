@@ -29,7 +29,7 @@
         <% } else if (quote) { %>
             <h3 class="reference-title"><%- gettext("Noted in:") %></h3>
         <% } %>
-        <a class="reference-meta reference-unit-link" href="<%= unit.url %>"><%- unit.display_name %></a>
+        <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
         <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
         <span class="reference-meta reference-updated-date"><%- updated %></span>
     </div>
