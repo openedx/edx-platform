@@ -14,6 +14,9 @@ class ElasticSearchEngine(SearchEngine):
         if tags:
             body.update({"_tags": tags})
 
+        if 'id' in body:
+            kwargs['id'] = body['id']
+
         self._es.index(
             index=self.index_name,
             doc_type=doc_type,
