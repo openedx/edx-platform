@@ -160,16 +160,19 @@
           ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
       </li>
       % endif
-      <li class="branding">
+
+      % if branding_url:
+      <li id="branding" class="branding">
         <!-- 
         Branding
         We only show this container if the video is hosted elsewhere, for instance in China.
         The image src can be swapped out depending on the host.
         The image alt can be swapped out depending on the host.
         -->
-        <span class="host-tag">Video hosted by 学堂在线 XuetangX.com</span>
-        <a href="http://xuetangx.com"><img class="brand-logo" src="http://www.xuetangx.com/static/images/logo.cd8bf6335127.png" alt="Video hosted by XuetanX" /></a>
+        <span class="host-tag">${_(branding_tag)}</span>
+        <a href="http://xuetangx.com"><img class="brand-logo" src="${_(branding_url)}" alt="${_(branding_tag)}" /></a>
         <!-- // -->
       </li>
+      % endif
     </ul>
 </div>

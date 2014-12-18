@@ -84,7 +84,7 @@ div.video {
       .host-tag {
         display: inline-block;
         vertical-align: middle;
-        font-size: 80%;
+        font-size: 70%;
         color: #777;
       }
 
@@ -92,8 +92,8 @@ div.video {
         display: inline-block;
         vertical-align: middle;
         max-width: 100%;
-        max-height: 35px;
-        padding: ($baseline/4);
+        max-height: ($baseline*1.5);
+        padding: ($baseline/4) 0;
       }
     }
   }
