@@ -17,12 +17,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from microsite_configuration import microsite
 
-from pocs.models import (
+from .models import (
     PersonalOnlineCourse,
     PocMembership,
     PocFutureMembership,
 )
-
+from .overrides import get_current_poc
 
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """
@@ -225,8 +225,12 @@ def get_all_pocs_for_user(user):
     Returns a list of dicts: {
         poc_name: <formatted title of POC course>
         poc_url: <url to view this POC>
+        poc_active: True if this poc is currently the 'active' one
+        mooc_name: <formatted title of the MOOC course for this POC>
+        mooc_url: <url to view this MOOC>
     }
     """
+    current_active_poc = get_current_poc(user)
     if user.is_anonymous():
         return []
     active_poc_memberships = PocMembership.objects.filter(
@@ -235,13 +239,22 @@ def get_all_pocs_for_user(user):
     memberships = []
     for membership in active_poc_memberships:
         course = get_course_by_id(membership.poc.course_id)
-        title = 'POC: {}'.format(get_course_about_section(course, 'title'))
+        course_title = get_course_about_section(course, 'title')
+        poc_title = 'POC: {}'.format(course_title)
+        mooc_title = 'MOOC: {}'.format(course_title)
         url = reverse(
             'switch_active_poc',
             args=[course.id.to_deprecated_string(), membership.poc.id]
         )
+        mooc_url = reverse(
+            'switch_active_poc',
+            args=[course.id.to_deprecated_string(),]
+        )
         memberships.append({
-            'poc_name': title,
-            'poc_url': url
+            'poc_name': poc_title,
+            'poc_url': url,
+            'active': membership.poc == current_active_poc,
+            'mooc_name': mooc_title,
+            'mooc_url': mooc_url,
         })
     return memberships

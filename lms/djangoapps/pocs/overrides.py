@@ -7,7 +7,9 @@ import threading
 
 from contextlib import contextmanager
 
+from courseware.courses import get_request_for_thread
 from courseware.field_overrides import FieldOverrideProvider
+from pocs import ACTIVE_POC_KEY
 
 from .models import PocMembership, PocFieldOverride
 
@@ -52,7 +54,11 @@ def poc_context(poc):
 
 def get_current_poc(user):
     """
-    TODO Needs to look in user's session
+    Return the poc that is active for this user
+
+    The user's session data is used to look up the active poc by id
+    If no poc is active, None is returned and MOOC view will take precedence
+    Active poc can be overridden by context manager (see `poc_context`)
     """
     # If poc context is explicitly set, that takes precedence over the user's
     # session.
@@ -60,15 +66,21 @@ def get_current_poc(user):
     if poc:
         return poc
 
-    # Temporary implementation.  Final implementation will need to look in
-    # user's session so user can switch between (potentially multiple) POC and
-    # MOOC views.  See courseware.courses.get_request_for_thread for idea to
-    # get at the request object.
-    try:
-        membership = PocMembership.objects.get(student=user, active=True)
-        return membership.poc
-    except PocMembership.DoesNotExist:
+    request = get_request_for_thread()
+    if request is None:
         return None
+
+    poc = None
+    poc_id = request.session.get(ACTIVE_POC_KEY, None)
+    if poc_id is not None:
+        try:
+            membership = PocMembership.objects.get(
+                student=user, active=True, poc__id__exact=poc_id
+            )
+            poc = membership.poc
+        except PocMembership.DoesNotExist:
+            pass
+    return poc
 
 
 def get_override_for_poc(poc, block, name, default=None):

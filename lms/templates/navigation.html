@@ -13,6 +13,7 @@ from status.status import get_site_status_msg
 
 <%! from microsite_configuration import microsite %>
 <%! from microsite_configuration.templatetags.microsite import platform_name %>
+<%! from pocs.utils import get_all_pocs_for_user %>
 
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
@@ -81,6 +82,15 @@ site_status_msg = get_site_status_msg(course_id)
           <%block name="navigation_dropdown_menu_links" >
             % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
               <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
+            % endif
+            % if settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False):
+              %for poc in get_all_pocs_for_user(user):
+                % if poc['active']:
+                <li><a href="${poc['mooc_url']}" role="menuitem">${poc['mooc_name']}</a></li>
+                % else:
+                <li><a href="${poc['poc_url']}" role="menuitem">${poc['poc_name']}</a></li>
+                % endif
+              %endfor
             % endif
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>

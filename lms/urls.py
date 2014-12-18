@@ -359,6 +359,8 @@ if settings.COURSEWARE_ENABLED:
             'pocs.views.poc_grades_csv', name='poc_grades_csv'),
         url(r'^courses/{}/poc_set_grading_policy$'.format(settings.COURSE_ID_PATTERN),
             'pocs.views.set_grading_policy', name='poc_set_grading_policy'),
+        url(r'^courses/{}/swich_poc(?:/(?P<poc_id>[\d]+))?$'.format(settings.COURSE_ID_PATTERN),
+            'pocs.views.swich_active_poc', name='switch_active_poc'),
         url(r'^courses/{}/set_course_mode_price$'.format(settings.COURSE_ID_PATTERN),
             'instructor.views.instructor_dashboard.set_course_mode_price', name="set_course_mode_price"),
         url(r'^courses/{}/instructor/api/'.format(settings.COURSE_ID_PATTERN),

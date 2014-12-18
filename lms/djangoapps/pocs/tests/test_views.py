@@ -23,6 +23,7 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
 )
+from pocs import ACTIVE_POC_KEY
 from ..models import (
     PersonalOnlineCourse,
     PocMembership,
@@ -537,6 +538,154 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             self.assertEqual(grades['percent'], 0.5)
             self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
             self.assertEqual(len(grades['section_breakdown']), 4)
+
+
+class TestSwitchActivePoc(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """Verify the view for switching which POC is active, if any
+    """
+    def setUp(self):
+        self.course = course = CourseFactory.create()
+        coach = AdminFactory.create()
+        role = CoursePocCoachRole(course.id)
+        role.add_users(coach)
+        self.poc = PocFactory(course_id=course.id, coach=coach)
+        enrollment = CourseEnrollmentFactory.create(course_id=course.id)
+        self.user = enrollment.user
+        self.target_url = reverse(
+            'course_root', args=[course.id.to_deprecated_string()]
+        )
+
+    def register_user_in_poc(self, active=False):
+        """create registration of self.user in self.poc
+
+        registration will be inactive unless active=True
+        """
+        PocMembershipFactory(poc=self.poc, student=self.user, active=active)
+
+    def verify_active_poc(self, request, id=None):
+        if id:
+            id = str(id)
+        self.assertEqual(id, request.session.get(ACTIVE_POC_KEY, None))
+
+    def test_unauthorized_cannot_switch_to_poc(self):
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_unauthorized_cannot_switch_to_mooc(self):
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string()]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+
+    def test_enrolled_inactive_user_cannot_select_poc(self):
+        self.register_user_in_poc(active=False)
+        self.client.login(username=self.user.username, password="test")
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        # if the poc were active, we'd need to pass the ID of the poc here.
+        self.verify_active_poc(self.client)
+
+    def test_enrolled_user_can_select_poc(self):
+        self.register_user_in_poc(active=True)
+        self.client.login(username=self.user.username, password="test")
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.verify_active_poc(self.client, self.poc.id)
+
+    def test_enrolled_user_can_select_mooc(self):
+        self.register_user_in_poc(active=True)
+        self.client.login(username=self.user.username, password="test")
+        # pre-seed the session with the poc id
+        session = self.client.session
+        session[ACTIVE_POC_KEY] = str(self.poc.id)
+        session.save()
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string()]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.verify_active_poc(self.client)
+
+    def test_unenrolled_user_cannot_select_poc(self):
+        self.client.login(username=self.user.username, password="test")
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        # if the poc were active, we'd need to pass the ID of the poc here.
+        self.verify_active_poc(self.client)
+
+    def test_unenrolled_user_switched_to_mooc(self):
+        self.client.login(username=self.user.username, password="test")
+        # pre-seed the session with the poc id
+        session = self.client.session
+        session[ACTIVE_POC_KEY] = str(self.poc.id)
+        session.save()
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        # we tried to select the poc but are not registered, so we are switched
+        # back to the mooc view
+        self.verify_active_poc(self.client)
+
+    def test_unassociated_course_and_poc_not_selected(self):
+        new_course = CourseFactory.create()
+        self.client.login(username=self.user.username, password="test")
+        expected_url = reverse(
+            'course_root', args=[new_course.id.to_deprecated_string()]
+        )
+        # the poc and the course are not related.
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[new_course.id.to_deprecated_string(), self.poc.id]
+        )
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(expected_url))
+        # the mooc should be active
+        self.verify_active_poc(self.client)
+
+    def test_missing_poc_cannot_be_selected(self):
+        self.register_user_in_poc()
+        self.client.login(username=self.user.username, password="test")
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        # delete the poc
+        self.poc.delete()
+
+        response = self.client.get(switch_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        # we tried to select the poc it doesn't exist anymore, so we are
+        # switched back to the mooc view
+        self.verify_active_poc(self.client)
 
 
 def flatten(seq):

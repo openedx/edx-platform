@@ -12,15 +12,21 @@ from copy import deepcopy
 from cStringIO import StringIO
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+)
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
 from django_future.csrf import ensure_csrf_cookie
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
+from courseware.courses import get_course
 from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
 from courseware.grades import iterate_grades_for
@@ -41,7 +47,13 @@ from .overrides import (
     override_field_for_poc,
     poc_context,
 )
-from .utils import enroll_email, unenroll_email
+from .utils import (
+    enroll_email,
+    unenroll_email,
+    get_all_pocs_for_user,
+)
+from pocs import ACTIVE_POC_KEY
+
 
 log = logging.getLogger(__name__)
 TODAY = datetime.datetime.today  # for patching in tests
@@ -403,7 +415,6 @@ def poc_grades_csv(request, course):
         course.id, request.user, course, depth=2)
     course = get_module_for_descriptor(
         request.user, request, course, field_data_cache, course.id)
-
     poc = get_poc_for_coach(course, request.user)
     with poc_context(poc):
         # The grading policy for the MOOC is probably already cached.  We need
@@ -446,3 +457,38 @@ def poc_grades_csv(request, course):
             writer.writerow(row)
 
         return HttpResponse(buf.getvalue(), content_type='text/plain')
+
+
+@login_required
+def swich_active_poc(request, course_id, poc_id=None):
+    """set the active POC for the logged-in user
+    """
+    user = request.user
+    if not user.is_authenticated():
+        return HttpResponseForbidden(
+            _('Only registered students may change POC views.')
+        )
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    # will raise Http404 if course_id is bad
+    course = get_course_by_id(course_key)
+    course_url = reverse(
+        'course_root', args=[course.id.to_deprecated_string()]
+    )
+    if poc_id is not None:
+        try:
+            requested_poc = PersonalOnlineCourse.objects.get(pk=poc_id)
+            assert requested_poc.course_id.to_deprecated_string() == course_id
+            if not PocMembership.objects.filter(
+                poc=requested_poc, student=request.user, active=True
+            ).exists():
+                poc_id = None
+        except PersonalOnlineCourse.DoesNotExist:
+            # what to do here?  Log the failure?  Do we care?
+            poc_id = None
+        except AssertionError:
+            # what to do here?  Log the failure?  Do we care?
+            poc_id = None
+
+    request.session[ACTIVE_POC_KEY] = poc_id
+
+    return HttpResponseRedirect(course_url)
