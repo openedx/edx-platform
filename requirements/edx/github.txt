@@ -2,7 +2,7 @@
 #
 # If you open a pull request that adds a new dependency, you should notify:
 #   * @mollydb - to check licensing
-#   * One of @e0d, @jarv, or @feanil - to check system requirements
+#   * One of @e0d or @feanil - to check system requirements
 
 # Python libraries to install directly from github
 
