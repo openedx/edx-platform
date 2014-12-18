@@ -21,6 +21,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from ..partition_scheme import CohortPartitionScheme, get_cohorted_user_partition
 from ..models import CourseUserGroupPartitionGroup
+from ..views import link_cohort_to_partition_group, unlink_cohort_partition_group
 from ..cohorts import add_user_to_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
@@ -55,22 +56,6 @@ class TestCohortPartitionScheme(django.test.TestCase):
         )
         self.student = UserFactory.create()
 
-    def link_cohort_partition_group(self, cohort, partition, group):
-        """
-        Utility for creating cohort -> partition group links
-        """
-        CourseUserGroupPartitionGroup(
-            course_user_group=cohort,
-            partition_id=partition.id,
-            group_id=group.id,
-        ).save()
-
-    def unlink_cohort_partition_group(self, cohort):
-        """
-        Utility for removing cohort -> partition group links
-        """
-        CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort).delete()
-
     def assert_student_in_group(self, group, partition=None):
         """
         Utility for checking that our test student comes up as assigned to the
@@ -99,16 +84,16 @@ class TestCohortPartitionScheme(django.test.TestCase):
         self.assert_student_in_group(None)
 
         # link first cohort to group 0 in the partition
-        self.link_cohort_partition_group(
+        link_cohort_to_partition_group(
             first_cohort,
-            self.user_partition,
-            self.groups[0],
+            self.user_partition.id,
+            self.groups[0].id,
         )
         # link second cohort to to group 1 in the partition
-        self.link_cohort_partition_group(
+        link_cohort_to_partition_group(
             second_cohort,
-            self.user_partition,
-            self.groups[1],
+            self.user_partition.id,
+            self.groups[1].id,
         )
         self.assert_student_in_group(self.groups[0])
 
@@ -133,26 +118,26 @@ class TestCohortPartitionScheme(django.test.TestCase):
         self.assert_student_in_group(None)
 
         # link cohort to group 0
-        self.link_cohort_partition_group(
+        link_cohort_to_partition_group(
             test_cohort,
-            self.user_partition,
-            self.groups[0],
+            self.user_partition.id,
+            self.groups[0].id,
         )
         # now the scheme should find a link
         self.assert_student_in_group(self.groups[0])
 
         # link cohort to group 1 (first unlink it from group 0)
-        self.unlink_cohort_partition_group(test_cohort)
-        self.link_cohort_partition_group(
+        unlink_cohort_partition_group(test_cohort)
+        link_cohort_to_partition_group(
             test_cohort,
-            self.user_partition,
-            self.groups[1],
+            self.user_partition.id,
+            self.groups[1].id,
         )
         # scheme should pick up the link
         self.assert_student_in_group(self.groups[1])
 
         # unlink cohort from anywhere
-        self.unlink_cohort_partition_group(
+        unlink_cohort_partition_group(
             test_cohort,
         )
         # scheme should now return nothing
@@ -171,10 +156,10 @@ class TestCohortPartitionScheme(django.test.TestCase):
         cohort = get_course_cohorts(self.course)[0]
 
         # map that cohort to a group in our partition
-        self.link_cohort_partition_group(
+        link_cohort_to_partition_group(
             cohort,
-            self.user_partition,
-            self.groups[0],
+            self.user_partition.id,
+            self.groups[0].id,
         )
 
         # The student will be lazily assigned to the default cohort
@@ -190,10 +175,10 @@ class TestCohortPartitionScheme(django.test.TestCase):
         test_cohort = CohortFactory(course_id=self.course_key)
 
         # link cohort to group 0
-        self.link_cohort_partition_group(
+        link_cohort_to_partition_group(
             test_cohort,
-            self.user_partition,
-            self.groups[0],
+            self.user_partition.id,
+            self.groups[0].id,
         )
         # place student into cohort
         add_user_to_cohort(test_cohort, self.student.username)
