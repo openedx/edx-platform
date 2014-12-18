@@ -852,7 +852,7 @@
           text-align: left;
         }
         &:last-child{
-          text-align: right;
+          text-align: center;
         }
       }
     }
@@ -865,15 +865,31 @@
         padding: 15px 0;
         text-align: center;
         color: $dark-gray1;
-        width: 33.33333%;
-
+        width: 30%;
+        &:nth-child(2){width: 20%;}
+        &:nth-child(3){width: 40%;}
         &:first-child{
           text-align: left;
           font-size: 18px;
           text-transform: capitalize;
         }
         &:last-child{
-          text-align: right;
+          text-align: center;
+          span{
+            padding: 2px 10px;
+            font-size: 13px;
+            color: #fff;
+            display: inline-block;
+            border-radius: 3px;
+            min-width: 55px;
+            text-align: center;
+            &.red{
+              background: rgb(231, 92, 92);
+            }
+            &.green{
+              background: rgb(108, 204, 108);
+            }
+          }
         }
       }
     }
@@ -953,5 +969,17 @@
          }
        }
     }
+    table.course-receipt{
+      tr{
+        td{
+          a{
+            &:before{content:" " attr(data-base-url) " ";display: inline-block;}
+          }
+        }
+      }
+      th:last-child{display: none;}
+      td:last-child{display: none;}
+    }
   }
+
 }

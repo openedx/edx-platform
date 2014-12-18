@@ -146,6 +146,15 @@
         </li>
         % endif
 
+        % if len(order_history_list):
+        <li class="order-history">
+          <span class="title">${_("Order History")}</span>
+          % for order_history_item in order_history_list:
+            <span><a href="${order_history_item['receipt_url']}" target="_blank" class="edit-name">${order_history_item['order_date']}</a></span>
+          % endfor
+        </li>
+        % endif
+
         % if external_auth_map is None or 'shib' not in external_auth_map.external_domain:
         <li class="controls--account">
           <span class="title"><a href="#password_reset_complete" rel="leanModal" id="pwd_reset_button">${_("Reset Password")}</a></span>
