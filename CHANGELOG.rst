@@ -28,9 +28,6 @@ LMS: Student Notes: Toggle single note visibility. TNL-660
 LMS: Student Notes: Add Notes page. TNL-797
 
 LMS: Student Notes: Add possibility to add/edit/remove notes. TNL-655
-=======
-LMS: Extend preview to support cohorted courseware.  TNL-651
->>>>>>> Extend preview to support cohorted courseware
 
 Platform: Add group_access field to all xblocks.  TNL-670
 

@@ -1,18 +1,3 @@
-.msg {
-
-  &.inline {
-    @extend %t-copy-sub2;
-    display: inline-block;
-    margin: 0 0 0 $baseline;
-    padding: 0;
-  }
-
-  &.error {
-    @extend %t-copy-sub2;
-    color: $error-red;
-  }
-}
-
 .cohort-management {
 
   .has-option-unavailable { // Given to <selects> that have some options that are unavailable
@@ -59,34 +44,40 @@
     @include clearfix();
     background: $gray-l5;
 
-    .group-header-title {
-      padding: $baseline;
-      margin-bottom: 0;
-      border-bottom: 1px solid $gray-l3;
-      text-transform: none;
-      letter-spacing: normal;
-    }
+    .cohort-manage-group-header {
+      padding: 0;
+      border-bottom: 0;
 
-    .cohort-management-group-setup {
-      padding: $baseline;
-
-      .cohort-management-group-text {
-        display: inline-block;
-        width: flex-grid(9);
+      .group-header-title {
+        padding: $baseline;
+        margin-bottom: 0;
+        border-bottom: 1px solid $gray-l3;
+        text-transform: none;
+        letter-spacing: normal;
       }
 
-      .cohort-management-group-actions {
-        display: inline-block;
-        width: flex-grid(3);
-        vertical-align: top;
+      .cohort-management-group-setup {
+        padding: $baseline;
 
-        .float-right {
-          float: right;
+        .cohort-management-group-text {
+          display: inline-block;
+          width: flex-grid(9);
+        }
+
+        .cohort-management-group-actions {
+          display: inline-block;
+          width: flex-grid(3);
+          vertical-align: top;
+
+          .float-right {
+            float: right;
+          }
         }
       }
     }
 
-    .cohort-management-details {
+    .cohort-management-details,
+    .cohort-management-group-add {
       border-top: ($baseline/5) solid $gray-l4;
       background: $white;
 
