@@ -513,6 +513,18 @@ $sm-btn-linkedin: #0077b5;
         }
     }
 
+    @include media( max-width 330px) {
+        .form-type {
+            width: 98%;
+            margin: 0 1%;
+        }
+
+        .login-provider {
+            width: 100%;
+            margin: 10px 0;
+        }
+    }
+
     /** RWD **/
     /*@include media( $tablet ) {
         $grid-columns: 8;
