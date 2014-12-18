@@ -2,16 +2,20 @@
 Views related to the video upload feature
 """
 from boto import s3
+import csv
 from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseNotFound
-from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse, HttpResponseNotFound
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_GET, require_http_methods
+import rfc6266
 
 from edxval.api import create_video, get_videos_for_ids
 from opaque_keys.edx.keys import CourseKey
 
+from contentstore.models import VideoEncodingDownloadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from util.json_request import expect_json, JsonResponse
@@ -21,7 +25,7 @@ from xmodule.modulestore.django import modulestore
 from .course import get_course_and_check_access
 
 
-__all__ = ["videos_handler"]
+__all__ = ["videos_handler", "video_encodings_download"]
 
 
 # String constant used in asset keys to identify video assets.
@@ -48,18 +52,9 @@ def videos_handler(request, course_key_string):
             to this endpoint but rather PUT to the respective upload_url values
             contained in the response
     """
-    course_key = CourseKey.from_string(course_key_string)
+    course = _get_and_validate_course(course_key_string, request.user)
 
-    # For now, assume all studio users that have access to the course can upload videos.
-    # In the future, we plan to add a new org-level role for video uploaders.
-    course = get_course_and_check_access(course_key, request.user)
-
-    if (
-            not settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] or
-            not getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) or
-            not course or
-            not course.video_pipeline_configured
-    ):
+    if not course:
         return HttpResponseNotFound()
 
     if request.method == "GET":
@@ -71,21 +66,132 @@ def videos_handler(request, course_key_string):
         return videos_post(course, request)
 
 
+@login_required
+@require_GET
+def video_encodings_download(request, course_key_string):
+    """
+    Returns a CSV report containing the encoded video URLs for video uploads
+    in the following format:
+
+    Video ID,Name,Profile1 URL,Profile2 URL
+    aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,http://example.com/profile1.mp4,http://example.com/profile2.mp4
+    """
+    course = _get_and_validate_course(course_key_string, request.user)
+
+    if not course:
+        return HttpResponseNotFound()
+
+    def get_profile_header(profile):
+        """Returns the column header string for the given profile's URLs"""
+        # Translators: This is the header for a CSV file column
+        # containing URLs for video encodings for the named profile
+        # (e.g. desktop, mobile high quality, mobile low quality)
+        return _("{profile_name} URL").format(profile_name=profile)
+
+    profile_whitelist = VideoEncodingDownloadConfig.get_profile_whitelist()
+    status_whitelist = VideoEncodingDownloadConfig.get_status_whitelist()
+
+    videos = list(_get_videos(course))
+    name_col = _("Name")
+    duration_col = _("Duration")
+    added_col = _("Date Added")
+    video_id_col = _("Video ID")
+    profile_cols = [get_profile_header(profile) for profile in profile_whitelist]
+
+    def make_csv_dict(video):
+        """
+        Makes a dictionary suitable for writing CSV output. This involves
+        extracting the required items from the original video dict and
+        converting all keys and values to UTF-8 encoded string objects,
+        because the CSV module doesn't play well with unicode objects.
+        """
+        # Translators: This is listed as the duration for a video that has not
+        # yet reached the point in its processing by the servers where its
+        # duration is determined.
+        duration_val = str(video["duration"]) if video["duration"] > 0 else _("Pending")
+        ret = dict(
+            [
+                (name_col, video["client_video_id"]),
+                (duration_col, duration_val),
+                (added_col, video["created"].isoformat()),
+                (video_id_col, video["edx_video_id"]),
+            ] +
+            [
+                (get_profile_header(encoded_video["profile"]), encoded_video["url"])
+                for encoded_video in video["encoded_videos"]
+                if encoded_video["profile"] in profile_whitelist
+            ]
+        )
+        return {
+            key.encode("utf-8"): value.encode("utf-8")
+            for key, value in ret.items()
+        }
+
+    response = HttpResponse(content_type="text/csv")
+    # Translators: This is the suggested filename when downloading the URL
+    # listing for videos uploaded through Studio
+    filename = _("{course}_video_urls").format(course=course.id.course)
+    # See https://tools.ietf.org/html/rfc6266#appendix-D
+    response["Content-Disposition"] = rfc6266.build_header(
+        filename + ".csv",
+        filename_compat="video_urls.csv"
+    )
+    writer = csv.DictWriter(
+        response,
+        [name_col, duration_col, added_col, video_id_col] + profile_cols,
+        dialect=csv.excel
+    )
+    writer.writeheader()
+    for video in videos:
+        if video["status"] in status_whitelist:
+            writer.writerow(make_csv_dict(video))
+    return response
+
+
+def _get_and_validate_course(course_key_string, user):
+    """
+    Given a course key, return the course if it exists, the given user has
+    access to it, and it is properly configured for video uploads
+    """
+    course_key = CourseKey.from_string(course_key_string)
+
+    # For now, assume all studio users that have access to the course can upload videos.
+    # In the future, we plan to add a new org-level role for video uploaders.
+    course = get_course_and_check_access(course_key, user)
+
+    if (
+            settings.FEATURES["ENABLE_VIDEO_UPLOAD_PIPELINE"] and
+            getattr(settings, "VIDEO_UPLOAD_PIPELINE", None) and
+            course and
+            course.video_pipeline_configured
+    ):
+        return course
+    else:
+        return None
+
+
 def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to the videos listed in
-    the asset metadata store and returns the needed subset of fields
+    the asset metadata store
     """
     edx_videos_ids = [
         v.asset_id.path
         for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
     ]
+    return get_videos_for_ids(edx_videos_ids)
+
+
+def _get_index_videos(course):
+    """
+    Returns the information about each video upload required for the video list
+    """
     return list(
         {
             attr: video[attr]
             for attr in ["edx_video_id", "client_video_id", "created", "duration", "status"]
         }
-        for video in get_videos_for_ids(edx_videos_ids)
+        for video in _get_videos(course)
     )
 
 
@@ -98,7 +204,7 @@ def videos_index_html(course):
         {
             "context_course": course,
             "post_url": reverse_course_url("videos_handler", unicode(course.id)),
-            "previous_uploads": _get_videos(course),
+            "previous_uploads": _get_index_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
         }
     )
@@ -117,7 +223,7 @@ def videos_index_json(course):
         }]
     }
     """
-    return JsonResponse({"videos": _get_videos(course)}, status=200)
+    return JsonResponse({"videos": _get_index_videos(course)}, status=200)
 
 
 def videos_post(course, request):

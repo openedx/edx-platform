@@ -92,6 +92,7 @@ urlpatterns += patterns(
     url(r'^textbooks/{}$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_list_handler'),
     url(r'^textbooks/{}/(?P<textbook_id>\d[^/]*)$'.format(settings.COURSE_KEY_PATTERN), 'textbooks_detail_handler'),
     url(r'^videos/{}$'.format(settings.COURSE_KEY_PATTERN), 'videos_handler'),
+    url(r'^video_encodings_download/{}$'.format(settings.COURSE_KEY_PATTERN), 'video_encodings_download'),
     url(r'^group_configurations/{}$'.format(settings.COURSE_KEY_PATTERN), 'group_configurations_list_handler'),
     url(r'^group_configurations/{}/(?P<group_configuration_id>\d+)/?$'.format(settings.COURSE_KEY_PATTERN),
         'group_configurations_detail_handler'),
