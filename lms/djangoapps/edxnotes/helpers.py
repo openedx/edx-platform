@@ -185,10 +185,7 @@ def preprocess_collection(user, course, collection):
                 u"unit": get_module_context(course, unit),
             }
             model.update(usage_context)
-            cache[usage_id] = usage_context
-            cache[unit] = usage_context
-            cache[section] = usage_context
-            cache[chapter] = usage_context
+            cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
