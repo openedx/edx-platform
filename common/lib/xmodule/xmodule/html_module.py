@@ -16,6 +16,8 @@ from xmodule.xml_module import XmlDescriptor, name_to_pathname
 import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
+from xmodule.annotator_mixin import html_to_text
+import re
 
 log = logging.getLogger("edx.courseware")
 
@@ -239,6 +241,14 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
         return non_editable_fields
+
+    def index_view(self):
+        xblock_body = super(HtmlDescriptor, self).index_view()
+        html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
+        html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
+        html_body = {"html_content": html_content}
+        xblock_body.update(html_body)
+        return xblock_body
 
 
 class AboutFields(object):
