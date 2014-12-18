@@ -9,7 +9,7 @@ import datetime
 from collections import namedtuple
 from pytz import UTC
 
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -24,6 +24,7 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 from openedx.core.djangoapps.user_api.api import profile as profile_api
 
@@ -43,6 +44,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
+from microsite_configuration import microsite
 
 from util.json_request import JsonResponse
 
@@ -843,12 +845,14 @@ def submit_photos_for_verification(request):
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return HttpResponseBadRequest(_("You already have a valid or pending verification."))
 
+    username = request.user.username
+
     # If the user wants to change his/her full name,
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
             profile_api.update_profile(
-                request.user.username,
+                username,
                 full_name=request.POST.get('full_name')
             )
         except profile_api.ProfileUserNotFound:
@@ -872,6 +876,21 @@ def submit_photos_for_verification(request):
     attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
     attempt.mark_ready()
     attempt.submit()
+
+    profile_dict = profile_api.profile_info(username)
+    if profile_dict:
+        # Send a confirmation email to the user
+        context = {
+            'full_name': profile_dict.get('full_name'),
+            'platform_name': settings.PLATFORM_NAME
+        }
+
+        subject = _("Verification photos received")
+        message = render_to_string('emails/photo_submission_confirmation.txt', context)
+        from_address = microsite.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+        to_address = profile_dict.get('email')
+
+        send_mail(subject, message, from_address, [to_address], fail_silently=False)
 
     return HttpResponse(200)
 

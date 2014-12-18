@@ -25,6 +25,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import mail
 from bs4 import BeautifulSoup
 
 from util.testing import UrlResetMixin
@@ -923,6 +924,15 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, expected_status_code)
+
+        if expected_status_code == 200:
+            # Verify that photo submission confirmation email was sent
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual("Verification photos received", mail.outbox[0].subject)
+        else:
+            # Verify that photo submission confirmation email was not sent
+            self.assertEqual(len(mail.outbox), 0)
+
         return response
 
     def _assert_full_name(self, full_name):
