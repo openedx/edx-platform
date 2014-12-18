@@ -218,9 +218,9 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
 
         # Verify that the expected errors are displayed.
         errors = self.register_page.wait_for_errors()
-        self.assertIn(u'The Username field cannot be empty.', errors)
+        self.assertIn(u'Please enter your Public username.', errors)
         self.assertIn(u'You must agree to the edX Terms of Service and Honor Code.', errors)
-        self.assertIn(u'The Country field cannot be empty.', errors)
+        self.assertIn(u'Please select your Country.', errors)
 
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()

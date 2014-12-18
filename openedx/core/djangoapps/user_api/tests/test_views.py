@@ -632,17 +632,6 @@ class LoginSessionViewTest(ApiTestCase):
                     "max_length": account_api.PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
-            },
-            {
-                "name": "remember",
-                "defaultValue": False,
-                "type": "checkbox",
-                "required": False,
-                "label": "Remember me",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
-                "errorMessages": {},
             }
         ])
 
@@ -846,7 +835,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"name": u"name",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Full Name",
+                u"label": u"Full name",
                 u"instructions": u"The name that will appear on your certificates",
                 u"restrictions": {
                     "max_length": profile_api.FULL_NAME_MAX_LENGTH,
@@ -860,7 +849,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"name": u"username",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Username",
+                u"label": u"Public username",
                 u"instructions": u"The name that will identify you in your courses",
                 u"restrictions": {
                     "min_length": account_api.USERNAME_MIN_LENGTH,
@@ -926,7 +915,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"defaultValue": u"Bob",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Full Name",
+                    u"label": u"Full name",
                     u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
                         "max_length": profile_api.FULL_NAME_MAX_LENGTH
@@ -942,7 +931,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"defaultValue": u"Bob123",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Username",
+                    u"label": u"Public username",
                     u"placeholder": u"",
                     u"instructions": u"The name that will identify you in your courses",
                     u"restrictions": {
@@ -959,7 +948,7 @@ class RegistrationViewTest(ApiTestCase):
                 "name": "level_of_education",
                 "type": "select",
                 "required": False,
-                "label": "Highest Level of Education Completed",
+                "label": "Highest level of education completed",
                 "options": [
                     {"value": "", "name": "--", "default": True},
                     {"value": "p", "name": "Doctorate"},
@@ -1006,7 +995,7 @@ class RegistrationViewTest(ApiTestCase):
                 "name": "year_of_birth",
                 "type": "select",
                 "required": False,
-                "label": "Year of Birth",
+                "label": "Year of birth",
                 "options": year_options,
             }
         )
@@ -1018,7 +1007,7 @@ class RegistrationViewTest(ApiTestCase):
                 "name": "mailing_address",
                 "type": "textarea",
                 "required": False,
-                "label": "Mailing Address",
+                "label": "Mailing address",
             }
         )
 
@@ -1029,7 +1018,7 @@ class RegistrationViewTest(ApiTestCase):
                 "name": "goals",
                 "type": "textarea",
                 "required": False,
-                "label": "If you'd like, tell us why you're interested in {platform_name}".format(
+                "label": "Tell us why you're interested in {platform_name}".format(
                     platform_name=settings.PLATFORM_NAME
                 )
             }
@@ -1062,6 +1051,9 @@ class RegistrationViewTest(ApiTestCase):
                 "type": "select",
                 "required": True,
                 "options": country_options,
+                "errorMessages": {
+                    "required": "Please select your Country."
+                },
             }
         )
 
@@ -1221,9 +1213,9 @@ class RegistrationViewTest(ApiTestCase):
             "password",
             "city",
             "country",
-            "level_of_education",
             "gender",
             "year_of_birth",
+            "level_of_education",
             "mailing_address",
             "goals",
             "honor_code",

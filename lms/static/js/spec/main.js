@@ -56,6 +56,7 @@
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
 
             // Manually specify LMS files that are not converted to RequireJS
+            'history': 'js/vendor/history',
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
 
@@ -372,6 +373,7 @@
                     'underscore',
                     'backbone',
                     'gettext',
+                    'history',
                     'utility',
                     'js/student_account/views/LoginView',
                     'js/student_account/views/PasswordResetView',

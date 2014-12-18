@@ -120,8 +120,8 @@ class CombinedLoginAndRegisterPage(PageObject):
     def is_browser_on_page(self):
         """Check whether the combined login/registration page has loaded. """
         return (
-            self.q(css="#register-option").is_present() and
-            self.q(css="#login-option").is_present() and
+            self.q(css="#login-anchor").is_present() and
+            self.q(css="#register-anchor").is_present() and
             self.current_form is not None
         )
 
@@ -130,7 +130,10 @@ class CombinedLoginAndRegisterPage(PageObject):
         old_form = self.current_form
 
         # Toggle the form
-        self.q(css=".form-toggle:not(:checked)").click()
+        if old_form == "login":
+            self.q(css=".form-toggle[data-type='register']").click()
+        else:
+            self.q(css=".form-toggle[data-type='login']").click()
 
         # Wait for the form to change before returning
         EmptyPromise(
@@ -157,9 +160,9 @@ class CombinedLoginAndRegisterPage(PageObject):
         """
         # Fill in the form
         self.q(css="#register-email").fill(email)
-        self.q(css="#register-password").fill(password)
-        self.q(css="#register-username").fill(username)
         self.q(css="#register-name").fill(full_name)
+        self.q(css="#register-username").fill(username)
+        self.q(css="#register-password").fill(password)
         if country:
             self.q(css="#register-country option[value='{country}']".format(country=country)).click()
         if (terms_of_service):
@@ -168,7 +171,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         # Submit it
         self.q(css=".register-button").click()
 
-    def login(self, email="", password="", remember_me=True):
+    def login(self, email="", password=""):
         """Fills in and submits the login form.
 
         Requires that the "login" form is visible.
@@ -179,14 +182,11 @@ class CombinedLoginAndRegisterPage(PageObject):
         Keyword Arguments:
             email (unicode): The user's email address.
             password (unicode): The user's password.
-            remember_me (boolean): If True, check the "remember me" box.
 
         """
         # Fill in the form
         self.q(css="#login-email").fill(email)
         self.q(css="#login-password").fill(password)
-        if remember_me:
-            self.q(css="#login-remember").click()
 
         # Submit it
         self.q(css=".login-button").click()
@@ -217,6 +217,8 @@ class CombinedLoginAndRegisterPage(PageObject):
         # Submit it
         self.q(css="button.js-reset").click()
 
+        return CombinedLoginAndRegisterPage(self.browser).wait_for_page()
+
     @property
     @unguarded
     def current_form(self):
@@ -233,7 +235,7 @@ class CombinedLoginAndRegisterPage(PageObject):
             return "register"
         elif self.q(css=".login-button").visible:
             return "login"
-        elif self.q(css=".js-reset").visible or self.q(css=".js-reset-success").visible:
+        elif self.q(css=".js-reset").visible:
             return "password-reset"
 
     @property
