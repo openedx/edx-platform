@@ -3,7 +3,6 @@ Tests for the EdxNotes app.
 """
 import json
 import jwt
-from copy import deepcopy
 from mock import patch, MagicMock
 from unittest import skipUnless
 from datetime import datetime
@@ -21,7 +20,6 @@ from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from student.tests.factories import UserFactory
