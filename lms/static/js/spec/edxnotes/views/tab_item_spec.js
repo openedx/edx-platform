@@ -8,10 +8,11 @@ define([
             customMatchers(this);
             TemplateHelpers.installTemplate('templates/edxnotes/tab-item');
             this.collection = new TabsCollection([
-                {'class_name': 'first-item'},
+                {identifier: 'first-item'},
                 {
-                    'class_name': 'second-item',
-                    'is_closable': true
+                    identifier: 'second-item',
+                    is_closable: true,
+                    icon: 'icon-class'
                 }
             ]);
             this.tabsList = new TabsListView({
@@ -19,9 +20,17 @@ define([
             }).render();
         });
 
+        it('can contain an icon', function () {
+            var firstItem = this.tabsList.$('#first-item'),
+                secondItem = this.tabsList.$('#second-item');
+
+            expect(firstItem.find('.icon')).not.toExist();
+            expect(secondItem.find('.icon')).toHaveClass('icon-class');
+        });
+
         it('can navigate between tabs', function () {
-            var firstItem = this.tabsList.$('.first-item'),
-                secondItem = this.tabsList.$('.second-item');
+            var firstItem = this.tabsList.$('#first-item'),
+                secondItem = this.tabsList.$('#second-item');
 
             expect(firstItem).toHaveClass('is-active'); // first tab is active
             expect(secondItem).not.toHaveClass('is-active'); // second tab is not active
@@ -31,11 +40,11 @@ define([
         });
 
         it('can close the tab', function () {
-            var secondItem = this.tabsList.$('.second-item');
+            var secondItem = this.tabsList.$('#second-item');
 
-            expect(this.tabsList.$('.tab-item')).toHaveLength(2);
+            expect(this.tabsList.$('.tab')).toHaveLength(2);
             secondItem.find('.btn-close').click();
-            expect(this.tabsList.$('.tab-item')).toHaveLength(1);
+            expect(this.tabsList.$('.tab')).toHaveLength(1);
         });
     });
 });

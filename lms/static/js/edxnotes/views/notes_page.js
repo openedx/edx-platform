@@ -26,7 +26,7 @@ define([
             });
 
             this.tabsView = new TabsListView({collection: this.tabsCollection});
-            this.$('.edx-notes-page-views')
+            this.$('.tab-list')
                 .append(this.tabsView.render().$el)
                 .removeClass('is-hidden');
         }

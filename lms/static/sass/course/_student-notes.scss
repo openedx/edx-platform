@@ -1,0 +1,266 @@
+.wrapper-student-notes {
+
+  .info-wrapper {
+    @include clearfix();
+    padding-bottom: $baseline;
+
+    .updates {
+      @include clearfix();
+      width: 100%;
+
+      .title-search-container {
+        border-bottom: 1px solid $gray-l4;
+        margin-bottom: $baseline;
+
+        .wrapper-title {
+          display: inline-block;
+          width: flex-grid(7,12);
+
+          .page-title {
+            font-weight: $font-light;
+
+            .page-subtitle {
+              @include line-height(18);
+              @extend %t-title6;
+              display: block;
+            }
+          }
+        }
+
+        .wrapper-notes-search {
+          display: inline-block;
+          width: flex-grid(5,12);
+          text-align: right;
+
+          .search-notes-input {
+            width: 55%;
+            padding: 5px;
+          }
+        }
+      }
+    }
+
+    .note {
+      @include clearfix();
+      margin: 0;
+      padding: ($baseline*1.5) 0;
+      border-top: 1px solid $gray-l4;
+      border-bottom: none;
+
+      .wrapper-note-excerpts {
+        display: inline-block;
+        width: flex-grid(9, 12);
+
+        .note-excerpt {
+          display: inline-block;
+          vertical-align: top;
+          background: $m-blue-l4;
+
+          .note-excerpt-p,
+          .note-excerpt-ul,
+          .note-excerpt-ol {
+            @extend %t-copy-base;
+            position: relative;
+            padding: $baseline ($baseline*4) $baseline ($baseline*4);
+          }
+        }
+
+        .note-excerpt > .note-excerpt-p:before,
+        .note-excerpt > .note-excerpt-ul:before,
+        .note-excerpt > .note-excerpt-ol:before,
+        .note-excerpt > .note-excerpt-p:after,
+        .note-excerpt > .note-excerpt-ul:after,
+        .note-excerpt > .note-excerpt-ol:after {
+          @extend %t-title3;
+          display: block;
+          position: absolute;
+          height: 40px;
+          width: 40px;
+          font-family: "FontAwesome";
+          // color: $gray-l4;
+          color: $white;
+        }
+
+        .note-excerpt > .note-excerpt-p:before,
+        .note-excerpt > .note-excerpt-ul:before,
+        .note-excerpt > .note-excerpt-ol:before {
+          content: "\f10d";
+          top: 0;
+          left: $baseline;
+        }
+
+        .note-excerpt > .note-excerpt-p:after,
+        .note-excerpt > .note-excerpt-ul:after,
+        .note-excerpt > .note-excerpt-ol:after {
+          content: "\f10e";
+          bottom: ($baseline/2);
+          right: $baseline;
+        }
+
+        .note-comments {
+          position: relative;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          // background: $m-blue-l4;
+
+          .note-comment {
+            padding: ($baseline/2) $baseline;
+            border-bottom: 2px solid $white;
+
+            .note-comment-p,
+            .note-comment-ul,
+            .note-comment-ol {
+              @extend %t-weight4;
+              padding: 0;
+              margin: 0;
+              background: transparent;
+            }
+
+            .note-comment-p {
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .note-comment-ul,
+            .note-comment-ol {
+              padding: auto;
+              margin: auto;
+            }
+
+            .note-highlight {
+              background-color: #FFFF88;
+            }
+          }
+        }
+
+        .note-comments:before {
+          @extend %t-title4;
+          display: block;
+          position: absolute;
+          top: -14px;
+          left: 20px;
+          height: 24px;
+          width: 24px;
+          font-family: "FontAwesome";
+          line-height: 20px;
+          content: "\f0d8";
+          // color: $m-blue-l4;
+          color: $white;
+        }
+      }
+
+      .reference {
+        @extend %t-copy-sub1;
+        display: inline-block;
+        width: flex-grid(3, 12);
+        vertical-align: top;
+
+        .wrapper-reference-content {
+          padding: 0 $baseline;
+          color: $gray-l2;
+
+          .reference-title {
+            @extend %t-copy-sub1;
+            margin-top: $baseline;
+            text-transform: uppercase;
+            font-weight: $font-regular;
+            letter-spacing: 1px;
+            color: $gray-l2;
+          }
+
+          .reference-title:first-child {
+            margin-top: 0;
+          }
+
+          .reference-meta {
+            font-weight: $font-regular;
+            color: $m-gray-d2;
+          }
+
+          a.reference-meta {
+            color: $link-color;
+
+            &:hover,
+            &:focus {
+              color: $link-hover;
+            }
+          }
+        }
+      }
+    }
+
+    .note-group {
+      padding-top: ($baseline*1.5);
+      border-top: 1px solid $gray-l4;
+
+      .group-lecture {
+        border-bottom: 2px solid $gray-l4;
+        padding-bottom: $baseline;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+
+        .course-subtitle {
+          @extend %t-copy-sub1;
+          display: block;
+          font-weight: $font-light;
+          color: inherit;
+        }
+      }
+    }
+  }
+}
+
+.wrapper-tabs {
+
+  .tab-panel, .inline-error, .ui-loading {
+    outline: none;
+  }
+
+  .inline-error {
+    color: $red;
+    border-bottom: 1px solid $red;
+    padding: 0 0 0.5em;
+    margin-bottom: 1em;
+  }
+
+  .tab-list {
+    @include clearfix();
+
+    .tabs-label {
+      @extend %t-copy-base;
+      @include line-height(14);
+      display: inline;
+      margin-bottom: 0;
+      padding: ($baseline/2) $baseline;
+      padding-left: 0;
+      font-weight: $font-bold;
+    }
+
+    .tabs {
+      @include clearfix();
+      display: inline;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+
+      .tab {
+        display: inline;
+
+        .tab-label {
+          @include transition(none);
+          display: inline-block;
+          padding: ($baseline/2) $baseline;
+        }
+
+        &.is-active {
+
+          .tab-label {
+            color: $gray-d3;
+            border-bottom: ($baseline/5) solid $gray-d3;
+          }
+        }
+      }
+    }
+  }
+}

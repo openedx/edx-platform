@@ -327,4 +327,4 @@ class StubEdxNotesService(StubHttpService):
         """
         Search the `query(str)` text in the provided `data(list)`.
         """
-        return [note for note in data if unicode(query).strip() in note.get("text")]
+        return [note for note in data if unicode(query).strip() in note.get("text", "").split()]
