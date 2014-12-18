@@ -275,11 +275,20 @@ MIXED_MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('draft', MongoModulestoreBuilder())]),
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
+MIXED_MS_SETUPS_SHORT = (
+    'mixed_mongo', 'mixed_split'
+)
 DIRECT_MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
     # VersioningModulestoreBuilder(),  # FUTUREDO: LMS-11227
 )
+DIRECT_MS_SETUPS_SHORT = (
+    'mongo',
+    #'split',
+)
 MODULESTORE_SETUPS = DIRECT_MODULESTORE_SETUPS + MIXED_MODULESTORE_SETUPS
+MODULESTORE_SHORTNAMES = DIRECT_MS_SETUPS_SHORT + MIXED_MS_SETUPS_SHORT
+SHORT_NAME_MAP = dict(zip(MODULESTORE_SETUPS, MODULESTORE_SHORTNAMES))
 
 CONTENTSTORE_SETUPS = (MongoContentstoreBuilder(),)
 COURSE_DATA_NAMES = (
@@ -312,7 +321,6 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
     ))
     @ddt.unpack
     def test_round_trip(self, source_builder, dest_builder, source_content_builder, dest_content_builder, course_data_name):
-
         # Construct the contentstore for storing the first import
         with source_content_builder.build() as source_content:
             # Construct the modulestore for storing the first import (using the previously created contentstore)
@@ -354,14 +362,14 @@ class CrossStoreXMLRoundtrip(CourseComparisonTest, PartitionTestCase):
                             raise_on_failure=True,
                         )
 
-# NOT CURRENTLY USED
-#                         export_to_xml(
-#                             dest_store,
-#                             dest_content,
-#                             dest_course_key,
-#                             self.export_dir,
-#                             'exported_dest_course',
-#                         )
+                        # NOT CURRENTLY USED
+                        # export_to_xml(
+                        #     dest_store,
+                        #     dest_content,
+                        #     dest_course_key,
+                        #     self.export_dir,
+                        #     'exported_dest_course',
+                        # )
 
                         self.exclude_field(None, 'wiki_slug')
                         self.exclude_field(None, 'xml_attributes')
