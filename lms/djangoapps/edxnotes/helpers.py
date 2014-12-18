@@ -127,7 +127,10 @@ def preprocess_collection(user, course, collection):
 
     store = modulestore()
     filtered_collection = list()
-    usages = {}
+    usage_cache = {}
+    unit_cache = {}
+    section_cache = {}
+    chapter_cache = {}
     with store.bulk_operations(course.id):
         for model in collection:
             model.update({
@@ -136,8 +139,8 @@ def preprocess_collection(user, course, collection):
                 u"updated": dateutil_parse(model["updated"]),
             })
             usage_id = model["usage_id"]
-            if usage_id in usages:
-                model.update(usages[usage_id])
+            if usage_id in usage_cache:
+                model.update(usage_cache[usage_id])
                 filtered_collection.append(model)
                 continue
 
@@ -156,14 +159,27 @@ def preprocess_collection(user, course, collection):
             if unit is None:
                 log.debug("Unit not found for %s", usage_key)
                 continue
+            if unit in unit_cache:
+                model.update(unit_cache[unit])
+                filtered_collection.append(model)
+                continue
 
             section = unit.get_parent()
             if not section:
                 log.debug("Section not found: %s", usage_key)
                 continue
+            if section in section_cache:
+                model.update(section_cache[section])
+                filtered_collection.append(model)
+                continue
+
             chapter = section.get_parent()
             if not chapter:
                 log.debug("Chapter not found: %s", usage_key)
+                continue
+            if chapter in chapter_cache:
+                model.update(chapter_cache[chapter])
+                filtered_collection.append(model)
                 continue
 
             usage_context = {
@@ -172,7 +188,10 @@ def preprocess_collection(user, course, collection):
                 u"unit": get_module_context(course, unit),
             }
             model.update(usage_context)
-            usages[usage_id] = usage_context
+            usage_cache[usage_id] = usage_context
+            unit_cache[unit] = usage_context
+            section_cache[section] = usage_context
+            chapter_cache[chapter] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
