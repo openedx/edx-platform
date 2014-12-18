@@ -46,7 +46,6 @@ var edx = edx || {};
         fetchXhr: null,
 
         performSearch: function (searchTerm) {
-<<<<<<< HEAD
             var self = this;
             $.ajax({
                 type: 'POST',
@@ -86,8 +85,8 @@ var edx = edx || {};
                 }
             });
             this.fetchXhr.done();
->>>>>>> simple paging
->>>>>>> add loading message and ability to load more results, faking xhr with sinon.js */
+    // simple paging
+    // add loading message and ability to load more results, faking xhr with sinon.js */
         },
 
         loadNextPage: function () {
