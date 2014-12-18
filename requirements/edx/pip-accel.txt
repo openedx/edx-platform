@@ -1,0 +1,12 @@
+# Install Shapely with pip as it does not install cleanly
+# with pip-accel because it has a weird setup.py
+Shapely==1.2.16
+
+# Install unittest2 which is needed by lettuce
+# but also pip-accel has trouble with determining that.
+# unittest2>=0.8.0 (from testtools>=0.9.34->python-subunit->lettuce==0.2.20)
+unittest2>=0.8.0
+
+# Install pip-accel itself (using pip), with S3 functionality (include boto)
+pip-accel[s3]==0.22
+
