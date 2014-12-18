@@ -156,17 +156,18 @@ def preprocess_collection(user, course, collection):
             if unit is None:
                 log.debug("Unit not found: %s", usage_key)
                 continue
-            if unit in cache:
-                model.update(cache[unit])
-                filtered_collection.append(model)
-                continue
 
             section = unit.get_parent()
             if not section:
                 log.debug("Section not found: %s", usage_key)
                 continue
             if section in cache:
-                model.update(cache[section])
+                usage_context = cache[section]
+                usage_context.update({
+                    "unit": get_module_context(course, unit),
+                })
+                model.update(usage_context)
+                cache[usage_id] = cache[unit] = usage_context
                 filtered_collection.append(model)
                 continue
 
@@ -175,14 +176,20 @@ def preprocess_collection(user, course, collection):
                 log.debug("Chapter not found: %s", usage_key)
                 continue
             if chapter in cache:
-                model.update(cache[chapter])
+                usage_context = cache[chapter]
+                usage_context.update({
+                    "unit": get_module_context(course, unit),
+                    "section": get_module_context(course, section),
+                })
+                model.update(usage_context)
+                cache[usage_id] = cache[unit] = cache[section] = usage_context
                 filtered_collection.append(model)
                 continue
 
             usage_context = {
-                u"chapter": get_module_context(course, chapter),
-                u"section": get_module_context(course, section),
-                u"unit": get_module_context(course, unit),
+                "unit": get_module_context(course, unit),
+                "section": get_module_context(course, section),
+                "chapter": get_module_context(course, chapter),
             }
             model.update(usage_context)
             cache[usage_id] = cache[unit] = cache[section] = cache[chapter] = usage_context
