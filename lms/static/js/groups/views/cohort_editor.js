@@ -1,18 +1,22 @@
 var edx = edx || {};
 
-(function(Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView) {
+(function(Backbone, _, $, gettext, ngettext, interpolate_text, CohortFormView, NotificationModel, NotificationView) {
     'use strict';
 
     edx.groups = edx.groups || {};
 
     edx.groups.CohortEditorView = Backbone.View.extend({
         events : {
-            "submit .cohort-management-group-add-form": "addStudents"
+            'click .wrapper-tabs .tab': 'selectTab',
+            'click .tab-content-settings .action-save': 'saveSettings',
+            'submit .cohort-management-group-add-form': 'addStudents'
         },
 
         initialize: function(options) {
             this.template = _.template($('#cohort-editor-tpl').text());
             this.cohorts = options.cohorts;
+            this.cohortUserPartitionId = options.cohortUserPartitionId;
+            this.contentGroups = options.contentGroups;
             this.advanced_settings_url = options.advanced_settings_url;
         },
 
@@ -24,9 +28,33 @@ var edx = edx || {};
         render: function() {
             this.$el.html(this.template({
                 cohort: this.model,
+                cohortUserPartitionId: this.cohortUserPartitionId,
+                contentGroups: this.contentGroups,
                 advanced_settings_url: this.advanced_settings_url
             }));
+            this.cohortFormView = new CohortFormView({
+                model: this.model,
+                cohortUserPartitionId: this.cohortUserPartitionId,
+                contentGroups: this.contentGroups
+            });
+            this.cohortFormView.render();
+            this.$('.tab-content-settings').append(this.cohortFormView.$el);
             return this;
+        },
+
+        selectTab: function(event) {
+            var tabElement = $(event.currentTarget),
+                tabName = tabElement.data('tab');
+            event.preventDefault();
+            this.$('.wrapper-tabs .tab').removeClass('is-selected');
+            tabElement.addClass('is-selected');
+            this.$('.tab-content').addClass('is-hidden');
+            this.$('.tab-content-' + tabName).removeClass('is-hidden');
+        },
+
+        saveSettings: function(event) {
+            event.preventDefault();
+            this.cohortFormView.saveForm();
         },
 
         setCohort: function(cohort) {
@@ -208,4 +236,5 @@ var edx = edx || {};
             }
         }
     });
-}).call(this, Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView);
+}).call(this, Backbone, _, $, gettext, ngettext, interpolate_text, edx.groups.CohortFormView,
+    NotificationModel, NotificationView);

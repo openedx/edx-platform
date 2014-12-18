@@ -153,7 +153,7 @@ class MembershipPageCohortManagementSection(PageObject):
         Adds a new manual cohort with the specified name.
         """
         self.q(css=self._bounded_selector("div.cohort-management-nav .action-create")).first.click()
-        textinput = self.q(css=self._bounded_selector("#cohort-create-name")).results[0]
+        textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
         self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
 
