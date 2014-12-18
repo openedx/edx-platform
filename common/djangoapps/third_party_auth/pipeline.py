@@ -528,12 +528,12 @@ def ensure_user_information(
     if dispatch_to_login_2:
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_LOGIN_2], strategy))
 
-    if is_register and user_unset:
+    if is_register and (user_unset or user_inactive):
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER], strategy))
 
     # TODO (ECOM-369): Consolidate this with `is_register`
     # once the A/B test completes. # pylint: disable=fixme
-    if is_register_2 and user_unset:
+    if is_register_2 and (user_unset or user_inactive):
         return redirect(_create_redirect_url(AUTH_DISPATCH_URLS[AUTH_ENTRY_REGISTER_2], strategy))
 
 
