@@ -31,7 +31,7 @@ $sm-btn-linkedin: #0077b5;
     @include outer-container;
     $grid-columns: 12;
     background: white;
-
+    min-height: 100%;
     width: 100%;
 
     h2 {
@@ -130,7 +130,7 @@ $sm-btn-linkedin: #0077b5;
         padding: 5px 0;
         width: calc( 100% - 56px );
         border: 3px solid $m-blue-d5;
-        border-radius: 2px;
+        border-radius: 5px;
         color: $m-blue-d5;
         box-shadow: none;
         text-shadow: none;
@@ -263,8 +263,6 @@ $sm-btn-linkedin: #0077b5;
             }
         }
 
-        .label
-
         .field-link {
             position: absolute;
             top: 0;
@@ -281,7 +279,7 @@ $sm-btn-linkedin: #0077b5;
         textarea {
             display: block;
             width: 100%;
-            margin: 0;
+            margin: 0 0 5px;
             padding: 0 ($baseline/2);
 
             &.long {
@@ -474,7 +472,8 @@ $sm-btn-linkedin: #0077b5;
             font-weight: 600;
         }
 
-        .message-copy {
+        .message-copy,
+        .message-copy p {
             @extend %body-text;
             font-family: $sans-serif;
             margin: 0 !important;

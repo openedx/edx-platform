@@ -58,6 +58,4 @@
     <% if( form === 'login' && name === 'password' ) { %>
         <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
-
-    <span id="<%= form %>-<%= name %>-desc" class="desc"><%= instructions %></span>
 </p>
