@@ -7,6 +7,10 @@ window.Tender = {
   hide_kb: 'true',
   widgetToggles: document.getElementsByClassName('show-tender')
 }
-require(['tender']);
+require(['domReady'], function (domReady) {
+  domReady(function () {
+      require(['tender']);
+  });
+});
 </script>
 % endif
