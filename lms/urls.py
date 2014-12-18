@@ -345,11 +345,8 @@ if settings.COURSEWARE_ENABLED:
             'open_ended_grading.views.take_action_on_flags', name='open_ended_flagged_problems_take_action'),
 
         # Cohorts management
-        url(r'^courses/{}/cohorts$'.format(settings.COURSE_KEY_PATTERN),
-            'openedx.core.djangoapps.course_groups.views.list_cohorts', name="cohorts"),
-        url(r'^courses/{}/cohorts/add$'.format(settings.COURSE_KEY_PATTERN),
-            'openedx.core.djangoapps.course_groups.views.add_cohort',
-            name="add_cohort"),
+        url(r'^courses/{}/cohorts/(?P<cohort_id>[0-9]+)?$'.format(settings.COURSE_KEY_PATTERN),
+            'openedx.core.djangoapps.course_groups.views.cohort_handler', name="cohorts"),
         url(r'^courses/{}/cohorts/(?P<cohort_id>[0-9]+)$'.format(settings.COURSE_KEY_PATTERN),
             'openedx.core.djangoapps.course_groups.views.users_in_cohort',
             name="list_cohort"),
