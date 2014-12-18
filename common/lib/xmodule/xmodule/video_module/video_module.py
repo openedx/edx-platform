@@ -612,3 +612,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             field_data['download_track'] = True
 
         return field_data
+
+    def index_view(self):
+        xblock_body = super(VideoDescriptor, self).index_view()
+        transcript = self.get_transcript(transcript_format='txt')[0].replace("\n", " ")
+        video_body = {"transcript": transcript}
+        xblock_body.update(video_body)
+        return xblock_body
