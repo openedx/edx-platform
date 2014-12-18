@@ -506,6 +506,9 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
         # Used by Bok Choy tests and by republishing of staff locks.
         if publish == 'make_public':
             modulestore().publish(xblock.location, user.id)
+            # Print index information for all the XBlocks in the unit
+            # Indexing will take place here (on publishing the content)
+            for child in xblock.get_children(): print child.index_view()
 
         # Note that children aren't being returned until we have a use case.
         return JsonResponse(result, encoder=EdxJSONEncoder)
