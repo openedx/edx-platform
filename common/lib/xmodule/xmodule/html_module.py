@@ -258,8 +258,17 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         xblock_body = super(HtmlDescriptor, self).index_view()
         html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
         html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
-        html_body = {"html_content": html_content}
-        xblock_body.update(html_body)
+        html_body = {
+            "html_content": html_content,
+            "display_name": self.display_name,
+        }
+        if "content" in xblock_body:
+            xblock_body["content"].update(html_body)
+        else:
+            xblock_body.update({"content": html_body})
+        xblock_body.update({
+            "content_type": "HTML Content"
+        })
         return xblock_body
 
 

@@ -58,8 +58,8 @@ var edx = edx || {};
         },
 
         parse: function(response) {
-            this.totalCount = response.totalCount;
-            return response.results;
+            this.totalCount = response.total;
+            return _.map(response.results, function(result){return result.data;});
         },
 
         hasNextPage: function () {
