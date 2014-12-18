@@ -12,7 +12,7 @@ var edx = edx || {};
         tpl: '#access-tpl',
 
         events: {
-            'change .form-toggle': 'toggleForm'
+            'click .form-toggle': 'toggleForm'
         },
 
         subview: {
@@ -38,6 +38,10 @@ var edx = edx || {};
                 providers: []
             };
             this.platformName = obj.platformName;
+            this.resetModel = new edx.student.account.PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
 
             this.render();
         },
@@ -55,7 +59,6 @@ var edx = edx || {};
         postRender: function() {
             // Load the default form
             this.loadForm( this.activeForm );
-            this.$header = $(this.el).find('.js-login-register-header');
         },
 
         loadForm: function( type ) {
@@ -72,6 +75,7 @@ var edx = edx || {};
                 context.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
+                    resetModel: context.resetModel,
                     thirdPartyAuth: context.thirdPartyAuth,
                     platformName: context.platformName
                 });
@@ -85,15 +89,18 @@ var edx = edx || {};
             },
 
             reset: function( data, context ) {
-                var model = new edx.student.account.PasswordResetModel({}, {
-                    method: data.method,
-                    url: data.submit_url
+                context.resetModel.set({
+                    ajaxType: data.method,
+                    urlRoot: data.submit_url
                 });
 
                 context.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
-                    model: model
+                    model: context.resetModel
                 });
+
+                // Listen for 'password-email-sent' event to toggle sub-views
+                context.listenTo( context.subview.passwordHelp, 'password-email-sent', context.passwordEmailSent );
             },
 
             register: function( data, context ) {
@@ -133,15 +140,20 @@ var edx = edx || {};
             });
         },
 
+        passwordEmailSent: function() {
+            this.element.hide( $(this.el).find('#password-reset-anchor') );
+            this.element.show( $('#login-anchor') );
+            this.element.scrollTop( $('#login-anchor') );
+        },
+
         resetPassword: function() {
             window.analytics.track('edx.bi.password_reset_form.viewed', {
                 category: 'user-engagement'
             });
 
-            this.element.hide( this.$header );
-            this.element.hide( $(this.el).find('.form-type') );
+            this.element.hide( $(this.el).find('#login-anchor') );
             this.loadForm('reset');
-            this.element.scrollTop( $('#password-reset-wrapper') );
+            this.element.scrollTop( $('#password-reset-anchor') );
         },
 
         showFormError: function() {
@@ -149,9 +161,11 @@ var edx = edx || {};
         },
 
         toggleForm: function( e ) {
-            var type = $(e.currentTarget).val(),
+            var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
                 $anchor = $('#' + type + '-anchor');
+
+            e.preventDefault();
 
             window.analytics.track('edx.bi.' + type + '_form.toggled', {
                 category: 'user-engagement'
@@ -161,6 +175,7 @@ var edx = edx || {};
                 this.loadForm( type );
             }
 
+            this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
             this.element.scrollTop( $anchor );

@@ -229,6 +229,15 @@ var edx = edx || {};
             } else {
                 this.toggleErrorMsg( true );
             }
+
+            this.postFormSubmission();
+        },
+
+        /* Allows extended views to add custom
+         * code after form submission
+         */
+        postFormSubmission: function() {
+            return true;
         },
 
         toggleErrorMsg: function( show ) {
