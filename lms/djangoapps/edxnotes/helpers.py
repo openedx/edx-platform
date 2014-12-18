@@ -116,7 +116,7 @@ def get_parent_unit(xblock):
             return xblock
 
 
-def preprocess_collection(user, course, collection, add_course_structure=False):
+def preprocess_collection(user, course, collection):
     """
     Reprocess provided `collection(list)`: adds information about ancestor,
     converts "updated" date, sorts the collection in descending order.
@@ -127,8 +127,20 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
 
     store = modulestore()
     filtered_collection = list()
+    usages = {}
     with store.bulk_operations(course.id):
         for model in collection:
+            model.update({
+                u"text": markupsafe.escape(model["text"]),
+                u"quote": markupsafe.escape(model["quote"]),
+                u"updated": dateutil_parse(model["updated"]),
+            })
+            usage_id = model["usage_id"]
+            if usage_id in usages:
+                model.update(usages[usage_id])
+                filtered_collection.append(model)
+                continue
+
             usage_key = course.id.make_usage_key_from_deprecated_string(model["usage_id"])
             try:
                 item = store.get_item(usage_key)
@@ -145,28 +157,22 @@ def preprocess_collection(user, course, collection, add_course_structure=False):
                 log.debug("Unit not found for %s", usage_key)
                 continue
 
-            model.update({
-                u"text": markupsafe.escape(model["text"]),
-                u"quote": markupsafe.escape(model["quote"]),
-                u"updated": dateutil_parse(model["updated"]),
+            section = unit.get_parent()
+            if not section:
+                log.debug("Section not found: %s", usage_key)
+                continue
+            chapter = section.get_parent()
+            if not chapter:
+                log.debug("Chapter not found: %s", usage_key)
+                continue
+
+            usage_context = {
+                u"chapter": get_module_context(course, chapter),
+                u"section": get_module_context(course, section),
                 u"unit": get_module_context(course, unit),
-            })
-
-            if add_course_structure:
-                section = unit.get_parent()
-                if not section:
-                    log.debug("Section not found: %s", usage_key)
-                    continue
-                chapter = section.get_parent()
-                if not chapter:
-                    log.debug("Chapter not found: %s", usage_key)
-                    continue
-
-                model.update({
-                    u"chapter": get_module_context(course, chapter),
-                    u"section": get_module_context(course, section),
-                })
-
+            }
+            model.update(usage_context)
+            usages[usage_id] = usage_context
             filtered_collection.append(model)
 
     return filtered_collection
@@ -228,7 +234,7 @@ def get_notes(user, course):
     if not collection:
         return None
 
-    return json.dumps(preprocess_collection(user, course, collection, add_course_structure=True), cls=NoteJSONEncoder)
+    return json.dumps(preprocess_collection(user, course, collection), cls=NoteJSONEncoder)
 
 
 def get_endpoint(path=""):
