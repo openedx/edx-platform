@@ -9,7 +9,7 @@ var edx = edx || {};
         defaults: {
             location: {},
             content_type: '',
-            excerpt: '',
+            excerpt: ''
         }
     });
 
