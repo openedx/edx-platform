@@ -19,6 +19,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             allLabel: 'ALL',
 
+
             initialize : function(options) {
                 options = options || {};
 
@@ -129,8 +130,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             },
 
             onFilterColumn: function(event) {
-                var columnName = event.target.id;
-                this.openFilterColumn(columnName, event);
+                this.openFilterColumn($(event.currentTarget));
+                event.stopPropagation();
             },
 
             hideModal: function (event) {
@@ -169,8 +170,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                         var error = gettext("File {filename} exceeds maximum size of {maxFileSizeInMBs} MB")
                                     .replace("{filename}", filename)
                                     .replace("{maxFileSizeInMBs}", self.maxFileSizeInMBs)
-                        
-                        // disable second part of message for any falsy value, 
+
+                        // disable second part of message for any falsy value,
                         // which can be null or an empty string
                         if(self.maxFileSizeRedirectUrl) {
                             var instructions = gettext("Please follow the instructions here to upload a file elsewhere and link to it: {maxFileSizeRedirectUrl}")
@@ -232,61 +233,63 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').html(percentVal);
             },
 
-            openFilterColumn: function(filterColumn, event) {
-                var $this = $(event.currentTarget);
-                this.toggleFilterColumnState($this, event);
+            openFilterColumn: function($this) {
+                this.toggleFilterColumnState($this);
             },
 
-            toggleFilterColumnState: function(menu, event) {
+            toggleFilterColumnState: function(menu, selected) {
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
-                var assettype = $(event.currentTarget).data('assetfilter');
-                if(assettype == this.allLabel){
-                    titleText.text(titleText.data('alllabel'));
+                var assettype = selected ? selected.data('assetfilter'): false;
+                if(assettype){
+                    if(assettype == this.allLabel){
+                        titleText.text(titleText.data('alllabel'));
+                    }
+                    else{
+                        titleText.text(assettype);
+                    }
                 }
-                else{
-                    titleText.text(assettype);
-                }
-
                 if ($subnav.hasClass('is-shown')) {
                     $subnav.removeClass('is-shown');
                     $title.removeClass('is-selected');
                 } else {
-                    $('.nav-dd .nav-item .title').removeClass('is-selected');
-                    $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
                     $title.addClass('is-selected');
                     $subnav.addClass('is-shown');
                 }
-                // if propagation is not stopped, the event will bubble up to the
-                // body element, which will close the dropdown.
-                event.stopPropagation();
             },
 
             toggleFilterColumn: function(event) {
                 event.preventDefault();
+                var $filterColumn = $(event.currentTarget);
+                this._toggleFilterColumn($filterColumn.data('assetfilter'));
+            },
+
+            _toggleFilterColumn: function(assettype) {
                 var collection = this.collection;
                 var filterColumn = this.$el.find('.filterable-column');
                 var resetFilter = filterColumn.find('.reset-filter');
                 var title = filterColumn.find('.title');
-                if($(event.currentTarget).data('assetfilter') == this.allLabel){
+                if(assettype == this.allLabel){
                     collection.assetType = '';
                     resetFilter.hide();
                     title.removeClass('column-selected-link');
                 }
                 else{
-                    collection.assetType = $(event.currentTarget).data('assetfilter');
+                    collection.assetType = assettype;
                     resetFilter.show();
                     title.addClass('column-selected-link');
                 }
 
+                this.filterableColumns['js-asset-type-col'].displayName = assettype;
                 this.selectFilter('js-asset-type-col');
-                this.closeFilterPopup(event);
+                this.closeFilterPopup(this.$el.find(
+                    '.column-filter-link[data-assetfilter="' + assettype + '"]'));
             },
 
-            closeFilterPopup: function(event){
-                var $menu = $(event.currentTarget).parents('.nav-dd.nav-item');
-                this.toggleFilterColumnState($menu, event);
+            closeFilterPopup: function(element){
+                var $menu = element.parents('.nav-dd > .nav-item');
+                this.toggleFilterColumnState($menu, element);
             },
 
             displayFinishedUpload: function (resp) {

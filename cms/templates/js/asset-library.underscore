@@ -1,6 +1,6 @@
 <div class="assets-library">
     <div id="asset-paging-header"></div>
-    
+
     <table class="assets-table">
         <caption class="sr"><%= gettext("List of uploaded files and assets in this course") %></caption>
         <colgroup>
@@ -14,15 +14,19 @@
         <thead>
         <tr>
             <th class="thumb-col"><%= gettext("Preview") %></th>
-            <th class="name-col sortable-column"><span class="column-sort-link" id="js-asset-name-col"><%= gettext("Name") %></span></th>
-            <th class="type-col filterable-column">
-                <div id="js-asset-type-col" class="nav-dd nav-item">
-                    <h3 class="title">
-                        <span class="label-prefix sr">Course </span>
+            <th class="name-col sortable-column">
+                <span class="column-sort-link" id="js-asset-name-col" role="button" tabindex="0"><%= gettext("Name") %>
+                    <%= gettext("Sortable") %>
+                </span>
+            </th>
+            <th class="type-col filterable-column nav-dd">
+                <div id="js-asset-type-col" class="nav-item" role="button" tabindex="0">
+                    <span class="title">
                         <span class="type-filter" data-alllabel='<%= gettext("Type") %>'><%= gettext("Type") %></span>
+                        <span class="label-prefix sr">Filter</span>
                         <span class="filter-link"></span>
-                        <i class="icon-caret-down ui-toggle-dd"></i>
-                    </h3>
+                        <i class="icon-caret-down ui-toggle-dd" aria-hidden="true"></i>
+                    </span>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
                             <ul>
@@ -54,5 +58,5 @@
 </div>
 
 <div class="no-asset-content">
-    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><i class="icon fa fa-plus"></i><%= gettext("Upload your first asset") %></a></p>
+    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button new-button upload-button"><i class="icon fa fa-plus" aria-hidden="true"></i><%= gettext("Upload your first asset") %></a></p>
 </div>

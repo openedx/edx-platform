@@ -31,8 +31,9 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 __all__ = ['assets_handler']
 
-
 # pylint: disable=unused-argument
+
+
 @login_required
 @ensure_csrf_cookie
 def assets_handler(request, course_key_string=None, asset_key_string=None):
@@ -100,12 +101,12 @@ def _assets_json(request, course_key):
     requested_page_size = int(request.REQUEST.get('page_size', 50))
     requested_sort = request.REQUEST.get('sort', 'date_added')
     requested_filter = request.REQUEST.get('asset_type', '')
-    requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTER.get(
+    requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
         requested_filter, None)
     filter_params = None
     if requested_filter:
         if requested_filter == 'OTHER':
-            all_filters = settings.FILES_AND_UPLOAD_TYPE_FILTER
+            all_filters = settings.FILES_AND_UPLOAD_TYPE_FILTERS
             where = []
             for all_filter in all_filters:
                 extension_filters = all_filters[all_filter]
@@ -162,8 +163,14 @@ def _assets_json(request, course_key):
                 'thumbnail', thumbnail_location[4])
 
         asset_locked = asset.get('locked', False)
-        asset_json.append(_get_asset_json(asset['displayname'], asset[
-                          'uploadDate'], asset_location, thumbnail_location, asset_locked))
+        asset_json.append(_get_asset_json(
+            asset['displayname'],
+            asset['contentType'],
+            asset['uploadDate'],
+            asset_location,
+            thumbnail_location,
+            asset_locked
+        ))
 
     return JsonResponse({
         'start': start,
@@ -275,10 +282,16 @@ def _upload_asset(request, course_key):
 
     # readback the saved content - we need the database timestamp
     readback = contentstore().find(content.location)
-
     locked = getattr(content, 'locked', False)
     response_payload = {
-        'asset': _get_asset_json(content.name, readback.last_modified_at, content.location, content.thumbnail_location, locked),
+        'asset': _get_asset_json(
+            content.name,
+            content.content_type,
+            readback.last_modified_at,
+            content.location,
+            content.thumbnail_location,
+            locked
+        ),
         'msg': _('Upload completed')
     }
 
@@ -341,7 +354,7 @@ def _update_asset(request, course_key, asset_key):
             return JsonResponse(modified_asset, status=201)
 
 
-def _get_asset_json(display_name, date, location, thumbnail_location, locked):
+def _get_asset_json(display_name, content_type, date, location, thumbnail_location, locked):
     """
     Helper method for formatting the asset information to send to client.
     """
@@ -349,6 +362,7 @@ def _get_asset_json(display_name, date, location, thumbnail_location, locked):
     external_url = settings.LMS_BASE + asset_url
     return {
         'display_name': display_name,
+        'content_type': content_type,
         'date_added': get_default_time_display(date),
         'url': asset_url,
         'external_url': external_url,

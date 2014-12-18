@@ -150,7 +150,6 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 if (collection.filterField != filterField) {
                     collection.filterField = filterField;
                 }
-
                 this.filterColumn = filterColumn;
                 this.setPage(0);
             }
