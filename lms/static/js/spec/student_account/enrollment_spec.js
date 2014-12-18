@@ -5,7 +5,7 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
         describe( 'edx.student.account.EnrollmentInterface', function() {
 
             var COURSE_KEY = 'edX/DemoX/Fall',
-                ENROLL_URL = '/enrollment/v0/course/edX/DemoX/Fall',
+                ENROLL_URL = '/api/enrollment/v1/enrollment',
                 FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/';
 
             beforeEach(function() {
@@ -21,7 +21,12 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
                 EnrollmentInterface.enroll( COURSE_KEY );
 
                 // Expect that the correct request was made to the server
-                AjaxHelpers.expectRequest( requests, 'POST', ENROLL_URL );
+                AjaxHelpers.expectRequest(
+                    requests,
+                    'POST',
+                    ENROLL_URL,
+                    '{"course_details":{"course_id":"edX/DemoX/Fall"}}'
+                );
 
                 // Simulate a successful response from the server
                 AjaxHelpers.respondWithJson(requests, {});

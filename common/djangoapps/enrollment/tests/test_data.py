@@ -3,6 +3,7 @@ Test the Data Aggregation Layer for Course Enrollments.
 
 """
 import ddt
+from mock import patch
 from nose.tools import raises
 import unittest
 
@@ -12,8 +13,10 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from enrollment.errors import CourseNotFoundError, UserNotFoundError, CourseEnrollmentClosedError, \
+    CourseEnrollmentFullError, CourseEnrollmentExistsError
 from student.tests.factories import UserFactory, CourseModeFactory
-from student.models import CourseEnrollment, NonExistentCourseError
+from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, AlreadyEnrolledError
 from enrollment import data
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
@@ -54,12 +57,11 @@ class EnrollmentDataTest(ModuleStoreTestCase):
     def test_enroll(self, course_modes, enrollment_mode):
         # Create the course modes (if any) required for this test case
         self._create_course_modes(course_modes)
-
-        enrollment = data.update_course_enrollment(
+        enrollment = data.create_course_enrollment(
             self.user.username,
             unicode(self.course.id),
-            mode=enrollment_mode,
-            is_active=True
+            enrollment_mode,
+            True
         )
 
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
@@ -72,7 +74,7 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self.assertEqual(is_active, enrollment['is_active'])
 
     def test_unenroll(self):
-        # Enroll the student in the course
+        # Enroll the user in the course
         CourseEnrollment.enroll(self.user, self.course.id, mode="honor")
 
         enrollment = data.update_course_enrollment(
@@ -119,9 +121,11 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         for course in created_courses:
             self._create_course_modes(course_modes, course=course)
             # Create the original enrollment.
-            created_enrollments.append(data.update_course_enrollment(
+            created_enrollments.append(data.create_course_enrollment(
                 self.user.username,
                 unicode(course.id),
+                'honor',
+                True
             ))
 
         # Compare the created enrollments with the results
@@ -148,18 +152,18 @@ class EnrollmentDataTest(ModuleStoreTestCase):
         self.assertIsNone(result)
 
         # Create the original enrollment.
-        enrollment = data.update_course_enrollment(
+        enrollment = data.create_course_enrollment(
             self.user.username,
             unicode(self.course.id),
-            mode=enrollment_mode,
-            is_active=True
+            enrollment_mode,
+            True
         )
         # Get the enrollment and compare it to the original.
         result = data.get_course_enrollment(self.user.username, unicode(self.course.id))
-        self.assertEqual(self.user.username, result['student'])
+        self.assertEqual(self.user.username, result['user'])
         self.assertEqual(enrollment, result)
 
-    @raises(NonExistentCourseError)
+    @raises(CourseNotFoundError)
     def test_non_existent_course(self):
         data.get_course_enrollment_info("this/is/bananas")
 
@@ -172,3 +176,37 @@ class EnrollmentDataTest(ModuleStoreTestCase):
                 mode_slug=mode_slug,
                 mode_display_name=mode_slug,
             )
+
+    @raises(UserNotFoundError)
+    def test_enrollment_for_non_existent_user(self):
+        data.create_course_enrollment("some_fake_user", unicode(self.course.id), 'honor', True)
+
+    @raises(CourseNotFoundError)
+    def test_enrollment_for_non_existent_course(self):
+        data.create_course_enrollment(self.user.username, "some/fake/course", 'honor', True)
+
+    @raises(CourseEnrollmentClosedError)
+    @patch.object(CourseEnrollment, "enroll")
+    def test_enrollment_for_closed_course(self, mock_enroll):
+        mock_enroll.side_effect = EnrollmentClosedError("Bad things happened")
+        data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
+
+    @raises(CourseEnrollmentFullError)
+    @patch.object(CourseEnrollment, "enroll")
+    def test_enrollment_for_closed_course(self, mock_enroll):
+        mock_enroll.side_effect = CourseFullError("Bad things happened")
+        data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
+
+    @raises(CourseEnrollmentExistsError)
+    @patch.object(CourseEnrollment, "enroll")
+    def test_enrollment_for_closed_course(self, mock_enroll):
+        mock_enroll.side_effect = AlreadyEnrolledError("Bad things happened")
+        data.create_course_enrollment(self.user.username, unicode(self.course.id), 'honor', True)
+
+    @raises(UserNotFoundError)
+    def test_update_for_non_existent_user(self):
+        data.update_course_enrollment("some_fake_user", unicode(self.course.id), is_active=False)
+
+    def test_update_for_non_existent_course(self):
+        enrollment = data.update_course_enrollment(self.user.username, "some/fake/course", is_active=False)
+        self.assertIsNone(enrollment)

@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.student.account.EnrollmentInterface = {
 
         urls: {
-            course: '/enrollment/v0/course/',
+            enrollment: '/api/enrollment/v1/enrollment',
             trackSelection: '/course_modes/choose/'
         },
 
@@ -23,10 +23,17 @@ var edx = edx || {};
          * @param  {string} courseKey  Slash-separated course key.
          */
         enroll: function( courseKey ) {
+            var data_obj = {
+                course_details: {
+                    course_id: courseKey
+                }
+            };
+            var data = JSON.stringify(data_obj);
             $.ajax({
-                url: this.courseEnrollmentUrl( courseKey ),
+                url: this.urls.enrollment,
                 type: 'POST',
-                data: {},
+                contentType: 'application/json; charset=utf-8',
+                data: data,
                 headers: this.headers,
                 context: this
             }).always(function() {
@@ -41,15 +48,6 @@ var edx = edx || {};
          */
         trackSelectionUrl: function( courseKey ) {
             return this.urls.trackSelection + courseKey + '/';
-        },
-
-        /**
-         * Construct a URL to enroll in a course.
-         * @param  {string} courseKey Slash-separated course key.
-         * @return {string} The URL to enroll in a course.
-         */
-        courseEnrollmentUrl: function( courseKey ) {
-            return this.urls.course + courseKey;
         },
 
         /**
