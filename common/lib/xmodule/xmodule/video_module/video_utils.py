@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Module contains utils specific for video_module but not for transcripts.
 """
@@ -33,6 +34,39 @@ def create_youtube_string(module):
     ])
 
 
+def validate_branding_info(branding_info):
+    """
+    Verifies whether `branding_info (dict)` contains required information.
+    """
+    REQUIRED_KEYS = ["url", "logo_src", "logo_tag"]
+    if set(REQUIRED_KEYS).issubset(branding_info):
+        return True
+
+    return False
+
+
+def get_branding_info(branding_info):
+    """
+    Get branding information about the CDN.
+
+    Example of branding_info:
+        {
+            "url": 'http://www.xuetangx.com',
+            "logo_src": "http://www.xuetangx.com/static/images/logo.cd8bf6335127.png",
+            "logo_tag": "Video hosted by XuetangX.com",
+        }
+    """
+    if not branding_info:
+        log.info("Branding info is unavailable.")
+        return None
+
+    if validate_branding_info(branding_info):
+        return branding_info
+    else:
+        log.info("Branding info is not valid.")
+        return None
+
+
 def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
     """
     Get video URL from CDN.
@@ -47,8 +81,6 @@ def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
                     "http://bm1.42.play.bokecc.com/flvs/ca/QxcVl/u39EQbA0Ra-20.mp4"
                 ],
             "s3_url": "http://s3.amazonaws.com/BESTech/CS169/download/CS169_v13_w5l2s3.mp4",
-            "logo": "http://www.xuetangx.com/static/images/logo.cd8bf6335127.png".
-            "logo_tag": "Video hosted by 学堂在线 XuetangX.com"
         }
     where `s3_url` is requested original video url and `sources` is the list of
     alternative links.
@@ -58,8 +90,6 @@ def get_video_from_cdn(cdn_base_url, original_video_url, cdn_branding_logo_url):
         return None
 
     request_url = cdn_base_url + urllib.quote(original_video_url)
-    branding_url = cdn_content['logo']
-    branding_tag = cdn_content['logo_tag']
 
     try:
         cdn_response = requests.get(request_url, timeout=0.5)

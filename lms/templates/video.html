@@ -161,7 +161,7 @@
       </li>
       % endif
 
-      % if branding_url:
+      % if branding_info:
       <li id="branding" class="branding">
         <!-- 
         Branding
@@ -169,8 +169,8 @@
         The image src can be swapped out depending on the host.
         The image alt can be swapped out depending on the host.
         -->
-        <span class="host-tag">${_(branding_tag)}</span>
-        <a href="http://xuetangx.com"><img class="brand-logo" src="${_(branding_url)}" alt="${_(branding_tag)}" /></a>
+        <span class="host-tag">${branding_info['logo_tag']}</span>
+        <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
         <!-- // -->
       </li>
       % endif
