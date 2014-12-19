@@ -138,19 +138,13 @@ define([
             this.logger.log('sendRequest', {
                 action: this.el.action,
                 method: this.el.method,
-                user: this.options.user,
-                course_id: this.options.courseId,
                 text: text
             });
             return $.ajax({
                 url: this.el.action,
                 type: this.el.method,
                 dataType: 'json',
-                data: {
-                    user: this.options.user,
-                    course_id: this.options.courseId,
-                    text: text
-                }
+                data: {text: text}
             });
         }
     });

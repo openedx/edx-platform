@@ -33,7 +33,6 @@ class CourseMetadata(object):
         'tags',  # from xblock
         'visible_to_staff_only',
         'group_access',
-        'edxnotes_visibility',
     ]
 
     @classmethod
@@ -48,7 +47,7 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
             filtered_list.append('giturl')
 
-        # Do not show edxnotes if feature is not enabled.
+        # Do not show edxnotes if the feature is disabled.
         if not settings.FEATURES.get('ENABLE_EDXNOTES'):
             filtered_list.append('edxnotes')
 

@@ -64,8 +64,6 @@ define([
             this.searchResults = null;
             this.searchBox = new SearchBoxView({
                 el: document.getElementById('search-notes-form'),
-                user: this.options.user,
-                courseId: this.options.courseId,
                 debug: this.options.debug,
                 beforeSearchStart: this.onBeforeSearchStart,
                 search: this.onSearch,
