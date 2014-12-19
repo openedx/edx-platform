@@ -451,6 +451,9 @@ class PhotoVerification(StatusModel):
         if self.status == "approved":
             return
 
+        log.info(u"Verification for user '{user_id}' approved by '{reviewer}'.".format(
+            user_id=self.user, reviewer=user_id
+        ))
         self.error_msg = ""  # reset, in case this attempt was denied before
         self.error_code = ""  # reset, in case this attempt was denied before
         self.reviewing_user = user_id
@@ -494,6 +497,9 @@ class PhotoVerification(StatusModel):
             lets you amend the error message in case there were additional
             details to be made.
         """
+        log.info(u"Verification for user '{user_id}' denied by '{reviewer}'.".format(
+            user_id=self.user, reviewer=reviewing_user
+        ))
         self.error_msg = error_msg
         self.error_code = error_code
         self.reviewing_user = reviewing_user
@@ -610,6 +616,9 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
                 if attempt.status != "approved":
                     return False
             except Exception:  # pylint: disable=broad-except
+                log.exception(
+                    u"An error occurred while checking re-verification for user '{user_id}'".format(user_id=user)
+                )
                 return False
 
         return True

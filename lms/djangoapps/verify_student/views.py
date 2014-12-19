@@ -424,12 +424,22 @@ class PayAndVerifyView(View):
 
         # Verify that the course exists and has a verified mode
         if course is None:
+            log.warn(u"No course specified for verification flow request.")
             raise Http404
 
         # Verify that the course has a verified mode
         course_mode = CourseMode.verified_mode_for_course(course_key)
         if course_mode is None:
+            log.warn(
+                u"No verified course mode found for course '{course_id}' for verification flow request"
+                .format(course_id=course_id)
+            )
             raise Http404
+
+        log.info(
+            u"Entering verified workflow for user '{user}', course '{course_id}', with current step '{current_step}'."
+            .format(user=request.user, course_id=course_id, current_step=current_step)
+        )
 
         # Check whether the user has verified, paid, and enrolled.
         # A user is considered "paid" if he or she has an enrollment
@@ -762,6 +772,7 @@ def create_order(request):
             b64_face_image = request.POST['face_image'].split(",")[1]
             b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
         except IndexError:
+            log.error(u"Invalid image data during photo verification.")
             context = {
                 'success': False,
             }
@@ -791,6 +802,7 @@ def create_order(request):
 
     # make sure this course has a verified mode
     if not current_mode:
+        log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
     if current_mode.slug == 'professional':
