@@ -1,5 +1,5 @@
 define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/views/cohorts', 'js/collections/cohort', 'string_utils'],
+        'js/groups/views/cohorts', 'js/groups/collections/cohort', 'string_utils'],
     function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection) {
         describe("Cohorts View", function () {
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
