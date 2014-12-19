@@ -1789,6 +1789,7 @@ def auto_auth(request):
     email = request.GET.get('email', unique_name + "@example.com")
     full_name = request.GET.get('full_name', username)
     is_staff = request.GET.get('staff', None)
+    is_superuser = request.GET.get('superuser', None)
     course_id = request.GET.get('course_id', None)
 
     # mode has to be one of 'honor'/'professional'/'verified'/'audit'/'no-id-professional'/'credit'
@@ -1827,6 +1828,10 @@ def auto_auth(request):
     # Set the user's global staff bit
     if is_staff is not None:
         user.is_staff = (is_staff == "true")
+        user.save()
+
+    if is_superuser is not None:
+        user.is_superuser = (is_superuser == "true")
         user.save()
 
     # Activate the user
