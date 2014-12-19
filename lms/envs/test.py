@@ -131,7 +131,7 @@ update_module_store_settings(
         'fs_root': TEST_ROOT / "data",
     },
     xml_store_options={
-        'data_dir': mkdtemp(),  # never inadvertently load all the XML courses
+        'data_dir': mkdtemp(dir=TEST_ROOT),  # never inadvertently load all the XML courses
     },
     doc_store_settings={
         'host': MONGO_HOST,
