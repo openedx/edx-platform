@@ -648,7 +648,7 @@ class DraftModuleStore(MongoModuleStore):
 
         def _fetch_item(item_location):
             try:
-                item = self.get_item(item_location)
+                item = self.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
             except:
                 log.warning('Cannot find: %s', item_location)
                 return None
