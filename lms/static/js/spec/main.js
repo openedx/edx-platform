@@ -485,6 +485,14 @@
             'js/search/views/form': {
                 exports: 'edx.search.Form',
                 deps: ['jquery', 'underscore', 'backbone']
+            },
+            'js/search/views/item': {
+                exports: 'edx.search.Item',
+                deps: ['jquery', 'underscore', 'backbone', 'gettext']
+            },
+            'js/search/models/result': {
+                exports: 'edx.search.Result',
+                deps: ['backbone']
             }
         }
     });
