@@ -1061,6 +1061,9 @@ class MidCourseReverifyView(View):
         """
         course_id = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_id)
+        if course is None:
+            raise Http404
+
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
         course_enrollment.emit_event(EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW)

@@ -716,6 +716,14 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         # enrolled in a verified course, and the window is open
         self.assertEquals(response.status_code, 200)
 
+    @patch('verify_student.views.render_to_response', render_mock)
+    def test_midcourse_reverify_invalid_course_id(self):
+        # if course id is invalid return 400
+        invalid_course_key = CourseLocator('edx', 'not', 'valid')
+        url = reverse('verify_student_midcourse_reverify', kwargs={'course_id': unicode(invalid_course_key)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestReverificationBanner(ModuleStoreTestCase):
