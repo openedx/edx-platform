@@ -1558,6 +1558,40 @@ class TestCourseCreation(SplitModuleTest):
                 dupe_course_key.org, dupe_course_key.course, dupe_course_key.run, user, BRANCH_NAME_DRAFT
             )
 
+    def test_bulk_ops_get_courses(self):
+        """
+        Test get_courses when some are created, updated, and deleted w/in a bulk operation
+        """
+        # create 3 courses before bulk operation
+        split_store = modulestore()
+
+        user = random.getrandbits(32)
+        to_be_created = split_store.make_course_key('new', 'created', 'course')
+        with split_store.bulk_operations(to_be_created):
+            split_store.create_course(
+                to_be_created.org, to_be_created.course, to_be_created.run, user, master_branch=BRANCH_NAME_DRAFT,
+            )
+
+            modified_course_loc = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
+            with split_store.bulk_operations(modified_course_loc):
+                modified_course = modulestore().get_course(modified_course_loc)
+                modified_course.advertised_start = 'coming soon to a theater near you'
+                split_store.update_item(modified_course, user)
+
+                to_be_deleted = split_store.make_course_key("guestx", "contender", "run")
+                with split_store.bulk_operations(to_be_deleted):
+                    split_store.delete_course(to_be_deleted, user)
+
+                    # now get_courses
+                    courses = split_store.get_courses(BRANCH_NAME_DRAFT)
+
+                    self.assertEqual(len(courses), 3)
+                    course_ids = [course.id.for_branch(None) for course in courses]
+                    self.assertNotIn(to_be_deleted, course_ids)
+                    self.assertIn(to_be_created, course_ids)
+                    fetched_modified = [course for course in courses if course.id == modified_course_loc][0]
+                    self.assertEqual(fetched_modified.advertised_start, modified_course.advertised_start)
+
 
 class TestInheritance(SplitModuleTest):
     """
