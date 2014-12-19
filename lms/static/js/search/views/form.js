@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function ($, Backbone) {
-   'use strict'
+   'use strict';
 
     edx.search = edx.search || {};
 
@@ -13,7 +13,7 @@ var edx = edx || {};
         },
         emptySearchRegex: /^\s*$/,
 
-        initialize: function (options) {
+        initialize: function () {
             this.$searchField = this.$el.find('.search-field');
             this.$searchButton = this.$el.find('.search-button');
             this.$cancelButton = this.$el.find('.cancel-button');
@@ -21,7 +21,7 @@ var edx = edx || {};
 
         submitForm: function () {
             var searchTerm = this.$searchField.val();
-            if (this.emptySearchRegex.test(searchTerm) == false) {
+            if (this.emptySearchRegex.test(searchTerm) === false) {
                 this.performSearch(searchTerm);
             }
             else {

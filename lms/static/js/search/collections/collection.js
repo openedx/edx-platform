@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function (Backbone) {
-    'use strict'
+    'use strict';
 
     edx.search = edx.search || {};
 
@@ -43,7 +43,7 @@ var edx = edx || {};
                 type: 'POST',
                 success: function (self) {
                     self.page += 1;
-                    self.trigger('next')
+                    self.trigger('next');
                 },
                 error: function (self) {
                     self.trigger('error');
@@ -59,7 +59,7 @@ var edx = edx || {};
 
         parse: function(response) {
             this.totalCount = response.total;
-            return _.map(response.results, function(result){return result.data;});
+            return _.map(response.results, function(result){ return result.data; });
         },
 
         hasNextPage: function () {

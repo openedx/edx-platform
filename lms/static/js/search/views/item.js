@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function ($, _, Backbone, gettext) {
-   'use strict'
+   'use strict';
 
     edx.search = edx.search || {};
 
@@ -12,7 +12,10 @@ var edx = edx || {};
             'role': 'region',
             'aria-label': 'search result'
         },
-        tpl: _.template($('#search_item-tpl').html()),
+
+        initialize: function () {
+            this.tpl = _.template($('#search_item-tpl').html());
+        },
 
         render: function () {
             this.$el.html(this.tpl(this.model.attributes));
@@ -21,7 +24,8 @@ var edx = edx || {};
 
         formatLocation: function (location) {
             var locationString = '';
-            _.each(_.keys(location).sort(), function(key, i, list) {
+            var keys = _.keys(location).sort();
+            _.each(keys, function(key, i, list) {
                 locationString += location[key];
                 if (i + 1 < list.length) {
                     locationString += ' ▸ ';
