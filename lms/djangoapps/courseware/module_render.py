@@ -45,14 +45,14 @@ from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
 from student.models import anonymous_id_for_user, user_by_anonymous_id
 from student.roles import CourseBetaTesterRole
-from xblock.core import XBlock
+from xblock.core import XBlock, XBlockAside
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
 from xblock.exceptions import NoSuchHandlerError, NoSuchViewError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import CourseKey, AsideUsageKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -539,8 +539,8 @@ def get_module_system_for_user(user, field_data_cache,
         block_wrappers.append(partial(
             wrap_xblock,
             'LmsRuntime',
-            extra_data={'course-id': course_id.to_deprecated_string()},
-            usage_id_serializer=lambda usage_id: quote_slashes(usage_id.to_deprecated_string()),
+            extra_data={'course-id': unicode(course_id)},
+            usage_id_serializer=lambda usage_id: quote_slashes(unicode(usage_id)),
             request_token=request_token,
         ))
 
@@ -789,6 +789,7 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     return HttpResponse("")
 
 
+<<<<<<< HEAD
 @csrf_exempt
 def handle_xblock_callback_noauth(request, course_id, usage_id, handler, suffix=None):
     """
@@ -821,11 +822,21 @@ def handle_xblock_callback(request, course_id, usage_id, handler, suffix=None):
 
 
 def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argument
+=======
+def xblock_resource(request, block_family, block_type, uri):  # pylint: disable=unused-argument
+>>>>>>> Enable XBlockAside Handlers in the LMS, with associated tests
     """
     Return a package resource for the specified XBlock.
     """
+    if block_family in ('xblock', XBlock.entry_point, XModuleDescriptor.entry_point):
+        block_family_cls = XBlock
+    elif block_family == XBlockAside.entry_point:
+        block_family_cls = XBlockAside
+    else:
+        raise Http404("{!r} is an invalid block family")
+
     try:
-        xblock_class = XBlock.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
+        xblock_class = block_family_cls.load_class(block_type, select=settings.XBLOCK_SELECT_FUNCTION)
         content = xblock_class.open_local_resource(uri)
     except IOError:
         log.info('Failed to load xblock resource', exc_info=True)
@@ -837,6 +848,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
     return HttpResponse(content, mimetype=mimetype)
 
 
+<<<<<<< HEAD
 def get_module_by_usage_id(request, course_id, usage_id):
     """
     Gets a module instance based on its `usage_id` in a course, for a given request/user
@@ -993,6 +1005,8 @@ def xblock_view(request, course_id, usage_id, view_name):
     })
 
 
+=======
+>>>>>>> Enable XBlockAside Handlers in the LMS, with associated tests
 def get_score_bucket(grade, max_grade):
     """
     Function to split arbitrary score ranges into 3 buckets.
@@ -1005,30 +1019,3 @@ def get_score_bucket(grade, max_grade):
         score_bucket = "correct"
 
     return score_bucket
-
-
-def _check_files_limits(files):
-    """
-    Check if the files in a request are under the limits defined by
-    `settings.MAX_FILEUPLOADS_PER_INPUT` and
-    `settings.STUDENT_FILEUPLOAD_MAX_SIZE`.
-
-    Returns None if files are correct or an error messages otherwise.
-    """
-    for fileinput_id in files.keys():
-        inputfiles = files.getlist(fileinput_id)
-
-        # Check number of files submitted
-        if len(inputfiles) > settings.MAX_FILEUPLOADS_PER_INPUT:
-            msg = 'Submission aborted! Maximum %d files may be submitted at once' % \
-                  settings.MAX_FILEUPLOADS_PER_INPUT
-            return msg
-
-        # Check file sizes
-        for inputfile in inputfiles:
-            if inputfile.size > settings.STUDENT_FILEUPLOAD_MAX_SIZE:  # Bytes
-                msg = 'Submission aborted! Your file "%s" is too large (max size: %d MB)' % \
-                      (inputfile.name, settings.STUDENT_FILEUPLOAD_MAX_SIZE / (1000 ** 2))
-                return msg
-
-    return None

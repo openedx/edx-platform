@@ -11,6 +11,7 @@ from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.xblock.acid import AcidView
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...fixtures.config import ConfigModelFixture
 
 
 class XBlockAcidBase(UniqueCourseTest):
@@ -155,7 +156,8 @@ class XBlockAcidAsideTest(XBlockAcidBase):
             )
         ).install()
 
-    @expectedFailure
+        ConfigModelFixture('/config/xblock/asides', {'enabled': True}).install()
+
     def test_acid_block(self):
         """
         Verify that all expected acid block tests pass in the lms.
