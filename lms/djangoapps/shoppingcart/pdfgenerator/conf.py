@@ -3,7 +3,7 @@ import os
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(os.path.join(__file__)))
 
-LANGUAGE = 'cs'
+LANGUAGE = 'en'
 
 try:
     import gettext

@@ -83,15 +83,10 @@ def currency(amount):
 
 class SimpleInvoice(BaseInvoice):
 
-    def gen(self, filename, generate_qr_code=False):
+    def gen(self, filename):
         self.filename = filename
 
-        qr_builder = None
-
-        self.qr_builder = qr_builder
-
         prepare_invoice_draw(self)
-
 
         # Texty
         self.drawMain()
@@ -106,8 +101,6 @@ class SimpleInvoice(BaseInvoice):
 
         self.pdf.showPage()
         self.pdf.save()
-        if self.qr_builder:
-            self.qr_builder.destroy()
 
     #############################################################
     ## Draw methods
@@ -382,15 +375,6 @@ class SimpleInvoice(BaseInvoice):
         self.pdf.drawPath(path, True, True)
 
         self.pdf.drawString((LEFT + 10) * mm, (TOP - 5) * mm - height, '%s: %s' % (_(u'Creator'), self.invoice.creator.name))
-
-
-    def drawQR(self, TOP, LEFT, size=130.0):
-        if self.qr_builder:
-            qr_filename = self.qr_builder.filename
-            im = Image.open(qr_filename)
-            height = float(im.size[1]) / (float(im.size[0]) / size)
-            self.pdf.drawImage(qr_filename, LEFT * mm, TOP * mm - height,
-                               size, height)
 
 
     def drawDates(self,TOP,LEFT):

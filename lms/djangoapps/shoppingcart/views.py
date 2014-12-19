@@ -9,6 +9,7 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, Http404
 )
 from django.utils.translation import ugettext as _
+from io import BytesIO
 from util.json_request import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
@@ -26,7 +27,6 @@ from courseware.views import registered_for_course
 from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
-from StringIO import StringIO
 from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
@@ -797,29 +797,28 @@ def _show_receipt_html(request, order):
 
     from pdfgenerator.api import Invoice, Item, Client, Provider, Creator
     from pdfgenerator.pdf import SimpleInvoice
-    from tempfile import NamedTemporaryFile
 
-    client = Client('Client company')
-    provider = Provider('My company', bank_account='2600420569/2010')
-    creator = Creator('John Doe')
+    client = Client('Jane Doe')
+    provider = Provider('MITx', bank_account='2600420569/2010', logo_filename='/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
+    creator = Creator('Afzal Wali')
 
     invoice = Invoice(client, provider, creator)
     invoice.currency_locale = 'en_US.UTF-8'
     invoice.add_item(Item(32, 600, description="Item 1"))
     invoice.add_item(Item(60, 50, description="Item 2", tax=10))
     invoice.add_item(Item(50, 60, description="Item 3", tax=5))
-    tmp_file = NamedTemporaryFile(delete=False)
-    print tmp_file.name
+
+    buffer = BytesIO()
     pdf = SimpleInvoice(invoice)
 
-    pdf.gen(tmp_file.name)
+    pdf.gen(buffer)
     # Make your response and prep to attach
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename=%s.pdf' % (pdf.filename)
-    response.write(pdf)
+    response['Content-Disposition'] = 'attachment; filename=receipt.pdf'
+    response.write(buffer.getvalue())
     return response
 
-    return render_to_response(receipt_template, context)
+    # return render_to_response(receipt_template, context)
 
 
 def _can_download_report(user):
