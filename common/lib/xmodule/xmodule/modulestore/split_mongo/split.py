@@ -673,7 +673,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
-                    system.course_entry.structure['blocks'],
+                    copy.deepcopy(system.course_entry.structure['blocks']),  # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
                     block_id,
                     depth,
                     new_module_data
