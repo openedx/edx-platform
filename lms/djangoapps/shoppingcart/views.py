@@ -352,8 +352,9 @@ def register_code_redemption(request, registration_code):
         course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
         if reg_code_is_valid and not reg_code_already_redeemed:
             #now redeem the reg code.
-            RegistrationCodeRedemption.create_invoice_generated_registration_redemption(course_registration, request.user)
-            CourseEnrollment.enroll(request.user, course.id)
+            redemption = RegistrationCodeRedemption.create_invoice_generated_registration_redemption(course_registration, request.user)
+            redemption.course_enrollment = CourseEnrollment.enroll(request.user, course.id)
+            redemption.save()
             context = {
                 'redemption_success': True,
                 'reg_code': registration_code,

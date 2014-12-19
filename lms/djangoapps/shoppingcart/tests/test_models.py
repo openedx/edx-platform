@@ -499,6 +499,8 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
         reg1 = PaidCourseRegistration.objects.get(id=reg1.id)  # reload from DB to get side-effect
         self.assertEqual(reg1.status, "purchased")
+        self.assertIsNotNone(reg1.course_enrollment)
+        self.assertEqual(reg1.course_enrollment.id, CourseEnrollment.objects.get(user=self.user, course_id=self.course_key).id)
 
     def test_generate_receipt_instructions(self):
         """
