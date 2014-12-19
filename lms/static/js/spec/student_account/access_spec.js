@@ -96,13 +96,13 @@ define([
             var assertForms = function(visibleType, hiddenType) {
                 expect($(visibleType)).not.toHaveClass('hidden');
                 expect($(hiddenType)).toHaveClass('hidden');
-                expect($('#password-reset-wrapper')).toBeEmpty();
+                expect($('#password-reset-form')).toHaveClass('hidden');
             };
 
             var selectForm = function(type) {
                 // Create a fake change event to control form toggling
                 var changeEvent = $.Event('change');
-                changeEvent.currentTarget = $('#' + type + '-option');
+                changeEvent.currentTarget = $('.form-toggle[data-type="' + type + '"]');
 
                 // Load form corresponding to the change event
                 view.toggleForm(changeEvent);
