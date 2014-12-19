@@ -97,7 +97,6 @@
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
     google_analytics_file = 'theme-google-analytics.html'
-    footer_file = 'theme-footer.html'
 
     style_overrides_file = None
 
@@ -110,12 +109,6 @@
         header_file = microsite.get_template_path('navigation.html')
 
     google_analytics_file = microsite.get_template_path('google_analytics.html')
-
-    if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
-        footer_file = microsite.get_template_path('footer-edx-new.html')
-
-    else:
-      footer_file = microsite.get_template_path('footer.html')
 
     style_overrides_file = microsite.get_value('css_overrides_file')
 %>
@@ -136,7 +129,6 @@
 
   <%include file="${google_analytics_file}" />
 
-
 % if style_overrides_file:
   <link rel="stylesheet" type="text/css" href="${static.url(style_overrides_file)}" />
 % endif
@@ -149,18 +141,25 @@
 
     <%include file="mathjax_accessible.html" />
 
-  % if not suppress_toplevel_navigation:
     <%include file="${header_file}" />
-  %endif
 
     <div class="content-wrapper" id="content">
       ${self.body()}
       <%block name="bodyextra"/>
     </div>
 
-  % if not suppress_toplevel_navigation:
-    <%include file="${footer_file}" />
-  % endif
+    <%block name="footer">
+      ## Can be overridden by child templates wanting to hide the footer. 
+      <%
+        if theme_enabled() and not is_microsite():
+          footer_file = 'theme-footer.html'
+        elif settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
+          footer_file = microsite.get_template_path('footer-edx-new.html')
+        else:
+          footer_file = microsite.get_template_path('footer.html')
+      %>
+      <%include file="${footer_file}" />
+    </%block>
 
   </div>
 
