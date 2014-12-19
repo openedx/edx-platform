@@ -1,8 +1,15 @@
-(function($, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderView) {
+var edx = edx || {};
+
+(function($, _, Backbone, gettext, interpolate_text, CohortEditorView,
+          NotificationModel, NotificationView, FileUploaderView) {
+    'use strict';
+
     var hiddenClass = 'is-hidden',
         disabledClass = 'is-disabled';
 
-    this.CohortsView = Backbone.View.extend({
+    edx.groups = edx.groups || {};
+
+    edx.groups.CohortsView = Backbone.View.extend({
         events : {
             'change .cohort-select': 'onCohortSelected',
             'click .action-create': 'showAddCohortForm',
@@ -226,6 +233,6 @@
         getSectionCss: function (section) {
             return ".instructor-nav .nav-item a[data-section='" + section + "']";
         }
-
     });
-}).call(this, $, _, Backbone, gettext, interpolate_text, CohortEditorView, NotificationModel, NotificationView, FileUploaderView);
+}).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortEditorView,
+    NotificationModel, NotificationView, FileUploaderView);
