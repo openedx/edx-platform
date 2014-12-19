@@ -61,7 +61,6 @@ def tabs_handler(request, course_key_string):
         # present in the same order they are displayed in LMS
 
         tabs_to_render = []
-
         for tab in CourseTabList.iterate_displayable_cms(
                 course_item,
                 settings,
