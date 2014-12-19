@@ -55,6 +55,16 @@ from django.utils.translation import ugettext as _
                 </div>
             </article>
             <aside class="content-supplementary" role="complimentary">
+                <div class="library-location">
+                    <h4 class="bar-mod-title">${_("Library ID")}</h4>
+                    <div class="wrapper-library-id bar-mod-content">
+                        <h5 class="title">${_("Library ID")}</h5>
+                        <p class="library-id">
+                            <span class="library-id-value">${context_library.location.library_key | h}</span>
+                            <span class="tip"><span class="sr">${_("Tip:")}</span> ${_("Use this ID when you want to add content from this library to a course using a Library Content component. You enter this ID in the Libraries field.")}</span>
+                        </p>
+                    </div>
+                </div>
                 <div class="bit">
                     <h3 class="title-3">${_("Adding content components")}</h3>
                     <p>${_("You can add components to the library. Help text here.")}</p>
