@@ -263,21 +263,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'display_name': self.display_name or self.url_name,
                 }))
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
-        else:
-            # When shown on a unit page, don't show any sort of preview - just the status of this block.
-            library_names = []
-            lib_tools = self.runtime.service(self, 'library_tools')
-            for library_key, version in self.source_libraries:  # pylint: disable=unused-variable
-                lib_name = lib_tools.get_library_display_name(library_key)
-                if lib_name is not None:
-                    library_names.append(lib_name)
+        # else: When shown on a unit page, don't show any sort of preview - just the status of this block in the validation area.
 
-            if library_names:
-                fragment.add_content(self.system.render_template('library-block-author-view.html', {
-                    'library_names': library_names,
-                    'max_count': self.max_count,
-                    'num_children': len(self.children),  # pylint: disable=no-member
-                }))
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
         fragment.initialize_js('LibraryContentAuthorView')

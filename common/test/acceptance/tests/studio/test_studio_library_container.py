@@ -146,7 +146,7 @@ class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
         library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
         self.assertFalse(library_block.has_validation_warning)
-        self.assertIn("3 matching components", library_block.author_content)
+        #self.assertIn("3 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
 
         self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc("html", "Html4"))
 
@@ -161,4 +161,4 @@ class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
         library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
         self.assertFalse(library_block.has_validation_message)
-        self.assertIn("4 matching components", library_block.author_content)
+        #self.assertIn("4 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
