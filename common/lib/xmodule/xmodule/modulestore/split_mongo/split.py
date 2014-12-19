@@ -262,6 +262,15 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             return self.db_connection.get_course_index(course_key, ignore_case)
 
+    def delete_course_index(self, course_key):
+        """
+        Delete the course index from cache and the db
+        """
+        if self._is_in_bulk_operation(course_key, False):
+            self._clear_bulk_ops_record(course_key)
+
+        self.db_connection.delete_course_index(course_key)
+
     def insert_course_index(self, course_key, index_entry):
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
@@ -452,9 +461,23 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
         Find the course_indexes which have the specified branch and search_targets.
+
+        Returns:
+            a Cursor if there are no changes in flight or a list if some have changed in current bulk op
         """
         indexes = self.db_connection.find_matching_course_indexes(branch, search_targets)
 
+        def _replace_or_append_index(altered_index):
+            """
+            If the index is already in indexes, replace it. Otherwise, append it.
+            """
+            for index, existing in enumerate(indexes):
+                if all(existing[attr] == altered_index[attr] for attr in ['org', 'course', 'run']):
+                    indexes[index] = altered_index
+                    return
+            indexes.append(altered_index)
+
+        # add any being built but not yet persisted or in the process of being updated
         for _, record in self._active_records:
             if branch and branch not in record.index.get('versions', {}):
                 continue
@@ -468,7 +491,10 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 ):
                     continue
 
-            indexes.append(record.index)
+            if not hasattr(indexes, 'append'):  # Just in time conversion to list from cursor
+                indexes = list(indexes)
+
+            _replace_or_append_index(record.index)
 
         return indexes
 
@@ -2116,12 +2142,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         with a versions hash to restore the course; however, the edited_on and
         edited_by won't reflect the originals, of course.
         """
-        index = self.get_course_index(course_key)
-        if index is None:
-            raise ItemNotFoundError(course_key)
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
-        self.db_connection.delete_course_index(index)
+        self.delete_course_index(course_key)
 
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
