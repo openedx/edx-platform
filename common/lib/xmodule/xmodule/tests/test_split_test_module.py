@@ -47,15 +47,7 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.course_sequence = self.course.get_children()[0]
         self.module_system = get_test_system()
 
-        def get_module(descriptor):
-            """Mocks module_system get_module function"""
-            module_system = get_test_system()
-            module_system.get_module = get_module
-            descriptor.bind_for_student(module_system, descriptor._field_data)  # pylint: disable=protected-access
-            return descriptor
-
-        self.module_system.get_module = get_module
-        self.module_system.descriptor_system = self.course.runtime
+        self.module_system.descriptor_runtime = self.course.runtime._descriptor_system  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
         self.partitions_service = StaticPartitionService(
@@ -97,14 +89,12 @@ class SplitTestModuleLMSTest(SplitTestModuleTest):
             self.module_system.render(self.split_test_module, STUDENT_VIEW).content
         )
 
-    @ddt.data((0,), (1,))
-    @ddt.unpack
+    @ddt.data(0, 1)
     def test_child_missing_tag_value(self, _user_tag):
         # If user_tag has a missing value, we should still get back a valid child url
         self.assertIn(self.split_test_module.child_descriptor.url_name, ['split_test_cond0', 'split_test_cond1'])
 
-    @ddt.data((100,), (200,), (300,), (400,), (500,), (600,), (700,), (800,), (900,), (1000,))
-    @ddt.unpack
+    @ddt.data(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000)
     def test_child_persist_new_tag_value_when_tag_missing(self, _user_tag):
         # If a user_tag has a missing value, a group should be saved/persisted for that user.
         # So, we check that we get the same url_name when we call on the url_name twice.
