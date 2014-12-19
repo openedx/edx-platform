@@ -148,7 +148,6 @@ var edx = edx || {};
         },
 
         getFormData: function() {
-
             var obj = {},
                 $form = this.$form,
                 elements = $form[0].elements,

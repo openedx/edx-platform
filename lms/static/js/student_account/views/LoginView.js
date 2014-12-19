@@ -30,7 +30,7 @@ var edx = edx || {};
             this.resetModel = data.resetModel;
 
             this.listenTo( this.model, 'sync', this.saveSuccess );
-            this.listenTo( this.resetModel, 'sync', this.resetEmail )
+            this.listenTo( this.resetModel, 'sync', this.resetEmail );
         },
 
         render: function( html ) {
