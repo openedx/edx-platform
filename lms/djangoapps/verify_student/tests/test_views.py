@@ -1473,6 +1473,31 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.WEBCAM_REQ,
         ])
 
+    def test_no_contribution(self):
+        # Do NOT specify a contribution for the course in a session var.
+        course = self._create_course("verified")
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "")
+
+    def test_contribution_other_course(self):
+        # Specify a contribution amount for another course in the session
+        course = self._create_course("verified")
+        other_course_id = CourseLocator(org="other", run="test", course="test")
+        self._set_contribution("12.34", other_course_id)
+
+        # Expect that the contribution amount is NOT pre-filled,
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "")
+
+    def test_contribution(self):
+        # Specify a contribution amount for this course in the session
+        course = self._create_course("verified")
+        self._set_contribution("12.34", course.id)
+
+        # Expect that the contribution amount is pre-filled,
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "12.34")
+
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
         course = CourseFactory.create()
@@ -1523,6 +1548,14 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
             attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
             attempt.save()
+
+    def _set_contribution(self, amount, course_id):
+        """Set the contribution amount pre-filled in a session var. """
+        session = self.client.session
+        session["donation_for_course"] = {
+            unicode(course_id): amount
+        }
+        session.save()
 
     def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False):
         """Retrieve one of the verification pages. """
@@ -1576,6 +1609,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response_dict = self._get_page_data(response)
         self.assertEqual(response_dict['full_name'], full_name)
 
+    def _assert_contribution_amount(self, response, expected_amount):
+        """Check the pre-filled contribution amount. """
+        response_dict = self._get_page_data(response)
+        self.assertEqual(response_dict['contribution_amount'], expected_amount)
+
     def _get_page_data(self, response):
         """Retrieve the data attributes rendered on the page. """
         soup = BeautifulSoup(response.content)
@@ -1591,7 +1629,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             'display_steps': json.loads(pay_and_verify_div['data-display-steps']),
             'current_step': pay_and_verify_div['data-current-step'],
             'requirements': json.loads(pay_and_verify_div['data-requirements']),
-            'message_key': pay_and_verify_div['data-msg-key']
+            'message_key': pay_and_verify_div['data-msg-key'],
+            'contribution_amount': pay_and_verify_div['data-contribution-amount']
         }
 
     def _assert_redirects_to_dashboard(self, response):
