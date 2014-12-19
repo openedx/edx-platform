@@ -34,6 +34,8 @@ class ConfigurationModel(models.Model):
         """
         Clear the cached value when saving a new configuration entry
         """
+        # Always create a new entry, instead of updating an existing model
+        self.pk = None
         super(ConfigurationModel, self).save(*args, **kwargs)
         cache.delete(self.cache_key_name())
 
