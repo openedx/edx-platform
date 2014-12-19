@@ -237,13 +237,13 @@
     }
 
     // location widget
-    .unit-location {
+    .unit-location, .library-location {
       @extend %bar-module;
       border-top: none;
 
-      .wrapper-unit-id {
+      .wrapper-unit-id, .wrapper-library-id {
 
-        .unit-id-value {
+        .unit-id-value, .library-id-value {
           @extend %cont-text-wrap;
           @extend %t-copy-sub1;
           display: inline-block;
