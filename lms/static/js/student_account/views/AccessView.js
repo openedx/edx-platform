@@ -6,6 +6,11 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
+    // Bind to StateChange Event
+    History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+        var State = History.getState(); // Note: We are using History.getState() instead of event.state
+    });
+
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
 
@@ -37,6 +42,7 @@ var edx = edx || {};
                 currentProvider: null,
                 providers: []
             };
+
             this.platformName = obj.platformName;
             this.resetModel = new edx.student.account.PasswordResetModel({}, {
                 method: 'GET',
@@ -179,6 +185,10 @@ var edx = edx || {};
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
             this.element.scrollTop( $anchor );
+
+            // Update url without reloading page
+            // window.history.pushState( '', type + ' form', '/account/' + type + '/' );
+            History.pushState( null, type + ' form', '/account/' + type + '/' );
         },
 
         /**
