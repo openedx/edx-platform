@@ -47,9 +47,6 @@
                     this.postRender();
                 }
             ).fail( _.bind( this.handleError, this ) );
-
-            // Track a virtual pageview, for easy funnel reconstruction.
-            window.analytics.page( 'verification', this.templateName );
         },
 
         handleResponse: function( data ) {
