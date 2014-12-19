@@ -38,6 +38,20 @@
   }
 
   // system feedback - messages
+  .msg {
+
+    &.inline {
+      @extend %t-copy-sub2;
+      display: inline-block;
+      margin: 0 0 0 $baseline;
+      padding: 0;
+    }
+
+    &.error {
+      @extend %t-copy-sub2;
+      color: $error-red;
+    }
+  }
   .wrapper-msg {
     margin-bottom: ($baseline*1.5);
   }
@@ -400,8 +414,6 @@ section.instructor-dashboard-content-2 {
   }
 }
 
-// view - membership
-// --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#membership {
 
   .membership-section {
@@ -412,7 +424,165 @@ section.instructor-dashboard-content-2 {
     }
   }
 
-  // cohort management
+  .cohort-management {
+
+    .input-lg {
+      @extend %t-action1;
+      padding: ($baseline/2);
+    }
+
+    .input-block {
+      display: block;
+      width: 100%;
+    }
+
+    .has-option-unavailable {
+
+      .option-unavailable {
+        background: #ffeef5;
+        color: $error-red;
+        font-style: italic;
+      }
+    }
+
+    .has-other {
+      display: inline-block;
+
+      label {
+        display: inline-block;
+      }
+
+      .input-group-other {
+        @extend %text-sr;
+        display: inline;
+
+        &.is-visible {
+          position: relative;
+          overflow: auto;
+          width: 100%;
+          height: auto;
+          margin: 0 0 0 $baseline;
+          padding: inherit;
+          border: inherit;
+          clip: auto;
+        }
+      }
+    }
+
+    .cohort-management-nav {
+      margin-bottom: $baseline;
+
+      .action-create {
+        margin-top: $baseline;
+      }
+    }
+
+    .cohort-management-settings {
+      @include clearfix();
+      background: $gray-l5;
+
+      .group-header-title {
+        padding: $baseline;
+        margin-bottom: 0;
+        border-bottom: 1px solid $gray-l3;
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .cohort-management-group-setup {
+        padding: $baseline;
+
+        .cohort-management-group-text {
+          display: inline-block;
+          width: flex-grid(9);
+        }
+
+        .cohort-management-group-actions {
+          display: inline-block;
+          width: flex-grid(3);
+          vertical-align: top;
+          text-align: right;
+        }
+      }
+
+      .wrapper-tabs {
+        @extend %ui-no-list;
+        position: relative;
+        z-index: 10;
+        top: ($baseline/5);
+        padding: 0 $baseline 0 $baseline;
+
+        .tab {
+          position: relative;
+          display: inline-block;
+
+          a {
+              display: inline-block;
+              padding: $baseline;
+          }
+
+          &.is-selected {
+
+            a {
+              padding-bottom: ($baseline+($baseline/5));
+              background: $white;
+              border-left: ($baseline/5) solid $gray-l4;
+              border-top: ($baseline/5) solid $gray-l4;
+              border-right: ($baseline/5) solid $gray-l4;
+              color: inherit;
+              cursor: default;
+            }
+          }
+        }
+      }
+
+      .cohort-management-details {
+        background: $white;
+        border-top: ($baseline/5) solid $gray-l4;
+
+        .cohort-details-name {
+          margin-bottom: ($baseline*2);
+        }
+
+        .cohort-section-header {
+          margin-top: ($baseline*1.5);
+          padding: $baseline 0 ($baseline/2) 0;
+        }
+
+        .cohort-section-header > .form-fields {
+          padding-bottom: $baseline;
+        }
+      }
+    }
+
+    .form-actions {
+
+      &.is-end {
+        margin-top: $baseline;
+
+        .action-primary {
+          @extend %btn;
+          @extend %btn-rounded;
+          @extend %btn-inherited-primary;
+          padding: 7px $baseline;
+          text-shadow: none;
+        }
+
+        .button-link {
+          
+        }
+      }
+    }
+  }
+
+  .no-margin-top {
+    @extend %no-margin-top;
+  }
+
+  %no-margin-top {
+    margin-top: 0;
+  }
+
   %cohort-management-form {
 
     .form-fields {
