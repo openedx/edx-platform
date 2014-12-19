@@ -8,6 +8,7 @@ from distutils import sysconfig
 from paver.easy import *
 import subprocess
 from .utils.envs import Env
+from .utils.prereqs import PyVenvStore
 
 
 PREREQS_MD5_DIR = os.getenv('PREREQ_CACHE_DIR', Env.REPO_ROOT / '.prereqs_cache')
@@ -105,8 +106,12 @@ def prereq_cache(cache_name, paths, install_func):
                 raise
 
         with open(cache_file_path, "w") as cache_file:
-            # Since the pip requirement files are modified during the install
-            # process, we need to store the hash generated AFTER the installation
+            # Since we are using sysconfig.get_python_lib() to generate the hash in
+            # addition to the requirements files and those files are modified during
+            # the installation process, we need to store a hash that is computed
+            # AFTER the installation is done. 
+            # TODO: check on why we are using sysconfig.get_python_lib() for computing
+            # the python requirements hash and remove it if we can.
             post_install_hash = compute_fingerprint(paths)
             cache_file.write(post_install_hash)
     else:
@@ -152,6 +157,38 @@ def python_prereqs_installation():
             req_file=req_file,
             )
         )
+
+
+def jenkins_python_prereqs_installation():
+    """
+    Installs python prereqs on a jenkins worker.
+    """
+    # TODO: add some exception handling here.
+    req_hash = compute_fingerprint(PYTHON_REQ_FILES)
+    store = PyVenvStore(req_hash)
+
+    if store.key:
+        store.extract()
+    else:
+        python_prereqs_installation()
+        store.upload()
+
+
+@task
+def install_jenkins_python_prereqs():
+    """
+    Installs python prerequisites on a jenkins worker.
+    This is optimized for speed by trying to use a prebuilt
+    virtual env stored in S3 that matches these requirements.
+    """
+    # Note: We still need to use sysconfig.get_python_lib()
+    # here so that install_python_prereqs will have a matching
+    # hash when it is run in jenkins.
+    prereq_cache(
+        "Python prereqs",
+        PYTHON_REQ_FILES + [sysconfig.get_python_lib()],
+        jenkins_python_prereqs_installation
+    )
 
 
 @task
