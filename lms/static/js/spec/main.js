@@ -61,13 +61,13 @@
             'js/staff_debug_actions': 'js/staff_debug_actions',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
-            'js/views/file_uploader': 'js/views/file_uploader',
-            'js/models/cohort': 'js/models/cohort',
-            'js/collections/cohort': 'js/collections/cohort',
-            'js/views/cohort_editor': 'js/views/cohort_editor',
-            'js/views/cohorts': 'js/views/cohorts',
-            'js/views/notification': 'js/views/notification',
             'js/models/notification': 'js/models/notification',
+            'js/views/file_uploader': 'js/views/file_uploader',
+            'js/views/notification': 'js/views/notification',
+            'js/groups/models/cohort': 'js/groups/models/cohort',
+            'js/groups/collections/cohort': 'js/groups/collections/cohort',
+            'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
+            'js/groups/views/cohorts': 'js/groups/views/cohorts',
             'js/student_account/account': 'js/student_account/account',
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
@@ -280,23 +280,25 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
-            'js/models/cohort': {
-                exports: 'CohortModel',
+            'js/groups/models/cohort': {
+                exports: 'edx.groups.CohortModel',
                 deps: ['backbone']
             },
-            'js/collections/cohort': {
-                exports: 'CohortCollection',
-                deps: ['backbone', 'js/models/cohort']
+            'js/groups/collections/cohort': {
+                exports: 'edx.groups.CohortCollection',
+                deps: ['backbone', 'js/groups/models/cohort']
             },
-            'js/views/cohort_editor': {
-                exports: 'CohortsEditor',
-                deps: ['backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
+            'js/groups/views/cohort_editor': {
+                exports: 'edx.groups.CohortsEditor',
+                deps: [
+                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
                     'string_utils'
                 ]
             },
-            'js/views/cohorts': {
-                exports: 'CohortsView',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/views/cohort_editor',
+            'js/groups/views/cohorts': {
+                exports: 'edx.groups.CohortsView',
+                deps: [
+                    'jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/groups/views/cohort_editor',
                     'js/views/notification', 'js/models/notification', 'js/views/file_uploader'
                 ]
             },
@@ -310,7 +312,8 @@
             },
             'js/views/file_uploader': {
                 exports: 'FileUploaderView',
-                deps: ['backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
+                deps: [
+                    'backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
                     'js/models/notification', 'jquery.fileupload'
                 ]
             },
@@ -505,12 +508,12 @@
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
     define([
         // Run the LMS tests
-        'lms/include/js/spec/views/cohorts_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/groups/views/cohorts_spec.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',

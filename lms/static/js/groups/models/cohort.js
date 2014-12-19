@@ -1,5 +1,11 @@
+var edx = edx || {};
+
 (function(Backbone) {
-    var CohortModel = Backbone.Model.extend({
+    'use strict';
+
+    edx.groups = edx.groups || {};
+
+    edx.groups.CohortModel = Backbone.Model.extend({
         idAttribute: 'id',
         defaults: {
             name: '',
@@ -20,6 +26,4 @@
             group_id: null
         }
     });
-
-    this.CohortModel = CohortModel;
 }).call(this, Backbone);

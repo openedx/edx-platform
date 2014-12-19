@@ -258,9 +258,9 @@
         $(document).ready(function() {
             var cohortManagementElement = $('.cohort-management');
             if (cohortManagementElement.length > 0) {
-                var cohorts = new CohortCollection();
+                var cohorts = new edx.groups.CohortCollection();
                 cohorts.url = cohortManagementElement.data('ajax_url');
-                var cohortsView = new CohortsView({
+                var cohortsView = new edx.groups.CohortsView({
                     el: cohortManagementElement,
                     model: cohorts,
                     advanced_settings_url: cohortManagementElement.data('advanced-settings-url'),
