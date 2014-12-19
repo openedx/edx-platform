@@ -29,11 +29,8 @@ from ..models import (
     PocMembership,
     PocFutureMembership,
 )
-from ..overrides import (
-    get_override_for_poc,
-    override_field_for_poc,
-    poc_context,
-)
+from ..overrides import get_override_for_poc, override_field_for_poc
+from .. import ACTIVE_POC_KEY
 from .factories import (
     PocFactory,
     PocMembershipFactory,
@@ -525,19 +522,20 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.addCleanup(patch_context.stop)
 
         self.client.login(username=self.student.username, password="test")
+        session = self.client.session
+        session[ACTIVE_POC_KEY] = self.poc.id
+        session.save()
+        self.client.session.get(ACTIVE_POC_KEY)
         url = reverse(
             'progress',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
-
-        with poc_context(self.poc):
-
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            grades = response.mako_context['grade_summary']
-            self.assertEqual(grades['percent'], 0.5)
-            self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
-            self.assertEqual(len(grades['section_breakdown']), 4)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        grades = response.mako_context['grade_summary']
+        self.assertEqual(grades['percent'], 0.5)
+        self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
+        self.assertEqual(len(grades['section_breakdown']), 4)
 
 
 class TestSwitchActivePoc(ModuleStoreTestCase, LoginEnrollmentTestCase):

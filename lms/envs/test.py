@@ -471,3 +471,4 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 
 ######### personal online courses #########
 INSTALLED_APPS += ('pocs',)
+MIDDLEWARE_CLASSES += ('pocs.overrides.PocMiddleware',)

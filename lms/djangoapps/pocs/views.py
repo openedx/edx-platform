@@ -26,7 +26,6 @@ from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from courseware.courses import get_course
 from courseware.courses import get_course_by_id
 from courseware.field_overrides import disable_overrides
 from courseware.grades import iterate_grades_for
@@ -50,7 +49,6 @@ from .overrides import (
 from .utils import (
     enroll_email,
     unenroll_email,
-    get_all_pocs_for_user,
 )
 from pocs import ACTIVE_POC_KEY
 
@@ -89,24 +87,27 @@ def dashboard(request, course):
     Display the POC Coach Dashboard.
     """
     poc = get_poc_for_coach(course, request.user)
-    schedule = get_poc_schedule(course, poc)
-    grading_policy = get_override_for_poc(poc, course, 'grading_policy',
-                                          course.grading_policy)
     context = {
         'course': course,
         'poc': poc,
-        'schedule': json.dumps(schedule, indent=4),
-        'save_url': reverse('save_poc', kwargs={'course_id': course.id}),
-        'poc_members': PocMembership.objects.filter(poc=poc),
-        'gradebook_url': reverse('poc_gradebook',
-                                 kwargs={'course_id': course.id}),
-        'grades_csv_url': reverse('poc_grades_csv',
-                                  kwargs={'course_id': course.id}),
-        'grading_policy': json.dumps(grading_policy, indent=4),
-        'grading_policy_url': reverse('poc_set_grading_policy',
-                                      kwargs={'course_id': course.id}),
     }
-    if not poc:
+
+    if poc:
+        schedule = get_poc_schedule(course, poc)
+        grading_policy = get_override_for_poc(
+            poc, course, 'grading_policy', course.grading_policy)
+        context['schedule'] = json.dumps(schedule, indent=4)
+        context['save_url'] = reverse(
+            'save_poc', kwargs={'course_id': course.id})
+        context['poc_members'] = PocMembership.objects.filter(poc=poc)
+        context['gradebook_url'] = reverse(
+            'poc_gradebook', kwargs={'course_id': course.id})
+        context['grades_csv_url'] = reverse(
+            'poc_grades_csv', kwargs={'course_id': course.id})
+        context['grading_policy'] = json.dumps(grading_policy, indent=4)
+        context['grading_policy_url'] = reverse(
+            'poc_set_grading_policy', kwargs={'course_id': course.id})
+    else:
         context['create_poc_url'] = reverse(
             'create_poc', kwargs={'course_id': course.id})
     return render_to_response('pocs/coach_dashboard.html', context)

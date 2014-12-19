@@ -7,7 +7,6 @@ import threading
 
 from contextlib import contextmanager
 
-from courseware.courses import get_request_for_thread
 from courseware.field_overrides import FieldOverrideProvider
 from pocs import ACTIVE_POC_KEY
 
@@ -54,33 +53,11 @@ def poc_context(poc):
 
 def get_current_poc(user):
     """
-    Return the poc that is active for this user
-
-    The user's session data is used to look up the active poc by id
-    If no poc is active, None is returned and MOOC view will take precedence
-    Active poc can be overridden by context manager (see `poc_context`)
+    Return the poc that is active for this request.
     """
-    # If poc context is explicitly set, that takes precedence over the user's
-    # session.
     poc = _POC_CONTEXT.poc
     if poc:
         return poc
-
-    request = get_request_for_thread()
-    if request is None:
-        return None
-
-    poc = None
-    poc_id = request.session.get(ACTIVE_POC_KEY, None)
-    if poc_id is not None:
-        try:
-            membership = PocMembership.objects.get(
-                student=user, active=True, poc__id__exact=poc_id
-            )
-            poc = membership.poc
-        except PocMembership.DoesNotExist:
-            pass
-    return poc
 
 
 def get_override_for_poc(poc, block, name, default=None):
@@ -89,16 +66,30 @@ def get_override_for_poc(poc, block, name, default=None):
     specify the block and the name of the field.  If the field is not
     overridden for the given poc, returns `default`.
     """
-    try:
-        override = PocFieldOverride.objects.get(
-            poc=poc,
-            location=block.location,
-            field=name)
-        field = block.fields[name]
-        return field.from_json(json.loads(override.value))
-    except PocFieldOverride.DoesNotExist:
-        pass
-    return default
+    if not hasattr(block, '_poc_overrides'):
+        block._poc_overrides = {}
+    overrides = block._poc_overrides.get(poc.id)
+    if overrides is None:
+        overrides = _get_overrides_for_poc(poc, block)
+        block._poc_overrides[poc.id] = overrides
+    return overrides.get(name, default)
+
+
+def _get_overrides_for_poc(poc, block):
+    """
+    Returns a dictionary mapping field name to overriden value for any
+    overrides set on this block for this POC.
+    """
+    overrides = {}
+    query = PocFieldOverride.objects.filter(
+        poc=poc,
+        location=block.location
+    )
+    for override in query:
+        field = block.fields[override.field]
+        value = field.from_json(json.loads(override.value))
+        overrides[override.field] = value
+    return overrides
 
 
 def override_field_for_poc(poc, block, name, value):
@@ -115,6 +106,9 @@ def override_field_for_poc(poc, block, name, value):
     override.value = json.dumps(field.to_json(value))
     override.save()
 
+    if hasattr(block, '_poc_overrides'):
+        del block._poc_overrides[poc.id]
+
 
 def clear_override_for_poc(poc, block, name):
     """
@@ -128,5 +122,36 @@ def clear_override_for_poc(poc, block, name):
             poc=poc,
             location=block.location,
             field=name).delete()
+
+        if hasattr(block, '_poc_overrides'):
+            del block._poc_overrides[poc.id]
+
     except PocFieldOverride.DoesNotExist:
         pass
+
+
+class PocMiddleware(object):
+    """
+    Checks to see if current session is examining a POC and sets the POC as
+    the current POC for the override machinery if so.
+    """
+    def process_request(self, request):
+        """
+        Do the check.
+        """
+        poc_id = request.session.get(ACTIVE_POC_KEY, None)
+        if poc_id is not None:
+            try:
+                membership = PocMembership.objects.get(
+                    student=request.user, active=True, poc__id__exact=poc_id
+                )
+                _POC_CONTEXT.poc = membership.poc
+            except PocMembership.DoesNotExist:
+                pass
+
+    def process_response(self, request, response):
+        """
+        Clean up afterwards.
+        """
+        _POC_CONTEXT.poc = None
+        return response

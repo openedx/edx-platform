@@ -24,18 +24,31 @@ def get_override_for_user(user, block, name, default=None):
     specify the block and the name of the field.  If the field is not
     overridden for the given user, returns `default`.
     """
-    try:
-        override = StudentFieldOverride.objects.get(
-            course_id=block.runtime.course_id,
-            location=block.location,
-            student_id=user.id,
-            field=name
-        )
-        field = block.fields[name]
-        return field.from_json(json.loads(override.value))
-    except StudentFieldOverride.DoesNotExist:
-        pass
-    return default
+    if not hasattr(block, '_student_overrides'):
+        block._student_overrides = {}
+    overrides = block._student_overrides.get(user.id)
+    if overrides is None:
+        overrides = _get_overrides_for_user(user, block)
+        block._student_overrides[user.id] = overrides
+    return overrides.get(name, default)
+
+
+def _get_overrides_for_user(user, block):
+    """
+    Gets all of the individual student overrides for given user and block.
+    Returns a dictionary of field override values keyed by field name.
+    """
+    query = StudentFieldOverride.objects.filter(
+        course_id=block.runtime.course_id,
+        location=block.location,
+        student_id=user.id,
+    )
+    overrides = {}
+    for override in query:
+        field = block.fields[override.field]
+        value = field.from_json(json.loads(override.value))
+        overrides[override.field] = value
+    return overrides
 
 
 def override_field_for_user(user, block, name, value):
