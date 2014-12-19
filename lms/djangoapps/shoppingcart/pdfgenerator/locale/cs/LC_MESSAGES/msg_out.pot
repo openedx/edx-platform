@@ -1,0 +1,164 @@
+# #-#-#-#-#  messages.pot (PACKAGE VERSION)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# #-#-#-#-#  messages.po (0.2.0)  #-#-#-#-#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.4.8\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-01-07 22:04+0100\n"
+"PO-Revision-Date: 2012-04-22 14:33+0100\n"
+"Last-Translator: rbas <rbas@rbas.cz>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: CS\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+
+#: api.py:41
+#, python-format
+msgid "Vat in: %s"
+msgstr "DIČ: %s"
+
+#: api.py:44
+#, python-format
+msgid "IR: %s"
+msgstr "IČ: %s"
+
+#: pdf.py:50
+#, python-format
+msgid "Page %(page_number)d of %(page_count)d"
+msgstr "Strana %(page_number)d z %(page_count)d"
+
+#: pdf.py:69
+#, python-format
+msgid "Variable symbol: %s"
+msgstr "Variabilní symbol: %s"
+
+#: pdf.py:94
+msgid "Customer"
+msgstr "Odběratel"
+
+#: pdf.py:114
+msgid "Provider"
+msgstr "Poskytovatel"
+
+#: pdf.py:133
+msgid "Payment information"
+msgstr "Platební informace"
+
+#: pdf.py:138
+msgid "Account n."
+msgstr "Č. účtu"
+
+#: pdf.py:139
+msgid "Variable symbol"
+msgstr "Variabilní symbol"
+
+#: pdf.py:143
+msgid "Specific symbol"
+msgstr "Specifický symbol"
+
+#: pdf.py:155
+msgid "List of items"
+msgstr "Seznam položek"
+
+#: pdf.py:157
+msgid "Description"
+msgstr "Popis"
+
+#: pdf.py:161 pdf.py:174
+msgid "Units"
+msgstr "Jednotek"
+
+#: pdf.py:163 pdf.py:176
+msgid "Price per one"
+msgstr "Cena za jednotku"
+
+#: pdf.py:165 pdf.py:178
+msgid "Total price"
+msgstr "Celková cena"
+
+#: pdf.py:167 pdf.py:229
+msgid "Tax"
+msgstr "DPH"
+
+#: pdf.py:169
+msgid "Total price with tax"
+msgstr "Celková cena s daní"
+
+#: pdf.py:214
+msgid "Rounding"
+msgstr "Haléřové vyrovnání"
+
+#: pdf.py:225
+msgid "Total"
+msgstr "Celkem"
+
+#: pdf.py:228
+msgid "Breakdown VAT"
+msgstr "Rozpis DPH"
+
+#: pdf.py:229
+msgid "VAT rate"
+msgstr "Sazba"
+
+#: pdf.py:229
+msgid "With VAT"
+msgstr "S DPH"
+
+#: pdf.py:229
+msgid "Without VAT"
+msgstr "Bez DPH"
+
+#: pdf.py:257
+msgid "Total with tax"
+msgstr "Celkem s DPH"
+
+#: pdf.py:274
+msgid "Creator"
+msgstr "Vytvořil"
+
+#: InvoiceGenerator/pdf.py:402
+msgid "Date of exposure taxable invoice"
+msgstr "Den vystavení daňového dokladu"
+
+#: pdf.py:282
+msgid "Payback"
+msgstr "Splatnost"
+
+#: pdf.py:287
+msgid "Taxable date"
+msgstr "Datum zdanitelného plnění"
+
+#: pdf.py:290
+msgid "Paytype"
+msgstr "Typ platby"
+
+#: pdf.py:333
+#, python-format
+msgid "Correcting document: %s"
+msgstr "Opravný daňový doklad: %s"
+
+#: pdf.py:339
+#, python-format
+msgid "Correction document for invoice: %s"
+msgstr "Opravný daňový doklad k daňovému dokladu: %s"
+
+#: pdf.py:340
+#, python-format
+msgid "Reason to correction: %s"
+msgstr "Důvod opravy: %s"
+
+#: pdf.py:281
+msgid "Date of exposure"
+msgstr "Den vystavení daňového dokladu"

@@ -1,0 +1,149 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2014-07-03 14:20+CEST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: InvoiceGenerator/api.py:47
+msgid "Vat in: %s"
+msgstr ""
+
+#: InvoiceGenerator/api.py:50
+msgid "IR: %s"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:51
+msgid "Page %(page_number)d of %(page_count)d"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:129
+msgid "Variable symbol: %s"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:154
+msgid "Customer"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:174
+msgid "Provider"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:199
+msgid "Payment information"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:204
+msgid "Account n."
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:205
+msgid "Variable symbol"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:209
+msgid "Specific symbol"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:221
+msgid "List of items"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:223
+msgid "Description"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:227 InvoiceGenerator/pdf.py:240
+msgid "Units"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:229 InvoiceGenerator/pdf.py:242
+msgid "Price per one"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:231 InvoiceGenerator/pdf.py:244
+msgid "Total price"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:233 InvoiceGenerator/pdf.py:335
+msgid "Tax"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:235
+msgid "Total price with tax"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:320
+msgid "Rounding"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:331
+msgid "Total"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:334
+msgid "Breakdown VAT"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:335
+msgid "VAT rate"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:335
+msgid "With VAT"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:335
+msgid "Without VAT"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:363
+msgid "Total with tax"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:385
+msgid "Creator"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:402
+msgid "Date of exposure taxable invoice"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:404 InvoiceGenerator/pdf.py:465
+msgid "Payback"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:406 InvoiceGenerator/pdf.py:467
+msgid "Taxable date"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:410 InvoiceGenerator/pdf.py:471
+msgid "Paytype"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:443
+msgid "Correcting document: %s"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:449
+msgid "Correction document for invoice: %s"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:450
+msgid "Reason to correction: %s"
+msgstr ""
+
+#: InvoiceGenerator/pdf.py:463
+msgid "Date of exposure"
+msgstr ""
+
