@@ -615,11 +615,22 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
     def index_view(self):
         xblock_body = super(VideoDescriptor, self).index_view()
-        transcript = self.get_transcript(transcript_format='txt')[0].replace("\n", " ")
         video_body = {
-            "transcript": transcript,
             "display_name": self.display_name,
         }
+
+        if self.sub:
+            transcript = self.get_transcript(transcript_format='txt')[0].replace("\n", " ")
+            video_body.update({"transcript_" + self.transcript_language: transcript})
+
+        #check to see if there are transcripts in other languages besides default transcript
+        if self.transcripts:
+            transcripts_content = {}
+            for language in self.transcripts.keys():
+                transcript_content = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
+                transcripts_content.update({"transcript_" + language: transcript_content})
+            video_body.update(transcripts_content)
+
         if "content" in xblock_body:
             xblock_body["content"].update(video_body)
         else:
