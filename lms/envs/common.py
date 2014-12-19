@@ -1970,3 +1970,17 @@ API_DATE_FORMAT = '%Y-%m-%d'
 # for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
+
+# Configuration used for generating PDF Receipts/Invoices
+PDF_RECEIPT_TAX_ID = 'add here'
+PDF_RECEIPT_FOOTER_TEXT = 'add your own specific footer text here'
+PDF_RECEIPT_DISCLAIMER_TEXT = 'add your own specific disclaimer text here'
+PDF_RECEIPT_BILLING_ADDRESS = 'add your own billing address here with appropriate line feed characters'
+PDF_RECEIPT_TERMS_AND_CONDITIONS = 'add your own terms and conditions'
+PDF_RECEIPT_TAX_ID_LABEL = 'Tax ID'
+PDF_RECEIPT_LOGO_PATH = PROJECT_ROOT + '/static/images/openedx-logo-tag.png'
+# Height of the Logo in mm
+PDF_RECEIPT_LOGO_HEIGHT_MM = 12
+PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/logo.png'
+# Height of the Co-brand Logo in mm
+PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12

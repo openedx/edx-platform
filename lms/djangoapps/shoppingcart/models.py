@@ -5,12 +5,12 @@ from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 import analytics
+from io import BytesIO
 import pytz
 import logging
 import smtplib
 import StringIO
 import csv
-from courseware.courses import get_course_by_id
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
 from django.dispatch import receiver
 from django.db import models
@@ -25,19 +25,17 @@ from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
 from django.core.mail.message import EmailMessage
-
 from xmodule.modulestore.django import modulestore
+from eventtracking import tracker
 
+from courseware.courses import get_course_by_id
 from config_models.models import ConfigurationModel
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE
-from eventtracking import tracker
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
-
 from verify_student.models import SoftwareSecurePhotoVerification
-
 from .exceptions import (
     InvalidCartItem,
     PurchasedCallbackException,
@@ -49,8 +47,9 @@ from .exceptions import (
     UnexpectedOrderItemStatus,
     ItemNotFoundInCartException
 )
-
 from microsite_configuration import microsite
+from shoppingcart.pdf import PDFInvoice
+
 
 log = logging.getLogger("shoppingcart")
 
@@ -288,6 +287,41 @@ class Order(models.Model):
         self.save()
         return old_to_new_id_map
 
+    def generate_pdf_receipt(self, order_items):
+        """
+        Generates the pdf receipt for the given order_items
+        and returns the pdf_buffer.
+        """
+        items_data = []
+        for item in order_items:
+            if item.list_price is not None:
+                discount_price = item.list_price - item.unit_cost
+                price = item.list_price
+            else:
+                discount_price = 0
+                price = item.unit_cost
+
+            item_total = item.qty * item.unit_cost
+            items_data.append({
+                'item_description': item.pdf_receipt_display_name,
+                'quantity': item.qty,
+                'list_price': price,
+                'discount': discount_price,
+                'item_total': item_total
+            })
+        pdf_buffer = BytesIO()
+
+        PDFInvoice(
+            items_data=items_data,
+            item_id=str(self.id),  # pylint: disable=no-member
+            date=self.purchase_time,
+            is_invoice=False,
+            total_cost=self.total_cost,
+            payment_received=self.total_cost,
+            balance=0
+        ).generate_pdf(pdf_buffer)
+        return pdf_buffer
+
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
         this function generates the csv file
@@ -308,7 +342,7 @@ class Order(models.Model):
 
         return csv_file, course_info
 
-    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, site_name, courses_info):
+    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, pdf_file, site_name, courses_info):
         """
         send confirmation e-mail
         """
@@ -370,6 +404,11 @@ class Order(models.Model):
 
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
+                if pdf_file is not None:
+                    email.attach(u'Receipt.pdf', pdf_file.getvalue(), 'application/pdf')
+                else:
+                    file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
+                    email.attach(u'pdf_not_available.txt', file_buffer.getvalue(), 'text/plain')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=no-member
@@ -436,7 +475,16 @@ class Order(models.Model):
             #
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
-        self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
+        try:
+            pdf_file = self.generate_pdf_receipt(orderitems)
+        except Exception:  # pylint: disable=broad-except
+            log.exception('Exception at creating pdf file.')
+            pdf_file = None
+
+        self.send_confirmation_emails(
+            orderitems, self.order_type == OrderTypes.BUSINESS,
+            csv_file, pdf_file, site_name, courses_info
+        )
         self._emit_order_event('Completed Order', orderitems)
 
     def refund(self):
@@ -679,6 +727,22 @@ class OrderItem(TimeStampedModel):
         """
         return ''
 
+    @property
+    def pdf_receipt_display_name(self):
+        """
+            How to display this item on a PDF printed receipt file.
+            This can be overridden by the subclasses of OrderItem
+        """
+        course_key = getattr(self, 'course_id', None)
+        if course_key:
+            course = get_course_by_id(course_key, depth=0)
+            return course.display_name
+        else:
+            raise Exception(
+                "Not Implemented. OrderItems that are not Course specific should have"
+                " a overridden pdf_receipt_display_name property"
+            )
+
     def analytics_data(self):
         """Simple function used to construct analytics data for the OrderItem.
 
@@ -732,6 +796,33 @@ class Invoice(models.Model):
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
+
+    def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
+        """
+        Generates the pdf invoice for the given course
+        and returns the pdf_buffer.
+        """
+        discount_per_item = float(course_price) - sale_price / quantity
+        list_price = course_price - discount_per_item
+        items_data = [{
+            'item_description': course.display_name,
+            'quantity': quantity,
+            'list_price': list_price,
+            'discount': discount_per_item,
+            'item_total': quantity * list_price
+        }]
+        pdf_buffer = BytesIO()
+        PDFInvoice(
+            items_data=items_data,
+            item_id=str(self.id),  # pylint: disable=no-member
+            date=datetime.now(pytz.utc),
+            is_invoice=True,
+            total_cost=float(self.total_amount),
+            payment_received=0,
+            balance=float(self.total_amount)
+        ).generate_pdf(pdf_buffer)
+
+        return pdf_buffer
 
 
 class CourseRegistrationCode(models.Model):
@@ -1606,3 +1697,10 @@ class Donation(OrderItem):
             data['name'] = settings.PLATFORM_NAME
             data['category'] = settings.PLATFORM_NAME
         return data
+
+    @property
+    def pdf_receipt_display_name(self):
+        """
+            How to display this item on a PDF printed receipt file.
+        """
+        return self._line_item_description(course_id=self.course_id)
