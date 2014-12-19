@@ -32,6 +32,8 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 __all__ = ['assets_handler']
 
 # pylint: disable=unused-argument
+
+
 @login_required
 @ensure_csrf_cookie
 def assets_handler(request, course_key_string=None, asset_key_string=None):
@@ -282,7 +284,14 @@ def _upload_asset(request, course_key):
     readback = contentstore().find(content.location)
     locked = getattr(content, 'locked', False)
     response_payload = {
-        'asset': _get_asset_json(content.name, content.content_type, readback.last_modified_at, content.location, content.thumbnail_location, locked),
+        'asset': _get_asset_json(
+            content.name,
+            content.content_type,
+            readback.last_modified_at,
+            content.location,
+            content.thumbnail_location,
+            locked
+        ),
         'msg': _('Upload completed')
     }
 

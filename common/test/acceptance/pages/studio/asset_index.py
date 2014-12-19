@@ -16,7 +16,7 @@ class AssetIndexPage(CoursePage):
     """
 
     url_path = "assets"
-    parent_element = '#js-asset-type-col '
+    type_filter_element = '#js-asset-type-col '
 
     @wait_for_js
     def is_browser_on_page(self):
@@ -27,7 +27,7 @@ class AssetIndexPage(CoursePage):
         """
         Checks that type filter is in table header.
         """
-        return self.q(css=self.parent_element).present
+        return self.q(css=self.type_filter_element).present
 
     def type_filter_header_label_visible(self):
         """
@@ -49,10 +49,10 @@ class AssetIndexPage(CoursePage):
         """
         self.wait_for_ajax()
         if self.q(css=".filterable-column .nav-item").is_present():
-            if not self.q(css=self.parent_element + ".wrapper-nav-sub").visible:
+            if not self.q(css=self.type_filter_element + ".wrapper-nav-sub").visible:
                 self.q(css=".filterable-column > .nav-item").first.click()
-            self.wait_for_element_visibility(self.parent_element + ".wrapper-nav-sub", "Type Filter promise satisfied.")
-            self.q(css=self.parent_element + ".column-filter-link").nth(filter_number).click()
+            self.wait_for_element_visibility(self.type_filter_element + ".wrapper-nav-sub", "Type Filter promise satisfied.")
+            self.q(css=self.type_filter_element + ".column-filter-link").nth(filter_number).click()
             self.wait_for_ajax()
             return True
         return False

@@ -8,14 +8,21 @@ from ...pages.studio.asset_index import AssetIndexPage
 
 from base_studio_test import StudioCourseTest
 
+
 class AssetIndexTest(StudioCourseTest):
+
     """
     Tests for the Asset index page.
     """
 
     def setUp(self):
         super(AssetIndexTest, self).setUp()
-        self.asset_page = AssetIndexPage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        self.asset_page = AssetIndexPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
 
     def populate_course_fixture(self, course_fixture):
         """
@@ -49,4 +56,3 @@ class AssetIndexTest(StudioCourseTest):
         else:
             msg = "Could not open select Type filter"
             raise StudioApiLoginError(msg)
-
