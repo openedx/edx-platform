@@ -19,6 +19,9 @@ var edx = edx || {};
                 errorModel: this.errorModel
             }).render();
 
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
+
             this.listenTo( webcam, 'imageCaptured', function() {
                 // Track the user's successful image capture
                 window.analytics.track( 'edx.bi.user.face_image.captured', {

@@ -17,6 +17,9 @@ var edx = edx || {};
                 requirements: this.stepData.requirements
             }).render();
 
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'payment', this.templateName );
+
             // Update the contribution amount with the amount the user
             // selected in a previous screen.
             if ( this.stepData.contributionAmount ) {
@@ -84,7 +87,7 @@ var edx = edx || {};
             // Marketing needs a way to tell the difference between users
             // leaving for the payment processor and users dropping off on
             // this page. A virtual pageview can be used to do this.
-            window.analytics.page( 'verification', 'payment_processor_step' );
+            window.analytics.page( 'payment', 'payment_processor_step' );
 
             form.submit();
         },
