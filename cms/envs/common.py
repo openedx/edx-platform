@@ -789,7 +789,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
     "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon'],
     "Documents": [
         'application/pdf',
-        'application/txt',
+        'text/plain',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
         'application/vnd.openxmlformats-officedocument.presentationml.presentation',
