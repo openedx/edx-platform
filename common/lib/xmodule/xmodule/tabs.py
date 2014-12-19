@@ -830,7 +830,6 @@ class CourseTabList(List):
                         yield item
                 else:
                     yield tab
-
         instructor_tab = InstructorTab()
         if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
             yield instructor_tab

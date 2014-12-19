@@ -61,6 +61,9 @@ class CoursewarePage(CoursePage):
                 (default is 0)
 
         """
+        # When Student Notes feature is enabled, it looks for the content inside
+        # `.edx-notes-wrapper-content` element (Otherwise, you will get an
+        # additional html related to Student Notes).
         element = self.q(css='{} .edx-notes-wrapper-content'.format(self.xblock_component_selector))
         if element.first:
             return element.attrs('innerHTML')[index].strip()

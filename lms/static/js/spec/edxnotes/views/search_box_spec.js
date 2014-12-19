@@ -9,8 +9,6 @@ define([
         getSearchBox = function (options) {
             options = _.defaults(options || {}, {
                 el: $('#search-notes-form').get(0),
-                user: 'test_user',
-                courseId: 'test_course_id',
                 beforeSearchStart: jasmine.createSpy(),
                 search: jasmine.createSpy(),
                 error: jasmine.createSpy(),
@@ -51,11 +49,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             request = requests[0];
             expect(request.method).toBe(form.method.toUpperCase());
-            expect(request.url).toBe(form.action + '?' + $.param({
-                user: 'test_user',
-                course_id: 'test_course_id',
-                text: 'test_text'
-            }));
+            expect(request.url).toBe(form.action + '?' + $.param({text: 'test_text'}));
         });
 
         it('returns success result', function () {

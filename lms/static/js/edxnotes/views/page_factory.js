@@ -8,8 +8,6 @@ define([
      * @param {Object} params Params for the Notes page.
      * @param {Array} params.notesList A list of note models.
      * @param {Boolean} params.debugMode Enable the flag to see debug information.
-     * @param {String} params.user User id of notes owner.
-     * @param {String} params.courseId Course id.
      * @param {String} params.endpoint The endpoint of the store.
      * @return {Object} An instance of NotesPageView.
      */
@@ -20,8 +18,6 @@ define([
             el: $('.wrapper-student-notes').get(0),
             collection: collection,
             debug: params.debugMode,
-            user: params.user,
-            courseId: params.courseId,
             endpoint: params.endpoint
         });
     };
