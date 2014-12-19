@@ -1,5 +1,11 @@
+var edx = edx || {};
+
 (function(Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView) {
-    var CohortEditorView = Backbone.View.extend({
+    'use strict';
+
+    edx.groups = edx.groups || {};
+
+    edx.groups.CohortEditorView = Backbone.View.extend({
         events : {
             "submit .cohort-management-group-add-form": "addStudents"
         },
@@ -202,6 +208,4 @@
             }
         }
     });
-
-    this.CohortEditorView = CohortEditorView;
 }).call(this, Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView);
