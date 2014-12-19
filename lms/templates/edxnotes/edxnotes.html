@@ -1,6 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! import json %>
-<%! from student.models import anonymous_id_for_user %>
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -85,9 +84,7 @@
         require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
             var pageView = new NotesFactory({
                 notesList: ${notes},
-                debugMode: ${debug},
-                user: '${anonymous_id_for_user(user, None)}',
-                courseId: '${course.id}'
+                debugMode: ${debug}
             });
         });
     }).call(this, require || RequireJS.require);

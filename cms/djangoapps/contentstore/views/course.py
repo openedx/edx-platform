@@ -882,7 +882,6 @@ def _config_course_advanced_components(request, course_module):
     """
     # TODO refactor the above into distinct advanced policy settings
     filter_tabs = True  # Exceptional conditions will pull this to False
-
     if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
         tab_component_map = {
             'open_ended': OPEN_ENDED_COMPONENT_TYPES,
