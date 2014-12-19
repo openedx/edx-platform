@@ -333,10 +333,12 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     )
     @ddt.unpack
     def test_find_matching_course_indexes(self, branch, search_targets, matching, unmatching):
-        db_indexes = [Mock(name='from_db')]
+        db_indexes = [{'org': 'what', 'course': 'this', 'run': 'needs'}]
         for n, index in enumerate(matching + unmatching):
             course_key = CourseLocator('org', 'course', 'run{}'.format(n))
             self.bulk._begin_bulk_operation(course_key)
+            for attr in ['org', 'course', 'run']:
+                index[attr] = getattr(course_key, attr)
             self.bulk.insert_course_index(course_key, index)
 
         expected = matching + db_indexes
