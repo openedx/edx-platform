@@ -255,7 +255,7 @@ class MongoConnection(object):
         """
         Retrieve all definitions listed in `definitions`.
         """
-        return self.definitions.find({'$in': {'_id': definitions}})
+        return self.definitions.find({'_id': {'$in': definitions}})
 
     def insert_definition(self, definition):
         """
