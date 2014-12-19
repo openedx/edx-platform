@@ -156,8 +156,8 @@ def update_db():
     Runs syncdb and then migrate.
     """
     settings = getattr(options, 'settings', DEFAULT_SETTINGS)
-    sh(django_cmd('lms', settings, 'syncdb', '--traceback', '--pythonpath=.'))
-    sh(django_cmd('lms', settings, 'migrate', '--traceback', '--pythonpath=.'))
+    for system in ('lms', 'cms'):
+        sh(django_cmd(system, settings, 'syncdb', '--migrate', '--traceback', '--pythonpath=.'))
 
 
 @task
