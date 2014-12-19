@@ -1794,6 +1794,40 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertIn(item.status, response.content.split('\r\n')[1],)
         self.assertIn(coupon_redemption[0].coupon.code, response.content.split('\r\n')[1],)
 
+    def test_coupon_redeem_count_in_ecommerce_section(self):
+        """
+        Test that checks the redeem count in the instructor_dashboard coupon section
+        """
+        # add the coupon code for the course
+        coupon = Coupon(
+            code='test_code', description='test_description', course_id=self.course.id,
+            percentage_discount='10', created_by=self.instructor, is_active=True
+        )
+        coupon.save()
+        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
+        # apply the coupon code to the item in the cart
+        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
+        self.assertEqual(resp.status_code, 200)
+
+        # URL for instructor dashboard
+        instructor_dashboard = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        # visit the instructor dashboard page and
+        # check that the coupon redeem count should be 0
+        resp = self.client.get(instructor_dashboard)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('Redeem Count', resp.content)
+        self.assertIn('<td>0</td>', resp.content)
+
+        # now make the payment of your cart items
+        self.cart.purchase()
+        # visit the instructor dashboard page and
+        # check that the coupon redeem count should be 1
+        resp = self.client.get(instructor_dashboard)
+        self.assertEqual(resp.status_code, 200)
+
+        self.assertIn('Redeem Count', resp.content)
+        self.assertIn('<td>1</td>', resp.content)
+
     def test_get_sale_records_features_csv(self):
         """
         Test that the response from get_sale_records is in csv format.
