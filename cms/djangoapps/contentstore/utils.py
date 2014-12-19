@@ -186,8 +186,8 @@ def has_children_visible_to_specific_content_groups(xblock):
     if not xblock.has_children:
         return False
 
-    for child in xblock.children:
-        if is_visible_to_specific_content_groups(modulestore().get_item(child)):
+    for child in xblock.get_children():
+        if is_visible_to_specific_content_groups(child):
             return True
 
     return False
