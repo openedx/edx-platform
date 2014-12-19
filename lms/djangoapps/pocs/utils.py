@@ -4,7 +4,6 @@ POC Enrollment operations for use by Coach APIs.
 Does not include any access control, be sure to check access before calling.
 """
 
-import json
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -13,7 +12,6 @@ from django.core.mail import send_mail
 from courseware.courses import get_course_about_section
 from courseware.courses import get_course_by_id
 from edxmako.shortcuts import render_to_string
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from microsite_configuration import microsite
 
@@ -23,6 +21,7 @@ from .models import (
     PocFutureMembership,
 )
 from .overrides import get_current_poc
+
 
 class EmailEnrollmentState(object):
     """ Store the complete enrollment state of an email in a class """

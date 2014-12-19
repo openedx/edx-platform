@@ -464,10 +464,6 @@ def swich_active_poc(request, course_id, poc_id=None):
     """set the active POC for the logged-in user
     """
     user = request.user
-    if not user.is_authenticated():
-        return HttpResponseForbidden(
-            _('Only registered students may change POC views.')
-        )
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     # will raise Http404 if course_id is bad
     course = get_course_by_id(course_key)
