@@ -40,7 +40,7 @@
       }
     }
 
-    .note-group {      
+    .note-group {
 
       &, .note-section {
         border-top: 2px solid $gray-l4;
@@ -71,9 +71,9 @@
         border-top: 1px dotted $gray-l4;
         border-bottom: none;
 
-        &:first-child { // Not working, but don't know why. It's like it's not even being seen although it's in the code and in the proper order (last).
-          border-top: 0px; // Grrr
-        } // Grrr
+        &:first-of-type {
+          border-top: 0px;
+        }
 
         .wrapper-note-excerpts {
           display: inline-block;
@@ -89,39 +89,8 @@
             .note-excerpt-ol {
               @extend %t-copy-base;
               position: relative;
-              padding: $baseline ($baseline*4) $baseline ($baseline*4);
+              padding: $baseline;
             }
-          }
-
-          .note-excerpt > .note-excerpt-p:before,
-          .note-excerpt > .note-excerpt-ul:before,
-          .note-excerpt > .note-excerpt-ol:before,
-          .note-excerpt > .note-excerpt-p:after,
-          .note-excerpt > .note-excerpt-ul:after,
-          .note-excerpt > .note-excerpt-ol:after {
-            @extend %t-title3;
-            display: block;
-            position: absolute;
-            height: 40px;
-            width: 40px;
-            font-family: "FontAwesome";
-            color: $white;
-          }
-
-          .note-excerpt > .note-excerpt-p:before,
-          .note-excerpt > .note-excerpt-ul:before,
-          .note-excerpt > .note-excerpt-ol:before {
-            content: "\f10d";
-            top: 0;
-            left: $baseline;
-          }
-
-          .note-excerpt > .note-excerpt-p:after,
-          .note-excerpt > .note-excerpt-ul:after,
-          .note-excerpt > .note-excerpt-ol:after {
-            content: "\f10e";
-            bottom: ($baseline/2);
-            right: $baseline;
           }
 
           .note-comments {
@@ -158,20 +127,6 @@
                 background-color: #FFFF88;
               }
             }
-          }
-
-          .note-comments:before {
-            @extend %t-title4;
-            display: block;
-            position: absolute;
-            top: -14px;
-            left: 20px;
-            height: 24px;
-            width: 24px;
-            font-family: "FontAwesome";
-            line-height: 20px;
-            content: "\f0d8";
-            color: $white;
           }
         }
 
