@@ -28,8 +28,6 @@ define([
             this.searchResultsView = new SearchResultsView({
                 el: this.el,
                 tabsCollection: this.tabsCollection,
-                user: this.options.user,
-                courseId: this.options.courseId,
                 debug: this.options.debug,
                 createTabOnInitialization: false
             });
