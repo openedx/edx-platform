@@ -4,6 +4,7 @@ Views for the course_mode module
 
 import decimal
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from django.http import HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
@@ -62,12 +63,20 @@ class ChooseModeView(View):
         # to the usual "choose your track" page.
         has_enrolled_professional = (enrollment_mode == "professional" and is_active)
         if "professional" in modes and not has_enrolled_professional:
-            return redirect(
-                reverse(
-                    'verify_student_show_requirements',
-                    kwargs={'course_id': course_key.to_deprecated_string()}
+            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+                return redirect(
+                    reverse(
+                        'verify_student_start_flow',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
                 )
-            )
+            else:
+                return redirect(
+                    reverse(
+                        'verify_student_show_requirements',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
+                )
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
@@ -171,9 +180,20 @@ class ChooseModeView(View):
             donation_for_course[unicode(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
-            return redirect(
-                reverse('verify_student_show_requirements',
-                        kwargs={'course_id': course_key.to_deprecated_string()}) + "?upgrade={}".format(upgrade))
+            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+                return redirect(
+                    reverse(
+                        'verify_student_start_flow',
+                        kwargs={'course_id': unicode(course_key)}
+                    )
+                )
+            else:
+                return redirect(
+                    reverse(
+                        'verify_student_show_requirements',
+                        kwargs={'course_id': unicode(course_key)}
+                    ) + "?upgrade={}".format(upgrade)
+                )
 
     def _get_requested_mode(self, request_dict):
         """Get the user's requested mode
