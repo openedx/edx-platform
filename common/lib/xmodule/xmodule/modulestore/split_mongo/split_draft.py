@@ -268,6 +268,15 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         location = self._map_revision_to_branch(location, revision=revision)
         return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)
 
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator from which the
+        copy was inherited.
+        """
+        usage_key = self._map_revision_to_branch(usage_key)
+        return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)
+
     def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
