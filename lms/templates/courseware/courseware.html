@@ -211,9 +211,6 @@ ${fragment.foot_html()}
 
     <section class="course-content" id="course-content">
       ${fragment.body_html()}
-      % if is_edxnotes_enabled(course):
-        <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
-      % endif
     </section>
   </div>
 </div>
@@ -229,6 +226,10 @@ ${fragment.foot_html()}
       <div id="candy"></div>
     </div>
   </div>
+% endif
+
+% if is_edxnotes_enabled(course):
+  <%include file="/edxnotes/toggle_notes.html" args="course=course"/>
 % endif
 
 % if course.show_calculator:
@@ -359,5 +360,4 @@ ${fragment.foot_html()}
     </div>
   </div>
 
-% endif
 <%include file="../modal/accessible_confirm.html" />
