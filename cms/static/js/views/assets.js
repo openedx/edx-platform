@@ -238,7 +238,6 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             },
 
             toggleFilterColumnState: function(menu) {
-                alert(JSON.stringify(this.filterableColumns));
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
