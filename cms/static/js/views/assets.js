@@ -237,11 +237,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 this.toggleFilterColumnState($this);
             },
 
-            toggleFilterColumnState: function(menu) {
+            toggleFilterColumnState: function(menu, selected) {
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
-                var assettype = menu.data('assetfilter');
+                var assettype = selected ? selected.data('assetfilter'): this.allLabel;
                 if(assettype == this.allLabel){
                     titleText.text(titleText.data('alllabel'));
                 }
@@ -282,7 +282,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             closeFilterPopup: function(element){
                 var $menu = element.parents('.nav-dd > .nav-item');
-                this.toggleFilterColumnState($menu);
+                this.toggleFilterColumnState($menu, element);
             },
 
             displayFinishedUpload: function (resp) {

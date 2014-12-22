@@ -250,10 +250,9 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                         var assetsNumber = $('#asset-table-body .type-col').length;
                         assetsView.openFilterColumn($typeColumn);
                         expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
-                        expect($typeColumn.find('h3.title')).toHaveClass('is-selected');
+                        expect($typeColumn.find('.title')).toHaveClass('is-selected');
                         expect($typeColumn.find('.column-filter-link')).toBeVisible();
-                        var $firstFilter = $typeColumn.find('li.nav-item a:visible').first();
-                        assetsView.closeFilterPopup($firstFilter);
+                        $typeColumn.find('.wrapper-nav-sub').trigger('click');
                         expect($typeColumn.find('.wrapper-nav-sub').hasClass('is-shown')).toBe(false);
                     });
                 });
@@ -269,7 +268,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                         var assetsNumber = assetsView.collection.length;
                         $typeColumn.trigger('click');
                         expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
-                        expect($typeColumn.find('h3.title')).toHaveClass('is-selected');
+                        expect($typeColumn.find('.title')).toHaveClass('is-selected');
                         var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
                         $firstFilter.trigger('click');
                         respondWithMockAssets(requests);

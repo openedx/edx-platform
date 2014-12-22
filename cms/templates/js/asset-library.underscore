@@ -21,12 +21,12 @@
             </th>
             <th class="type-col filterable-column nav-dd">
                 <div id="js-asset-type-col" class="nav-item" role="button" tabindex="0">
-                    <h3 class="title">
-                        <span class="label-prefix sr">Course </span>
+                    <span class="title">
                         <span class="type-filter" data-alllabel='<%= gettext("Type") %>'><%= gettext("Type") %></span>
+                        <span class="label-prefix sr">Filter</span>
                         <span class="filter-link"></span>
-                        <i class="icon-caret-down ui-toggle-dd"></i>
-                    </h3>
+                        <i class="icon-caret-down ui-toggle-dd" aria-hidden="true"></i>
+                    </span>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">
                             <ul>
@@ -58,5 +58,5 @@
 </div>
 
 <div class="no-asset-content">
-    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus"></i><%= gettext("Upload your first asset") %></a></p>
+    <p><%= gettext("You haven't added any assets to this course yet.") %> <a href="#" class="button upload-button new-button"><i class="icon-plus" aria-hidden="true"></i><%= gettext("Upload your first asset") %></a></p>
 </div>

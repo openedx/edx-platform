@@ -316,6 +316,8 @@
 
       .thumb-col {
         padding: ($baseline/2) $baseline;
+        @extend %t-copy-sub2;
+        color: $gray-l2;
 
         .thumb {
           width: 100px;
