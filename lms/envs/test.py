@@ -74,14 +74,14 @@ SOUTH_TESTS_MIGRATE = False  # To disable migrations and use syncdb instead
 # Nose Test Runner
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-_system = 'lms'
+_SYSTEM = 'lms'
 
-_report_dir = REPO_ROOT / 'reports' / _system
-_report_dir.makedirs_p()
+_REPORT_DIR = REPO_ROOT / 'reports' / _SYSTEM
+_REPORT_DIR.makedirs_p()
 
 NOSE_ARGS = [
-    '--id-file', REPO_ROOT / '.testids' / _system / 'noseids',
-    '--xunit-file', _report_dir / 'nosetests.xml',
+    '--id-file', REPO_ROOT / '.testids' / _SYSTEM / 'noseids',
+    '--xunit-file', _REPORT_DIR / 'nosetests.xml',
 ]
 
 # Local Directories
@@ -257,9 +257,9 @@ FEATURES['ENABLE_PAYMENT_FAKE'] = True
 # the same settings, we can generate this randomly and guarantee
 # that they are using the same secret.
 from random import choice
-import string
+from string import letters, digits, punctuation  # pylint: disable=deprecated-module
 RANDOM_SHARED_SECRET = ''.join(
-    choice(string.letters + string.digits + string.punctuation)
+    choice(letters + digits + punctuation)
     for x in range(250)
 )
 
@@ -287,7 +287,7 @@ MEDIA_ROOT = TEST_ROOT / "uploads"
 MEDIA_URL = "/static/uploads/"
 STATICFILES_DIRS.append(("uploads", MEDIA_ROOT))
 
-new_staticfiles_dirs = []
+_NEW_STATICFILES_DIRS = []
 # Strip out any static files that aren't in the repository root
 # so that the tests can run with only the edx-platform directory checked out
 for static_dir in STATICFILES_DIRS:
@@ -298,8 +298,8 @@ for static_dir in STATICFILES_DIRS:
         data_dir = static_dir
 
     if data_dir.startswith(REPO_ROOT):
-        new_staticfiles_dirs.append(static_dir)
-STATICFILES_DIRS = new_staticfiles_dirs
+        _NEW_STATICFILES_DIRS.append(static_dir)
+STATICFILES_DIRS = _NEW_STATICFILES_DIRS
 
 FILE_UPLOAD_TEMP_DIR = TEST_ROOT / "uploads"
 FILE_UPLOAD_HANDLERS = (
