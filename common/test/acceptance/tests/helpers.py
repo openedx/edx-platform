@@ -9,8 +9,8 @@ import os
 from path import path
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
-from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 
 
 def skip_if_browser(browser):
@@ -167,6 +167,15 @@ def enable_css_animations(page):
 
         head.removeChild(styles)
     """)
+
+
+def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
+    """
+    Helper method to create user partition JSON.
+    """
+    return UserPartition(
+        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+    ).to_json()
 
 
 class UniqueCourseTest(WebAppTest):
