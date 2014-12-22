@@ -15,9 +15,10 @@ var edx = edx || {};
         fetchXhr: null,
 
         performSearch: function (searchTerm) {
-            this.page = 0;
-            this.searchTerm = searchTerm;
             this.fetchXhr && this.fetchXhr.abort();
+            this.searchTerm = searchTerm || '';
+            this.totalCount = 0;
+            this.page = 0;
             this.fetchXhr = this.fetch({
                 data: {
                     search_string: searchTerm,
