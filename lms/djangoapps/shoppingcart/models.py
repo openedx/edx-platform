@@ -1000,8 +1000,9 @@ class PaidCourseRegistration(OrderItem):
         would in fact be quite silly since there's a clear back door.
         """
         if not modulestore().has_course(self.course_id):
-            raise PurchasedCallbackException(
-                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+            msg = u"The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
+            log.error(msg)
+            raise PurchasedCallbackException(msg)
 
         CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
 
@@ -1144,8 +1145,9 @@ class CourseRegCodeItem(OrderItem):
         be redeemed by users
         """
         if not modulestore().has_course(self.course_id):
-            raise PurchasedCallbackException(
-                "The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id))
+            msg = u"The customer purchased Course {0}, but that course doesn't exist!".format(self.course_id)
+            log.error(msg)
+            raise PurchasedCallbackException(msg)
         total_registration_codes = int(self.qty)
 
         # we need to import here because of a circular dependency
@@ -1306,7 +1308,9 @@ class CertificateItem(OrderItem):
         if mode in valid_modes:
             mode_info = valid_modes[mode]
         else:
-            raise InvalidCartItem(_("Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id))
+            msg = u"Mode {mode} does not exist for {course_id}".format(mode=mode, course_id=course_id)
+            log.error(msg)
+            raise InvalidCartItem(_(msg))
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
@@ -1577,10 +1581,9 @@ class Donation(OrderItem):
         if course_id is not None:
             course = modulestore().get_course(course_id)
             if course is None:
-                err = _(
-                    u"Could not find a course with the ID '{course_id}'"
-                ).format(course_id=course_id)
-                raise CourseDoesNotExistException(err)
+                msg = u"Could not find a course with the ID '{course_id}'".format(course_id=course_id)
+                log.error(msg)
+                raise CourseDoesNotExistException(_(msg))
 
             return _(u"Donation for {course}").format(course=course.display_name)
 
