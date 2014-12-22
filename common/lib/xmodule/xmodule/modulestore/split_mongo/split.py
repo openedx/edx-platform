@@ -262,6 +262,15 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             return self.db_connection.get_course_index(course_key, ignore_case)
 
+    def delete_course_index(self, course_key):
+        """
+        Delete the course index from cache and the db
+        """
+        if self._is_in_bulk_operation(course_key, False):
+            self._clear_bulk_ops_record(course_key)
+
+        self.db_connection.delete_course_index(course_key)
+
     def insert_course_index(self, course_key, index_entry):
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
@@ -452,9 +461,23 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
         Find the course_indexes which have the specified branch and search_targets.
+
+        Returns:
+            a Cursor if there are no changes in flight or a list if some have changed in current bulk op
         """
         indexes = self.db_connection.find_matching_course_indexes(branch, search_targets)
 
+        def _replace_or_append_index(altered_index):
+            """
+            If the index is already in indexes, replace it. Otherwise, append it.
+            """
+            for index, existing in enumerate(indexes):
+                if all(existing[attr] == altered_index[attr] for attr in ['org', 'course', 'run']):
+                    indexes[index] = altered_index
+                    return
+            indexes.append(altered_index)
+
+        # add any being built but not yet persisted or in the process of being updated
         for _, record in self._active_records:
             if branch and branch not in record.index.get('versions', {}):
                 continue
@@ -468,7 +491,10 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
                 ):
                     continue
 
-            indexes.append(record.index)
+            if not hasattr(indexes, 'append'):  # Just in time conversion to list from cursor
+                indexes = list(indexes)
+
+            _replace_or_append_index(record.index)
 
         return indexes
 
@@ -2116,12 +2142,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         with a versions hash to restore the course; however, the edited_on and
         edited_by won't reflect the originals, of course.
         """
-        index = self.get_course_index(course_key)
-        if index is None:
-            raise ItemNotFoundError(course_key)
         # this is the only real delete in the system. should it do something else?
         log.info(u"deleting course from split-mongo: %s", course_key)
-        self.db_connection.delete_course_index(index)
+        self.delete_course_index(course_key)
 
         # We do NOT call the super class here since we need to keep the assets
         # in case the course is later restored.
@@ -2225,7 +2248,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         # So use the filename as the unique identifier.
         accessor = asset_key.block_type
         for idx, asset in enumerate(structure.setdefault(accessor, [])):
-            if asset['filename'] == asset_key.block_id:
+            if asset['filename'] == asset_key.path:
                 return idx
         return None
 
@@ -2256,7 +2279,45 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # update the index entry if appropriate
                 self._update_head(asset_key.course_key, index_entry, asset_key.branch, new_structure['_id'])
 
-    def save_asset_metadata(self, asset_metadata, user_id):
+    def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
+        """
+        A wrapper for functions wanting to manipulate assets. Gets and versions the structure,
+        passes the mutable array for all asset types as well as the idx to the function for it to
+        update, then persists the changed data back into the course.
+
+        The update function can raise an exception if it doesn't want to actually do the commit. The
+        surrounding method probably should catch that exception.
+        """
+        asset_key = asset_metadata_list[0].asset_id
+        course_key = asset_key.course_key
+
+        with self.bulk_operations(course_key):
+            original_structure = self._lookup_course(course_key).structure
+            index_entry = self._get_index_if_valid(course_key)
+            new_structure = self.version_structure(course_key, original_structure, user_id)
+
+            # Add all asset metadata to the structure at once.
+            for asset_metadata in asset_metadata_list:
+                metadata_to_insert = asset_metadata.to_storable()
+                asset_md_key = asset_metadata.asset_id
+
+                asset_idx = self._lookup_course_asset(new_structure.setdefault('assets', {}), asset_md_key)
+
+                all_assets = new_structure['assets'][asset_md_key.asset_type]
+                if asset_idx is None:
+                    all_assets.append(metadata_to_insert)
+                else:
+                    all_assets[asset_idx] = metadata_to_insert
+                new_structure['assets'][asset_md_key.asset_type] = all_assets
+
+            # update index if appropriate and structures
+            self.update_structure(course_key, new_structure)
+
+            if index_entry is not None:
+                # update the index entry if appropriate
+                self._update_head(course_key, index_entry, asset_key.branch, new_structure['_id'])
+
+    def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
         The guts of saving a new or updated asset
         """
@@ -2347,7 +2408,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             index_entry = self._get_index_if_valid(dest_course_key)
             new_structure = self.version_structure(dest_course_key, original_structure, user_id)
 
-            new_structure['assets'] = source_structure.get('assets', [])
+            new_structure['assets'] = source_structure.get('assets', {})
             new_structure['thumbnails'] = source_structure.get('thumbnails', [])
 
             # update index if appropriate and structures

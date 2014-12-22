@@ -107,6 +107,9 @@ FEATURES = {
 
     # Modulestore to use for new courses
     'DEFAULT_STORE_FOR_NEW_COURSE': None,
+
+    # Turn off Video Upload Pipeline through Studio, by default
+    'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 }
 ENABLE_JASMINE = False
 
@@ -290,9 +293,14 @@ SERVER_EMAIL = 'devops@example.com'
 ADMINS = ()
 MANAGERS = ADMINS
 
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+
+if not EDX_PLATFORM_REVISION:
+    EDX_PLATFORM_REVISION = git.revision
+
 # Static content
-STATIC_URL = '/static/' + git.revision + "/"
-STATIC_ROOT = ENV_ROOT / "staticfiles" / git.revision
+STATIC_URL = '/static/' + EDX_PLATFORM_REVISION + "/"
+STATIC_ROOT = ENV_ROOT / "staticfiles" / EDX_PLATFORM_REVISION
 
 STATICFILES_DIRS = [
     COMMON_ROOT / "static",
@@ -549,6 +557,14 @@ YOUTUBE = {
     },
 }
 
+############################# VIDEO UPLOAD PIPELINE #############################
+
+VIDEO_UPLOAD_PIPELINE = {
+    'BUCKET': '',
+    'ROOT_PATH': '',
+    'CONCURRENT_UPLOAD_LIMIT': 4,
+}
+
 ############################ APPS #####################################
 
 INSTALLED_APPS = (
@@ -576,6 +592,7 @@ INSTALLED_APPS = (
     'course_creators',
     'student',  # misleading name due to sharing with lms
     'openedx.core.djangoapps.course_groups',  # not used in cms (yet), but tests run
+    'xblock_config',
 
     # Tracking
     'track',

@@ -136,7 +136,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
     # snippets that will be included in the middle of pages.
 
     @classmethod
-    def load_definition(cls, xml_object, system, location):
+    def load_definition(cls, xml_object, system, location, id_generator):
         '''Load a descriptor from the specified xml_object:
 
         If there is a filename attribute, load it as a string, and
@@ -145,6 +145,12 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         If there is not a filename attribute, the definition is the body
         of the xml_object, without the root tag (do not want <html> in the
         middle of a page)
+
+        Args:
+            xml_object: an lxml.etree._Element containing the definition to load
+            system: the modulestore system or runtime which caches data
+            location: the usage id for the block--used to compute the filename if none in the xml_object
+            id_generator: used by other impls of this method to generate the usage_id
         '''
         filename = xml_object.get('filename')
         if filename is None:

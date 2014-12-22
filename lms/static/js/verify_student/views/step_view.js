@@ -47,6 +47,9 @@
                     this.postRender();
                 }
             ).fail( _.bind( this.handleError, this ) );
+
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
         },
 
         handleResponse: function( data ) {
@@ -64,10 +67,10 @@
             this.postRender();
         },
 
-        handleError: function() {
+        handleError: function( errorTitle, errorMsg ) {
             this.errorModel.set({
-                errorTitle: gettext( "Error" ),
-                errorMsg: gettext( "An unexpected error occurred.  Please reload the page to try again." ),
+                errorTitle: errorTitle || gettext( "Error" ),
+                errorMsg: errorMsg || gettext( "An unexpected error occurred.  Please reload the page to try again." ),
                 shown: true
             });
         },

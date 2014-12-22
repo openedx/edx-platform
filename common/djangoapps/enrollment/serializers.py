@@ -53,8 +53,12 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     the Course Descriptor and course modes, to give a complete representation of course enrollment.
 
     """
-    course = CourseField()
-    student = serializers.SerializerMethodField('get_username')
+    course_details = serializers.SerializerMethodField('get_course_details')
+    user = serializers.SerializerMethodField('get_username')
+
+    def get_course_details(self, model):
+        field = CourseField()
+        return field.to_native(model.course)
 
     def get_username(self, model):
         """Retrieves the username from the associated model."""
@@ -62,7 +66,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
 
     class Meta:  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course', 'student')
+        fields = ('created', 'mode', 'is_active', 'course_details', 'user')
         lookup_field = 'username'
 
 

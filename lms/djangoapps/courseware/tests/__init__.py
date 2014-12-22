@@ -57,17 +57,7 @@ class BaseTestXmodule(ModuleStoreTestCase):
         """
         Generate a new ModuleSystem that is minimally set up for testing
         """
-        runtime = get_test_system(course_id=self.course.id)
-
-        # When asked for a module out of a descriptor, just create a new xmodule runtime,
-        # and inject it into the descriptor
-        def get_module(descr):
-            descr.xmodule_runtime = self.new_module_runtime()
-            return descr
-
-        runtime.get_module = get_module
-
-        return runtime
+        return get_test_system(course_id=self.course.id)
 
     def new_descriptor_runtime(self):
         runtime = get_test_descriptor_system()

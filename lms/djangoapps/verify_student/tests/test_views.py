@@ -25,6 +25,7 @@ from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
+from django.core import mail
 from bs4 import BeautifulSoup
 
 from util.testing import UrlResetMixin
@@ -923,6 +924,15 @@ class TestSubmitPhotosForVerification(UrlResetMixin, TestCase):
 
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, expected_status_code)
+
+        if expected_status_code == 200:
+            # Verify that photo submission confirmation email was sent
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertEqual("Verification photos received", mail.outbox[0].subject)
+        else:
+            # Verify that photo submission confirmation email was not sent
+            self.assertEqual(len(mail.outbox), 0)
+
         return response
 
     def _assert_full_name(self, full_name):
@@ -1456,6 +1466,48 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             expected_status_code=404
         )
 
+    def test_account_not_active(self):
+        self.user.is_active = False
+        self.user.save()
+        course = self._create_course("verified")
+        response = self._get_page('verify_student_start_flow', course.id)
+        self._assert_steps_displayed(
+            response,
+            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
+        )
+        self._assert_requirements_displayed(response, [
+            PayAndVerifyView.ACCOUNT_ACTIVATION_REQ,
+            PayAndVerifyView.CREDIT_CARD_REQ,
+            PayAndVerifyView.PHOTO_ID_REQ,
+            PayAndVerifyView.WEBCAM_REQ,
+        ])
+
+    def test_no_contribution(self):
+        # Do NOT specify a contribution for the course in a session var.
+        course = self._create_course("verified")
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "")
+
+    def test_contribution_other_course(self):
+        # Specify a contribution amount for another course in the session
+        course = self._create_course("verified")
+        other_course_id = CourseLocator(org="other", run="test", course="test")
+        self._set_contribution("12.34", other_course_id)
+
+        # Expect that the contribution amount is NOT pre-filled,
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "")
+
+    def test_contribution(self):
+        # Specify a contribution amount for this course in the session
+        course = self._create_course("verified")
+        self._set_contribution("12.34", course.id)
+
+        # Expect that the contribution amount is pre-filled,
+        response = self._get_page("verify_student_start_flow", course.id)
+        self._assert_contribution_amount(response, "12.34")
+
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
         course = CourseFactory.create()
@@ -1506,6 +1558,14 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             days_good_for = settings.VERIFY_STUDENT["DAYS_GOOD_FOR"]
             attempt.created_at = datetime.now(pytz.UTC) - timedelta(days=(days_good_for + 1))
             attempt.save()
+
+    def _set_contribution(self, amount, course_id):
+        """Set the contribution amount pre-filled in a session var. """
+        session = self.client.session
+        session["donation_for_course"] = {
+            unicode(course_id): amount
+        }
+        session.save()
 
     def _get_page(self, url_name, course_key, expected_status_code=200, skip_first_step=False):
         """Retrieve one of the verification pages. """
@@ -1559,6 +1619,11 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         response_dict = self._get_page_data(response)
         self.assertEqual(response_dict['full_name'], full_name)
 
+    def _assert_contribution_amount(self, response, expected_amount):
+        """Check the pre-filled contribution amount. """
+        response_dict = self._get_page_data(response)
+        self.assertEqual(response_dict['contribution_amount'], expected_amount)
+
     def _get_page_data(self, response):
         """Retrieve the data attributes rendered on the page. """
         soup = BeautifulSoup(response.content)
@@ -1574,7 +1639,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             'display_steps': json.loads(pay_and_verify_div['data-display-steps']),
             'current_step': pay_and_verify_div['data-current-step'],
             'requirements': json.loads(pay_and_verify_div['data-requirements']),
-            'message_key': pay_and_verify_div['data-msg-key']
+            'message_key': pay_and_verify_div['data-msg-key'],
+            'contribution_amount': pay_and_verify_div['data-contribution-amount']
         }
 
     def _assert_redirects_to_dashboard(self, response):

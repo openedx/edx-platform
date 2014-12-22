@@ -52,17 +52,25 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <th>${_("Course Name")}</th>
         <th>${_("Enrollment Code")}</th>
         <th>${_("Enrollment Link")}</th>
+        <th>${_("Status")}</th>
         </thead>
         <tbody>
-        % for registration_code in registration_codes:
-          <% course = get_course_by_id(registration_code.course_id, depth=0) %>
+        % for reg_code_info in reg_code_info_list:
           <tr>
-            <td>${_("{course_name}").format(course_name=course.display_name)}</td>
-            <td>${registration_code.code}</td>
-
-            <% redemption_url = reverse('register_code_redemption', args = [registration_code.code] ) %>
-            <% enrollment_url = '{redemption_url}'.format(redemption_url=redemption_url) %>
-            <td><a href="${redemption_url}">${enrollment_url}</a></td>
+            <td>${reg_code_info['course_name']}</td>
+            <td>${reg_code_info['code']}</td>
+            % if reg_code_info['is_redeemed']:
+            <td>${reg_code_info['redemption_url']}</td>
+            % else:
+            <td><a href="${reg_code_info['redemption_url']}" data-base-url="${site_name}">${reg_code_info['redemption_url']}</a></td>
+            % endif
+            <td>
+              % if reg_code_info['is_redeemed']:
+                <span class="red"></M>${_("Used")}</span>
+              % else:
+                <span class="green"></M>${_("Available")}</span>
+              % endif
+            </td>
           </tr>
         % endfor
         </tbody>

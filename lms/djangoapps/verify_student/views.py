@@ -9,7 +9,7 @@ import datetime
 from collections import namedtuple
 from pytz import UTC
 
-from edxmako.shortcuts import render_to_response
+from edxmako.shortcuts import render_to_response, render_to_string
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -24,6 +24,7 @@ from django.views.generic.base import View
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 
 from openedx.core.djangoapps.user_api.api import profile as profile_api
 
@@ -43,6 +44,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 from opaque_keys.edx.keys import CourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
+from microsite_configuration import microsite
 
 from util.json_request import JsonResponse
 
@@ -375,6 +377,7 @@ class PayAndVerifyView(View):
     # need to complete the verification steps,
     # then the photo ID and webcam requirements are hidden.
     #
+    ACCOUNT_ACTIVATION_REQ = "account-activation-required"
     PHOTO_ID_REQ = "photo-id-required"
     WEBCAM_REQ = "webcam-required"
     CREDIT_CARD_REQ = "credit-card-required"
@@ -454,7 +457,7 @@ class PayAndVerifyView(View):
             already_verified,
             already_paid
         )
-        requirements = self._requirements(display_steps)
+        requirements = self._requirements(display_steps, request.user.is_active)
 
         if current_step is None:
             current_step = display_steps[0]['name']
@@ -482,26 +485,34 @@ class PayAndVerifyView(View):
             else ""
         )
 
+        # If the user set a contribution amount on another page,
+        # use that amount to pre-fill the price selection form.
+        contribution_amount = request.session.get(
+            'donation_for_course', {}
+        ).get(unicode(course_key), '')
+
         # Render the top-level page
         context = {
-            'disable_courseware_js': True,
             'user_full_name': full_name,
-            'platform_name': settings.PLATFORM_NAME,
-            'course_key': unicode(course_key),
             'course': course,
-            'courseware_url': courseware_url,
+            'course_key': unicode(course_key),
             'course_mode': course_mode,
-            'purchase_endpoint': get_purchase_endpoint(),
-            'display_steps': display_steps,
+            'courseware_url': courseware_url,
             'current_step': current_step,
-            'requirements': requirements,
-            'message_key': message,
+            'disable_courseware_js': True,
+            'display_steps': display_steps,
+            'contribution_amount': contribution_amount,
+            'is_active': request.user.is_active,
             'messages': self._messages(
                 message,
                 course.display_name,
                 course_mode,
                 requirements
             ),
+            'message_key': message,
+            'platform_name': settings.PLATFORM_NAME,
+            'purchase_endpoint': get_purchase_endpoint(),
+            'requirements': requirements,
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -582,6 +593,7 @@ class PayAndVerifyView(View):
         if the user has already completed them.
 
         Arguments:
+
             always_show_payment (bool): If True, display the payment steps
                 even if the user has already paid.
 
@@ -618,7 +630,7 @@ class PayAndVerifyView(View):
             if step not in remove_steps
         ]
 
-    def _requirements(self, display_steps):
+    def _requirements(self, display_steps, is_active):
         """Determine which requirements to show the user.
 
         For example, if the user needs to submit a photo
@@ -627,6 +639,7 @@ class PayAndVerifyView(View):
 
         Arguments:
             display_steps (list): The steps to display to the user.
+            is_active (bool): If False, adds a requirement to activate the user account.
 
         Returns:
             dict: Keys are requirement names, values are booleans
@@ -634,6 +647,7 @@ class PayAndVerifyView(View):
 
         """
         all_requirements = {
+            self.ACCOUNT_ACTIVATION_REQ: not is_active,
             self.PHOTO_ID_REQ: False,
             self.WEBCAM_REQ: False,
             self.CREDIT_CARD_REQ: False
@@ -838,12 +852,14 @@ def submit_photos_for_verification(request):
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return HttpResponseBadRequest(_("You already have a valid or pending verification."))
 
+    username = request.user.username
+
     # If the user wants to change his/her full name,
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
             profile_api.update_profile(
-                request.user.username,
+                username,
                 full_name=request.POST.get('full_name')
             )
         except profile_api.ProfileUserNotFound:
@@ -867,6 +883,21 @@ def submit_photos_for_verification(request):
     attempt.upload_photo_id_image(b64_photo_id_image.decode('base64'))
     attempt.mark_ready()
     attempt.submit()
+
+    profile_dict = profile_api.profile_info(username)
+    if profile_dict:
+        # Send a confirmation email to the user
+        context = {
+            'full_name': profile_dict.get('full_name'),
+            'platform_name': settings.PLATFORM_NAME
+        }
+
+        subject = _("Verification photos received")
+        message = render_to_string('emails/photo_submission_confirmation.txt', context)
+        from_address = microsite.get_value('default_from_email', settings.DEFAULT_FROM_EMAIL)
+        to_address = profile_dict.get('email')
+
+        send_mail(subject, message, from_address, [to_address], fail_silently=False)
 
     return HttpResponse(200)
 

@@ -39,7 +39,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
-from xmodule.x_module import XModuleDescriptor, STUDENT_VIEW
+from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -49,6 +49,20 @@ class PureXBlock(XBlock):
     Pure XBlock to use in tests.
     """
     pass
+
+
+class EmptyXModule(XModule):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    pass
+
+
+class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    module_class = EmptyXModule
 
 
 @ddt.ddt
@@ -1105,3 +1119,42 @@ class TestRebindModule(TestSubmittingProblems):
         module = self.get_module_for_user(self.anon_user)
         module.system.rebind_noauth_module_to_user(module, self.anon_user)
         self.assertFalse(psycho_handler.called)
+
+
+@ddt.ddt
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Tests of event publishing for both XModules and XBlocks.
+    """
+
+    def setUp(self):
+        """
+        Set up the course and user context
+        """
+        super(TestEventPublishing, self).setUp()
+
+        self.mock_user = UserFactory()
+        self.mock_user.id = 1
+        self.request_factory = RequestFactory()
+
+    @ddt.data('xblock', 'xmodule')
+    @XBlock.register_temp_plugin(PureXBlock, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptor, identifier='xmodule')
+    @patch.object(render, 'make_track_function')
+    def test_event_publishing(self, block_type, mock_track_function):
+        request = self.request_factory.get('')
+        request.user = self.mock_user
+        course = CourseFactory()
+        descriptor = ItemFactory(category=block_type, parent=course)
+        field_data_cache = FieldDataCache([course, descriptor], course.id, self.mock_user)  # pylint: disable=no-member
+        block = render.get_module(self.mock_user, request, descriptor.location, field_data_cache)
+
+        event_type = 'event_type'
+        event = {'event': 'data'}
+
+        block.runtime.publish(block, event_type, event)
+
+        mock_track_function.assert_called_once_with(request)
+
+        mock_track_function.return_value.assert_called_once_with(event_type, event)

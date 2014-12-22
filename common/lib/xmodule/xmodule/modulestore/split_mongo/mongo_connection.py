@@ -4,14 +4,11 @@ Segregation of pymongo functions from the data modeling mechanisms for split mod
 import re
 from mongodb_proxy import autoretry_read, MongoProxy
 import pymongo
-import time
 
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
 from contracts import check
-from functools import wraps
-from pymongo.errors import AutoReconnect
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.modulestore.split_mongo import BlockKey
 import datetime
@@ -238,15 +235,15 @@ class MongoConnection(object):
         course_index['last_update'] = datetime.datetime.now(pytz.utc)
         self.course_index.update(query, course_index, upsert=False,)
 
-    def delete_course_index(self, course_index):
+    def delete_course_index(self, course_key):
         """
         Delete the course_index from the persistence mechanism whose id is the given course_index
         """
-        return self.course_index.remove({
-            'org': course_index['org'],
-            'course': course_index['course'],
-            'run': course_index['run'],
-        })
+        query = {
+            key_attr: getattr(course_key, key_attr)
+            for key_attr in ('org', 'course', 'run')
+        }
+        return self.course_index.remove(query)
 
     def get_definition(self, key):
         """

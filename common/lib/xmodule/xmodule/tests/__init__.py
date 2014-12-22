@@ -26,6 +26,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin, own_metadata
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.error_module import ErrorDescriptor
+from xmodule.assetstore import AssetMetadata
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.draft import DraftModuleStore
 from xmodule.modulestore.xml import CourseLocationManager
@@ -91,16 +92,36 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     where `my_render_func` is a function of the form my_render_func(template, context).
 
     """
-    user = Mock(is_staff=False)
+    user = Mock(name='get_test_system.user', is_staff=False)
+
+    descriptor_system = get_test_descriptor_system(),
+
+    def get_module(descriptor):
+        """Mocks module_system get_module function"""
+        # pylint: disable=protected-access
+
+        # Unlike XBlock Runtimes or DescriptorSystems,
+        # each XModule is provided with a new ModuleSystem.
+        # Construct one for the new XModule.
+        module_system = get_test_system()
+
+        # Descriptors can all share a single DescriptorSystem.
+        # So, bind to the same one as the current descriptor.
+        module_system.descriptor_runtime = descriptor.runtime._descriptor_system
+
+        descriptor.bind_for_student(module_system, descriptor._field_data)
+
+        return descriptor
+
     return TestModuleSystem(
         static_url='/static',
-        track_function=Mock(),
-        get_module=Mock(),
+        track_function=Mock(name='get_test_system.track_function'),
+        get_module=get_module,
         render_template=mock_render_template,
         replace_urls=str,
         user=user,
         get_real_user=lambda(__): user,
-        filestore=Mock(),
+        filestore=Mock(name='get_test_system.filestore'),
         debug=True,
         hostname="edx.org",
         xqueue={
@@ -108,16 +129,16 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
             'callback_url': '/',
             'default_queuename': 'testqueue',
             'waittime': 10,
-            'construct_callback': Mock(side_effect="/"),
+            'construct_callback': Mock(name='get_test_system.xqueue.construct_callback', side_effect="/"),
         },
         node_path=os.environ.get("NODE_PATH", "/usr/local/lib/node_modules"),
         anonymous_student_id='student',
         open_ended_grading_interface=open_ended_grading_interface,
         course_id=course_id,
         error_descriptor_class=ErrorDescriptor,
-        get_user_role=Mock(is_staff=False),
-        descriptor_runtime=get_test_descriptor_system(),
-        user_location=Mock(),
+        get_user_role=Mock(name='get_test_system.get_user_role', is_staff=False),
+        user_location=Mock(name='get_test_system.user_location'),
+        descriptor_runtime=descriptor_system,
     )
 
 
@@ -127,15 +148,17 @@ def get_test_descriptor_system():
     """
     field_data = DictFieldData({})
 
-    return MakoDescriptorSystem(
-        load_item=Mock(),
-        resources_fs=Mock(),
-        error_tracker=Mock(),
+    descriptor_system = MakoDescriptorSystem(
+        load_item=Mock(name='get_test_descriptor_system.load_item'),
+        resources_fs=Mock(name='get_test_descriptor_system.resources_fs'),
+        error_tracker=Mock(name='get_test_descriptor_system.error_tracker'),
         render_template=mock_render_template,
         mixins=(InheritanceMixin, XModuleMixin),
         field_data=field_data,
         services={'field-data': field_data},
     )
+    descriptor_system.get_asides = lambda block: []
+    return descriptor_system
 
 
 def mock_render_template(*args, **kwargs):
@@ -498,3 +521,22 @@ class CourseComparisonTest(BulkAssertionTest):
             actual_thumbs = actual_store.get_all_content_thumbnails_for_course(actual_course_key)
 
             self._assertAssetsEqual(expected_course_key, expected_thumbs, actual_course_key, actual_thumbs)
+
+    def assertAssetsMetadataEqual(self, expected_modulestore, expected_course_key, actual_modulestore, actual_course_key):
+        """
+        Assert that the modulestore asset metdata for the ``expected_course_key`` and the ``actual_course_key``
+        are equivalent.
+        """
+        expected_course_assets = expected_modulestore.get_all_asset_metadata(
+            expected_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
+        )
+        actual_course_assets = actual_modulestore.get_all_asset_metadata(
+            actual_course_key, None, sort=('displayname', ModuleStoreEnum.SortOrder.descending)
+        )
+        self.assertEquals(len(expected_course_assets), len(actual_course_assets))
+        for idx, __ in enumerate(expected_course_assets):
+            for attr in AssetMetadata.ATTRS_ALLOWED_TO_UPDATE:
+                if attr in ('edited_on',):
+                    # edited_on is updated upon import.
+                    continue
+                self.assertEquals(getattr(expected_course_assets[idx], attr), getattr(actual_course_assets[idx], attr))

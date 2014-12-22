@@ -9,7 +9,6 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.api import course_tag as user_course_tag_api
-from xblock.core import XBlockAside
 from xmodule.modulestore.django import modulestore
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -226,7 +225,7 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
             extra_data,
         )
 
-    def get_asides(self, block):
+    def applicable_aside_types(self, block):
         """
         Return all of the asides which might be decorating this `block`.
 
@@ -242,8 +241,4 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
         if block.scope_ids.block_type in config.disabled_blocks.split():
             return []
 
-        return [
-            self.get_aside_of_type(block, aside_type)
-            for aside_type, __
-            in XBlockAside.load_classes()
-        ]
+        return super(LmsModuleSystem, self).applicable_aside_types()

@@ -36,15 +36,19 @@ var edx = edx || {};
         currentStep: el.data('current-step'),
         stepInfo: {
             'intro-step': {
+                isActive: el.data('is-active'),
                 introTitle: el.data('intro-title'),
                 introMsg: el.data('intro-msg'),
+                platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
             'make-payment-step': {
+                isActive: el.data('is-active'),
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 minPrice: el.data('course-mode-min-price'),
                 suggestedPrices: (el.data('course-mode-suggested-prices') || "").split(","),
+                contributionAmount: el.data('contribution-amount'),
                 currency: el.data('course-mode-currency'),
                 purchaseEndpoint: el.data('purchase-endpoint')
             },
@@ -56,6 +60,11 @@ var edx = edx || {};
             'review-photos-step': {
                 fullName: el.data('full-name'),
                 platformName: el.data('platform-name')
+            },
+            'enrollment-confirmation-step': {
+                courseName: el.data('course-name'),
+                courseStartDate: el.data('course-start-date'),
+                coursewareUrl: el.data('courseware-url')
             }
         }
     }).render();

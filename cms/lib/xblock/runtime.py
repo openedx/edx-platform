@@ -33,14 +33,3 @@ def local_resource_url(block, uri):
         'block_type': block.scope_ids.block_type,
         'uri': uri,
     })
-
-
-def get_asides(block):  # pylint: disable=unused-argument
-    """
-    Return all of the asides which might be decorating this `block`.
-
-    Arguments:
-        block (:class:`.XBlock`): The block to render retrieve asides for.
-    """
-    # TODO: Implement this method to make XBlockAsides for editing views in Studio
-    return []

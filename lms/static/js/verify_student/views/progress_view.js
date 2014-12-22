@@ -18,6 +18,24 @@
             this.currentStepIndex = obj.currentStepIndex || 0;
         },
 
+        nextStep: function() {
+            this.currentStepIndex = Math.min(
+                this.currentStepIndex + 1,
+                this.displaySteps.length - 1
+            );
+        },
+
+        goToStep: function( stepName ) {
+            var stepIndex = _.indexOf(
+                _.pluck( this.displaySteps, 'name' ),
+                stepName
+            );
+
+            if ( stepIndex >= 0 ) {
+                this.currentStepIndex = stepIndex;
+            }
+        },
+
         render: function() {
             var renderedHtml, context;
 

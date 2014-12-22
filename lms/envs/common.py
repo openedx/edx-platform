@@ -33,6 +33,7 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
+from dealer.git import git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -690,6 +691,11 @@ FINANCE_EMAIL = ''
 ADMINS = ()
 MANAGERS = ADMINS
 
+EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
+
+if not EDX_PLATFORM_REVISION:
+    EDX_PLATFORM_REVISION = git.revision
+
 # Static content
 STATIC_URL = '/static/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
@@ -1018,6 +1024,7 @@ courseware_js = (
 base_vendor_js = [
     'js/vendor/jquery.min.js',
     'js/vendor/jquery.cookie.js',
+    'js/vendor/url.min.js',
     'js/vendor/underscore-min.js',
     'js/vendor/require.js',
     'js/RequireJS-namespace-undefine.js',

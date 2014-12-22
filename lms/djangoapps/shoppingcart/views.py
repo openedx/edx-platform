@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.date_utils import get_default_time_display
 from django.contrib.auth.decorators import login_required
 from microsite_configuration import microsite
 from edxmako.shortcuts import render_to_response
@@ -655,15 +656,76 @@ def show_receipt(request, ordernum):
     Displays a receipt for a particular order.
     404 if order is not yet purchased or request.user != order.user
     """
-
     try:
         order = Order.objects.get(id=ordernum)
     except Order.DoesNotExist:
         raise Http404('Order not found!')
 
-    if order.user != request.user or order.status != 'purchased':
+    if order.user != request.user or order.status not in ['purchased', 'refunded']:
         raise Http404('Order not found!')
 
+    if 'application/json' in request.META.get('HTTP_ACCEPT', ""):
+        return _show_receipt_json(order)
+    else:
+        return _show_receipt_html(request, order)
+
+
+def _show_receipt_json(order):
+    """Render the receipt page as JSON.
+
+    The included information is deliberately minimal:
+    as much as possible, the included information should
+    be common to *all* order items, so the client doesn't
+    need to handle different item types differently.
+
+    Arguments:
+        request (HttpRequest): The request for the receipt.
+        order (Order): The order model to display.
+
+    Returns:
+        HttpResponse
+
+    """
+    order_info = {
+        'orderNum': order.id,
+        'currency': order.currency,
+        'status': order.status,
+        'purchase_datetime': get_default_time_display(order.purchase_time) if order.purchase_time else None,
+        'billed_to': {
+            'first_name': order.bill_to_first,
+            'last_name': order.bill_to_last,
+            'street1': order.bill_to_street1,
+            'street2': order.bill_to_street2,
+            'city': order.bill_to_city,
+            'state': order.bill_to_state,
+            'postal_code': order.bill_to_postalcode,
+            'country': order.bill_to_country,
+        },
+        'total_cost': order.total_cost,
+        'items': [
+            {
+                'quantity': item.qty,
+                'unit_cost': item.unit_cost,
+                'line_cost': item.line_cost,
+                'line_desc': item.line_desc
+            }
+            for item in OrderItem.objects.filter(order=order).select_subclasses()
+        ]
+    }
+    return JsonResponse(order_info)
+
+
+def _show_receipt_html(request, order):
+    """Render the receipt page as HTML.
+
+    Arguments:
+        request (HttpRequest): The request for the receipt.
+        order (Order): The order model to display.
+
+    Returns:
+        HttpResponse
+
+    """
     order_items = OrderItem.objects.filter(order=order).select_subclasses()
     shoppingcart_items = []
     course_names_list = []
@@ -688,16 +750,26 @@ def show_receipt(request, ordernum):
         request.session['attempting_upgrade'] = False
 
     recipient_list = []
-    registration_codes = None
     total_registration_codes = None
+    reg_code_info_list = []
     recipient_list.append(getattr(order.user, 'email'))
     if order_type == OrderTypes.BUSINESS:
-        registration_codes = CourseRegistrationCode.objects.filter(order=order)
-        total_registration_codes = registration_codes.count()
         if order.company_contact_email:
             recipient_list.append(order.company_contact_email)
         if order.recipient_email:
             recipient_list.append(order.recipient_email)
+
+        for __, course in shoppingcart_items:
+            course_registration_codes = CourseRegistrationCode.objects.filter(order=order, course_id=course.id)
+            total_registration_codes = course_registration_codes.count()
+            for course_registration_code in course_registration_codes:
+                reg_code_info_list.append({
+                    'course_name': course.display_name,
+                    'redemption_url': reverse('register_code_redemption', args=[course_registration_code.code]),
+                    'code': course_registration_code.code,
+                    'is_redeemed': RegistrationCodeRedemption.objects.filter(
+                        registration_code=course_registration_code).exists(),
+                })
 
     appended_recipient_emails = ", ".join(recipient_list)
 
@@ -713,7 +785,7 @@ def show_receipt(request, ordernum):
         'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
         'currency': settings.PAID_COURSE_REGISTRATION_CURRENCY[0],
         'total_registration_codes': total_registration_codes,
-        'registration_codes': registration_codes,
+        'reg_code_info_list': reg_code_info_list,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
     # we want to have the ability to override the default receipt page when
