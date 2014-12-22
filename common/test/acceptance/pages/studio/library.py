@@ -3,13 +3,14 @@ Library edit page in Studio
 """
 
 from bok_choy.page_object import PageObject
+from ...pages.studio.pagination import PaginatedMixin
 from .container import XBlockWrapper
 from ...tests.helpers import disable_animations
 from .utils import confirm_prompt, wait_for_notification
 from . import BASE_URL
 
 
-class LibraryPage(PageObject):
+class LibraryPage(PageObject, PaginatedMixin):
     """
     Library page in Studio
     """
