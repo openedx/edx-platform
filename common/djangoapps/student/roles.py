@@ -204,11 +204,19 @@ class CourseInstructorRole(CourseRole):
 
 
 class CourseFinanceAdminRole(CourseRole):
-    """A course Instructor"""
+    """A course staff member with privileges to review financial data."""
     ROLE = 'finance_admin'
 
     def __init__(self, *args, **kwargs):
         super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+class CourseSalesAdminRole(CourseRole):
+    """A course staff member with privileges to perform sales operations. """
+    ROLE = 'sales_admin'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseSalesAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class CourseBetaTesterRole(CourseRole):

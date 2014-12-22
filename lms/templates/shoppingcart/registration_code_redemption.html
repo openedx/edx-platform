@@ -73,6 +73,10 @@ from courseware.courses import course_image_url, get_course_about_section
               link_end='</a>',
             )}
           </p>
+          % elif redeem_code_error:
+          <p class="enrollment-text">
+            ${_( "There was an error processing your redeem code.")}
+          </p>
           % else:
           <p class="enrollment-text">
             ${_(
@@ -90,12 +94,13 @@ from courseware.courses import course_image_url, get_course_about_section
       </div>
       % if not reg_code_already_redeemed:
         %if redemption_success:
-          <a href="${reverse('dashboard')}" class="link-button course-link-bg-color">${_("View Dashboard &nbsp; &nbsp; &#x25b8;")}</a>
+          <a href="${reverse('dashboard')}" class="link-button course-link-bg-color">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
         %elif not registered_for_course:
           <form method="post">
             <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-            <input type="submit" value="${_("Activate Course Enrollment")} &#x25b8;"
-               id="id_active_course_enrollment" name="active_course_enrollment">
+            <button type="submit"
+               id="id_active_course_enrollment"
+               name="active_course_enrollment">${_("Activate Course Enrollment")} <i class="icon fa fa-caret-right"></i></button>
           </form>
         %endif
       %endif
