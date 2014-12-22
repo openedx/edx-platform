@@ -25,6 +25,7 @@ import time
 import datetime
 import contextlib
 import logging
+import optparse
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -42,6 +43,9 @@ class Command(BaseCommand):
 
     args = "<OUTPUT_FILENAME> <ORG_ALIASES> --courses=COURSE_ID_LIST"
     help = "Generate a list of email opt-in values for user enrollments."
+    option_list = BaseCommand.option_list + (
+        optparse.make_option('--courses ', action='store'),
+    )
 
     # Fields output in the CSV
     OUTPUT_FIELD_NAMES = [
@@ -81,6 +85,7 @@ class Command(BaseCommand):
         # filter out anything not in that list.
         courses = self._get_courses_for_org(org_list)
         only_courses = options.get("courses")
+
         if only_courses is not None:
             only_courses = [
                 CourseKey.from_string(course_key.strip())
@@ -136,6 +141,7 @@ class Command(BaseCommand):
 
         file_path = args[0]
         org_list = args[1:]
+
         if os.path.exists(file_path):
             raise CommandError("File already exists at '{path}'".format(path=file_path))
 
