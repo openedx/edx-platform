@@ -173,14 +173,15 @@ class InheritanceMixin(XBlockMixin):
         default=default_reset_button
     )
     edxnotes = Boolean(
-        display_name=_("Enable Notes"),
-        help=_("Enter true or false. If true, you can use the Notes for HTML components."),
+        display_name=_("Enable Student Notes"),
+        help=_("Enter true or false. If true, students can use the Student Notes feature."),
         default=False,
         scope=Scope.settings
     )
     edxnotes_visibility = Boolean(
-        display_name=_("Enable visibility of Notes"),
-        help=_("Enter true or false. If true, Notes for HTML components will be visible."),
+        display_name="Student Notes Visibility",
+        help=_("Indicates whether Student Notes are visible in the course. "
+               "Students can also show or hide their notes in the courseware."),
         default=True,
         scope=Scope.user_info
     )
