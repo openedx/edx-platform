@@ -19,6 +19,11 @@
     } else {
         paths.gettext = "/i18n";
     }
+    if (window.Logger) {
+        define("logger", [], function() {return window.Logger;});
+    } else {
+        paths.logger = "js/src/logger";
+    }
     if (window.URI) {
         define("URI", [], function() {return window.URI;});
     } else {
@@ -66,6 +71,7 @@
         },
         shim: {
             "annotator_1.2.9": {
+                deps: ["jquery"],
                 exports: "Annotator"
             },
             "date": {
@@ -80,6 +86,9 @@
             "backbone": {
                 deps: ["underscore", "jquery"],
                 exports: "Backbone"
+            },
+            "logger": {
+                exports: "Logger"
             },
             // Needed by OVA
             "video.dev": {
