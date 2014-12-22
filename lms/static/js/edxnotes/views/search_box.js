@@ -3,7 +3,7 @@
 define([
     'jquery', 'underscore', 'backbone', 'gettext', 'js/edxnotes/utils/logger',
     'js/edxnotes/collections/notes'
-], function ($, _, Backbone, gettext, Logger, NotesCollection) {
+], function ($, _, Backbone, gettext, NotesLogger, NotesCollection) {
     var SearchBoxView = Backbone.View.extend({
         events: {
             'submit': 'submitHandler'
@@ -20,7 +20,7 @@ define([
                 error: function () {},
                 complete: function () {}
             });
-            this.logger = Logger.getLogger('search_box', this.options.debug);
+            this.logger = NotesLogger.getLogger('search_box', this.options.debug);
             this.$el.removeClass('is-hidden');
             this.isDisabled = false;
             this.logger.log('initialized');
@@ -92,7 +92,10 @@ define([
             var args = this.prepareData(data);
             if (args) {
                 this.options.search.apply(this, args);
-                this.logger.log('Successful response', args);
+                this.logger.emit('edx.student_notes.searched', {
+                    'number_of_results': args[1],
+                    'search_string': args[2]
+                });
             } else {
                 this.options.error(this.errorMessage, this.searchQuery);
             }
@@ -135,17 +138,15 @@ define([
          * @return {jQuery.Deferred}
          */
         sendRequest: function (text) {
-            this.logger.log('sendRequest', {
-                action: this.el.action,
-                method: this.el.method,
-                text: text
-            });
-            return $.ajax({
+            var settings = {
                 url: this.el.action,
                 type: this.el.method,
                 dataType: 'json',
                 data: {text: text}
-            });
+            };
+
+            this.logger.log(settings);
+            return $.ajax(settings);
         }
     });
 

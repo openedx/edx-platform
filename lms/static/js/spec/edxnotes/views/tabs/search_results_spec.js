@@ -1,9 +1,10 @@
 define([
     'jquery', 'js/common_helpers/template_helpers', 'js/common_helpers/ajax_helpers',
-    'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
+    'logger', 'js/edxnotes/collections/tabs', 'js/edxnotes/views/tabs/search_results',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(
-    $, TemplateHelpers, AjaxHelpers, TabsCollection, SearchResultsView, customMatchers
+    $, TemplateHelpers, AjaxHelpers, Logger, TabsCollection, SearchResultsView,
+    customMatchers
 ) {
     'use strict';
     describe('EdxNotes SearchResultsView', function() {
@@ -124,6 +125,7 @@ define([
             var view = getView(this.tabsCollection),
                 requests = AjaxHelpers.requests(this);
 
+            spyOn(Logger, 'log');
             submitForm(view.searchBox, 'test_query');
             AjaxHelpers.respondWithJson(requests, responseJson);
 
