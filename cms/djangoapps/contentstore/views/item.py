@@ -205,7 +205,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
     if 'application/json' in accept_header:
         store = modulestore()
         xblock = store.get_item(usage_key)
-        container_views = ['container_preview', 'reorderable_container_child_preview']
+        container_views = ['container_preview', 'reorderable_container_child_preview', 'container_child_preview']
 
         # wrap the generated fragment in the xmodule_editor div so that the javascript
         # can bind to it correctly
@@ -237,12 +237,32 @@ def xblock_view_handler(request, usage_key_string, view_name):
             if view_name == 'reorderable_container_child_preview':
                 reorderable_items.add(xblock.location)
 
+            paging = None
+            try:
+                if request.REQUEST.get('enable_paging', 'false') == 'true':
+                    paging = {
+                        'page_number': int(request.REQUEST.get('page_number', 0)),
+                        'page_size': int(request.REQUEST.get('page_size', 0)),
+                    }
+            except ValueError:
+                return HttpResponse(
+                    content="Couldn't parse paging parameters: enable_paging: "
+                            "%s, page_number: %s, page_size: %s".format(
+                                request.REQUEST.get('enable_paging', 'false'),
+                                request.REQUEST.get('page_number', 0),
+                                request.REQUEST.get('page_size', 0)
+                            ),
+                    status=400,
+                    content_type="text/plain",
+                )
+
             # Set up the context to be passed to each XBlock's render method.
             context = {
                 'is_pages_view': is_pages_view,     # This setting disables the recursive wrapping of xblocks
                 'is_unit_page': is_unit(xblock),
                 'root_xblock': xblock if (view_name == 'container_preview') else None,
-                'reorderable_items': reorderable_items
+                'reorderable_items': reorderable_items,
+                'paging': paging,
             }
 
             fragment = get_preview_fragment(request, xblock, context)
