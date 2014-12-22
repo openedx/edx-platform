@@ -2,7 +2,6 @@ class @Courseware
   @prefix: ''
 
   constructor: ->
-    Courseware.prefix = $("meta[name='path_prefix']").attr('content')
     new Navigation
     Logger.bind()
     @render()
