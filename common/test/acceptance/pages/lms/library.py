@@ -16,6 +16,9 @@ class LibraryContentXBlockWrapper(PageObject):
         self.locator = locator
 
     def is_browser_on_page(self):
+        """
+        Checks if page is opened
+        """
         return self.q(css='{}[data-id="{}"]'.format(self.BODY_SELECTOR, self.locator)).present
 
     def _bounded_selector(self, selector):
@@ -35,3 +38,11 @@ class LibraryContentXBlockWrapper(PageObject):
         """
         child_blocks = self.q(css=self._bounded_selector("div[data-id]"))
         return frozenset(child.text for child in child_blocks)
+
+    @property
+    def children_headers(self):
+        """
+        Gets headers if all child XBlocks as list of strings
+        """
+        child_blocks_headers = self.q(css=self._bounded_selector("div[data-id] h2.problem-header"))
+        return frozenset(child.text for child in child_blocks_headers)
