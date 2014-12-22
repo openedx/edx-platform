@@ -19,6 +19,15 @@ from tempfile import mkdtemp
 from uuid import uuid4
 from warnings import filterwarnings, simplefilter
 
+# Silence noisy logs to make troubleshooting easier when tests fail.
+import logging
+LOG_OVERRIDES = [
+    ('factory.generate', logging.ERROR),
+    ('factory.containers', logging.ERROR),
+]
+for log_name, log_level in LOG_OVERRIDES:
+    logging.getLogger(log_name).setLevel(log_level)
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
