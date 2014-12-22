@@ -19,6 +19,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             allLabel: 'ALL',
 
+
             initialize : function(options) {
                 options = options || {};
 
@@ -129,8 +130,8 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             },
 
             onFilterColumn: function(event) {
-                var columnName = event.target.id;
-                this.openFilterColumn(columnName, event);
+                this.openFilterColumn($(event.currentTarget));
+                event.stopPropagation();
             },
 
             hideModal: function (event) {
@@ -232,35 +233,29 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 $('.upload-modal .progress-fill').html(percentVal);
             },
 
-            openFilterColumn: function(filterColumn, event) {
-                var $this = $(event.currentTarget);
-                this.toggleFilterColumnState($this, event);
+            openFilterColumn: function($this) {
+                this.toggleFilterColumnState($this);
             },
 
-            toggleFilterColumnState: function(menu, event) {
+            toggleFilterColumnState: function(menu) {
+                alert(JSON.stringify(this.filterableColumns));
                 var $subnav = menu.find('.wrapper-nav-sub');
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
-                var assettype = $(event.currentTarget).data('assetfilter');
+                var assettype = menu.data('assetfilter');
                 if(assettype == this.allLabel){
                     titleText.text(titleText.data('alllabel'));
                 }
                 else{
                     titleText.text(assettype);
                 }
-
                 if ($subnav.hasClass('is-shown')) {
                     $subnav.removeClass('is-shown');
                     $title.removeClass('is-selected');
                 } else {
-                    $('.nav-dd .nav-item .title').removeClass('is-selected');
-                    $('.nav-dd .nav-item .wrapper-nav-sub').removeClass('is-shown');
                     $title.addClass('is-selected');
                     $subnav.addClass('is-shown');
                 }
-                // if propagation is not stopped, the event will bubble up to the
-                // body element, which will close the dropdown.
-                event.stopPropagation();
             },
 
             toggleFilterColumn: function(event) {
@@ -283,12 +278,12 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
                 this.filterableColumns['js-asset-type-col'].displayName = assettype;
                 this.selectFilter('js-asset-type-col');
-                this.closeFilterPopup(event);
+                this.closeFilterPopup($(event.currentTarget));
             },
 
-            closeFilterPopup: function(event){
-                var $menu = $(event.currentTarget).parents('.nav-dd.nav-item');
-                this.toggleFilterColumnState($menu, event);
+            closeFilterPopup: function(element){
+                var $menu = element.parents('.nav-dd > .nav-item');
+                this.toggleFilterColumnState($menu);
             },
 
             displayFinishedUpload: function (resp) {

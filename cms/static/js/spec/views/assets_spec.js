@@ -1,6 +1,6 @@
-define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views/assets",
+define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "js/views/assets",
     "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers"],
-    function ($, AjaxHelpers, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
+    function ($, AjaxHelpers, URI, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
@@ -28,6 +28,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     collection: collection,
                     el: $('#asset_table_body')
                 });
+
                 assetsView.render();
             });
 
@@ -50,9 +51,9 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 totalCount: 0
             };
 
-            mockExampleAssetsResponse = {
+            var mockExampleAssetsResponse = {
                 sort: "uploadDate",
-                end: 50,
+                end: 2,
                 assets: [
                     {
                         "display_name": "pivo.jpg",
@@ -65,16 +66,6 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                         "external_url": "localhost:8000/c4x/A/CS102/asset/pivo.jpg"
                     },
                     {
-                        "display_name": "STRAT_L5_PositionalProprietary_PrivelegedAssets.png",
-                        "url": "/c4x/A/CS102/asset/STRAT_L5_PositionalProprietary_PrivelegedAssets.png",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_L5_PositionalProprietary_PrivelegedAssets.png",
-                        "portable_url": "/static/STRAT_L5_PositionalProprietary_PrivelegedAssets.png",
-                        "thumbnail": "/c4x/A/CS102/thumbnail/STRAT_L5_PositionalProprietary_PrivelegedAssets.jpg",
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_L5_PositionalProprietary_PrivelegedAssets.png"
-                    },
-                    {
                         "display_name": "STRAT_02-06-v2f.pdf",
                         "url": "/c4x/A/CS102/asset/STRAT_02-06-v2f.pdf",
                         "date_added": "Oct 20, 2014 at 11:00 UTC",
@@ -83,93 +74,34 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                         "thumbnail": null,
                         "locked": false,
                         "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_02-06-v2f.pdf"
-                    },
-                    {
-                        "display_name": "A fresh look at strategy under uncertainty - an interview.pdf",
-                        "url": "/c4x/A/CS102/asset/A_fresh_look_at_strategy_under_uncertainty_-_an_interview.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/A_fresh_look_at_strategy_under_uncertainty_-_an_interview.pdf",
-                        "portable_url": "/static/A_fresh_look_at_strategy_under_uncertainty_-_an_interview.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/A_fresh_look_at_strategy_under_uncertainty_-_an_interview.pdf"
-                    },
-                    {
-                        "display_name": "STRAT_02-02-v2f.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_02-02-v2f.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_02-02-v2f.pdf",
-                        "portable_url": "/static/STRAT_02-02-v2f.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_02-02-v2f.pdf"
-                    },
-                    {
-                        "display_name": "STRAT_02-09-v2e.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_02-09-v2e.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_02-09-v2e.pdf",
-                        "portable_url": "/static/STRAT_02-09-v2e.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_02-09-v2e.pdf"
-                    },
-                    {
-                        "display_name": "Delegation worksheet.pdf",
-                        "url": "/c4x/A/CS102/asset/Delegation_worksheet.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/Delegation_worksheet.pdf",
-                        "portable_url": "/static/Delegation_worksheet.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/Delegation_worksheet.pdf"
-                    },
-                    {
-                        "display_name": "STRAT_04-08_v2e.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_04-08_v2e.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_04-08_v2e.pdf",
-                        "portable_url": "/static/STRAT_04-08_v2e.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_04-08_v2e.pdf"
-                    },
-                    {
-                        "display_name": "STRAT_05-13_v2d.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_05-13_v2d.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_05-13_v2d.pdf",
-                        "portable_url": "/static/STRAT_05-13_v2d.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_05-13_v2d.pdf"
-                    },
-                    {
-                        "display_name": "STRAT_06-09-v2f.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_06-09-v2f.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_06-09-v2f.pdf",
-                        "portable_url": "/static/STRAT_06-09-v2f.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_06-09-v2f.pdf"
-                    },
-                    {
-                        "display_name": "Strategy's strategist - An interview with Richard Rumelt.pdf",
-                        "url": "/c4x/A/CS102/asset/Strategy_s_strategist_-_An_interview_with_Richard_Rumelt.pdf",
-                        "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/Strategy_s_strategist_-_An_interview_with_Richard_Rumelt.pdf",
-                        "portable_url": "/static/Strategy_s_strategist_-_An_interview_with_Richard_Rumelt.pdf",
-                        "thumbnail": null,
-                        "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/Strategy_s_strategist_-_An_interview_with_Richard_Rumelt.pdf"
                     }
                 ],
-                pageSize: 50,
-                totalCount: 172,
+                pageSize: 2,
+                totalCount: 2,
                 start: 0,
                 page: 0
-            }
+            };
+
+            var mockExampleFilteredAssetsResponse = {
+                sort: "uploadDate",
+                end: 1,
+                assets: [
+                    {
+                        "display_name": "pivo.jpg",
+                        "url": "/c4x/A/CS102/asset/pivo.jpg",
+                        "date_added": "Nov 07, 2014 at 17:47 UTC",
+                        "id": "/c4x/A/CS102/asset/pivo.jpg",
+                        "portable_url": "/static/pivo.jpg",
+                        "thumbnail": "/c4x/A/CS102/thumbnail/pivo.jpg",
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/pivo.jpg"
+                    }
+                ],
+                pageSize: 1,
+                totalCount: 1,
+                start: 0,
+                page: 0
+            };
 
             mockAssetUploadResponse = {
                 asset: mockAsset,
@@ -180,14 +112,27 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 files: [{name: 'largefile', size: 0}]
             };
 
-            var event = {}
+            var respondWithMockAssets = function(requests) {
+                var requestIndex = requests.length - 1;
+                var request = requests[requestIndex];
+                var url = new URI(request.url);
+                var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
+                var asset_type = queryParameters.asset_type;
+                var response = asset_type !== '' ? mockExampleFilteredAssetsResponse : mockExampleAssetsResponse;
+                AjaxHelpers.respondWithJson(requests, response, requestIndex);
+            };
+
+            $.fn.fileupload = function() {
+                return '';
+            };
+
+            var event = {};
             event.target = {"value": "dummy.jpg"};
 
             describe("AssetsView", function () {
                 var setup;
                 setup = function(responseData) {
-                    var requests;
-                    requests = AjaxHelpers.requests(this);
+                    var requests = AjaxHelpers.requests(this);
                     assetsView.setPage(0);
                     if (!responseData){
                         AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
@@ -294,18 +239,43 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
 
                     expect(assetsView.largeFileErrorMsg).toBeNull();
+                });
+
+                it('opens and closes select type menu', function () {
+                    expect(assetsView).toBeDefined();
+                    setup.call(this, mockExampleAssetsResponse);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                        var $typeColumn = $('#' + columnID);
+                        expect($typeColumn).toBeVisible();
+                        var assetsNumber = $('#asset-table-body .type-col').length;
+                        assetsView.openFilterColumn($typeColumn);
+                        expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
+                        expect($typeColumn.find('h3.title')).toHaveClass('is-selected');
+                        expect($typeColumn.find('.column-filter-link')).toBeVisible();
+                        var $firstFilter = $typeColumn.find('li.nav-item a:visible').first();
+                        assetsView.closeFilterPopup($firstFilter);
+                        expect($typeColumn.find('.wrapper-nav-sub').hasClass('is-shown')).toBe(false);
+                    });
+                });
 
                 it('shows type select menu, selects type, and filters results', function () {
                     expect(assetsView).toBeDefined();
-                    setup.call(this, mockExampleAssetsResponse);
-
-                    $typeColumn = $('.type-col.filterable-column .nav-dd');
-                    expect($typeColumn.length).toBe(1);
-                    $typeColumn.click();
-                    expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
-                    expect($typeColumn.find('h3.title')).toHaveClass('is-selected');
-
-                    var assetsNumber = $('#asset-table-body .type-col').length;
+                    var requests = AjaxHelpers.requests(this);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                        assetsView.setPage(0);
+                        respondWithMockAssets(requests);
+                        var $typeColumn = $('#' + columnID);
+                        expect($typeColumn).toBeVisible();
+                        var assetsNumber = assetsView.collection.length;
+                        $typeColumn.trigger('click');
+                        expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
+                        expect($typeColumn.find('h3.title')).toHaveClass('is-selected');
+                        var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
+                        $firstFilter.trigger('click');
+                        respondWithMockAssets(requests);
+                        var assetsNumberFiltered = assetsView.collection.length;
+                        expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
+                    });
                 });
             });
         });
