@@ -50,6 +50,8 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         """
         response = self.client.get(self.url)
         self.assertTrue(self.e_commerce_link in response.content)
+        # Coupons should show up for White Label sites with priced honor modes.
+        self.assertTrue('Coupons' in response.content)
 
     def test_user_has_finance_admin_rights_in_e_commerce_tab(self):
         response = self.client.get(self.url)
@@ -190,7 +192,8 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
+            code='Vs23Ws4j', course_id=unicode(self.course.id), created_by=self.instructor,
+            mode_slug='honor'
         )
         course_registration.save()
 
@@ -288,3 +291,20 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         data['coupon_id'] = ''  # Coupon id is not provided
         response = self.client.post(update_coupon_url, data=data)
         self.assertTrue('coupon id not found' in response.content)
+
+    def test_verified_course(self):
+        """Verify the e-commerce panel shows up for verified courses as well, without Coupons """
+        # Change honor mode to verified.
+        original_mode = CourseMode.objects.get(course_id=self.course.id, mode_slug='honor')
+        original_mode.delete()
+        new_mode = CourseMode(
+            course_id=unicode(self.course.id), mode_slug='verified',
+            mode_display_name='verified', min_price=10, currency='usd'
+        )
+        new_mode.save()
+
+        # Get the response value, ensure the Coupon section is not included.
+        response = self.client.get(self.url)
+        self.assertTrue(self.e_commerce_link in response.content)
+        # Coupons should show up for White Label sites with priced honor modes.
+        self.assertFalse('Coupons List' in response.content)
