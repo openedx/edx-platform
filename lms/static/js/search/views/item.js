@@ -20,18 +20,6 @@ var edx = edx || {};
         render: function () {
             this.$el.html(this.tpl(this.model.attributes));
             return this;
-        },
-
-        formatLocation: function (location) {
-            var locationString = '';
-            var keys = _.keys(location).sort();
-            _.each(keys, function(key, i, list) {
-                locationString += location[key];
-                if (i + 1 < list.length) {
-                    locationString += ' ▸ ';
-                }
-            });
-            return locationString;
         }
 
     });

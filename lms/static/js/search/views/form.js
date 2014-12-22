@@ -20,7 +20,7 @@ var edx = edx || {};
         },
 
         submitForm: function () {
-            var searchTerm = this.$searchField.val();
+            var searchTerm = $.trim(this.$searchField.val());
             if (this.emptySearchRegex.test(searchTerm) === false) {
                 this.performSearch(searchTerm);
             }

@@ -7,21 +7,24 @@ var edx = edx || {};
 
     edx.search.List = Backbone.View.extend({
         el: '#search-content',
-        $courseContent: $('#course-content'),
         events: {
             'click .search-load-next': 'loadNext'
         },
 
         initialize: function () {
+            this.courseName = this.$el.attr('data-course-name');
+            this.$courseContent = $('#course-content');
             this.listTemplate = _.template($('#search_list-tpl').html());
             this.loadingTemplate = _.template($('#search_loading-tpl').html());
+            this.errorTemplate = _.template($('#search_error-tpl').html());
             this.collection.on('search', this.render, this);
             this.collection.on('next', this.renderNext, this);
-            // this.collection.on('error', ???, this);
+            this.collection.on('error', this.showErrorMessage, this);
         },
 
         render: function () {
             this.$el.html(this.listTemplate({
+                courseName: this.courseName,
                 totalCount: this.collection.totalCount,
                 pageSize: this.collection.pageSize,
                 hasMoreResults: this.collection.hasNextPage()
@@ -41,10 +44,9 @@ var edx = edx || {};
         },
 
         renderItems: function () {
-            var items = [];
-            _.each(this.collection.models, function (model) {
-                var item = new edx.search.Item({ model: model });
-                items.push(item.render().el);
+            var items = this.collection.map(function (result) {
+                var item = new edx.search.Item({ model: result });
+                return item.render().el;
             });
             this.$el.find('.search-results').append(items);
         },
@@ -60,10 +62,15 @@ var edx = edx || {};
             this.$courseContent.hide();
         },
 
+        showErrorMessage: function () {
+            this.$el.html(this.errorTemplate());
+            this.$el.show();
+            this.$courseContent.hide();
+        },
+
         loadNext: function (event) {
-            event.preventDefault();
+            event && event.preventDefault();
             this.$el.find('.icon-spin').show();
-            this.trigger('next');
         }
 
     });
