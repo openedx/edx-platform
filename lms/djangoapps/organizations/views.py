@@ -73,11 +73,30 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
     @action(methods=['get', 'post'])
     def users(self, request, pk):
         """
-        Add a User to an Organization
+        - URI: ```/api/organizations/{org_id}/users/```
+        - GET: Returns users in an organization
+            * course_id parameter should filter user by course
+            * include_course_counts parameter should be `true` to get user's enrollment count
+            * include_grades parameter should be `true` to get user's grades
+            * for the course given in the course_id parameter
+        - POST: Adds a User to an Organization
+
         """
         if request.method == 'GET':
             include_course_counts = request.QUERY_PARAMS.get('include_course_counts', None)
+            include_grades = request.QUERY_PARAMS.get('include_grades', None)
+            course_id = request.QUERY_PARAMS.get('course_id', None)
+            grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+            course_key = None
+            if course_id:
+                course_key = get_course_key(course_id)
+
             users = User.objects.filter(organizations=pk)
+            if course_key:
+                users = users.filter(courseenrollment__course_id__exact=course_key,
+                                     courseenrollment__is_active=True)
+            if str2bool(include_grades):
+                users = users.select_related('studentgradebook')
             response_data = []
             if users:
                 for user in users:
@@ -86,6 +105,15 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                     if str2bool(include_course_counts):
                         enrollments = CourseEnrollment.enrollments_for_user(user).count()
                         user_data['course_count'] = enrollments
+                    if str2bool(include_grades) and course_key:
+                        user_grades = {'grade': 0, 'proforma_grade': 0}
+                        gradebook = user.studentgradebook_set.filter(course_id=course_key)
+                        if gradebook:
+                            user_grades['grade'] = gradebook[0].grade
+                            user_grades['proforma_grade'] = gradebook[0].proforma_grade
+                            user_grades['complete_status'] = True if 0 < gradebook[0].proforma_grade <= \
+                                gradebook[0].grade + grade_complete_match_range else False
+                        user_data.update(user_grades)
                     response_data.append(user_data)
             return Response(response_data, status=status.HTTP_200_OK)
         else:
