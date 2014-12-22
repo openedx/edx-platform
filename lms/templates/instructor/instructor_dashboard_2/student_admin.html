@@ -5,6 +5,11 @@
   %if section_data['is_small_course']:
   ## Show the gradebook for small courses
     <h2>${_("Student Gradebook")}</h2>
+      %if not section_data['access']['admin']:
+      <p>
+      ${_("You do not have permission to use this function.")}
+      </p>
+      %else:
       <p>
 	${_("Click here to view the gradebook for enrolled students. This feature is only visible to courses with a small number of total enrolled students.")}
       </p>
@@ -12,6 +17,7 @@
       <p>
 	<a href="${ section_data['spoc_gradebook_url'] }" class="gradebook-link"> ${_("View Gradebook")} </a>
       </p>
+      %endif
     <hr>
   %endif
 </div>
