@@ -1,4 +1,4 @@
-<div id="wrapper-facephoto" class="wrapper-view block-photo">
+<div id="wrapper-facephoto" class="wrapper-view block-photo face-photo-step">
   <div class="facephoto view">
     <h3 class="title"><%- gettext( "Take Your Photo" ) %></h3>
     <div class="instruction">

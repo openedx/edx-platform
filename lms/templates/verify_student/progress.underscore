@@ -1,4 +1,4 @@
-<div class="wrapper-progress">
+<div class="wrapper-progress progress">
   <section class="progress">
     <h3 class="sr title"><%- gettext("Your Progress") %></h3>
 

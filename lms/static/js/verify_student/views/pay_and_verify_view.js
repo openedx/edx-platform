@@ -16,8 +16,6 @@ var edx = edx || {};
     edx.verify_student.PayAndVerifyView = Backbone.View.extend({
         el: '#pay-and-verify-container',
 
-        template: '#progress-tpl',
-
         subviews: {},
 
         VERIFICATION_VIEW_NAMES: [
@@ -27,7 +25,7 @@ var edx = edx || {};
         ],
 
         initialize: function( obj ) {
-            this.errorModel = obj.errorModel || {};
+            this.errorModel = obj.errorModel || null;
             this.displaySteps = obj.displaySteps || [];
 
             this.progressView = new edx.verify_student.ProgressView({
@@ -43,7 +41,7 @@ var edx = edx || {};
                 )
             });
 
-            this.initializeStepViews( obj.stepInfo );
+            this.initializeStepViews( obj.stepInfo || {} );
         },
 
         initializeStepViews: function( stepInfo ) {

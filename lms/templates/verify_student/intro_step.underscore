@@ -1,4 +1,4 @@
-<div class="wrapper-content-main">
+<div class="wrapper-content-main intro-step">
   <article class="content-main">
     <h3 class="title"><%- introTitle %></h3>
     <div class="instruction"><p><%- introMsg %></p></div>
@@ -9,11 +9,11 @@
     <nav class="nav-wizard is-ready">
       <ol class="wizard-steps">
         <li class="wizard-step">
-        <a class="next action-primary" <% if (isActive == "False") { %>disabled="true"<% } %> id="next_step_button" href="?skip-first-step=1">
-          <% if ( isActive == "False" ) { %>
+        <a class="next action-primary" <% if ( !isActive ) { %>disabled="true"<% } %> id="next_step_button" href="?skip-first-step=1">
+          <% if ( !isActive ) { %>
             <%- gettext( "Activate Your Account" ) %>
           <% } else { %>
-            <%- _.sprintf( gettext( "Go to Step %s" ), nextStepNum ) %>: <%- nextStepTitle %>
+            <%- _.sprintf( gettext( "Go to Step %(stepNumber)s" ), { stepNumber: nextStepNum } ) %>: <%- nextStepTitle %>
           <% } %>
         </a>
         </li>

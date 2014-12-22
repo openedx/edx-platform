@@ -10,7 +10,7 @@
  */
 var edx = edx || {};
 
-(function($) {
+(function( $, _ ) {
     'use strict';
     var errorView,
         el = $('#pay-and-verify-container');
@@ -47,8 +47,11 @@ var edx = edx || {};
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 minPrice: el.data('course-mode-min-price'),
-                suggestedPrices: (el.data('course-mode-suggested-prices') || "").split(","),
                 contributionAmount: el.data('contribution-amount'),
+                suggestedPrices: _.filter(
+                    (el.data('course-mode-suggested-prices') || "").split(","),
+                    function( price ) { return Boolean( price ); }
+                ),
                 currency: el.data('course-mode-currency'),
                 purchaseEndpoint: el.data('purchase-endpoint')
             },
@@ -68,4 +71,4 @@ var edx = edx || {};
             }
         }
     }).render();
-})(jQuery);
+})( jQuery, _ );
