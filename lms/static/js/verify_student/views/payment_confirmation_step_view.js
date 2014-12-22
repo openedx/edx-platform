@@ -71,18 +71,20 @@ var edx = edx || {};
          * those used to track business intelligence events.
          */
         postRender: function() {
+            var $verifyNowButton = $('#verify_now_button'),
+                $verifyLaterButton = $('#verify_later_button');
+
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'payment', this.templateName );
+
             // Track the user's decision to verify immediately
-            $( '#verify_now_button' ).on( 'click', function() {
-                window.analytics.track( 'edx.bi.user.verification.immediate', {
-                    category: 'verification'
-                });
+            window.analytics.trackLink( $verifyNowButton, 'edx.bi.user.verification.immediate', {
+                category: 'verification'
             });
 
             // Track the user's decision to defer their verification
-            $( '#verify_later_button' ).on( 'click', function() {
-                window.analytics.track( 'edx.bi.user.verification.deferred', {
-                    category: 'verification'
-                });
+            window.analytics.trackLink( $verifyLaterButton, 'edx.bi.user.verification.deferred', {
+                category: 'verification'
             });
         },
 

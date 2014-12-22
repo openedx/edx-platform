@@ -21,6 +21,9 @@ var edx = edx || {};
                 el: $( '.requirements-container', this.el ),
                 requirements: this.stepData.requirements
             }).render();
+
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
         }
 
     });

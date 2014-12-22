@@ -11,6 +11,11 @@ var edx = edx || {};
 
     // Currently, this step does not need to install any event handlers,
     // since the displayed information is static.
-    edx.verify_student.EnrollmentConfirmationStepView = edx.verify_student.StepView.extend({});
+    edx.verify_student.EnrollmentConfirmationStepView = edx.verify_student.StepView.extend({
+        postRender: function() {
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
+        }
+    });
 
 })( jQuery );

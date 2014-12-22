@@ -30,6 +30,9 @@ var edx = edx || {};
 
             // When moving to the next step, submit photos for verification
             $( '#next_step_button' ).on( 'click', _.bind( this.submitPhotos, this ) );
+
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
         },
 
         toggleSubmitEnabled: function() {
@@ -38,7 +41,7 @@ var edx = edx || {};
 
         retakePhotos: function() {
             // Track the user's intent to retake their photos
-            window.analytics.track( 'edx.bi.user.verification_images.retaken', {
+            window.analytics.track( 'edx.bi.user.images.retaken', {
                 category: 'verification'
             });
 
