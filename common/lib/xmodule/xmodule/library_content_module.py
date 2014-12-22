@@ -35,8 +35,10 @@ def enum(**enums):
 
 
 def _get_capa_types():
+    """
+    Gets capa types tags and labels
+    """
     capa_types = {
-        ANY_CAPA_TYPE_VALUE: _('Any Type'),
         'annotationinput': _('Annotation'),
         'checkboxgroup': _('Checkbox Group'),
         'checkboxtextgroup': _('Checkbox Text Group'),
@@ -54,7 +56,7 @@ def _get_capa_types():
         'javascriptinput': _('Javascript Input'),
         'jsinput': _('JS Input'),
         'matlabinput': _('Matlab'),
-        'optioninput': _('Select option'),
+        'optioninput': _('Select Option'),
         'radiogroup': _('Radio Group'),
         'radiotextgroup': _('Radio Text Group'),
         'schematic': _('Schematic'),
@@ -63,7 +65,7 @@ def _get_capa_types():
         'vsepr_input': _('VSEPR'),
     }
 
-    return sorted([
+    return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
         {'value': capa_type, 'display_name': caption}
         for capa_type, caption in capa_types.items()
     ], key=lambda item: item.get('display_name'))
@@ -221,6 +223,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     any particular student.
     """
     def _filter_children(self, child_locator):
+        """
+        Filters children by CAPA problem type, if configured
+        """
         if self.capa_type == ANY_CAPA_TYPE_VALUE:
             return True
 
@@ -233,7 +238,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             return True
 
         return any(self.capa_type in capa_input.tags for capa_input in block.lcp.inputs.values())
-
 
     def selected_children(self):
         """
@@ -427,8 +431,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         If source_libraries has been edited, refresh_children automatically.
         """
         old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
-        if (set(old_source_libraries) != set(self.source_libraries) or
-            old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
+        if set(old_source_libraries) != set(self.source_libraries) or \
+                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type:
             try:
                 self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
             except ValueError:
