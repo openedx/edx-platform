@@ -54,6 +54,7 @@
             'xblock/lms.runtime.v1': 'coffee/src/xblock/lms.runtime.v1',
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
+            'logger': 'xmodule_js/common_static/js/src/logger',
 
             // Manually specify LMS files that are not converted to RequireJS
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
@@ -216,6 +217,9 @@
             },
             'xmodule': {
                 exports: 'XModule'
+            },
+            'logger': {
+                exports: 'Logger'
             },
             'sinon': {
                 exports: 'sinon'
@@ -548,6 +552,7 @@
         'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
         'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js'
     ]);

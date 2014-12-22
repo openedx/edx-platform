@@ -2,9 +2,10 @@
 'use strict';
 define([
      'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/logger',
-     'js/edxnotes/views/shim', 'js/edxnotes/plugins/scroller'
-], function ($, _, Annotator, Logger) {
-    var plugins = ['Auth', 'Store', 'Scroller'],
+     'js/edxnotes/views/shim', 'js/edxnotes/plugins/scroller',
+     'js/edxnotes/plugins/events'
+], function ($, _, Annotator, NotesLogger) {
+    var plugins = ['Auth', 'Store', 'Scroller', 'Events'],
         getOptions, setupPlugins, updateHeaders, getAnnotator;
 
     /**
@@ -73,7 +74,7 @@ define([
     getAnnotator = function (element, params) {
         var el = $(element),
             options = getOptions(el, params),
-            logger = Logger.getLogger(element.id, params.debug),
+            logger = NotesLogger.getLogger(element.id, params.debug),
             annotator;
 
         annotator = el.annotator(options).data('annotator');

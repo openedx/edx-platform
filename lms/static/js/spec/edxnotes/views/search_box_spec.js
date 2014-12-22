@@ -38,6 +38,7 @@ define([
         beforeEach(function () {
             customMatchers(this);
             loadFixtures('js/fixtures/edxnotes/edxnotes.html');
+            spyOn(Logger, 'log');
             this.searchBox = getSearchBox();
         });
 
@@ -70,6 +71,20 @@ define([
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
                 'test_text'
             );
+        });
+
+        it('should log the edx.student_notes.searched event properly', function () {
+            var requests = AjaxHelpers.requests(this);
+            submitForm(this.searchBox, 'test_text');
+            AjaxHelpers.respondWithJson(requests, {
+                total: 2,
+                rows: [null, null]
+            });
+
+            expect(Logger.log).toHaveBeenCalledWith('edx.student_notes.searched', {
+                'number_of_results': 2,
+                'search_string': 'test_text'
+            });
         });
 
         it('returns default error message if received data structure is wrong', function () {
