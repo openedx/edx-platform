@@ -15,6 +15,7 @@ new_contract('AssetKey', AssetKey)
 new_contract('CourseKey', CourseKey)
 new_contract('datetime', datetime)
 new_contract('basestring', basestring)
+new_contract('long', long)
 new_contract('AssetElement', lambda x: isinstance(x, etree._Element) and x.tag == "asset")  # pylint: disable=protected-access, no-member
 new_contract('AssetsElement', lambda x: isinstance(x, etree._Element) and x.tag == "assets")  # pylint: disable=protected-access, no-member
 
@@ -54,8 +55,8 @@ class AssetMetadata(object):
               locked='bool|None', contenttype='basestring|None',
               thumbnail='basestring|None', fields='dict|None',
               curr_version='basestring|None', prev_version='basestring|None',
-              created_by='int|None', created_by_email='basestring|None', created_on='datetime|None',
-              edited_by='int|None', edited_by_email='basestring|None', edited_on='datetime|None')
+              created_by='int|long|None', created_by_email='basestring|None', created_on='datetime|None',
+              edited_by='int|long|None', edited_by_email='basestring|None', edited_on='datetime|None')
     def __init__(self, asset_id,
                  pathname=None, internal_name=None,
                  locked=None, contenttype=None,

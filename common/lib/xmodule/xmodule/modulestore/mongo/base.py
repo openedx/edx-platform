@@ -57,6 +57,7 @@ log = logging.getLogger(__name__)
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
+new_contract('long', long)
 
 # sort order that returns DRAFT items first
 SORT_REVISION_FAVOR_DRAFT = ('_id.revision', pymongo.DESCENDING)
@@ -1517,14 +1518,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return 'assets.{}'.format(asset_type)
 
-    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int)
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id='int|long')
     def _save_asset_metadata_list(self, asset_metadata_list, user_id, import_only):
         """
         Internal; saves the info for a particular course's asset.
 
         Arguments:
             asset_metadata_list (list(AssetMetadata)): list of data about several course assets
-            user_id (int): user ID saving the asset metadata
+            user_id (int|long): user ID saving the asset metadata
             import_only (bool): True if edited_on/by data should remain unchanged.
         """
         course_assets = self._find_course_assets(asset_metadata_list[0].asset_id.course_key)
@@ -1563,14 +1564,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         )
         return True
 
-    @contract(asset_metadata='AssetMetadata', user_id=int)
+    @contract(asset_metadata='AssetMetadata', user_id='int|long')
     def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
         Saves the info for a particular course's asset.
 
         Arguments:
             asset_metadata (AssetMetadata): data about the course asset data
-            user_id (int): user ID saving the asset metadata
+            user_id (int|long): user ID saving the asset metadata
             import_only (bool): True if importing without editing, False if editing
 
         Returns:
@@ -1578,7 +1579,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return self._save_asset_metadata_list([asset_metadata, ], user_id, import_only)
 
-    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int)
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id='int|long')
     def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
         """
         Saves the asset metadata for each asset in a list of asset metadata.
@@ -1586,7 +1587,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
         Args:
             asset_metadata (AssetMetadata): data about the course asset data
-            user_id (int): user ID saving the asset metadata
+            user_id (int|long): user ID saving the asset metadata
             import_only (bool): True if importing without editing, False if editing
 
         Returns:
@@ -1594,7 +1595,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         return self._save_asset_metadata_list(asset_metadata_list, user_id, import_only)
 
-    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
+    @contract(source_course_key='CourseKey', dest_course_key='CourseKey', user_id='int|long')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
         """
         Copy all the course assets from source_course_key to dest_course_key.
@@ -1613,7 +1614,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Update the document.
         self.asset_collection.insert(dest_assets)
 
-    @contract(asset_key='AssetKey', attr_dict=dict)
+    @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
@@ -1644,7 +1645,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             {"$set": {self._make_mongo_asset_key(asset_key.asset_type): all_assets}}
         )
 
-    @contract(asset_key='AssetKey')
+    @contract(asset_key='AssetKey', user_id='int|long')
     def delete_asset_metadata(self, asset_key, user_id):
         """
         Internal; deletes a single asset's metadata.
@@ -1670,7 +1671,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         return 1
 
     # pylint: disable=unused-argument
-    @contract(course_key='CourseKey')
+    @contract(course_key='CourseKey', user_id='int|long')
     def delete_all_asset_metadata(self, course_key, user_id):
         """
         Delete all of the assets which use this course_key as an identifier.
