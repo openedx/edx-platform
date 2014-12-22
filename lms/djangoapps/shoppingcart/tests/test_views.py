@@ -28,6 +28,7 @@ from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
 
@@ -37,7 +38,7 @@ from shoppingcart.models import (
     Coupon, CourseRegistrationCode, RegistrationCodeRedemption,
     DonationConfiguration
 )
-from student.tests.factories import UserFactory, AdminFactory
+from student.tests.factories import UserFactory, AdminFactory, CourseModeFactory
 from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
@@ -104,6 +105,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.cart = Order.get_cart_for_user(self.user)
         self.addCleanup(patcher.stop)
 
+        self.now = datetime.now(pytz.UTC)
+        self.yesterday = self.now - timedelta(days=1)
+        self.tomorrow = self.now + timedelta(days=1)
+
     def get_discount(self, cost):
         """
         This method simple return the discounted amount
@@ -119,12 +124,26 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                         percentage_discount=self.percentage_discount, created_by=self.user, is_active=is_active)
         coupon.save()
 
-    def add_reg_code(self, course_key):
+    def add_reg_code(self, course_key, mode_slug='honor'):
         """
         add dummy registration code into models
         """
-        course_reg_code = CourseRegistrationCode(code=self.reg_code, course_id=course_key, created_by=self.user)
+        course_reg_code = CourseRegistrationCode(
+            code=self.reg_code, course_id=course_key, created_by=self.user, mode_slug=mode_slug
+        )
         course_reg_code.save()
+
+    def _add_course_mode(self, min_price=50, mode_slug='honor', expiration_date=None):
+        """
+        Adds a course mode to the test course.
+        """
+        mode = CourseModeFactory.create()
+        mode.course_id = self.course.id
+        mode.min_price = min_price
+        mode.mode_slug = mode_slug
+        mode.expiration_date = expiration_date
+        mode.save()
+        return mode
 
     def add_course_to_user_cart(self, course_key):
         """
@@ -391,6 +410,31 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 404)
         self.assertIn("Cart item quantity should not be greater than 1 when applying activation code", resp.content)
+
+    @ddt.data(True, False)
+    def test_reg_code_uses_associated_mode(self, expired_mode):
+        """Tests the use of reg codes on verified courses, expired or active. """
+        course_key = self.course_key.to_deprecated_string()
+        expiration_date = self.yesterday if expired_mode else self.tomorrow
+        self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
+        self.add_reg_code(course_key, mode_slug='verified')
+        self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.course.display_name, resp.content)
+
+    @ddt.data(True, False)
+    def test_reg_code_uses_unknown_mode(self, expired_mode):
+        """Tests the use of reg codes on verified courses, expired or active. """
+        course_key = self.course_key.to_deprecated_string()
+        expiration_date = self.yesterday if expired_mode else self.tomorrow
+        self._add_course_mode(mode_slug='verified', expiration_date=expiration_date)
+        self.add_reg_code(course_key, mode_slug='bananas')
+        self.add_course_to_user_cart(self.course_key)
+        resp = self.client.post(reverse('register_code_redemption', args=[self.reg_code]), HTTP_HOST='localhost')
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn(self.course.display_name, resp.content)
+        self.assertIn("error processing your redeem code", resp.content)
 
     def test_course_discount_for_valid_active_coupon_code(self):
 
@@ -1472,6 +1516,10 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         cache.clear()
         instructor = InstructorFactory(course_key=self.course_key)
         self.client.login(username=instructor.username, password='test')
+
+        # Registration Code Generation only available to Sales Admins.
+        CourseSalesAdminRole(self.course.id).add_users(instructor)
+
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 

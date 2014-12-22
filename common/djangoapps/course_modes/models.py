@@ -81,17 +81,7 @@ class CourseMode(models.Model):
         """
         modes_by_course = defaultdict(list)
         for mode in cls.objects.filter(course_id__in=course_id_list):
-            modes_by_course[mode.course_id].append(
-                Mode(
-                    mode.mode_slug,
-                    mode.mode_display_name,
-                    mode.min_price,
-                    mode.suggested_prices,
-                    mode.currency,
-                    mode.expiration_datetime,
-                    mode.description
-                )
-            )
+            modes_by_course[mode.course_id].append(mode.to_tuple())
 
         # Assign default modes if nothing available in the database
         missing_courses = set(course_id_list) - set(modes_by_course.keys())
@@ -131,6 +121,31 @@ class CourseMode(models.Model):
         return (all_modes, unexpired_modes)
 
     @classmethod
+    def paid_modes_for_course(cls, course_id):
+        """
+        Returns a list of non-expired modes for a course ID that have a set minimum price.
+
+        If no modes have been set, returns an empty list.
+
+        Args:
+            course_id (CourseKey): The course to find paid modes for.
+
+        Returns:
+            A list of CourseModes with a minimum price.
+
+        """
+        now = datetime.now(pytz.UTC)
+        found_course_modes = cls.objects.filter(
+            Q(course_id=course_id) &
+            Q(min_price__gt=0) &
+            (
+                Q(expiration_datetime__isnull=True) |
+                Q(expiration_datetime__gte=now)
+            )
+        )
+        return [mode.to_tuple() for mode in found_course_modes]
+
+    @classmethod
     def modes_for_course(cls, course_id):
         """
         Returns a list of the non-expired modes for a given course id
@@ -141,15 +156,7 @@ class CourseMode(models.Model):
         found_course_modes = cls.objects.filter(Q(course_id=course_id) &
                                                 (Q(expiration_datetime__isnull=True) |
                                                 Q(expiration_datetime__gte=now)))
-        modes = ([Mode(
-            mode.mode_slug,
-            mode.mode_display_name,
-            mode.min_price,
-            mode.suggested_prices,
-            mode.currency,
-            mode.expiration_datetime,
-            mode.description
-        ) for mode in found_course_modes])
+        modes = ([mode.to_tuple() for mode in found_course_modes])
         if not modes:
             modes = [cls.DEFAULT_MODE]
         return modes
@@ -358,6 +365,24 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
+
+    def to_tuple(self):
+        """
+        Takes a mode model and turns it into a model named tuple.
+
+        Returns:
+            A 'Model' namedtuple with all the same attributes as the model.
+
+        """
+        return Mode(
+            self.mode_slug,
+            self.mode_display_name,
+            self.min_price,
+            self.suggested_prices,
+            self.currency,
+            self.expiration_datetime,
+            self.description
+        )
 
     def __unicode__(self):
         return u"{} : {}, min={}, prices={}".format(
