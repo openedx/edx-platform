@@ -26,8 +26,10 @@ def edxnotes(cls):
         is_studio = getattr(self.system, "is_author_mode", False)
         course = self.descriptor.runtime.modulestore.get_course(self.runtime.course_id)
 
-        # Must be disabled in Studio or depends on the feature flag/advanced
-        # settings of the course.
+        # Must be disabled:
+        # - in Studio;
+        # - when Harvard Annotation Tool is enabled for the course;
+        # - when the feature flag or `edxnotes` setting of the course is set to False.
         if is_studio or not is_feature_enabled(course):
             return original_get_html(self, *args, **kwargs)
         else:
