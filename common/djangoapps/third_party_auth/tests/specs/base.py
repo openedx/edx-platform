@@ -689,7 +689,19 @@ class IntegrationTest(testutil.TestCase, test.TestCase):
         # social auth.
         self.assert_social_auth_does_not_exist_for_user(created_user, strategy)
 
-        # We should be redirected back to the complete page, setting
+        # Since the user's account is not yet active, we should be redirected to /login
+        self.assert_redirect_to_login_looks_correct(
+            actions.do_complete(
+                request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
+                redirect_field_name=auth.REDIRECT_FIELD_NAME
+            )
+        )
+
+        # Activate the user's account
+        strategy.request.user.is_active = True
+        strategy.request.user.save()
+
+        # Try again.  This time, we should be redirected back to the complete page, setting
         # the "logged in" cookie for the marketing site.
         self.assert_logged_in_cookie_redirect(actions.do_complete(
             request.social_strategy, social_views._do_login, request.user, None,  # pylint: disable-msg=protected-access
