@@ -58,6 +58,11 @@ var edx = edx || {};
             return parseInt(this.$('.input-cohort-group-association').val());
         },
 
+        getUpdatedCohortName: function() {
+            var cohortName = this.$('.cohort-name').val();
+            return cohortName ? cohortName.trim() : this.model.get('name');
+        },
+
         saveForm: function() {
             var self = this,
                 cohort = this.model,
@@ -70,8 +75,11 @@ var edx = edx || {};
                     self.$('.cohort-management-create-form-name label')
                 );
             };
-            cohortName = this.$('.cohort-name').val().trim();
-            if (cohortName.length > 0) {
+            cohortName = this.getUpdatedCohortName();
+            if (cohortName.length === 0) {
+                showAddError(gettext('Please enter a name for your new cohort group.'));
+                saveOperation.reject();
+            } else {
                 groupId = this.getSelectedGroupId();
                 cohort.save(
                     {name: cohortName, user_partition_id: this.cohortUserPartitionId, group_id: groupId}
@@ -94,9 +102,6 @@ var edx = edx || {};
                     showAddError(errorMessage);
                     saveOperation.reject();
                 });
-            } else {
-                showAddError(gettext('Please enter a name for your new cohort group.'));
-                saveOperation.reject();
             }
             return saveOperation.promise();
         }
