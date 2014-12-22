@@ -90,4 +90,17 @@
     @extend %ui-btn-non;
   }
 
+  .assets-library {
+    .assets-title {
+      display: inline-block;
+      width: flex-grid(5, 9);
+      @include margin-right(flex-gutter());
+    }
+
+    .wrapper-encodings-download {
+      display: inline-block;
+      width: flex-grid(4, 9);
+      text-align: right;
+    }
+  }
 }

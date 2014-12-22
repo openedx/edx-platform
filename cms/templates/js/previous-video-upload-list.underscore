@@ -1,5 +1,10 @@
 <div class="assets-library">
     <h3 class="assets-title"><%- gettext("Previous Uploads") %></h3>
+    <div class="wrapper-encodings-download">
+      <a href="<%- encodingsDownloadUrl %>">
+        <%- gettext("Download available encodings (.csv)") %>
+      </a>
+    </div>
     <table class="assets-table">
         <thead>
             <tr>

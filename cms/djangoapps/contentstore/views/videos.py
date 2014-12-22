@@ -204,6 +204,7 @@ def videos_index_html(course):
         {
             "context_course": course,
             "post_url": reverse_course_url("videos_handler", unicode(course.id)),
+            "encodings_download_url": reverse_course_url("video_encodings_download", unicode(course.id)),
             "previous_uploads": _get_index_videos(course),
             "concurrent_upload_limit": settings.VIDEO_UPLOAD_PIPELINE.get("CONCURRENT_UPLOAD_LIMIT", 0),
         }
