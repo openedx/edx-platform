@@ -122,6 +122,7 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
     LIBRARY_LABEL = "Libraries"
     COUNT_LABEL = "Count"
     SCORED_LABEL = "Scored"
+    PROBLEM_TYPE_LABEL = "Problem Type"
 
     def is_browser_on_page(self):
         """
@@ -195,6 +196,24 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
         scored_select = Select(select_element)
         scored_select.select_by_value(str(scored))
         EmptyPromise(lambda: self.scored == scored, "scored is updated in modal.").fulfill()
+
+    @property
+    def capa_type(self):
+        """
+        Gets value of CAPA type select
+        """
+        return self.get_metadata_input(self.PROBLEM_TYPE_LABEL).get_attribute('value')
+
+    @capa_type.setter
+    def capa_type(self, value):
+        """
+        Sets value of CAPA type select
+        """
+        select_element = self.get_metadata_input(self.PROBLEM_TYPE_LABEL)
+        select_element.click()
+        problem_type_select = Select(select_element)
+        problem_type_select.select_by_value(value)
+        EmptyPromise(lambda: self.capa_type == value, "problem type is updated in modal.").fulfill()
 
     def _add_library_key(self):
         """
