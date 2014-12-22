@@ -27,6 +27,7 @@ new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('LibraryLocator', LibraryLocator)
+new_contract('long', long)
 
 log = logging.getLogger(__name__)
 
@@ -351,14 +352,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
 
-    @contract(asset_metadata='AssetMetadata', user_id=int, import_only=bool)
+    @contract(asset_metadata='AssetMetadata', user_id='int|long', import_only=bool)
     def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
         Saves the asset metadata for a particular course's asset.
 
         Args:
         asset_metadata (AssetMetadata): data about the course asset data
-        user_id (int): user ID saving the asset metadata
+        user_id (int|long): user ID saving the asset metadata
         import_only (bool): True if importing without editing, False if editing
 
         Returns:
@@ -367,7 +368,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(asset_metadata.asset_id.course_key)
         return store.save_asset_metadata(asset_metadata, user_id, import_only)
 
-    @contract(asset_metadata_list='list(AssetMetadata)', user_id=int, import_only=bool)
+    @contract(asset_metadata_list='list(AssetMetadata)', user_id='int|long', import_only=bool)
     def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
         """
         Saves the asset metadata for each asset in a list of asset metadata.
@@ -375,7 +376,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         Args:
         asset_metadata_list (list(AssetMetadata)): list of data about several course assets
-        user_id (int): user ID saving the asset metadata
+        user_id (int|long): user ID saving the asset metadata
         import_only (bool): True if importing without editing, False if editing
 
         Returns:
@@ -424,13 +425,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         return store.get_all_asset_metadata(course_key, asset_type, start, maxresults, sort, **kwargs)
 
-    @contract(asset_key='AssetKey')
+    @contract(asset_key='AssetKey', user_id='int|long')
     def delete_asset_metadata(self, asset_key, user_id):
         """
         Deletes a single asset's metadata.
 
         Arguments:
             asset_id (AssetKey): locator containing original asset filename
+            user_id (int_long): user deleting the metadata
 
         Returns:
             Number of asset metadata entries deleted (0 or 1)
@@ -438,7 +440,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(asset_key.course_key)
         return store.delete_asset_metadata(asset_key, user_id)
 
-    @contract(source_course_key='CourseKey', dest_course_key='CourseKey')
+    @contract(source_course_key='CourseKey', dest_course_key='CourseKey', user_id='int|long')
     def copy_all_asset_metadata(self, source_course_key, dest_course_key, user_id):
         """
         Copy all the course assets from source_course_key to dest_course_key.
@@ -446,6 +448,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Arguments:
             source_course_key (CourseKey): identifier of course to copy from
             dest_course_key (CourseKey): identifier of course to copy to
+            user_id (int|long): user copying the asset metadata
         """
         source_store = self._get_modulestore_for_courseid(source_course_key)
         dest_store = self._get_modulestore_for_courseid(dest_course_key)
@@ -463,7 +466,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             # Courses in the same modulestore can be handled by the modulestore itself.
             source_store.copy_all_asset_metadata(source_course_key, dest_course_key, user_id)
 
-    @contract(asset_key='AssetKey', attr=str)
+    @contract(asset_key='AssetKey', attr=str, user_id='int|long')
     def set_asset_metadata_attr(self, asset_key, attr, value, user_id):
         """
         Add/set the given attr on the asset at the given location. Value can be any type which pymongo accepts.
@@ -472,6 +475,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             asset_key (AssetKey): asset identifier
             attr (str): which attribute to set
             value: the value to set it to (any type pymongo accepts such as datetime, number, string)
+            user_id: (int|long): user setting the attribute
 
         Raises:
             NotFoundError if no such item exists
@@ -480,7 +484,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(asset_key.course_key)
         return store.set_asset_metadata_attrs(asset_key, {attr: value}, user_id)
 
-    @contract(asset_key='AssetKey', attr_dict=dict)
+    @contract(asset_key='AssetKey', attr_dict=dict, user_id='int|long')
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
         """
         Add/set the given dict of attrs on the asset at the given location. Value can be any type which pymongo accepts.
@@ -488,6 +492,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         Arguments:
             asset_key (AssetKey): asset identifier
             attr_dict (dict): attribute/value pairs to set
+            user_id: (int|long): user setting the attributes
 
         Raises:
             NotFoundError if no such item exists

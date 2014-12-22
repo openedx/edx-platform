@@ -25,6 +25,7 @@ class AssetStoreTestData(object):
     """
     now = datetime.now(pytz.utc)
     user_id = 144
+    user_id_long = long(user_id)
     user_email = "me@example.com"
 
     asset_fields = (
@@ -33,10 +34,10 @@ class AssetStoreTestData(object):
         'curr_version', 'prev_version'
     )
     all_asset_data = (
-        ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id, user_email, now, user_id, user_email, now, '14', '13'),
+        ('pic1.jpg', 'EKMND332DDBK', 'pix/archive', False, user_id_long, user_email, now, user_id_long, user_email, now, '14', '13'),
         ('shout.ogg', 'KFMDONSKF39K', 'sounds', True, user_id, user_email, now, user_id, user_email, now, '1', None),
         ('code.tgz', 'ZZB2333YBDMW', 'exercises/14', False, user_id * 2, user_email, now, user_id * 2, user_email, now, 'AB', 'AA'),
-        ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id * 3, user_email, now, user_id * 3, user_email, now, '5', '4'),
+        ('dog.png', 'PUPY4242X', 'pictures/animals', True, user_id_long * 3, user_email, now, user_id_long * 3, user_email, now, '5', '4'),
         ('not_here.txt', 'JJJCCC747', '/dev/null', False, user_id * 4, user_email, now, user_id * 4, user_email, now, '50', '49'),
         ('asset.txt', 'JJJCCC747858', '/dev/null', False, user_id * 4, user_email, now, user_id * 4, user_email, now, '50', '49'),
         ('roman_history.pdf', 'JASDUNSADK', 'texts/italy', True, user_id * 7, user_email, now, user_id * 7, user_email, now, '1.1', '1.01'),
