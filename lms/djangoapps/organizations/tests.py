@@ -16,8 +16,8 @@ from django.test.utils import override_settings
 
 from gradebook.models import StudentGradebook
 from student.models import UserProfile
-from student.tests.factories import CourseEnrollmentFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 TEST_API_KEY = str(uuid.uuid4())
 
@@ -342,6 +342,44 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['course_count'], 2)
+
+    def test_organizations_users_get_with_grades(self):
+        # Create 4 users
+        user_course = 4
+        users_completed = 2
+        users = [UserFactory.create(username="testuser" + str(__), profile='test') for __ in xrange(user_course)]
+        for i, user in enumerate(users):
+            CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
+            grades = (0.75, 0.85)
+            # mark 3 users as who completed course and 1 who did not
+            if i < users_completed:
+                grades = (0.90, 0.91)
+            StudentGradebook.objects.create(user=user, course_id=self.course.id, grade=grades[0],
+                                            proforma_grade=grades[1])
+
+        data = {
+            'name': self.test_organization_name,
+            'display_name': self.test_organization_display_name,
+            'contact_name': self.test_organization_contact_name,
+            'contact_email': self.test_organization_contact_email,
+            'contact_phone': self.test_organization_contact_phone
+        }
+        response = self.do_post(self.base_organizations_uri, data)
+        self.assertEqual(response.status_code, 201)
+        test_uri = '{}{}/'.format(self.base_organizations_uri, str(response.data['id']))
+        users_uri = '{}users/'.format(test_uri)
+        for user in users:
+            data = {"id": user.id}
+            response = self.do_post(users_uri, data)
+            self.assertEqual(response.status_code, 201)
+        response = self.do_get('{}?{}&course_id={}'.format(users_uri, 'include_grades=True', self.course.id))
+        self.assertEqual(response.status_code, 200)
+        complete_count = len([user for user in response.data if user['complete_status']])
+        self.assertEqual(complete_count, users_completed)
+        grade_sum = sum([user['grade'] for user in response.data])
+        proforma_grade_sum = sum([user['proforma_grade'] for user in response.data])
+        self.assertEqual(grade_sum, 0.75 + 0.75 + 0.9 + 0.9)
+        self.assertEqual(proforma_grade_sum, 0.85 + 0.85 + 0.91 + 0.91)
 
     def test_organizations_metrics_get(self):
         users = []
