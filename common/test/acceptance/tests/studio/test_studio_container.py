@@ -565,25 +565,6 @@ class EditVisibilityModalTest(ContainerBase):
         self.verify_selected_labels(visibility_editor, ['Dogs', 'Cats'] + [self.MISSING_GROUP_LABEL] * 2)
         self.remove_missing_groups(visibility_editor)
 
-@attr('shard_1')
-class EditXBlockVisibilityTest(NestedVerticalTest):
-    """
-    Tests of editing the visibility of an XBlock.
-    """
-
-    def test_edit_visibility_with_no_groups(self):
-        """
-        Test the "edit" button on a container appearing on the unit page.
-        """
-        unit = self.go_to_unit_page()
-        component = unit.xblocks[1]
-        component.edit_visibility()
-        editor = VisibilityEditorView(self.browser, component.locator)
-        self.assertEqual(
-            editor.visibility_summary_title,
-            'You have not set up any groups to manage visibility with.'
-        )
-
 
 @attr('shard_1')
 class UnitPublishingTest(ContainerBase):
