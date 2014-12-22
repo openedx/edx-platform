@@ -33,7 +33,7 @@ from warnings import simplefilter
 from django.utils.translation import ugettext_lazy as _
 
 from .discussionsettings import *
-from dealer.git import git
+import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
@@ -688,7 +688,13 @@ MANAGERS = ADMINS
 EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
 
 if not EDX_PLATFORM_REVISION:
-    EDX_PLATFORM_REVISION = git.revision
+    try:
+        # Get git revision of the current file
+        git_backend = dealer.git.Backend(path=os.path.dirname(os.path.realpath(__file__)))
+        EDX_PLATFORM_REVISION = git_backend.revision
+    except TypeError:
+        # Not a git repository
+        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/'
