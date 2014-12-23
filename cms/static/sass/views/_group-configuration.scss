@@ -253,7 +253,7 @@
           color: $gray-l3;
         }
 
-        .is-focused .tip{
+        .is-focused .tip {
           color: $gray;
         }
 
@@ -274,12 +274,12 @@
           // add a group is below with groups styling
           .action-primary {
             @extend %btn-primary-blue;
-            padding: ($baseline*.3) $baseline;
+            padding: ($baseline/4) $baseline;
           }
 
           .action-secondary {
             @extend %btn-secondary-gray;
-            padding: ($baseline*.3) $baseline;
+            padding: ($baseline/4) $baseline;
           }
 
           .wrapper-delete-button {
@@ -493,6 +493,25 @@
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
+      }
+    }
+
+    // add/new items
+    .action-add {
+      @extend %ui-btn-flat-outline;
+      display: block;
+      width: 100%;
+      margin-top: ($baseline*0.75);
+      padding: ($baseline/2) $baseline;
+
+      &.is-hidden {
+        display: none;
+      }
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+        @include margin-right($baseline/2);
       }
     }
   }

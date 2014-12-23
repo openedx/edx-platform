@@ -262,6 +262,7 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         self.q(css=self._bounded_selector(".cohort-management-settings li.tab-settings>a")).first.click()
 
+    # pylint: disable=redefined-builtin
     def get_cohort_settings_messages(self, type="confirmation", wait_for_messages=True):
         """
         Returns an array of messages related to modifying cohort settings. If wait_for_messages
