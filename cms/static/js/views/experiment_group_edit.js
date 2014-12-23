@@ -1,10 +1,14 @@
+/**
+ * This class defines an edit view for groups within content experiment group configurations.
+ * It is expected to be backed by a Group model.
+ */
 define([
-    'js/views/baseview', 'underscore', 'underscore.string', 'jquery', 'gettext'
+    'js/views/baseview', 'underscore', 'underscore.string', 'gettext'
 ],
-function(BaseView, _, str, $, gettext) {
+function(BaseView, _, str, gettext) {
     'use strict';
     _.str = str; // used in template
-    var GroupEdit = BaseView.extend({
+    var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {
             'click .action-close': 'removeGroup',
@@ -38,7 +42,7 @@ function(BaseView, _, str, $, gettext) {
         },
 
         changeName: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set({
                 name: this.$('.group-name').val()
             }, { silent: true });
@@ -47,7 +51,7 @@ function(BaseView, _, str, $, gettext) {
         },
 
         removeGroup: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.collection.remove(this.model);
             return this.remove();
         },
@@ -65,5 +69,5 @@ function(BaseView, _, str, $, gettext) {
         }
     });
 
-    return GroupEdit;
+    return ExperimentGroupEditView;
 });

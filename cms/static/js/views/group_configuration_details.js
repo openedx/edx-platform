@@ -1,9 +1,13 @@
+/**
+ * This class defines a details view for content experiment group configurations.
+ * It is expected to be instantiated with a GroupConfiguration model.
+ */
 define([
     'js/views/baseview', 'underscore', 'gettext', 'underscore.string'
 ],
 function(BaseView, _, gettext, str) {
     'use strict';
-    var GroupConfigurationDetails = BaseView.extend({
+    var GroupConfigurationDetailsView = BaseView.extend({
         tagName: 'div',
         events: {
             'click .edit': 'editConfiguration',
@@ -40,17 +44,17 @@ function(BaseView, _, gettext, str) {
         },
 
         editConfiguration: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('editing', true);
         },
 
         showGroups: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', true);
         },
 
         hideGroups: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', false);
         },
 
@@ -107,5 +111,5 @@ function(BaseView, _, gettext, str) {
         }
     });
 
-    return GroupConfigurationDetails;
+    return GroupConfigurationDetailsView;
 });
