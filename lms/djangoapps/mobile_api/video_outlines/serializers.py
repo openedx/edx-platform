@@ -4,6 +4,10 @@ Serializer for video outline
 from rest_framework.reverse import reverse
 
 from courseware.access import has_access
+from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.django import modulestore
+
+
 
 from edxval.api import (
     get_video_info_for_course_and_profile, ValInternalError
@@ -49,30 +53,24 @@ class BlockOutline(object):
 
         def find_urls(block):
             """section and unit urls for block"""
-            block_path = []
             while block in child_to_parent:
-                block = child_to_parent[block]
-                block_path.append(block)
+                usage_key = child_to_parent[block].location
+                break;
 
-            course, chapter, section, unit = list(reversed(block_path))[:4]
-            position = 1
-            unit_name = unit.url_name
-            for block in section.children:
-                if block.name == unit_name:
-                    break
-                position += 1
+            (course, chapter, section, unit) = \
+                path_to_location(modulestore(), usage_key)
 
             kwargs = dict(
-                course_id=course.id.to_deprecated_string(),
-                chapter=chapter.url_name,
-                section=section.url_name
+                course_id=course,
+                chapter=chapter,
+                section=section
             )
             section_url = reverse(
                 "courseware_section",
                 kwargs=kwargs,
                 request=self.request,
             )
-            kwargs['position'] = position
+            kwargs['position'] = unit
             unit_url = reverse(
                 "courseware_position",
                 kwargs=kwargs,
