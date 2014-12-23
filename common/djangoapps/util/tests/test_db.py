@@ -8,9 +8,9 @@ import unittest
 from django.contrib.auth.models import User
 from django.db import connection, IntegrityError
 from django.db.transaction import commit_on_success, TransactionManagementError
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 
-from util.db import commit_on_success_with_read_committed
+from util.db import commit_on_success_with_read_committed, generate_int_id
 
 
 @ddt.ddt
@@ -99,3 +99,31 @@ class TransactionIsolationLevelsTestCase(TransactionTestCase):
             with commit_on_success():
                 with commit_on_success():
                     commit_on_success_with_read_committed(do_nothing)()
+
+
+@ddt.ddt
+class GenerateIntIdTestCase(TestCase):
+    """Tests for `generate_int_id`"""
+    @ddt.data(10)
+    def test_no_used_ids(self, times):
+        """
+        Verify that we get a random integer within the specified range
+        when there are no used ids.
+        """
+        minimum = 1
+        maximum = times
+        for i in range(times):
+            self.assertIn(generate_int_id(minimum, maximum), range(minimum, maximum + 1))
+
+    @ddt.data(10)
+    def test_used_ids(self, times):
+        """
+        Verify that we get a random integer within the specified range
+        but not in a list of used ids.
+        """
+        minimum = 1
+        maximum = times
+        used_ids = {2, 4, 6, 8}
+        for i in range(times):
+            int_id = generate_int_id(minimum, maximum, used_ids)
+            self.assertIn(int_id, list(set(range(minimum, maximum + 1)) - used_ids))

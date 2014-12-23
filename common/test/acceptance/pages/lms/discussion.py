@@ -567,10 +567,16 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
 
     @property
     def new_post_button(self):
+        """
+        Returns the new post button.
+        """
         elements = self.q(css="ol.course-tabs .new-post-btn")
         return elements.first if elements.visible and len(elements) == 1 else None
 
     @property
     def new_post_form(self):
+        """
+        Returns the new post form.
+        """
         elements = self.q(css=".forum-new-post-form")
         return elements[0] if elements.visible and len(elements) == 1 else None
