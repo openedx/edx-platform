@@ -11,7 +11,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="header_extras">
     <%
       template_names = (
-          ["progress", "requirements", "webcam_photo", "error"] +
+          ["webcam_photo", "error"] +
           [step['templateName'] for step in display_steps]
       )
     %>
@@ -26,6 +26,7 @@ from verify_student.views import PayAndVerifyView
   <script src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
 
@@ -36,24 +37,12 @@ from verify_student.views import PayAndVerifyView
 
 <div class="container">
   <section class="wrapper carousel">
-
-    ## Verification status header
-    <header class="page-header">
-      <h2 class="title">
-        <span class="wrapper-sts">
-          <span class="sts-label">${messages.top_level_msg}</span>
-        </span>
-        <span class="sts-track ${"professional-ed" if course_mode.slug == "professional" else ""}">
-          <span class="sts-track-value"><span class="context">${messages.status_msg}</span>: ${course_mode.name}<span>
-        </span>
-      </h2>
-    </header>
-
     ## Payment / Verification flow
     ## Most of these data attributes are used to dynamically render
     ## the steps, but some are just useful for A/B test setup.
     <div
       id="pay-and-verify-container"
+      class="pay-and-verify"
       data-full-name='${user_full_name}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
@@ -67,6 +56,7 @@ from verify_student.views import PayAndVerifyView
       data-course-mode-currency='${course_mode.currency}'
       data-contribution-amount='${contribution_amount}'
       data-purchase-endpoint='${purchase_endpoint}'
+      data-verification-deadline='${verification_deadline}'
       data-display-steps='${json.dumps(display_steps)}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'

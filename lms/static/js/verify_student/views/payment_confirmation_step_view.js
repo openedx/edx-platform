@@ -9,6 +9,18 @@ var edx = edx || {};
     edx.verify_student = edx.verify_student || {};
 
     edx.verify_student.PaymentConfirmationStepView = edx.verify_student.StepView.extend({
+
+        defaultContext: function() {
+            return {
+                courseKey: '',
+                courseName: '',
+                courseStartDate: '',
+                coursewareUrl: '',
+                platformName: '',
+                requirements: []
+            };
+        },
+
         /**
          * Retrieve receipt information from the shopping cart.
          *
@@ -64,9 +76,7 @@ var edx = edx || {};
 
         /**
          * The "Verify Later" button goes directly to the dashboard,
-         * The "Verify Now" button reloads this page with the "skip-first-step"
-         * flag set.  This allows the user to navigate back to the confirmation
-         * if he/she wants to.
+         * The "Verify Now" button sends the user to the verification flow.
          * For this reason, we don't need any custom click handlers here, except for
          * those used to track business intelligence events.
          */

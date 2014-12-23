@@ -10,6 +10,12 @@ var edx = edx || {};
 
     edx.verify_student.FacePhotoStepView = edx.verify_student.StepView.extend({
 
+        defaultContext: function() {
+            return {
+                platformName: ''
+            };
+        },
+
         postRender: function() {
             var webcam = new edx.verify_student.WebcamPhotoView({
                 el: $( '#facecam' ),

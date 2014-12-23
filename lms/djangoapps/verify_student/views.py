@@ -47,6 +47,7 @@ from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
 from util.json_request import JsonResponse
+from util.date_utils import get_default_time_display
 
 log = logging.getLogger(__name__)
 
@@ -259,10 +260,9 @@ class PayAndVerifyView(View):
         ENROLLMENT_CONFIRMATION_STEP
     ]
 
-    # These are steps that can be skipped, since there are no barring requirements.
+    # These steps can be skipped using the ?skip-first-step GET param
     SKIP_STEPS = [
         INTRO_STEP,
-        PAYMENT_CONFIRMATION_STEP
     ]
 
     Step = namedtuple(
@@ -287,15 +287,15 @@ class PayAndVerifyView(View):
             template_name="payment_confirmation_step"
         ),
         FACE_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take Face Photo"),
+            title=ugettext_lazy("Take Photo"),
             template_name="face_photo_step"
         ),
         ID_PHOTO_STEP: Step(
-            title=ugettext_lazy("ID Photo"),
+            title=ugettext_lazy("Take a Photo of Your ID"),
             template_name="id_photo_step"
         ),
         REVIEW_PHOTOS_STEP: Step(
-            title=ugettext_lazy("Review Photos"),
+            title=ugettext_lazy("Review Your Info"),
             template_name="review_photos_step"
         ),
         ENROLLMENT_CONFIRMATION_STEP: Step(
@@ -380,12 +380,10 @@ class PayAndVerifyView(View):
     ACCOUNT_ACTIVATION_REQ = "account-activation-required"
     PHOTO_ID_REQ = "photo-id-required"
     WEBCAM_REQ = "webcam-required"
-    CREDIT_CARD_REQ = "credit-card-required"
 
     STEP_REQUIREMENTS = {
         ID_PHOTO_STEP: [PHOTO_ID_REQ, WEBCAM_REQ],
         FACE_PHOTO_STEP: [WEBCAM_REQ],
-        MAKE_PAYMENT_STEP: [CREDIT_CARD_REQ],
     }
 
     @method_decorator(login_required)
@@ -507,6 +505,10 @@ class PayAndVerifyView(View):
             'course': course,
             'course_key': unicode(course_key),
             'course_mode': course_mode,
+            'verification_deadline': (
+                get_default_time_display(course_mode.expiration_datetime)
+                if course_mode.expiration_datetime else ""
+            ),
             'courseware_url': courseware_url,
             'current_step': current_step,
             'disable_courseware_js': True,
@@ -660,7 +662,6 @@ class PayAndVerifyView(View):
             self.ACCOUNT_ACTIVATION_REQ: not is_active,
             self.PHOTO_ID_REQ: False,
             self.WEBCAM_REQ: False,
-            self.CREDIT_CARD_REQ: False
         }
 
         display_steps = set(step['name'] for step in display_steps)

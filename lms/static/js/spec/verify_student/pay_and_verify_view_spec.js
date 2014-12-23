@@ -69,27 +69,8 @@ define(['jquery', 'js/common_helpers/template_helpers', 'js/verify_student/views
             };
 
             var expectStepRendered = function( stepName, stepNum, numSteps ) {
-                var i, j, sel;
-
                 // Expect that the step container div rendered
                 expect( $( '.' + stepName ).length > 0 ).toBe( true );
-
-                // Expect that the progress indicator shows the correct step
-                expect( $( '#progress-step-' + stepNum ).hasClass( 'is-current' ) ).toBe( true );
-
-                // Expect that all steps before this step are completed
-                for ( i = 1; i < stepNum; i++ ) {
-                    sel = $( '#progress-step-' + i );
-                    expect( sel.hasClass('is-completed') ).toBe( true );
-                    expect( sel.hasClass('is-current') ).toBe( false );
-                }
-
-                // Expect that all steps after this step are neither completed nor current
-                for ( j = stepNum + 1; j <= numSteps; j++ ) {
-                    sel = $( '#progress-step-' + j );
-                    expect( sel.hasClass('is-completed') ).toBe( false );
-                    expect( sel.hasClass('is-current') ).toBe( false );
-                }
             };
 
             beforeEach(function() {

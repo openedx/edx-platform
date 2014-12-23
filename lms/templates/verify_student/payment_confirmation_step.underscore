@@ -1,15 +1,12 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
-    <h3 class="title"><%- gettext( "Congratulations!  You are now enrolled in the verified track." ) %></h3>
-    <div class="instruction">
-      <p><%- gettext( "You are now enrolled as a verified student!  Your enrollment details are below.") %></p>
-    </div>
+    <h3 class="title">
+      <%- _.sprintf( gettext( "Thank you! We have received your payment for %(courseName)s" ), { courseName: courseName } ) %>
+    </h3>
 
     <% if ( receipt ) { %>
     <ul class="list-info">
       <li class="info-item payment-info">
-        <h4 class="title"><%- gettext( "Payment Details" ) %></h4>
-
         <div class="copy">
           <p><%- gettext( "Please print this page for your records; it serves as your receipt. You will also receive an email with the same information." ) %></p>
         </div>
@@ -77,23 +74,73 @@
       </li>
     </ul>
     <% } else { %>
-        <p><%- gettext( "No receipt available." ) %></p>
+        <p class="no-content"><%- gettext( "No receipt available." ) %></p>
     <% } %>
 
     <% if ( nextStepTitle ) { %>
+    <h3 class="title"><%- gettext( "Next Step: Confirm Your Identity" ) %></h3>
+
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if ( requirements['account-activation-required'] ) { %>
+        <li class="req req-0 req-activate">
+          <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+          <div class="placeholder-art">
+            <i class="icon-envelope-alt"></i>
+          </div>
+
+          <div class="copy">
+            <p>
+              <span class="copy-super"><%- gettext( "Check your email." ) %></span>
+              <span class="copy-sub"><%-
+                  gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email." )
+                %>
+              </span>
+            </p>
+          </div>
+        </li>
+        <% } %>
+
+        <% if ( requirements['photo-id-required'] ) { %>
+        <li class="req req-1 req-id">
+          <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
+          <div class="placeholder-art">
+            <i class="icon-list-alt icon-under"></i>
+            <i class="icon-user icon-over"></i>
+          </div>
+
+          <div class="copy">
+            <p>
+              <span class="copy-sub"><%- gettext( "A driver's license, passport, or government-issued ID with your name and picture." ) %></span>
+            </p>
+          </div>
+        </li>
+        <% } %>
+
+        <% if ( requirements['webcam-required'] ) { %>
+        <li class="req req-2 req-webcam">
+          <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+          <div class="placeholder-art">
+            <i class="icon-facetime-video"></i>
+          </div>
+
+          <div class="copy"></div>
+        </li>
+        <% } %>
+      </ul>
+    </div>
+
     <nav class="nav-wizard is-ready">
-      <ol class="wizard-steps">
-        <li class="wizard-step">
-          <a class="next action-primary" id="verify_now_button" href="?skip-first-step=1">
-            <%- gettext( "Verify Now" ) %>
-          </a>
-        </li>
-        <li class="wizard-step">
-          <a class="next action-secondary" id="verify_later_button" href="/dashboard">
-            <%- gettext( "Verify Later" ) %>
-          </a>
-        </li>
-      </ol>
+      <a id="verify_now_button"
+         class="next action-primary right"
+         href="<%- _.sprintf( '/verify_student/verify-now/%(courseKey)s', { courseKey: courseKey } ) %>"
+      >
+        <%- nextStepTitle %>
+      </a>
+
+      <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't confirm your identity now, you can go to the dashboard to explore your course and %(platformName)s will remind you later." ), { platformName: platformName } ) %>">
+        <%- gettext( "Want to confirm your identity later?" ) %>
+      </a>
     </nav>
     <% } %>
   </article>
