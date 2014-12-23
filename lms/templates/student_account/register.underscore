@@ -7,8 +7,8 @@
     <% if (context.currentProvider) { %>
         <div class="status" aria-hidden="false">
             <p class="message-copy">
-                <%- _.sprintf(gettext("You've successfully logged into %(currentProvider)s."), context) %>
-                <%- _.sprintf(gettext("We just need a little more information before you start learning with %(platformName)s."), context) %>
+                <%- _.sprintf( gettext("You've successfully logged into %(currentProvider)s."), context ) %>
+                <%- _.sprintf( gettext("We just need a little more information before you start learning with %(platformName)s."), context ) %>
             </p>
         </div>
     <% } else {  %>
@@ -38,7 +38,7 @@
 
     <%= context.fields %>
 
-    <button class="action action-primary action-update js-register register-button"><%- gettext("Register") %></button>
+    <button class="action action-primary action-update js-register register-button"><%- gettext("Create your account") %></button>
     <p class="note">* <%- gettext("Required field") %></p>
 </form>
 
