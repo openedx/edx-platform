@@ -1,21 +1,44 @@
 <div id="wrapper-review" class="wrapper-view make-payment-step">
   <div class="review view">
-    <h3 class="title <% if ( !upgrade ) { %>center-col<% } %>">
-      <%- gettext( "You are enrolling in: " ) %>
-      <span class="course-title"><%= courseName %></span>
-    </h3>
+    <% if ( !upgrade ) { %>
+      <h3 class="title center-col">
+        <%= _.sprintf(
+            gettext( "You are enrolling in: %(courseName)s"),
+            { courseName: '<span class="course-title">' + courseName + '</span>' }
+          ) %>
+      </h3>
+    <% } else { %>
+      <h3 class="title">
+        <%= _.sprintf(
+            gettext( "You are upgrading your enrollment for: %(courseName)s"),
+            { courseName: '<span class="course-title">' + courseName + '</span>' }
+          ) %>
+      </h3>
+      <div class="instruction">
+        <%- gettext( "We've already verified your identity through the photos of you and your ID you provided earlier. You can now pay and complete registration." ) %>
+      </div>
+    <% } %>
 
-    <% if ( isActive ) { %>
+    <% if ( isActive && ( !hasVisibleReqs || upgrade ) ) { %>
       <div class="wrapper-task hidden" aria-hidden="true">
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
           <li class="review-task review-task-contribution">
-            <h4 class="title"><%- gettext( "Enter Your Contribution Level" ) %></h4>
+            <h4 class="title">
+              <% if ( upgrade ) { %>
+                <%- gettext( "Choose your contribution for your Verified Track upgrade" ) %>
+              <% } else { %>
+                <%- gettext( "Enter Your Contribution Level" ) %>
+              <% } %>
+            </h4>
             <div class="copy">
-              <p><%- _.sprintf(
-                    gettext( "Please confirm your contribution for this course (min. $ %(minPrice)s %(currency)s)" ),
-                    { minPrice: minPrice, currency: currency }
-                ) %>
+              <p>
+                <% if ( !upgrade ) { %>
+                  <%- _.sprintf(
+                      gettext( "Please confirm your contribution for this course (min. $ %(minPrice)s %(currency)s)" ),
+                      { minPrice: minPrice, currency: currency }
+                  ) %>
+                <% } %>
               </p>
             </div>
 
@@ -73,6 +96,7 @@
       </div>
     </div>
     <% } %>
+
     <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
       <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
       <p>
@@ -81,13 +105,14 @@
             gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
             { date: verificationDeadline }
           ) %>
-        <% } else { %>
+        <% } else if ( !upgrade ) { %>
             <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
         <% } %>
       </p>
       <% } %>
     </div>
 
+    <% if ( !upgrade ) { %>
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
         <% if ( requirements['account-activation-required'] ) { %>
@@ -111,7 +136,7 @@
 
         <% if ( requirements['photo-id-required'] ) { %>
         <li class="req req-1 req-id">
-          <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
+          <h4 class="title"><%- gettext( "Government-issued Photo ID" ) %></h4>
           <div class="placeholder-art">
             <i class="icon-list-alt icon-under"></i>
             <i class="icon-user icon-over"></i>
@@ -133,18 +158,23 @@
         <% } %>
       </ul>
     </div>
+    <% } %>
 
 
-  <nav class="nav-wizard is-ready center">
-    <% if ( isActive ) { %>
+  <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
+    <% if ( upgrade ) { %>
+        <a class="next action-primary is-disabled right" id="pay_button">
+          <%- gettext( "Next: Make payment" ) %>
+        </a>
+    <% } else if ( isActive ) { %>
         <a class="next action-primary is-disabled" id="pay_button">
-          <%- gettext( "Go to payment" ) %>
+          <%- gettext( "Continue to payment" ) %>
         </a>
-        <% } else { %>
+    <% } else { %>
         <a class="next action-primary is-disabled" id="activate_button">
-          <%- gettext( "Activate Your Account" ) %>
+          <%- gettext( "Activate your account" ) %>
         </a>
-        <% } %>
+    <% } %>
   </nav>
 
   <form id="payment-processor-form"></form>

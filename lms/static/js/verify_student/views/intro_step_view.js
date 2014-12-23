@@ -15,6 +15,7 @@ var edx = edx || {};
                 introTitle: '',
                 introMsg: '',
                 isActive: false,
+                hasPaid: false,
                 platformName: '',
                 requirements: {}
             };

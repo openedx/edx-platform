@@ -20,6 +20,7 @@ var edx = edx || {};
                 verificationDeadline: '',
                 courseName: '',
                 requirements: {},
+                hasVisibleReqs: false,
                 platformName: ''
             };
         },
