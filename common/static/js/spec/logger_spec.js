@@ -49,7 +49,7 @@
                 Logger.listen('new_event', null, this.callbacks[3]);
             });
 
-            it('can listen events when the element name is unknown', function() {
+            it('can listen to events when the element name is unknown', function() {
                 Logger.log('example', 'data');
                 expect(this.callbacks[0]).toHaveBeenCalledWith('example', 'data', null);
                 expect(this.callbacks[1]).toHaveBeenCalledWith('example', 'data', null);
@@ -57,12 +57,23 @@
                 expect(this.callbacks[3]).not.toHaveBeenCalled();
             });
 
-            it('can listen events when the element name is known', function() {
+            it('can listen to events when the element name is known', function() {
                 Logger.log('example', 'data', 'element');
                 expect(this.callbacks[0]).not.toHaveBeenCalled();
                 expect(this.callbacks[1]).not.toHaveBeenCalled();
                 expect(this.callbacks[2]).toHaveBeenCalledWith('example', 'data', 'element');
                 expect(this.callbacks[3]).not.toHaveBeenCalled();
+            });
+
+            it('can catch exceptions', function() {
+                var callback = function () {
+                    Logger.log('exception', 'data');
+                };
+                Logger.listen('exception', null, function () {
+                    throw new Error();
+                });
+                expect(callback).not.toThrow();
+                expect(jQuery.ajaxWithPrefix).toHaveBeenCalled();
             });
         });
 

@@ -39,7 +39,16 @@
                         // Make the callbacks.
                         callbacks = listeners[eventType][element];
                         $.each(callbacks, function(index, callback) {
-                            callback(eventType, data, element);
+                            try {
+                                callback(eventType, data, element);
+                            } catch (err) {
+                                console.error({
+                                    eventType: eventType,
+                                    data: data,
+                                    element: element,
+                                    error: err
+                                });
+                            }
                         });
                     }
                 }
