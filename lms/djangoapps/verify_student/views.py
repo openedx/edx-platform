@@ -295,7 +295,7 @@ class PayAndVerifyView(View):
             template_name="id_photo_step"
         ),
         REVIEW_PHOTOS_STEP: Step(
-            title=ugettext_lazy("Review Your Info"),
+            title=ugettext_lazy("Review your info"),
             template_name="review_photos_step"
         ),
         ENROLLMENT_CONFIRMATION_STEP: Step(

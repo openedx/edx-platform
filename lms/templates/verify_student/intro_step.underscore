@@ -1,9 +1,18 @@
 <div class="wrapper-content-main intro-step">
   <article class="content-main">
+  <% if ( hasPaid ) { %>
+     <h3 class="title">
+      <%= _.sprintf(
+          gettext( "Thanks for returning to verify your ID in: <span class='course-title'> %(courseName)s </span>"),
+          { courseName: courseName }
+        ) %>
+     </h3>
+  <% } else { %>
     <h3 class="title"><%- introTitle %></h3>
     <% if ( introMsg ) { %>
       <div class="instruction"><p><%- introMsg %></p></div>
     <% } %>
+  <% } %>
 
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
@@ -62,6 +71,8 @@
         <a class="next action-primary" <% if ( !isActive ) { %>disabled="true"<% } %> id="next_step_button" href="?skip-first-step=1">
           <% if ( !isActive ) { %>
             <%- gettext( "Activate Your Account" ) %>
+          <% } else if ( hasPaid ) { %>
+            <%- gettext( "Next: Take photo" ) %>
           <% } else { %>
             <%- nextStepTitle %>
           <% } %>
