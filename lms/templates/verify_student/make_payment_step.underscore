@@ -5,7 +5,7 @@
       <span class="course-title"><%= courseName %></span>
     </h3>
 
-    <% if ( isActive == "True" ) { %>
+    <% if ( isActive ) { %>
       <div class="wrapper-task <% if ( !upgrade ) { %>hidden" aria-hidden="true<% } %>">
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
@@ -132,7 +132,7 @@
   <nav class="nav-wizard is-ready center">
     <% if ( isActive ) { %>
         <a class="next action-primary is-disabled" id="pay_button">
-          <%- gettext( "contribution-option-other1 to payment" ) %>
+          <%- gettext( "Go to payment" ) %>
         </a>
         <% } else { %>
         <a class="next action-primary is-disabled" id="activate_button">

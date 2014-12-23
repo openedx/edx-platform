@@ -19,7 +19,9 @@
               <li class="help-item"><%- gettext( "Ensure that you can see your photo and read your name" ) %></li>
               <li class="help-item"><%- gettext( "Try to keep your fingers at the edge to avoid covering important information" ) %></li>
               <li class="help-item"><%- gettext( "Acceptable IDs include drivers licenses, passports, or other goverment-issued IDs that include your name and photo" ) %></li>
-              <li class="help-item"><%- gettext( "Once in position, use the camera button ") %> <span class="example">(<i class="icon-camera"></i>)</span> <%- gettext( "to capture your ID" ) %></li>
+              <li class="help-item">
+                <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your ID" ), { icon: '<span class="example">(<i class="icon-camera"></i>)</span>' } ) %>
+              </li>
             </ul>
           </div>
         </div>

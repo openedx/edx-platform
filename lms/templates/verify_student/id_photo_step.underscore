@@ -16,7 +16,9 @@
             <ul class="list-help">
               <li class="help-item"><%- gettext( "Make sure your face is well-lit" ) %></li>
               <li class="help-item"><%- gettext( "Be sure your entire face is inside the frame" ) %></li>
-              <li class="help-item"><%- gettext( "Once in position, use the camera button" ) %> <span class="example">(<i class="icon-camera"></i>)</span> <%- gettext( "to capture your picture" ) %></li>
+              <li class="help-item">
+                <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your ID" ), { icon: '<span class="example">(<i class="icon-camera"></i>)</span>' } ) %>
+              </li>
               <li class="help-item"><%- gettext( "Can we match the photo you took with the one on your ID?" ) %></li>
               <li class="help-item"><%- gettext( "Use the retake photo button if you are not pleased with your photo" ) %></li>
             </ul>
