@@ -1020,10 +1020,21 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, invoice=None, order=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
+
+    Args:
+        user (User): The user creating the course registration codes.
+        course_id (str): The string representation of the course ID.
+        mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
+        invoice (Invoice): (Optional) The associated invoice for this code.
+        order (Order): (Optional) The associated order for this code.
+
+    Returns:
+        The newly created CourseRegistrationCode.
+
     """
     code = random_code_generator()
 
@@ -1034,10 +1045,11 @@ def save_registration_code(user, course_id, invoice=None, order=None):
 
     course_registration = CourseRegistrationCode(
         code=code,
-        course_id=course_id.to_deprecated_string(),
+        course_id=unicode(course_id),
         created_by=user,
         invoice=invoice,
-        order=order
+        order=order,
+        mode_slug=mode_slug
     )
     try:
         course_registration.save()
@@ -1103,7 +1115,7 @@ def generate_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Generated Codes.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -1151,15 +1163,32 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
     )
+
+    course = get_course_by_id(course_id, depth=None)
+    paid_modes = [mode for mode in CourseMode.modes_for_course(course_id) if mode.min_price > 0]
+
+    if len(paid_modes) != 1:
+        msg = (
+            u"Generating Code Redeem Codes for Course '{course_id}', which must have a single paid course mode. "
+            u"This is a configuration issue. Current course modes with payment options: {paid_modes}"
+        ).format(course_id=course_id, paid_modes=paid_modes)
+        log.error(msg)
+        return HttpResponse(
+            status=500,
+            content=_(u"Unable to generate redeem codes because of course misconfiguration.")
+        )
+
+    course_mode = paid_modes[0]
+    course_price = course_mode.min_price
+
     registration_codes = []
-    for _ in range(course_code_number):  # pylint: disable=redefined-outer-name
-        generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
+    for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
+        generated_registration_code = save_registration_code(
+            request.user, course_id, course_mode.slug, sale_invoice, order=None
+        )
         registration_codes.append(generated_registration_code)
 
     site_name = microsite.get_value('SITE_NAME', 'localhost')
-    course = get_course_by_id(course_id, depth=None)
-    course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
-    course_price = course_honor_mode.min_price
     quantity = course_code_number
     discount = (float(quantity * course_price) - float(sale_price))
     course_url = '{base_url}{course_about}'.format(
