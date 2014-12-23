@@ -1,5 +1,4 @@
 <!-- <div class="wrapper-progress progress">
->>>>>>> ECOM-811 design and layout changes
   <section class="progress">
     <h3 class="sr title"><%- gettext("Your Progress") %></h3>
 
