@@ -61,16 +61,16 @@ define(["jquery", "underscore", "gettext", "js/views/baseview", "js/views/utils/
                 var previewAction = this.$el.find('.button-preview'),
                     viewLiveAction = this.$el.find('.button-view');
                 if (this.model.get('published')) {
-                    viewLiveAction.removeClass(disabledCss);
+                    viewLiveAction.removeClass(disabledCss).attr('aria-disabled', false);
                 }
                 else {
-                    viewLiveAction.addClass(disabledCss);
+                    viewLiveAction.addClass(disabledCss).attr('aria-disabled', true);
                 }
                 if (this.model.get('has_changes') || !this.model.get('published')) {
-                    previewAction.removeClass(disabledCss);
+                    previewAction.removeClass(disabledCss).attr('aria-disabled', false);
                 }
                 else {
-                    previewAction.addClass(disabledCss);
+                    previewAction.addClass(disabledCss).attr('aria-disabled', true);
                 }
             }
         });

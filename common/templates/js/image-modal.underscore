@@ -30,7 +30,7 @@
         </li>
     
         <li class="image-control">
-          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" role="button">
+          <a href="#" class="modal-ui-icon action-zoom-out is-disabled" aria-disabled="true" role="button">
             <span class="label">
               <i class="icon-zoom-out icon-large"></i> <%= gettext("Zoom Out") %>
             </span>

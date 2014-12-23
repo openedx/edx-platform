@@ -673,9 +673,11 @@ class @Problem
     # Used to disable check button to reduce chance of accidental double-submissions.
     if enable
       @checkButton.removeClass 'is-disabled'
+      @checkButton.attr({'aria-disabled': 'false'})
       @checkButton.val(@checkButtonCheckText)
     else
       @checkButton.addClass 'is-disabled'
+      @checkButton.attr({'aria-disabled': 'true'})
       @checkButton.val(@checkButtonCheckingText)
 
   enableCheckButtonAfterResponse: =>

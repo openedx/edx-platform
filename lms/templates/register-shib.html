@@ -71,12 +71,14 @@
       if(enable) {
         $submitButton.
           removeClass('is-disabled').
+          attr('aria-disabled', false).
           removeProp('disabled').
           text("${_('Update my {platform_name} Account').format(platform_name=settings.PLATFORM_NAME)}");
       }
       else {
         $submitButton.
           addClass('is-disabled').
+          attr('aria-disabled', true).
           prop('disabled', true).
           text("${_(u'Processing your account information …')}");
       }

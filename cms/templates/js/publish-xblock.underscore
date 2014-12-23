@@ -93,12 +93,12 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <ul class="action-list">
             <li class="action-item">
                 <a class="action-publish action-primary <% if (published && !hasChanges) { %>is-disabled<% } %>"
-                   href=""><%= gettext("Publish") %>
+                   href="" aria-disabled="<% if (published && !hasChanges) { %>true<% } else { %>false<% } %>" ><%= gettext("Publish") %>
                 </a>
             </li>
             <li class="action-item">
                 <a class="action-discard action-secondary <% if (!published || !hasChanges) { %>is-disabled<% } %>"
-                   href=""><%= gettext("Discard Changes") %>
+                   href="" aria-disabled="<% if (!published || !hasChanges) { %>true<% } else { %>false<% } %>"><%= gettext("Discard Changes") %>
                 </a>
             </li>
         </ul>

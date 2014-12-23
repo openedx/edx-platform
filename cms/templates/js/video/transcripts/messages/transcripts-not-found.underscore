@@ -10,7 +10,7 @@
     <button class="action setting-upload" type="button" name="setting-upload" value="<%= gettext("Upload New Transcript") %>" data-tooltip="<%= gettext("Upload New Transcript") %>">
         <%= gettext("Upload New Transcript") %>
     </button>
-    <a class="action setting-download is-disabled" href="javascropt: void(0);" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
+    <a class="action setting-download is-disabled" aria-disabled="true" href="javascropt: void(0);" data-tooltip="<%= gettext("Download Transcript for Editing") %>">
         <%= gettext("Download Transcript for Editing") %>
     </a>
 </div>

@@ -12,7 +12,7 @@
 <script type="text/javascript">
 var submitToPaymentProcessing = function(event) {
     event.preventDefault();
-    $("#pay_button").addClass("is-disabled");
+    $("#pay_button").addClass("is-disabled").attr('aria-disabled', true);
     var xhr = $.post(
       "${create_order_url}",
       {
@@ -32,7 +32,7 @@ var submitToPaymentProcessing = function(event) {
       $("#pay_form").submit();
     })
     .fail(function(jqXhr,text_status, error_thrown) {
-      $("#pay_button").removeClass("is-disabled");
+      $("#pay_button").removeClass("is-disabled").attr('aria-disabled', false);
       alert(jqXhr.responseText); });
 }
 $(document).ready(function() {

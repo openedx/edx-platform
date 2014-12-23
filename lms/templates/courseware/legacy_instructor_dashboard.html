@@ -202,17 +202,17 @@ function goto( mode)
     % endif
 
     <p>
-    <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump all RAW grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="Download CSV of all RAW grades" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump all RAW grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
+    <input type="submit" name="action" value="Download CSV of all RAW grades" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
     </p>
 
     <p>
   %if not settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
-    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
   %endif
     <p  class="is-deprecated">
       ${_("To download student grades and view the grading configuration for your course, visit the Data Download section of the Instructor Dashboard.")}
@@ -329,8 +329,8 @@ function goto( mode)
     </div>
     % endif
 
-    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
     <hr width="40%" style="align:left">
 
   %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:

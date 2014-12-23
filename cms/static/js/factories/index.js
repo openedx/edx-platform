@@ -33,8 +33,9 @@ define(['jquery.form', 'js/index'], function() {
         $('#request-coursecreator-submit').click(function(event){
             $(this)
                 .toggleClass('is-disabled is-submitting')
+                .attr('aria-disabled', $(this).hasClass('is-disabled'))
                 .find('.label')
-                    .text('Submitting Your Request');
+                .text('Submitting Your Request');
         });
     };
 });

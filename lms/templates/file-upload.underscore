@@ -18,7 +18,7 @@
       </div>
 
       <div class="form-actions">
-        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-submit is-disabled"><%- submitButtonText %></button>
+        <button id="file-upload-form-submit" type="submit" class="submit-file-button action action-submit is-disabled" aria-disabled="true"><%- submitButtonText %></button>
       </div>
   </form>
 </div>

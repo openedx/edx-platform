@@ -59,6 +59,7 @@ def clear_fields(_step):
         $('{selector}')
             .prop('disabled', false)
             .removeClass('is-disabled')
+            .attr('aria-disabled', false)
             .val('')
             .trigger('input');
     """.format(selector=SELECTORS['url_inputs'])

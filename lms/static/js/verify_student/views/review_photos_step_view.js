@@ -96,7 +96,8 @@ var edx = edx || {};
         setSubmitButtonEnabled: function( isEnabled ) {
             $( '#next_step_button' )
                 .toggleClass( 'is-disabled', !isEnabled )
-                .prop( 'disabled', !isEnabled );
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         }
     });
 

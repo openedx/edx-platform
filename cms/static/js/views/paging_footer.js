@@ -27,8 +27,8 @@ define(["underscore", "js/views/baseview"], function(_, BaseView) {
                 current_page: collection.currentPage,
                 total_pages: collection.totalPages
             }));
-            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);;
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
             return this;
         },
 
