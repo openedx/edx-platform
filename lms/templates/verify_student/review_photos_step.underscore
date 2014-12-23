@@ -1,6 +1,6 @@
 <div id="wrapper-review" class="wrapper-view review-photos-step">
   <div class="review view">
-    <h3 class="title"><%- gettext( "Review Your Photos" ) %></h3>
+    <h3 class="title"><%- gettext( "Review your photos" ) %></h3>
     <div class="instruction">
       <p><%- gettext( "Make sure we can verify your identity from the photos below." ) %></p>
     </div>
@@ -30,7 +30,7 @@
               <li class="tip"><%- _.sprintf(  gettext( "Does the name on your ID match your account name: %(fullName)s?" ), { fullName: fullName } ) %>
                 <div class="help-tip is-expandable">
                   <a href="#" class="title title-expand" aria-expanded="false" role="link">
-                    <%- gettext( "Edit Your Name" ) %>
+                    <%- gettext( "Edit your name" ) %>
                   </a>
 
                   <div class="copy expandable-area">
@@ -48,7 +48,7 @@
             <p>
               <%- gettext( "Photos don't meet the requirements?" ) %>
               <a id="retake_photos_button" class="retake-photos">
-                <%- gettext( "Retake Your Photos" ) %>
+                <%- gettext( "Retake your photos" ) %>
               </a>
             </p>
           </div>
@@ -59,13 +59,13 @@
 
     <nav class="nav-wizard">
       <div class="prompt-verify">
-        <h3 class="title"><%- gettext( "Before proceeding, please confirm that your photos match." ) %></h3>
+        <h3 class="title"><%- gettext( "Before proceeding, please confirm that your details match" ) %></h3>
       </div>
 
       <ol class="wizard-steps">
         <li class="wizard-step step-proceed">
           <a id="next_step_button" class="next action-primary right" aria-hidden="true" title="Confirmation">
-            <%- gettext( "Confirmation" ) %>
+            <%- gettext( "Confirm" ) %>
           </a>
         </li>
       </ol>
