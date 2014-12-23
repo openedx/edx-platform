@@ -41,7 +41,10 @@ from dealer.git import git
 from xmodule.modulestore.edit_info import EditInfoMixin
 
 ############################ FEATURE CONFIGURATION #############################
-STUDIO_NAME = "{platform_name} Studio".format(platform_name=PLATFORM_NAME)
+STUDIO_SHORT_NAME = "Studio"
+STUDIO_NAME = "{platform_name} {short_name}".format(
+    platform_name=PLATFORM_NAME, short_name=STUDIO_SHORT_NAME,
+)
 FEATURES = {
     'USE_DJANGO_PIPELINE': True,
 

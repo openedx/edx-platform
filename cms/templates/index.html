@@ -44,12 +44,12 @@
 
         %if len(courses) > 0:
         <div class="copy">
-          <p>${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_NAME)}</p>
+          <p>${_("Here are all of the courses you currently have access to in {studio_name}:").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
         </div>
 
         %else:
         <div class="copy">
-          <p>${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_NAME)}</p>
+          <p>${_("You currently aren't associated with any {studio_name} Courses.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
         </div>
         %endif
       </div>
@@ -252,9 +252,9 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices">
         <div class="notice-item">
           <div class="msg">
-            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_NAME)}</h3>
+            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
             <div class="copy">
-              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_NAME)}</p>
+              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
             </div>
           </div>
         </div>
@@ -283,7 +283,7 @@
       %if course_creator_status == "unrequested":
       <div class="wrapper wrapper-creationrights">
         <h3 class="title">
-          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in {studio_name}').format(studio_name=settings.STUDIO_NAME)}</span> <i class="icon-remove-sign"></i></a>
+          <a href="#instruction-creationrights" class="ui-toggle-control show-creationrights"><span class="label">${_('Becoming a Course Creator in {studio_name}').format(studio_name=settings.STUDIO_SHORT_NAME)}</span> <i class="icon-remove-sign"></i></a>
         </h3>
 
         <div class="notice notice-incontext notice-instruction notice-instruction-creationrights ui-toggle-target" id="instruction-creationrights">
@@ -367,7 +367,7 @@
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title title-3">${_('New to {studio_name}?').format(studio_name=settings.STUDIO_NAME)}</h3>
-        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_NAME)}</p>
+        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
         <ol class="list-actions">
           <li class="action-item">

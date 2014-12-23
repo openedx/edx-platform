@@ -21,7 +21,7 @@
         )
       )}</h1>
       <p class="tagline">${_("{studio_name} helps manage your online courses, so you can focus on teaching them").format(
-        studio_name=settings.STUDIO_NAME
+        studio_name=settings.STUDIO_SHORT_NAME
       )}</p>
     </header>
   </section>
@@ -30,14 +30,14 @@
 <div class="wrapper-content-features wrapper">
   <section class="content content-features">
     <header>
-      <h2 class="sr">${_("{studio_name}'s Many Features").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <h2 class="sr">${_("{studio_name}'s Many Features").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
     </header>
 
     <ol class="list-features">
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature1">
-            <img src="${static.url("images/thumb-hiw-feature1.png")}" alt="${_('{studio_name} Helps You Keep Your Courses Organized').format(studio_name=settings.STUDIO_NAME)}" />
+            <img src="${static.url("images/thumb-hiw-feature1.png")}" alt="${_('{studio_name} Helps You Keep Your Courses Organized').format(studio_name=settings.STUDIO_SHORT_NAME)}" />
             <figcaption class="sr">${_("{studio_name} Helps You Keep Your Courses Organized").format(studio_name=settings.STUDIO_NAME)}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
@@ -47,12 +47,12 @@
 
         <div class="copy">
           <h3>${_("Keeping Your Course Organized")}</h3>
-          <p>${_("The backbone of your course is how it is organized. {studio_name} offers an <strong>Outline</strong> editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.").format(studio_name=settings.STUDIO_NAME)}</p>
+          <p>${_("The backbone of your course is how it is organized. {studio_name} offers an <strong>Outline</strong> editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Simple Organization For Content")}</h4>
-              <p>${_("{studio_name} uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.").format(studio_name=settings.STUDIO_NAME)}</p>
+              <p>${_("{studio_name} uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
             </li>
 
             <li class="proofpoint">
@@ -81,7 +81,7 @@
 
         <div class="copy">
           <h3>${_("Learning is More than Just Lectures")}</h3>
-          <p>${_("{studio_name} lets you weave your content together in a way that reinforces learning. Insert videos, discussions, and a wide variety of exercises with just a few clicks.").format(studio_name=settings.STUDIO_NAME)} </p>
+          <p>${_("{studio_name} lets you weave your content together in a way that reinforces learning. Insert videos, discussions, and a wide variety of exercises with just a few clicks.").format(studio_name=settings.STUDIO_SHORT_NAME)} </p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
@@ -105,8 +105,8 @@
       <li class="feature">
         <figure class="img zoom">
           <a rel="modal" href="#hiw-feature3">
-            <img src="${static.url("images/thumb-hiw-feature3.png")}" alt="${_('{studio_name} Gives You Simple, Fast, and Incremental Publishing. With Friends.').format(studio_name=settings.STUDIO_NAME)}" />
-            <figcaption class="sr">${_("{studio_name} Gives You Simple, Fast, and Incremental Publishing. With Friends.").format(studio_name=settings.STUDIO_NAME)}</figcaption>
+            <img src="${static.url("images/thumb-hiw-feature3.png")}" alt="${_('{studio_name} Gives You Simple, Fast, and Incremental Publishing. With Friends.').format(studio_name=settings.STUDIO_SHORT_NAME)}" />
+            <figcaption class="sr">${_("{studio_name} Gives You Simple, Fast, and Incremental Publishing. With Friends.").format(studio_name=settings.STUDIO_SHORT_NAME)}</figcaption>
             <span class="action-zoom">
               <i class="icon-zoom-in"></i>
             </span>
@@ -115,7 +115,7 @@
 
         <div class="copy">
           <h3>${_("Simple, Fast, and Incremental Publishing. With Friends.")}</h3>
-          <p>${_("{studio_name} works like web applications you already know, yet understands how you build curriculum. Instant publishing to the web when you want it, incremental release when it makes sense. And with co-authors, you can have a whole team building a course, together.").format(studio_name=settings.STUDIO_NAME)}</p>
+          <p>${_("{studio_name} works like web applications you already know, yet understands how you build curriculum. Instant publishing to the web when you want it, incremental release when it makes sense. And with co-authors, you can have a whole team building a course, together.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
@@ -125,7 +125,7 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Release-On Date Publishing")}</h4>
-              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and {studio_name} takes care of the rest. Build your course incrementally.").format(studio_name=settings.STUDIO_NAME)}</p>
+              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and {studio_name} takes care of the rest. Build your course incrementally.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
             </li>
 
             <li class="proofpoint">
@@ -142,7 +142,7 @@
 <div class="wrapper-content-cta wrapper">
   <section class="content content-cta">
     <header>
-      <h2 class="sr">${_("Sign Up for {studio_name} Today!").format(studio_name=settings.STUDIO_NAME)}</h2>
+      <h2 class="sr">${_("Sign Up for {studio_name} Today!").format(studio_name=settings.STUDIO_SHORT_NAME)}</h2>
     </header>
 
     <ul class="list-actions">
@@ -150,7 +150,7 @@
         <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up &amp; Start Making an {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
       </li>
       <li class="action-item">
-        <a href="${reverse('login')}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_NAME)}</a>
+        <a href="${reverse('login')}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
       </li>
     </ul>
   </section>
@@ -186,7 +186,7 @@
   <h3 class="title">${_("Publishing on Date")}</h3>
   <figure>
     <img src="${static.url("images/hiw-feature3.png")}" alt="" />
-    <figcaption class="description">${_("Simply set the date of a section or subsection, and {studio_name} will publish it to your students for you.").format(studio_name=settings.STUDIO_NAME)}</figcaption>
+    <figcaption class="description">${_("Simply set the date of a section or subsection, and {studio_name} will publish it to your students for you.").format(studio_name=settings.STUDIO_SHORT_NAME)}</figcaption>
   </figure>
 
   <a href="" rel="view" class="action action-modal-close">
