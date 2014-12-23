@@ -44,12 +44,12 @@ define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"
             CreateCourseUtils.createCourse(course_info, function (errorMessage) {
                 $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
                 $('#course_rerun_error').html('<p>' + errorMessage + '</p>');
-                $('.rerun-course-save').addClass('is-disabled').removeClass('is-processing').html(gettext('Create Re-run'));
+                $('.rerun-course-save').addClass('is-disabled').attr('aria-disabled', true).removeClass('is-processing').html(gettext('Create Re-run'));
                 $('.action-cancel').removeClass('is-hidden');
             });
 
             // Go into creating re-run state
-            $('.rerun-course-save').addClass('is-disabled').addClass('is-processing').html(
+            $('.rerun-course-save').addClass('is-disabled').attr('aria-disabled', true).addClass('is-processing').html(
                '<i class="icon icon-refresh icon-spin"></i>' + gettext('Processing Re-run Request')
             );
             $('.action-cancel').addClass('is-hidden');

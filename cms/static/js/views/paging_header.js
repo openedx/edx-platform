@@ -25,8 +25,8 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
             this.$el.html(this.template({
                 messageHtml: messageHtml
             }));
-            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
             return this;
         },
 

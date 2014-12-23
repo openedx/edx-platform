@@ -279,7 +279,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
 
                 // Enable inputs.
                 $inputs
-                    .prop('disabled', false)
+                    .prop('disabled', false).attr('aria-disabled', false)
                     .removeClass('is-disabled');
 
             } else {
@@ -288,7 +288,7 @@ function($, Backbone, _, AbstractEditor, Utils, MessageManager) {
                 // the current input.
                 $inputs
                     .not($el)
-                    .prop('disabled', true)
+                    .prop('disabled', true).attr('aria-disabled', true)
                     .addClass('is-disabled');
 
                 // If error occurs in the main video input, just close video

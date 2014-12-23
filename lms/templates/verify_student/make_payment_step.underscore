@@ -163,15 +163,15 @@
 
   <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
     <% if ( upgrade ) { %>
-        <a class="next action-primary is-disabled right" id="pay_button">
+        <a class="next action-primary is-disabled right" id="pay_button" aria-disabled="true">
           <%- gettext( "Next: Make payment" ) %>
         </a>
     <% } else if ( isActive ) { %>
-        <a class="next action-primary is-disabled" id="pay_button">
+        <a class="next action-primary is-disabled" id="pay_button" aria-disabled="true">
           <%- gettext( "Continue to payment" ) %>
         </a>
     <% } else { %>
-        <a class="next action-primary is-disabled" id="activate_button">
+        <a class="next action-primary is-disabled" id="activate_button" aria-disabled="true">
           <%- gettext( "Activate your account" ) %>
         </a>
     <% } %>

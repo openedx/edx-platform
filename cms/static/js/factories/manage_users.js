@@ -87,14 +87,14 @@ define(['jquery', 'underscore', 'gettext', 'js/views/feedback_prompt'], function
         $cancelButton = $createUserForm.find('.action-cancel');
         $cancelButton.bind('click', function(event) {
             event.preventDefault();
-            $('.create-user-button').toggleClass('is-disabled');
+            $('.create-user-button').toggleClass('is-disabled').attr('aria-disabled', $('.create-user-button').hasClass('is-disabled'));
             $createUserFormWrapper.toggleClass('is-shown');
             $('#user-email-input').val('');
         });
 
         $('.create-user-button').bind('click', function(event) {
             event.preventDefault();
-            $('.create-user-button').toggleClass('is-disabled');
+            $('.create-user-button').toggleClass('is-disabled').attr('aria-disabled', $('.create-user-button').hasClass('is-disabled'));
             $createUserFormWrapper.toggleClass('is-shown');
             $createUserForm.find('#user-email-input').focus();
         });
