@@ -241,6 +241,22 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
 
+                it('make sure _toggleFilterColumn filters asset list', function () {
+                    expect(assetsView).toBeDefined();
+                    var requests = AjaxHelpers.requests(this);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                        var $typeColumn = $('#' + columnID);
+                        assetsView.setPage(0);
+                        respondWithMockAssets(requests);
+                        var assetsNumber = assetsView.collection.length;
+                        assetsView._toggleFilterColumn('Images');
+                        respondWithMockAssets(requests);
+                        var assetsNumberFiltered = assetsView.collection.length;
+                        expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
+                        expect($typeColumn.find('.title .type-filter')).not.toEqual(assetsView.allLabel);
+                    });
+                });
+
                 it('opens and closes select type menu', function () {
                     expect(assetsView).toBeDefined();
                     setup.call(this, mockExampleAssetsResponse);
