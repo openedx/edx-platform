@@ -5,7 +5,7 @@
 <div class="wrapper-mast wrapper sr">
   <header class="mast">
     <h1 class="page-header">
-      ${_("{studio_name} Account Activation").format(studio_name=settings.STUDIO_NAME)}
+      ${_("{studio_name} Account Activation").format(studio_name=settings.STUDIO_SHORT_NAME)}
     </h1>
   </header>
 </div>
@@ -26,7 +26,7 @@
       <ul class="list-actions">
         <li class="action-item">
           <a href="/signin" class="action-primary action-signin">
-            ${_("Sign into {studio_name}").format(platform_name=settings.STUDIO_NAME)}
+            ${_("Sign into {studio_name}").format(platform_name=settings.STUDIO_SHORT_NAME)}
           </a>
         </li>
       </ul>
