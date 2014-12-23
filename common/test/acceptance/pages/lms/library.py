@@ -42,7 +42,7 @@ class LibraryContentXBlockWrapper(PageObject):
     @property
     def children_headers(self):
         """
-        Gets headers if all child XBlocks as list of strings
+        Gets headers of all child XBlocks as list of strings
         """
         child_blocks_headers = self.q(css=self._bounded_selector("div[data-id] h2.problem-header"))
         return frozenset(child.text for child in child_blocks_headers)
