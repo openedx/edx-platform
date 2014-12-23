@@ -449,7 +449,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         config.add_group()  # Group C
 
         # Save the configuration
-        self.assertEqual(config.get_text('.action-primary'), "CREATE")
+        self.assertEqual(config.get_text('.action-primary'), "Create")
         self.assertTrue(config.delete_button_is_absent)
         config.save()
 
@@ -466,7 +466,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.assertTrue(config.id)
         config.name = "Second Group Configuration Name"
         config.description = "Second Description of the group configuration."
-        self.assertEqual(config.get_text('.action-primary'), "SAVE")
+        self.assertEqual(config.get_text('.action-primary'), "Save")
         # Add new group
         config.add_group()  # Group D
         # Remove group with name "New Group Name"

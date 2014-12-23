@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio: Support adding groups to the cohort-schemed group configuration.  TNL-736
+
 LMS: Assign cohorts to content groups in the instructor dashboard.  TNL-653
 
 LMS: Extend preview to support cohorted courseware.  TNL-651
