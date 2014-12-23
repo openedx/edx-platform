@@ -211,8 +211,8 @@ def inherit_metadata(descriptor, inherited_data):
 
 def own_metadata(module):
     """
-    Return a dictionary that contains only non-inherited field keys,
-    mapped to their serialized values
+    Return a JSON-friendly dictionary that contains only non-inherited field
+    keys, mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
