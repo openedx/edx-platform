@@ -27,6 +27,7 @@ class LibraryFixture(XBlockContainerFixture):
             'display_name': display_name
         }
 
+        self.display_name = display_name
         self._library_key = None
         super(LibraryFixture, self).__init__()
 
