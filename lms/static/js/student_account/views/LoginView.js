@@ -81,7 +81,7 @@ var edx = edx || {};
             this.element.hide( this.$resetSuccess );
         },
 
-        resetEmail: function( a ) {
+        resetEmail: function() {
             this.element.hide( this.$errors );
             this.element.show( this.$resetSuccess );
         },
@@ -94,7 +94,7 @@ var edx = edx || {};
             }
         },
 
-        saveSuccess: function () {
+        saveSuccess: function() {
             this.trigger('auth-complete');
             this.element.hide( this.$resetSuccess );
         },

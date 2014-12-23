@@ -171,7 +171,7 @@ class CombinedLoginAndRegisterPage(PageObject):
         # Submit it
         self.q(css=".register-button").click()
 
-    def login(self, email="", password="", remember_me=True):
+    def login(self, email="", password=""):
         """Fills in and submits the login form.
 
         Requires that the "login" form is visible.
@@ -182,14 +182,11 @@ class CombinedLoginAndRegisterPage(PageObject):
         Keyword Arguments:
             email (unicode): The user's email address.
             password (unicode): The user's password.
-            remember_me (boolean): If True, check the "remember me" box.
 
         """
         # Fill in the form
         self.q(css="#login-email").fill(email)
         self.q(css="#login-password").fill(password)
-        if remember_me:
-            self.q(css="#login-remember").click()
 
         # Submit it
         self.q(css=".login-button").click()
@@ -219,6 +216,8 @@ class CombinedLoginAndRegisterPage(PageObject):
 
         # Submit it
         self.q(css="button.js-reset").click()
+
+        return CombinedLoginAndRegisterPage(self.browser).wait_for_page()
 
     @property
     @unguarded

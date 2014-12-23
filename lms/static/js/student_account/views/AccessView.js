@@ -44,6 +44,8 @@ var edx = edx || {};
             };
 
             this.platformName = obj.platformName;
+
+            // The login view listens for 'sync' events from the reset model
             this.resetModel = new edx.student.account.PasswordResetModel({}, {
                 method: 'GET',
                 url: '#'
@@ -95,10 +97,8 @@ var edx = edx || {};
             },
 
             reset: function( data, context ) {
-                context.resetModel.set({
-                    ajaxType: data.method,
-                    urlRoot: data.submit_url
-                });
+                context.resetModel.ajaxType = data.method;
+                context.resetModel.urlRoot = data.submit_url;
 
                 context.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
@@ -187,8 +187,7 @@ var edx = edx || {};
             this.element.scrollTop( $anchor );
 
             // Update url without reloading page
-            // window.history.pushState( '', type + ' form', '/account/' + type + '/' );
-            History.pushState( null, type + ' form', '/account/' + type + '/' );
+            History.pushState( null, document.title, '/account/' + type + '/' );
         },
 
         /**
