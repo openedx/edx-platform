@@ -12,6 +12,15 @@ define(['jquery.cookie', 'utility'], function() {
             });
         }
 
+        // Clear the login error message when credentials are edited
+        $('input#email').on('input',function() {
+            $('#login_error').removeClass('is-shown');
+        });
+
+        $('input#password').on('input',function() {
+            $('#login_error').removeClass('is-shown');
+        });
+
         $('form#login_form').submit(function(event) {
             event.preventDefault();
             var submit_data = $('#login_form').serialize();
