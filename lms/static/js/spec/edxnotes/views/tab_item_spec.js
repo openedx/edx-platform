@@ -33,10 +33,14 @@ define([
                 secondItem = this.tabsList.$('#second-item');
 
             expect(firstItem).toHaveClass('is-active'); // first tab is active
+            expect(firstItem).toContainText('Current tab');
             expect(secondItem).not.toHaveClass('is-active'); // second tab is not active
+            expect(secondItem).not.toContainText('Current tab');
             secondItem.click();
             expect(firstItem).not.toHaveClass('is-active'); // first tab is not active
+            expect(firstItem).not.toContainText('Current tab');
             expect(secondItem).toHaveClass('is-active'); // second tab is active
+            expect(secondItem).toContainText('Current tab');
         });
 
         it('can close the tab', function () {
