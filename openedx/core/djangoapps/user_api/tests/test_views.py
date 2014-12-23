@@ -633,17 +633,6 @@ class LoginSessionViewTest(ApiTestCase):
                     "max_length": account_api.PASSWORD_MAX_LENGTH
                 },
                 "errorMessages": {},
-            },
-            {
-                "name": "remember",
-                "defaultValue": False,
-                "type": "checkbox",
-                "required": False,
-                "label": "Remember me",
-                "placeholder": "",
-                "instructions": "",
-                "restrictions": {},
-                "errorMessages": {},
             }
         ])
 
