@@ -106,7 +106,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
 
           % if not about_page_editable:
           <div class="notice notice-incontext notice-workflow">
-            <h3 class="title">${_("Promoting Your Course with edX")}</h3>
+            <h3 class="title">${_("Promoting Your Course with {platform_name}").format(platform_name=settings.PLATFORM_NAME)}</h3>
             <div class="copy">
               <p>${_(
                 'Your course summary page will not be viewable until your course '

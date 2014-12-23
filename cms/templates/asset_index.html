@@ -63,7 +63,7 @@
 
                 <p>${_("To add files to use in your course, click {em_start}Upload New File{em_end}. Then follow the prompts to upload a file from your computer.").format(em_start='<strong>', em_end="</strong>")}</p>
 
-                <p>${_("{em_start}Caution{em_end}: edX recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("{em_start}Caution{em_end}: {platform_name} recommends that you limit the file size to {em_start}10 MB{em_end}. In addition, do not upload video or audio files. You should use a third party service to host multimedia files.").format(em_start='<strong>', em_end="</strong>", platform_name=settings.PLATFORM_NAME)}</p>
 
             	<p>${_("The course image, textbook chapters, and files that appear on your Course Handouts sidebar also appear in this list.")}</p>
             </div>
