@@ -21,10 +21,10 @@ var edx = edx || {};
 
         postRender: function() {
             // Render requirements
-            new edx.verify_student.RequirementsView({
-                el: $( '.requirements-container', this.el ),
-                requirements: this.stepData.requirements
-            }).render();
+            // new edx.verify_student.RequirementsView({
+            //     el: $( '.requirements-container', this.el ),
+            //     requirements: this.stepData.requirements
+            // }).render();
 
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'payment', this.templateName );

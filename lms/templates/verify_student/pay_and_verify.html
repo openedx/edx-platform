@@ -26,6 +26,7 @@ from verify_student.views import PayAndVerifyView
   <script src="${static.url('js/vendor/underscore-min.js')}"></script>
   <script src="${static.url('js/vendor/underscore.string.min.js')}"></script>
   <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('js/src/tooltip_manager.js')}"></script>
   <%static:js group='verify_student'/>
 </%block>
 
@@ -38,7 +39,7 @@ from verify_student.views import PayAndVerifyView
   <section class="wrapper carousel">
 
     ## Verification status header
-    <header class="page-header">
+    <!--header class="page-header">
       <h2 class="title">
         <span class="wrapper-sts">
           <span class="sts-label">${messages.top_level_msg}</span>
@@ -47,13 +48,14 @@ from verify_student.views import PayAndVerifyView
           <span class="sts-track-value"><span class="context">${messages.status_msg}</span>: ${course_mode.name}<span>
         </span>
       </h2>
-    </header>
+    </header-->
 
     ## Payment / Verification flow
     ## Most of these data attributes are used to dynamically render
     ## the steps, but some are just useful for A/B test setup.
     <div
       id="pay-and-verify-container"
+      class="pay-and-verify"
       data-full-name='${user_full_name}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'

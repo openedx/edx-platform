@@ -91,11 +91,12 @@ var edx = edx || {};
         },
 
         expandCallback: function( event ) {
+            var title;
+
             event.preventDefault();
 
             $(this).next('.expandable-area' ).slideToggle();
-
-            var title = $( this ).parent();
+            title = $( this ).parent();
             title.toggleClass( 'is-expanded' );
             title.attr( 'aria-expanded', !title.attr( 'aria-expanded' ) );
         }

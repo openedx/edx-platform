@@ -47,6 +47,7 @@
 // base - specific views
 @import 'views/login-register';
 @import 'views/verification';
+@import 'views/decoupled-verification';
 @import 'views/shoppingcart';
 
 // applications

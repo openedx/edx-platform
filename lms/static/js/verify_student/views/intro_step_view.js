@@ -25,10 +25,10 @@ var edx = edx || {};
         // and if they reload the page we want them to stay on the
         // second step.
         postRender: function() {
-            new edx.verify_student.RequirementsView({
-                el: $( '.requirements-container', this.el ),
-                requirements: this.stepData.requirements
-            }).render();
+            // new edx.verify_student.RequirementsView({
+            //     el: $( '.requirements-container', this.el ),
+            //     requirements: this.stepData.requirements
+            // }).render();
 
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'verification', this.templateName );

@@ -43,34 +43,7 @@
       <i class="icon-facetime-video"></i>
     </div>
 
-    <div class="copy">
-      <p>
-        <span class="copy-super"><%- gettext( "A webcam and a modern browser" ) %></span>
-        <span class="copy-sub"><strong>
-          <a rel="external" href="https://www.mozilla.org/en-US/firefox/new/">Firefox</a>,
-          <a rel="external" href="https://www.google.com/intl/en/chrome/browser/">Chrome</a>,
-          <a rel="external" href="http://www.apple.com/safari/">Safari</a>,
-          <a rel="external" href="http://windows.microsoft.com/en-us/internet-explorer/download-ie"><%- gettext("Internet Explorer 9 or later" ) %></a></strong>.
-          <%- gettext( "Please make sure your browser is updated to the most recent version possible." ) %>
-        </span>
-      </p>
-    </div>
-  </li>
-  <% } %>
-
-  <% if ( requirements['credit-card-required'] ) { %>
-  <li class="req req-3 req-payment">
-    <h4 class="title"><%- gettext( "Credit or Debit Card" ) %></h4>
-    <div class="placeholder-art">
-      <i class="icon-credit-card"></i>
-    </div>
-
-    <div class="copy">
-      <p>
-        <span class="copy-super"><%- gettext( "A major credit or debit card" ) %></span>
-        <span class="copy-sub"><%- gettext( "Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the Discover logo." ) %></span>
-      </p>
-    </div>
+    <div class="copy"></div>
   </li>
   <% } %>
 </ul>
