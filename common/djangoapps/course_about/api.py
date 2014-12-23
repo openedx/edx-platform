@@ -10,14 +10,14 @@ This API is exposed via the RESTful layer (views.py) but may be used directly in
 import logging
 from django.conf import settings
 from django.utils import importlib
-from course_about import errors
+
 
 DEFAULT_DATA_API = 'course_about.data'
 
 log = logging.getLogger(__name__)
 
 
-def get_course_about_details(course_id):
+def get_course_about_details(request, course_id):
     """Get course about details for the given course ID.
 
     Given a Course ID, retrieve all the metadata necessary to fully describe the Course.
@@ -62,22 +62,19 @@ def get_course_about_details(course_id):
             }
         }
     """
-    # TODO Implement all validation and error handling
-    return _data_api().get_course_about_details(course_id)
+    return _data_api().get_course_about_details(request, course_id)
 
 
 def _data_api():
     """Returns a Data API.
     This relies on Django settings to find the appropriate data API.
-
     """
     # We retrieve the settings in-line here (rather than using the
     # top-level constant), so that @override_settings will work
     # in the test suite.
     api_path = getattr(settings, "COURSE_ABOUT_DATA_API", DEFAULT_DATA_API)
-
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):
         log.exception(u"Could not load module at '{path}'".format(path=api_path))
-        raise errors.CourseAboutApiLoadError(api_path)
+        return

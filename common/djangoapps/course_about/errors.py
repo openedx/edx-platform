@@ -12,7 +12,9 @@ class CourseAboutError(Exception):
         # Corresponding information to help resolve the error.
         self.data = data
 
-
 class CourseAboutApiLoadError(CourseAboutError):
     """The data API could not be loaded. """
+    pass
+
+class CourseNotFoundError(CourseAboutError):
     pass
