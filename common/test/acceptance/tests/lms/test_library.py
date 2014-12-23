@@ -119,6 +119,9 @@ class LibraryContentTestBase(UniqueCourseTest):
         Open library page in LMS
         """
         self.courseware_page.visit()
+        paragraphs = self.courseware_page.q(css='.course-content p')
+        if paragraphs and "You were most recently in" in paragraphs.text[0]:
+            paragraphs[0].find_element_by_tag_name('a').click()
         block_id = block_id if block_id is not None else self.lib_block.locator
         #pylint: disable=attribute-defined-outside-init
         self.library_content_page = LibraryContentXBlockWrapper(self.browser, block_id)
@@ -241,62 +244,54 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         """ Expected XBLock headers according to populate_library_fixture """
         return frozenset(child.display_name.upper() for child in self.library_fixture.children)
 
-    @ddt.data(1, 3)
-    def test_any_capa_type_shows_all(self, count):
+    def _set_library_content_settings(self, count=1, capa_type="Any Type"):
         """
-        Scenario: Ensure setting "Any Type" for Problem Type does not filter out Problems
-        Given I have a library with two "Select Option" and two "Choice Group" problems, and a course containing
-               LibraryContent XBlock configured to draw XBlocks from that library
-        When I go to studio unit page for library content xblock as staff
-        And I set library content xblock Problem Type to "Any Type" and Count to {count}
-        And I refresh library content xblock and pulbish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see {count} xblocks from the library of any type
-        """
-        self._change_library_content_settings(count=count, capa_type="Any Type")
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self._goto_library_block_page()
-        children_headers = self.library_content_page.children_headers
-        self.assertEqual(len(children_headers), count)
-        self.assertLessEqual(children_headers, self._problem_headers)
-
-    @ddt.data(
-        ('Choice Group', 1, ["Problem Choice Group 1", "Problem Choice Group 2"]),
-        ('Select Option', 2, ["Problem Select 1", "Problem Select 2"]),
-    )
-    @ddt.unpack
-    def test_capa_type_shows_only_chosen_type(self, capa_type, count, expected_headers):
-        """
-        Scenario: Ensure setting "{capa_type}" for Problem Type draws aonly problem of {capa_type} from library
-        Given I have a library with two "Select Option" and two "Choice Group" problems, and a course containing
-               LibraryContent XBlock configured to draw XBlocks from that library
-        When I go to studio unit page for library content xblock as staff
-        And I set library content xblock Problem Type to "{capa_type}" and Count to {count}
-        And I refresh library content xblock and pulbish unit
-        When I go to LMS courseware page for library content xblock as student
-        Then I can see {count} xblocks from the library of {capa_type}
+        Sets library content XBlock parameters, saves, publishes unit, goes to LMS unit page and
+        gets children XBlock headers to assert against them
         """
         self._change_library_content_settings(count=count, capa_type=capa_type)
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self._goto_library_block_page()
-        children_headers = self.library_content_page.children_headers
-        self.assertEqual(len(children_headers), count)
-        self.assertLessEqual(children_headers, self._problem_headers)
-        self.assertLessEqual(children_headers, set(map(lambda header: header.upper(), expected_headers)))
+        return self.library_content_page.children_headers
 
-    def test_missing_capa_type_shows_none(self):
+    def test_problem_type_selector(self):
         """
-        Scenario: Ensure setting "{capa_type}" for Problem Type that is not present in library results in empty XBlock
+        Scenario: Ensure setting "Any Type" for Problem Type does not filter out Problems
         Given I have a library with two "Select Option" and two "Choice Group" problems, and a course containing
                LibraryContent XBlock configured to draw XBlocks from that library
-        When I go to studio unit page for library content xblock as staff
-        And I set library content xblock Problem Type to type not present in library
-        And I refresh library content xblock and pulbish unit
+        When I set library content xblock Problem Type to "Any Type" and Count to 3 and publish unit
         When I go to LMS courseware page for library content xblock as student
-        Then I can see no xblocks
+        Then I can see 3 xblocks from the library of any type
+        When I set library content xblock Problem Type to "Choice Group" and Count to 1 and publish unit
+        When I go to LMS courseware page for library content xblock as student
+        Then I can see 1 xblock from the library of "Choice Group" type
+        When I set library content xblock Problem Type to "Select Option" and Count to 2 and publish unit
+        When I go to LMS courseware page for library content xblock as student
+        Then I can see 2 xblock from the library of "Select Option" type
+        When I set library content xblock Problem Type to "Matlab" and Count to 2 and publish unit
+        When I go to LMS courseware page for library content xblock as student
+        Then I can see 0 xblocks from the library
         """
-        self._change_library_content_settings(count=1, capa_type="Matlab")
-        self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self._goto_library_block_page()
-        children_headers = self.library_content_page.children_headers
-        self.assertEqual(len(children_headers), 0)
+        children_headers = self._set_library_content_settings(count=3, capa_type="Any Type")
+        self.assertEqual(len(children_headers), 3)
+        self.assertLessEqual(children_headers, self._problem_headers)
+
+        # Choice group test
+        children_headers = self._set_library_content_settings(count=1, capa_type="Choice Group")
+        self.assertEqual(len(children_headers), 1)
+        self.assertLessEqual(
+            children_headers,
+            set(map(lambda header: header.upper(), ["Problem Choice Group 1", "Problem Choice Group 2"]))
+        )
+
+        # Choice group test
+        children_headers = self._set_library_content_settings(count=2, capa_type="Select Option")
+        self.assertEqual(len(children_headers), 2)
+        self.assertLessEqual(
+            children_headers,
+            set(map(lambda header: header.upper(), ["Problem Select 1", "Problem Select 2"]))
+        )
+
+        # Missing problem type test
+        children_headers = self._set_library_content_settings(count=2, capa_type="Matlab")
+        self.assertEqual(children_headers, set())
