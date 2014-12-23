@@ -94,8 +94,21 @@ if [ -e $HOME/edx-venv_clean.tar.gz ]; then
     tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
 fi
 
-# Activate the Python virtualenv
-source $HOME/edx-venv/bin/activate
+# Activate a new Python virtualenv
+virtualenv $HOME/edx-venv-$GIT_COMMIT
+source $HOME/edx-venv-$GIT_COMMIT/bin/activate
+
+# boto is included in base.txt, but we need it to download the pip cache from S3.
+# To avoid installing all of base.txt before getting the cache, just install boto
+# first.  If version is changed in base.txt, it will get updated before tests run.
+# path.py is included in paver.txt. Same reasons apply for installing it here.
+pip install -q boto>=2.32.1 path.py>=3.0.1
+
+# Download the pip-download-cache
+python scripts/pip_cache_store.py download -b edx-platform.dependency-cache -f v1/master -d $HOME/.pip/download-cache/ -t $HOME/pip-download-cache.tar.gz
+
+# Now install paver requirements
+pip install -q -r requirements/edx/paver.txt
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -122,7 +135,13 @@ case "$TEST_SUITE" in
 <testcase classname="quality" name="quality" time="0.604"></testcase>
 </testsuite>
 END
-        exit $EXIT
+        exitcode=$EXIT
+
+        # Update the pip-download-cache.tar.gz in S3
+        if [[ ${JOB_NAME} == *'edx-all-tests-auto-master'* ]]; then
+            python scripts/pip_cache_store.py upload -b edx-platform.dependency-cache -f v1/master -d $HOME/.pip/download-cache/ -t $HOME/pip-download-cache.tar.gz
+        fi
+        exit $exitcode
         ;;
 
     "unit")
