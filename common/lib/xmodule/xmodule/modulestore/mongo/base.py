@@ -627,11 +627,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
     def _compute_metadata_inheritance_tree(self, course_id):
         '''
-        TODO (cdodge) This method can be deleted when the 'split module store' work has been completed
+        Find all inheritable fields from all xblocks in the course which may define inheritable data
         '''
         # get all collections in the course, this query should not return any leaf nodes
-        # note this is a bit ugly as when we add new categories of containers, we have to add it here
-
         course_id = self.fill_in_run(course_id)
         query = SON([
             ('_id.tag', 'i4x'),
@@ -639,6 +637,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ('_id.course', course_id.course),
             ('_id.category', {'$in': BLOCK_TYPES_WITH_CHILDREN})
         ])
+        # if we're only dealing in the published branch, then only get published containers
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+            query['_id.revision'] = None
         # we just want the Location, children, and inheritable metadata
         record_filter = {'_id': 1, 'definition.children': 1}
 
@@ -663,6 +664,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             location_url = unicode(location)
             if location_url in results_by_url:
                 # found either draft or live to complement the other revision
+                # FIXME this is wrong. If the child was moved in draft from one parent to the other, it will
+                # show up under both in this logic: https://openedx.atlassian.net/browse/TNL-1075
                 existing_children = results_by_url[location_url].get('definition', {}).get('children', [])
                 additional_children = result.get('definition', {}).get('children', [])
                 total_children = existing_children + additional_children

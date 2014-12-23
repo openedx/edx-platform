@@ -5,7 +5,6 @@ Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Dr
 from collections import namedtuple
 import datetime
 import ddt
-from importlib import import_module
 import itertools
 import mimetypes
 from uuid import uuid4
@@ -33,7 +32,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
@@ -920,28 +919,39 @@ class TestMixedModuleStore(CourseComparisonTest):
         # publish the course
         self.course = self.store.publish(self.course.location, self.user_id)
 
-        # make drafts of verticals
-        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
-        self.store.convert_to_draft(self.vertical_y1a, self.user_id)
+        with self.store.bulk_operations(self.course.id):
+            # make drafts of verticals
+            self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+            self.store.convert_to_draft(self.vertical_y1a, self.user_id)
 
-        # move child problem_x1a_1 to vertical_y1a
-        child_to_move_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+            # move child problem_x1a_1 to vertical_y1a
+            child_to_move_location = self.problem_x1a_1
+            new_parent_location = self.vertical_y1a
+            old_parent_location = self.vertical_x1a
 
-        old_parent = self.store.get_item(old_parent_location)
-        old_parent.children.remove(child_to_move_location.replace(version_guid=old_parent.location.version_guid))
-        self.store.update_item(old_parent, self.user_id)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                old_parent = self.store.get_item(child_to_move_location).get_parent()
 
-        new_parent = self.store.get_item(new_parent_location)
-        new_parent.children.append(child_to_move_location.replace(version_guid=new_parent.location.version_guid))
-        self.store.update_item(new_parent, self.user_id)
+            self.assertEqual(old_parent_location, old_parent.location)
 
-        self.verify_get_parent_locations_results([
-            (child_to_move_location, new_parent_location, None),
-            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, old_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
-        ])
+            child_to_move_contextualized = child_to_move_location.map_into_course(old_parent.location.course_key)
+            old_parent.children.remove(child_to_move_contextualized)
+            self.store.update_item(old_parent, self.user_id)
+
+            new_parent = self.store.get_item(new_parent_location)
+            new_parent.children.append(child_to_move_location)
+            self.store.update_item(new_parent, self.user_id)
+
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.assertEqual(new_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                self.assertEqual(old_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
+
+            self.verify_get_parent_locations_results([
+                (child_to_move_location, new_parent_location, None),
+                (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+                (child_to_move_location, old_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
+            ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
