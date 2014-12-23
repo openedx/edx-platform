@@ -107,13 +107,22 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
             "Response field received focus"
         ).fulfill()
 
+    @wait_for_js
     def is_response_editor_visible(self, response_id):
         """Returns true if the response editor is present, false otherwise"""
         return self._is_element_visible(".response_{} .edit-post-body".format(response_id))
 
+    def is_response_visible(self, comment_id):
+        """Returns true if the response is viewable onscreen"""
+        return self._is_element_visible(".response_{} .response-body".format(comment_id))
+
     def is_response_editable(self, response_id):
         """Returns true if the edit response button is present, false otherwise"""
-        return self._is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            return self._is_element_visible(".response_{} .discussion-response .action-edit".format(response_id))
+
+    def get_response_body(self, response_id):
+        return self._get_element_text(".response_{} .response-body".format(response_id))
 
     def start_response_edit(self, response_id):
         """Click the edit button for the response, loading the editing view"""
@@ -123,6 +132,57 @@ class DiscussionThreadPage(PageObject, DiscussionPageMixin):
                 lambda: self.is_response_editor_visible(response_id),
                 "Response edit started"
             ).fulfill()
+
+    def get_response_vote_count(self, response_id):
+        return self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
+
+    def vote_response(self, response_id):
+        current_count = self._get_element_text(".response_{} .discussion-response .action-vote .vote-count".format(response_id))
+        self._find_within(".response_{} .discussion-response .action-vote".format(response_id)).first.click()
+        self.wait_for_ajax()
+        EmptyPromise(
+            lambda: current_count != self.get_response_vote_count(response_id),
+            "Response is voted"
+        ).fulfill()
+
+    def is_response_reported(self, response_id):
+        return self._is_element_visible(".response_{} .discussion-response .post-label-reported".format(response_id))
+
+    def report_response(self, response_id):
+        with self._secondary_action_menu_open(".response_{} .discussion-response".format(response_id)):
+            self._find_within(".response_{} .discussion-response .action-report".format(response_id)).first.click()
+            self.wait_for_ajax()
+            EmptyPromise(
+                lambda: self.is_response_reported(response_id),
+                "Response is reported"
+            ).fulfill()
+
+    def is_response_endorsed(self, response_id):
+        return "endorsed" in self._get_element_text(".response_{} .discussion-response .posted-details".format(response_id))
+
+    def endorse_response(self, response_id):
+        self._find_within(".response_{} .discussion-response .action-endorse".format(response_id)).first.click()
+        self.wait_for_ajax()
+        EmptyPromise(
+            lambda: self.is_response_endorsed(response_id),
+            "Response edit started"
+        ).fulfill()
+
+    def set_response_editor_value(self, response_id, new_body):
+        """Replace the contents of the response editor"""
+        self._find_within(".response_{} .discussion-response .wmd-input".format(response_id)).fill(new_body)
+
+    def submit_response_edit(self, response_id, new_response_body):
+        """Click the submit button on the response editor"""
+        self._find_within(".response_{} .discussion-response .post-update".format(response_id)).first.click()
+        EmptyPromise(
+            lambda: (
+                not self.is_response_editor_visible(response_id) and
+                self.is_response_visible(response_id) and
+                self.get_response_body(response_id) == new_response_body
+            ),
+            "Comment edit succeeded"
+        ).fulfill()
 
     def is_show_comments_visible(self, response_id):
         """Returns true if the "show comments" link is visible for a response"""

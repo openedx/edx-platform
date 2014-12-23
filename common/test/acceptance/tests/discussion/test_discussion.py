@@ -247,6 +247,107 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
 
 
 @attr('shard_1')
+class DiscussionResponseEditTest(UniqueCourseTest):
+    """
+    Tests for editing responses displayed beneath thread in the single thread view.
+    """
+
+    def setUp(self):
+        super(DiscussionResponseEditTest, self).setUp()
+
+        # Create a course to register for
+        CourseFixture(**self.course_info).install()
+
+    def setup_user(self, roles=[]):
+        roles_str = ','.join(roles)
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
+
+    def setup_view(self):
+        view = SingleThreadViewFixture(Thread(id="response_edit_test_thread"))
+        view.addResponse(
+            Response(id="response_other_author", user_id="other", thread_id="response_edit_test_thread"),
+        )
+        view.addResponse(
+            Response(id="response_self_author", user_id=self.user_id, thread_id="response_edit_test_thread"),
+        )
+        view.push()
+
+    def edit_response(self, page, response_id):
+        self.assertTrue(page.is_response_editable(response_id))
+        page.start_response_edit(response_id)
+        new_response = "edited body"
+        page.set_response_editor_value(response_id, new_response)
+        page.submit_response_edit(response_id, new_response)
+
+    def test_edit_response_as_student(self):
+        """
+        Scenario: Students should be able to edit the response they created not responses of other users
+            Given that I am on discussion page with student logged in
+            When I try to edit the response created by student
+            Then the response should be edited and rendered successfully
+            And responses from other users should be shown over there
+            And the student should be able to edit the response of other people
+        """
+        self.setup_user()
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.assertTrue(page.is_response_visible("response_other_author"))
+        self.assertFalse(page.is_response_editable("response_other_author"))
+        self.edit_response(page, "response_self_author")
+
+    def test_edit_response_as_moderator(self):
+        """
+        Scenario: Moderator should be able to edit the response they created and responses of other users
+            Given that I am on discussion page with moderator logged in
+            When I try to edit the response created by moderator
+            Then the response should be edited and rendered successfully
+            And I try to edit the response created by other users
+            Then the response should be edited and rendered successfully
+        """
+        self.setup_user(roles=["Moderator"])
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.edit_response(page, "response_self_author")
+        self.edit_response(page, "response_other_author")
+
+    def test_vote_report_endorse_after_edit(self):
+        """
+        Scenario: Moderator should be able to vote, report or endorse after editing the response.
+            Given that I am on discussion page with moderator logged in
+            When I try to edit the response created by moderator
+            Then the response should be edited and rendered successfully
+            And I try to edit the response created by other users
+            Then the response should be edited and rendered successfully
+            And I try to vote the response created by moderator
+            Then the response should be voted successfully
+            And I try to vote the response created by other users
+            Then the response should be voted successfully
+            And I try to report the response created by moderator
+            Then the response should be reported successfully
+            And I try to report the response created by other users
+            Then the response should be reported successfully
+            And I try to endorse the response created by moderator
+            Then the response should be endorsed successfully
+            And I try to endorse the response created by other users
+            Then the response should be endorsed successfully
+        """
+        self.setup_user(roles=["Moderator"])
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.edit_response(page, "response_self_author")
+        self.edit_response(page, "response_other_author")
+        page.vote_response('response_self_author')
+        page.vote_response('response_other_author')
+        page.report_response('response_self_author')
+        page.report_response('response_other_author')
+        page.endorse_response('response_self_author')
+        page.endorse_response('response_other_author')
+
+
+@attr('shard_1')
 class DiscussionCommentEditTest(UniqueCourseTest):
     """
     Tests for editing comments displayed beneath responses in the single thread view.
