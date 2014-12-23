@@ -240,7 +240,7 @@ class EdxNotesPage(CoursePage):
         """
         tabs = self.q(css=".tabs .tab-label")
         if tabs:
-            return tabs.text
+            return map(lambda x: x.replace("Current tab\n", ""), tabs.text)
         else:
             return None
 
