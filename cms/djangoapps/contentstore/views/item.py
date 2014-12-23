@@ -559,7 +559,10 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         category = dest_usage_key.block_type
 
         # Update the display name to indicate this is a duplicate (unless display name provided).
-        duplicate_metadata = own_metadata(source_item)
+        duplicate_metadata = {}  # Can't use own_metadata(), b/c it converts data for JSON serialization - not suitable for setting metadata of the new block
+        for field in source_item.fields.values():
+            if (field.scope == Scope.settings and field.is_set_on(source_item)):
+                duplicate_metadata[field.name] = field.read_from(source_item)
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
         else:
@@ -584,7 +587,8 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             dest_module.children = []
             for child in source_item.children:
                 dupe = _duplicate_item(dest_module.location, child, user=user)
-                dest_module.children.append(dupe)
+                if dupe not in dest_module.children:  # _duplicate_item may add the child for us.
+                    dest_module.children.append(dupe)
             store.update_item(dest_module, user.id)
 
         if 'detached' not in source_item.runtime.load_block_type(category)._class_tags:
