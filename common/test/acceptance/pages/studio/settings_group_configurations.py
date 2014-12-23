@@ -41,15 +41,15 @@ class GroupConfigurationsPage(CoursePage):
         """
         Creates new group configuration.
         """
-        self.q(css=".new-button").first.click()
+        self.q(css=".experiment-groups .new-button").first.click()
 
     @property
     def no_group_configuration_message_is_present(self):
-        return self.q(css='.wrapper-content .no-group-configurations-content').present
+        return self.q(css='.wrapper-content .experiment-groups .no-group-configurations-content').present
 
     @property
     def no_group_configuration_message_text(self):
-        return self.q(css='.wrapper-content .no-group-configurations-content').text[0]
+        return self.q(css='.wrapper-content .experiment-groups .no-group-configurations-content').text[0]
 
 
 class GroupConfiguration(object):
