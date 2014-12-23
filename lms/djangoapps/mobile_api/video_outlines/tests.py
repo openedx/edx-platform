@@ -52,11 +52,13 @@ class TestVideoAPITestCase(MobileAPITestCase):
             category="vertical",
             display_name=u"split test vertical\u03a9",
         )
+
         self.split_test = ItemFactory.create(
             parent_location=self.split_unit.location,
             category="split_test",
             display_name=u"split test unit"
         )
+
 
         self.edx_video_id = 'testing-123'
 
@@ -122,6 +124,85 @@ class TestVideoAPITestCase(MobileAPITestCase):
             display_name=u"test video omega \u03a9",
             sub=subid
         )
+
+class TestEmptyCourseVideoSummaryList(MobileAPITestCase):
+    """
+    Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
+    """
+    REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
+
+    def test_chapter_is_none(self):
+        """
+        Tests when there is no chapter under course, and video under course
+        """
+        self.login_and_enroll()
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="video",
+            display_name=u"test factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(section_url, r'courseware/$')
+        self.assertTrue(section_url)
+        self.assertTrue(unit_url)
+        self.assertEqual(section_url, unit_url)
+
+    def test_section_is_none(self):
+        """
+        Tests when there is no section under chapter, and video under chapter
+        """
+        self.login_and_enroll()
+        self.chapter = ItemFactory.create(
+            parent_location=self.course.location,
+            category="chapter",
+            display_name=u"test factory chapter omega \u03a9",
+        )
+        ItemFactory.create(
+            parent_location=self.chapter.location,
+            category="video",
+            display_name=u"test factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(
+            section_url,
+            r'courseware/test_factory_chapter_omega_%CE%A9/$'
+        )
+        self.assertTrue(section_url)
+        self.assertTrue(unit_url)
+        self.assertEqual(section_url, unit_url)
+
+    def test_section_under_course(self):
+        """
+        Tests when chapter is none, and video under section under course
+        """
+        self.login_and_enroll()
+        self.section = ItemFactory.create(
+            parent_location=self.course.location,
+            category="sequential",
+            display_name=u"test factory section omega \u03a9",
+        )
+        ItemFactory.create(
+            parent_location=self.section.location,
+            category="video",
+            display_name=u"test factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(
+            section_url,
+            r'courseware/test_factory_section_omega_%CE%A9/$'
+        )
+        self.assertTrue(section_url)
+        self.assertTrue(unit_url)
+        self.assertEqual(section_url, unit_url)
 
 
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
@@ -201,10 +282,10 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         self.assertEqual(len(course_outline[0]['path']), 2)
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
-        print type(section_url)
         self.assertIn(
             u'courseware/test_factory_section_omega_%CE%A9/test_subsection_omega_%CE%A9',
             section_url
+
         )
         self.assertTrue(section_url)
         self.assertTrue(unit_url)

@@ -65,21 +65,25 @@ class BlockOutline(object):
             block_list = list(reversed(block_path))
             block_count = len(block_list)
 
-            chapter = block_list[1] if block_count > 1 else None
+            chapter = block_list[1].location.block_id if block_count > 1 else None
             section = block_list[2] if block_count > 2 else None
             position = ""
 
+            #position is found traversing the section block
             if block_count > 3:
                 position = 1
                 for block in section.children:
                     if block.name == block_list[3].url_name:
                         break
                     position += 1
+            if section:
+                section = section.url_name
 
+            #Below this point chapter, section, and position are strings or None
             kwargs = dict(
                 course_id=unicode(self.course_id),
-                chapter=chapter.url_name,
-                section=section.url_name
+                chapter=chapter,
+                section=section
             )
             section_url = reverse(
                 "courseware_section",
@@ -92,6 +96,15 @@ class BlockOutline(object):
                 kwargs=kwargs,
                 request=self.request,
             )
+            #reverse will return "None/" if chapter or section is None.
+            if not chapter:
+                unit_url = unit_url[:-5]
+                section_url = section_url[:-5]
+            #If both are none, a second "None/" needs to be removed.
+            if not section:
+                unit_url = unit_url[:-5]
+                section_url = section_url[:-5]
+
             return unit_url, section_url
 
         user = self.request.user
