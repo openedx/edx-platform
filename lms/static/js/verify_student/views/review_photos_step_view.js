@@ -12,8 +12,8 @@ var edx = edx || {};
 
         defaultContext: function() {
             return {
-                platformName: "",
-                fullName: "",
+                platformName: '',
+                fullName: '',
             };
         },
 
@@ -27,9 +27,6 @@ var edx = edx || {};
             $( '.is-expandable' ).addClass('is-ready');
             $( '.is-expandable .title-expand' ).on( 'click', this.expandCallback );
 
-            // Disable the submit button until user confirmation
-            $( '#confirm_pics_good' ).on( 'click', this.toggleSubmitEnabled );
-
             // Go back to the first photo step if we need to retake photos
             $( '#retake_photos_button' ).on( 'click', _.bind( this.retakePhotos, this ) );
 
@@ -38,10 +35,6 @@ var edx = edx || {};
 
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'verification', this.templateName );
-        },
-
-        toggleSubmitEnabled: function() {
-            $( '#next_step_button' ).toggleClass( 'is-disabled' );
         },
 
         retakePhotos: function() {
@@ -73,11 +66,10 @@ var edx = edx || {};
         },
 
         handleSubmissionError: function( xhr ) {
-            var isConfirmChecked = $( "#confirm_pics_good" ).prop('checked'),
-                errorMsg = gettext( 'An unexpected error occurred.  Please try again later.' );
+            var errorMsg = gettext( 'An unexpected error occurred. Please try again later.' );
 
             // Re-enable the submit button to allow the user to retry
-            $( '#next_step_button' ).toggleClass( 'is-disabled', !isConfirmChecked );
+            $( '#next_step_button' ).removeClass( 'is-disabled' );
 
             if ( xhr.status === 400 ) {
                 errorMsg = xhr.responseText;
@@ -91,11 +83,12 @@ var edx = edx || {};
         },
 
         expandCallback: function( event ) {
+            var title;
+
             event.preventDefault();
 
             $(this).next('.expandable-area' ).slideToggle();
-
-            var title = $( this ).parent();
+            title = $( this ).parent();
             title.toggleClass( 'is-expanded' );
             title.attr( 'aria-expanded', !title.attr( 'aria-expanded' ) );
         }

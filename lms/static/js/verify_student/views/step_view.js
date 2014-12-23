@@ -43,19 +43,6 @@
             return this;
         },
 
-        handleResponse: function( data ) {
-            var context = {
-                nextStepNum: this.nextStepNum,
-                nextStepTitle: this.nextStepTitle
-            };
-
-            // Include step-specific information
-            _.extend( context, this.stepData );
-
-            // Track a virtual pageview, for easy funnel reconstruction.
-            window.analytics.page( 'verification', this.templateName );
-        },
-
         handleError: function( errorTitle, errorMsg ) {
             this.errorModel.set({
                 errorTitle: errorTitle || gettext( "Error" ),
@@ -66,7 +53,6 @@
 
         templateContext: function() {
             var context = {
-                nextStepNum: this.nextStepNum,
                 nextStepTitle: this.nextStepTitle
             };
             return _.extend( context, this.defaultContext(), this.stepData );

@@ -992,7 +992,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
-            PayAndVerifyView.CREDIT_CARD_REQ,
         ])
 
     @ddt.data("expired", "denied")
@@ -1033,9 +1032,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.CREDIT_CARD_REQ,
-        ])
+        self._assert_requirements_displayed(response, [])
 
     @ddt.data("verified", "professional")
     def test_start_flow_already_paid(self, course_mode):
@@ -1068,9 +1065,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.PAYMENT_STEPS,
             PayAndVerifyView.MAKE_PAYMENT_STEP
         )
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.CREDIT_CARD_REQ,
-        ])
+        self._assert_requirements_displayed(response, [])
 
     def test_start_flow_unenrolled(self):
         course = self._create_course("verified")
@@ -1086,9 +1081,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.PAYMENT_STEPS,
             PayAndVerifyView.MAKE_PAYMENT_STEP
         )
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.CREDIT_CARD_REQ,
-        ])
+        self._assert_requirements_displayed(response, [])
 
     @ddt.data(
         ("verified", "submitted"),
@@ -1128,7 +1121,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
-            PayAndVerifyView.CREDIT_CARD_REQ,
         ])
 
     def test_verify_now_already_verified(self):
@@ -1237,27 +1229,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
-            PayAndVerifyView.CREDIT_CARD_REQ,
         ])
-
-    def test_payment_confirmation_skip_first_step(self):
-        course = self._create_course("verified")
-        self._enroll(course.id, "verified")
-        response = self._get_page(
-            'verify_student_payment_confirmation',
-            course.id,
-            skip_first_step=True
-        )
-
-        self._assert_messaging(response, PayAndVerifyView.PAYMENT_CONFIRMATION_MSG)
-
-        # Expect that *all* steps are displayed,
-        # but we start on the first verify step
-        self._assert_steps_displayed(
-            response,
-            PayAndVerifyView.PAYMENT_STEPS + PayAndVerifyView.VERIFICATION_STEPS,
-            PayAndVerifyView.FACE_PHOTO_STEP,
-        )
 
     def test_payment_cannot_skip(self):
         """
@@ -1358,7 +1330,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
-            PayAndVerifyView.CREDIT_CARD_REQ,
         ])
 
     def test_upgrade_already_verified(self):
@@ -1373,9 +1344,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.MAKE_PAYMENT_STEP
         )
         self._assert_messaging(response, PayAndVerifyView.UPGRADE_MSG)
-        self._assert_requirements_displayed(response, [
-            PayAndVerifyView.CREDIT_CARD_REQ,
-        ])
+        self._assert_requirements_displayed(response, [])
 
     def test_upgrade_already_paid(self):
         course = self._create_course("verified")
@@ -1486,7 +1455,6 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         )
         self._assert_requirements_displayed(response, [
             PayAndVerifyView.ACCOUNT_ACTIVATION_REQ,
-            PayAndVerifyView.CREDIT_CARD_REQ,
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
         ])
@@ -1515,6 +1483,22 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         # Expect that the contribution amount is pre-filled,
         response = self._get_page("verify_student_start_flow", course.id)
         self._assert_contribution_amount(response, "12.34")
+
+    def test_verification_deadline(self):
+        # Set a deadline on the course mode
+        course = self._create_course("verified")
+        mode = CourseMode.objects.get(
+            course_id=course.id,
+            mode_slug="verified"
+        )
+        expiration = datetime(2999, 1, 2, tzinfo=pytz.UTC)
+        mode.expiration_datetime = expiration
+        mode.save()
+
+        # Expect that the expiration date is set
+        response = self._get_page("verify_student_start_flow", course.id)
+        data = self._get_page_data(response)
+        self.assertEqual(data['verification_deadline'], "Jan 02, 2999 at 00:00 UTC")
 
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
@@ -1648,7 +1632,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             'current_step': pay_and_verify_div['data-current-step'],
             'requirements': json.loads(pay_and_verify_div['data-requirements']),
             'message_key': pay_and_verify_div['data-msg-key'],
-            'contribution_amount': pay_and_verify_div['data-contribution-amount']
+            'contribution_amount': pay_and_verify_div['data-contribution-amount'],
+            'verification_deadline': pay_and_verify_div['data-verification-deadline']
         }
 
     def _assert_redirects_to_dashboard(self, response):

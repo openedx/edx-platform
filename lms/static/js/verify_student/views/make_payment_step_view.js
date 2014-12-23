@@ -15,41 +15,62 @@ var edx = edx || {};
                 isActive: true,
                 suggestedPrices: [],
                 minPrice: 0,
-                currency: "usd"
+                currency: 'usd',
+                upgrade: false,
+                verificationDeadline: '',
+                courseName: '',
+                requirements: {},
+                platformName: ''
             };
         },
 
         postRender: function() {
-            // Render requirements
-            new edx.verify_student.RequirementsView({
-                el: $( '.requirements-container', this.el ),
-                requirements: this.stepData.requirements
-            }).render();
+            var templateContext = this.templateContext(),
+                hasVisibleReqs = _.some(
+                    templateContext.requirements,
+                    function( isVisible ) { return isVisible; }
+                );
 
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'payment', this.templateName );
 
             // Update the contribution amount with the amount the user
             // selected in a previous screen.
-            if ( this.stepData.contributionAmount ) {
-                this.selectPaymentAmount( this.stepData.contributionAmount );
+            if ( templateContext.contributionAmount ) {
+                this.selectPaymentAmount( templateContext.contributionAmount );
             }
 
-            if ( this.templateContext().suggestedPrices.length > 0 ) {
+            // The contribution section is hidden by default
+            // Display it if the user hasn't already selected an amount
+            // or is upgrading.
+            // In the short-term, we're also displaying this if there
+            // are no requirements (e.g. the user already verified).
+            // Otherwise, there's absolutely nothing to do on this page.
+            // In the future, we'll likely skip directly to payment
+            // from the track selection page if this happens.
+            if ( templateContext.upgrade || !templateContext.contributionAmount || !hasVisibleReqs ) {
+                $( '.wrapper-task' ).removeClass( 'hidden' ).removeAttr( 'aria-hidden' );
+            }
+
+            if ( templateContext.suggestedPrices.length > 0 ) {
                 // Enable the payment button once an amount is chosen
-                $( "input[name='contribution']" ).on( 'click', _.bind( this.enablePaymentButton, this ) );
+                $( 'input[name="contribution"]' ).on( 'click', _.bind( this.setPaymentEnabled, this ) );
             } else {
                 // If there is only one payment option, then the user isn't shown
                 // radio buttons, so we need to enable the radio button.
-                this.enablePaymentButton();
+                this.setPaymentEnabled( true );
             }
 
             // Handle payment submission
-            $( "#pay_button" ).on( 'click', _.bind( this.createOrder, this ) );
+            $( '#pay_button' ).on( 'click', _.bind( this.createOrder, this ) );
         },
 
-        enablePaymentButton: function() {
-            $("#pay_button").removeClass("is-disabled");
+        setPaymentEnabled: function( isEnabled ) {
+            if ( _.isUndefined( isEnabled ) ) {
+                isEnabled = true;
+            }
+
+            $( '#pay_button' ).toggleClass( 'is-disabled', !isEnabled );
         },
 
         createOrder: function() {
@@ -60,7 +81,7 @@ var edx = edx || {};
                 };
 
             // Disable the payment button to prevent multiple submissions
-            $("#pay_button").addClass("is-disabled");
+            this.setPaymentEnabled( false );
 
             // Create the order for the amount
             $.ajax({
@@ -84,16 +105,16 @@ var edx = edx || {};
             // these parameters, then submit it to the payment processor.
             // This will send the user to a hosted order page,
             // where she can enter credit card information.
-            var form = $( "#payment-processor-form" );
+            var form = $( '#payment-processor-form' );
 
-            $( "input", form ).remove();
+            $( 'input', form ).remove();
 
-            form.attr( "action", this.stepData.purchaseEndpoint );
-            form.attr( "method", "POST" );
+            form.attr( 'action', this.stepData.purchaseEndpoint );
+            form.attr( 'method', 'POST' );
 
             _.each( paymentParams, function( value, key ) {
-                $("<input>").attr({
-                    type: "hidden",
+                $('<input>').attr({
+                    type: 'hidden',
                     name: key,
                     value: value
                 }).appendTo(form);
@@ -121,15 +142,15 @@ var edx = edx || {};
             });
 
             // Re-enable the button so the user can re-try
-            $( "#pay_button" ).removeClass("is-disabled");
+            $( '#pay_button' ).removeClass( 'is-disabled' );
         },
 
         getPaymentAmount: function() {
-            var contributionInput = $("input[name='contribution']:checked", this.el),
+            var contributionInput = $( 'input[name="contribution"]:checked' , this.el),
                 amount = null;
 
             if ( contributionInput.attr('id') === 'contribution-other' ) {
-                amount = $( "input[name='contribution-other-amt']", this.el ).val();
+                amount = $( 'input[name="contribution-other-amt"]' , this.el ).val();
             } else {
                 amount = contributionInput.val();
             }
@@ -167,7 +188,7 @@ var edx = edx || {};
             }
 
             // In either case, enable the payment button
-            this.enablePaymentButton();
+            this.setPaymentEnabled();
 
             return amount;
         },

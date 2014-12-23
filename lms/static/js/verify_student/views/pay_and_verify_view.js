@@ -1,8 +1,8 @@
 /**
  * Base view for the payment/verification flow.
  *
- * This view is responsible for the "progress steps"
- * at the top of the page, but it delegates
+ * This view is responsible for keeping track of the
+ * current step, but it delegates to
  * to subviews to render individual steps.
  *
  */
@@ -27,21 +27,11 @@ var edx = edx || {};
         initialize: function( obj ) {
             this.errorModel = obj.errorModel || null;
             this.displaySteps = obj.displaySteps || [];
-
-            this.progressView = new edx.verify_student.ProgressView({
-                el: this.el,
-                displaySteps: this.displaySteps,
-
-                // Determine which step we're starting on
-                // Depending on how the user enters the flow,
-                // this could be anywhere in the sequence of steps.
-                currentStepIndex: _.indexOf(
-                    _.pluck( this.displaySteps, 'name' ),
-                    obj.currentStep
-                )
-            });
-
             this.initializeStepViews( obj.stepInfo || {} );
+            this.currentStepIndex = _.indexOf(
+                _.pluck( this.displaySteps, 'name' ),
+                obj.currentStep
+            );
         },
 
         initializeStepViews: function( stepInfo ) {
@@ -94,7 +84,6 @@ var edx = edx || {};
                     subviewConfig = {
                         errorModel: this.errorModel,
                         templateName: this.displaySteps[i].templateName,
-                        nextStepNum: (i + 2), // Next index, starting from 1
                         nextStepTitle: nextStepTitle,
                         stepData: stepData
                     };
@@ -118,7 +107,6 @@ var edx = edx || {};
         },
 
         render: function() {
-            this.progressView.render();
             this.renderCurrentStep();
             return this;
         },
@@ -137,19 +125,30 @@ var edx = edx || {};
             // underscore template.
             // When the view is rendered, it will overwrite the existing
             // step in the DOM.
-            stepName = this.displaySteps[ this.progressView.currentStepIndex ].name;
+            stepName = this.displaySteps[ this.currentStepIndex ].name;
             stepView = this.subviews[ stepName ];
             stepView.el = stepEl;
             stepView.render();
         },
 
         nextStep: function() {
-            this.progressView.nextStep();
+            this.currentStepIndex = Math.min(
+                this.currentStepIndex + 1,
+                this.displaySteps.length - 1
+            );
             this.render();
         },
 
         goToStep: function( stepName ) {
-            this.progressView.goToStep( stepName );
+            var stepIndex = _.indexOf(
+                _.pluck( this.displaySteps, 'name' ),
+                stepName
+            );
+
+            if ( stepIndex >= 0 ) {
+                this.currentStepIndex = stepIndex;
+            }
+
             this.render();
         }
     });
