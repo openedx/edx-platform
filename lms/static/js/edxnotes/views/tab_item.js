@@ -19,6 +19,14 @@ function (gettext, _, Backbone, templateUtils) {
             this.listenTo(this.model, {
                 'change:is_active': function (model, value) {
                     this.$el.toggleClass(this.activeClassName, value);
+                    if (value) {
+                        this.$('.tab-label').prepend($('<span />', {
+                            'class': 'tab-aria-label sr',
+                            'text': gettext('Current tab')
+                        }));
+                    } else {
+                        this.$('.tab-aria-label').remove();
+                    }
                 },
                 'destroy': this.remove
             });
