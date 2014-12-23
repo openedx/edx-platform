@@ -37,19 +37,6 @@ from verify_student.views import PayAndVerifyView
 
 <div class="container">
   <section class="wrapper carousel">
-
-    ## Verification status header
-    <!--header class="page-header">
-      <h2 class="title">
-        <span class="wrapper-sts">
-          <span class="sts-label">${messages.top_level_msg}</span>
-        </span>
-        <span class="sts-track ${"professional-ed" if course_mode.slug == "professional" else ""}">
-          <span class="sts-track-value"><span class="context">${messages.status_msg}</span>: ${course_mode.name}<span>
-        </span>
-      </h2>
-    </header-->
-
     ## Payment / Verification flow
     ## Most of these data attributes are used to dynamically render
     ## the steps, but some are just useful for A/B test setup.
