@@ -62,7 +62,6 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
       $(@element.find('.xml-box')).hide()
     else
       @createXMLEditor()
-      @xml_editor.display.wrapper.className += " CodeMirror-advanced";
 
     @alertTaskRubricModification()
 
@@ -93,7 +92,6 @@ Write a persuasive essay to a newspaper reflecting your views on censorship in l
       @toggleCheatsheetVisibility()
     if @confirmConversionToXml()
       @createXMLEditor(OpenEndedMarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
-      @xml_editor.display.wrapper.className += " CodeMirror-advanced";
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
       @xml_editor.setCursor(0)
       @xml_editor.refresh()
