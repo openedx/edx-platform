@@ -27,6 +27,7 @@ from courseware.views import registered_for_course
 from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment
+from branding import get_logo_url
 from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
@@ -804,9 +805,9 @@ def _show_receipt_html(request, order):
 
     invoice = Invoice(client, provider, creator)
     invoice.currency_locale = 'en_US.UTF-8'
-    invoice.add_item(Item(32, 600, description="Item 1"))
-    invoice.add_item(Item(60, 50, description="Item 2", tax=10))
-    invoice.add_item(Item(50, 60, description="Item 3", tax=5))
+    # invoice.add_item(Item(32, 600, description="Item 1"))
+    # invoice.add_item(Item(60, 50, description="Item 2", tax=10))
+    # invoice.add_item(Item(50, 60, description="Item 3", tax=5))
 
     buffer = BytesIO()
     pdf = SimpleInvoice(invoice)
