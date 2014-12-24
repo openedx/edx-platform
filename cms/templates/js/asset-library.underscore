@@ -26,7 +26,7 @@
                         <span class="type-filter" data-alllabel='<%= gettext("Type") %>'><%= gettext("Type") %></span>
                         <span class="label-prefix sr">Filter</span>
                         <span class="filter-link"></span>
-                        <i class="icon-caret-down ui-toggle-dd" aria-hidden="true"></i>
+                        <i class="fa fa-caret-down ui-toggle-dd" aria-hidden="true"></i>
                     </span>
                     <div class="wrapper-nav-sub">
                         <div class="nav-sub">

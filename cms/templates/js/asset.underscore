@@ -20,13 +20,13 @@
     <ul>
         <li class="embed-url">
             <label>
-                <span class="label"><%= gettext('Studio:') %></span> 
+                <span class="label"><%= gettext('Studio:') %></span>
                 <input type="text" class="embeddable-xml-input" value="<%= portable_url %>" readonly>
             </label>
         </li>
         <li class="external-url">
             <label>
-                <span class="label"><%= gettext('Web:') %></span> 
+                <span class="label"><%= gettext('Web:') %></span>
                 <input type="text" class="embeddable-xml-input" value="<%= external_url %>" readonly>
             </label>
         </li>

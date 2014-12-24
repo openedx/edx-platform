@@ -5,7 +5,6 @@ from datetime import datetime
 from io import BytesIO
 from pytz import UTC
 import json
-import os
 from django.conf import settings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views import assets
@@ -35,17 +34,17 @@ class AssetsTestCase(CourseTestCase):
         super(AssetsTestCase, self).setUp()
         self.url = reverse_course_url('assets_handler', self.course.id)
 
-    def upload_asset(self, name="asset-1"):
+    def upload_asset(self, name="asset-1", extension=".txt"):
         """
         Post to the asset upload url
         """
-        f = self.get_sample_asset(name)
+        f = self.get_sample_asset(name, extension)
         return self.client.post(self.url, {"name": name, "file": f})
 
-    def get_sample_asset(self, name):
+    def get_sample_asset(self, name, extension=".txt"):
         """Returns an in-memory file with the given name for testing"""
         f = BytesIO(name)
-        f.name = name + ".txt"
+        f.name = name + extension
         return f
 
 
@@ -99,23 +98,60 @@ class PaginationTestCase(AssetsTestCase):
         self.upload_asset("asset-1")
         self.upload_asset("asset-2")
         self.upload_asset("asset-3")
+        self.upload_asset("asset-4", ".odt")
 
         # Verify valid page requests
-        self.assert_correct_asset_response(self.url, 0, 3, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=1", 2, 1, 3)
+        self.assert_correct_asset_response(self.url, 0, 4, 4)
+        self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 4)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=2&page=1", 2, 2, 4)
         self.assert_correct_sort_response(self.url, 'date_added', 'asc')
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
         self.assert_correct_sort_response(self.url, 'display_name', 'desc')
         self.assert_correct_filter_response(self.url, 'asset_type', '')
         self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
-        self.assert_correct_filter_response(self.url, 'asset_type', 'Documents')
+        self.assert_correct_filter_response(
+            self.url, 'asset_type', 'Documents')
 
         # Verify querying outside the range of valid pages
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=2", 2, 1, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=3&page=1", 0, 3, 3)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=2&page=-1", 0, 2, 4)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=2&page=2", 2, 2, 4)
+        self.assert_correct_asset_response(
+            self.url + "?page_size=3&page=1", 3, 1, 4)
+
+    @mock.patch('xmodule.contentstore.mongo.MongoContentStore.get_all_content_for_course')
+    def test_mocked_filtered_response(self, mock_get_all_content_for_course):
+        """
+        Test the ajax asset interfaces
+        """
+        asset_key = self.course.id.make_asset_key(
+            AssetMetadata.GENERAL_ASSET_TYPE, 'test.jpg')
+        upload_date = datetime(2015, 1, 12, 10, 30, tzinfo=UTC)
+        thumbnail_location = [
+            'c4x', 'edX', 'toy', 'thumbnail', 'test_thumb.jpg', None]
+
+        mock_get_all_content_for_course.return_value = [
+            [
+                {
+                    "asset_key": asset_key,
+                    "displayname": "test.jpg",
+                    "contentType": "image/jpg",
+                    "url": "/c4x/A/CS102/asset/test.jpg",
+                    "uploadDate": upload_date,
+                    "id": "/c4x/A/CS102/asset/test.jpg",
+                    "portable_url": "/static/test.jpg",
+                    "thumbnail": None,
+                    "thumbnail_location": thumbnail_location,
+                    "locked": None
+                }
+            ],
+            1
+        ]
+        # Verify valid page requests
+        self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
 
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         """
@@ -132,7 +168,8 @@ class PaginationTestCase(AssetsTestCase):
         """
         Get from the url w/ a sort option and ensure items honor that sort
         """
-        resp = self.client.get(url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
+        resp = self.client.get(
+            url + '?sort=' + sort + '&direction=' + direction, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
         name1 = assets_response[0][sort]
@@ -149,21 +186,24 @@ class PaginationTestCase(AssetsTestCase):
         """
         Get from the url w/ a filter option and ensure items honor that filter
         """
-        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(filter_value, None)
-        resp = self.client.get(url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
+        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(
+            filter_value, None)
+        resp = self.client.get(
+            url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
         json_response = json.loads(resp.content)
         assets_response = json_response['assets']
         if filter_value is not '':
-            extensions = [os.path.splitext(asset['display_name'])[1][1:].upper() for asset in assets_response]
+            content_types = [asset['content_type'].lower()
+                             for asset in assets_response]
             if filter_value is 'OTHER':
                 all_file_type_extensions = []
                 for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTERS:
                     all_file_type_extensions.extend(file_type)
-                for extension in extensions:
-                    self.assertNotIn(extension, all_file_type_extensions)
+                for content_type in content_types:
+                    self.assertNotIn(content_type, all_file_type_extensions)
             else:
-                for extension in extensions:
-                    self.assertIn(extension, requested_file_types)
+                for content_type in content_types:
+                    self.assertIn(content_type, requested_file_types)
 
 
 @ddt
@@ -299,9 +339,11 @@ class LockAssetTestCase(AssetsTestCase):
             resp = self.client.post(
                 url,
                 # pylint: disable=protected-access
-                json.dumps(assets._get_asset_json("sample_static.txt", content_type, upload_date, asset_location, None, lock)),
+                json.dumps(assets._get_asset_json(
+                    "sample_static.txt", content_type, upload_date, asset_location, None, lock)),
                 "application/json"
             )
+
             self.assertEqual(resp.status_code, 201)
             return json.loads(resp.content)
 

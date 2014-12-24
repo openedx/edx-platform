@@ -70,7 +70,7 @@
             <div class="bit">
                 <h3 class="title-3">${_("Using File URLs")}</h3>
 
-                <p>${_("Use the {em_start}Studio URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("Use the {em_start}{studio_name} URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(studio_name=settings.STUDIO_SHORT_NAME, em_start="<strong>", em_end="</strong>")}</p>
 
                 <p>${_("Use the {em_start}Web URL{em_end} value to reference the file or image only from outside of your course. {em_start}Note:{em_end} If you lock a file, the Web URL no longer works for external access to a file.").format(em_start='<strong>', em_end="</strong>")}</p>
 

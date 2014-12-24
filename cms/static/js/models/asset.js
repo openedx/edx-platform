@@ -13,7 +13,7 @@ define(["backbone"], function(Backbone) {
       portable_url: "",
       locked: false
     },
-    get_asset_type: function(){
+    get_extension: function(){
       var name_segments = this.get("display_name").split(".").reverse();
       var asset_type = (name_segments.length > 1) ? name_segments[0].toUpperCase() : "";
       return asset_type;

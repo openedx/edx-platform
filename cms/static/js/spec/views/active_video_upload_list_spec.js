@@ -35,14 +35,14 @@ define(
 
             var makeUploadUrl = function(fileName) {
                 return "http://www.example.com/test_url/" + fileName;
-            }
+            };
 
             var getSentRequests = function() {
                 return _.filter(
                     ajaxRequests,
                     function(request) { return request.readyState > 0; }
                 );
-            }
+            };
 
             _.each(
                 [

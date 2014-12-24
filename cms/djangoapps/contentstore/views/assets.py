@@ -110,8 +110,9 @@ def _assets_json(request, course_key):
             where = []
             for all_filter in all_filters:
                 extension_filters = all_filters[all_filter]
-                where.extend(["JSON.stringify(this.contentType).toUpperCase() != JSON.stringify('{}').toUpperCase()".format(
-                    extension_filter) for extension_filter in extension_filters])
+                where.extend(
+                    ["JSON.stringify(this.contentType).toUpperCase() != JSON.stringify('{}').toUpperCase()".format(
+                        extension_filter) for extension_filter in extension_filters])
             filter_params = {
                 "$where": ' && '.join(where),
             }

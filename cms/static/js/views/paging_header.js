@@ -31,16 +31,32 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
         },
 
         messageHtml: function() {
-            var message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ');
-            if (this.view.collection.assetType){
-                message = message + gettext('filtered by %(asset_type)s, ');
+            var message = '';
+            if (this.view.collection.assetType) {
+                if (this.view.collection.sortDirection === 'asc') {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'filtered by %(asset_type)s, sorted by %(sort_name)s ascending');
+                } else {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'filtered by %(asset_type)s, sorted by %(sort_name)s descending');
+                }
             }
-            if (this.view.collection.sortDirection === 'asc') {
-                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                message = message + gettext('sorted by %(sort_name)s ascending');
-            } else {
-                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                message = message + gettext('sorted by %(sort_name)s descending');
+            else {
+                if (this.view.collection.sortDirection === 'asc') {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'sorted by %(sort_name)s ascending');
+                } else {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added descending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'sorted by %(sort_name)s descending');
+                }
             }
             return '<p>' + interpolate(message, {
                 current_item_range: this.currentItemRangeLabel(),

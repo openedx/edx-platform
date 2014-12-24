@@ -197,7 +197,13 @@ class MongoContentStore(ContentStore):
             self.fs_files.remove(query)
         return assets_to_delete
 
-    def _get_all_content_for_course(self, course_key, get_thumbnails=False, start=0, maxresults=-1, sort=None, filter_params=None):
+    def _get_all_content_for_course(self,
+                                    course_key,
+                                    get_thumbnails=False,
+                                    start=0,
+                                    maxresults=-1,
+                                    sort=None,
+                                    filter_params=None):
         '''
         Returns a list of all static assets for a course. The return format is a list of asset data dictionary elements.
 

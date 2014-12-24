@@ -83,7 +83,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             renderPageItems: function() {
                 var self = this,
                 assets = this.collection,
-                hasAssets = this.collection.assetType != '' || assets.length > 0,
+                hasAssets = this.collection.assetType !== '' || assets.length > 0,
                 tableBody = this.getTableBody();
                 tableBody.empty();
                 if (hasAssets) {
@@ -242,11 +242,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
                 var assettype = selected ? selected.data('assetfilter'): false;
-                if(assettype){
-                    if(assettype == this.allLabel){
+                if(assettype) {
+                    if(assettype === this.allLabel) {
                         titleText.text(titleText.data('alllabel'));
                     }
-                    else{
+                    else {
                         titleText.text(assettype);
                     }
                 }
@@ -262,26 +262,26 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var $filterColumn = $(event.currentTarget);
-                this._toggleFilterColumn($filterColumn.data('assetfilter'));
+                this._toggleFilterColumn($filterColumn.data('assetfilter'), $filterColumn.text());
             },
 
-            _toggleFilterColumn: function(assettype) {
+            _toggleFilterColumn: function(assettype, assettypeLabel) {
                 var collection = this.collection;
                 var filterColumn = this.$el.find('.filterable-column');
                 var resetFilter = filterColumn.find('.reset-filter');
                 var title = filterColumn.find('.title');
-                if(assettype == this.allLabel){
+                if(assettype === this.allLabel) {
                     collection.assetType = '';
                     resetFilter.hide();
                     title.removeClass('column-selected-link');
                 }
-                else{
+                else {
                     collection.assetType = assettype;
                     resetFilter.show();
                     title.addClass('column-selected-link');
                 }
 
-                this.filterableColumns['js-asset-type-col'].displayName = assettype;
+                this.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
                 this.selectFilter('js-asset-type-col');
                 this.closeFilterPopup(this.$el.find(
                     '.column-filter-link[data-assetfilter="' + assettype + '"]'));
