@@ -1,25 +1,40 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%namespace file="../main.html" import="stanford_theme_enabled" />
-${_("We received a request to change the e-mail associated with your "
-    "{platform_name} account from {old_email} to {new_email}. "
-    "If this is correct, please confirm your new e-mail address by "
-    "visiting:").format(platform_name=settings.PLATFORM_NAME, old_email=old_email, new_email=new_email)}
+━━━━━━━━━━
+■gaccoメールアドレス変更手続きのご案内
+━━━━━━━━━━
+いつもgaccoをご利用いただきまして、ありがとうございます。
 
+
+下記のＵＲＬをクリックして、メールアドレスの変更の手続きを完了して
+ください。
+
+──────────
+【メールアドレス変更のＵＲＬ】
 % if is_secure:
  https://${ site }/email_confirm/${ key }
 % else:
  http://${ site }/email_confirm/${ key }
 % endif
+──────────
 
-## TODO: fix this ugly hack
-% if stanford_theme_enabled():
-  ${_("If you didn't request this, you don't need to do anything; you won't "
-      "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the about section of the "
-      "{platform_name} Courses web site.").format(platform_name=settings.PLATFORM_NAME)}
-% else:
-  ${_("If you didn't request this, you don't need to do anything; you won't "
-      "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the help section of the "
-      "{platform_name} web site.").format(platform_name=settings.PLATFORM_NAME)}
-% endif
+※アクセスしてもエラー画面が表示される場合は、
+　再度メールアドレス変更の申込を行ってください。
+
+※上記手続き用URLが改行され、URLをクリックしても
+　登録ページが表示されない場合は、URLをすべてコピーして
+　ブラウザのアドレス欄に貼り付けてアクセスしてください。
+
+──────────
+
+
+このメールは自動送信しています。ご返信いただいてもお答えできかね
+ますのでご了承ください。
+====================
+・gaccoに関する「よくあるご質問」はコチラ
+https://support.gacco.org/
+
+・お問い合わせはマイページの「ヘルプ」ボタンよりお願いします
+https://lms.gacco.org/dashboard
+
+
+gacco運営チーム

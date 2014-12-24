@@ -1,51 +1,38 @@
 <%namespace file="../main.html" import="stanford_theme_enabled" />
 <%! from django.utils.translation import ugettext as _ %>
-${_("Thank you for signing up for {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
+━━━━━━━━━
+■gacco 会員登録のご案内
+━━━━━━━━━
+この度は、gaccoに会員登録いただきまして、ありがとうございます。
 
-${_("To get started, please activate your account by clicking on the link below"
-      " (you may also copy and paste the link into your browser's address"
-      " bar).").format(platform_name=settings.PLATFORM_NAME)}
-
+登録の手続きはまだ完了していません。
+以下のURLをクリックし、登録を完了してください。
+─────────
+【会員登録手続き用ＵＲＬ】
 % if is_secure:
   https://${ site }/activate/${ key }
 % else:
   http://${ site }/activate/${ key }
 % endif
+─────────
 
-% if settings.PLATFORM_NAME == "edX":
-${_("Activation ensures that you can register for {platform_name} courses and"
-      " access the courseware."
-      " If you require assistance, please use our web form at"
-      " {contact_us} or email {info_address}.").format(
-             platform_name=settings.PLATFORM_NAME,
-             contact_us='https://www.edx.org/contact-us',
-             info_address=settings.CONTACT_EMAIL
-      )}
+※上記手続き用URLが改行され、URLをクリックしても
+　登録ページが表示されない場合は、URLをすべてコピーして、
+　ブラウザのアドレス欄に貼り付けてアクセスしてください。
 
-${_("We hope you enjoy learning with {platform_name}!").format(
-        platform_name=settings.PLATFORM_NAME
-)}
+─────────
 
-${_("The {platform_name} Team").format(platform_name=settings.PLATFORM_NAME)}
+このメールは自動送信しています。ご返信いただいてもお答えできかね
+ますのでご了承ください。
 
-${_("This email was automatically sent by {site_name} because someone "
-      "attempted to create an {platform_name} account using this email address. If you "
-      "did not attempt to create this account and do not activate the account, "
-      "you will no longer receive emails from {platform_name}.").format(
-        platform_name=settings.PLATFORM_NAME,
-	site_name=settings.SITE_NAME
-)}
+なお、このメールの内容に覚えのない方は、破棄していただきますよう
+お願い申し上げます。
+==================
+・gaccoに関する「よくあるご質問」はコチラ
+https://support.gacco.org/
 
-% elif stanford_theme_enabled():  ## Temporary hack until we develop a better way to adjust language
-${_("If you didn't request this, you don't need to do anything; you won't "
-      "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the about section of the "
-      "{platform_name} Courses web site.").format(platform_name=settings.PLATFORM_NAME)}
+・お問い合わせはマイページの「ヘルプ」ボタンよりお願いします
+https://lms.gacco.org/dashboard
 
-% else:
-${_("If you didn't request this, you don't need to do anything; you won't "
-      "receive any more email from us. Please do not reply to this e-mail; "
-      "if you require assistance, check the help section of the "
-      "{platform_name} website.").format(platform_name=settings.PLATFORM_NAME)}
 
-% endif
+gacco運営チーム
