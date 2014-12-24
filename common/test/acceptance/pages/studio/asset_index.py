@@ -2,10 +2,8 @@
 The Files and Uploads page for a course in Studio
 """
 
-import time
 from .course_page import CoursePage
-from bok_choy.javascript import wait_for_js, js_defined, requirejs
-from bok_choy.promise import EmptyPromise
+from bok_choy.javascript import wait_for_js, requirejs
 
 
 @requirejs('js/views/assets')
@@ -29,12 +27,14 @@ class AssetIndexPage(CoursePage):
         """
         return self.q(css=self.type_filter_element).present
 
+    @wait_for_js
     def type_filter_header_label_visible(self):
         """
         Checks type filter label is added and visible in the pagination header.
         """
         return self.q(css='span.filter-column').visible
 
+    @wait_for_js
     def click_type_filter(self):
         """
         Clicks type filter menu.

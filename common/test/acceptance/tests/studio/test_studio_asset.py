@@ -1,12 +1,11 @@
 """
 Acceptance tests for Studio related to the asset index page.
 """
-import unittest
-from bok_choy.web_app_test import WebAppTest
-import bok_choy.browser
+
 from ...pages.studio.asset_index import AssetIndexPage
 
-from base_studio_test import StudioCourseTest
+from acceptance.tests.studio.base_studio_test import StudioCourseTest
+from acceptance.fixtures.course import StudioApiLoginError
 
 
 class AssetIndexTest(StudioCourseTest):
@@ -15,7 +14,7 @@ class AssetIndexTest(StudioCourseTest):
     Tests for the Asset index page.
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False):
         super(AssetIndexTest, self).setUp()
         self.asset_page = AssetIndexPage(
             self.browser,
@@ -40,15 +39,15 @@ class AssetIndexTest(StudioCourseTest):
         """
         Make sure type filter is on the page.
         """
-        browser = bok_choy.browser.browser()
-        self.addCleanup(browser.quit)
-        assert self.asset_page.visit().type_filter_on_page() == True
+        self.asset_page.visit()
+        assert self.asset_page.type_filter_on_page() is True
 
     def test_filter_results(self):
         """
         Make sure type filter actually filters the results.
         """
-        all_results = len(self.asset_page.visit().return_results_set())
+        self.asset_page.visit()
+        all_results = len(self.asset_page.return_results_set())
         if self.asset_page.select_type_filter(1):
             filtered_results = len(self.asset_page.return_results_set())
             assert self.asset_page.type_filter_header_label_visible()
