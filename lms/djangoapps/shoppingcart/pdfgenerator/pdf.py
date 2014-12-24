@@ -10,21 +10,18 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.platypus.tables import Table, TableStyle
 
-from .conf import _, FONT_PATH, FONT_BOLD_PATH
-from api import Invoice
 import locale
 import warnings
 
-class BaseInvoice(object):
+_ = lambda x: x
 
-    def __init__(self, invoice):
-        assert isinstance(invoice, Invoice)
+class UnicodeProperty(object):
+    _attrs = ()
 
-        self.invoice = invoice
-
-    def gen(self, filename):
-        pass
-
+    def __setattr__(self, key, value):
+        if key in self._attrs:
+            value = unicode(value)
+        self.__dict__[key] = value
 
 class NumberedCanvas(Canvas):
     def __init__(self, *args, **kwargs):
@@ -53,20 +50,18 @@ class NumberedCanvas(Canvas):
 
 def prepare_invoice_draw(self):
     self.MARGIN = 15
+    FONT_PATH = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf'
+    FONT_BOLD_PATH = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf'
 
     pdfmetrics.registerFont(TTFont('DejaVu', FONT_PATH))
     pdfmetrics.registerFont(TTFont('DejaVu-Bold', FONT_BOLD_PATH))
 
     self.pdf = NumberedCanvas(self.filename, pagesize=letter)
-    self.addMetaInformation(self.pdf)
 
     self.pdf.setFont('DejaVu', 15)
     self.pdf.setStrokeColorRGB(0.5, 0.5, 0.5)
     self.pdf.setLineWidth(0.353 * mm)
 
-    if self.invoice.currency:
-        warnings.warn("currency attribute is deprecated, use locale instead", DeprecationWarning)
-    locale.setlocale(locale.LC_ALL, str(self.invoice.currency_locale))
 
 #Fix for http://bugs.python.org/issue15276.
 def fix_grouping(bytestring):
@@ -80,7 +75,7 @@ def currency(amount):
     return fix_grouping(locale.currency(amount, grouping=True)).replace(u",00 Kč", u",- Kč   ")
 
 
-class SimpleInvoice(BaseInvoice):
+class SimpleInvoice(UnicodeProperty):
 
     def gen(self, filename):
         self.filename = filename
@@ -102,11 +97,6 @@ class SimpleInvoice(BaseInvoice):
     #############################################################
     ## Draw methods
     #############################################################
-
-    def addMetaInformation(self, pdf):
-        pdf.setCreator(self.invoice.provider.summary)
-        pdf.setTitle(self.invoice.title)
-        pdf.setAuthor(self.invoice.creator.name)
 
     def drawBorders(self):
         # Borders
@@ -247,3 +237,15 @@ class SimpleInvoice(BaseInvoice):
 
         self.pdf.setFont('DejaVu', 10)
         self.pdf.drawString((self.MARGIN + 12) * mm, (y_pos - 70) * mm, _('EdX Billing Address'), 0)
+
+        textobject = self.pdf.beginText((self.MARGIN + 12) * mm, (y_pos - 85) * mm)
+        textobject.textLines(
+            """
+            test
+            Hello World
+            23434r34
+            alsdjf;askdjf;
+            """
+        )
+
+        self.pdf.drawText(textobject)

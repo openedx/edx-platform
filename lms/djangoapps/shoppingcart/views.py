@@ -796,21 +796,10 @@ def _show_receipt_html(request, order):
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
 
-    from pdfgenerator.api import Invoice, Item, Client, Provider, Creator
     from pdfgenerator.pdf import SimpleInvoice
 
-    client = Client('Jane Doe')
-    provider = Provider('MITx', bank_account='2600420569/2010', logo_filename='/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
-    creator = Creator('Afzal Wali')
-
-    invoice = Invoice(client, provider, creator)
-    invoice.currency_locale = 'en_US.UTF-8'
-    # invoice.add_item(Item(32, 600, description="Item 1"))
-    # invoice.add_item(Item(60, 50, description="Item 2", tax=10))
-    # invoice.add_item(Item(50, 60, description="Item 3", tax=5))
-
     buffer = BytesIO()
-    pdf = SimpleInvoice(invoice)
+    pdf = SimpleInvoice()
 
     pdf.gen(buffer)
     # Make your response and prep to attach
