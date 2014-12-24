@@ -148,7 +148,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
                     }
                 }]
             };
-            this.server.respondWith('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             this.server.respond();
             expect(this.onSearch).toHaveBeenCalled();
             expect(this.collection.totalCount).toEqual(1);
@@ -166,7 +166,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
         it('loads next page', function () {
             var response = { total: 35, results: [] };
             this.collection.loadNextPage();
-            this.server.respond('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.onNext).toHaveBeenCalled();
             expect(this.onError).not.toHaveBeenCalled();
         });
@@ -174,7 +174,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
         it('has next page', function () {
             var response = { total: 35, results: [] };
             this.collection.performSearch('search string');
-            this.server.respond('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.collection.hasNextPage()).toEqual(true);
             this.collection.loadNextPage();
             this.server.respond();
@@ -186,17 +186,17 @@ function($, Sinon, Backbone, TemplateHelpers) {
 
             this.collection.performSearch('old search');
             this.collection.performSearch('new search');
-            this.server.respond('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.onSearch.calls.length).toEqual(1);
 
             this.collection.performSearch('old search');
             this.collection.cancelSearch();
-            this.server.respond('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.onSearch.calls.length).toEqual(1);
 
             this.collection.loadNextPage();
             this.collection.loadNextPage();
-            this.server.respond('POST', '/search', [200, {}, JSON.stringify(response)]);
+            this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.onNext.calls.length).toEqual(1);
         });
 
