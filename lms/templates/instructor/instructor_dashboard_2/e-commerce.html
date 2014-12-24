@@ -96,7 +96,7 @@
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
                            <th class="c_discount">${_("Discount (%)")}</th>
-                           <th class="c_count">${_("Count")}</th>
+                           <th class="c_count">${_("Redeem Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
                         </tr>
                      </thead>
@@ -110,10 +110,7 @@
                             <td>${_('{code}').format(code=coupon.code)}</td>
                             <td>${_('{description}').format(description=coupon.description)}</td>
                             <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
-                           <td>
-                              ${ coupon.couponredemption_set.all().count() }
-                           </td>
-                           <!--<td>${coupon.is_active}</td>-->
+                           <td>${ coupon.couponredemption_set.filter(order__status='purchased').count() }</td>
                            <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
                         %endfor
