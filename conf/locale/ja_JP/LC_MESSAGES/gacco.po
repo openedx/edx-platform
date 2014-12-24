@@ -19,6 +19,78 @@ msgstr ""
 "Language: ja_JP\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: lms/templates/register.html lms/templates/login.html
+msgid "Welcome, {platform_name}!"
+msgstr "ようこそ！{platform_name}へ。"
+
+#: lms/templates/register.html
+msgid "{platform_name} is an educational Web Service. For everyone, for free."
+msgstr "{platform_name}は誰でも無料で受講できるウェブサービスです。"
+
+#: lms/templates/register.html
+msgid "If you're already registerd. Here to Login."
+msgstr "すでに登録済の方はログイン"
+
+#: lms/templates/register.html
+msgid "If you are under 20 years old, you have to get permission of your parents to regist this site."
+msgstr "※未成年の方がお申し込みをいただく場合は、親権者の同意が必要となります。"
+
+#: lms/templates/registration/activation_complete.html
+msgid "{link_start}My Page{link_end}"
+msgstr "{link_start}マイページ{link_end}"
+
+#: lms/templates/registration/activation_complete.html
+msgid "{link_start}Log In{link_end}"
+msgstr "{link_start}ログイン{link_end}"
+
+#: lms/templates/login.html
+msgid "Let's login and enjoy your courses!"
+msgstr "ログインして学習をはじめましょう。"
+
+#: lms/templates/login.html
+msgid "If you're not registerd. Here to Register."
+msgstr "会員登録はこちら"
+
+#: lms/templates/courseware/course_about.html
+msgid "Play PV! PLAY Button above!!"
+msgstr "上の画像をクリックしてPVを再生！"
+
+#: lms/templates/courseware/course_about.html
+msgid "Period"
+msgstr "標準学習期間"
+
+#: lms/templates/courseware/course_about.html
+msgid "Weeks"
+msgstr "週間"
+
+#: lms/templates/courseware/course_about.html
+msgid "Share with friends"
+msgstr "ともだちに教えよう！"
+
+#: lms/templates/dashboard.html lms/templates/navigation.html
+msgid "My Page"
+msgstr "マイページ"
+
+#: lms/templates/navigation.html
+msgid "Navi Menu"
+msgstr "ナビメニュー"
+
+#: lms/templates/navigation.html
+msgid "Top Page"
+msgstr "トップページ"
+
+#: lms/templates/navigation.html
+msgid "Login"
+msgstr "ログイン"
+
+#: lms/templates/navigation.html
+msgid "Study Menu"
+msgstr "学習メニュー"
+
+#: lms/templates/courseware/courseware.html
+msgid "Unit List"
+msgstr "単元リスト"
+
 #: common/djangoapps/student/forms.py
 msgid "New password is required."
 msgstr "新パスワードは必須です。"
