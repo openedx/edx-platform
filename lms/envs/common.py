@@ -312,7 +312,7 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
-    'ENABLE_EDXNOTES': False,
+    'ENABLE_EDXNOTES': True,
 }
 
 # Ignore static asset files on import which match this pattern
