@@ -1,15 +1,17 @@
 <%page args="course, enrollment, show_courseware_link, cert_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status" />
 
-<%! from django.utils.translation import ugettext as _ %>
 <%!
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  from student.helpers import (
-    VERIFY_STATUS_NEED_TO_VERIFY,
-    VERIFY_STATUS_SUBMITTED,
-    VERIFY_STATUS_APPROVED,
-    VERIFY_STATUS_MISSED_DEADLINE
-  )
+from django.utils.translation import ugettext as _
+from django.utils.translation import ungettext
+from django.core.urlresolvers import reverse
+from markupsafe import escape
+from courseware.courses import course_image_url, get_course_about_section
+from student.helpers import (
+  VERIFY_STATUS_NEED_TO_VERIFY,
+  VERIFY_STATUS_SUBMITTED,
+  VERIFY_STATUS_APPROVED,
+  VERIFY_STATUS_MISSED_DEADLINE
+)
 %>
 
 <%
@@ -56,13 +58,15 @@
           % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
             <span class="sts-enrollment" title="${_("Your verification is pending")}">
               <span class="label">${_("Enrolled as: ")}</span>
-              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Pending Ribbon/Badge" />
-              <div class="sts-enrollment-value">${_("Verified Pending")}</div>
+              ## Translators: This text describes that the student has enrolled for a Verified Certificate, but verification of identity is pending.
+              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="${_("ID verification pending")}" />
+              ## Translators: The student is enrolled for a Verified Certificate, but verification of identity is pending.
+              <div class="sts-enrollment-value">${_("Verified: Pending Verification")}</div>
             </span>
           % elif verification_status.get('status') == VERIFY_STATUS_APPROVED:
             <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
               <span class="label">${_("Enrolled as: ")}</span>
-              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Ribbon/Badge" />
+              <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="${_("ID Verified Ribbon/Badge")}" />
               <div class="sts-enrollment-value">${_("Verified")}</div>
             </span>
           % else:
@@ -74,7 +78,7 @@
         % else:
           <span class="sts-enrollment" title="${_("You're enrolled as a verified student")}">
             <span class="label">${_("Enrolled as: ")}</span>
-            <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="ID Verified Ribbon/Badge" />
+            <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="${_("ID Verified Ribbon/Badge")}" />
             <div class="sts-enrollment-value">${_("Verified")}</div>
           </span>
         % endif
@@ -134,7 +138,11 @@
             <div class="verification-reminder">
               % if verification_status['days_until_deadline'] is not None:
                 <h4 class="message-title">${_('Verification not yet complete.')}</h4>
-                <p class="message-copy">${_('You only have {days} days left to verify for this course.').format(days=verification_status['days_until_deadline'])}</p>
+                <p class="message-copy">${ungettext(
+                  'You only have {days} day left to verify for this course.',
+                  'You only have {days} days left to verify for this course.',
+                  verification_status['days_until_deadline']
+                ).format(days=verification_status['days_until_deadline'])}</p>
               % else:
                 <h4 class="message-title">${_('Almost there!')}</h4>
                 <p class="message-copy">${_('You still need to verify for this course.')}</p>
@@ -177,7 +185,7 @@
                   % else:
                   <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': unicode(course.id)})}?upgrade=True" data-course-id="${course.id | h}" data-user="${user.username | h}">
                   % endif
-                    <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="ID Verified Ribbon/Badge">
+                    <img class="deco-graphic" src="${static.url('images/vcert-ribbon-s.png')}" alt="${_("ID Verified Ribbon/Badge")}">
                     <span class="wrapper-copy">
                       <span class="copy" id="upgrade-to-verified">${_("Upgrade to Verified Track")}</span>
                     </span>
@@ -189,14 +197,23 @@
       %endif
       % if is_course_blocked:
         <p id="block-course-msg" class="course-block">
-            ${_("You can no longer access this course because payment has not yet been received. You "
-	    "can {link_start}contact the account holder{link_end} to request payment, or you can "
-	    "{unenroll_link_start}unenroll{unenroll_link_end} from this course").format(
-   	        link_start='<a href="#">',
-	        link_end='</a>',
-	        unenroll_link_start='<a id="unregister_block_course" rel="leanModal" data-course-id="${course.id | h}" data-course-number="${course.number | h}" href="#unenroll-modal">',
-	        unenroll_link_end="</a>"
-	    )}
+          ${_("You can no longer access this course because payment has not yet been received. "
+              "You can {contact_link_start}contact the account holder{contact_link_end} "
+              "to request payment, or you can "
+              "{unenroll_link_start}unenroll{unenroll_link_end} "
+              "from this course").format(
+            contact_link_start='<a href="#">',
+            contact_link_end='</a>',
+            unenroll_link_start=(
+              '<a id="unregister_block_course" rel="leanModal" '
+              'data-course-id="{course_id}" data-course-number="{course_number}" '
+              'href="#unenroll-modal">'.format(
+                course_id=escape(course.id),
+                course_number=escape(course.number),
+              )
+            ),
+            unenroll_link_end="</a>",
+          )}
         </p>
       %endif
 
