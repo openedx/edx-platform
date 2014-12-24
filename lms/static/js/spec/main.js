@@ -397,14 +397,6 @@
                 exports: 'edx.verify_student.WebcamPhotoView',
                 deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
             },
-            'js/verify_student/views/progress_view': {
-                exports: 'edx.verify_student.ProgressView',
-                deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
-            },
-            'js/verify_student/views/requirements_view': {
-                exports: 'edx.verify_student.RequirementsView',
-                deps: [ 'jquery', 'backbone', 'underscore', 'gettext' ]
-            },
             'js/verify_student/views/step_view': {
                 exports: 'edx.verify_student.StepView',
                 deps: [ 'jquery', 'underscore', 'underscore.string', 'backbone', 'gettext' ]
@@ -414,7 +406,6 @@
                 deps: [
                     'jquery',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/requirements_view'
                 ]
             },
             'js/verify_student/views/make_payment_step_view': {
@@ -426,7 +417,6 @@
                     'jquery.cookie',
                     'jquery.url',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/requirements_view'
                 ]
             },
             'js/verify_student/views/payment_confirmation_step_view': {
@@ -436,7 +426,6 @@
                     'underscore',
                     'gettext',
                     'js/verify_student/views/step_view',
-                    'js/verify_student/views/requirements_view'
                 ]
             },
             'js/verify_student/views/face_photo_step_view': {
@@ -484,7 +473,6 @@
                     'backbone',
                     'gettext',
                     'js/verify_student/models/verification_model',
-                    'js/verify_student/views/progress_view',
                     'js/verify_student/views/intro_step_view',
                     'js/verify_student/views/make_payment_step_view',
                     'js/verify_student/views/payment_confirmation_step_view',

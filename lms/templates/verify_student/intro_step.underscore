@@ -36,7 +36,7 @@
 
           <div class="copy">
             <p>
-              <span class="copy-sub"><%- gettext( "A driver's license, passport, or government or ID with your name and picture" ) %></span>
+              <span class="copy-sub"><%- gettext( "A driver's license, passport, or government-issued ID with your name and picture" ) %></span>
             </p>
           </div>
         </li>
@@ -63,7 +63,7 @@
           <% if ( !isActive ) { %>
             <%- gettext( "Activate Your Account" ) %>
           <% } else { %>
-            <%- gettext( "Next: Take Photo" ) %>
+            <%- nextStepTitle %>
           <% } %>
         </a>
         </li>

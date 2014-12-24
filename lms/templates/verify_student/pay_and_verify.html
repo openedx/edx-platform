@@ -11,7 +11,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="header_extras">
     <%
       template_names = (
-          ["progress", "requirements", "webcam_photo", "error"] +
+          ["webcam_photo", "error"] +
           [step['templateName'] for step in display_steps]
       )
     %>
@@ -56,6 +56,7 @@ from verify_student.views import PayAndVerifyView
       data-course-mode-currency='${course_mode.currency}'
       data-contribution-amount='${contribution_amount}'
       data-purchase-endpoint='${purchase_endpoint}'
+      data-verification-deadline='${verification_deadline}'
       data-display-steps='${json.dumps(display_steps)}'
       data-current-step='${current_step}'
       data-requirements='${json.dumps(requirements)}'

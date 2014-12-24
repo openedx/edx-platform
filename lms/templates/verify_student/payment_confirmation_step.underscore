@@ -1,8 +1,7 @@
 <div class="wrapper-content-main payment-confirmation-step">
   <article class="content-main">
     <h3 class="title">
-      <%- gettext( "Thank you!  We have received your payment for:" ) %>
-      <span><%= courseName %></span>
+      <%- _.sprintf( gettext( "Thank you! We have received your payment for %(courseName)s" ), { courseName: courseName } ) %>
     </h3>
 
     <% if ( receipt ) { %>
@@ -78,6 +77,7 @@
         <p class="no-content"><%- gettext( "No receipt available." ) %></p>
     <% } %>
 
+    <% if ( nextStepTitle ) { %>
     <h3 class="title"><%- gettext( "Next Step: Confirm your identity" ) %></h3>
 
     <div class="requirements-container">
@@ -93,7 +93,7 @@
             <p>
               <span class="copy-super"><%- gettext( "Check your email." ) %></span>
               <span class="copy-sub"><%-
-                  gettext( "You need to activate your account before you can register for courses. Check your inbox for an activation email." )
+                  gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email." )
                 %>
               </span>
             </p>
@@ -111,7 +111,7 @@
 
           <div class="copy">
             <p>
-              <span class="copy-sub"><%- gettext( "A driver's license, passport, or government ID with your name and picture." ) %></span>
+              <span class="copy-sub"><%- gettext( "A driver's license, passport, or government-issued ID with your name and picture." ) %></span>
             </p>
           </div>
         </li>
@@ -130,10 +130,12 @@
       </ul>
     </div>
 
-    <% if ( nextStepTitle ) { %>
     <nav class="nav-wizard is-ready">
-      <a id="verify_now_button" class="next action-primary right" href="?skip-first-step=1">
-        <%- gettext( "Next: Take Photo" ) %>
+      <a id="verify_now_button"
+         class="next action-primary right"
+         href="<%- _.sprintf( '/verify_student/verify-now/%(courseKey)s', { courseKey: courseKey } ) %>"
+      >
+        <%- nextStepTitle %>
       </a>
 
       <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't confirm your identity now, you can go to the dashboard to explore your course and %(platformName)s will remind you later." ), { platformName: platformName } ) %>">
