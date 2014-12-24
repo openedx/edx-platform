@@ -1019,8 +1019,13 @@ class PaidCourseRegistration(OrderItem):
         Generates instructions when the user has purchased a PaidCourseRegistration.
         Basically tells the user to visit the dashboard to see their new classes
         """
-        notification = (_('Please visit your <a href="{dashboard_link}">dashboard</a>  to see your new course.')
-                        .format(dashboard_link=reverse('dashboard')))
+        notification = _(
+            "Please visit your {link_start}dashboard{link_end} "
+            "to see your new course."
+        ).format(
+            link_start='<a href="{url}">'.format(url=reverse('dashboard')),
+            link_end='</a>',
+        )
 
         return self.pk_with_subclass, set([notification])
 
