@@ -171,6 +171,23 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.onError).not.toHaveBeenCalled();
         });
 
+        it('sends correct paging parameters', function () {
+            this.collection.performSearch('search string');
+            var response = { total: 52, results: [] };
+            this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
+            this.server.respond();
+            this.collection.loadNextPage();
+            this.server.respond();
+            spyOn($, 'ajax');
+            this.collection.loadNextPage();
+            expect($.ajax.mostRecentCall.args[0].url).toEqual(this.collection.url);
+            expect($.ajax.mostRecentCall.args[0].data).toEqual({
+                search_string : 'search string',
+                page_size : this.collection.pageSize,
+                page_index : 2
+            });
+        });
+
         it('has next page', function () {
             var response = { total: 35, results: [] };
             this.collection.performSearch('search string');

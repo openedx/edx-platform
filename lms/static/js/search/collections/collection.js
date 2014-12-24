@@ -22,7 +22,8 @@ var edx = edx || {};
             this.fetchXhr = this.fetch({
                 data: {
                     search_string: searchTerm,
-                    page: 0
+                    page_size: this.pageSize,
+                    page_index: 0
                 },
                 type: 'POST',
                 success: function (self) {
@@ -39,7 +40,8 @@ var edx = edx || {};
             this.fetchXhr = this.fetch({
                 data: {
                     search_string: this.searchTerm,
-                    page: this.page + 1
+                    page_size: this.pageSize,
+                    page_index: this.page + 1
                 },
                 type: 'POST',
                 success: function (self) {
