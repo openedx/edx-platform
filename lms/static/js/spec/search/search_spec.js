@@ -27,6 +27,13 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.form.submitForm()).toEqual(false);
         });
 
+        it('trims input string', function () {
+            var term = '  search string  ';
+            $('.search-field').val(term);
+            $('form').trigger('submit');
+            expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
+        });
+
         it('triggers a search event and changes to active state', function () {
             var term = 'search string';
             $('.search-field').val(term);
