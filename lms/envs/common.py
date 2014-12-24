@@ -308,7 +308,7 @@ FEATURES = {
     # Separate the verification flow from the payment flow
     'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
 
-    'ENABLE_EDXNOTES': True,
+    'ENABLE_EDXNOTES': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -914,7 +914,7 @@ MOCK_STAFF_GRADING = False
 
 # Configure the LMS to use our stub EdxNotes implementation
 EDXNOTES_INTERFACE = {
-    'url': 'http://localhost:8042/api/v1',
+    'url': 'http://example.com/api/v1',
 }
 
 ################################# Jasmine ##################################

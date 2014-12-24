@@ -1,5 +1,7 @@
+import os
 from uuid import uuid4
 from datetime import datetime
+from unittest import skipUnless
 from ..helpers import UniqueCourseTest
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -9,6 +11,7 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
+@skipUnless(os.environ.get("FEATURE_EDXNOTES"), "Requires Student Notes feature to be enabled")
 class EdxNotesTestMixin(UniqueCourseTest):
     """
     Creates a course with initial data and contains useful helper methods.
