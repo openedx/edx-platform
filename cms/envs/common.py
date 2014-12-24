@@ -118,7 +118,7 @@ FEATURES = {
     'IS_EDX_DOMAIN': False,
 
     # let students save and manage their annotations
-    'ENABLE_EDXNOTES': False,
+    'ENABLE_EDXNOTES': True,
 }
 ENABLE_JASMINE = False
 
