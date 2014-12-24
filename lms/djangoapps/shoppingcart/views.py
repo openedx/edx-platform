@@ -794,6 +794,23 @@ def _show_receipt_html(request, order):
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
 
+        # TODO (ECOM-188): Once the A/B test of separate verified / payment flow
+        # completes, implement this in a more general way.  For now,
+        # we simply redirect to the new receipt page (in verify_student).
+        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+            if receipt_template == 'shoppingcart/verified_cert_receipt.html':
+                url = reverse(
+                    'verify_student_payment_confirmation',
+                    kwargs={'course_id': unicode(order_items[0].course_id)}
+                )
+
+                # Add a query string param for the order ID
+                # This allows the view to query for the receipt information later.
+                url += '?payment-order-num={order_num}'.format(
+                    order_num=order_items[0].id
+                )
+                return HttpResponseRedirect(url)
+
     return render_to_response(receipt_template, context)
 
 
