@@ -222,23 +222,6 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
     as children of this block, but only a subset of those children are shown to
     any particular student.
     """
-    def _filter_children(self, child_locator):
-        """
-        Filters children by CAPA problem type, if configured
-        """
-        if self.capa_type == ANY_CAPA_TYPE_VALUE:
-            return True
-
-        if child_locator.block_type != CAPA_BLOCK_TYPE:
-            return False
-
-        block = self.runtime.get_block(child_locator)
-
-        if not hasattr(block, 'lcp'):
-            return True
-
-        return any(self.capa_type in capa_input.tags for capa_input in block.lcp.inputs.values())
-
     def selected_children(self):
         """
         Returns a set() of block_ids indicating which of the possible children
@@ -255,7 +238,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             return self._selected_set  # pylint: disable=access-member-before-definition
         # Determine which of our children we will show:
         selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples
-        valid_block_keys = set([(c.block_type, c.block_id) for c in self.children if self._filter_children(c)])  # pylint: disable=no-member
+        valid_block_keys = set([(c.block_type, c.block_id) for c in self.children])  # pylint: disable=no-member
         # Remove any selected blocks that are no longer valid:
         selected -= (selected - valid_block_keys)
         # If max_count has been decreased, we may have to drop some previously selected blocks:
