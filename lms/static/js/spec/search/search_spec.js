@@ -227,8 +227,9 @@ function($, Sinon, Backbone, TemplateHelpers) {
     describe('edx.search.List', function () {
 
         beforeEach(function () {
-            setFixtures('<section class="search-content" id="search-content"></section>'+
-                '<section class="course-content" id="course-content"></section>');
+            setFixtures(
+                '<section id="search-content" data-course-name="Test Course"></section>' +
+                '<section id="course-content"></section>');
 
             TemplateHelpers.installTemplate('templates/courseware_search/search_item');
             TemplateHelpers.installTemplate('templates/courseware_search/search_list');
@@ -299,6 +300,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
             this.listView.render();
             expect(this.listView.$el.find('ol')[0]).toExist();
             expect(this.listView.$el.find('li')).toHaveLength(1);
+            expect(this.listView.$el).toContainText('Test Course');
             expect(this.listView.$el).toContainText('this is a short excerpt');
 
             this.collection.set(searchResults);

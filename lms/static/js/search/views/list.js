@@ -12,6 +12,7 @@ var edx = edx || {};
         },
 
         initialize: function () {
+            this.courseName = this.$el.attr('data-course-name');
             this.$courseContent = $('#course-content');
             this.listTemplate = _.template($('#search_list-tpl').html());
             this.loadingTemplate = _.template($('#search_loading-tpl').html());
@@ -23,6 +24,7 @@ var edx = edx || {};
 
         render: function () {
             this.$el.html(this.listTemplate({
+                courseName: this.courseName,
                 totalCount: this.collection.totalCount,
                 pageSize: this.collection.pageSize,
                 hasMoreResults: this.collection.hasNextPage()
