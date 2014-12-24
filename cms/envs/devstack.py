@@ -85,5 +85,3 @@ except ImportError:
 #####################################################################
 # Lastly, run any migrations, if needed.
 MODULESTORE = convert_module_store_setting_if_needed(MODULESTORE)
-
-FEATURES['ENABLE_EDXNOTES'] = True
