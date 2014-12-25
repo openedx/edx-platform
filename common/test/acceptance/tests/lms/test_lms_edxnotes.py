@@ -321,12 +321,6 @@ class EdxNotesPageTest(EdxNotesTestMixin):
             self.assertIsNone(quote)
         self.assertEqual(unit_name, item.unit_name)
         self.assertEqual(time_updated, item.time_updated)
-        if text is not None and quote is not None:
-            self.assertEqual(item.title_highlighted, "HIGHLIGHTED & NOTED IN:")
-        elif text is not None:
-            self.assertEqual(item.title_highlighted, "HIGHLIGHTED IN:")
-        elif quote is not None:
-            self.assertEqual(item.title_highlighted, "NOTED IN:")
 
     def assertGroupContent(self, item, title=None, subtitles=None):
         self.assertEqual(item.title, title)
@@ -399,10 +393,10 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
     def test_course_structure_view(self):
         """
-        Scenario: User can view all notes by course structure.
+        Scenario: User can view all notes by location in Course.
         Given I have a course with 5 notes
         When I open Notes page
-        And I switch to "Course Structure" view
+        And I switch to "Location in Course" view
         Then I see 2 groups, 3 sections and 5 notes
         And I see correct content in the notes and groups
         """
@@ -492,7 +486,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         And I click on the first unit link
         Then I see correct text on the unit page
         When go back to the Notes page
-        And I switch to "Course Structure" view
+        And I switch to "Location in Course" view
         And I click on the second unit link
         Then I see correct text on the unit page
         When go back to the Notes page
@@ -552,12 +546,12 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         Scenario: Tabs behaves correctly.
         Given I have a course with 5 notes
         When I open Notes page
-        Then I see only "Recent Activity" and "Course Structure" tabs
+        Then I see only "Recent Activity" and "Location in Course" tabs
         When I run the search with "note" query
         And I see that "Search Results" tab appears with 4 notes found
         Then I switch to "Recent Activity" tab
         And I see all 5 notes
-        Then I switch to "Course Structure" tab
+        Then I switch to "Location in Course" tab
         And I see all 2 groups and 5 notes
         When I switch back to "Search Results" tab
         Then I can still see 4 notes found
@@ -571,7 +565,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         # We're on Recent Activity tab.
         self.assertEqual(len(self.notes_page.tabs), 2)
-        self.assertEqual([u"Recent Activity", u"Course Structure"], self.notes_page.tabs)
+        self.assertEqual([u"Recent Activity", u"Location in Course"], self.notes_page.tabs)
         self.notes_page.search("note")
         # We're on Search Results tab
         self.assertEqual(len(self.notes_page.tabs), 3)
