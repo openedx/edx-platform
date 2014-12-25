@@ -7,7 +7,7 @@ define([
     var CourseStructureView = TabView.extend({
         PanelConstructor: TabPanelView.extend({
             id: 'structure-panel',
-            title: 'Course Structure',
+            title: 'Location in Course',
 
             renderContent: function () {
                 var courseStructure = this.collection.getCourseStructure();
@@ -43,7 +43,7 @@ define([
         }),
 
         tabInfo: {
-            name: gettext('Course Structure'),
+            name: gettext('Location in Course'),
             identifier: 'view-course-structure',
             icon: 'icon-list-ul'
         }
