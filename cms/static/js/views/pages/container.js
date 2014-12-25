@@ -15,6 +15,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             events: {
                 "click .edit-button": "editXBlock",
+                "click .visibility-button": "editVisibilitySettings",
                 "click .duplicate-button": "duplicateXBlock",
                 "click .delete-button": "deleteXBlock"
             },
@@ -136,16 +137,26 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 });
             },
 
-            editXBlock: function(event) {
+            editXBlock: function(event, options) {
                 var xblockElement = this.findXBlockElement(event.target),
                     self = this,
-                    modal = new EditXBlockModal({ });
+                    modal = new EditXBlockModal(options);
                 event.preventDefault();
 
                 modal.edit(xblockElement, this.model, {
                     refresh: function() {
                         self.refreshXBlock(xblockElement);
                     }
+                });
+            },
+
+            editVisibilitySettings: function(event) {
+                this.editXBlock(event, {
+                    view: 'visibility_view',
+                    // Translators: "title" is the name of the current component being edited.
+                    titleFormat: gettext("Editing visibility for: %(title)s"),
+                    viewSpecificClasses: '',
+                    modalSize: 'med'
                 });
             },
 
