@@ -22,13 +22,7 @@
 </div>
 <footer class="reference" role="complementary" aria-label="<%- gettext('References') %>">
     <div class="wrapper-reference-content">
-        <% if (text && quote) { %>
-            <h3 class="reference-title"><%- gettext("Highlighted & Noted in:") %></h3>
-        <% } else if (text) { %>
-            <h3 class="reference-title"><%- gettext("Highlighted in:") %></h3>
-        <% } else if (quote) { %>
-            <h3 class="reference-title"><%- gettext("Noted in:") %></h3>
-        <% } %>
+        <h3 class="reference-title"><%- gettext("Location of highlight or note:") %></h3>
         <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
         <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
         <span class="reference-meta reference-updated-date"><%- updated %></span>

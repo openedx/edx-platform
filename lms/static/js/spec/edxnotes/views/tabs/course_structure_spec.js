@@ -52,7 +52,7 @@ define([
 
             expect(this.tabsCollection).toHaveLength(1);
             expect(this.tabsCollection.at(0).toJSON()).toEqual({
-                name: 'Course Structure',
+                name: 'Location in Course',
                 identifier: 'view-course-structure',
                 icon: 'icon-list-ul',
                 is_active: true,
