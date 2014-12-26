@@ -207,19 +207,23 @@ class SimpleInvoice(UnicodeProperty):
         self.pdf.drawString((self.MARGIN + 12) * mm, (y_pos - 70) * mm, _('EdX Billing Address'), 0)
 
         text = """
-Enrollments:
-Enrollments must be completed within 7 full days from the course start date.
-Payment Terms:
-Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.
-Cancellations:
-Cancellation requests must be submitted to onlinex-registration@mit.edu 14 days prior to the course start date to be eligible for a refund. If you submit a cancellation request within 14 days prior to the course start date, you will not be eligible for a refund. Please see our Terms of Service page for full details.
-Substitutions:
-The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.
+Enrollments:<br/>
+Enrollments must be completed within 7 full days from the course start date.<br/>
+Payment Terms:<br/>
+Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.<br/>
+Cancellations:<br/>
+Cancellation requests must be submitted to onlinex-registration@mit.edu 14 days prior to the course start date to be eligible for a refund. If you submit a cancellation request within 14 days prior to the course start date, you will not be eligible for a refund. Please see our Terms of Service page for full details.<br/>
+Substitutions:<br/>
+The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.<br/>
 Please see our Terms of Service page for our detailed policies, including terms and conditions of use.
             """
 
         style = getSampleStyleSheet()['Normal']
         style.backColor = '#D0D0D0'
+        style.borderColor = '#000000'
+        style.borderWidth = 0.5
+        style.borderPadding = (2*mm, 5*mm, 2*mm, 5*mm)
+        style.fontSize = 8
         para = Paragraph(text, style)
-        para.wrap(161 * mm, 8*mm)
-        para.drawOn(self.pdf, (self.MARGIN + 11) * mm, (y_pos - 110) * mm)
+        para.wrap(151 * mm, 7*mm)
+        para.drawOn(self.pdf, (self.MARGIN + 11+5) * mm, (y_pos - 150) * mm)
