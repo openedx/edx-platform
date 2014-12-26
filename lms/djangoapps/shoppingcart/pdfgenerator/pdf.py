@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from PIL import Image
+from reportlab.lib import colors
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import mm
+from reportlab.lib.units import mm, inch
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph
 from reportlab.pdfbase.ttfonts import TTFont
@@ -123,58 +124,30 @@ class SimpleInvoice(UnicodeProperty):
         self.pdf.drawRightString((self.MARGIN + 177) * mm, 220 * mm, _(u'Date ' + purchase_date))
 
     def drawCourseInfo(self):
-        path = self.pdf.beginPath()
-        path.moveTo((self.MARGIN+2) * mm, 205 * mm)
-        path.lineTo((self.MARGIN + 183) * mm, 205 * mm)
-        self.pdf.drawPath(path, True, True)
 
-        self.pdf.setFont('DejaVu', 8)
-        self.pdf.drawString((self.MARGIN + 8) * mm, 207 * mm, _(u'Description'))
-        self.pdf.drawString((self.MARGIN + 70) * mm, 207 * mm, _(u'Quantity'))
-        self.pdf.drawString((self.MARGIN + 95) * mm, 207 * mm, _(u'List Price'))
-        self.pdf.drawString((self.MARGIN + 120) * mm, 207 * mm, _(u'Discount'))
-        self.pdf.drawString((self.MARGIN + 155) * mm, 207 * mm, _(u'Amount'))
+        data= [['', 'Description', 'Quantity', 'List Price \n per item', 'Discount \n per item', 'Amount', ''],
+        ['', 'Demo Course', '2', '2$', '0$', '22$', ''],
+        ['', 'Demo Course', '2', '2$', '0$', '22$', ''],
+        ['', 'Demo Course', '2', '2$', '0$', '22$', '']
+        ]
+        heights = [12*mm]
+        heights.extend((len(data) - 1 )*[8*mm])
+        t=Table(data,[7*mm, 60*mm, 27*mm, 21*mm,21*mm, 40*mm, 7*mm], heights)
 
-        for i in range(5):
-            y = i * 10
-            path = self.pdf.beginPath()
-            path.moveTo((self.MARGIN + 9) * mm, (195 - y) * mm)
-            path.lineTo((self.MARGIN + 175) * mm, (195 - y) * mm)
-            self.pdf.drawPath(path, True, True)
-
-            path = self.pdf.beginPath()
-            path.moveTo((self.MARGIN + 139) * mm, (195 - y) * mm)
-            path.lineTo((self.MARGIN + 139) * mm, (205 - y) * mm)
-            self.pdf.drawPath(path, True, True)
-
-            path = self.pdf.beginPath()
-            path.moveTo((self.MARGIN + 139 - (25*1)) * mm, (195 - y) * mm)
-            path.lineTo((self.MARGIN + 139 - (25*1)) * mm, (205 - y) * mm)
-            self.pdf.drawPath(path, True, True)
-
-            path = self.pdf.beginPath()
-            path.moveTo((self.MARGIN + 139 - (25*2)) * mm, (195 - y) * mm)
-            path.lineTo((self.MARGIN + 139 - (25*2)) * mm, (205 - y) * mm)
-            self.pdf.drawPath(path, True, True)
-
-            path = self.pdf.beginPath()
-            path.moveTo((self.MARGIN + 139 - (25*3)) * mm, (195 - y) * mm)
-            path.lineTo((self.MARGIN + 139 - (25*3)) * mm, (205 - y) * mm)
-            self.pdf.drawPath(path, True, True)
-
-            self.pdf.setFont('DejaVu', 8)
-            self.pdf.drawString((self.MARGIN + 11) * mm, (198 - y) * mm, _(u'Edx Demo Course'))
-            self.pdf.drawString((self.MARGIN + 73) * mm, (198 - y) * mm, _(u'22'))
-            self.pdf.drawString((self.MARGIN + 98) * mm, (198 - y) * mm, _(u'$20'))
-            self.pdf.drawString((self.MARGIN + 123) * mm, (198 - y) * mm, _(u'$2'))
-            self.pdf.drawString((self.MARGIN + 160) * mm, (198 - y) * mm, _(u'$22'))
-
-        path = self.pdf.beginPath()
-        length_of_list = 5
-        path.moveTo((self.MARGIN + 2) * mm, (195 - (length_of_list*10)) * mm)
-        path.lineTo((self.MARGIN + 183) * mm, (195 - (length_of_list*10)) * mm)
-        self.pdf.drawPath(path, True, True)
-        return 195 - (length_of_list*10)
+        t.setStyle(TableStyle([('ALIGN',(1,1),(-2,-2),'RIGHT'),
+        ('VALIGN',(0,0),(0,-1),'TOP'),
+        ('ALIGN',(0,0),(-1,-1),'CENTER'),
+        ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+        ('TEXTCOLOR',(0,-1),(-1,-1),colors.black),
+        # ('LINEABOVE', (0,0), (-1,0), .25, colors.black),
+        ('LINEBELOW', (0,0), (-1,0), .25, colors.black),
+        ('LINEBELOW', (0,-1), (-1,-1), .25, colors.black),
+        ('INNERGRID', (1,1), (-2,-1), 0.25, colors.black),
+        # ('BOX', (1,1), (-1,-1), 0.25, colors.black),
+        ]))
+        t.wrap(0,0)
+        t.drawOn(self.pdf, (self.MARGIN +2) * mm, (205 * mm) -t._height)
+        return ((205 * mm) -t._height)/ mm
 
     def calculate_total(self, y_pos, total_amount, payment_received, balance):
         self.pdf.setFillColorRGB(0.823, 0.823, 0.823)
