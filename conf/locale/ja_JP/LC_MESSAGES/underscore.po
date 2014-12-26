@@ -1,0 +1,339 @@
+# edX translation file
+# Copyright (C) 2014 edX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# watcafe, 2014
+# h_yoshida <h_yoshida@matsumo-sys.com>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-12-15 18:24+0000\n"
+"PO-Revision-Date: 2014-12-11 18:31+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: cms/templates/js/add-xblock-component-menu-problem.underscore:47
+#: cms/templates/js/add-xblock-component-menu.underscore:22
+#: cms/templates/js/course_info_handouts.underscore:20
+#: cms/templates/js/edit-textbook.underscore:26
+#: cms/templates/js/group-configuration-edit.underscore:46
+#: cms/templates/js/section-name-edit.underscore:4
+#: cms/templates/js/xblock-string-field-editor.underscore:14
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:23
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: cms/templates/js/course_info_handouts.underscore:19
+#: cms/templates/js/edit-textbook.underscore:25
+#: cms/templates/js/group-configuration-edit.underscore:45
+#: cms/templates/js/section-name-edit.underscore:3
+#: cms/templates/js/xblock-string-field-editor.underscore:13
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:21
+msgid "Save"
+msgstr "一時保存"
+
+#: common/templates/js/image-modal.underscore:6
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+#: common/templates/js/image-modal.underscore:14
+msgid "Large"
+msgstr "大きい"
+
+#: common/templates/js/image-modal.underscore:19
+msgid "Close"
+msgstr "閉じる"
+
+#: common/templates/js/image-modal.underscore:27
+msgid "Zoom In"
+msgstr "ズームイン"
+
+#: common/templates/js/image-modal.underscore:35
+msgid "Zoom Out"
+msgstr "ズームアウト"
+
+#: common/templates/js/discussion/thread-show.underscore:7
+#, python-format
+msgid "This post is visible only to %(group_name)s."
+msgstr "この投稿は%(group_name)sにのみ表示されます。"
+
+#: common/templates/js/discussion/thread-show.underscore:13
+msgid "This post is visible to everyone."
+msgstr "この投稿は全ユーザーに表示されます。"
+
+#: common/templates/js/discussion/thread-show.underscore:31
+#, python-format
+msgid "%(post_type)s posted %(time_ago)s by %(author)s"
+msgstr " %(author)sによる%(time_ago)s前の投稿（%(post_type)s）"
+
+#: common/templates/js/discussion/thread-show.underscore:38
+msgid "Pinned"
+msgstr "注目"
+
+#: common/templates/js/discussion/thread-show.underscore:39
+msgid "Reported"
+msgstr "報告済"
+
+#: common/templates/js/discussion/thread-show.underscore:40
+msgid "Closed"
+msgstr "〆切済"
+
+#: common/templates/js/discussion/thread-show.underscore:71
+#, python-format
+msgid "(this post is about %(courseware_title_linked)s)"
+msgstr "(この投稿は%(courseware_title_linked)sについてのものです)"
+
+#: lms/templates/dashboard/donation.underscore:5
+msgid "Donate"
+msgstr "義援金を送る"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:4
+msgid "Add a New Cohort Group"
+msgstr "新しいユーザー群を追加する"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:9
+msgid "New Cohort Name"
+msgstr "新しいユーザー群の名前"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:10
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:47
+msgid "(Required Field)"
+msgstr "(必須項目)"
+
+#: lms/templates/instructor/instructor_dashboard_2/add-cohort-form.underscore:14
+msgid "Enter Your New Cohort Group's Name"
+msgstr "新しいユーザー群の名前を入力"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:6
+#, python-format
+msgid "(contains %(student_count)s student)"
+msgid_plural "(contains %(student_count)s students)"
+msgstr[0] "(%(student_count)s名の受講者が含まれます)"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:15
+msgid ""
+"Students are added to this group only when you provide their email addresses"
+" or usernames on this page."
+msgstr "このページで受講者のemailアドレスもしくはユーザー名を入力した場合にのみ、このグループに追加されます。"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:16
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:19
+msgid "What does this mean?"
+msgstr "これは何を意味するの？"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:18
+msgid "Students are added to this group automatically."
+msgstr "受講者は自動的にこのグループに追加されます。"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:24
+msgid "Edit settings in Studio"
+msgstr "Studioで編集する"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:34
+msgid "Add students to this cohort group"
+msgstr "受講者をこのユーザー群に追加"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:37
+msgid ""
+"Note: Students can only be in one cohort group. Adding students to this "
+"group overrides any previous group assignment."
+msgstr "注意：受講者は単一のユーザー群に所属します。このグループに受講者を追加するということは、以前の所属グループについて上書きすることとなります。"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:46
+msgid ""
+"Enter email addresses and/or usernames separated by new lines or commas for "
+"students to add. *"
+msgstr "受講生を追加するには、emailアドレス、そして/もしくは、ユーザー名を行ごともしくはカンマ区切りで入力してください。"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:51
+msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
+msgstr "例：johndoe@example.com, 学校太郎, joeydoe@example.com"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:53
+msgid ""
+"You will not get notification for emails that bounce, so please double-check"
+" spelling."
+msgstr "バウンスするメールアドレスには通知は届きません。表記を再確認してください。"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore:59
+msgid "Add Students"
+msgstr "受講者を追加"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore:2
+msgid "Select a cohort group"
+msgstr "ユーザー群を選択"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohort-selector.underscore:7
+#, python-format
+msgid "%(cohort_name)s (%(user_count)s)"
+msgstr "%(cohort_name)s (%(user_count)s人)"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:2
+msgid "Cohort Management"
+msgstr "ユーザー群管理"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:7
+msgid "Assign students to cohort groups manually"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:11
+msgid "Select a cohort group to manage"
+msgstr "管理するユーザー群を選択"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:17
+msgid "View Cohort Group"
+msgstr "ユーザー群を見る"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:23
+msgid "Add Cohort Group"
+msgstr "ユーザー群を追加"
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:35
+msgid "Assign students to cohort groups by uploading a CSV file"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/cohorts.underscore:42
+#, python-format
+msgid ""
+"To review student cohort group assignments or see the results of uploading a"
+" CSV file, download course profile information or cohort results on "
+"%(link_start)s the Data Download page. %(link_end)s"
+msgstr ""
+
+#: lms/templates/student_account/access.underscore:2
+msgid "Welcome!"
+msgstr "ようこそ！"
+
+#: lms/templates/student_account/access.underscore:3
+msgid "Log in or register to take courses from the world's best universities."
+msgstr "世界中の最高の大学講座を受講しよう。さぁログイン、もしくは登録を。"
+
+#: lms/templates/student_account/access.underscore:8
+msgid ""
+"Sorry, we're having some technical problems. Wait a few minutes and try "
+"again."
+msgstr "申し訳ございません。技術的な問題が発生しています。数分後に改めてお試しください。"
+
+#: lms/templates/student_account/access.underscore:16
+#: lms/templates/student_account/access.underscore:34
+msgid "I am a new user"
+msgstr "私はユーザー登録をしていません"
+
+#: lms/templates/student_account/access.underscore:25
+msgid "I am a returning user"
+msgstr "私はユーザー登録済です"
+
+#: lms/templates/student_account/account.underscore:2
+msgid "New Address"
+msgstr "新しいアドレス"
+
+#: lms/templates/student_account/account.underscore:6
+msgid "Password"
+msgstr "パスワード"
+
+#: lms/templates/student_account/account.underscore:11
+msgid "Change My Email Address"
+msgstr "Emailアドレスを変更"
+
+#: lms/templates/student_account/account.underscore:16
+#: lms/templates/student_account/password_reset.underscore:2
+msgid "Reset Password"
+msgstr "パスワード変更"
+
+#: lms/templates/student_account/form_field.underscore:59
+msgid "Forgot password?"
+msgstr "パスワードを忘れた方はこちら"
+
+#: lms/templates/student_account/login.underscore:5
+#, python-format
+msgid ""
+"You've successfully logged into %(currentProvider)s, but your "
+"%(currentProvider)s account isn't linked with an %(platformName)s account. "
+"To link your accounts, go to your %(platformName)s dashboard."
+msgstr "%(currentProvider)sへのログインに成功しました。しかし、%(currentProvider)sのアカウントは%(platformName)sとの連携設定が完了していません。アカウントの連携を行うには%(platformName)sのマイページで設定しましょう。"
+
+#: lms/templates/student_account/login.underscore:11
+msgid "We couldn't log you in."
+msgstr "ログインに失敗しました。"
+
+#: lms/templates/student_account/login.underscore:17
+msgid "Log in"
+msgstr "ログイン"
+
+#: lms/templates/student_account/login.underscore:24
+#, python-format
+msgid "Log in using %(name)s"
+msgstr "%(name)sとしてログイン中"
+
+#: lms/templates/student_account/password_reset.underscore:7
+msgid ""
+"Enter the email address you used to create your account. We'll send you a "
+"link you can use to reset your password."
+msgstr "アカウントを作成した際のemailアドレスを入力してください。すぐにパスワードの再設定を行うためのリンクをメールにてお送りします。"
+
+#: lms/templates/student_account/password_reset.underscore:10
+msgid "An error occurred."
+msgstr "エラーが発生しました。"
+
+#: lms/templates/student_account/password_reset.underscore:16
+msgid "Reset password"
+msgstr "パスワードリセット"
+
+#: lms/templates/student_account/password_reset.underscore:21
+msgid "Password Reset Email Sent"
+msgstr "パスワードレセットのメールを送信"
+
+#: lms/templates/student_account/password_reset.underscore:24
+msgid ""
+"We've sent instructions for resetting your password to the email address you"
+" provided."
+msgstr "入力されたemailアドレスへパスワードリセットの手順を送信しました。"
+
+#: lms/templates/student_account/register.underscore:4
+#, python-format
+msgid "You've successfully logged into %(currentProvider)s."
+msgstr "%(currentProvider)sへのログインに成功しました。"
+
+#: lms/templates/student_account/register.underscore:5
+#, python-format
+msgid ""
+"We just need a little more information before you start learning with "
+"%(platformName)s."
+msgstr "%(platformName)sでの学習を始めるにあたって、あと少しの情報が必要です。"
+
+#: lms/templates/student_account/register.underscore:13
+#, python-format
+msgid "Register using %(name)s"
+msgstr "%(name)sとして登録"
+
+#: lms/templates/student_account/register.underscore:21
+msgid "We couldn't complete your registration."
+msgstr "登録を完了することができませんでした。"
+
+#: lms/templates/student_account/register.underscore:27
+msgid "Register"
+msgstr "登録"
+
+#: lms/templates/student_account/register.underscore:28
+msgid "Required field"
+msgstr "必須項目"
+
+#: lms/templates/student_profile/profile.underscore:2
+msgid "Full Name"
+msgstr "氏名"
+
+#: lms/templates/student_profile/profile.underscore:6
+msgid "Preferred Language"
+msgstr "使用言語"
+
+#: lms/templates/student_profile/profile.underscore:11
+msgid "Update Profile"
+msgstr "プロフィールを更新"

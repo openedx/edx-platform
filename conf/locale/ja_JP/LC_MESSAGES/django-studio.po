@@ -1,0 +1,276 @@
+# edX translation file.
+# Copyright (C) 2014 EdX
+# This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
+# 
+# Translators:
+# watcafe, 2014
+# kawa <h.kawasaki@nttks.co.jp>, 2014
+# h_yoshida <h_yoshida@matsumo-sys.com>, 2014
+# sunk <s.kim@nttks.co.jp>, 2014
+# Takashi Nagai <ngi644@gmail.com>, 2014
+# Shige Usui <ushige@live.com>, 2014
+# わたカフェの店長, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: edx-platform\n"
+"Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+"POT-Creation-Date: 2014-12-15 18:25+0000\n"
+"PO-Revision-Date: 2014-12-15 18:15+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"Language-Team: Japanese (Japan) (http://www.transifex.com/projects/p/edx-platform/language/ja_JP/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: cms/djangoapps/contentstore/course_info_model.py:67
+#: cms/djangoapps/contentstore/course_info_model.py:154
+msgid "Invalid course update id."
+msgstr "無効な講座更新ID"
+
+#: cms/djangoapps/contentstore/course_info_model.py:119
+msgid "Course update not found."
+msgstr "講座更新がありません。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:33
+msgid ""
+"GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, please create it, or "
+"configure a different path with GIT_REPO_EXPORT_DIR"
+msgstr "GIT_REPO_EXPORT_DIR が設定されていないか、パス {0} が存在しません。作成するか、GIT_REPO_EXPORT_DIR に違うパスを指定してください。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:36
+msgid ""
+"Non writable git url provided. Expecting something like: "
+"git@github.com:mitocw/edx4edx_lite.git"
+msgstr "書き込みの出来ないgit urlです。「git@github.com:mitocw/edx4edx_lite.git」のような形式が期待値です。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:38
+msgid ""
+"If using http urls, you must provide the username and password in the url. "
+"Similar to https://user:pass@github.com/user/course."
+msgstr "httpのurlを使用している場合、ユーザー名とパスワードをurlに含めてください。「https://user:pass@github.com/user/course」のような形式です。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:41
+msgid "Unable to determine branch, repo in detached HEAD mode"
+msgstr "detached HEAD状態のレポジトリではブランチを決定することができません。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:42
+msgid "Unable to update or clone git repository."
+msgstr "gitレポジトリでupdateまたはcloneができません。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:43
+msgid "Unable to export course to xml."
+msgstr "講座をxmlでエクスポートすることができません。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:44
+msgid "Unable to configure git username and password"
+msgstr "gitのユーザー名とパスワードを設定することができません。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:45
+msgid ""
+"Unable to commit changes. This is usually because there are no changes to be"
+" committed"
+msgstr "変更をコミットすることができません。通常コミットする変更が無い場合にこの事象が発生します。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:47
+msgid ""
+"Unable to push changes.  This is usually because the remote repository "
+"cannot be contacted"
+msgstr "変更をプッシュすることができません。通常リモートレポジトリが接続できない場合にこの事象が発生します。"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:49
+msgid "Bad course location provided"
+msgstr "間違った講座ロケーションです"
+
+#: cms/djangoapps/contentstore/git_export_utils.py:50
+msgid "Missing branch on fresh clone"
+msgstr "新規クローンにブランチがありません"
+
+#: cms/djangoapps/contentstore/utils.py:32
+msgid "My Notes"
+msgstr "マイノート"
+
+#: cms/djangoapps/contentstore/management/commands/git_export.py:44
+msgid ""
+"Take the specified course and attempt to export it to a git repository\n"
+". Course directory must already be a git repository. Usage:  git_export <course_loc> <git_url>"
+msgstr "gitレポジトリにエクスポートする講座を選んでください。\n講座ディレクトリはgitレポジトリである必要があります。使用方法：git_export <course_loc> <git_url>"
+
+#: cms/djangoapps/contentstore/views/assets.py:201
+msgid ""
+"File {filename} exceeds maximum size of {size_mb} MB. Please follow the "
+"instructions here to upload a file elsewhere and link to it instead: "
+"{faq_url}"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/assets.py:246
+msgid "Upload completed"
+msgstr "アップロード完了"
+
+#: cms/djangoapps/contentstore/views/component.py:234
+msgid "HTML"
+msgstr "HTML"
+
+#: cms/djangoapps/contentstore/views/component.py:236
+msgid "Video"
+msgstr "ビデオ"
+
+#: cms/djangoapps/contentstore/views/component.py:249
+msgid "Blank"
+msgstr "空白"
+
+#: cms/djangoapps/contentstore/views/course.py:442
+msgid "Unscheduled"
+msgstr "未定"
+
+#: cms/djangoapps/contentstore/views/course.py:535
+msgid ""
+"Special characters not allowed in organization, course number, and course "
+"run."
+msgstr "記号は組織、講座番号、コース開始では使用することができません。"
+
+#: cms/djangoapps/contentstore/views/course.py:551
+msgid ""
+"There is already a course defined with the same organization and course "
+"number. Please change either organization or course number to be unique."
+msgstr "既に同様に組織、コース番号で規定されているコースがあります。組織もしくはコース番号のどちらかがユニークとなるように変更をしてください。"
+
+#: cms/djangoapps/contentstore/views/course.py:556
+#: cms/djangoapps/contentstore/views/course.py:559
+msgid ""
+"Please change either the organization or course number so that it is unique."
+msgstr "ユニークな情報とするため、組織もしくは講座番号を変更してください。"
+
+#: cms/djangoapps/contentstore/views/course.py:564
+msgid ""
+"Unable to create course '{name}'.\n"
+"\n"
+"{err}"
+msgstr "講座名「'{name}」の生成に失敗しました。\n{err}"
+
+#: cms/djangoapps/contentstore/views/course.py:1175
+msgid "invalid JSON"
+msgstr "不正なJSONデータです。"
+
+#: cms/djangoapps/contentstore/views/course.py:1184
+msgid "must have name of the configuration"
+msgstr "この設定の名前を決めてください。"
+
+#: cms/djangoapps/contentstore/views/course.py:1186
+msgid "must have at least one group"
+msgstr "最低一つのグループが必要です"
+
+#: cms/djangoapps/contentstore/views/course.py:1415
+msgid "This Group Configuration is already in use and cannot be removed."
+msgstr "このグループ設定は利用中なので、削除することができません。"
+
+#: cms/djangoapps/contentstore/views/export_git.py:46
+msgid "Course successfully exported to git repository"
+msgstr "gitレポジトリへの講座エクスポートが完了しました。"
+
+#: cms/djangoapps/contentstore/views/helpers.py:126
+msgid "Vertical"
+msgstr "縦"
+
+#: cms/djangoapps/contentstore/views/import_export.py:88
+msgid "We only support uploading a .tar.gz file."
+msgstr ".tar.gz 形式のファイルのアップロードのみがサポートされています。"
+
+#: cms/djangoapps/contentstore/views/import_export.py:126
+msgid "File upload corrupted. Please try again"
+msgstr "ファイルアップロードが失敗しました。再度、お試しください。"
+
+#: cms/djangoapps/contentstore/views/import_export.py:225
+msgid "Could not find the course.xml file in the package."
+msgstr "パッケージ内に course.xml が見当たりませんでした。"
+
+#: cms/djangoapps/contentstore/views/item.py:502
+msgid "Empty"
+msgstr "空"
+
+#: cms/djangoapps/contentstore/views/item.py:532
+msgid "Duplicate of {0}"
+msgstr "'{0}' の重複"
+
+#: cms/djangoapps/contentstore/views/item.py:534
+msgid "Duplicate of '{0}'"
+msgstr "'{0}' の重複"
+
+#: cms/djangoapps/contentstore/views/item.py:916
+msgid "{section_or_subsection} \"{display_name}\""
+msgstr "{section_or_subsection} \"{display_name}\""
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:436
+msgid "Incoming video data is empty."
+msgstr "入力されたビデオデータは空です。"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:441
+msgid "Can't find item by locator."
+msgstr "ロケーターでアイテムを見つけることができません。"
+
+#: cms/djangoapps/contentstore/views/transcripts_ajax.py:444
+msgid "Transcripts are supported only for \"video\" modules."
+msgstr "字幕は「ビデオ」モジュールのみ対応します。"
+
+#: cms/djangoapps/contentstore/views/user.py:99
+msgid "Insufficient permissions"
+msgstr "権限が不十分です"
+
+#: cms/djangoapps/contentstore/views/user.py:107
+msgid "Could not find user by email address '{email}'."
+msgstr "電子メールアドレス「{email}」でユーザを見つけることができませんでした．"
+
+#: cms/djangoapps/contentstore/views/user.py:129
+msgid "User {email} has registered but has not yet activated his/her account."
+msgstr "ユーザ {email} は登録済みですが、まだアクティベーションが完了していません。"
+
+#: cms/djangoapps/contentstore/views/user.py:145
+msgid "`role` is required"
+msgstr "「ロール」は必須です"
+
+#: cms/djangoapps/contentstore/views/user.py:150
+msgid "Only instructors may create other instructors"
+msgstr "教員権限のユーザだけが別の教員権限のユーザを設定できます"
+
+#: cms/djangoapps/contentstore/views/user.py:187
+msgid "You may not remove the last instructor from a course"
+msgstr "講師は最低１ユーザー必要なので、講師を全削除はできません。"
+
+#: cms/djangoapps/course_creators/models.py:33
+msgid "unrequested"
+msgstr "要求されていない"
+
+#: cms/djangoapps/course_creators/models.py:34
+msgid "pending"
+msgstr "ペンディング"
+
+#: cms/djangoapps/course_creators/models.py:35
+msgid "granted"
+msgstr "許可済み"
+
+#: cms/djangoapps/course_creators/models.py:36
+msgid "denied"
+msgstr "不許可"
+
+#: cms/djangoapps/course_creators/models.py:39
+msgid "Studio user"
+msgstr "Studio ユーザ"
+
+#: cms/djangoapps/course_creators/models.py:41
+msgid "The date when state was last updated"
+msgstr "状態が最後に更新された日時"
+
+#: cms/djangoapps/course_creators/models.py:43
+msgid "Current course creator state"
+msgstr "現在の講座制作状況"
+
+#: cms/djangoapps/course_creators/models.py:44
+msgid ""
+"Optional notes about this user (for example, why course creation access was "
+"denied)"
+msgstr "このユーザへの補足説明 (たとえば、講座制作画面へのアクセス拒否理由、等)"
+
+#: cms/djangoapps/models/settings/course_metadata.py:100
+msgid "Incorrect format for field '{name}'. {detailed_message}"
+msgstr "次のフィールドがフォーマットが不正です：'{name}'. {detailed_message}"
