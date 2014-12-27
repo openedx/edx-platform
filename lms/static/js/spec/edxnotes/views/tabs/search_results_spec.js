@@ -82,10 +82,6 @@ define([
             });
             expect(view.$('#search-results-panel')).toExist();
             expect(view.$('#search-results-panel')).toBeFocused();
-            expect(view.$('.note-comments').eq(1)).toContainHtml(
-                '<span class="note-highlight">Second</span>'
-            );
-            expect(view.$('.note-excerpt .note-highlight')).not.toExist();
             expect(view.$('.note')).toHaveLength(3);
             view.searchResults.collection.each(function (model, index) {
                 expect(model.get('text')).toBe(notes[index].text);
@@ -119,7 +115,6 @@ define([
             expect(view.$('#search-results-panel')).not.toExist();
             expect(view.$('#no-results-panel')).toBeFocused();
             expect(view.$('#no-results-panel')).toExist();
-            expect(view.$('.note-highlight')).not.toExist();
             expect(view.$('#no-results-panel')).toContainText(
                 'No results found for "some text".'
             );
@@ -169,7 +164,6 @@ define([
 
             expect(view.$('.wrapper-msg')).not.toHaveClass('is-hidden');
             expect(view.$('.wrapper-msg .copy')).toContainText('test error message');
-            expect(view.$('.note-highlight')).not.toExist();
             expect(view.$('.ui-loading')).toHaveClass('is-hidden');
 
             submitForm(view.searchBox, 'Second');
@@ -177,7 +171,6 @@ define([
 
             expect(view.$('.wrapper-msg')).toHaveClass('is-hidden');
             expect(view.$('.wrapper-msg .copy')).toBeEmpty();
-            expect(view.$('.note-highlight')).toExist();
         });
 
         it('can correctly update search results', function () {

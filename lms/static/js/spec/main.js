@@ -23,7 +23,6 @@
             'jquery.immediateDescendents': 'xmodule_js/common_static/coffee/src/jquery.immediateDescendents',
             'jquery.simulate': 'xmodule_js/common_static/js/vendor/jquery.simulate',
             'jquery.url': 'xmodule_js/common_static/js/vendor/url.min',
-            'jquery.highlight': 'xmodule_js/common_static/js/vendor/jquery.highlight',
             'datepair': 'xmodule_js/common_static/js/vendor/timepicker/datepair',
             'date': 'xmodule_js/common_static/js/vendor/date',
             'underscore': 'xmodule_js/common_static/js/vendor/underscore-min',
@@ -152,10 +151,6 @@
             'jquery.url': {
                 deps: ['jquery'],
                 exports: 'jQuery.fn.url'
-            },
-            'jquery.highlight': {
-                deps: ['jquery'],
-                exports: 'jQuery.fn.highlight'
             },
             'datepair': {
                 deps: ['jquery.ui', 'jquery.timepicker']
