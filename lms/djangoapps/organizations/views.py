@@ -12,7 +12,7 @@ from rest_framework.response import Response
 
 from api_manager.courseware_access import get_course_key, get_aggregate_exclusion_user_ids
 from organizations.models import Organization
-from api_manager.users.serializers import UserSerializer
+from api_manager.users.serializers import UserSerializer, SimpleUserSerializer
 from api_manager.groups.serializers import GroupSerializer
 from api_manager.utils import str2bool
 from gradebook.models import StudentGradebook
@@ -92,19 +92,28 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                 course_key = get_course_key(course_id)
 
             users = User.objects.filter(organizations=pk)
+
             if course_key:
                 users = users.filter(courseenrollment__course_id__exact=course_key,
                                      courseenrollment__is_active=True)
             if str2bool(include_grades):
                 users = users.select_related('studentgradebook')
+
+            if str2bool(include_course_counts):
+                enrollments = CourseEnrollment.objects.filter(user__in=users).values('user').order_by().annotate(total=Count('user'))
+                enrollments_by_user = {}
+                for enrollment in enrollments:
+                    enrollments_by_user[enrollment['user']] = enrollment['total']
+
             response_data = []
             if users:
                 for user in users:
-                    serializer = UserSerializer(user)
+                    serializer = SimpleUserSerializer(user)
                     user_data = serializer.data
+
                     if str2bool(include_course_counts):
-                        enrollments = CourseEnrollment.enrollments_for_user(user).count()
-                        user_data['course_count'] = enrollments
+                        user_data['course_count'] = enrollments_by_user.get(user.id, 0)
+
                     if str2bool(include_grades) and course_key:
                         user_grades = {'grade': 0, 'proforma_grade': 0}
                         gradebook = user.studentgradebook_set.filter(course_id=course_key)
@@ -114,6 +123,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                             user_grades['complete_status'] = True if 0 < gradebook[0].proforma_grade <= \
                                 gradebook[0].grade + grade_complete_match_range else False
                         user_data.update(user_grades)
+
                     response_data.append(user_data)
             return Response(response_data, status=status.HTTP_200_OK)
         else:
