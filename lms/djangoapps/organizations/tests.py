@@ -64,6 +64,14 @@ class OrganizationsApiTests(TestCase):
         profile.city = 'Boston'
         profile.save()
 
+        self.test_user2 = User.objects.create(
+            email=str(uuid.uuid4()),
+            username=str(uuid.uuid4())
+        )
+        profile2 = UserProfile(user=self.test_user2)
+        profile2.city = 'NYC'
+        profile2.save()
+
         self.course = CourseFactory.create()
         self.second_course = CourseFactory.create(
             number="899"
@@ -324,6 +332,7 @@ class OrganizationsApiTests(TestCase):
 
     def test_organizations_users_get_with_course_count(self):
         CourseEnrollmentFactory.create(user=self.test_user, course_id=self.course.id)
+        CourseEnrollmentFactory.create(user=self.test_user2, course_id=self.course.id)
         CourseEnrollmentFactory.create(user=self.test_user, course_id=self.second_course.id)
 
         data = {
@@ -340,10 +349,16 @@ class OrganizationsApiTests(TestCase):
         data = {"id": self.test_user.id}
         response = self.do_post(users_uri, data)
         self.assertEqual(response.status_code, 201)
+
+        data = {"id": self.test_user2.id}
+        response = self.do_post(users_uri, data)
+        self.assertEqual(response.status_code, 201)
         response = self.do_get('{}{}'.format(users_uri, '?include_course_counts=True'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]['id'], self.test_user.id)
         self.assertEqual(response.data[0]['course_count'], 2)
+        self.assertEqual(response.data[1]['id'], self.test_user2.id)
+        self.assertEqual(response.data[1]['course_count'], 1)
 
     def test_organizations_users_get_with_grades(self):
         # Create 4 users
