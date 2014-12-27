@@ -43,7 +43,6 @@
             "date": "js/vendor/date",
             "backbone": "js/vendor/backbone-min",
             "underscore.string": "js/vendor/underscore.string.min",
-            "jquery.highlight": "js/vendor/jquery.highlight",
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
@@ -74,10 +73,6 @@
             },
             "jquery": {
                 exports: "$"
-            },
-            "jquery.highlight": {
-                deps: ["jquery"],
-                exports: "jQuery.fn.highlight"
             },
             "underscore": {
                 exports: "_"

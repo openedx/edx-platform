@@ -3,7 +3,6 @@ Helper methods related to EdxNotes.
 """
 import json
 import logging
-import markupsafe
 import requests
 from requests.exceptions import RequestException
 from uuid import uuid4
@@ -16,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext as _
 
+from capa.util import sanitize_html
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -28,6 +28,8 @@ from opaque_keys.edx.keys import UsageKey
 from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 
 log = logging.getLogger(__name__)
+HIGHLIGHT_TAG = "span"
+HIGHLIGHT_CLASS = "note-highlight"
 
 
 class NoteJSONEncoder(JSONEncoder):
@@ -73,7 +75,7 @@ def get_token_url(course_id):
     })
 
 
-def send_request(user, course_id, path="", query_string=""):
+def send_request(user, course_id, path="", query_string=None):
     """
     Sends a request with appropriate parameters and headers.
     """
@@ -86,6 +88,9 @@ def send_request(user, course_id, path="", query_string=""):
     if query_string:
         params.update({
             "text": query_string,
+            "highlight": True,
+            "highlight_tag": HIGHLIGHT_TAG,
+            "highlight_class": HIGHLIGHT_CLASS,
         })
 
     try:
@@ -132,8 +137,8 @@ def preprocess_collection(user, course, collection):
     with store.bulk_operations(course.id):
         for model in collection:
             model.update({
-                u"text": markupsafe.escape(model["text"]),
-                u"quote": markupsafe.escape(model["quote"]),
+                u"text": sanitize_html(model["text"]),
+                u"quote": sanitize_html(model["quote"]),
                 u"updated": dateutil_parse(model["updated"]),
             })
             usage_id = model["usage_id"]

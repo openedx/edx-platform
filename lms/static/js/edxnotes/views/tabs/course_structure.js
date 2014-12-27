@@ -10,7 +10,9 @@ define([
             title: 'Location in Course',
 
             renderContent: function () {
-                var courseStructure = this.collection.getCourseStructure();
+                var courseStructure = this.collection.getCourseStructure(),
+                    container = document.createDocumentFragment();
+
                 _.each(courseStructure.chapters, function (chapterInfo) {
                     var group = this.getGroup(chapterInfo);
                     _.each(chapterInfo.children, function (location) {
@@ -26,9 +28,9 @@ define([
                             }, this);
                         }
                     }, this);
-                    group.render().$el.appendTo(this.$el);
+                    container.appendChild(group.render().el);
                 }, this);
-
+                this.$el.append(container);
                 return this;
             },
 
