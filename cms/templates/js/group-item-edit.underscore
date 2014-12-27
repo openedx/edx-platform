@@ -1,0 +1,18 @@
+<form class="group-configuration-edit-form">
+    <div class="wrapper-form">
+    <% if (error && error.message) { %>
+        <div class="group-configuration-edit-error message message-status message-status error is-shown" name="group-configuration-edit-error">
+          <%= gettext(error.message) %>
+        </div>
+    <% } %>
+        <fieldset class="groups-fields">
+            <div class="input-wrap field text required add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+                <input name="group-<%= index %>-name" class="group-name long" value="<%= name %>" type="text">
+            </div>
+        </fieldset>
+    </div>
+    <div class="actions">
+        <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
+        <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+    </div>
+</form>

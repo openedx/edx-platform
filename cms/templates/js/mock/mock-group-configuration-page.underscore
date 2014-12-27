@@ -19,8 +19,10 @@
     <div class="wrapper-content wrapper">
         <section class="content">
             <article class="content-primary" role="main">
-                <div class="ui-loading">
-                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                <div class="wrapper-groups experiment-groups">
+                    <div class="ui-loading">
+                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                    </div>
                 </div>
             </article>
             <aside class="content-supplementary" role="complementary"></aside>

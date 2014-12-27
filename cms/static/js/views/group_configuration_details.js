@@ -40,17 +40,17 @@ function(BaseView, _, gettext, str) {
         },
 
         editConfiguration: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('editing', true);
         },
 
         showGroups: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', true);
         },
 
         hideGroups: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
+            if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set('showGroups', false);
         },
 

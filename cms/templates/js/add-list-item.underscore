@@ -1,0 +1,3 @@
+<button class="action action-add">
+    <i class="icon icon-plus"></i><%= interpolate(gettext('New %(item_type)s'), {item_type: itemCategoryDisplayName}, true) %>
+</button>
