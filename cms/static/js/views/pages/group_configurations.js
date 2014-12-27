@@ -1,21 +1,41 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
-    'js/views/group_configurations_list'
+    'js/views/group_configurations_list', 'js/views/group_list'
 ],
-function ($, _, gettext, BasePage, GroupConfigurationsList) {
+function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
-        initialize: function() {
+        events: function() {
+            var events = {
+                'click .cohort-groups .new-button': this.cohortGroupsListView.addOne.bind(this.cohortGroupsListView)
+            };
+            if (this.experimentsEnabled) {
+                events['click .experiment-groups .new-button'] = this.experimentGroupsListView.addOne.bind(this.experimentGroupsListView);
+            }
+            return events;
+        },
+
+        initialize: function(options) {
             BasePage.prototype.initialize.call(this);
-            this.listView = new GroupConfigurationsList({
-                collection: this.collection
+            this.experimentsEnabled = options.experimentsEnabled;
+            if (this.experimentsEnabled) {
+                this.experimentGroupsCollection = options.experimentGroupsCollection;
+                this.experimentGroupsListView = new GroupConfigurationsList({
+                    collection: this.experimentGroupsCollection
+                });
+            }
+            this.cohortGroupConfiguration = options.cohortGroupConfiguration;
+            this.cohortGroupsListView = new GroupList({
+                collection: this.cohortGroupConfiguration.get('groups')
             });
         },
 
         renderPage: function() {
             var hash = this.getLocationHash();
-            this.$('.content-primary').append(this.listView.render().el);
-            this.addButtonActions();
+            if (this.experimentsEnabled) {
+                this.$('.experiment-groups').append(this.experimentGroupsListView.render().el);
+            }
+            this.$('.cohort-groups').append(this.cohortGroupsListView.render().el);
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match
@@ -24,22 +44,17 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
             return $.Deferred().resolve().promise();
         },
 
-        addButtonActions: function () {
-            this.$('.nav-actions .new-button').click(function (event) {
-                this.listView.addOne(event);
-            }.bind(this));
-        },
-
         addWindowActions: function () {
             $(window).on('beforeunload', this.onBeforeUnload.bind(this));
         },
 
         onBeforeUnload: function () {
-            var dirty = this.collection.find(function(configuration) {
-                return configuration.isDirty();
-            });
+            var dirty = this.cohortGroupConfiguration.isDirty ||
+                (this.experimentsEnabled && this.experimentGroupsCollection.find(function(configuration) {
+                    return configuration.isDirty();
+                }));
 
-            if(dirty) {
+            if (dirty) {
                 return gettext('You have unsaved changes. Do you really want to leave this page?');
             }
         },
@@ -57,7 +72,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList) {
          * @param {String|Number} Id of the group configuration.
          */
         expandConfiguration: function (id) {
-            var groupConfig = this.collection.findWhere({
+            var groupConfig = this.experimentsEnabled && this.experimentGroupsCollection.findWhere({
                 id: parseInt(id)
             });
 
