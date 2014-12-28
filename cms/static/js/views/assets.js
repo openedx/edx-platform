@@ -135,6 +135,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 event.preventDefault();
                 self.resetUploadModal();
                 ModalUtils.showModal();
+                $('.modal-cover').on('click', self.hideModal);
                 $('.file-input').bind('change', self.startUpload);
                 $('.upload-modal .file-chooser').fileupload({
                     dataType: 'json',
@@ -182,6 +183,9 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
 
             showFileSelectionMenu: function(event) {
                 event.preventDefault();
+                if (assetsView.largeFileErrorMsg) {
+                  assetsView.largeFileErrorMsg.hide();
+                }
                 $('.file-input').click();
             },
 

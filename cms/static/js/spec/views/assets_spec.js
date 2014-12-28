@@ -169,6 +169,21 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
 
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
+
+                it('hides the error modal if a large file, then small file is uploaded', function() {
+                    expect(assetsView).toBeDefined();
+                    mockFileUpload.files[0].size = assetsView.maxFileSize;
+
+                    $('.choose-file-button').click();
+                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+
+                    expect(assetsView.largeFileErrorMsg).toBeDefined();
+
+                    mockFileUpload.files[0].size = assetsView.maxFileSize / 10;
+                    $('.choose-file-button').click();
+                    $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
+                    expect(assetsView.largeFileErrorMsg).toBeNull();
+                });
             });
         });
     });
