@@ -1,0 +1,62 @@
+// LMS -- elements -- navigation
+// ====================
+
+// in this document:
+// --------------------
+// +notes
+// +skip navigation
+// +utility navigation
+
+// +notes:
+// --------------------
+// this Sass partial should have its contents eventually abstracted out so that onboarding/non-coureware navigation is separate from in course-based navigation systems
+
+
+// +skip navigation
+// --------------------
+%nav-skip {
+  @extend %text-sr;
+}
+
+.nav-contents, .nav-skip {
+  @extend %nav-skip;
+}
+
+// +utility navigation (course utiltiies)
+// --------------------
+.nav-utilities {
+  @extend %ui-depth3;
+  position: fixed;
+  right: ($baseline*2.25);
+  bottom: 0;
+
+
+  .wrapper-utility {
+    @extend %wipe-last-child;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: ($baseline/2);
+  }
+
+  .utility-control {
+    @include transition(background-color $tmg-f2 ease-in-out 0s);
+    position: relative;
+    bottom: -6px; // needed to sync up with current rogue/more complex calc utility alignment
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: ($baseline/10);
+    padding: ($baseline/2) ($baseline*0.75) ($baseline*0.75) ($baseline*0.75);
+    background: $black-t3;
+    color: $white;
+
+    // STATE: hover/active
+    &:hover, &:active {
+      background: $black;
+    }
+
+    // STATE: is active/in use
+    &.is-active {
+      background: red;
+    }
+  }
+}
