@@ -5,7 +5,6 @@ div.calc-main {
   @include transition(bottom 0.75s linear 0s);
   -webkit-appearance: none;
   width: 100%;
-  z-index: 99;
 
   &.open {
     bottom: -36px;
@@ -13,10 +12,11 @@ div.calc-main {
 
   a.calc {
     @include text-hide();
-    background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
+    @include transition(background-color $tmg-f2 ease-in-out 0s);
+    background: url("../images/calc-icon.png") $black-t3 no-repeat center;
     border-bottom: 0;
-    border-radius: 3px 3px 0 0;
-    color: #fff;
+    border-radius: ($baseline/10);
+    color: $white;
     float: right;
     height: 20px;
     display: inline-block;
@@ -27,17 +27,18 @@ div.calc-main {
     width: 16px;
 
     &:hover, &:focus {
-      opacity: 0.8;
+      background-color: $black;
     }
 
     &.closed {
       background-image: url("../images/close-calc-icon.png");
+      background-color: $black;
       top: -36px;
     }
   }
 
   div#calculator_wrapper {
-    background: rgba(#111, .9);
+    background: $black;
     clear: both;
     max-height: 90px;
     position: relative;
