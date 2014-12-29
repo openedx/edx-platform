@@ -4,6 +4,8 @@ from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal
 import analytics
+from django.http import HttpResponse
+from io import BytesIO
 import pytz
 import logging
 import smtplib
@@ -289,6 +291,28 @@ class Order(models.Model):
         self.save()
         return old_to_new_id_map
 
+    def generate_pdf_file(self, order_items):
+        data = []
+        for item in order_items:
+            discount_price = '0.00'
+            price = item.unit_cost
+            course_key = getattr(item, 'course_id', None)
+            if course_key is not None:
+                course = get_course_by_id(course_key, depth=0)
+            if item.list_price is not None:
+                discount_price = item.list_price - item.unit_cost
+                price = item.list_price
+            total = item.qty*item.unit_cost
+            data.append({
+                'course_name': course.display_name,
+                'quantity': item.qty,
+                'list_price': price,
+                'discount':discount_price,
+                'total': total
+            })
+
+        return data
+
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
         this function generates the csv file
@@ -437,6 +461,7 @@ class Order(models.Model):
             #
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
+        # pdf_buffer = self.generate_pdf_file(orderitems)
         self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
         self._emit_order_event('Completed Order', orderitems)
 

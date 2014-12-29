@@ -50,6 +50,15 @@ class NumberedCanvas(Canvas):
 
 
 class SimpleInvoice(UnicodeProperty):
+    def __init__(self, data, id, date, title, is_invoice, total_cost, payment_received='0.00', balance='NIL'):
+        self._data = data
+        self.id = id
+        self.date = date
+        self.title = title
+        self.is_invoice = is_invoice
+        self.total_cost = total_cost
+        self.payment_received = payment_received
+        self.balance = balance
 
     def prepare_invoice_draw(self):
         self.MARGIN = 15
@@ -73,11 +82,10 @@ class SimpleInvoice(UnicodeProperty):
         self.drawBorders()
         self.drawLogos('/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif', '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
 
-        self.drawTitle('INVOICE', '23', '23 Feb, 2014')
+        self.drawTitle()
         y_pos = self.drawCourseInfo()
-        y_pos = self.show_totals(y_pos, '$26180.00', '$30.00', '$26150.00')
+        y_pos = self.show_totals(y_pos)
         self.draw_footer(y_pos)
-
         # self.pdf.setFillColorRGB(0, 0, 0)
 
         self.pdf.showPage()
@@ -103,22 +111,24 @@ class SimpleInvoice(UnicodeProperty):
         width = float(im.size[0]) / (float(im.size[1])/height)
         self.pdf.drawImage(edx_logo, (self.MARGIN + 177 -width) * mm, top * mm, width * mm, height*mm)
 
-    def drawTitle(self, title, order_number, purchase_date):
+    def drawTitle(self):
         self.pdf.setFont('DejaVu', 21)
-        self.pdf.drawCentredString(108*mm, (230)*mm, title)
+        self.pdf.drawCentredString(108*mm, (230)*mm, self.title)
 
         self.pdf.setFont('DejaVu', 10)
-        self.pdf.drawString((self.MARGIN + 8) * mm, 220 * mm, _(u'Order # ' + order_number))
-        self.pdf.drawRightString((self.MARGIN + 177) * mm, 220 * mm, _(u'Date ' + purchase_date))
+        self.pdf.drawString((self.MARGIN + 8) * mm, 220 * mm, _(u'Order # ' + self.id))
+        self.pdf.drawRightString((self.MARGIN + 177) * mm, 220 * mm, _(u'Date ' + self.date))
 
     def drawCourseInfo(self):
-
-        data= [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', ''],
-        ['', 'Demo Course 1', '2', '$100.00', '$0.00', '$200.00', ''],
-        ['', 'Demo Course 2', '2', '$1000.00', '$10.00', '$1980.00', ''],
-        ['', 'Demo Course 3', '5', '$500.00', '$0.00', '$2500.00', ''],
-        ['', 'Demo Course 4', '2', '$10000.00', '$150.00', '$19700.00', '']
-        ]
+        data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
+        for row in self._data:
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+        # data= [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', ''],
+        # ['', 'Demo Course 1', '2', '$100.00', '$0.00', '$200.00', ''],
+        # ['', 'Demo Course 2', '2', '$1000.00', '$10.00', '$1980.00', ''],
+        # ['', 'Demo Course 3', '5', '$500.00', '$0.00', '$2500.00', ''],
+        # ['', 'Demo Course 4', '2', '$10000.00', '$150.00', '$19700.00', '']
+        # ]
         heights = [12*mm]
         heights.extend((len(data) - 1 )*[8*mm])
         t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm], heights)
@@ -140,16 +150,14 @@ class SimpleInvoice(UnicodeProperty):
         t.drawOn(self.pdf, (self.MARGIN + 2) * mm, (215 * mm) -t._height)
         return ((215 * mm) -t._height)/ mm
 
-    def show_totals(self, y_pos, total_amount, payment_received, balance):
-        data= [['Total', total_amount]]
-
-        is_invoice = False
-        if (is_invoice):
-            data.append(['Payment Received', payment_received])
-            data.append(['Balance', balance])
+    def show_totals(self, y_pos):
+        data= [['Total', self.total_cost]]
+        if (self.is_invoice):
+            data.append(['Payment Received', self.payment_received])
+            data.append(['Balance', self.balance])
 
         data.append(['', 'EdX Tax ID:  46-0807740'])
-
+        
         heights = 8*mm
         t=Table(data,40*mm, heights)
 
@@ -190,7 +198,6 @@ class SimpleInvoice(UnicodeProperty):
             ['edX Billing Address'],
             [billing_address_para]
         ]
-        is_invoice = True
 
         footer_style = [
             ('ALIGN',(0,0),(-1,-1),'LEFT'),
@@ -208,7 +215,7 @@ class SimpleInvoice(UnicodeProperty):
 
         ]
 
-        if (is_invoice):
+        if (self.is_invoice):
             terms_contitions_text = """Enrollments:
             Enrollments must be completed within 7 full days from the course start date.
             Payment Terms:

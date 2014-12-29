@@ -799,8 +799,16 @@ def _show_receipt_html(request, order):
     from pdfgenerator.pdf import SimpleInvoice
 
     buffer = BytesIO()
-    pdf = SimpleInvoice()
-
+    data = order.generate_pdf_file(order_items)
+    pdf = SimpleInvoice(
+        data=data,
+        id=str(order.id),
+        date=order.purchase_time.strftime("%B %d, %Y"),
+        title='RECEIPT',
+        is_invoice = False,
+        total_cost=order.total_cost,
+        payment_received=order.total_cost
+    )
     pdf.gen(buffer)
     # Make your response and prep to attach
     response = HttpResponse(content_type='application/pdf')
