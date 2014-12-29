@@ -9,11 +9,12 @@
 %>
 <div class="wrapper-utility edx-notes-visibility">
   <div class="edx-notes-visibility-error error"></div>
-  <a href="#" class="utility-control action-toggle-notes is-disabled" role="button" aria-pressed="">
+  <a href="#" class="utility-control action-toggle-notes is-disabled ${"is-active" if edxnotes_visibility else ""}"  role="button" aria-pressed="">
+    <i class="icon-pencil"></i>
     % if edxnotes_visibility:
-      <i class="icon-pencil"></i> <span class="utility-control-label sr">${_("Hide notes")}</span>
+     <span class="utility-control-label sr">${_("Hide notes")}</span>
     % else:
-      <i class="icon-pencil"></i> <span class="utility-control-label sr">${_("Show notes")}</span>
+     <span class="utility-control-label sr">${_("Show notes")}</span>
     % endif
   </a>
 </div>
