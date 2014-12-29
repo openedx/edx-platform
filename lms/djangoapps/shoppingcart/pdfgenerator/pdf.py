@@ -75,8 +75,9 @@ class SimpleInvoice(UnicodeProperty):
 
         self.drawTitle('INVOICE', '23', '23 Feb, 2014')
         y_pos = self.drawCourseInfo()
-        self.show_totals(y_pos, '$26180.00', '$30.00', '$26150.00')
-        self.drawFooter(y_pos)
+        y_pos = self.show_totals(y_pos, '$26180.00', '$30.00', '$26150.00')
+        self.draw_footer(y_pos)
+
         # self.pdf.setFillColorRGB(0, 0, 0)
 
         self.pdf.showPage()
@@ -140,10 +141,15 @@ class SimpleInvoice(UnicodeProperty):
         return ((215 * mm) -t._height)/ mm
 
     def show_totals(self, y_pos, total_amount, payment_received, balance):
-        data= [['Total', total_amount],
-        ['Payment Received', payment_received],
-        ['Balance', balance],
-        ['', 'EdX Tax ID:  46-0807740']]
+        data= [['Total', total_amount]]
+
+        is_invoice = False
+        if (is_invoice):
+            data.append(['Payment Received', payment_received])
+            data.append(['Balance', balance])
+
+        data.append(['', 'EdX Tax ID:  46-0807740'])
+
         heights = 8*mm
         t=Table(data,40*mm, heights)
 
@@ -156,105 +162,78 @@ class SimpleInvoice(UnicodeProperty):
             ('BACKGROUND', (-1,0), (-1,-2), colors.lightgrey),
         ]))
         t.wrap(0,0)
-        t.drawOn(self.pdf, (self.MARGIN + 97) * mm, (y_pos - 38) * mm)
+        t.drawOn(self.pdf, (self.MARGIN + 97) * mm, (y_pos - (14 + (len(data)-1)*8)) * mm)
+        return y_pos - t._height
 
-    # def calculate_total2(self, y_pos, total_amount, payment_received, balance):
-    #
-    #     self.pdf.setFillColorRGB(0.823, 0.823, 0.823)
-    #     self.pdf.setStrokeColorRGB(0.5, 0.5, 0.5)
-    #     self.pdf.rect((self.MARGIN + 142) * mm, (y_pos - 12) * mm, 33 * mm, 7 * mm, stroke=True, fill=1)
-    #
-    #     self.pdf.setFillColorRGB(0, 0, 0)
-    #     self.pdf.setFont('DejaVu', 10)
-    #     self.pdf.drawString((self.MARGIN + 131) * mm, (y_pos - 10) * mm, _(u'Total'), 0)
-    #
-    #     self.pdf.setFont('DejaVu', 8)
-    #     self.pdf.drawRightString((self.MARGIN + 170) * mm, (y_pos - 10) * mm, _('$' + total_amount), 0)
-    #
-    #     self.pdf.setFillColorRGB(0.823, 0.823, 0.823)
-    #     self.pdf.rect((self.MARGIN + 142) * mm, (y_pos - 21) * mm, 33 * mm, 7 * mm, stroke=True, fill=1)
-    #
-    #     self.pdf.setFont('DejaVu', 8)
-    #     self.pdf.setFillColorRGB(0, 0, 0)
-    #     self.pdf.drawString((self.MARGIN + 114) * mm, (y_pos - 19) * mm, _(u'Payment Received'), 0)
-    #
-    #     self.pdf.setFont('DejaVu', 8)
-    #     self.pdf.drawRightString((self.MARGIN + 170) * mm, (y_pos - 19) * mm, _('$' + payment_received), 0)
-    #
-    #     self.pdf.setFillColorRGB(0.823, 0.823, 0.823)
-    #     self.pdf.rect((self.MARGIN + 142) * mm, (y_pos - 30) * mm, 33 * mm, 7 * mm, stroke=True, fill=1)
-    #
-    #     self.pdf.setFont('DejaVu', 10)
-    #     self.pdf.setFillColorRGB(0, 0, 0)
-    #     self.pdf.drawString((self.MARGIN + 126) * mm, (y_pos - 28) * mm, _(u'Balance'), 0)
-    #
-    #     self.pdf.setFont('DejaVu', 8)
-    #     self.pdf.drawRightString((self.MARGIN + 170) * mm, (y_pos - 28) * mm, _('$' + balance), 0)
-    #
-    #     self.pdf.setFont('DejaVu', 10)
-    #     self.pdf.drawRightString((self.MARGIN + 174) * mm, (y_pos - 36) * mm, _(u'EdX Tax ID:  46-0807740'), 0)
 
-    def drawFooter(self, y_pos):
+    def draw_footer(self, y_pos):
+        service_provider_text = """EdX offers online courses that include opportunities for professor-to-student and student-to-student interactivity, individual assessment of a student's work and, for students who demonstrate their mastery of subjects, a certificate of achievement or other acknowledgment."""
 
-        text = "Edx As a service provider"
+        disclaimer_text = """THE SITE AND ANY INFORMATION, CONTENT OR SERVICES MADE AVAILABLE ON OR THROUGH THE SITE ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTY OF ANY KIND (EXPRESS, IMPLIED OR OTHERWISE), INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, EXCEPT INSOFAR AS ANY SUCH IMPLIED WARRANTIES MAY NOT BE DISCLAIMED UNDER APPLICABLE LAW."""
+
+        billing_address_text = """141 Portland St.
+        9th Floor
+        Cambridge,
+        MA 02139"""
+
         style = getSampleStyleSheet()['Normal']
-        style.backColor = colors.lightgrey
-        style.borderColor = colors.black
-        style.borderWidth = 0.5
-        style.borderPadding = (2*mm, 5*mm, 2*mm, 5*mm)
         style.fontSize = 8
-        para = Paragraph(text.replace("\n", "<br/>"), style)
-        para.wrap(151 * mm, 8 * mm)
-        para.drawOn(self.pdf, (self.MARGIN + 11+5) * mm, (y_pos - 49) * mm)
+
+        service_provider_para = Paragraph(service_provider_text.replace("\n", "<br/>"), style)
+        disclaimer_para = Paragraph(disclaimer_text.replace("\n", "<br/>"), style)
+        billing_address_para = Paragraph(billing_address_text.replace("\n", "<br/>"), style)
+
+        data= [
+            [service_provider_para],
+            ['Disclaimer'],
+            [disclaimer_para],
+            ['edX Billing Address'],
+            [billing_address_para]
+        ]
+        is_invoice = True
+
+        footer_style = [
+            ('ALIGN',(0,0),(-1,-1),'LEFT'),
+            ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+            ('TEXTCOLOR',(0,0),(-1,-1),colors.black),
+            ('BACKGROUND', (0,0), (0,0), colors.lightgrey),
+            ('LEFTPADDING', (0,0), (0,0), 5*mm),
+            ('GRID', (0,0), (0,0), 0.50, colors.black),
+            ('BACKGROUND', (0,2), (0,2), colors.lightgrey),
+            ('LEFTPADDING', (0,2), (0,2), 5*mm),
+            ('GRID', (0,2), (0,2), 0.50, colors.black),
+            ('BACKGROUND', (0,4), (0,4), colors.lightgrey),
+            ('LEFTPADDING', (0,4), (0,4), 5*mm),
+            ('GRID', (0,4), (0,4), 0.50, colors.black),
+
+        ]
+
+        if (is_invoice):
+            terms_contitions_text = """Enrollments:
+            Enrollments must be completed within 7 full days from the course start date.
+            Payment Terms:
+            Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.
+            Cancellations:
+            Cancellation requests must be submitted to onlinex-registration@mit.edu 14 days prior to the course start date to be eligible for a refund. If you submit a cancellation request within 14 days prior to the course start date, you will not be eligible for a refund. Please see our Terms of Service page for full details.
+            Substitutions:
+            The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.
+            Please see our Terms of Service page for our detailed policies, including terms and conditions of use."""
+            terms_conditions_para = Paragraph(terms_contitions_text.replace("\n", "<br/>"), style)
+            data.append(['TERMS AND CONDITIONS'])
+            data.append([terms_conditions_para])
+            footer_style.append(('LEFTPADDING', (0,6), (0,6), 5*mm))
+
+        t=Table(data, 176*mm)
+
+        t.setStyle(TableStyle(footer_style))
+        t.wrap(0,0)
+
+        if (y_pos+4)*mm<=t._height:
+            self.pdf.showPage()
+            self.drawBorders()
+            self.drawLogos('/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif', '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
+
+        t.drawOn(self.pdf, (self.MARGIN + 5) * mm, (self.MARGIN + 5) * mm)
 
 
-        self.pdf.setFont('DejaVu', 8)
-        self.pdf.setFillColorRGB(0, 0, 0)
-        self.pdf.drawString((self.MARGIN + 12) * mm, (y_pos - 57) * mm, _('Disclaimer'), 0)
 
-        text = "Auto Generated Disclaimer"
-        style = getSampleStyleSheet()['Normal']
-        style.backColor = colors.lightgrey
-        style.borderColor = colors.black
-        style.borderWidth = 0.5
-        style.borderPadding = (2*mm, 5*mm, 2*mm, 5*mm)
-        style.fontSize = 8
-        para = Paragraph(text.replace("\n", "<br/>"), style)
-        para.wrap(151 * mm, 8 * mm)
-        para.drawOn(self.pdf, (self.MARGIN + 11+5) * mm, (y_pos - 65) * mm)
-
-
-        self.pdf.setFont('DejaVu', 8)
-        self.pdf.drawString((self.MARGIN + 12) * mm, (y_pos - 72) * mm, _('EdX Billing Address'), 0)
-
-        text = "edX Billing Address"
-        style = getSampleStyleSheet()['Normal']
-        style.backColor = colors.lightgrey
-        style.borderColor = colors.black
-        style.borderWidth = 0.5
-        style.borderPadding = (2*mm, 5*mm, 2*mm, 5*mm)
-        style.fontSize = 8
-        para = Paragraph(text.replace("\n", "<br/>"), style)
-        para.wrap(151 * mm, 8 * mm)
-        para.drawOn(self.pdf, (self.MARGIN + 11+5) * mm, (y_pos - 80) * mm)
-
-        text = """TERMS AND CONDITIONS
-        Enrollments:
-        Enrollments must be completed within 7 full days from the course start date.
-        Payment Terms:
-        Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.
-        Cancellations:
-        Cancellation requests must be submitted to onlinex-registration@mit.edu 14 days prior to the course start date to be eligible for a refund. If you submit a cancellation request within 14 days prior to the course start date, you will not be eligible for a refund. Please see our Terms of Service page for full details.
-        Substitutions:
-        The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.
-        Please see our Terms of Service page for our detailed policies, including terms and conditions of use.
-        """
-        style = getSampleStyleSheet()['Normal']
-        # style.backColor = colors.lightgrey
-        # style.borderColor = colors.black
-        # style.borderWidth = 0.5
-        # style.borderPadding = (2*mm, 5*mm, 2*mm, 5*mm)
-        style.fontSize = 8
-        para = Paragraph(text.replace("\n", "<br/>"), style)
-        para.wrap(161 * mm, 7*mm)
-        para.drawOn(self.pdf, (self.MARGIN + 11) * mm, (y_pos - 150) * mm)
