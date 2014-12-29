@@ -15,42 +15,6 @@ Contents:
     :maxdepth: 2
 
     change_log
-    preface.rst
-    browsers.rst
-    overview.rst
-    extending_platform/index
-    modulestores/index
-    xblocks.rst
-    pavelib.rst
-    public_sandboxes.rst
-    analytics.rst
-    process/index
-    testing/index
-    code-considerations
-    deploy-new-service
-
-APIs
------
-
-.. toctree::
-    :maxdepth: 2
-
-    djangoapps.rst
-    common-lib.rst
-    experiments.rst
-
-Internationalization
----------------------
-
-.. toctree::
-    :maxdepth: 2
-
-    i18n.rst
-    i18n_translators_guide.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+    common/index
+    lms/index
+    cms/index
