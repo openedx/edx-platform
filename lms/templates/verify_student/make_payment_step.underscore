@@ -1,12 +1,12 @@
 <div id="wrapper-review" class="wrapper-view make-payment-step">
   <div class="review view">
-    <h3 class="title <% if ( !upgrade ) { %>center-col<%  } %>">
+    <h3 class="title <% if ( !upgrade ) { %>center-col<% } %>">
       <%- gettext( "You are enrolling in: " ) %>
       <span class="course-title"><%= courseName %></span>
     </h3>
 
     <% if ( isActive ) { %>
-      <div class="wrapper-task <% if ( !upgrade ) { %>hidden" aria-hidden="true<% } %>">
+      <div class="wrapper-task hidden" aria-hidden="true">
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
           <li class="review-task review-task-contribution">
@@ -58,7 +58,7 @@
           <li class="review-task review-task-contribution">
             <h4 class="title"><%- gettext( "Your Course Total" ) %></h4>
             <div class="copy">
-              <p><%- gettext( "To complete your registration, you will need to pay:" ) %></p>
+              <p><%- gettext( "To complete your enrollment, you will need to pay:" ) %></p>
             </div>
             <ul class="list-fields contribution-options">
               <li class="field contribution-option">
@@ -73,13 +73,19 @@
       </div>
     </div>
     <% } %>
-    <div class="instruction <% if ( !upgrade ) { %>center-col<%  } %>">
+    <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
+      <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
       <p>
-        <%- _.sprintf(
-          gettext( "You can pay now even if you don't have the following items available, but you will need to have these by (%(date)s) to qualify to earn a Verified Certificate." ),
-          { date: 'month date year' }
-        ) %>
+        <% if ( verificationDeadline ) { %>
+          <%- _.sprintf(
+            gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
+            { date: verificationDeadline }
+          ) %>
+        <% } else { %>
+            <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
+        <% } %>
       </p>
+      <% } %>
     </div>
 
     <div class="requirements-container">
@@ -95,7 +101,7 @@
             <p>
               <span class="copy-super"><%- gettext( "Check your email." ) %></span>
               <span class="copy-sub"><%-
-                  gettext( "You need to activate your account before you can register for courses. Check your inbox for an activation email." )
+                  gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email." )
                 %>
               </span>
             </p>

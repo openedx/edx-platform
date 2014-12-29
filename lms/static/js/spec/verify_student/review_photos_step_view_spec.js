@@ -31,10 +31,6 @@ define([
                 }).render();
             };
 
-            var confirmPhotos = function( isConfirmed ) {
-                $('#confirm_pics_good').trigger( 'click' );
-            };
-
             var submitPhotos = function( requests, expectedParams, succeeds ) {
                 // Submit the photos
                 $( '#next_step_button' ).click();
@@ -69,27 +65,11 @@ define([
                 TemplateHelpers.installTemplate( 'templates/verify_student/review_photos_step' );
             });
 
-            it( 'requires the user to confirm before submitting photos', function() {
-                createView();
-
-                // Initially disabled
-                expectSubmitEnabled( false );
-
-                // Confirm the photos, enabling submission
-                confirmPhotos( true );
-                expectSubmitEnabled( true );
-
-                // Unconfirm the photos, disabling submission
-                confirmPhotos( false );
-                expectSubmitEnabled( false );
-            });
-
             it( 'allows the user to change her full name', function() {
                 var requests = AjaxHelpers.requests( this );
 
                 createView();
                 setFullName( FULL_NAME );
-                confirmPhotos( true );
                 submitPhotos(
                     requests,
                     {
@@ -105,7 +85,6 @@ define([
                 var requests = AjaxHelpers.requests( this );
 
                 createView();
-                confirmPhotos( true );
                 submitPhotos(
                     requests,
                     {
@@ -124,7 +103,6 @@ define([
                 var view = createView(),
                     requests = AjaxHelpers.requests( this );
 
-                confirmPhotos( true );
                 submitPhotos(
                     requests,
                     {
