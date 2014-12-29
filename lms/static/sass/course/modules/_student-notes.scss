@@ -4,7 +4,7 @@
 // in this document:
 // --------------------
 // +notes
-// +messages
+// +toggling notes
 // +creating/editing notes
 // +listing notes
 
@@ -12,12 +12,51 @@
 // --------------------
 // this Sass partial contains all of the styling needed for the in-line student notes UI.
 
-// +messages
+// +toggling notes
 // --------------------
 
-// CASE: error in toggling notes
 .edx-notes-visibility {
 
+  .edx-notes-visibility-error {
+    @extend %t-copy-sub2;
+    @extend %text-truncated;
+    position: relative;
+    bottom: -($baseline/20); // needed to sync up with current rogue/more complex calc utility alignment
+    max-width: ($baseline*15);
+    display: none;
+    vertical-align: bottom;
+    margin-right: -($baseline/4);
+    border-right: ($baseline/4) solid $error-color;
+    padding: ($baseline/2) $baseline;
+    background: $black-t3;
+    text-align: center;
+    color: $white;
+  }
+
+  // STATE: has error
+  &.has-error {
+
+    .edx-notes-visibility-error {
+      display: inline-block;
+    }
+
+    .utility-control {
+      color: $error-color;
+    }
+  }
+}
+
+// CASE: annotator error in toggling notes (vendor customization)
+.annotator-notice {
+  @extend %t-weight4;
+  @extend %t-copy-sub1;
+  background: $black-t3;
+  padding: ($baseline/4) $baseline;
+}
+
+// vendor customization
+.annotator-notice-error {
+  border-color: $error-color;
 }
 
 // +creating/editing notes
