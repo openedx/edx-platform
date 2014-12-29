@@ -24,6 +24,7 @@ from dateutil.parser import parse as dateutil_parse
 from provider.oauth2.models import AccessToken, Client
 import oauth2_provider.oidc as oidc
 from provider.utils import now
+from opaque_keys.edx.keys import UsageKey
 from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 
 log = logging.getLogger(__name__)
@@ -68,7 +69,7 @@ def get_token_url(course_id):
     Returns token url for the course.
     """
     return reverse("get_token", kwargs={
-        "course_id": course_id.to_deprecated_string(),
+        "course_id": unicode(course_id),
     })
 
 
@@ -106,9 +107,6 @@ def get_parent_unit(xblock):
     Find vertical that is a unit, not just some container.
     """
     while xblock:
-        xblock = xblock.get_parent()
-        if xblock is None:
-            return None
         parent = xblock.get_parent()
         if parent is None:
             return None
@@ -118,12 +116,15 @@ def get_parent_unit(xblock):
 
 def preprocess_collection(user, course, collection):
     """
-    Reprocess provided `collection(list)`: adds information about ancestor,
-    converts "updated" date, sorts the collection in descending order.
+    Prepare `collection(notes_list)` provided by edx-notes-api
+    for rendering in a template:
+       add information about ancestor blocks,
+       convert "updated" to date
 
     Raises:
         ItemNotFoundError - when appropriate module is not found.
     """
+    # pylint: disable=too-many-statements
 
     store = modulestore()
     filtered_collection = list()
@@ -141,7 +142,10 @@ def preprocess_collection(user, course, collection):
                 filtered_collection.append(model)
                 continue
 
-            usage_key = course.id.make_usage_key_from_deprecated_string(usage_id)
+            usage_key = UsageKey.from_string(usage_id)
+            # Add a course run if necessary.
+            usage_key = usage_key.replace(course_key=store.fill_in_run(usage_key.course_key))
+
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
@@ -203,22 +207,22 @@ def get_module_context(course, item):
     Returns dispay_name and url for the parent module.
     """
     item_dict = {
-        'location': item.location.to_deprecated_string(),
+        'location': unicode(item.location),
         'display_name': item.display_name_with_default,
     }
 
     if item.category == 'chapter' and item.get_parent():
         course = item.get_parent()
-        ancestor_children = [child.to_deprecated_string() for child in course.children]
+        ancestor_children = [unicode(child) for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
         item_dict['url'] = reverse("jump_to_id", kwargs={
-            "course_id": course.id.to_deprecated_string(),
+            "course_id": unicode(course.id),
             "module_id": item.url_name,
         })
 
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
+        item_dict['children'] = [unicode(child) for child in item.children]
 
     return item_dict
 
@@ -260,7 +264,7 @@ def get_notes(user, course):
 
 def get_endpoint(path=""):
     """
-    Returns endpoint.
+    Returns edx-notes-api endpoint.
     """
     try:
         url = settings.EDXNOTES_INTERFACE['url']
@@ -288,7 +292,7 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': course_module.id.to_deprecated_string()}
+    urlargs = {'course_id': unicode(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
@@ -331,10 +335,9 @@ def is_feature_enabled(course):
         2) present in the course tab configuration.
         3) Harvard Annotation Tool must be disabled for the course.
     """
-    tab_found = next((True for t in course.tabs if t["type"] == "edxnotes"), False)
-    feature_enabled = settings.FEATURES.get("ENABLE_EDXNOTES")
-
-    return (feature_enabled and tab_found) and not is_harvard_notes_enabled(course)
+    return (settings.FEATURES.get("ENABLE_EDXNOTES")
+            and [t for t in course.tabs if t["type"] == "edxnotes"]  # tab found
+            and not is_harvard_notes_enabled(course))
 
 
 def is_harvard_notes_enabled(course):

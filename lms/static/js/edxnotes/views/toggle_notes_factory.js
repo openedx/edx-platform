@@ -8,7 +8,7 @@ define([
             'click .action-toggle-notes': 'toogleHandler'
         },
 
-        errorMessage: gettext('Cannot save your state. This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),
+        errorMessage: gettext("An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."),
 
         initialize: function (options) {
             this.visibility = options.visibility;

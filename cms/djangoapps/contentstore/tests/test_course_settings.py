@@ -615,7 +615,7 @@ class CourseMetadataEditingTest(CourseTestCase):
     @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': False})
     def test_update_from_json_filtered_edxnotes_off(self):
         """
-        If feature flag is on, then edxnotes must not be updated.
+        If feature flag is off, then edxnotes must not be updated.
         """
         test_model = CourseMetadata.update_from_json(
             self.course,
@@ -785,6 +785,7 @@ class CourseMetadataEditingTest(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertNotIn(EXTRA_TAB_PANELS.get("open_ended"), course.tabs)
 
+    @patch.dict(settings.FEATURES, {'ENABLE_EDXNOTES': True})
     def test_course_settings_munge_tabs(self):
         """
         Test that adding and removing specific course settings adds and removes tabs.
