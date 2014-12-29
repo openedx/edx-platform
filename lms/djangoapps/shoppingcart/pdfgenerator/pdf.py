@@ -125,6 +125,54 @@ class SimpleInvoice(UnicodeProperty):
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
             data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
         # data= [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', ''],
         # ['', 'Demo Course 1', '2', '$100.00', '$0.00', '$200.00', ''],
         # ['', 'Demo Course 2', '2', '$1000.00', '$10.00', '$1980.00', ''],
@@ -133,7 +181,7 @@ class SimpleInvoice(UnicodeProperty):
         # ]
         heights = [12*mm]
         heights.extend((len(data) - 1 )*[8*mm])
-        t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm], heights)
+        t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm], heights, splitByRow=1, repeatRows=1)
 
         t.setStyle(TableStyle([
             ('ALIGN',(3,1),(5,-1),'RIGHT'),
@@ -149,8 +197,50 @@ class SimpleInvoice(UnicodeProperty):
             ('INNERGRID', (1,1), (-2,-1), 0.50, colors.black),
         ]))
         t.wrap(0,0)
-        t.drawOn(self.pdf, (self.MARGIN + 2) * mm, (215 * mm) -t._height)
-        return ((215 * mm) -t._height)/ mm
+
+
+        first_page_available_height = 185*mm
+        remainaing_pages_available_height = 205*mm
+        first_page_top = 215*mm
+        next_pages_top = 235*mm
+
+        split_tables = t.split(0, first_page_available_height)
+        last_table_height = 0
+        is_on_first_page = True
+        if len(split_tables)>1:
+            split_table = split_tables[0]
+            split_table.wrap(0,0)
+            split_table.drawOn(self.pdf, (self.MARGIN + 2) * mm, first_page_top - split_table._height)
+
+            self.prepare_new_page()
+            is_on_first_page = False
+            split_tables = split_tables[1].split(0, remainaing_pages_available_height)
+            while len(split_tables) > 1:
+                split_table = split_tables[0]
+                split_table.wrap(0,0)
+                split_table.drawOn(self.pdf, (self.MARGIN + 2) * mm, next_pages_top - split_table._height)
+
+                self.prepare_new_page()
+                split_tables = split_tables[1].split(0, remainaing_pages_available_height)
+            split_table = split_tables[0]
+            split_table.wrap(0,0)
+            split_table.drawOn(self.pdf, (self.MARGIN + 2) * mm, next_pages_top - split_table._height)
+            last_table_height = split_table._height
+        else:
+            split_table = split_tables[0]
+            split_table.wrap(0,0)
+            split_table.drawOn(self.pdf, (self.MARGIN + 2) * mm, first_page_top -split_table._height)
+            last_table_height = split_table._height
+
+        if is_on_first_page:
+            return first_page_top - last_table_height
+        else:
+            return next_pages_top - last_table_height
+
+    def prepare_new_page(self):
+        self.pdf.showPage()
+        self.drawBorders()
+        self.drawLogos()
 
     def show_totals(self, y_pos):
         data= [['Total', self.total_cost]]
@@ -172,8 +262,8 @@ class SimpleInvoice(UnicodeProperty):
             ('BACKGROUND', (-1,0), (-1,-2), colors.lightgrey),
         ]))
         t.wrap(0,0)
-        t.drawOn(self.pdf, (self.MARGIN + 97) * mm, (y_pos - (14 + (len(data)-1)*8)) * mm)
-        return y_pos - t._height
+        t.drawOn(self.pdf, (self.MARGIN + 97) * mm, y_pos - t._height - 5*mm)
+        return y_pos - t._height - 5*mm
 
 
     def draw_footer(self, y_pos):
@@ -237,10 +327,8 @@ class SimpleInvoice(UnicodeProperty):
         t.setStyle(TableStyle(footer_style))
         t.wrap(0,0)
 
-        if (y_pos+4)*mm<=t._height:
-            self.pdf.showPage()
-            self.drawBorders()
-            self.drawLogos()
+        if (y_pos-(5+self.MARGIN+5)*mm)<=t._height:
+            self.prepare_new_page()
 
         t.drawOn(self.pdf, (self.MARGIN + 5) * mm, (self.MARGIN + 5) * mm)
 
