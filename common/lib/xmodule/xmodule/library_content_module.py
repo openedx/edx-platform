@@ -39,30 +39,28 @@ def _get_capa_types():
     Gets capa types tags and labels
     """
     capa_types = {
-        'annotationinput': _('Annotation'),
-        'checkboxgroup': _('Checkbox Group'),
-        'checkboxtextgroup': _('Checkbox Text Group'),
-        'chemicalequationinput': _('Chemical Equation'),
-        'choicegroup': _('Choice Group'),
-        'codeinput': _('Code Input'),
-        'crystallography': _('Crystallography'),
-        'designprotein2dinput': _('Design Protein 2D'),
-        'drag_and_drop_input': _('Drag and Drop'),
-        'editageneinput': _('Edit A Gene'),
-        'editamoleculeinput': _('Edit A Molecule'),
-        'filesubmission': _('File Submission'),
-        'formulaequationinput': _('Formula Equation'),
-        'imageinput': _('Image'),
-        'javascriptinput': _('Javascript Input'),
-        'jsinput': _('JS Input'),
-        'matlabinput': _('Matlab'),
-        'optioninput': _('Select Option'),
-        'radiogroup': _('Radio Group'),
-        'radiotextgroup': _('Radio Text Group'),
-        'schematic': _('Schematic'),
-        'textbox': _('Code Text Input'),
-        'textline': _('Text Line'),
-        'vsepr_input': _('VSEPR'),
+        # basic tab
+        'choiceresponse': _('Checkboxes'),
+        'optionresponse': _('Dropdown'),
+        'multiplechoiceresponse': _('Multiple Choice'),
+        'truefalseresponse': _('True/False Choice'),
+        'numericalresponse': _('Numerical Input'),
+        'stringresponse': _('Text Input'),
+
+        # advanced tab
+        'schematicresponse': _('Circuit Schematic Builder'),
+        'customresponse': _('Custom Evaluated Script'),
+        'imageresponse': _('Image Mapped Input'),
+        'formularesponse': _('Math Expression Input'),
+        'jsmeresponse': _('Molecular Structure'),
+
+        # not in "Add Component" menu
+        'javascriptresponse': _('Javascript Input'),
+        'symbolicresponse': _('Symbolic Math Input'),
+        'coderesponse': _('Code Input'),
+        'externalresponse': _('External Grader'),
+        'annotationresponse': _('Annotation Input'),
+        'choicetextresponse': _('Checkboxes With Text Input'),
     }
 
     return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
