@@ -56,7 +56,7 @@
 
     // STATE: is active/in use
     &.is-active {
-      background: red;
+      background: $active-color;
     }
   }
 }
