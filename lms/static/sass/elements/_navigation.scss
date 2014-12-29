@@ -27,15 +27,14 @@
 .nav-utilities {
   @extend %ui-depth3;
   position: fixed;
-  right: ($baseline*2.25);
+  @include right($baseline*2.25);
   bottom: 0;
-
 
   .wrapper-utility {
     @extend %wipe-last-child;
     display: inline-block;
     vertical-align: bottom;
-    margin-right: ($baseline/2);
+    @include margin-right($baseline/2);
   }
 
   .utility-control {
@@ -57,6 +56,21 @@
     // STATE: is active/in use
     &.is-active {
       background: $active-color;
+    }
+  }
+
+  // specific reset styling for any controls that are button elements
+  .utility-control-button {
+    border: none;
+    box-shadow: none;
+    text-shadow: none;
+    font-size: inherit;
+    font-weight: inherit;
+
+    // STATE: hover/active
+    &:hover, &:active, &:focus {
+      border: none;
+      box-shadow: none;
     }
   }
 }
