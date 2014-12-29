@@ -759,6 +759,7 @@ class RegistrationCodeRedemption(models.Model):
     registration_code = models.ForeignKey(CourseRegistrationCode, db_index=True)
     redeemed_by = models.ForeignKey(User, db_index=True)
     redeemed_at = models.DateTimeField(default=datetime.now(pytz.utc), null=True)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
 
     @classmethod
     def delete_registration_redemption(cls, user, cart):
@@ -811,6 +812,7 @@ class RegistrationCodeRedemption(models.Model):
         """
         code_redemption = RegistrationCodeRedemption(registration_code=course_reg_code, redeemed_by=user)
         code_redemption.save()
+        return code_redemption
 
 
 class SoftDeleteCouponManager(models.Manager):
@@ -910,6 +912,7 @@ class PaidCourseRegistration(OrderItem):
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
     mode = models.SlugField(default=CourseMode.DEFAULT_MODE_SLUG)
+    course_enrollment = models.ForeignKey(CourseEnrollment, null=True)
 
     @classmethod
     def contained_in_order(cls, order, course_id):
@@ -1004,7 +1007,9 @@ class PaidCourseRegistration(OrderItem):
             log.error(msg)
             raise PurchasedCallbackException(msg)
 
-        CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
+        # enroll in course and link to the enrollment_id
+        self.course_enrollment = CourseEnrollment.enroll(user=self.user, course_key=self.course_id, mode=self.mode)
+        self.save()
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member

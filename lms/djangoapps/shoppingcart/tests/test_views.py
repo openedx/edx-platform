@@ -977,8 +977,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         # Two courses in user shopping cart
         self.login_user()
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+        item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        item2 = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
@@ -998,6 +998,16 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         course_enrollment = CourseEnrollment.objects.filter(user=self.user)
         self.assertEqual(course_enrollment.count(), 2)
+
+        # make sure the enrollment_ids were stored in the PaidCourseRegistration items
+        # refetch them first since they are updated
+        item1 = PaidCourseRegistration.objects.get(id=item1.id)
+        self.assertIsNotNone(item1.course_enrollment)
+        self.assertEqual(item1.course_enrollment.course_id, self.course_key)
+
+        item2 = PaidCourseRegistration.objects.get(id=item2.id)
+        self.assertIsNotNone(item2.course_enrollment)
+        self.assertEqual(item2.course_enrollment.course_id, self.testing_course.id)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_valid_reg_code(self):
@@ -1516,7 +1526,9 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         self.assertTrue('View Course' in response.content)
 
         #now check that the registration code has already been redeemed and user is already registered in the course
-        RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
+        redemption = RegistrationCodeRedemption.objects.get(registration_code__code=registration_code)
+        self.assertIsNotNone(redemption.course_enrollment)
+
         response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
         self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
