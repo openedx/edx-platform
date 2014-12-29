@@ -8,4 +8,4 @@ python-memcached
 
 # Requirements to run paver with pip-accel
 -e git+https://github.com/jzoldak/pip.git@v1.4.1patch772#egg=pip
-pip-accel==0.21.1
+pip-accel[s3]==0.21.1

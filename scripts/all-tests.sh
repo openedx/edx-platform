@@ -221,3 +221,8 @@ END
         ;;
 
 esac
+
+
+# Deactivate and clean up python virtualenv
+deactivate
+rm -r $HOME/edx-venv-$GIT_COMMIT
