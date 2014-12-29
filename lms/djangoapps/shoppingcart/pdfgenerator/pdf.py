@@ -218,7 +218,7 @@ class SimpleInvoice(UnicodeProperty):
         ]
 
         if (self.is_invoice):
-            terms_contitions_text = """Enrollments:
+            terms_conditions_text = """Enrollments:
             Enrollments must be completed within 7 full days from the course start date.
             Payment Terms:
             Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.
@@ -227,7 +227,7 @@ class SimpleInvoice(UnicodeProperty):
             Substitutions:
             The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.
             Please see our Terms of Service page for our detailed policies, including terms and conditions of use."""
-            terms_conditions_para = Paragraph(terms_contitions_text.replace("\n", "<br/>"), style)
+            terms_conditions_para = Paragraph(terms_conditions_text.replace("\n", "<br/>"), style)
             data.append(['TERMS AND CONDITIONS'])
             data.append([terms_conditions_para])
             footer_style.append(('LEFTPADDING', (0,6), (0,6), 5*mm))
