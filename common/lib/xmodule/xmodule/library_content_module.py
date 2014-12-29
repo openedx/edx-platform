@@ -361,6 +361,31 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         lib_tools.update_children(self, user_id, user_perms, update_db)
         return Response()
 
+    def _validate_library_version(self, validation, lib_tools, version, library_key):
+        latest_version = lib_tools.get_library_version(library_key)
+        if latest_version is not None:
+            if version is None or version != latest_version:
+                validation.set_summary(
+                    StudioValidationMessage(
+                        StudioValidationMessage.WARNING,
+                        _(u'This component is out of date. The library has new content.'),
+                        action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                        action_label=_(u"↻ Update now")
+                    )
+                )
+                return False
+        else:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.ERROR,
+                    _(u'Library is invalid, corrupt, or has been deleted.'),
+                    action_class='edit-button',
+                    action_label=_(u"Edit Library List")
+                )
+            )
+            return False
+        return True
+
     def validate(self):
         """
         Validates the state of this Library Content Module Instance. This
@@ -381,29 +406,26 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             )
             return validation
         lib_tools = self.runtime.service(self, 'library_tools')
+        has_children_matching_filter = False
         for library_key, version in self.source_libraries:
-            latest_version = lib_tools.get_library_version(library_key)
-            if latest_version is not None:
-                if version is None or version != latest_version:
-                    validation.set_summary(
-                        StudioValidationMessage(
-                            StudioValidationMessage.WARNING,
-                            _(u'This component is out of date. The library has new content.'),
-                            action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
-                            action_label=_(u"↻ Update now")
-                        )
-                    )
-                    break
-            else:
-                validation.set_summary(
-                    StudioValidationMessage(
-                        StudioValidationMessage.ERROR,
-                        _(u'Library is invalid, corrupt, or has been deleted.'),
-                        action_class='edit-button',
-                        action_label=_(u"Edit Library List")
-                    )
-                )
+            if not self._validate_library_version(validation, lib_tools, version, library_key):
                 break
+
+            library = lib_tools.get_library(library_key)
+            children_matching_filter = lib_tools.get_filtered_children(library, self.capa_type)
+            # get_filtered_children returns generator, so we're basically checking if there are at least one child
+            # that satisfy filtering. Children are never equal to None, so None is returned only if generator was empty
+            has_children_matching_filter |= next(children_matching_filter, None) is not None
+
+        if not has_children_matching_filter and validation.empty:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _(u'There are no content matching configured filters in the selected libraries.'),
+                    action_class='edit-button',
+                    action_label=_(u"Edit Library List")
+                )
+            )
 
         return validation
 
