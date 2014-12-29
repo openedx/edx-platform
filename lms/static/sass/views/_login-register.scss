@@ -305,8 +305,12 @@ $sm-btn-linkedin: #0077b5;
             height: 32px;
         }
 
-        textarea.long {
-            height: ($baseline*5);
+        textarea {
+            resize: none;
+
+            &.long {
+                height: ($baseline*5);
+            }
         }
 
         select {
