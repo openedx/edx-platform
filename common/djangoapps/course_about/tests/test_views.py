@@ -42,6 +42,38 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
         """ Create a course"""
         super(CourseInfoTest, self).setUp()
 
+
+    def test_with_valid_course_id(self):
+        self.course = CourseFactory.create()
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_with_invalid_course_id(self):
+        self.course = CourseFactory.create()
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": 'not/a/validkey'})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_get_course_details_all_attributes(self, **kwargs):
+        self.course = CourseFactory.create(**kwargs)
+        kwargs["course_id"] = self.course.id
+        kwargs["course_runtime"] = self.course.runtime
+        CourseAboutFactory.create(**kwargs)
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        data = json.loads(resp.content)
+        all_attrs = ['display_name', 'start', 'end', 'announcement', 'advertised_start', 'is_new', 'course_number',
+                     'course_id',
+                     'effort', 'media', 'video', 'course_image']
+        for attr in all_attrs:
+            self.assertIn(attr, str(data))
+
+
     @unpack
     @data({"org": "test", "course": "course1", "display_name": "testing display name", "start": datetime.now(),
            "end": datetime.now() + timedelta(days=2),
@@ -66,15 +98,3 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
         self.assertEqual('testing-video-link', data['media']['video'])
 
 
-    def test_invalid_get_course_details(self, **kwargs):
-        self.course = CourseFactory.create(**kwargs)
-        kwargs["course_id"] = self.course.id
-        kwargs["course_runtime"] = self.course.runtime
-        CourseAboutFactory.create(**kwargs)
-        resp = self.client.get(
-            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = json.loads(resp.content)
-        self.assertEqual(unicode(self.course.id), data['course_id'])
-        self.assertNotEqual('testing display name', data['display_name'])
