@@ -89,3 +89,20 @@ def get_signed_purchase_params(cart, **kwargs):
 
     """
     return PROCESSOR_MODULE.get_signed_purchase_params(cart, **kwargs)
+
+
+def synchronize_transactions(start_date, end_date):
+    """
+    This will query out to the Payment Processor to synchronize any transactional data between any date ranges.
+
+    Due to some limitations in CyberSource the date ranges must be full days: midnight to midnight. So for example,
+
+    start_date='2015-01-01'
+    end_date='2015-01-02'
+
+    will synchronize 2015-01-01 full days worth of transactions
+
+    Returns:
+        num_processed, num_in_err, errors
+    """
+    return PROCESSOR_MODULE.synchronize_transactions(start_date, end_date)

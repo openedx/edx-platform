@@ -1,3 +1,9 @@
+"""
+Exceptions for Payment Processing
+"""
+# (Exception Class Names are sort of self-explanatory, so skipping docstring requirement)
+# pylint: disable=missing-docstring
+
 from shoppingcart.exceptions import PaymentException
 
 
@@ -23,4 +29,8 @@ class CCProcessorUserCancelled(CCProcessorException):
 
 class CCProcessorUserDeclined(CCProcessorException):
     """Transaction declined."""
+    pass
+
+
+class CCProcessorFailedSyncronization(CCProcessorException):
     pass
