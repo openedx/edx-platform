@@ -15,6 +15,6 @@ Contents:
     :maxdepth: 2
 
     change_log
-    common/index
+.. common/index
     lms/index
     cms/index

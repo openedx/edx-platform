@@ -4,7 +4,3 @@ CMS module
 
 
 .. module:: cms
-.. toctree::
-
-    transcripts.rst
-
