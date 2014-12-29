@@ -4,7 +4,7 @@
     <div class="msg-content">
       <h3 class="title"><%- errorTitle %></h3>
       <div class="copy">
-        <p><%- errorMsg %></p>
+        <p><%= errorMsg %></p>
       </div>
     </div>
   </div>
