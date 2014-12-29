@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 """
 This script is intended to be used to store the ~/.pip/download-cache
-directory in S3. The primary use case, as of writing this, is to help
+directory in S3. The primary use case, as of this writing, is to help
 speed up Jenkins build times for edx-platform tests.
 
 Before running pip-accel install (or pip install) on a Jenkins worker,
-this directory will be download from S3.
+this directory will be downloaded from S3.
 
 For usage:  `python pip_cache_store.py -h`.
 """
@@ -79,7 +79,6 @@ class S3TarStore():
                     tar.extractall(path=dirpath.parent)
             except Exception as e:
                 print ("Ignored Exception:\n {}".format(e.message))
-                sys.stderr.write(e.message)
         else:
             print (
                 "Couldn't find anything matching {} in S3 bucket. "
