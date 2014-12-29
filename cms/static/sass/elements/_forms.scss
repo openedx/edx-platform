@@ -93,7 +93,7 @@ form {
     }
 
     .input-checkbox-checked, .input-checkbox-unchecked {
-      width: $baseline;
+      width: ($baseline*0.75);
     }
 
     .input-checkbox {
