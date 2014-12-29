@@ -798,16 +798,39 @@ def _show_receipt_html(request, order):
 
     from pdfgenerator.pdf import SimpleInvoice
 
+    disclaimer_text = ""
+    edx_as_a_service_provider_text = ""
+    edx_billing_address_text = """141 Portland St.
+        9th Floor
+        Cambridge,
+        MA 02139"""
+    edx_tax_id = '46-0807740'
+    tax_label = 'EdX Tax ID'
+    terms_conditions_text = """Enrollments:
+            Enrollments must be completed within 7 full days from the course start date.
+            Payment Terms:
+            Payment is due immediately. Preferred method of payment is wire transfer. Full instructions and remittance details will be included on your official invoice. Please note that our terms are net zero. For questions regarding payment instructions or extensions, please contact onlinex-registration@mit.edu and include the words "payment question" in your subject line.
+            Cancellations:
+            Cancellation requests must be submitted to onlinex-registration@mit.edu 14 days prior to the course start date to be eligible for a refund. If you submit a cancellation request within 14 days prior to the course start date, you will not be eligible for a refund. Please see our Terms of Service page for full details.
+            Substitutions:
+            The MIT Professional Education Online X Programs office must receive substitution requests before the course start date in order for the request to be considered. Please email onlinex-registration@mit.edu to request a substitution.
+            Please see our Terms of Service page for our detailed policies, including terms and conditions of use."""
+    wl_partner_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif'
+    edx_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png'
+
+
     buffer = BytesIO()
-    data = order.generate_pdf_file(order_items)
+    items_data = order.generate_pdf_file(order_items)
     pdf = SimpleInvoice(
-        data=data,
+        items_data=items_data,
         id=str(order.id),
         date=order.purchase_time.strftime("%B %d, %Y"),
         title='RECEIPT',
-        is_invoice = False,
+        is_invoice = True,
         total_cost=order.total_cost,
-        payment_received=order.total_cost
+        payment_received=order.total_cost,
+        wl_logo=wl_partner_logo_path,
+        edx_logo=edx_logo_path
     )
     pdf.gen(buffer)
     # Make your response and prep to attach

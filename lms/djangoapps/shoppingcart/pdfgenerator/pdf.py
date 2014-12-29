@@ -50,8 +50,8 @@ class NumberedCanvas(Canvas):
 
 
 class SimpleInvoice(UnicodeProperty):
-    def __init__(self, data, id, date, title, is_invoice, total_cost, payment_received='0.00', balance='NIL'):
-        self._data = data
+    def __init__(self, items_data, id, date, title, is_invoice, total_cost, wl_logo, edx_logo, payment_received='0.00', balance='NIL'):
+        self.items_data = items_data
         self.id = id
         self.date = date
         self.title = title
@@ -59,6 +59,8 @@ class SimpleInvoice(UnicodeProperty):
         self.total_cost = total_cost
         self.payment_received = payment_received
         self.balance = balance
+        self.wl_logo = wl_logo
+        self.edx_logo = edx_logo
 
     def prepare_invoice_draw(self):
         self.MARGIN = 15
@@ -80,7 +82,7 @@ class SimpleInvoice(UnicodeProperty):
         self.prepare_invoice_draw()
 
         self.drawBorders()
-        self.drawLogos('/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif', '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
+        self.drawLogos()
 
         self.drawTitle()
         y_pos = self.drawCourseInfo()
@@ -100,16 +102,16 @@ class SimpleInvoice(UnicodeProperty):
         self.pdf.rect(self.MARGIN * mm, self.MARGIN * mm,
                       186 * mm, 249 * mm, stroke=True, fill=False)
 
-    def drawLogos(self, wl_logo, edx_logo):
-        im = Image.open(wl_logo)
+    def drawLogos(self):
+        im = Image.open(self.wl_logo)
         height = 12
         top = 240
         width = float(im.size[0]) / (float(im.size[1])/height)
-        self.pdf.drawImage(wl_logo, (self.MARGIN + 9) * mm, top * mm, width * mm, height*mm)
+        self.pdf.drawImage(self.wl_logo, (self.MARGIN + 9) * mm, top * mm, width * mm, height*mm, mask='auto')
 
-        im = Image.open(edx_logo)
+        im = Image.open(self.edx_logo)
         width = float(im.size[0]) / (float(im.size[1])/height)
-        self.pdf.drawImage(edx_logo, (self.MARGIN + 177 -width) * mm, top * mm, width * mm, height*mm)
+        self.pdf.drawImage(self.edx_logo, (self.MARGIN + 177 -width) * mm, top * mm, width * mm, height*mm, mask='auto')
 
     def drawTitle(self):
         self.pdf.setFont('DejaVu', 21)
@@ -121,7 +123,7 @@ class SimpleInvoice(UnicodeProperty):
 
     def drawCourseInfo(self):
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
-        for row in self._data:
+        for row in self.items_data:
             data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
         # data= [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', ''],
         # ['', 'Demo Course 1', '2', '$100.00', '$0.00', '$200.00', ''],
@@ -195,7 +197,7 @@ class SimpleInvoice(UnicodeProperty):
             [service_provider_para],
             ['Disclaimer'],
             [disclaimer_para],
-            ['edX Billing Address'],
+            ['Billing Address'],
             [billing_address_para]
         ]
 
@@ -238,7 +240,7 @@ class SimpleInvoice(UnicodeProperty):
         if (y_pos+4)*mm<=t._height:
             self.pdf.showPage()
             self.drawBorders()
-            self.drawLogos('/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif', '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png')
+            self.drawLogos()
 
         t.drawOn(self.pdf, (self.MARGIN + 5) * mm, (self.MARGIN + 5) * mm)
 
