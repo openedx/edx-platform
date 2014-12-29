@@ -3,6 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+import json
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
@@ -187,6 +188,15 @@ def enrolled_students_features(course_key, features):
         student_features = [x for x in STUDENT_FEATURES if x in features]
         profile_features = [x for x in PROFILE_FEATURES if x in features]
 
+        # For data extractions on the 'meta' field
+        # the feature name should be in the format of 'meta.foo' where
+        # 'foo' is the keyname in the meta dictionary
+        meta_features = []
+        for feature in features:
+            if 'meta.' in feature:
+                meta_key = feature.split('.')[1]
+                meta_features.append((feature, meta_key))
+
         student_dict = dict((feature, getattr(student, feature))
                             for feature in student_features)
         profile = student.profile
@@ -194,6 +204,11 @@ def enrolled_students_features(course_key, features):
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
+
+            # now featch the requested meta fields
+            meta_dict = json.loads(profile.meta) if profile.meta else {}
+            for meta_feature, meta_key in meta_features:
+                student_dict[meta_feature] = meta_dict.get(meta_key)
 
         if include_cohort_column:
             # Note that we use student.course_groups.all() here instead of
