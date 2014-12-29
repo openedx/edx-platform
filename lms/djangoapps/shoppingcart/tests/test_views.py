@@ -3,6 +3,8 @@ Tests for Shopping Cart views
 """
 import pytz
 from urlparse import urlparse
+from decimal import Decimal
+import json
 
 from django.http import HttpRequest
 from django.conf import settings
@@ -27,6 +29,8 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.date_utils import get_default_time_display
+from util.testing import UrlResetMixin
+
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
     Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
@@ -42,8 +46,6 @@ from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.views import initialize_report
 from shoppingcart.tests.payment_fake import PaymentFakeView
-from decimal import Decimal
-import json
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -1229,6 +1231,66 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
         self._assert_404(reverse('shoppingcart.views.register_courses', args=[]))
+
+
+# TODO (ECOM-188): Once we complete the A/B test of separate
+# verified/payment flows, we can replace these tests
+# with something more general.
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class ReceiptRedirectTest(UrlResetMixin, ModuleStoreTestCase):
+    """Test special-case redirect from the receipt page. """
+
+    COST = 40
+    PASSWORD = 'password'
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def setUp(self):
+        super(ReceiptRedirectTest, self).setUp('verify_student.urls')
+        self.user = UserFactory.create()
+        self.user.set_password(self.PASSWORD)
+        self.user.save()
+        self.course = CourseFactory.create()
+        self.course_key = self.course.id
+        self.course_mode = CourseMode(
+            course_id=self.course_key,
+            mode_slug="verified",
+            mode_display_name="verified cert",
+            min_price=self.COST
+        )
+        self.course_mode.save()
+        self.cart = Order.get_cart_for_user(self.user)
+
+        self.client.login(
+            username=self.user.username,
+            password=self.PASSWORD
+        )
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def test_show_receipt_redirect_to_verify_student(self):
+        # Purchase a verified certificate
+        CertificateItem.add_to_order(
+            self.cart,
+            self.course_key,
+            self.COST,
+            'verified'
+        )
+        self.cart.purchase()
+
+        # Visit the receipt page
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url)
+
+        # Expect to be redirected to the payment confirmation
+        # page in the verify_student app
+        redirect_url = reverse(
+            'verify_student_payment_confirmation',
+            kwargs={'course_id': unicode(self.course_key)}
+        )
+        redirect_url += '?payment-order-num={order_num}'.format(
+            order_num=self.cart.id
+        )
+
+        self.assertRedirects(resp, redirect_url)
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
