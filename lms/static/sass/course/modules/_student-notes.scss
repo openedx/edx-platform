@@ -54,6 +54,15 @@
   padding: ($baseline/4) $baseline;
 }
 
+// CASE: annotator error in toggling notes
+// vendor customization
+.annotator-notice {
+  @extend %t-weight4;
+  @extend %t-copy-sub1;
+  background: $gray-d4;
+  padding: ($baseline/2) $baseline;
+}
+
 // vendor customization
 .annotator-notice-error {
   border-color: $error-color;
