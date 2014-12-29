@@ -74,7 +74,7 @@ define([
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
-                'Cannot save your state. This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'
+                "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
             );
 
             this.button.click();

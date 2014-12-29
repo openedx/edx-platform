@@ -431,7 +431,7 @@ class EdxNotesTestCase(TabTestCase):
 
     def test_edxnotes_tabs_enabled(self):
         """
-        Test that check if edxnotes tab can be enabled correctly.
+        Tests that edxnotes tab is shown when feature is enabled.
         """
         self.settings.FEATURES['ENABLE_EDXNOTES'] = True
         tab = self.check_edxnotes_tab()
@@ -439,7 +439,7 @@ class EdxNotesTestCase(TabTestCase):
 
     def test_edxnotes_tabs_disabled(self):
         """
-        Test that check if edxnotes tab doewn't work when feature is disabled.
+        Tests that edxnotes tab is not shown when feature is disabled.
         """
         self.settings.FEATURES['ENABLE_EDXNOTES'] = False
         tab = self.check_edxnotes_tab()
