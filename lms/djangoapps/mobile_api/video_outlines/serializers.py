@@ -53,12 +53,26 @@ class BlockOutline(object):
 
         def find_urls(block):
             """section and unit urls for block"""
+            block_path = []
             while block in child_to_parent:
-                usage_key = child_to_parent[block].location
-                break;
+                block = child_to_parent[block]
+                block_path.append(block)
 
-            (course, chapter, section, unit) = \
-                path_to_location(modulestore(), usage_key)
+            try:
+                course, chapter, section, unit = list(reversed(block_path))[:4]
+                position = 1
+                for block in section.children:
+                    if block.name == unit.url_name:
+                        break
+                    position += 1
+                chapter=chapter.url_name
+                section=section.url_name
+                course=course.id.to_deprecated_string()
+
+            except ValueError:
+                (course, chapter, section, unit) = \
+                    path_to_location(modulestore(), block_path[0].location)
+                position = unit
 
             kwargs = dict(
                 course_id=course,
@@ -70,7 +84,7 @@ class BlockOutline(object):
                 kwargs=kwargs,
                 request=self.request,
             )
-            kwargs['position'] = unit
+            kwargs['position'] = position
             unit_url = reverse(
                 "courseware_position",
                 kwargs=kwargs,
