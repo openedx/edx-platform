@@ -82,7 +82,6 @@ var edx = edx || {};
         },
 
         resetEmail: function( a ) {
-            console.log('resetEmail ', a);
             this.element.hide( this.$errors );
             this.element.show( this.$resetSuccess );
         },
