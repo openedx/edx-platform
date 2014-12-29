@@ -38,8 +38,6 @@ define([
     };
 
     _.extend(Annotator.Plugin.Events.prototype, new Annotator.Plugin(), {
-        stringLimit: 300,
-
         pluginInit: function () {
             _.bindAll(this,
                 'annotationViewerShown', 'annotationFullyCreated', 'annotationEditorShown',
@@ -80,7 +78,7 @@ define([
         },
 
         annotationEditorShown: function (editor, annotation) {
-            this.oldNoteText = annotation.text;
+            this.oldNoteText = annotation.text || '';
         },
 
         annotationEditorHidden: function () {
@@ -88,9 +86,10 @@ define([
         },
 
         annotationUpdated: function (annotation) {
-            var data = _.extend({
-                old_note_text: _.str.truncate(this.oldNoteText, this.stringLimit)
-            }, this.getDefaultData(annotation));
+            var data = _.extend(
+                this.getDefaultData(annotation),
+                this.getText('old_note_text', this.oldNoteText)
+            );
             this.log('edx.course.student_notes.edited', data);
         },
 
@@ -100,12 +99,30 @@ define([
         },
 
         getDefaultData: function (annotation) {
-            return {
-                'note_id': annotation.id,
-                'note_text': _.str.truncate(annotation.text, this.stringLimit),
-                'highlighted_content': _.str.truncate(annotation.quote, this.stringLimit),
-                'component_id': annotation.usage_id
-            };
+            return _.extend(
+                {
+                    'note_id': annotation.id,
+                    'component_usage_id': annotation.usage_id
+                },
+                this.getText('note_text', annotation.text),
+                this.getText('highlighted_content', annotation.quote)
+            );
+        },
+
+        getText: function (fieldName, text) {
+            var info = {},
+                truncated = false,
+                limit = this.options.stringLimit;
+
+            if (_.isNumber(limit) && text.length > limit) {
+                text = String(text).slice(0, limit);
+                truncated = true;
+            }
+
+            info[fieldName] = text;
+            info[fieldName + '_truncated'] = truncated;
+
+            return info;
         },
 
         log: function (eventName, data) {

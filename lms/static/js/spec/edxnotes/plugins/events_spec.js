@@ -1,7 +1,7 @@
 define([
-    'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'annotator',
-    'logger', 'js/edxnotes/views/notes_factory'
-], function($, _, AjaxHelpers, Annotator, Logger, NotesFactory) {
+    'jquery', 'underscore', 'js/common_helpers/ajax_helpers', 'js/spec/edxnotes/helpers',
+    'annotator', 'logger', 'js/edxnotes/views/notes_factory'
+], function($, _, AjaxHelpers, Helpers, Annotator, Logger, NotesFactory) {
     'use strict';
     describe('EdxNotes Events Plugin', function() {
         var note = {
@@ -32,7 +32,7 @@ define([
             );
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.viewed', {
-                    'notes': [{note_id: 'note-123'}, {note_id: 'note-456'}]
+                    'notes': [{'note_id': 'note-123'}, {'note_id': 'note-456'}]
                 }
             );
         });
@@ -50,10 +50,12 @@ define([
             AjaxHelpers.respondWithJson(requests, note);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.added', {
-                    note_id: 'note-123',
-                    note_text: 'text-123',
-                    highlighted_content: 'quote-123',
-                    component_id: 'usage-123'
+                    'note_id': 'note-123',
+                    'note_text': 'text-123',
+                    'note_text_truncated': false,
+                    'highlighted_content': 'quote-123',
+                    'highlighted_content_truncated': false,
+                    'component_usage_id': 'usage-123'
                 }
             );
         });
@@ -69,11 +71,14 @@ define([
 
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.edited', {
-                    note_id: 'note-123',
-                    old_note_text: 'text-123',
-                    note_text: 'text-456',
-                    highlighted_content: 'quote-123',
-                    component_id: 'usage-123'
+                    'note_id': 'note-123',
+                    'old_note_text': 'text-123',
+                    'old_note_text_truncated': false,
+                    'note_text': 'text-456',
+                    'note_text_truncated': false,
+                    'highlighted_content': 'quote-123',
+                    'highlighted_content_truncated': false,
+                    'component_usage_id': 'usage-123'
                 }
             );
             expect(this.annotator.plugins.Events.oldNoteText).toBeNull();
@@ -83,12 +88,41 @@ define([
             this.annotator.publish('annotationDeleted', note);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.deleted', {
-                    note_id: 'note-123',
-                    note_text: 'text-123',
-                    highlighted_content: 'quote-123',
-                    component_id: 'usage-123'
+                    'note_id': 'note-123',
+                    'note_text': 'text-123',
+                    'note_text_truncated': false,
+                    'highlighted_content': 'quote-123',
+                    'highlighted_content_truncated': false,
+                    'component_usage_id': 'usage-123'
                 }
             );
+        });
+
+        it('should truncate values of some fields', function() {
+            var old_note = $.extend({}, note, {text: Helpers.LONG_TEXT}),
+                new_note = $.extend({}, note, {
+                    text: Helpers.LONG_TEXT + '123',
+                    quote: Helpers.LONG_TEXT + '123'
+                });
+
+            this.annotator.publish('annotationEditorShown', [this.annotator.editor, old_note]);
+            expect(this.annotator.plugins.Events.oldNoteText).toBe(Helpers.LONG_TEXT);
+            this.annotator.publish('annotationUpdated', new_note);
+            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, new_note]);
+
+            expect(Logger.log).toHaveBeenCalledWith(
+                'edx.course.student_notes.edited', {
+                    'note_id': 'note-123',
+                    'old_note_text': Helpers.TRUNCATED_TEXT,
+                    'old_note_text_truncated': true,
+                    'note_text': Helpers.TRUNCATED_TEXT,
+                    'note_text_truncated': true,
+                    'highlighted_content': Helpers.TRUNCATED_TEXT,
+                    'highlighted_content_truncated': true,
+                    'component_usage_id': 'usage-123'
+                }
+            );
+            expect(this.annotator.plugins.Events.oldNoteText).toBeNull();
         });
     });
 });

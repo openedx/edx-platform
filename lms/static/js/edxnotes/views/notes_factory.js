@@ -32,6 +32,9 @@ define([
                 token: params.token,
                 tokenUrl: params.tokenUrl
             },
+            events: {
+                stringLimit: 300
+            },
             store: {
                 prefix: prefix,
                 annotationData: defaultParams,

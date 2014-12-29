@@ -21,7 +21,7 @@ define([
             var model = this.collection.at(0);
 
             // is_expanded = false, show_link = true
-            expect(model.getNoteText()).toBe(Helpers.TRUNCATED_TEXT);
+            expect(model.getNoteText()).toBe(Helpers.PRUNED_TEXT);
             model.set('is_expanded', true);
             // is_expanded = true, show_link = true
             expect(model.getNoteText()).toBe(Helpers.LONG_TEXT);

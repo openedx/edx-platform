@@ -1,7 +1,7 @@
 define(['underscore'], function(_) {
     'use strict';
     var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-        LONG_TEXT, TRUNCATED_TEXT, SHORT_TEXT,
+        LONG_TEXT, PRUNED_TEXT, TRUNCATED_TEXT, SHORT_TEXT,
         base64Encode, makeToken, getChapter, getSection, getUnit, getDefaultNotes;
 
     LONG_TEXT = [
@@ -14,7 +14,7 @@ define(['underscore'], function(_) {
         'sint occaecat cupidatat non proident, sunt in culpa ',
         'qui officia deserunt mollit anim id est laborum.'
     ].join('');
-    TRUNCATED_TEXT = [
+    PRUNED_TEXT = [
         'Adipisicing elit, sed do eiusmod tempor incididunt ',
         'ut labore et dolore magna aliqua. Ut enim ad minim ',
         'veniam, quis nostrud exercitation ullamco laboris ',
@@ -22,8 +22,15 @@ define(['underscore'], function(_) {
         'irure dolor in reprehenderit in voluptate velit esse ',
         'cillum dolore eu fugiat nulla pariatur...'
     ].join('');
+    TRUNCATED_TEXT = [
+        'Adipisicing elit, sed do eiusmod tempor incididunt ',
+        'ut labore et dolore magna aliqua. Ut enim ad minim ',
+        'veniam, quis nostrud exercitation ullamco laboris ',
+        'nisi ut aliquip ex ea commodo consequat. Duis aute ',
+        'irure dolor in reprehenderit in voluptate velit esse ',
+        'cillum dolore eu fugiat nulla pariatur. Exce'
+    ].join('');
     SHORT_TEXT = 'Adipisicing elit, sed do eiusmod tempor incididunt';
-
 
     base64Encode = function (data) {
         var ac, bits, enc, h1, h2, h3, h4, i, o1, o2, o3, r, tmp_arr;
@@ -149,6 +156,7 @@ define(['underscore'], function(_) {
 
     return {
         LONG_TEXT: LONG_TEXT,
+        PRUNED_TEXT: PRUNED_TEXT,
         TRUNCATED_TEXT: TRUNCATED_TEXT,
         SHORT_TEXT: SHORT_TEXT,
         base64Encode: base64Encode,

@@ -37,7 +37,7 @@ define([
                 unitLink = view.$('.reference-unit-link').get(0);
 
             expect(view.$el).toContain('.note-excerpt-more-link');
-            expect(view.$el).toContainText(Helpers.TRUNCATED_TEXT);
+            expect(view.$el).toContainText(Helpers.PRUNED_TEXT);
             expect(view.$el).toContainText('More');
             view.$('.note-excerpt-more-link').click();
 
@@ -64,7 +64,7 @@ define([
             view.$('.reference-unit-link').click();
             expect(Logger.log).toHaveBeenCalledWith('edx.student_notes.used_unit_link', {
                 'note_id': 'id-123',
-                'component_id': 'usage_id-123'
+                'component_usage_id': 'usage_id-123'
             });
             expect(view.redirectTo).not.toHaveBeenCalled();
             AjaxHelpers.respondWithJson(requests, {});
