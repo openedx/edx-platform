@@ -98,10 +98,11 @@ fi
 virtualenv $HOME/edx-venv-$GIT_COMMIT
 source $HOME/edx-venv-$GIT_COMMIT/bin/activate
 
-# boto is included in base.txt, but we need it to download the pip cache from S3.
-# To avoid installing all of base.txt before getting the cache, just install boto
-# first.  If version is changed in base.txt, it will get updated before tests run.
-# path.py is included in paver.txt. Same reasons apply for installing it here.
+# boto and path.py are requirements of scripts/pip_cache_store.py which is used
+# to download the pip download cache from S3.
+# We are installing just boto and path.py here to avoid installing all of base.txt
+# and paver.txt before getting the download cache. If versions of these are changed
+# in requirements files, they will be updated by install_prereqs.
 pip install -q boto>=2.32.1 path.py>=3.0.1
 
 # Download the pip-download-cache
