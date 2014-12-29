@@ -26,7 +26,6 @@ _ = lambda text: text
 
 
 ANY_CAPA_TYPE_VALUE = 'any'
-CAPA_BLOCK_TYPE = 'problem'
 
 
 def enum(**enums):
@@ -362,6 +361,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         return Response()
 
     def _validate_library_version(self, validation, lib_tools, version, library_key):
+        """
+        Validates library version
+        """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
             if version is None or version != latest_version:
@@ -423,7 +425,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     _(u'There are no content matching configured filters in the selected libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Library List")
+                    action_label=_(u"Edit Problem Type Filter")
                 )
             )
 
