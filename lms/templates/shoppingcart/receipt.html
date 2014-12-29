@@ -21,7 +21,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
       <div class="message-left">
         <% courses_url = reverse('courses') %>
         % if receipt_has_donation_item:
-          <b>${_("Thank you for your Purchase!")}</b>
+          <b>${_("Thank you for your purchase!")}</b>
           % for inst in instructions:
             ${inst}
           % endfor
@@ -31,35 +31,32 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
           <% dashboard_url = reverse('dashboard') %>
           <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
           <span class="mt-7">
-            ${_("You have successfully been enrolled for {course_names}. "
-                "The following receipt has been emailed to {receipient_emails}").format(
-                  course_names="<b>{course_names}</b>".format(
+            ${_(u"You have successfully been enrolled for {course_names}. "
+                u"The following receipt has been emailed to {receipient_emails}").format(
+                  course_names=u"<b>{course_names}</b>".format(
                     course_names=appended_course_names
                   ),
-                  receipient_emails="<strong>{receipient_emails}</strong>".format(
+                  receipient_emails=u"<strong>{receipient_emails}</strong>".format(
                     receipient_emails=appended_recipient_emails
                   ),
             )}
           </span>
         % elif order_type == 'business':
-          ${_("You have successfully purchased {items} for {course_names}. "
-              "The following receipt has been emailed to {receipient_emails}"
-            ).format(
-              items="<b>{items}</b>".format(
-                items=ungettext(
-                  "{number} course registration code",
-                  "{number} course registration codes",
-                  total_registration_codes
-                ).format(number=total_registration_codes)
-              ),
-              course_names="<b>{course_names}</b>".format(
-                course_names=appended_course_names
-              ),
-              receipient_emails="<strong>{receipient_emails}</strong>".format(
-                receipient_emails=appended_recipient_emails,
-              )
+          ${ungettext(
+            "You have successfully purchased <b>{number} course registration code</b> for {course_names}.",
+            "You have successfully purchased <b>{number} course registration codes</b> for {course_names}.",
+            total_registration_codes
+          ).format(
+            number=total_registration_codes,
+            course_names=u"<b>{course_names}</b>".format(
+              course_names=appended_course_names
             )
-          }
+          )}
+          ${_("The following receipt has been emailed to {receipient_emails}").format(
+            receipient_emails=u"<strong>{receipient_emails}</strong>".format(
+              receipient_emails=appended_recipient_emails,
+            )
+          )}
         % endif
 
       </div>
@@ -136,7 +133,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Contact Name')}:</b>
                   <label>
                     % if order.company_contact_name:
-                      ${ order.company_contact_name }
+                      ${order.company_contact_name}
                     % else:
                       N/A
                     % endif
@@ -148,7 +145,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Company Contact Email')}:</b>
                   <label>
                     % if order.company_contact_email:
-                      ${ order.company_contact_email }
+                      ${order.company_contact_email}
                     % else:
                       N/A
                     % endif
@@ -160,7 +157,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
                   <b>${_('Recipient Name')}:</b>
                   <label>
                     % if order.recipient_name:
-                      ${ order.recipient_name }
+                      ${order.recipient_name}
                     % else:
                       N/A
                     % endif
