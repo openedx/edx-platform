@@ -15,6 +15,8 @@ from mock import Mock, patch
 from nose.tools import assert_less_equal, assert_greater_equal
 import factory
 import threading
+from django.contrib.auth.models import User
+from xmodule.modulestore.django import modulestore
 
 
 class Dummy(object):
@@ -348,3 +350,53 @@ def check_mongo_calls(num_finds=0, num_sends=None):
                 yield
         else:
             yield
+
+
+# This dict represents the attribute keys for a course's 'about' info.
+# Note: The 'video' attribute is intentionally excluded as it must be
+# handled separately; its value maps to an alternate key name.
+# Reference : cms/djangoapps/models/settings/course_details.py
+
+ABOUT_ATTRIBUTES = {
+    'syllabus': "This is the value of syllabus",
+    'short_description': "The short descrition",
+    'overview': "The overview contents",
+    'effort': "Testing effort",
+}
+
+class CourseAboutFactory(XModuleFactory):
+    """
+    Factory for XModule courses about.
+    """
+    @classmethod
+    def create_user(self):
+        uname = 'testuser_about'
+        email = 'test+courses_about@edx.org'
+        password = 'foo'
+
+        # Create the user so we can log them in.
+        self.user = User.objects.create_user(uname, email, password)
+
+        # Note that we do not actually need to do anything
+        # for registration if we directly mark them active.
+        self.user.is_active = True
+
+        # Staff has access to view all courses
+        self.user.is_staff = True
+        self.user.save()
+        return self.user
+
+
+    @classmethod
+    def _create(cls, target_class, **kwargs):
+        # from cms.djangoapps.models.settings.course_details import CourseDetails
+        course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
+        user = cls.create_user()
+        store = modulestore()
+        for about_key in ABOUT_ATTRIBUTES:
+            about_item = store.create_xblock(course_runtime, course_id, 'about', about_key)
+            about_item.data = ABOUT_ATTRIBUTES[about_key]
+            store.update_item(about_item, user.id, allow_not_found=True)
+        about_item = store.create_xblock(course_runtime, course_id, 'about', 'video')
+        about_item.data = "testing-video-link"
+        store.update_item(about_item, user.id, allow_not_found=True)
