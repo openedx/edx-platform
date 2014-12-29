@@ -277,7 +277,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         self.assertLessEqual(children_headers, self._problem_headers)
 
         # Choice group test
-        children_headers = self._set_library_content_settings(count=1, capa_type="Choice Group")
+        children_headers = self._set_library_content_settings(count=1, capa_type="Multiple Choice")
         self.assertEqual(len(children_headers), 1)
         self.assertLessEqual(
             children_headers,
@@ -285,7 +285,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         )
 
         # Choice group test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Select Option")
+        children_headers = self._set_library_content_settings(count=2, capa_type="Dropdown")
         self.assertEqual(len(children_headers), 2)
         self.assertLessEqual(
             children_headers,
@@ -293,5 +293,5 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         )
 
         # Missing problem type test
-        children_headers = self._set_library_content_settings(count=2, capa_type="Matlab")
+        children_headers = self._set_library_content_settings(count=2, capa_type="Custom Evaluated Script")
         self.assertEqual(children_headers, set())
