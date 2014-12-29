@@ -34,7 +34,7 @@
   .wrapper-utility {
     @extend %wipe-last-child;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: bottom;
     margin-right: ($baseline/2);
   }
 
