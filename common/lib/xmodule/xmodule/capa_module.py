@@ -7,7 +7,7 @@ from lxml import etree
 from pkg_resources import resource_string
 
 from .capa_base import CapaMixin, CapaFields, ComplexEncoder
-from capa import inputtypes
+from capa import responsetypes
 from .progress import Progress
 from xmodule.x_module import XModule, module_attr
 from xmodule.raw_module import RawDescriptor
@@ -178,8 +178,8 @@ class CapaDescriptor(CapaFields, RawDescriptor):
     def problem_types(self):
         """ Low-level problem type introspection for content libraries filtering by problem type """
         tree = etree.XML(self.data)
-        registered_tas = inputtypes.registry.registered_tags()
-        return set([node.tag for node in tree.iter() if node.tag in registered_tas])
+        registered_tags = responsetypes.registry.registered_tags()
+        return set([node.tag for node in tree.iter() if node.tag in registered_tags])
 
     # Proxy to CapaModule for access to any of its attributes
     answer_available = module_attr('answer_available')

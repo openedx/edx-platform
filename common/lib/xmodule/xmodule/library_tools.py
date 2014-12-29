@@ -104,7 +104,7 @@ class LibraryToolsService(object):
             new_libraries = []
             for library_key, library in libraries:
 
-                def copy_children_recursively(from_block, filter_problem_type=True):
+                def copy_children_recursively(from_block, filter_problem_type=False):
                     """
                     Internal method to copy blocks from the library recursively
                     """
