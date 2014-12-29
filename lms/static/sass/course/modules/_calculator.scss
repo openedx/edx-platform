@@ -13,21 +13,19 @@ div.calc-main {
     bottom: -36px;
   }
 
-  a.calc {
-    @include text-hide();
+  .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
     background: url("../images/calc-icon.png") $black-t3 no-repeat center;
     border-bottom: 0;
     border-radius: ($baseline/10);
     color: $white;
     float: right;
-    height: 20px;
-    display: inline-block;
-    margin-right: 10px;
-    padding: 8px 12px;
+    height: $baseline;
+    margin-right: ($baseline/2);
+    padding: $baseline;
     position: relative;
-    top: -45px;
-    width: 16px;
+    top: -42px;
+    width: ($baseline*0.75);
 
     &:hover, &:focus {
       background-color: $black;
