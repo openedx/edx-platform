@@ -42,6 +42,14 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
             XBlockFixtureDesc("html", "Html1"),
             XBlockFixtureDesc("html", "Html2"),
             XBlockFixtureDesc("html", "Html3"),
+
+            XBlockFixtureDesc(
+                "problem", "Dropdown",
+                data="""
+<problem>
+    <p>Dropdown</p>
+    <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
+</problem>""")
         )
 
     def populate_course_fixture(self, course_fixture):
@@ -171,3 +179,37 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         self.assertFalse(library_block.has_validation_message)
         #self.assertIn("4 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
+
+    def test_no_content_message(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And I set Problem Type selector so that no libraries have matching content
+        Then I can see that "No matching content" warning is shown
+        """
+        expected_text = 'There are no content matching configured filters in the selected libraries. ' \
+                        'Edit Problem Type Filter'
+
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        # precondition check - assert library has children matching filter criteria
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        self.assertEqual(edit_modal.capa_type, "Any Type")  # precondition check
+        edit_modal.capa_type = "Custom Evaluated Script"
+
+        library_container.save_settings()
+
+        self.assertTrue(library_container.has_validation_warning)
+        self.assertIn(expected_text, library_container.validation_warning_text)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        self.assertEqual(edit_modal.capa_type, "Custom Evaluated Script")  # precondition check
+        edit_modal.capa_type = "Dropdown"
+        library_container.save_settings()
+
+        # Library should contain single Dropdown problem, so now there should be no errors again
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
