@@ -762,14 +762,14 @@ class Invoice(models.Model):
 
     def generate_pdf_invoice(self, course, course_price, quantity, sale_price, wl_partner_logo_path, edx_logo_path):
         from shoppingcart.pdfgenerator.pdf import SimpleInvoice
-        list_price = float(course_price) - sale_price/quantity
-        discount = course_price - list_price
+        discount_per_item = float(course_price) - sale_price/quantity
+        list_price = course_price - discount_per_item
         item_data = [
             {
                 'course_name': course.display_name,
                 'quantity': quantity,
                 'list_price': list_price,
-                'discount': discount,
+                'discount': discount_per_item,
                 'total': quantity * list_price
             }
         ]

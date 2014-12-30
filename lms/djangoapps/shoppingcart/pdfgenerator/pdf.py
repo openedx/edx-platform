@@ -114,13 +114,16 @@ class SimpleInvoice(UnicodeProperty):
 
     def drawTitle(self):
         title = 'RECEIPT'
+        id_title = 'Order'
         if self.is_invoice:
             title = 'INVOICE'
+            id_title = 'Invoice'
         self.pdf.setFont('DejaVu', 21)
         self.pdf.drawCentredString(108*mm, (230)*mm, title)
 
         self.pdf.setFont('DejaVu', 10)
-        self.pdf.drawString((self.MARGIN + 8) * mm, 220 * mm, _(u'Order # ' + self.id))
+
+        self.pdf.drawString((self.MARGIN + 8) * mm, 220 * mm, _(u'{id_title} # '.format(id_title=id_title) + self.id))
         self.pdf.drawRightString((self.MARGIN + 177) * mm, 220 * mm, _(u'Date ' + self.date))
 
     def drawCourseInfo(self):
