@@ -68,6 +68,7 @@
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
     google_analytics_file = 'theme-google-analytics.html'
+    google_tag_manager_file = 'theme-google-tag-manager.html'
     footer_file = 'theme-footer.html'
 
     style_overrides_file = None
@@ -82,6 +83,7 @@
 
 
     google_analytics_file = microsite.get_template_path('google_analytics.html')
+    google_tag_manager_file = microsite.get_template_path('google_tag_manager.html')
 
     if settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
         if settings.FEATURES.get('ENABLE_NEW_EDX_FOOTER', False):
@@ -117,6 +119,8 @@
 </head>
 
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
+  <%include file="${google_tag_manager_file}" />
+
   <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
 
   <%include file="mathjax_accessible.html" />
