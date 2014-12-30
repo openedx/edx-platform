@@ -231,6 +231,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         data = {
             'enrollment-button': 'Enroll',
             'student-ids': u','.join([student.email, ]),
+            'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -263,6 +264,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         data = {
             'enrollment-button': 'Unenroll',
             'student-ids': u','.join([student.email, ]),
+            'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -292,6 +294,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         data = {
             'enrollment-button': 'Enroll',
             'student-ids': u','.join([test_email, ]),
+            'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -323,6 +326,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         data = {
             'enrollment-button': 'Unenroll',
             'student-ids': u','.join([test_email, ]),
+            'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)

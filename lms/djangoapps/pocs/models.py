@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from student.models import CourseEnrollment, AlreadyEnrolledError
 from xmodule_django.models import CourseKeyField, LocationKeyField
 
 
@@ -21,6 +22,20 @@ class PocMembership(models.Model):
     student = models.ForeignKey(User, db_index=True)
     active = models.BooleanField(default=False)
 
+    @classmethod
+    def auto_enroll(cls, student=None, future_membership=None):
+        assert student is not None and future_membership is not None
+        membership = cls(
+            poc=future_membership.poc, student=student, active=True
+        )
+        try:
+            CourseEnrollment.enroll(student, future_membership.poc.course_id)
+        except AlreadyEnrolledError:
+            pass
+        else:
+            membership.save()
+            future_membership.delete()
+
 
 class PocFutureMembership(models.Model):
     """
@@ -28,6 +43,7 @@ class PocFutureMembership(models.Model):
     """
     poc = models.ForeignKey(PersonalOnlineCourse, db_index=True)
     email = models.CharField(max_length=255)
+    auto_enroll = models.BooleanField(default=0)
 
 
 class PocFieldOverride(models.Model):

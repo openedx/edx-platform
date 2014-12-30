@@ -65,7 +65,14 @@ def enroll_email(poc, student_email, auto_enroll=False, email_students=False, em
     if previous_state.user:
         if not previous_state.in_poc:
             user = User.objects.get(email=student_email)
-            membership = PocMembership(poc=poc, student=user)
+            membership = PocMembership(
+                poc=poc, student=user, active=True
+            )
+            membership.save()
+        elif auto_enroll:
+            # activate existing memberships
+            membership = PocMembership.objects.get(student=user, poc=poc)
+            membership.active = True
             membership.save()
         if email_students:
             email_params['message'] = 'enrolled_enroll'
@@ -73,7 +80,9 @@ def enroll_email(poc, student_email, auto_enroll=False, email_students=False, em
             email_params['full_name'] = previous_state.full_name
             send_mail_to_student(student_email, email_params)
     else:
-        membership = PocFutureMembership(poc=poc, email=student_email)
+        membership = PocFutureMembership(
+            poc=poc, auto_enroll=auto_enroll, email=student_email
+        )
         membership.save()
         if email_students:
             email_params['message'] = 'allowed_enroll'

@@ -1806,6 +1806,16 @@ def activate_account(request, key):
                 if cea.auto_enroll:
                     CourseEnrollment.enroll(student[0], cea.course_id)
 
+            # enroll student in any pending POCs he/she may have if auto_enroll flag is set
+            if settings.FEATURES.get('PERSONAL_ONLINE_COURSES'):
+                from pocs.models import PocMembership, PocFutureMembership
+                pfms = PocFutureMembership.objects.filter(
+                    email=student[0].email
+                )
+                for pfm in pfms:
+                    if pfm.auto_enroll:
+                        PocMembership.auto_enroll(student[0], pfm)
+
         resp = render_to_response(
             "registration/activation_complete.html",
             {
