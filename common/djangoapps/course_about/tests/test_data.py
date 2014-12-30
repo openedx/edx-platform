@@ -6,6 +6,7 @@ import ddt
 from mock import patch
 from nose.tools import raises
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 import unittest
 
 from django.test.utils import override_settings
@@ -51,11 +52,26 @@ class CourseAboutDataTest(ModuleStoreTestCase):
         try:
             data.get_course_about_details("this/is/bananas")
         except Exception as e:
-            self.assertEquals(e.__class__, CourseNotFoundError)
+            self.assertIsInstance(e, CourseNotFoundError)
 
-    @raises(InvalidKeyError)
-    def test_non_existent_course_key(self):
+    def test_invalid_course_key(self):
         try:
-            data.get_course_about_details("invalidKey")
+            data._get_course_key("invalidKey")
         except Exception as e:
-            self.assertEquals(e.__class__, InvalidKeyError)
+            self.assertIsInstance(e, InvalidKeyError)
+
+    def test_get_valid_course_key(self):
+        d = data._get_course_key("edX/DemoX/Demo_Course")
+        self.assertIsInstance(d, CourseKey)
+
+    def test_get_course_descriptor_with_valid_key(self):
+        d = data._get_course_descriptor(self.course.id, 0)
+        self.assertIsNotNone(d)
+
+    def test_get_course_descriptor_with_invalid_key(self):
+        try:
+            descriptor = data._get_course_descriptor("this/is/bananas", 0)
+        except Exception as e:
+            descriptor = None
+            self.assertIsInstance(e, ValueError)
+        self.assertIsNone(descriptor)

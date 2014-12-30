@@ -24,17 +24,13 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
         Course descriptor object.
 
     Raises:
-        InvalidKeyError , ValueError
+        CourseNotFoundError
     """
     try:
         course_descriptor = _get_course(course_id)  # pylint: disable=W0612
         return _serialize_content(course_descriptor=course_descriptor)
-    except InvalidKeyError as err:
-        raise InvalidKeyError(err.message)
-    except ValueError as err:
+    except CourseNotFoundError as err:
         raise CourseNotFoundError(err.message)
-    except Exception as err:
-        raise ValueError(err.message)
 
 
 def _get_course(course_id, depth=0):
@@ -51,11 +47,9 @@ def _get_course(course_id, depth=0):
     """
     try:
         course_key = _get_course_key(course_id)
-        course_descriptor = get_course_descriptor(course_key, depth)
-    except InvalidKeyError as err:
-        raise InvalidKeyError(err.message)
-    except ValueError as err:
-        raise ValueError(err.message)
+        course_descriptor = _get_course_descriptor(course_key, depth)
+    except (InvalidKeyError, ValueError) as err:
+        raise CourseNotFoundError(err.message)
     return course_descriptor
 
 
@@ -75,7 +69,7 @@ def _get_course_key(course_id):
     return course_key
 
 
-def get_course_descriptor(course_key, depth):
+def _get_course_descriptor(course_key, depth):
     """Returns all course course information for the given course key.
 
     Based on the course course_key, return course info
@@ -86,5 +80,8 @@ def get_course_descriptor(course_key, depth):
 
     Returns:
         Course descriptor object.
+
+    Raises:
+        ValueError
     """
     return courses.get_course(course_key, depth)

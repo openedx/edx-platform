@@ -43,7 +43,7 @@ class CourseAboutView(APIView):
 
         """
         try:
-            return Response(api.get_course_about_details(request, course_id))
+            return Response(api.get_course_about_details(course_id))
         except InvalidKeyError:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,

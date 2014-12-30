@@ -17,7 +17,7 @@ DEFAULT_DATA_API = 'course_about.data'
 log = logging.getLogger(__name__)
 
 
-def get_course_about_details(request, course_id):
+def get_course_about_details(course_id):
     """Get course about details for the given course ID.
 
     Given a Course ID, retrieve all the metadata necessary to fully describe the Course.
