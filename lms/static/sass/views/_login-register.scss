@@ -121,6 +121,7 @@ $sm-btn-linkedin: #0077b5;
                 z-index: 10;
                 text-transform: none;
                 font-size: 0.7em;
+                font-weight: 600;
             }
         }
     }
@@ -348,7 +349,7 @@ $sm-btn-linkedin: #0077b5;
         border: 3px solid $m-blue-d6;
         border-radius: 5px;
         box-shadow: none;
-        font-weight: normal;
+        font-weight: 600;
         text-shadow: none;
 
         &:hover,
