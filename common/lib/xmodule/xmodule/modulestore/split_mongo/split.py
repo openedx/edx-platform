@@ -2182,6 +2182,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             existing_block_info = dest_structure['blocks'].get(new_block_key, {})
             # Inherit the Scope.settings values from 'fields' to 'defaults'
             new_block_info['defaults'] = new_block_info['fields']
+
+            # <workaround>
+            # CAPA modules store their 'markdown' value (an alternate representation of their content) in Scope.settings rather than Scope.content :-/
+            # markdown is a field that really should not be overridable - it fundamentally changes the content.
+            # capa modules also use a custom editor that always saves their markdown field to the metadata, even if it hasn't changed, which breaks our override system.
+            # So until capa modules are fixed, we special-case them and remove their markdown fields, forcing the inherited version to use XML only.
+            if usage_key.block_type == 'problem' and 'markdown' in new_block_info['defaults']:
+                del new_block_info['defaults']['markdown']
+            # </workaround>
+
             new_block_info['fields'] = existing_block_info.get('fields', {})  # Preserve any existing overrides
             if 'children' in new_block_info['defaults']:
                 del new_block_info['defaults']['children']  # Will be set later
