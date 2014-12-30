@@ -50,8 +50,10 @@ if Backbone?
       toggleGroupDropdown: ($target) ->
         if $target.data('cohorted')
             $('.js-group-select').prop('disabled', false);
+            $('.group-selector-wrapper').show()
         else
             $('.js-group-select').val('').prop('disabled', true);
+            $('.group-selector-wrapper').hide()
 
       postOptionChange: (event) ->
           $target = $(event.target)
