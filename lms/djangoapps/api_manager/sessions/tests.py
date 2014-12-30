@@ -8,6 +8,7 @@ Run these tests @ Devstack:
 from random import randint
 import uuid
 import mock
+from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -77,8 +78,15 @@ class SessionsApiTests(TestCase):
         data = {'email': self.test_email, 'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_users_uri, data)
         user_id = response.data['id']
+        # get a copy of the User object, so we can compare timestamps
+        user1 = User.objects.get(id=user_id)
+        self.assertTrue(isinstance(user1.last_login, datetime))
+        self.assertIsNotNone(user1.last_login)
+
         data = {'username': local_username, 'password': self.test_password}
         response = self.do_post(self.base_sessions_uri, data)
+        user2 = User.objects.get(id=user_id)
+
         self.assertEqual(response.status_code, 201)
         self.assertGreater(len(response.data['token']), 0)
         confirm_uri = self.test_server_prefix + self.base_sessions_uri + '/' + response.data['token']
@@ -87,6 +95,10 @@ class SessionsApiTests(TestCase):
         self.assertGreater(len(response.data['user']), 0)
         self.assertEqual(str(response.data['user']['username']), local_username)
         self.assertEqual(response.data['user']['id'], user_id)
+
+        # make sure the last_login timestamp was updated at the login operation
+        self.assertTrue(isinstance(user2.last_login, datetime))
+        self.assertNotEqual(user1.last_login, user2.last_login)
 
     def test_session_list_post_invalid(self):
         local_username = self.test_username + str(randint(11, 99))
