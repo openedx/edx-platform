@@ -3,6 +3,7 @@ Serializers for all Course Descriptor and Course About Descriptor related return
 
 """
 from lms.djangoapps.courseware.courses import course_image_url, get_course_about_section
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 
 def _serialize_content(course_descriptor):
@@ -60,11 +61,11 @@ def _course_about_serialize_content(course_descriptor):
     try:
         video = get_course_about_section(course_descriptor, 'video')
         data["media"]["video"] = video
-    except Exception as e:
+    except ItemNotFoundError:
         data["media"]["video"] = None
     try:
         effort = get_course_about_section(course_descriptor, 'effort')
         data["effort"] = effort
-    except Exception as e:
+    except ItemNotFoundError:
         data["effort"] = None
     return data

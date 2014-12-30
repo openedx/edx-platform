@@ -3,8 +3,6 @@ This is responsible for combining data from the following resources:
 * CourseDescriptor
 * CourseAboutDescriptor
 """
-
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from course_about.serializers import _serialize_content
 from course_about.errors import CourseNotFoundError

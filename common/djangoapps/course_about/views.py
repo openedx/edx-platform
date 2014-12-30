@@ -3,14 +3,14 @@ Implementation of the RESTful endpoints for the Course About API.
 
 """
 from opaque_keys import InvalidKeyError
-from rest_framework import generics, permissions
+from rest_framework import permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from course_about import api
 from rest_framework import status
 from rest_framework.response import Response
-from errors import CourseNotFoundError
+from course_about.errors import CourseNotFoundError
 
 
 class CourseAboutThrottle(UserRateThrottle):

@@ -19,4 +19,5 @@ class CourseAboutApiLoadError(CourseAboutError):
 
 
 class CourseNotFoundError(CourseAboutError):
+    """The Course Not Found. """
     pass

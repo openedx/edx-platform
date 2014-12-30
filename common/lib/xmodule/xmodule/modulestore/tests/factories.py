@@ -15,7 +15,6 @@ from mock import Mock, patch
 from nose.tools import assert_less_equal, assert_greater_equal
 import factory
 import threading
-from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 from student.tests.factories import UserFactory
 
@@ -360,21 +359,24 @@ def check_mongo_calls(num_finds=0, num_sends=None):
 # Reference : cms/djangoapps/models/settings/course_details.py
 
 ABOUT_ATTRIBUTES = {
-    'syllabus': "This is the value of syllabus",
-    'short_description': "The short descrition",
-    'overview': "The overview contents",
     'effort': "Testing effort",
 }
 
 
 class CourseAboutFactory(XModuleFactory):
     """
-    Factory for XModule courses about.
+    Factory for XModule course about.
     """
 
     @classmethod
-    def _create(cls, target_class, **kwargs):
-        # from cms.djangoapps.models.settings.course_details import CourseDetails
+    def _create(cls, target_class, **kwargs):  # pylint: disable=unused-argument
+        """
+        Uses **kwargs:
+
+        effort:  effor information
+
+        video : video link
+        """
         user = UserFactory.create()
         course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
         store = modulestore()
