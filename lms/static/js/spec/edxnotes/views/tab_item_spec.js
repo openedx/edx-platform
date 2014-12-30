@@ -47,7 +47,7 @@ define([
             var secondItem = this.tabsList.$('#second-item');
 
             expect(this.tabsList.$('.tab')).toHaveLength(2);
-            secondItem.find('.btn-close').click();
+            secondItem.find('.action-close').click();
             expect(this.tabsList.$('.tab')).toHaveLength(1);
         });
     });

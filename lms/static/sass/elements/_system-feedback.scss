@@ -120,6 +120,10 @@
     border-top: 3px solid $alert-color;
   }
 
+  &.error {
+    border-top: 3px solid $error-color;
+  }
+
   &.warning {
     border-top: 3px solid $warning-color;
   }
