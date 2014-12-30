@@ -42,6 +42,15 @@ class UserSerializer(DynamicFieldsModelSerializer):
         fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active", "organizations", "avatar_url", "city", "title", "country", "full_name")
         read_only_fields = ("id", "email", "username")
 
+class SimpleUserSerializer(DynamicFieldsModelSerializer):
+    created = serializers.DateTimeField(source='date_joined', required=False)
+
+    class Meta:
+        """ Serializer/field specification """
+        model = APIUser
+        fields = ("id", "email", "username", "first_name", "last_name", "created", "is_active")
+        read_only_fields = ("id", "email", "username")
+
 class UserCountByCitySerializer(serializers.Serializer):
     """ Serializer for user count by city """
     city = serializers.CharField(source='profile__city')
