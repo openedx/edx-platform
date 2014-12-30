@@ -1,3 +1,5 @@
+-r ../../../requirements/edx/base.txt
+-r ../../../requirements/edx/local.txt
 path.py
 Django >=1.4,<1.5
 pytz
