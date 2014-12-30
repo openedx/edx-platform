@@ -17,6 +17,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
 from course_about import data
+from course_about.errors import CourseNotFoundError
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -46,10 +47,15 @@ class CourseAboutDataTest(ModuleStoreTestCase):
         course_info = data.get_course_about_details(unicode(self.course.id))
         self.assertIsNotNone(course_info)
 
-    @raises(ValueError)
     def test_non_existent_course(self):
-        data.get_course_about_details("this/is/bananas")
+        try:
+            data.get_course_about_details("this/is/bananas")
+        except Exception as e:
+            self.assertEquals(e.__class__, CourseNotFoundError)
 
     @raises(InvalidKeyError)
     def test_non_existent_course_key(self):
-        data.get_course_about_details("invalidKey")
+        try:
+            data.get_course_about_details("invalidKey")
+        except Exception as e:
+            self.assertEquals(e.__class__, InvalidKeyError)
