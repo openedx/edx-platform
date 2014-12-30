@@ -760,6 +760,9 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
 # a file that exceeds the above size
 MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
 
+### Default value for entrance exam minimum score
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
+
 ################ ADVANCED_COMPONENT_TYPES ###############
 
 ADVANCED_COMPONENT_TYPES = [

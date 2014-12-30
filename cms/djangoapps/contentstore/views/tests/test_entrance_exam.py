@@ -82,7 +82,7 @@ class EntranceExamHandlerTests(CourseTestCase):
         """
         Unit Test: test_contentstore_views_entrance_exam_get
         """
-        resp = self.client.post(self.exam_url, {}, http_accept='application/json')
+        resp = self.client.post(self.exam_url, {'entrance_exam_minimum_score_pct': '50'}, http_accept='application/json')
         self.assertEqual(resp.status_code, 201)
         resp = self.client.get(self.exam_url)
         self.assertEqual(resp.status_code, 200)

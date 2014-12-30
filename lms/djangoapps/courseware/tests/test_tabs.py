@@ -108,7 +108,7 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class CoursewareTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     if settings.FEATURES.get('ENTRANCE_EXAMS', False) and \
-        settings.FEATURES.get('MILESTONES_APP', False):
+            settings.FEATURES.get('MILESTONES_APP', False):
 
         def setUp(self):
             self.course = CourseFactory.create()
@@ -127,7 +127,6 @@ class CoursewareTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.setup_user()
             self.enroll(self.course)
             self.user.is_staff = True
-
 
         def test_get_course_tabs_list_entrance_exam_enabled(self):
             self.entrance_exam = ItemFactory.create(

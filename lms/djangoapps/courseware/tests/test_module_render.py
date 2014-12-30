@@ -28,7 +28,7 @@ from courseware.tests.factories import StudentModuleFactory, UserFactory, Global
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE,
-    TEST_DATA_XML_MODULESTORE,TEST_DATA_MIXED_CLOSED_MODULESTORE
+    TEST_DATA_XML_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -1248,7 +1248,7 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class TestEntranceExamGating(LoginEnrollmentTestCase, ModuleStoreTestCase):
     if settings.FEATURES.get('ENTRANCE_EXAMS', False) and \
-        settings.FEATURES.get('MILESTONES_APP', False):
+            settings.FEATURES.get('MILESTONES_APP', False):
 
         def setUp(self):
             self.course = CourseFactory.create()
@@ -1270,7 +1270,6 @@ class TestEntranceExamGating(LoginEnrollmentTestCase, ModuleStoreTestCase):
             factory = RequestFactory()
             self.request = factory.get('/')
             self.request.user = UserFactory()
-
 
         def test_get_course_tabs_list_entrance_exam_enabled(self):
 

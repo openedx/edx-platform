@@ -15,7 +15,9 @@ var CourseDetails = Backbone.Model.extend({
         intro_video: null,
         effort: null,	// an int or null,
         course_image_name: '', // the filename
-        course_image_asset_path: '' // the full URL (/c4x/org/course/num/asset/filename)
+        course_image_asset_path: '',  // the full URL (/c4x/org/course/num/asset/filename)
+        entrance_exam_enabled : '',
+        entrance_exam_minimum_score_pct: '50'
     },
 
     validate: function(newattrs) {
@@ -42,6 +44,12 @@ var CourseDetails = Backbone.Model.extend({
                 errors.intro_video = gettext("Key should only contain letters, numbers, _, or -");
             }
             // TODO check if key points to a real video using google's youtube api
+        }
+        if(_.has(newattrs, 'entrance_exam_minimum_score_pct')){
+            var intEntranceExamMinScore = Math.round(newattrs.entrance_exam_minimum_score_pct); // see if this ensures value saved is int
+            if (!isFinite(intEntranceExamMinScore) || /\D+/.test(newattrs.entrance_exam_minimum_score_pct) || intEntranceExamMinScore < 0 || intEntranceExamMinScore > 100) {
+                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between 0 and 100.");
+            }
         }
         if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state
