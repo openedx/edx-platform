@@ -142,13 +142,13 @@ class EdxNotesPageView(PageObject):
         """
         Indicates if tab is closable or not.
         """
-        return self.q(css="{} .btn-close".format(self.TAB_SELECTOR)).present
+        return self.q(css="{} .action-close".format(self.TAB_SELECTOR)).present
 
     def close(self):
         """
         Closes the tab.
         """
-        self.q(css="{} .btn-close".format(self.TAB_SELECTOR)).first.click()
+        self.q(css="{} .action-close".format(self.TAB_SELECTOR)).first.click()
 
     @property
     def children(self):
