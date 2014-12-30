@@ -19,9 +19,10 @@ from student.tests.factories import UserFactory
 from cms.djangoapps.contentstore.utils import course_image_url
 
 from course_about import api
-from course_about.errors import CourseNotFoundError
+from course_about.errors import CourseNotFoundError,CourseAboutApiLoadError
 
 from mock import patch
+from nose.tools import raises
 
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
@@ -124,6 +125,14 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
     @patch.object(api, "get_course_about_details")
     def test_get_enrollment_internal_error(self, mock_get_course_about_details):
         mock_get_course_about_details.side_effect = Exception('error')
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @override_settings(COURSE_ABOUT_DATA_API='foo')
+    def test_data_api_config_error(self):
+        # Enroll in the course and verify the URL we get sent to
         resp = self.client.get(
             reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
         )
