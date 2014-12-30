@@ -18,5 +18,5 @@ edX Platform LMS Docstrings
     multicourse
     psychometrics
     static_book
-    static_template
+    static_template_view
     wiki
