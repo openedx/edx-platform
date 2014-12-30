@@ -17,6 +17,7 @@ import factory
 import threading
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
+from student.tests.factories import UserFactory
 
 
 class Dummy(object):
@@ -36,6 +37,7 @@ class XModuleFactory(Factory):
     @lazy_attribute
     def modulestore(self):
         from xmodule.modulestore.django import modulestore
+
         return modulestore()
 
 
@@ -334,18 +336,18 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         the given int value.
     """
     with check_sum_of_calls(
-        pymongo.message,
-        ['query', 'get_more'],
-        num_finds,
-        num_finds
+            pymongo.message,
+            ['query', 'get_more'],
+            num_finds,
+            num_finds
     ):
         if num_sends is not None:
             with check_sum_of_calls(
-                pymongo.message,
-                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
-                num_sends,
-                num_sends
+                    pymongo.message,
+                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
+                    num_sends,
+                    num_sends
             ):
                 yield
         else:
@@ -364,34 +366,17 @@ ABOUT_ATTRIBUTES = {
     'effort': "Testing effort",
 }
 
+
 class CourseAboutFactory(XModuleFactory):
     """
     Factory for XModule courses about.
     """
-    @classmethod
-    def create_user(self):
-        uname = 'testuser_about'
-        email = 'test+courses_about@edx.org'
-        password = 'foo'
-
-        # Create the user so we can log them in.
-        self.user = User.objects.create_user(uname, email, password)
-
-        # Note that we do not actually need to do anything
-        # for registration if we directly mark them active.
-        self.user.is_active = True
-
-        # Staff has access to view all courses
-        self.user.is_staff = True
-        self.user.save()
-        return self.user
-
 
     @classmethod
     def _create(cls, target_class, **kwargs):
         # from cms.djangoapps.models.settings.course_details import CourseDetails
+        user = UserFactory.create()
         course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
-        user = cls.create_user()
         store = modulestore()
         for about_key in ABOUT_ATTRIBUTES:
             about_item = store.create_xblock(course_runtime, course_id, 'about', about_key)

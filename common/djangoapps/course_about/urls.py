@@ -9,7 +9,7 @@ from course_about.views import CourseAboutView
 urlpatterns = patterns(
     'course_about.views',
     url(
-        r'^course/about/{course_key}'.format(course_key=settings.COURSE_ID_PATTERN),
+        r'^{course_key}'.format(course_key=settings.COURSE_ID_PATTERN),
         CourseAboutView.as_view(), name="courseabout"
     ),
 )

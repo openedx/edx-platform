@@ -2,6 +2,9 @@
 Implementation of the RESTful endpoints for the Course About API.
 
 """
+from opaque_keys import InvalidKeyError
+from rest_framework import generics, permissions
+from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from course_about import api
@@ -22,8 +25,8 @@ class CourseAboutView(APIView):
     Used to retrieve JSON serialized Course About information.
 
     """
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    permission_classes = (permissions.IsAuthenticated,)
     throttle_classes = CourseAboutThrottle,
 
     def get(self, request, course_id=None):  # pylint: disable=unused-argument
@@ -41,7 +44,26 @@ class CourseAboutView(APIView):
         """
         try:
             return Response(api.get_course_about_details(request, course_id))
-        except CourseNotFoundError:
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={
+                    "message": (
+                        u"Course '{course_id}' not found."
+                    ).format(course_id=course_id)
+                }
+            )
+        except ValueError:
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+                data={
+                    "message": (
+                        u"An error occurred while retrieving course information"
+                        u" for course '{course_id}' no course found"
+                    ).format(course_id=course_id)
+                }
+            )
+        except:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data={

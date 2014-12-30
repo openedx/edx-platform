@@ -29,9 +29,6 @@ def get_course_about_details(request, course_id):
     Returns:
         A JSON serializable dictionary of metadata describing the course.
 
-    Raises:
-        TODO: Describe all errors
-
     Example:
         >>> get_course_about_details('edX/Demo/2014T2')
         {
@@ -62,7 +59,7 @@ def get_course_about_details(request, course_id):
             }
         }
     """
-    return _data_api().get_course_about_details(request, course_id)
+    return _data_api().get_course_about_details(course_id)
 
 
 def _data_api():

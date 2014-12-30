@@ -8,6 +8,11 @@ from lms.djangoapps.courseware.courses import course_image_url, get_course_about
 def _serialize_content(course_descriptor):
     """
     Returns a serialized representation of the course_descriptor and about_descriptor
+    Args:
+        course_descriptor : course descriptor object
+
+    return:
+        serialize data for course information.
     """
     data = dict()
     data['display_name'] = getattr(course_descriptor, 'display_name', None)
@@ -34,10 +39,25 @@ def _serialize_content(course_descriptor):
 
     # Following code is getting the course about descriptor information
 
-    video = get_course_about_section(course_descriptor, 'video')
-    data['effort'] = get_course_about_section(course_descriptor, 'effort')
-
-    data["media"] = {'video': video, 'course_image': image_url}
+    new_dict = _course_about_serialize_content(course_descriptor)
+    data["media"] = {'video': new_dict["video"], 'course_image': image_url}
+    data["effort"] = new_dict["effort"]
 
     return data
 
+
+def _course_about_serialize_content(course_descriptor):
+    """
+    Returns a serialized representation of the about_descriptor
+
+    Args:
+        course_descriptor : course descriptor object
+
+    return:
+        serialize data for about descriptor.
+
+    """
+    data = dict()
+    data["video"] = get_course_about_section(course_descriptor, 'video')
+    data["effort"] = get_course_about_section(course_descriptor, 'effort')
+    return data
