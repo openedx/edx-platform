@@ -655,8 +655,7 @@ class OrderItem(TimeStampedModel):
         """
         return {}
 
-    @property
-    def additional_instruction_text(self):
+    def additional_instruction_text(self, **kwargs):  # pylint: disable=unused-argument
         """
         Individual instructions for this order item.
 
@@ -1378,8 +1377,7 @@ class CertificateItem(OrderItem):
             "dashboard_url": reverse('dashboard'),
         }
 
-    @property
-    def additional_instruction_text(self):
+    def additional_instruction_text(self, **kwargs):
         refund_reminder = _(
             "You have up to two weeks into the course to unenroll from the Verified Certificate option "
             "and receive a full refund. To receive your refund, contact {billing_email}. "
@@ -1387,7 +1385,18 @@ class CertificateItem(OrderItem):
             "Please do NOT include your credit card information."
         ).format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)
 
-        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+        # TODO (ECOM-188): When running the A/B test for
+        # separating the verified / payment flow, we want to add some extra instructions
+        # for users in the experimental group.  In order to know the user is in the experimental
+        # group, we need to check a session variable.  But at this point in the code,
+        # we're so deep into the request handling stack that we don't have access to the request.
+        # The approach taken here is to have the email template check the request session
+        # and pass in a kwarg to this function if it's set.  The template already has
+        # access to the request (via edxmako middleware), so we don't need to change
+        # too much to make this work.  Once the A/B test completes, though, we should
+        # clean this up by removing the `**kwargs` param and skipping the check
+        # for the session variable.
+        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and kwargs.get('separate_verification'):
             domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
             path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
             verification_url = "http://{domain}{path}".format(domain=domain, path=path)
@@ -1542,8 +1551,7 @@ class Donation(OrderItem):
         """
         return self.pk_with_subclass, set([self._tax_deduction_msg()])
 
-    @property
-    def additional_instruction_text(self):
+    def additional_instruction_text(self, **kwargs):  # pylint: disable=unused-argument
         """Provide information about tax-deductible donations in the confirmation email.
 
         Returns:

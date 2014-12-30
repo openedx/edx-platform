@@ -54,7 +54,7 @@ from student.helpers import (
     % endif
     % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
       % if enrollment.mode == "verified":
-        % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+        % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
           % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
             <span class="sts-enrollment" title="${_("Your verification is pending")}">
               <span class="label">${_("Enrolled as: ")}</span>
@@ -131,7 +131,7 @@ from student.helpers import (
       <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 
-      % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+      % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', True):
         % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED] and not is_course_blocked:
         <div class="message message-status is-shown">
           % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
@@ -180,7 +180,7 @@ from student.helpers import (
 
               <ul class="actions message-actions">
                 <li class="action-item">
-                  % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+                  % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
                   <a class="action action-upgrade" href="${reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course.id)})}" data-course-id="${course.id | h}" data-user="${user.username | h}">
                   % else:
                   <a class="action action-upgrade" href="${reverse('course_modes_choose', kwargs={'course_id': unicode(course.id)})}?upgrade=True" data-course-id="${course.id | h}" data-user="${user.username | h}">
