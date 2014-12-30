@@ -1,9 +1,10 @@
+"""
+Utility function for some parsing stuff
+"""
+
 __author__ = 'aamir'
 
 import re
-from xmodule.modulestore.django import modulestore
-from xmodule.modulestore import ModuleStoreEnum
-from xmodule.contentstore.content import StaticContent
 
 
 def parse_video_tag(video_with_html):

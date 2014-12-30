@@ -3,7 +3,6 @@ Tests specific to the Data Aggregation Layer of the Course About API.
 
 """
 import ddt
-from nose.tools import raises
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 import unittest

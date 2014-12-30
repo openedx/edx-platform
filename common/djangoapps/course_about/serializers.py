@@ -57,5 +57,3 @@ def _course_about_serialize_content(about_descriptor):
     data["video"] = about_descriptor.get("video", None)
     data["effort"] = about_descriptor.get("effort", None)
     return data
-
-

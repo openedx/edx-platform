@@ -6,7 +6,6 @@ This is responsible for combining data from the following resources:
 from opaque_keys import InvalidKeyError
 from course_about.serializers import _serialize_content
 from course_about.errors import CourseNotFoundError
-import re
 from lms.djangoapps.courseware import courses
 import logging
 from opaque_keys.edx.keys import CourseKey
@@ -103,4 +102,3 @@ def _fetch_course_detail(course_key, attribute):
     except ItemNotFoundError:
         value = None
     return value
-
