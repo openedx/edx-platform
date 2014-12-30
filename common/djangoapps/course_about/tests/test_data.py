@@ -45,16 +45,10 @@ class CourseAboutDataTest(ModuleStoreTestCase):
         self.assertIsNotNone(course_info)
 
     def test_non_existent_course(self):
-        try:
-            data.get_course_about_details("this/is/bananas")
-        except Exception as e:
-            self.assertIsInstance(e, CourseNotFoundError)
+        self.assertRaises(CourseNotFoundError, data.get_course_about_details, "this/is/bananas")
 
     def test_invalid_course_key(self):
-        try:
-            data._get_course_key("invalidKey")
-        except Exception as e:
-            self.assertIsInstance(e, InvalidKeyError)
+        self.assertRaises(InvalidKeyError, data._get_course_key, "invalidKey")
 
     def test_get_valid_course_key(self):
         d = data._get_course_key("edX/DemoX/Demo_Course")
