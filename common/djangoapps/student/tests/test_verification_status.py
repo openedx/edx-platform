@@ -214,8 +214,8 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     BANNER_ALT_MESSAGES = {
         None: "Honor",
-        VERIFY_STATUS_NEED_TO_VERIFY: "ID Verified Pending Ribbon/Badge",
-        VERIFY_STATUS_SUBMITTED: "ID Verified Pending Ribbon/Badge",
+        VERIFY_STATUS_NEED_TO_VERIFY: "ID verification pending",
+        VERIFY_STATUS_SUBMITTED: "ID verification pending",
         VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
         VERIFY_STATUS_MISSED_DEADLINE: "Honor"
     }
