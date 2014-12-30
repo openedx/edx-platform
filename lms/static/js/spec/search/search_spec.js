@@ -338,6 +338,16 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.listView.$el.find('a.search-load-next')[0]).not.toExist();
         });
 
+        it('shows a spinner when loading more results', function () {
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.listView.render();
+            this.listView.loadNext();
+            expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeVisible();
+            this.listView.renderNext();
+            expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeHidden();
+        });
+
     });
 
 });

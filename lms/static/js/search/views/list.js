@@ -69,9 +69,8 @@ var edx = edx || {};
         },
 
         loadNext: function (event) {
-            event.preventDefault();
+            event && event.preventDefault();
             this.$el.find('.icon-spin').show();
-            this.trigger('next');
         }
 
     });
