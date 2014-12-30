@@ -285,6 +285,7 @@ class XBlockWrapper(PageObject):
     COMPONENT_BUTTONS = {
         'basic_tab': '.editor-tabs li.inner_tab_wrap:nth-child(1) > a',
         'advanced_tab': '.editor-tabs li.inner_tab_wrap:nth-child(2) > a',
+        'settings_tab': '.editor-modes .settings-button',
         'save_settings': '.action-save',
     }
 
@@ -411,6 +412,28 @@ class XBlockWrapper(PageObject):
         Click on Basic Tab.
         """
         self._click_button('basic_tab')
+
+    def open_settings_tab(self):
+        """
+        If editing, click on the "Settings" tab
+        """
+        self._click_button('settings_tab')
+
+    def set_field_val(self, field_display_name, field_value):
+        """
+        If editing, set the value of a field.
+        """
+        selector = '{} li.field label:contains("{}") + input'.format(self.editor_selector, field_display_name)
+        script = "$(arguments[0]).val(arguments[1]).change();"
+        self.browser.execute_script(script, selector, field_value)
+
+    def reset_field_val(self, field_display_name):
+        """
+        If editing, reset the value of a field to its default.
+        """
+        scope = '{} li.field label:contains("{}")'.format(self.editor_selector, field_display_name)
+        script = "$(arguments[0]).siblings('.setting-clear').click();"
+        self.browser.execute_script(script, scope)
 
     def set_codemirror_text(self, text, index=0):
         """

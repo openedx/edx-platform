@@ -244,3 +244,54 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
             expected_tpl.format(count=50, actual=len(self.library_fixture.children)),
             library_container.validation_warning_text
         )
+
+    def test_settings_overrides(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And when I click the "View" link
+        Then I can see a preview of the blocks drawn from the library.
+
+        When I edit one of the blocks to change a setting such as "display_name",
+        Then I can see the new setting is overriding the library version.
+
+        When I subsequently click to refresh the content with the latest from the library,
+        Then I can see that the overrided version of the setting is preserved.
+
+        When I click to edit the block and reset the setting,
+        then I can see that the setting's field defaults back to the library version.
+        """
+        block_wrapper_unit_page = self._get_library_xblock_wrapper(self.unit_page.xblocks[0].children[0])
+        container_page = block_wrapper_unit_page.go_to_container()
+        library_block = self._get_library_xblock_wrapper(container_page.xblocks[0])
+
+        self.assertFalse(library_block.has_validation_message)
+        self.assertEqual(len(library_block.children), 3)
+
+        block = library_block.children[0]
+        self.assertIn(block.name, ("Html1", "Html2", "Html3"))
+        name_default = block.name
+
+        block.edit()
+        new_display_name = "A new name for this HTML block"
+        block.set_field_val("Display Name", new_display_name)
+        block.save_settings()
+
+        self.assertEqual(block.name, new_display_name)
+
+        # Create a new block, causing a new library version:
+        self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc("html", "Html4"))
+
+        container_page.visit()  # Reload
+        self.assertTrue(library_block.has_validation_warning)
+        library_block.refresh_children()
+        container_page.wait_for_page()  # Wait for the page to reload
+
+        self.assertEqual(len(library_block.children), 4)
+        self.assertEqual(block.name, new_display_name)
+
+        # Reset:
+        block.edit()
+        block.reset_field_val("Display Name")
+        block.save_settings()
+        self.assertEqual(block.name, name_default)
