@@ -122,13 +122,30 @@ class SimpleInvoice(UnicodeProperty):
         self.pdf.drawRightString((self.MARGIN + 177) * mm, 220 * mm, _(u'Date ' + self.date))
 
     def drawCourseInfo(self):
+        style = getSampleStyleSheet()['Normal']
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
-            for i in range(10):
-                data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-        heights = [12*mm]
-        heights.extend((len(data) - 1 )*[8*mm])
-        t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm], heights, splitByRow=1, repeatRows=1)
+            for i in range(1):
+                data.append(['', Paragraph("very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # for i in range(5):
+            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            for i in range(1):
+                data.append(['', Paragraph("very very very very very very very very very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # for i in range(50):
+            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            for i in range(1):
+                data.append(['', Paragraph("description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            for i in range(1):
+                data.append(['', Paragraph("very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # for i in range(5):
+            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            for i in range(1):
+                data.append(['', Paragraph("very very very very very very very very very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            # for i in range(50):
+            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            for i in range(1):
+                data.append(['', Paragraph("description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+        t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm],  splitByRow=1, repeatRows=1)
 
         t.setStyle(TableStyle([
             ('ALIGN',(3,1),(5,-1),'RIGHT'),
@@ -138,6 +155,8 @@ class SimpleInvoice(UnicodeProperty):
             ('ALIGN',(1,1),(1,-1),'LEFT'),
             ('ALIGN',(2,1),(2,-1),'CENTER'),
             ('VALIGN',(0,0),(-1,-1),'MIDDLE'),
+            ('TOPPADDING',(0,0),(-1,-1),2*mm),
+            ('BOTTOMPADDING',(0,0),(-1,-1),2*mm),
             ('TEXTCOLOR',(0,-1),(-1,-1),colors.black),
             ('LINEBELOW', (0,0), (-1,0), 1.00, colors.black),
             ('LINEBELOW', (0,-1), (-1,-1), 1.00, colors.black),
@@ -250,12 +269,15 @@ class SimpleInvoice(UnicodeProperty):
             ('TEXTCOLOR',(0,0),(-1,-1),colors.black),
             ('BACKGROUND', (0,0), (0,0), colors.lightgrey),
             ('LEFTPADDING', (0,0), (0,0), 5*mm),
+            ('RIGHTPADDING', (0,0), (0,0), 5*mm),
             ('GRID', (0,0), (0,0), 0.50, colors.black),
             ('BACKGROUND', (0,2), (0,2), colors.lightgrey),
             ('LEFTPADDING', (0,2), (0,2), 5*mm),
+            ('RIGHTPADDING', (0,2), (0,2), 5*mm),
             ('GRID', (0,2), (0,2), 0.50, colors.black),
             ('BACKGROUND', (0,4), (0,4), colors.lightgrey),
             ('LEFTPADDING', (0,4), (0,4), 5*mm),
+            ('RIGHTPADDING', (0,4), (0,4), 5*mm),
             ('GRID', (0,4), (0,4), 0.50, colors.black),
 
         ]
@@ -274,13 +296,14 @@ class SimpleInvoice(UnicodeProperty):
             data.append(['TERMS AND CONDITIONS'])
             data.append([terms_conditions_para])
             footer_style.append(('LEFTPADDING', (0,6), (0,6), 5*mm))
+            footer_style.append(('RIGHTPADDING', (0,6), (0,6), 5*mm))
 
         t=Table(data, 176*mm)
 
         t.setStyle(TableStyle(footer_style))
         t.wrap(0,0)
 
-        if (y_pos-(5+self.MARGIN+5)*mm)<=t._height:
+        if (y_pos-(5+self.MARGIN)*mm)<=t._height:
             self.prepare_new_page()
 
         t.drawOn(self.pdf, (self.MARGIN + 5) * mm, (self.MARGIN + 5) * mm)
