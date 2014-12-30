@@ -2,9 +2,7 @@
 Serializers for all Course Descriptor and Course About Descriptor related return objects.
 
 """
-import re
-from lms.djangoapps.courseware.courses import course_image_url, get_course_about_section
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from lms.djangoapps.courseware.courses import course_image_url
 
 
 def _serialize_content(course_descriptor, about_descriptor):
@@ -39,7 +37,7 @@ def _serialize_content(course_descriptor, about_descriptor):
 
     data['media'] = {}
     data['media']['course_image'] = image_url
-    data['media']['video'] = course_about_data["video"]
+    data['media']['video'] = parse_video_tag(course_about_data["video"])
     data["effort"] = course_about_data["effort"]
     return data
 
@@ -53,7 +51,6 @@ def _course_about_serialize_content(about_descriptor):
 
     return:
         serialize data for about descriptor.
-
     """
     data = dict()
     data["video"] = about_descriptor.get("video", None)

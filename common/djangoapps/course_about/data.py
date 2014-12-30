@@ -31,20 +31,13 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
 
     Raises:
         CourseNotFoundError
-
     """
-
-    try:
-        course_key = _get_course_key(course_id)
-        course_descriptor = _get_course(course_key)  # pylint: disable=W0612
-
-        about_descriptor = {}
-        for attribute in ABOUT_ATTRIBUTES:
-            about_descriptor[attribute] = fetch_course_detail(course_key, attribute)
-
-        return _serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
-    except CourseNotFoundError as err:
-        raise CourseNotFoundError(err.message)
+    course_key = _get_course_key(course_id)
+    course_descriptor = _get_course(course_key)
+    about_descriptor = {}
+    for attribute in ABOUT_ATTRIBUTES:
+        about_descriptor[attribute] = _fetch_course_detail(course_key, attribute)
+    return _serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
 
 
 def _get_course(course_key, depth=0):
@@ -100,9 +93,9 @@ def _get_course_descriptor(course_key, depth):
     return courses.get_course(course_key, depth)
 
 
-def fetch_course_detail(course_key, attribute):
+def _fetch_course_detail(course_key, attribute):
     """
-    Fetch the course details for the given course from persistence and return a CourseDetails model.
+    Fetch the course about attribute for the given course's attribute from persistence and return its value.
     """
     usage_key = course_key.make_usage_key('about', attribute)
     try:
