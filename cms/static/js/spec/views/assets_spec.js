@@ -122,10 +122,6 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 AjaxHelpers.respondWithJson(requests, response, requestIndex);
             };
 
-            $.fn.fileupload = function() {
-                return '';
-            };
-
             var event = {};
             event.target = {"value": "dummy.jpg"};
 
