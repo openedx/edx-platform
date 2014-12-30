@@ -2,6 +2,7 @@
 Serializers for all Course Descriptor and Course About Descriptor related return objects.
 
 """
+from util.parsing_utils import parse_video_tag
 from lms.djangoapps.courseware.courses import course_image_url
 
 

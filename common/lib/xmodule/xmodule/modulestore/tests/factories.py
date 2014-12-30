@@ -385,5 +385,5 @@ class CourseAboutFactory(XModuleFactory):
             about_item.data = ABOUT_ATTRIBUTES[about_key]
             store.update_item(about_item, user.id, allow_not_found=True)
         about_item = store.create_xblock(course_runtime, course_id, 'about', 'video')
-        about_item.data = "testing-video-link"
+        about_item.data = "www.youtube.com/embed/testing-video-link"
         store.update_item(about_item, user.id, allow_not_found=True)
