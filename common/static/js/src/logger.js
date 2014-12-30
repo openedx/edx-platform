@@ -13,6 +13,7 @@
                 'type': 'POST',
                 'data': data,
                 'async': true,
+                'timeout': 2000
             }, options);
             return request(options);
         };

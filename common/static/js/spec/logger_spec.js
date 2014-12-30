@@ -17,13 +17,18 @@
                         event: '"data"',
                         page: window.location.href
                     },
-                    async: true
+                    async: true,
+                    timeout: 2000
                 });
             });
 
             it('can send a request with custom options to log event', function() {
                 spyOn(jQuery, 'ajaxWithPrefix');
-                Logger.log('example', 'data', null, {type: 'GET', async: false});
+                Logger.log('example', 'data', null, {
+                    type: 'GET',
+                    async: false,
+                    timeout: 3000
+                });
                 expect(jQuery.ajaxWithPrefix).toHaveBeenCalledWith({
                     url: '/event',
                     type: 'GET',
@@ -32,7 +37,8 @@
                         event: '"data"',
                         page: window.location.href
                     },
-                    async: false
+                    async: false,
+                    timeout: 3000
                 });
             });
         });
@@ -100,7 +106,8 @@
                         event: '',
                         page: window.location.href
                     },
-                    async: false
+                    async: false,
+                    timeout: 2000
                 });
             });
         });
