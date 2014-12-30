@@ -818,25 +818,10 @@ def _show_receipt_html(request, order):
     wl_partner_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif'
     edx_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png'
 
-
-    buffer = BytesIO()
-    items_data = order.generate_pdf_file(order_items)
-    pdf = SimpleInvoice(
-        items_data=items_data,
-        id=str(order.id),
-        date=order.purchase_time.strftime("%B %d, %Y"),
-        title='RECEIPT',
-        is_invoice = True,
-        total_cost=order.total_cost,
-        payment_received=order.total_cost,
-        wl_logo=wl_partner_logo_path,
-        edx_logo=edx_logo_path
-    )
-    pdf.gen(buffer)
-    # Make your response and prep to attach
+    pdf_file = order.generate_pdf_receipt(order_items, wl_partner_logo_path, edx_logo_path)
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=receipt.pdf'
-    response.write(buffer.getvalue())
+    response.write(pdf_file.getvalue())
     return response
 
     # return render_to_response(receipt_template, context)

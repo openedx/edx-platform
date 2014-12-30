@@ -1171,6 +1171,9 @@ def generate_registration_codes(request, course_id):
         dashboard=reverse('dashboard')
     )
 
+    wl_partner_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif'
+    edx_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png'
+    pdf_file = sale_invoice.generate_pdf_invoice(course_price, int(quantity), float(sale_price), wl_partner_logo_path, edx_logo_path)
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,
@@ -1217,6 +1220,7 @@ def generate_registration_codes(request, course_id):
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
+        email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", registration_codes)

@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 from datetime import datetime
+import time
 from decimal import Decimal
 import analytics
 from django.http import HttpResponse
@@ -291,8 +292,10 @@ class Order(models.Model):
         self.save()
         return old_to_new_id_map
 
-    def generate_pdf_file(self, order_items):
-        data = []
+    def generate_pdf_receipt(self, order_items, wl_partner_logo_path, edx_logo_path):
+        from pdfgenerator.pdf import SimpleInvoice
+        items_data = []
+        buffer = BytesIO()
         for item in order_items:
             discount_price = '0.00'
             price = item.unit_cost
@@ -303,15 +306,25 @@ class Order(models.Model):
                 discount_price = item.list_price - item.unit_cost
                 price = item.list_price
             total = item.qty*item.unit_cost
-            data.append({
+            items_data.append({
                 'course_name': course.display_name,
                 'quantity': item.qty,
                 'list_price': price,
                 'discount':discount_price,
                 'total': total
             })
-
-        return data
+        context = {
+            'items_data': items_data,
+            'id': str(self.id),
+            'date': self.purchase_time.strftime("%B %d, %Y"),
+            'is_invoice': False,
+            'total_cost': self.total_cost,
+            'wl_logo': wl_partner_logo_path,
+            'edx_logo': edx_logo_path
+        }
+        pdf = SimpleInvoice(context)
+        pdf.gen(buffer)
+        return buffer
 
     def generate_registration_codes_csv(self, orderitems, site_name):
         """
@@ -333,7 +346,7 @@ class Order(models.Model):
 
         return csv_file, course_info
 
-    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, site_name, courses_info):
+    def send_confirmation_emails(self, orderitems, is_order_type_business, csv_file, pdf_file, site_name, courses_info):
         """
         send confirmation e-mail
         """
@@ -395,6 +408,7 @@ class Order(models.Model):
 
                 if csv_file:
                     email.attach(u'RegistrationCodesRedemptionUrls.csv', csv_file.getvalue(), 'text/csv')
+                email.attach(u'Receipt.pdf', pdf_file.getvalue(), 'application/pdf')
                 email.send()
         except (smtplib.SMTPException, BotoServerError):  # sadly need to handle diff. mail backends individually
             log.error('Failed sending confirmation e-mail for order %d', self.id)  # pylint: disable=no-member
@@ -461,8 +475,11 @@ class Order(models.Model):
             #
             csv_file, courses_info = self.generate_registration_codes_csv(orderitems, site_name)
 
-        # pdf_buffer = self.generate_pdf_file(orderitems)
-        self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, site_name, courses_info)
+        wl_partner_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif'
+        edx_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png'
+        pdf_file = self.generate_pdf_receipt(orderitems, wl_partner_logo_path, edx_logo_path)
+
+        self.send_confirmation_emails(orderitems, self.order_type == OrderTypes.BUSINESS, csv_file, pdf_file, site_name, courses_info)
         self._emit_order_event('Completed Order', orderitems)
 
     def refund(self):
@@ -742,6 +759,36 @@ class Invoice(models.Model):
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
+
+    def generate_pdf_invoice(self, course_price, quantity, sale_price, wl_partner_logo_path, edx_logo_path):
+        from shoppingcart.pdfgenerator.pdf import SimpleInvoice
+        course = get_course_by_id(self.course_id)
+        list_price = float(course_price) - sale_price/quantity
+        discount = course_price - list_price
+        item_data = [
+            {
+                'course_name': course.display_name,
+                'quantity': quantity,
+                'list_price': list_price,
+                'discount': discount,
+                'total': quantity * list_price
+            }
+        ]
+        buffer = BytesIO()
+        context = {
+            'items_data': item_data,
+            'id': str(self.id),
+            'date': time.strftime("%B %d, %Y"),
+            'is_invoice': True,
+            'total_cost': self.total_amount,
+            'wl_logo': wl_partner_logo_path,
+            'edx_logo': edx_logo_path,
+            'payment_received': '0.00',
+            'balance': self.total_amount,
+        }
+        pdf = SimpleInvoice(context)
+        pdf.gen(buffer)
+        return buffer
 
 
 class CourseRegistrationCode(models.Model):

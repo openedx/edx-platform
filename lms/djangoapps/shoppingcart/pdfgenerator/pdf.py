@@ -50,17 +50,16 @@ class NumberedCanvas(Canvas):
 
 
 class SimpleInvoice(UnicodeProperty):
-    def __init__(self, items_data, id, date, title, is_invoice, total_cost, wl_logo, edx_logo, payment_received='0.00', balance='NIL'):
-        self.items_data = items_data
-        self.id = id
-        self.date = date
-        self.title = title
-        self.is_invoice = is_invoice
-        self.total_cost = total_cost
-        self.payment_received = payment_received
-        self.balance = balance
-        self.wl_logo = wl_logo
-        self.edx_logo = edx_logo
+    def __init__(self, context):
+        self.items_data = context['items_data']
+        self.id = context['id']
+        self.date = context['date']
+        self.is_invoice = context['is_invoice']
+        self.total_cost = context['total_cost']
+        self.wl_logo = context['wl_logo']
+        self.edx_logo = context['edx_logo']
+        self.payment_received = context['payment_received'] if 'payment_received' in context else ''
+        self.balance = context['balance'] if 'balance' in context else ''
 
     def prepare_invoice_draw(self):
         self.MARGIN = 15
@@ -114,8 +113,11 @@ class SimpleInvoice(UnicodeProperty):
         self.pdf.drawImage(self.edx_logo, (self.MARGIN + 177 -width) * mm, top * mm, width * mm, height*mm, mask='auto')
 
     def drawTitle(self):
+        title = 'RECEIPT'
+        if self.is_invoice:
+            title = 'INVOICE'
         self.pdf.setFont('DejaVu', 21)
-        self.pdf.drawCentredString(108*mm, (230)*mm, self.title)
+        self.pdf.drawCentredString(108*mm, (230)*mm, title)
 
         self.pdf.setFont('DejaVu', 10)
         self.pdf.drawString((self.MARGIN + 8) * mm, 220 * mm, _(u'Order # ' + self.id))
