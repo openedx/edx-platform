@@ -64,11 +64,3 @@ class CourseAboutDataTest(ModuleStoreTestCase):
     def test_get_course_descriptor_with_valid_key(self):
         d = data._get_course_descriptor(self.course.id, 0)
         self.assertIsNotNone(d)
-
-    def test_get_course_descriptor_with_invalid_key(self):
-        try:
-            descriptor = data._get_course_descriptor("this/is/bananas", 0)
-        except Exception as e:
-            descriptor = None
-            self.assertIsInstance(e, ValueError)
-        self.assertIsNone(descriptor)
