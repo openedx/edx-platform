@@ -1173,7 +1173,14 @@ def generate_registration_codes(request, course_id):
 
     wl_partner_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/wl_logo.gif'
     edx_logo_path = '/edx/app/edxapp/edx-platform/lms/static/images/logo-edX-77x36.png'
-    pdf_file = sale_invoice.generate_pdf_invoice(course_price, int(quantity), float(sale_price), wl_partner_logo_path, edx_logo_path)
+    pdf_file = sale_invoice.generate_pdf_invoice(
+        course,
+        course_price,
+        int(quantity),
+        float(sale_price),
+        wl_partner_logo_path,
+        edx_logo_path
+    )
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
         'invoice': sale_invoice,

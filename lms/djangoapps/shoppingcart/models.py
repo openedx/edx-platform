@@ -760,9 +760,8 @@ class Invoice(models.Model):
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
 
-    def generate_pdf_invoice(self, course_price, quantity, sale_price, wl_partner_logo_path, edx_logo_path):
+    def generate_pdf_invoice(self, course, course_price, quantity, sale_price, wl_partner_logo_path, edx_logo_path):
         from shoppingcart.pdfgenerator.pdf import SimpleInvoice
-        course = get_course_by_id(self.course_id)
         list_price = float(course_price) - sale_price/quantity
         discount = course_price - list_price
         item_data = [
