@@ -39,7 +39,7 @@ define([
                 ].join(' ')
             },
             renderContent: function () {
-                var message = gettext('No results found for "%(query_string)s".');
+                var message = gettext('No results found for "%(query_string)s". Please try searching again.');
 
                 this.$el.append($('<p></p>', {
                     text: interpolate(message, {

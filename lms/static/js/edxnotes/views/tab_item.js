@@ -10,7 +10,7 @@ function (gettext, _, Backbone, templateUtils) {
         events: {
             'click': 'selectHandler',
             'click a': function (event) { event.preventDefault(); },
-            'click .btn-close': 'closeHandler'
+            'click .action-close': 'closeHandler'
         },
 
         initialize: function (options) {
