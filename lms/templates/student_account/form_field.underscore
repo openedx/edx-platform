@@ -11,6 +11,11 @@
             name="<%= name %>"
             class="input-inline"
             aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%= type %>="<%= msg %>"
+            <%  });
+            } %>
             <% if ( required ) { %> aria-required="true" required<% } %>>
         <% _.each(options, function(el) { %>
             <option value="<%= el.value%>"<% if ( el.default ) { %> data-isdefault="true"<% } %>><%= el.name %></option>
