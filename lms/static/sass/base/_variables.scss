@@ -442,3 +442,9 @@ $blue1: #4A90E2;
 $blue2: #00A1E5;
 $green1: #61A12E;
 $red1: #D0021B;
+
+// +feature: student notes
+// --------------------
+$student-notes-highlight-color-base: saturate($yellow, 50%);
+$student-notes-highlight-color: tint($student-notes-highlight-color-base, 60%);
+$student-notes-highlight-color-focus: $student-notes-highlight-color-base;
