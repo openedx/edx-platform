@@ -186,6 +186,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         When I go to studio unit page for library content block
         And I set Problem Type selector so that no libraries have matching content
         Then I can see that "No matching content" warning is shown
+        When I set Problem Type selector so that there are matching content
+        Then I can see that warning messages are not shown
         """
         expected_text = 'There are no content matching configured filters in the selected libraries. ' \
                         'Edit Problem Type Filter'
@@ -213,3 +215,28 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         # Library should contain single Dropdown problem, so now there should be no errors again
         self.assertFalse(library_container.has_validation_error)
         self.assertFalse(library_container.has_validation_warning)
+
+    def test_not_enough_children_blocks(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And I set Problem Type selector so "Any"
+        Then I can see that "No matching content" warning is shown
+        """
+        expected_tpl = "Configured to fetch {count} blocks, library and filter settings yield only {actual} blocks."
+
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        # precondition check - assert block is configured fine
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        edit_modal.count = 50
+        library_container.save_settings()
+
+        self.assertTrue(library_container.has_validation_warning)
+        self.assertIn(
+            expected_tpl.format(count=50, actual=len(self.library_fixture.children)),
+            library_container.validation_warning_text
+        )
