@@ -388,6 +388,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             return False
         return True
 
+    def _set_validation_error_if_empty(self, validation, summary):
+        """  Helper method to only set validation summary if it's empty """
+        if validation.empty:
+            validation.set_summary(summary)
+
     def validate(self):
         """
         Validates the state of this Library Content Module Instance. This
@@ -408,24 +413,37 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             )
             return validation
         lib_tools = self.runtime.service(self, 'library_tools')
-        has_children_matching_filter = False
+        matching_children_count = 0
         for library_key, version in self.source_libraries:
             if not self._validate_library_version(validation, lib_tools, version, library_key):
                 break
 
             library = lib_tools.get_library(library_key)
             children_matching_filter = lib_tools.get_filtered_children(library, self.capa_type)
-            # get_filtered_children returns generator, so we're basically checking if there are at least one child
-            # that satisfy filtering. Children are never equal to None, so None is returned only if generator was empty
-            has_children_matching_filter |= next(children_matching_filter, None) is not None
+            # get_filtered_children returns generator, so can't use len.
+            # And we don't actually need those children, so no point of constructing a list
+            matching_children_count += sum(1 for child in children_matching_filter)
 
-        if not has_children_matching_filter and validation.empty:
-            validation.set_summary(
+        if matching_children_count == 0:
+            self._set_validation_error_if_empty(
+                validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
                     _(u'There are no content matching configured filters in the selected libraries.'),
                     action_class='edit-button',
                     action_label=_(u"Edit Problem Type Filter")
+                )
+            )
+
+        if matching_children_count < self.max_count:
+            self._set_validation_error_if_empty(
+                validation,
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _(u'Configured to fetch {count} blocks, library and filter settings yield only {actual} blocks.')
+                    .format(actual=matching_children_count, count=self.max_count),
+                    action_class='edit-button',
+                    action_label=_(u"Edit block configuration")
                 )
             )
 
