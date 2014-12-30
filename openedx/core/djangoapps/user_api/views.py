@@ -369,7 +369,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Public Username")
+        username_label = _(u"Public username")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.

@@ -850,7 +850,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"name": u"username",
                 u"type": u"text",
                 u"required": True,
-                u"label": u"Public Username",
+                u"label": u"Public username",
                 u"instructions": u"The name that will identify you in your courses",
                 u"restrictions": {
                     "min_length": account_api.USERNAME_MIN_LENGTH,
@@ -932,7 +932,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"defaultValue": u"Bob123",
                     u"type": u"text",
                     u"required": True,
-                    u"label": u"Public Username",
+                    u"label": u"Public username",
                     u"placeholder": u"",
                     u"instructions": u"The name that will identify you in your courses",
                     u"restrictions": {
