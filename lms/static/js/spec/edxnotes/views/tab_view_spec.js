@@ -78,7 +78,7 @@ define([
         it('can remove the content if tab is closed', function () {
             var view = getView(this.tabsCollection);
             view.onClose =  jasmine.createSpy();
-            view.$('.tab .btn-close').click();
+            view.$('.tab .action-close').click();
             expect(view.$('.tab')).toHaveLength(0);
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
             expect(view.tabModel).toBeNull();
