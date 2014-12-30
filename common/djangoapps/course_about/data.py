@@ -6,11 +6,19 @@ This is responsible for combining data from the following resources:
 from opaque_keys import InvalidKeyError
 from course_about.serializers import _serialize_content
 from course_about.errors import CourseNotFoundError
+import re
 from lms.djangoapps.courseware import courses
 import logging
 from opaque_keys.edx.keys import CourseKey
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
+
+ABOUT_ATTRIBUTES = [
+    'effort',
+    'video'
+]
 
 
 def get_course_about_details(course_id):  # pylint: disable=unused-argument
@@ -23,15 +31,23 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
 
     Raises:
         CourseNotFoundError
+
     """
+
     try:
-        course_descriptor = _get_course(course_id)  # pylint: disable=W0612
-        return _serialize_content(course_descriptor=course_descriptor)
+        course_key = _get_course_key(course_id)
+        course_descriptor = _get_course(course_key)  # pylint: disable=W0612
+
+        about_descriptor = {}
+        for attribute in ABOUT_ATTRIBUTES:
+            about_descriptor[attribute] = fetch_course_detail(course_key, attribute)
+
+        return _serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
     except CourseNotFoundError as err:
         raise CourseNotFoundError(err.message)
 
 
-def _get_course(course_id, depth=0):
+def _get_course(course_key, depth=0):
     """
     Utility method to obtain course descriptor object.
     Args:
@@ -44,7 +60,6 @@ def _get_course(course_id, depth=0):
         InvalidKeyError , ValueError
     """
     try:
-        course_key = _get_course_key(course_id)
         course_descriptor = _get_course_descriptor(course_key, depth)
     except (InvalidKeyError, ValueError) as err:
         raise CourseNotFoundError(err.message)
@@ -83,3 +98,16 @@ def _get_course_descriptor(course_key, depth):
         ValueError
     """
     return courses.get_course(course_key, depth)
+
+
+def fetch_course_detail(course_key, attribute):
+    """
+    Fetch the course details for the given course from persistence and return a CourseDetails model.
+    """
+    usage_key = course_key.make_usage_key('about', attribute)
+    try:
+        value = modulestore().get_item(usage_key).data
+    except ItemNotFoundError:
+        value = None
+    return value
+

@@ -16,7 +16,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
-from cms.djangoapps.contentstore.utils import course_image_url
+from lms.djangoapps.courseware.courses import course_image_url
 from course_about import api
 from course_about.errors import CourseNotFoundError
 from mock import patch
