@@ -13,7 +13,10 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 sys.path.append('../../../../')
 
-from docs.shared.conf import *
+# from docs.shared.conf import *
+
+# The master toctree document.
+master_doc = 'index'
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
