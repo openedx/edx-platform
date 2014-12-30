@@ -112,9 +112,9 @@ define([
          * Shows error message.
          */
         showErrorMessage: function (message) {
-            this.$('.inline-error')
-                .text(message)
+            this.$('.wrapper-msg')
                 .removeClass('is-hidden')
+                .find('.msg-content .copy').text(message)
                 .focus();
         },
 
