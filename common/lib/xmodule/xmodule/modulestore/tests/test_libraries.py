@@ -274,6 +274,10 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         problem_block_course = self.store.get_item(vertical_block_course.children[0])
         self.assertEqual(problem_block_course.display_name, problem_library_display_name)
 
+        # Check that when capa modules are copied, their "markdown" fields (Scope.settings) are removed. (See note in split.py:copy_from_template())
+        self.assertIsNotNone(problem_block.markdown)
+        self.assertIsNone(problem_block_course.markdown)
+
         # Override the display_name and weight:
         new_display_name = "The Trouble with Tribbles"
         new_weight = 20
