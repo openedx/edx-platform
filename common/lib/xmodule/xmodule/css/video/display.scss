@@ -42,6 +42,7 @@ div.video {
   .wrapper-downloads {
     margin: 0;
     padding: 0;
+    list-style: none;
 
     .video-download-button{
       display: inline-block;
@@ -64,12 +65,35 @@ div.video {
         }
       }
     }
+
     .video-tracks {
       > a {
         border-radius: 3px 0 0 3px;
       }
       > a.external-track {
         border-radius: 3px;
+      }
+    }
+
+    .branding {
+      display: inline-block;
+      float: right;
+      margin: 15px 0 0 10px;
+      vertical-align: top;
+
+      .host-tag {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 70%;
+        color: #777;
+      }
+
+      .brand-logo {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 100%;
+        max-height: ($baseline*1.5);
+        padding: ($baseline/4) 0;
       }
     }
   }
@@ -158,15 +182,20 @@ div.video {
       }
     }
 
-    section.video-controls {
+    .video-controls {
       @include clearfix();
-      background: #333;
-      border: 1px solid #000;
-      border-top: 0;
-      color: #ccc;
       position: relative;
 
+      // .icon {
+      //   font-family: "FontAwesome";
+      //   display: inline-block;
+      //   font-size: inherit;
+      //   min-height: 16px;
+      //   min-width: 16px;
+      // }
+
       &:hover, &:focus {
+
         ul, div {
           opacity: 1;
         }
@@ -180,9 +209,8 @@ div.video {
         margin: 0;
         padding: 0 0 0 15px;
         overflow: hidden;
-        text-indent: -9999px;
         -webkit-font-smoothing: antialiased;
-        box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+        // box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
         color: #fff;
         cursor: pointer;
         border-width: 0 1px;
@@ -207,10 +235,10 @@ div.video {
         @include clearfix();
         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
         background: #c2c2c2;
-        border: 1px solid #000;
+        // border: 1px solid #000;
         border-radius: 0;
-        border-top: 1px solid #000;
-        box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
+        // border-top: 1px solid #000;
+        // box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
         position: absolute;
         z-index: 1;
         bottom: 100%;
@@ -226,7 +254,7 @@ div.video {
 
         div.ui-widget-header {
           background: #777;
-          box-shadow: inset 0 1px 0 #999;
+          // box-shadow: inset 0 1px 0 #999;
         }
 
         div.ui-corner-all.slider-range {
@@ -257,172 +285,105 @@ div.video {
         }
       }
 
-      ul.vcr {
-        float: left;
-        list-style: none;
-        margin: 0 lh() 0 0;
-        padding: 0;
+      .video-control,
+      .speeds,
+      .volume,
+      .size-quality-controls,
+      .language-control,
+      .branding,
+      .label,
+      .value,
+      .size-control,
+      .add-fullscreen {
+        height: 46px;
+        line-height: 46px;
+      }
 
-        @media (max-width: 1120px) {
-          margin-right: lh(.5);
-          font-size: em(14);
-        }
+      .video-playback-controls {
+        @include clearfix();
+        background: #181818;
+        color: #f2f2f2;
 
-        li {
+        .video-controls-options {
+          display: block;
           float: left;
-          margin-bottom: 0;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          border-right: 1px solid #666;
 
-          a {
-            @extend %video-button;
-            background-image: url('../images/vcr.png');
-            background-position: 15px 15px ;
-            background-repeat: no-repeat;
-            border-left: none;
-            box-shadow: 1px 0 0 #555;
-            padding: 0 lh(.75);
-            width: 14px;
+          .video-control {
+            display: block;
+            float: left;
+            margin: 0;
 
-            &:focus {
-              position: relative;
-              z-index: 10000;
-              outline: #fff dotted thin;
-              outline-offset: -2px;
+            a {
+              @extend %video-button;
+              text-align: center;
+              border: none;
+              box-shadow: none;
+              padding: 0 lh(.75);
+              width: 14px;
+
+              &:focus {
+                position: relative;
+                z-index: 10000;
+                outline: $white dotted thin;
+                outline-offset: -2px;
+              }
+
+              &:empty {
+                height: 46px;
+              }
             }
 
-            &:empty {
-              height: 46px;
-              background-position: 15px 15px;
-            }
+            .vidtime {
+              font-weight: bold;
+              -webkit-font-smoothing: antialiased;
+              padding: 0 lh(.75);
 
-            &.play {
-              background-position: 17px -114px;
-            }
-
-            &.pause {
-              background-position: 16px -50px;
+              @media (max-width: 1120px) {
+                padding-left: lh(.5);
+              }
             }
           }
 
-          div.vidtime {
-            font-weight: bold;
-            line-height: 46px; //height of play pause buttons
-            -webkit-font-smoothing: antialiased;
-            padding-left: lh(.75);
-            @media (max-width: 1120px) {
-              padding-left: lh(.5);
-            }
+          .video-control:first-child {
+            border-right: 1px solid #666;
+          }
+
+          @media (max-width: 1120px) {
+            margin-right: lh(.5);
+            font-size: em(14);
           }
         }
       }
 
-      div.secondary-controls {
-        float: right;
+      .secondary-controls {
+        display: block;
+        float: left;
 
-        a.speed-button,
-        div.volume > a,
-        a.add-fullscreen,
-        a.quality-control,
-        a.hide-subtitles {
-          // overflow is used to bypass Firefox CSS :focus outline bug
-          // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
-          &:focus {
-            position: relative;
-            z-index: 10000;
-            outline: #fff dotted thin;
-            outline-offset: -2px;
-            overflow: auto;
-          }
-        }
-
-        .menu-container {
+        .speeds {
+          display: block;
           float: left;
           position: relative;
-
-          &.is-opened {
-            .menu {
-              display: block;
-              opacity: 1;
-              padding: 0;
-              margin: 0;
-              list-style: none;
-            }
-          }
-
-          .menu {
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
-            background-color: #444;
-            border: 1px solid #000;
-            bottom: 46px;
-            display: none;
-            opacity: 0;
-            position: absolute;
-            z-index: 10;
-
-            li {
-              box-shadow:  0 1px 0 #555;
-              border-bottom: 1px solid #000;
-              color: #fff;
-              cursor: pointer;
-
-              a {
-                border: 0;
-                color: #fff;
-                display: block;
-                padding: lh(.5);
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-
-                &:hover, &:focus {
-                  background-color: #666;
-                  color: #aaa;
-                  outline-offset: -4px;
-                }
-              }
-
-              &.is-active{
-                a {
-                  font-weight: bold;
-                }
-              }
-
-              &:last-child {
-                box-shadow: none;
-                border-bottom: 0;
-                margin-top: 0;
-              }
-            }
-          }
-        }
-
-        div.speeds {
-          &.is-opened {
-            .speed-button {
-              background-image: url('../images/open-arrow.png');
-            }
-          }
-
-          .menu{
-            width: 131px;
-
-            @media (max-width: 1120px) {
-              width: 80px;
-            }
-          }
+          border-right: 1px solid #666;
 
           .speed-button {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/closed-arrow.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            min-width: 116px;
+            border: none;
             text-indent: 0;
 
             @media (max-width: 1120px) {
               min-width: 0;
               width: 60px;
+            }
+
+            .icon {
+              float: left;
+              margin-top: 1em;
+              min-width: ($baseline / 2);
             }
 
             .label {
@@ -431,7 +392,6 @@ div.video {
               font-weight: normal;
               letter-spacing: 1px;
               padding: 0 lh(.25) 0 lh(.5);
-              line-height: 46px;
               text-transform: uppercase;
               color: #999;
 
@@ -445,22 +405,99 @@ div.video {
               font-weight: bold;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
+              color: #fff;
 
               @media (max-width: 1120px) {
                 padding: 0 lh(.5) 0 lh(.5);
               }
+            }
+          }
 
-              line-height: 46px;
+          .video-speeds {
+            @include transition(none);
+            width: 127px;
+            background-color: #444;
+            bottom: 46px;
+            display: none;
+            opacity: 0;
+            position: absolute;
+            z-index: 10;
+
+            li {
               color: #fff;
+              cursor: pointer;
+
+              a {
+                border: 0;
+                color: #fff;
+                display: block;
+                padding: lh(.5);
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &:hover,
+                &:focus {
+                  background-color: #666;
+                  color: #aaa;
+                  outline-offset: -4px;
+                }
+              }
+
+              &.is-active {
+
+                a {
+                  font-weight: bold;
+                }
+              }
+
+              &:last-child {
+                box-shadow: none;
+                border-bottom: 0;
+                margin-top: 0;
+              }
+            }
+
+            @media (max-width: 1120px) {
+              width: 80px;
+            }
+          }
+
+          &.is-opened {
+
+            .video-speeds {
+              display: block;
+              opacity: 1;
+              padding: 0;
+              margin: 0;
+              list-style: none;
             }
           }
         }
 
-        div.volume {
-          float: left;
+        a.speed-button,
+        div.volume > a,
+        a.add-fullscreen,
+        a.quality-control,
+        a.hide-subtitles {
+
+          &:focus {
+            position: relative;
+            z-index: 10000;
+            outline: $white dotted thin;
+            outline-offset: -2px;
+            overflow: auto;
+          }
+        }
+
+        .volume {
           position: relative;
+          display: block;
+          float: left;
+          border-right: 1px solid #666;
 
           &.is-opened {
+
             .volume-slider-container {
               display: block;
               opacity: 1;
@@ -469,26 +506,21 @@ div.video {
 
           &.is-muted {
             & > a {
-              background-image: url('../images/mute.png');
+
             }
           }
 
           & > a {
             @extend %video-button;
             @include clearfix();
-            background-image: url('../images/volume.png');
-            background-position: 10px center;
-            background-repeat: no-repeat;
-            border-left: none;
+            border: none;
             width: 30px;
             height: 46px;
           }
 
           .volume-slider-container {
             @include transition(none);
-            box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
             background-color: #444;
-            border: 1px solid #000;
             bottom: 46px;
             display: none;
             opacity: 0;
@@ -504,8 +536,6 @@ div.video {
               width: 5px;
               margin: 14px auto;
               background: #666;
-              border: 1px solid #000;
-              box-shadow: 0 1px 0 #333;
 
               a.ui-slider-handle {
                 @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
@@ -527,48 +557,92 @@ div.video {
           }
         }
 
-        a.add-fullscreen {
-          @extend %video-button;
-          background: url(../images/fullscreen.png) center no-repeat;
-          border-left: none;
+        .size-quality-controls {
+          display: block;
           float: left;
-          padding: 0 11px;
-          width: 30px;
-        }
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          border-right: 1px solid #666;
 
+          .size-control {
+            margin: 0;
+            height: 46px;
+            border: none;
 
-        a.quality-control {
-          @extend %video-button;
-          background: url(../images/hd.png) center no-repeat;
-          border-left: none;
-          float: left;
-          padding: 0 11px;
-          width: 30px;
-
-          &.active {
-            background-color: #F44;
-            color: #0ff;
-            text-decoration: none;
+            .add-fullscreen {
+              @extend %video-button;
+              display: inline-block;
+              width: 24px;
+              padding: 0 11px;
+              border: none;
+              line-height: 46px;
+              text-align: center;
+            }
           }
 
-          &.is-hidden {
-            display: none !important;
+          .quality-control {
+            margin: 0;
+            height: 46px;
+
+            .quality-toggle-control {
+              @extend %video-button;
+              float: left;
+              padding: 0 11px;
+              width: 30px;
+              border: none;
+
+              &.active {
+                background-color: #F44;
+                color: #0ff;
+                text-decoration: none;
+              }
+
+              &.is-hidden {
+                display: none !important;
+              }
+            }
           }
         }
 
-        div.lang {
-          & > a.hide-subtitles {
+        .language-control {
+          display: block;
+          float: left;
+          height: 46px;
+          border-right: 1px solid #666;
+
+          // .hide-subtitles {
+          .subtitles-control {
             @extend %video-button;
-            @include transition(none);
-            box-shadow: inset 1px 0 0 #555;
-            background: url('../images/cc.png') center no-repeat;
-            border-left: none;
-            border-right: none;
-            padding: 0 11px;
-            width: 30px;
+            float: left;
+            padding: 0;
+            width: 46px;
+            text-align: center;
+            border: none;
+            white-space: nowrap;
 
-            &.off {
-              opacity: 0.7;
+            &.show_transcript {
+
+              .icon {
+                color: $white;
+              }
+            }
+
+            &.hide_transcript {
+
+              .icon {
+                color: $gray-l1;
+              }
+            }
+
+            &.active {
+              background-color: #F44;
+              color: #0ff;
+              text-decoration: none;
+            }
+
+            &.is-hidden {
+              display: none !important;
             }
           }
 
@@ -578,6 +652,17 @@ div.video {
           }
         }
       }
+
+      // .branding {
+      //   display: block;
+      //   float: right;
+
+      //   .brand-logo {
+      //     max-width: 100%;
+      //     max-height: 35px;
+      //     padding: ($baseline/4);
+      //   }
+      // }
     }
 
     &:hover section.video-controls {

@@ -137,7 +137,9 @@ function (Iterator) {
             }
 
             this.el.addClass('is-opened');
-            this.speedButton.attr('tabindex', -1);
+            this.speedButton.attr('tabindex', -1).find('i')
+                .removeClass('icon-caret-right')
+                .addClass('icon-caret-up');
         },
 
         /**
@@ -151,7 +153,9 @@ function (Iterator) {
             }
 
             this.el.removeClass('is-opened');
-            this.speedButton.attr('tabindex', 0);
+            this.speedButton.attr('tabindex', 0).find('i')
+                .removeClass('icon-caret-up')
+                .addClass('icon-caret-right');
         },
 
         /**
