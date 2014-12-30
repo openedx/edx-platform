@@ -188,7 +188,7 @@ class LibraryContentFields(object):
     )
     capa_type = String(
         display_name=_("Problem Type"),
-        help=_("The type of components to include in this block"),
+        help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
         default=ANY_CAPA_TYPE_VALUE,
         values=_get_capa_types(),
         scope=Scope.settings,
