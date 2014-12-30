@@ -6,6 +6,7 @@ from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
+from courseware.masquerade import CourseMasquerade
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
 from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
 from xmodule.course_module import (
@@ -105,7 +106,7 @@ class AccessTestCase(TestCase):
     def test__has_access_descriptor(self):
         # TODO: override DISABLE_START_DATES and test the start date branch of the method
         user = Mock()
-        descriptor = Mock()
+        descriptor = Mock(user_partitions=[])
 
         # Always returns true because DISABLE_START_DATES is set in test.py
         self.assertTrue(access._has_access_descriptor(user, 'load', descriptor))
@@ -118,7 +119,7 @@ class AccessTestCase(TestCase):
         """
         Tests that "visible_to_staff_only" overrides start date.
         """
-        mock_unit = Mock()
+        mock_unit = Mock(user_partitions=[])
         mock_unit._class_tags = {}  # Needed for detached check in _has_access_descriptor
 
         def verify_access(student_should_have_access):
@@ -255,6 +256,14 @@ class UserRoleTestCase(TestCase):
         self.course_staff = StaffFactory(course_key=self.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course_key)
 
+    def _install_masquerade(self, user, role='student'):
+        """
+        Installs a masquerade for the specified user.
+        """
+        user.masquerade_settings = {
+            self.course_key: CourseMasquerade(self.course_key, role=role)
+        }
+
     def test_user_role_staff(self):
         """Ensure that user role is student for staff masqueraded as student."""
         self.assertEqual(
@@ -262,7 +271,7 @@ class UserRoleTestCase(TestCase):
             access.get_user_role(self.course_staff, self.course_key)
         )
         # Masquerade staff
-        self.course_staff.masquerade_as_student = True
+        self._install_masquerade(self.course_staff)
         self.assertEqual(
             'student',
             access.get_user_role(self.course_staff, self.course_key)
@@ -275,7 +284,7 @@ class UserRoleTestCase(TestCase):
             access.get_user_role(self.course_instructor, self.course_key)
         )
         # Masquerade instructor
-        self.course_instructor.masquerade_as_student = True
+        self._install_masquerade(self.course_instructor)
         self.assertEqual(
             'student',
             access.get_user_role(self.course_instructor, self.course_key)
