@@ -45,7 +45,7 @@ class NumberedCanvas(Canvas):
 
     def draw_page_number(self, page_count):
         self.setFont("DejaVu", 7)
-        self.drawRightString(200*mm, 20*mm,
+        self.drawRightString(200*mm, 12*mm,
             _("Page %(page_number)d of %(page_count)d") % {"page_number": self._pageNumber, "page_count": page_count})
 
 
@@ -124,7 +124,7 @@ class SimpleInvoice(UnicodeProperty):
     def drawCourseInfo(self):
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
-            for i in range(21):
+            for i in range(10):
                 data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
         heights = [12*mm]
         heights.extend((len(data) - 1 )*[8*mm])
@@ -209,8 +209,14 @@ class SimpleInvoice(UnicodeProperty):
             ('BACKGROUND', (-1,0), (-1,-2), colors.lightgrey),
         ]))
         t.wrap(0,0)
-        t.drawOn(self.pdf, (self.MARGIN + 97) * mm, y_pos - t._height - 5*mm)
-        return y_pos - t._height - 5*mm
+        if (y_pos-(5+self.MARGIN+5)*mm)<=t._height:
+            self.prepare_new_page()
+            next_pages_top = 235*mm
+            t.drawOn(self.pdf, (self.MARGIN + 97) * mm, next_pages_top - t._height - 5*mm)
+            return next_pages_top - t._height - 5*mm
+        else:
+            t.drawOn(self.pdf, (self.MARGIN + 97) * mm, y_pos - t._height - 5*mm)
+            return y_pos - t._height - 5*mm
 
 
     def draw_footer(self, y_pos):
