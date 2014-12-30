@@ -3,6 +3,7 @@ Contains all the errors associated with the Course About API.
 
 """
 
+
 class CourseAboutError(Exception):
     """Generic Course About Error"""
 

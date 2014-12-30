@@ -101,7 +101,6 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
         self.assertEquals(url, resp_data['media']['course_image'])
         self.assertEqual('testing-video-link', resp_data['media']['video'])
 
-
     @patch.object(api, "get_course_about_details")
     def test_get_enrollment_course_not_found_error(self, mock_get_course_about_details):
         mock_get_course_about_details.side_effect = CourseNotFoundError("Something bad happened.")
