@@ -369,7 +369,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Username")
+        username_label = _(u"Public Username")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.
@@ -568,13 +568,19 @@ class RegistrationView(APIView):
             (country_code, unicode(country_name))
             for country_code, country_name in sorted_countries
         ]
+
+        error_msg = _(u"Please select your Country.")
+
         form_desc.add_field(
             "country",
             label=country_label,
             field_type="select",
             options=options,
             include_default_option=True,
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_honor_code_field(self, form_desc, required=True):
