@@ -71,10 +71,7 @@ def _get_course_key(course_id):
     Raises:
         InvalidKeyError
     """
-    try:
-        course_key = CourseKey.from_string(course_id)
-    except InvalidKeyError as err:
-        raise InvalidKeyError(err.message)
+    course_key = CourseKey.from_string(course_id)
     return course_key
 
 

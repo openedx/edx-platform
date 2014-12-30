@@ -39,10 +39,9 @@ def _serialize_content(course_descriptor):
 
     # Following code is getting the course about descriptor information
 
-    new_dict = _course_about_serialize_content(course_descriptor)
-    data["media"] = {'video': new_dict["video"], 'course_image': image_url}
-    data["effort"] = new_dict["effort"]
-
+    course_about_data = _course_about_serialize_content(course_descriptor)
+    course_about_data['media']['course_image'] = image_url
+    data.update(course_about_data)
     return data
 
 
@@ -57,7 +56,15 @@ def _course_about_serialize_content(course_descriptor):
         serialize data for about descriptor.
 
     """
-    data = dict()
-    data["video"] = get_course_about_section(course_descriptor, 'video')
-    data["effort"] = get_course_about_section(course_descriptor, 'effort')
+    data = dict({"media": {"video": None}, "effort": None})
+    try:
+        video = get_course_about_section(course_descriptor, 'video')
+        data["media"]["video"] = video
+    except Exception as e:
+        data["media"]["video"] = None
+    try:
+        effort = get_course_about_section(course_descriptor, 'effort')
+        data["effort"] = effort
+    except Exception as e:
+        data["effort"] = None
     return data
