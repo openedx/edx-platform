@@ -32,7 +32,7 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
     except InvalidKeyError as err:
         raise InvalidKeyError(err.message)
     except ValueError as err:
-        raise ValueError(err.message)
+        raise CourseNotFoundError(err.message)
     except Exception as err:
         raise ValueError(err.message)
 

@@ -3,6 +3,7 @@ Tests for user enrollment.
 """
 import ddt
 import json
+from opaque_keys import InvalidKeyError
 import unittest
 
 from django.test.utils import override_settings
@@ -16,6 +17,11 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
 from cms.djangoapps.contentstore.utils import course_image_url
+
+from course_about import api
+from course_about.errors import CourseNotFoundError
+
+from mock import patch
 
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
@@ -97,3 +103,28 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
         url = course_image_url(self.course)
         self.assertEquals(url, resp_data['media']['course_image'])
         self.assertEqual('testing-video-link', resp_data['media']['video'])
+
+
+    @patch.object(api, "get_course_about_details")
+    def test_get_enrollment_course_not_found_error(self, mock_get_course_about_details):
+        mock_get_course_about_details.side_effect = CourseNotFoundError("Something bad happened.")
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch.object(api, "get_course_about_details")
+    def test_get_enrollment_invalid_key_error(self, mock_get_course_about_details):
+        mock_get_course_about_details.side_effect = InvalidKeyError('a/a/a', "Something bad happened.")
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch.object(api, "get_course_about_details")
+    def test_get_enrollment_internal_error(self, mock_get_course_about_details):
+        mock_get_course_about_details.side_effect = Exception('error')
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)

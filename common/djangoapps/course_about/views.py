@@ -53,7 +53,7 @@ class CourseAboutView(APIView):
                     ).format(course_id=course_id)
                 }
             )
-        except ValueError:
+        except CourseNotFoundError:
             return Response(
                 status=status.HTTP_404_NOT_FOUND,
                 data={
