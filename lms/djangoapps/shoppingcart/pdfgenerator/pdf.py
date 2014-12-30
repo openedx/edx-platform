@@ -127,29 +127,11 @@ class SimpleInvoice(UnicodeProperty):
         style = getSampleStyleSheet()['Normal']
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
-            for i in range(1):
-                data.append(['', Paragraph("very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # for i in range(5):
-            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            for i in range(1):
-                data.append(['', Paragraph("very very very very very very very very very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # for i in range(50):
-            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            for i in range(1):
-                data.append(['', Paragraph("description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            for i in range(1):
-                data.append(['', Paragraph("very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # for i in range(5):
-            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            for i in range(1):
-                data.append(['', Paragraph("very very very very very very very very very very very very very very very long description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # for i in range(50):
-            #     data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            for i in range(1):
-                data.append(['', Paragraph("description of course title", style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-        t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm],  splitByRow=1, repeatRows=1)
+            data.append(['', Paragraph(row['course_name'], style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
 
-        t.setStyle(TableStyle([
+        items_table=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm],  splitByRow=1, repeatRows=1)
+
+        items_table.setStyle(TableStyle([
             ('ALIGN',(3,1),(5,-1),'RIGHT'),
             ('RIGHTPADDING', (5,1), (5,-1), 7*mm),
             ('ALIGN',(2,0),(-1,0),'CENTER'),
@@ -164,7 +146,7 @@ class SimpleInvoice(UnicodeProperty):
             ('LINEBELOW', (0,-1), (-1,-1), 1.00, colors.black),
             ('INNERGRID', (1,1), (-2,-1), 0.50, colors.black),
         ]))
-        t.wrap(0,0)
+        items_table.wrap(0,0)
 
 
         first_page_available_height = 185*mm
@@ -172,7 +154,7 @@ class SimpleInvoice(UnicodeProperty):
         first_page_top = 215*mm
         next_pages_top = 235*mm
 
-        split_tables = t.split(0, first_page_available_height)
+        split_tables = items_table.split(0, first_page_available_height)
         last_table_height = 0
         is_on_first_page = True
         if len(split_tables)>1:
