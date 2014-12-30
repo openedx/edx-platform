@@ -390,7 +390,7 @@
                 <span class="field-label-text">
                     ## Translators: This labels the selector for which group of students can view a post
                     ${_("Visible To:")}
-                </span><select class="field-input js-group-select" name="group_id">
+                </span><select class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
                     <option value="">${_("All Groups")}</option>
                     ${'<% _.each(cohort_options, function(opt) { %>'}
                     <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>

@@ -6,12 +6,14 @@ if Backbone?
           if @mode not in ["tab", "inline"]
               throw new Error("invalid mode: " + @mode)
           @course_settings = options.course_settings
+          @is_commentable_cohorted = options.is_commentable_cohorted
           @topicId = options.topicId
 
       render: () ->
           context = _.clone(@course_settings.attributes)
           _.extend(context, {
               cohort_options: @getCohortOptions(),
+              is_commentable_cohorted: @is_commentable_cohorted,
               mode: @mode,
               form_id: @mode + (if @topicId then "-" + @topicId else "")
           })

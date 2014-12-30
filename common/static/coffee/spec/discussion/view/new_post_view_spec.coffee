@@ -10,6 +10,15 @@ describe "NewPostView", ->
         )
         @discussion = new Discussion([], {pages: 1})
 
+    checkVisibility = (view, expectedVisible, expectedDisabled) =>
+      view.render()
+      expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
+      disabled = view.$(".js-group-select").prop("disabled")
+      if expectedVisible and ! expectedDisabled
+        expect(disabled).toEqual(false)
+      else if expectedDisabled
+        expect(disabled).toEqual(true)
+
     describe "cohort selector", ->
       beforeEach ->
         @course_settings = new DiscussionCourseSettings({
@@ -31,12 +40,6 @@ describe "NewPostView", ->
           course_settings: @course_settings,
           mode: "tab"
         )
-
-      checkVisibility = (view, expectedVisible) =>
-        view.render()
-        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
-        if expectedVisible
-          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
 
       it "is not visible to students", ->
         checkVisibility(@view, false)
@@ -68,6 +71,46 @@ describe "NewPostView", ->
             expect($.ajax).toHaveBeenCalled()
             $.ajax.reset()
         )
+
+    describe "always cohort inline discussions ", ->
+      beforeEach ->
+        @course_settings = new DiscussionCourseSettings({
+          "category_map": {
+            "children": [],
+            "entries": {}
+          },
+          "allow_anonymous": false,
+          "allow_anonymous_to_peers": false,
+          "is_cohorted": true,
+          "cohorts": [
+            {"id": 1, "name": "Cohort1"},
+            {"id": 2, "name": "Cohort2"}
+          ]
+        })
+        @view = new NewPostView(
+          el: $("#fixture-element"),
+          collection: @discussion,
+          course_settings: @course_settings,
+          mode: "tab"
+        )
+
+      it "disables the cohort menu if it is set false", ->
+        DiscussionSpecHelper.makeModerator()
+        @view.is_commentable_cohorted = false
+        checkVisibility(@view, true, true)
+
+      it "enables the cohort menu if it is set true", ->
+        DiscussionSpecHelper.makeModerator()
+        @view.is_commentable_cohorted = true
+        checkVisibility(@view, true)
+
+      it "is not visible to students when set false", ->
+        @view.is_commentable_cohorted = false
+        checkVisibility(@view, false)
+
+      it "is not visible to students when set true", ->
+        @view.is_commentable_cohorted = true
+        checkVisibility(@view, false)
 
     describe "cancel post resets form ", ->
       beforeEach ->
