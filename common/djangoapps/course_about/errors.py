@@ -3,7 +3,6 @@ Contains all the errors associated with the Course About API.
 
 """
 
-
 class CourseAboutError(Exception):
     """Generic Course About Error"""
 
@@ -19,4 +18,5 @@ class CourseAboutApiLoadError(CourseAboutError):
 
 
 class CourseNotFoundError(CourseAboutError):
+    """The Course Not Found. """
     pass

@@ -17,13 +17,9 @@ from xmodule.modulestore.tests.django_utils import (
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
 from cms.djangoapps.contentstore.utils import course_image_url
-
 from course_about import api
-from course_about.errors import CourseNotFoundError,CourseAboutApiLoadError
-
+from course_about.errors import CourseNotFoundError
 from mock import patch
-from nose.tools import raises
-
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.

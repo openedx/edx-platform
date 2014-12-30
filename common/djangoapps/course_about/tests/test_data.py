@@ -3,18 +3,15 @@ Tests specific to the Data Aggregation Layer of the Course About API.
 
 """
 import ddt
-from mock import patch
 from nose.tools import raises
 from opaque_keys import InvalidKeyError
 import unittest
-
 from django.test.utils import override_settings
 from django.conf import settings
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
 from course_about import data
 from course_about.errors import CourseNotFoundError
@@ -49,13 +46,13 @@ class CourseAboutDataTest(ModuleStoreTestCase):
 
     def test_non_existent_course(self):
         try:
-            data.get_course_about_details("this/is/bananas")
-        except Exception as e:
-            self.assertEquals(e.__class__, CourseNotFoundError)
+            data.get_course_about_details("this/is/invalid")
+        except Exception as ex:
+            self.assertEquals(ex.__class__, CourseNotFoundError)
 
     @raises(InvalidKeyError)
     def test_non_existent_course_key(self):
         try:
             data.get_course_about_details("invalidKey")
-        except Exception as e:
-            self.assertEquals(e.__class__, InvalidKeyError)
+        except Exception as ex:
+            self.assertEquals(ex.__class__, InvalidKeyError)
