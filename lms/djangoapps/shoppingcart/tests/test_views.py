@@ -1286,6 +1286,12 @@ class ReceiptRedirectTest(UrlResetMixin, ModuleStoreTestCase):
         )
         self.cart.purchase()
 
+        # Set the session flag indicating that the user is in the
+        # experimental group
+        session = self.client.session
+        session['separate-verified'] = True
+        session.save()
+
         # Visit the receipt page
         url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(url)
@@ -1301,6 +1307,28 @@ class ReceiptRedirectTest(UrlResetMixin, ModuleStoreTestCase):
         )
 
         self.assertRedirects(resp, redirect_url)
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def test_no_redirect_if_not_in_experimental_group(self):
+        # Purchase a verified certificate
+        CertificateItem.add_to_order(
+            self.cart,
+            self.course_key,
+            self.COST,
+            'verified'
+        )
+        self.cart.purchase()
+
+        # We do NOT set the session flag indicating that the user is in
+        # the experimental group.
+
+        # Visit the receipt page
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url)
+
+        # Since the user is not in the experimental group, expect
+        # that we see the usual receipt page (no redirect)
+        self.assertEqual(resp.status_code, 200)
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)

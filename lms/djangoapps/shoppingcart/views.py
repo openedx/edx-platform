@@ -798,7 +798,7 @@ def _show_receipt_html(request, order):
         # TODO (ECOM-188): Once the A/B test of separate verified / payment flow
         # completes, implement this in a more general way.  For now,
         # we simply redirect to the new receipt page (in verify_student).
-        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT'):
+        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
             if receipt_template == 'shoppingcart/verified_cert_receipt.html':
                 url = reverse(
                     'verify_student_payment_confirmation',

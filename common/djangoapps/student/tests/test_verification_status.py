@@ -50,6 +50,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         success = self.client.login(username=self.user.username, password="edx")
         self.assertTrue(success, msg="Did not log in successfully")
 
+        # Use the URL with the querystring param to put the user
+        # in the experimental track.
+        # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
+        # completes, we can remove the querystring param.
+        self.dashboard_url = reverse('dashboard') + '?separate-verified=1'
+
     def test_enrolled_as_non_verified(self):
         self._setup_mode_and_enrollment(None, "honor")
 
@@ -92,7 +98,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
     def test_need_to_verify_expiration(self):
         self._setup_mode_and_enrollment(self.FUTURE, "verified")
-        response = self.client.get(reverse('dashboard'))
+        response = self.client.get(self.dashboard_url)
         self.assertContains(response, self.BANNER_ALT_MESSAGES[VERIFY_STATUS_NEED_TO_VERIFY])
         self.assertContains(response, "You only have 4 days left to verify for this course.")
 
@@ -122,7 +128,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
 
         # Check that the "verification good until" date is displayed
-        response = self.client.get(reverse('dashboard'))
+        response = self.client.get(self.dashboard_url)
         self.assertContains(response, attempt.expiration_datetime.strftime("%m/%d/%Y"))
 
     def test_missed_verification_deadline(self):
@@ -237,7 +243,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
             AssertionError
 
         """
-        response = self.client.get(reverse('dashboard'))
+        response = self.client.get(self.dashboard_url)
 
         # Sanity check: verify that the course is on the page
         self.assertContains(response, unicode(self.course.id))
