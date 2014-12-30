@@ -39,8 +39,6 @@ var edx = edx || {};
                 courseName: el.data('course-name'),
                 hasPaid: el.data('msg-key') === 'verify-now' || el.data('msg-key') === 'verify-later',
                 isActive: el.data('is-active'),
-                introTitle: el.data('intro-title'),
-                introMsg: el.data('intro-msg'),
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },

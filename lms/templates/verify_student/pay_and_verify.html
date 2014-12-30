@@ -7,7 +7,19 @@ from verify_student.views import PayAndVerifyView
 
 <%inherit file="../main.html" />
 <%block name="bodyclass">register verification-process step-requirements</%block>
-<%block name="pagetitle">${messages.page_title}</%block>
+
+<%block name="pagetitle">
+  % if message_key == PayAndVerifyView.UPGRADE_MSG:
+    ${_("Upgrade Your Enrollment For {course_name}.").format(course_name=course.display_name)}
+  % elif message_key == PayAndVerifyView.PAYMENT_CONFIRMATION_MSG:
+    ${_("Receipt For {course_name}").format(course_name=course.display_name)}
+  % elif message_key in [PayAndVerifyView.VERIFY_NOW_MSG, PayAndVerifyView.VERIFY_LATER_MSG]:
+    ${_("Verify For {course_name}").format(course_name=course.display_name)}
+  % else:
+    ${_("Enroll In {course_name}").format(course_name=course.display_name)}
+  % endif
+</%block>
+
 <%block name="header_extras">
     <%
       template_names = (
@@ -62,8 +74,6 @@ from verify_student.views import PayAndVerifyView
       data-requirements='${json.dumps(requirements)}'
       data-msg-key='${message_key}'
       data-is-active='${is_active}'
-      data-intro-title='${messages.intro_title}'
-      data-intro-msg='${messages.intro_msg}'
     ></div>
 
     ## Support
