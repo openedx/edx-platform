@@ -226,7 +226,9 @@ function () {
         this.videoControl.playPauseEl
             .removeClass('play')
             .addClass('pause')
-            .attr('title', gettext('Pause'));
+            .attr('title', gettext('Pause')).find('i')
+                .removeClass('icon-play').
+                addClass('icon-pause');
 
         if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
             this.videoControl.hidePlayPlaceholder();
@@ -238,7 +240,9 @@ function () {
         this.videoControl.playPauseEl
             .removeClass('pause')
             .addClass('play')
-            .attr('title', gettext('Play'));
+            .attr('title', gettext('Play')).find('i')
+                .removeClass('icon-pause').
+                addClass('icon-play');
 
         if (/iPad|Android/i.test(this.isTouch[0]) && this.videoType === 'html5') {
             this.videoControl.showPlayPlaceholder();

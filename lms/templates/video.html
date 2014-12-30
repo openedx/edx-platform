@@ -55,12 +55,12 @@
         <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
         <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
         <div class="video-player-pre"></div>
-        
+
         <section class="video-player">
             <div id="${id}"></div>
             <h3 class="hidden">${_('No playable video sources found.')}</h3>
         </section>
-        
+
         <div class="video-player-post"></div>
 
         <section class="video-controls is-hidden">
@@ -81,7 +81,7 @@
               <div class="speeds menu-container">
                 <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
                   <i class="icon icon-caret-right" aria-hidden="true"></i>
-                  <!-- ### <i class="icon icon-caret-up" aria-hidden="true"></i>  ### On hover, when menu is visible--> 
+                  <!-- ### <i class="icon icon-caret-up" aria-hidden="true"></i>  ### On hover, when menu is visible-->
                   <span class="label">${_('Speed')}</span>
                   <span class="value"></span>
                 </a>
@@ -102,10 +102,9 @@
               </ul>
               <!-- Captioning/Subtitles -->
               <div class="language-control menu-container">
-                <a href="#" class="subtitles-control" title="${_('Turn off captions')}" role="button" aria-disabled="false"><i class="icon icon-quote-left" aria-hidden="true"></i><span class="sr">${_('Turn off captions')}</span></a>
+                <a href="#" class="subtitles-control hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false"><i class="icon icon-quote-left" aria-hidden="true"></i><span class="sr">${_('Turn off captions')}</span></a>
               </div>
             </div>
-            <!-- Branding was here previously -->
           </div>
         </section>
 
@@ -163,11 +162,11 @@
 
       % if branding_info:
       <li id="branding" class="branding">
-        <!-- 
+        <!--
         Branding
         We only show this container if the video is hosted elsewhere, for instance in China.
-        The image src can be swapped out depending on the host.
-        The image alt can be swapped out depending on the host.
+        The image src can be swapped out depending on the CDN provider.
+        The image alt can be swapped out depending on the CDN provider.
         -->
         <span class="host-tag">${branding_info['logo_tag']}</span>
         <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>

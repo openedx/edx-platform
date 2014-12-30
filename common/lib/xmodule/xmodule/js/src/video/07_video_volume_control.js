@@ -193,10 +193,14 @@ function() {
          * Updates the volume button view.
          * @param {Boolean} isMuted Flag to use muted or unmuted view.
          */
-        updateMuteButtonView: function(isMuted) {
+        updateMuteButtonView: function(isMuted, volumeIcon) {
             var action = isMuted ? 'addClass' : 'removeClass';
 
-            this.el[action]('is-muted');
+            this.el[action]('is-muted').find('a i')
+                .removeClass('icon-volume-up')
+                .removeClass('icon-volume-off')
+                .removeClass('icon-volume-undefined')
+                .addClass('icon-volume-' + volumeIcon);
         },
 
         /** Toggles the state of the volume button. */
@@ -211,10 +215,10 @@ function() {
          */
         checkMuteButtonStatus: function (volume) {
             if (volume <= this.min) {
-                this.updateMuteButtonView(true);
+                this.updateMuteButtonView(true, 'off');
                 this.state.el.off('volumechange.is-muted');
                 this.state.el.on('volumechange.is-muted', _.once(function () {
-                     this.updateMuteButtonView(false);
+                     this.updateMuteButtonView(false, 'up');
                 }.bind(this)));
             }
         },

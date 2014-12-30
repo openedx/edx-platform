@@ -65,7 +65,7 @@ div.video {
         }
       }
     }
-    
+
     .video-tracks {
       > a {
         border-radius: 3px 0 0 3px;
@@ -285,15 +285,15 @@ div.video {
         }
       }
 
-      .video-control, 
-      .speeds, 
-      .volume, 
-      .size-quality-controls, 
-      .language-control, 
-      .branding, 
-      .label, 
-      .value, 
-      .size-control, 
+      .video-control,
+      .speeds,
+      .volume,
+      .size-quality-controls,
+      .language-control,
+      .branding,
+      .label,
+      .value,
+      .size-control,
       .add-fullscreen {
         height: 46px;
         line-height: 46px;
@@ -383,6 +383,7 @@ div.video {
             .icon {
               float: left;
               margin-top: 1em;
+              min-width: ($baseline / 2);
             }
 
             .label {
@@ -505,7 +506,7 @@ div.video {
 
           &.is-muted {
             & > a {
-              
+
             }
           }
 
@@ -618,6 +619,21 @@ div.video {
             width: 46px;
             text-align: center;
             border: none;
+            white-space: nowrap;
+
+            &.show_transcript {
+
+              .icon {
+                color: $white;
+              }
+            }
+
+            &.hide_transcript {
+
+              .icon {
+                color: $gray-l1;
+              }
+            }
 
             &.active {
               background-color: #F44;
