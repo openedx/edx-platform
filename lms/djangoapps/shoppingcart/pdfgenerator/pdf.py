@@ -124,61 +124,8 @@ class SimpleInvoice(UnicodeProperty):
     def drawCourseInfo(self):
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            # data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-            data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
-        # data= [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', ''],
-        # ['', 'Demo Course 1', '2', '$100.00', '$0.00', '$200.00', ''],
-        # ['', 'Demo Course 2', '2', '$1000.00', '$10.00', '$1980.00', ''],
-        # ['', 'Demo Course 3', '5', '$500.00', '$0.00', '$2500.00', ''],
-        # ['', 'Demo Course 4', '2', '$10000.00', '$150.00', '$19700.00', '']
-        # ]
+            for i in range(21):
+                data.append(['', row['course_name'], row['quantity'], row['list_price'], row['discount'], row['total'], ''])
         heights = [12*mm]
         heights.extend((len(data) - 1 )*[8*mm])
         t=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm], heights, splitByRow=1, repeatRows=1)
