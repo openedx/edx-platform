@@ -2,6 +2,7 @@
 from PIL import Image
 from reportlab.lib import colors
 
+from django.conf import settings
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import mm, inch
@@ -60,6 +61,7 @@ class SimpleInvoice(UnicodeProperty):
         self.edx_logo = context['edx_logo']
         self.payment_received = context['payment_received'] if 'payment_received' in context else ''
         self.balance = context['balance'] if 'balance' in context else ''
+        self.currency = settings.PAID_COURSE_REGISTRATION_CURRENCY[1]
 
     def prepare_invoice_draw(self):
         self.MARGIN = 15
@@ -130,7 +132,15 @@ class SimpleInvoice(UnicodeProperty):
         style = getSampleStyleSheet()['Normal']
         data = [['', 'Description', 'Quantity', 'List Price\nper item', 'Discount\nper item', 'Amount', '']]
         for row in self.items_data:
-            data.append(['', Paragraph(row['course_name'], style), row['quantity'], row['list_price'], row['discount'], row['total'], ''])
+            data.append([
+                '',
+                Paragraph(row['course_name'], style),
+                row['quantity'],
+                '{currency}{price}'.format(price=row['list_price'], currency=self.currency),
+                '{currency}{price}'.format(price=row['discount'], currency=self.currency),
+                '{currency}{price}'.format(price=row['total'], currency=self.currency),
+                ''
+            ])
 
         items_table=Table(data,[7*mm, 60*mm, 26*mm, 21*mm,21*mm, 40*mm, 7*mm],  splitByRow=1, repeatRows=1)
 
@@ -196,10 +206,16 @@ class SimpleInvoice(UnicodeProperty):
         self.drawLogos()
 
     def show_totals(self, y_pos):
-        data= [['Total', self.total_cost]]
+        data = [
+            ['Total', '{currency}{price}'.format(currency=self.currency, price=self.total_cost)]
+        ]
         if (self.is_invoice):
-            data.append(['Payment Received', self.payment_received])
-            data.append(['Balance', self.balance])
+            data.append(
+                ['Payment Received', '{currency}{price}'.format(currency=self.currency, price=self.payment_received)]
+            )
+            data.append(
+                ['Balance', '{currency}{price}'.format(currency=self.currency, price=self.balance)]
+            )
 
         data.append(['', 'EdX Tax ID:  46-0807740'])
         
