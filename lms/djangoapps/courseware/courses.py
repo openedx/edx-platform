@@ -9,7 +9,7 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -20,8 +20,9 @@ from microsite_configuration import microsite
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module
+from courseware.module_render import get_module, get_module_for_descriptor
 from student.models import CourseEnrollment
+from .module_utils import yield_dynamic_descriptor_descendents
 import branding
 
 log = logging.getLogger(__name__)
@@ -415,3 +416,32 @@ def get_studio_url(course, page):
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_course_link(course, page)
     return studio_link
+
+
+def get_entrance_exam_modules(request, course, student):
+    """
+    This returns all problems in an entrance exam
+    """
+
+    exam_modules = []
+    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        if getattr(course, 'entrance_exam_enabled', False):
+            exam_key = UsageKey.from_string(course.entrance_exam_id)
+            exam_descriptor = modulestore().get_item(exam_key)
+
+            def create_module(descriptor):
+                """creates an XModule instance given a descriptor"""
+                field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                    course.id, student, descriptor
+                )
+                return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
+
+            exam_modules = yield_dynamic_descriptor_descendents(
+                exam_descriptor,
+                create_module
+            )
+            ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
+            # filter not graded modules and anything which is not a problem
+            exam_modules = [module for module in exam_modules
+                            if module.graded and module.category not in ignore_categories]
+    return exam_modules

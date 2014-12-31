@@ -39,7 +39,7 @@ from instructor.views.instructor_task_helpers import extract_email_features, ext
 from microsite_configuration import microsite
 
 from courseware.access import has_access
-from courseware.courses import get_course_with_access, get_course_by_id
+from courseware.courses import get_course_with_access, get_course_by_id, get_entrance_exam_modules
 from django.contrib.auth.models import User
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import (
@@ -1506,23 +1506,36 @@ def reset_student_attempts(request, course_id):
         if not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
-    try:
-        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
-    except InvalidKeyError:
-        return HttpResponseBadRequest()
+    if problem_to_reset != 'entrance_exam':
+        try:
+            module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+        except InvalidKeyError:
+            return HttpResponseBadRequest()
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
     if student:
-        try:
-            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
-        except StudentModule.DoesNotExist:
-            return HttpResponseBadRequest(_("Module does not exist."))
-        except sub_api.SubmissionError:
-            # Trust the submissions API to log the error
-            error_msg = _("An error occurred while deleting the score.")
-            return HttpResponse(error_msg, status=500)
+        if problem_to_reset == 'entrance_exam':
+            entrance_exam_modules = get_entrance_exam_modules(request, course, student)
+            if entrance_exam_modules:
+                for module in entrance_exam_modules:
+                    instructor_task.api.submit_reset_problem_attempts_for_student(
+                        module.scope_ids.usage_id,
+                        student
+                    )
+            else:
+                return HttpResponseBadRequest(_("Course does not has entrance exam enabled."))
+
+        else:
+            try:
+                enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
+            except StudentModule.DoesNotExist:
+                return HttpResponseBadRequest(_("Module does not exist."))
+            except sub_api.SubmissionError:
+                # Trust the submissions API to log the error
+                error_msg = _("An error occurred while deleting the score.")
+                return HttpResponse(error_msg, status=500)
         response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, module_state_key)

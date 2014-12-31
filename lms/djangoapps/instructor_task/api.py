@@ -146,6 +146,35 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
+def submit_reset_problem_attempts_for_student(request, usage_key, student):  # pylint: disable=invalid-name
+    """
+    Request to have attempts reset for a problem as a background task.
+
+    The problem's attempts will be reset for specified students only.
+    Parameters are `usage_key`, which must be a :class:`Location`
+    and the `student` as a User object.
+
+    ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
+    if the problem is already being reset.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # check arguments:  make sure that the usage_key is defined
+    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
+    # an exception will be raised.  Let it pass up to the caller.
+    modulestore().get_item(usage_key)
+
+    task_type = 'reset_problem_attempts'
+    task_class = reset_problem_attempts
+    task_input, task_key = encode_problem_and_student_input(usage_key, student)
+    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+
+
 def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint: disable=invalid-name
     """
     Request to have state deleted for a problem as a background task.
