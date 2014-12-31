@@ -49,7 +49,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
         },
 
         onBeforeUnload: function () {
-            var dirty = this.cohortGroupConfiguration.isDirty ||
+            var dirty = this.cohortGroupConfiguration.isDirty() ||
                 (this.experimentsEnabled && this.experimentGroupsCollection.find(function(configuration) {
                     return configuration.isDirty();
                 }));
