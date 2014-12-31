@@ -211,7 +211,7 @@ class PhotoVerification(StatusModel):
         ).exists()
 
     @classmethod
-    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, window=None):
+    def user_has_valid_or_pending(cls, user, earliest_allowed_date=None, window=None, queryset=None):
         """
         Return whether the user has a complete verification attempt that is or
         *might* be good. This means that it's approved, been submitted, or would
@@ -222,15 +222,21 @@ class PhotoVerification(StatusModel):
         If window=None, this will check for the user's *initial* verification.  If
         window is anything else, this will check for the reverification associated
         with that window.
+
+        If a queryset is provided, that will be used instead of hitting the database.
         """
         valid_statuses = ['submitted', 'approved']
         if not window:
             valid_statuses.append('must_retry')
-        return cls.objects.filter(
-            user=user,
+        if queryset is None:
+            queryset = cls.objects.filter(user=user)
+
+        return queryset.filter(
             status__in=valid_statuses,
-            created_at__gte=(earliest_allowed_date
-                             or cls._earliest_allowed_date()),
+            created_at__gte=(
+                earliest_allowed_date
+                or cls._earliest_allowed_date()
+            ),
             window=window,
         ).exists()
 

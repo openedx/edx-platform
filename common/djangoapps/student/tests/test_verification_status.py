@@ -199,6 +199,26 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # messaging relating to verification
         self._assert_course_verification_status(None)
 
+    def test_verification_will_expire_by_deadline(self):
+        # Expiration date in the future
+        self._setup_mode_and_enrollment(self.FUTURE, "verified")
+
+        # Create a verification attempt that:
+        # 1) Is current (submitted in the last year)
+        # 2) Will expire by the deadline for the course
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+
+        # This attempt will expire tomorrow, before the course deadline
+        attempt.created_at = attempt.created_at - timedelta(days=364)
+        attempt.save()
+
+        # Expect that the "verify now" message is hidden
+        # (since the user isn't allowed to submit another attempt while
+        # a verification is active).
+        self._assert_course_verification_status(None)
+
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
 
@@ -227,9 +247,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     }
 
     NOTIFICATION_MESSAGES = {
-        VERIFY_STATUS_NEED_TO_VERIFY: "You still need to verify for this course.",
-        VERIFY_STATUS_SUBMITTED: "Thanks for your patience as we process your request.",
-        VERIFY_STATUS_APPROVED: "You have already verified your ID!",
+        VERIFY_STATUS_NEED_TO_VERIFY: [
+            "You still need to verify for this course.",
+            "Verification not yet complete"
+        ],
+        VERIFY_STATUS_SUBMITTED: ["Thanks for your patience as we process your request."],
+        VERIFY_STATUS_APPROVED: ["You have already verified your ID!"],
     }
 
     def _assert_course_verification_status(self, status):
@@ -254,7 +277,25 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Verify that the correct copy is rendered on the dashboard
         if status is not None:
             if status in self.NOTIFICATION_MESSAGES:
-                self.assertContains(response, self.NOTIFICATION_MESSAGES[status])
+                # Different states might have different messaging
+                # so in some cases we check several possibilities
+                # and fail if none of these are found.
+                found_msg = False
+                for message in self.NOTIFICATION_MESSAGES[status]:
+                    if message in response.content:
+                        found_msg = True
+                        break
+
+                fail_msg = "Could not find any of these messages: {expected}".format(
+                    expected=self.NOTIFICATION_MESSAGES[status]
+                )
+                self.assertTrue(found_msg, msg=fail_msg)
         else:
-            for msg in self.NOTIFICATION_MESSAGES.values():
+            # Combine all possible messages into a single list
+            all_messages = []
+            for msg_group in self.NOTIFICATION_MESSAGES.values():
+                all_messages.extend(msg_group)
+
+            # Verify that none of the messages are displayed
+            for msg in all_messages:
                 self.assertNotContains(response, msg)
