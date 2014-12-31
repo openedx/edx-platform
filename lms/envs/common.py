@@ -983,6 +983,9 @@ MIDDLEWARE_CLASSES = (
     'courseware.middleware.RedirectUnenrolledMiddleware',
 
     'course_wiki.middleware.WikiAccessMiddleware',
+
+    # This must be last
+    'microsite_configuration.middleware.MicrositeSessionCookieDomainMiddleware',
 )
 
 # Clickjacking protection can be enabled by setting this to 'DENY'
