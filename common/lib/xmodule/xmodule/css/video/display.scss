@@ -83,6 +83,7 @@ div.video {
       vertical-align: top;
 
       .host-tag {
+        @extend %text-sr;
         display: inline-block;
         vertical-align: middle;
         font-size: 70%;
