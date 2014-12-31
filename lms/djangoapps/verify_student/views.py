@@ -499,6 +499,10 @@ class PayAndVerifyView(View):
             'donation_for_course', {}
         ).get(unicode(course_key), '')
 
+        # Remember whether the user is upgrading
+        # so we can fire an analytics event upon payment.
+        request.session['attempting_upgrade'] = (message == self.UPGRADE_MSG)
+
         # Render the top-level page
         context = {
             'user_full_name': full_name,

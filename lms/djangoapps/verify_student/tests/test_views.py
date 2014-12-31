@@ -993,6 +993,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
         ])
+        self._assert_upgrade_session_flag(False)
 
     @ddt.data("expired", "denied")
     def test_start_flow_expired_or_denied_verification(self, verification_status):
@@ -1331,6 +1332,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             PayAndVerifyView.PHOTO_ID_REQ,
             PayAndVerifyView.WEBCAM_REQ,
         ])
+        self._assert_upgrade_session_flag(True)
 
     def test_upgrade_already_verified(self):
         course = self._create_course("verified")
@@ -1635,6 +1637,10 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             'contribution_amount': pay_and_verify_div['data-contribution-amount'],
             'verification_deadline': pay_and_verify_div['data-verification-deadline']
         }
+
+    def _assert_upgrade_session_flag(self, is_upgrade):
+        """Check that the session flag for attempting an upgrade is set. """
+        self.assertEqual(self.client.session.get('attempting_upgrade'), is_upgrade)
 
     def _assert_redirects_to_dashboard(self, response):
         """Check that the page redirects to the student dashboard. """
