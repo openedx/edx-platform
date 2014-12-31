@@ -12,7 +12,9 @@ case "${TEST_SUITE}" in
         paver run_pep8 -l $PEP8_THRESHOLD > pep8.log
         paver run_pylint -l $PYLINT_THRESHOLD > pylint.log
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
-        paver run_quality -p 100
+        # First fetch origin/master because travis only fetches the branch it is building
+        git fetch origin +master:master
+        paver run_quality --compare-branch=master --percentage=100
         ;;
 
     "unit-cms")
