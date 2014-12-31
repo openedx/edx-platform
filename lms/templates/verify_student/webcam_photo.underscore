@@ -8,14 +8,12 @@
 </div>
 
 <div class="controls photo-controls">
-  <ul class="list-controls">
-    <li class="control control-retake is-hidden" id="webcam_reset_button">
-      <a class="action action-redo"><%- gettext( "Retake Photo" ) %></a>
-    </li>
-    <li class="control control-do is-hidden" id="webcam_capture_button">
-      <a class="action action-do">
-        <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
-      </a>
-    </li>
-  </ul>
+  <div class="control control-retake is-hidden" id="webcam_reset_button">
+    <a class="action action-redo"><%- gettext( "Retake photo" ) %></a>
+  </div>
+  <div class="control control-do is-hidden" id="webcam_capture_button">
+    <a class="action action-do">
+      <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
+    </a>
+  </div>
 </div>

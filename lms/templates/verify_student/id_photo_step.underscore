@@ -10,18 +10,18 @@
 
       <div class="wrapper-help">
          <div class="help help-task photo-tips idtips">
+          <p class="photo-tip"><%- gettext( "You need an ID with your name and photo. A driver's license, passport, or other government-issued IDs are all acceptable." ) %></p>
+
           <h4 class="title"><%- gettext( "Tips on taking a successful photo" ) %></h4>
 
           <div class="copy">
             <ul class="list-help">
-              <li class="help-item"><%- gettext( "Make sure your ID is well-lit" ) %></li>
-              <li class="help-item"><%- gettext( "Check that there isn't any glare" ) %></li>
               <li class="help-item"><%- gettext( "Ensure that you can see your photo and read your name" ) %></li>
-              <li class="help-item"><%- gettext( "Try to keep your fingers at the edge to avoid covering important information" ) %></li>
-              <li class="help-item"><%- gettext( "Acceptable IDs include driver's licenses, passports, or other government-issued IDs that include your name and photo" ) %></li>
+              <li class="help-item"><%- gettext( "Make sure your ID is well-lit" ) %></li>
               <li class="help-item">
                 <%=  _.sprintf( gettext( "Once in position, use the camera button %(icon)s to capture your ID" ), { icon: '<span class="example">(<i class="icon-camera"></i>)</span>' } ) %>
               </li>
+              <li class="help-item"><%- gettext( "Use the retake photo button if you are not pleased with your photo" ) %></li>
             </ul>
           </div>
         </div>
@@ -31,10 +31,14 @@
 
           <div class="copy">
             <dl class="list-faq">
-              <dt class="faq-question"><%- gettext( "Why do you need a photo of my ID?" ) %></dt>
-              <dd class="faq-answer"><%- gettext( "We need to match your ID with your photo and name to confirm that you are you." ) %></dd>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
+              </dt>
+              <dd class="faq-answer"><%- gettext( "We need to match your ID with your photo and name to confirm your identity." ) %></dd>
 
-              <dt class="faq-question"><%- gettext( "What do you do with this picture?" ) %></dt>
+              <dt class="faq-question">
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this picture?" ), { platformName: platformName } ) %>
+              </dt>
               <dd class="faq-answer"><%- gettext( "We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed." ) %></dd>
             </dl>
           </div>
@@ -45,7 +49,10 @@
     <% if ( nextStepTitle ) { %>
     <nav class="nav-wizard" id="face_next_button_nav">
       <a id="next_step_button" class="next action-primary is-disabled right" aria-hidden="true" title="Next">
-        <%- nextStepTitle %>
+        <%- _.sprintf(
+          gettext( "Next: %(nextStepTitle)s" ),
+          { nextStepTitle: nextStepTitle }
+        ) %>
       </a>
     </nav>
     <% } %>

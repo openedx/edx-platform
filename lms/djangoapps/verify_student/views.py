@@ -279,27 +279,27 @@ class PayAndVerifyView(View):
             template_name="intro_step"
         ),
         MAKE_PAYMENT_STEP: Step(
-            title=ugettext_lazy("Make Payment"),
+            title=ugettext_lazy("Make payment"),
             template_name="make_payment_step"
         ),
         PAYMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Payment Confirmation"),
+            title=ugettext_lazy("Payment confirmation"),
             template_name="payment_confirmation_step"
         ),
         FACE_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take Photo"),
+            title=ugettext_lazy("Take photo"),
             template_name="face_photo_step"
         ),
         ID_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take a Photo of Your ID"),
+            title=ugettext_lazy("Take a photo of your ID"),
             template_name="id_photo_step"
         ),
         REVIEW_PHOTOS_STEP: Step(
-            title=ugettext_lazy("Review Your Info"),
+            title=ugettext_lazy("Review your info"),
             template_name="review_photos_step"
         ),
         ENROLLMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Enrollment Confirmation"),
+            title=ugettext_lazy("Enrollment confirmation"),
             template_name="enrollment_confirmation_step"
         ),
     }
@@ -317,55 +317,6 @@ class PayAndVerifyView(View):
     VERIFY_LATER_MSG = 'verify-later'
     UPGRADE_MSG = 'upgrade'
     PAYMENT_CONFIRMATION_MSG = 'payment-confirmation'
-
-    Message = namedtuple(
-        'Message',
-        [
-            'page_title',
-            'top_level_msg',
-            'status_msg',
-            'intro_title',
-            'intro_msg'
-        ]
-    )
-
-    MESSAGES = {
-        FIRST_TIME_VERIFY_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolling as"),
-            intro_title=ugettext_lazy("What You Will Need To Enroll"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to enroll in the {course_mode} track.")
-        ),
-        VERIFY_NOW_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title=ugettext_lazy("What You Will Need To Enroll"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to enroll in the {course_mode} track.")
-        ),
-        VERIFY_LATER_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title=ugettext_lazy("What You Will Need To Verify"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to complete verification.")
-        ),
-        UPGRADE_MSG: Message(
-            page_title=ugettext_lazy("Upgrade Your Enrollment For {course_name}."),
-            top_level_msg=ugettext_lazy("You are upgrading your enrollment for {course_name}."),
-            status_msg=ugettext_lazy("Upgrading to"),
-            intro_title=ugettext_lazy("What You Will Need To Upgrade"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to complete upgrade to the {course_mode} track.")
-        ),
-        PAYMENT_CONFIRMATION_MSG: Message(
-            page_title=ugettext_lazy("Payment Confirmation"),
-            top_level_msg=ugettext_lazy("You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title="",
-            intro_msg=""
-        )
-    }
 
     # Requirements
     #
@@ -505,30 +456,24 @@ class PayAndVerifyView(View):
 
         # Render the top-level page
         context = {
-            'user_full_name': full_name,
+            'contribution_amount': contribution_amount,
             'course': course,
             'course_key': unicode(course_key),
             'course_mode': course_mode,
-            'verification_deadline': (
-                get_default_time_display(course_mode.expiration_datetime)
-                if course_mode.expiration_datetime else ""
-            ),
             'courseware_url': courseware_url,
             'current_step': current_step,
             'disable_courseware_js': True,
             'display_steps': display_steps,
-            'contribution_amount': contribution_amount,
             'is_active': json.dumps(request.user.is_active),
-            'messages': self._messages(
-                message,
-                course.display_name,
-                course_mode,
-                requirements
-            ),
             'message_key': message,
             'platform_name': settings.PLATFORM_NAME,
             'purchase_endpoint': get_purchase_endpoint(),
             'requirements': requirements,
+            'user_full_name': full_name,
+            'verification_deadline': (
+                get_default_time_display(course_mode.expiration_datetime)
+                if course_mode.expiration_datetime else ""
+            ),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -676,42 +621,6 @@ class PayAndVerifyView(View):
                     all_requirements[requirement] = True
 
         return all_requirements
-
-    def _messages(self, message_key, course_name, course_mode, requirements):
-        """Construct messages based on how the user arrived at the page.
-
-        Arguments:
-            message_key (string): One of the keys in `MESSAGES`.
-            course_name (unicode): The name of the course the user wants to enroll in.
-            course_mode (CourseMode): The course mode for the course.
-            requirements (dict): The requirements for verifying and/or paying.
-
-        Returns:
-            `Message` (namedtuple)
-
-        """
-        messages = self.MESSAGES[message_key]
-
-        # Count requirements
-        num_requirements = sum([
-            1 if requirement else 0
-            for requirement in requirements.values()
-        ])
-
-        context = {
-            'course_name': course_name,
-            'course_mode': course_mode.name,
-            'num_requirements': num_requirements
-        }
-
-        # Interpolate the course name / mode into messaging strings
-        # Implicitly force lazy translations to unicode
-        return self.Message(
-            **{
-                key: value.format(**context)
-                for key, value in messages._asdict().iteritems()  # pylint: disable=protected-access
-            }
-        )
 
     def _check_already_verified(self, user):
         """Check whether the user has a valid or pending verification.

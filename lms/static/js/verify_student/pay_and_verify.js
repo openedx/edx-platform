@@ -36,9 +36,9 @@ var edx = edx || {};
         currentStep: el.data('current-step'),
         stepInfo: {
             'intro-step': {
+                courseName: el.data('course-name'),
+                hasPaid: el.data('msg-key') === 'verify-now' || el.data('msg-key') === 'verify-later',
                 isActive: el.data('is-active'),
-                introTitle: el.data('intro-title'),
-                introMsg: el.data('intro-msg'),
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
@@ -47,7 +47,11 @@ var edx = edx || {};
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
-                upgrade: el.data('data-msg-key') === 'upgrade',
+                hasVisibleReqs: _.some(
+                    el.data('requirements'),
+                    function( isVisible ) { return isVisible; }
+                ),
+                upgrade: el.data('msg-key') === 'upgrade',
                 minPrice: el.data('course-mode-min-price'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(

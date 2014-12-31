@@ -2,7 +2,7 @@
   <article class="content-main">
     <h3 class="title"><%- _.sprintf( gettext( "Congratulations! You are now verified on %(platformName)s!" ), { platformName: platformName } ) %></h3>
     <div class="instruction">
-      <p><%- gettext( "You are now enrolled as an ID verified student for:" ) %></p>
+      <p><%- gettext( "You are now enrolled as a verified student for:" ) %></p>
     </div>
 
     <ul class="list-info">
@@ -34,7 +34,7 @@
                   <% } %>
                 </td>
                 <td>
-                  <a class="action action-primary" href="/dashboard"><%- gettext("Go to your dashboard") %></a>
+                  <a class="action action-primary" href="/dashboard"><%- gettext("Go to your Dashboard") %></a>
                 </td>
               </tr>
             </tfoot>

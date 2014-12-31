@@ -15,6 +15,14 @@
             }
         }
 
+        .payment-info {
+            padding: 5px 0 30px;
+
+            .copy {
+                margin: 20px 0;
+            }
+        }
+
         .requirements-container {
 
             .list-reqs {
@@ -74,6 +82,26 @@
             }
         }
 
+        .photo-controls {
+            position: relative;
+
+            .control {
+                &.control-do {
+                    left: 45%;
+                    left: calc( ( 50% ) - ( 69px / 2 ) );
+                }
+
+                &.control-retake {
+                    left: 40%;
+                    left: calc( ( 50% ) - ( 131px / 2 ) );
+                }
+
+                .action-redo {
+                    line-height: 28px;
+                }
+            }
+        }
+
         .retake-photos {
             color: $blue;
 
@@ -98,6 +126,17 @@
             margin-left: 0 !important;
         }
 
+        .photo-tip {
+            @extend %t-copy-sub1;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .list-help {
+            list-style: disc;
+            padding-left: 20px;
+        }
+
         .wrapper-task {
             .msg-retake {
                 margin-top: 0;
@@ -115,6 +154,7 @@
                 }
             }
         }
+
         .enrollment-status-footer {
             margin: 50px 0;
 
