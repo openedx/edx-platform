@@ -1252,7 +1252,6 @@ class GroupConfiguration(object):
         usage_info = GroupConfiguration.get_usage_info(course, store)
         configurations = []
         # TODO: Usage info is currently defined for the 'random' partition scheme.
-        # import pudb; pu.db
         for partition in course.user_partitions:
             if partition.scheme == RandomUserPartitionScheme:
                 configuration = partition.to_json()
