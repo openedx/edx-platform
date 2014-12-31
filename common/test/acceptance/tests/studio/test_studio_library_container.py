@@ -2,8 +2,11 @@
 Acceptance tests for Library Content in LMS
 """
 import ddt
-from .base_studio_test import StudioLibraryTest, ContainerBase
+from .base_studio_test import StudioLibraryTest
+from ...fixtures.course import CourseFixture
+from ..helpers import UniqueCourseTest
 from ...pages.studio.library import StudioLibraryContentXBlockEditModal, StudioLibraryContainerXBlockWrapper
+from ...pages.studio.overview import CourseOutlinePage
 from ...fixtures.course import XBlockFixtureDesc
 
 SECTION_NAME = 'Test Section'
@@ -12,7 +15,7 @@ UNIT_NAME = 'Test Unit'
 
 
 @ddt.ddt
-class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
+class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
     """
     Test Library Content block in LMS
     """
@@ -21,6 +24,12 @@ class StudioLibraryContainerTest(ContainerBase, StudioLibraryTest):
         Install library with some content and a course using fixtures
         """
         super(StudioLibraryContainerTest, self).setUp()
+        # Also create a course:
+        self.course_fixture = CourseFixture(self.course_info['org'], self.course_info['number'], self.course_info['run'], self.course_info['display_name'])
+        self.populate_course_fixture(self.course_fixture)
+        self.course_fixture.install()
+        self.outline = CourseOutlinePage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+
         self.outline.visit()
         subsection = self.outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
         self.unit_page = subsection.toggle_expand().unit(UNIT_NAME).go_to()
