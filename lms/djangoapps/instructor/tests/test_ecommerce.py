@@ -175,7 +175,8 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue('Please Enter the Integer Value for Coupon Discount' in response.content)
 
         course_registration = CourseRegistrationCode(
-            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor
+            code='Vs23Ws4j', course_id=self.course.id.to_deprecated_string(), created_by=self.instructor,
+            mode_slug='honor'
         )
         course_registration.save()
 
