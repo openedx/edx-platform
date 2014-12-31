@@ -56,24 +56,34 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 end: 2,
                 assets: [
                     {
-                        "display_name": "pivo.jpg",
-                        "url": "/c4x/A/CS102/asset/pivo.jpg",
+                        "display_name": "test.jpg",
+                        "url": "/c4x/A/CS102/asset/test.jpg",
                         "date_added": "Nov 07, 2014 at 17:47 UTC",
-                        "id": "/c4x/A/CS102/asset/pivo.jpg",
-                        "portable_url": "/static/pivo.jpg",
-                        "thumbnail": "/c4x/A/CS102/thumbnail/pivo.jpg",
+                        "id": "/c4x/A/CS102/asset/test.jpg",
+                        "portable_url": "/static/test.jpg",
+                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
                         "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/pivo.jpg"
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
                     },
                     {
-                        "display_name": "STRAT_02-06-v2f.pdf",
-                        "url": "/c4x/A/CS102/asset/STRAT_02-06-v2f.pdf",
+                        "display_name": "test.pdf",
+                        "url": "/c4x/A/CS102/asset/test.pdf",
                         "date_added": "Oct 20, 2014 at 11:00 UTC",
-                        "id": "/c4x/A/CS102/asset/STRAT_02-06-v2f.pdf",
-                        "portable_url": "/static/STRAT_02-06-v2f.pdf",
+                        "id": "/c4x/A/CS102/asset/test.pdf",
+                        "portable_url": "/static/test.pdf",
                         "thumbnail": null,
                         "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/STRAT_02-06-v2f.pdf"
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.pdf"
+                    },
+                    {
+                        "display_name": "test.odt",
+                        "url": "/c4x/A/CS102/asset/test.odt",
+                        "date_added": "Oct 20, 2014 at 11:00 UTC",
+                        "id": "/c4x/A/CS102/asset/test.odt",
+                        "portable_url": "/static/test.odt",
+                        "thumbnail": null,
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.odt"
                     }
                 ],
                 pageSize: 2,
@@ -87,14 +97,14 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 end: 1,
                 assets: [
                     {
-                        "display_name": "pivo.jpg",
-                        "url": "/c4x/A/CS102/asset/pivo.jpg",
+                        "display_name": "test.jpg",
+                        "url": "/c4x/A/CS102/asset/test.jpg",
                         "date_added": "Nov 07, 2014 at 17:47 UTC",
-                        "id": "/c4x/A/CS102/asset/pivo.jpg",
-                        "portable_url": "/static/pivo.jpg",
-                        "thumbnail": "/c4x/A/CS102/thumbnail/pivo.jpg",
+                        "id": "/c4x/A/CS102/asset/test.jpg",
+                        "portable_url": "/static/test.jpg",
+                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
                         "locked": false,
-                        "external_url": "localhost:8000/c4x/A/CS102/asset/pivo.jpg"
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
                     }
                 ],
                 pageSize: 1,
@@ -272,7 +282,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                 it('shows type select menu, selects type, and filters results', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
-                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                    $.each(assetsView.filterableColumns, function(columnID, columnData) {
                         assetsView.setPage(0);
                         respondWithMockAssets(requests);
                         var $typeColumn = $('#' + columnID);
@@ -281,11 +291,19 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                         $typeColumn.trigger('click');
                         expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
                         expect($typeColumn.find('.title')).toHaveClass('is-selected');
+                        var $allFilter = $($typeColumn.find('li.nav-item a')[0]);
                         var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
-                        $firstFilter.trigger('click');
-                        respondWithMockAssets(requests);
-                        var assetsNumberFiltered = assetsView.collection.length;
-                        expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
+                        var $otherFilter = $($typeColumn.find('li.nav-item a[data-assetfilter="OTHER"]')[0]);
+                        var select_filter_and_check = function($filterEl, result) {
+                            $filterEl.trigger('click');
+                            respondWithMockAssets(requests);
+                            var assetsNumberFiltered = assetsView.collection.length;
+                            expect(assetsNumberFiltered).toBe(result);
+                        };
+
+                        select_filter_and_check($firstFilter, 1);
+                        select_filter_and_check($allFilter, assetsNumber);
+                        select_filter_and_check($otherFilter, 1);
                     });
                 });
             });

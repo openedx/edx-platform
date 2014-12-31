@@ -34,17 +34,17 @@ class AssetsTestCase(CourseTestCase):
         super(AssetsTestCase, self).setUp()
         self.url = reverse_course_url('assets_handler', self.course.id)
 
-    def upload_asset(self, name="asset-1"):
+    def upload_asset(self, name="asset-1", extension=".txt"):
         """
         Post to the asset upload url
         """
-        f = self.get_sample_asset(name)
+        f = self.get_sample_asset(name, extension)
         return self.client.post(self.url, {"name": name, "file": f})
 
-    def get_sample_asset(self, name):
+    def get_sample_asset(self, name, extension=".txt"):
         """Returns an in-memory file with the given name for testing"""
         f = BytesIO(name)
-        f.name = name + ".txt"
+        f.name = name + extension
         return f
 
 
@@ -98,11 +98,12 @@ class PaginationTestCase(AssetsTestCase):
         self.upload_asset("asset-1")
         self.upload_asset("asset-2")
         self.upload_asset("asset-3")
+        self.upload_asset("asset-4", ".odt")
 
         # Verify valid page requests
-        self.assert_correct_asset_response(self.url, 0, 3, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=1", 2, 1, 3)
+        self.assert_correct_asset_response(self.url, 0, 4, 4)
+        self.assert_correct_asset_response(self.url + "?page_size=2", 0, 2, 4)
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=1", 2, 2, 4)
         self.assert_correct_sort_response(self.url, 'date_added', 'asc')
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
@@ -112,9 +113,9 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_filter_response(self.url, 'asset_type', 'Documents')
 
         # Verify querying outside the range of valid pages
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=2&page=2", 2, 1, 3)
-        self.assert_correct_asset_response(self.url + "?page_size=3&page=1", 0, 3, 3)
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 4)
+        self.assert_correct_asset_response(self.url + "?page_size=2&page=2", 2, 2, 4)
+        self.assert_correct_asset_response(self.url + "?page_size=3&page=1", 3, 1, 4)
 
     def assert_correct_asset_response(self, url, expected_start, expected_length, expected_total):
         """

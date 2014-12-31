@@ -147,7 +147,7 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                     filterInfo = this.filterableColumnInfo(filterColumn),
                     filterField = filterInfo.fieldName,
                     defaultFilterKey = false;
-                if (collection.filterField != filterField) {
+                if (collection.filterField !== filterField) {
                     collection.filterField = filterField;
                 }
                 this.filterColumn = filterColumn;

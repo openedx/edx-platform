@@ -242,11 +242,11 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var $title = menu.find('.title');
                 var titleText = $title.find('.type-filter');
                 var assettype = selected ? selected.data('assetfilter'): false;
-                if(assettype){
-                    if(assettype == this.allLabel){
+                if(assettype) {
+                    if(assettype === this.allLabel) {
                         titleText.text(titleText.data('alllabel'));
                     }
-                    else{
+                    else {
                         titleText.text(assettype);
                     }
                 }
@@ -270,12 +270,12 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 var filterColumn = this.$el.find('.filterable-column');
                 var resetFilter = filterColumn.find('.reset-filter');
                 var title = filterColumn.find('.title');
-                if(assettype == this.allLabel){
+                if(assettype === this.allLabel) {
                     collection.assetType = '';
                     resetFilter.hide();
                     title.removeClass('column-selected-link');
                 }
-                else{
+                else {
                     collection.assetType = assettype;
                     resetFilter.show();
                     title.addClass('column-selected-link');
