@@ -2,9 +2,6 @@
 Tests specific to the Data Aggregation Layer of the Course About API.
 
 """
-import ddt
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.keys import CourseKey
 import unittest
 from django.test.utils import override_settings
 from django.conf import settings
@@ -15,13 +12,13 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from course_about import data
 from course_about.errors import CourseNotFoundError
+from util.parsing_utils import parse_video_tag
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
 MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 
-@ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseAboutDataTest(ModuleStoreTestCase):
@@ -47,13 +44,19 @@ class CourseAboutDataTest(ModuleStoreTestCase):
     def test_non_existent_course(self):
         self.assertRaises(CourseNotFoundError, data.get_course_about_details, "this/is/bananas")
 
-    def test_invalid_course_key(self):
-        self.assertRaises(InvalidKeyError, data._get_course_key, "invalidKey")
+    def test_parsing_utils_valid_data(self):
+        video_html = '<iframe width="560" height="315" src="//www.youtube.com/embed/myvdolink?rel=0" frameborder="0" ' \
+                     'allowfullscreen=""></iframe>'
+        video_id = parse_video_tag(video_html)
+        self.assertIsNotNone(video_id)
 
-    def test_get_valid_course_key(self):
-        d = data._get_course_key("edX/DemoX/Demo_Course")
-        self.assertIsInstance(d, CourseKey)
+    def test_parsing_utils_invalid_data(self):
+        video_html = '<iframe width="560" height="315" src="//www.google.com?rel=0" frameborder="0" ' \
+                     'allowfullscreen=""></iframe>'
+        video_id = parse_video_tag(video_html)
+        self.assertIsNone(video_id)
 
-    def test_get_course_descriptor_with_valid_key(self):
-        d = data._get_course_descriptor(self.course.id, 0)
-        self.assertIsNotNone(d)
+    def test_parsing_utils_no_data(self):
+        video_html = None
+        video_id = parse_video_tag(video_html)
+        self.assertIsNone(video_id)
