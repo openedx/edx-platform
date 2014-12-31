@@ -96,9 +96,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = self.staff_user
         if cohort:
-            response = cohort_handler(request, course.id.to_deprecated_string(), cohort.id)
+            response = cohort_handler(request, unicode(course.id), cohort.id)
         else:
-            response = cohort_handler(request, course.id.to_deprecated_string())
+            response = cohort_handler(request, unicode(course.id))
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
@@ -113,9 +113,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         request = RequestFactory().put(path="dummy path", data=data, content_type="application/json")
         request.user = self.staff_user
         if cohort:
-            response = cohort_handler(request, course.id.to_deprecated_string(), cohort.id)
+            response = cohort_handler(request, unicode(course.id), cohort.id)
         else:
-            response = cohort_handler(request, course.id.to_deprecated_string())
+            response = cohort_handler(request, unicode(course.id))
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
@@ -157,9 +157,9 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that we cannot access cohort_handler if we're a non-staff user.
         """
-        self._verify_non_staff_cannot_access(cohort_handler, "GET", [self.course.id.to_deprecated_string()])
-        self._verify_non_staff_cannot_access(cohort_handler, "POST", [self.course.id.to_deprecated_string()])
-        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [self.course.id.to_deprecated_string()])
+        self._verify_non_staff_cannot_access(cohort_handler, "GET", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "POST", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(cohort_handler, "PUT", [unicode(self.course.id)])
 
     def test_no_cohorts(self):
         """
@@ -431,7 +431,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         """
         request = RequestFactory().get("dummy_url", {"page": requested_page})
         request.user = self.staff_user
-        response = users_in_cohort(request, course.id.to_deprecated_string(), cohort.id)
+        response = users_in_cohort(request, unicode(course.id), cohort.id)
 
         if should_return_bad_request:
             self.assertEqual(response.status_code, 400)
@@ -461,7 +461,7 @@ class UsersInCohortTestCase(CohortViewsTestCase):
         Verify that non-staff users cannot access `check_users_in_cohort`.
         """
         cohort = CohortFactory(course_id=self.course.id, users=[])
-        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [self.course.id.to_deprecated_string(), cohort.id])
+        self._verify_non_staff_cannot_access(users_in_cohort, "GET", [unicode(self.course.id), cohort.id])
 
     def test_no_users(self):
         """
@@ -570,10 +570,10 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         if should_raise_404:
             self.assertRaises(
                 Http404,
-                lambda: add_users_to_cohort(request, course.id.to_deprecated_string(), cohort.id)
+                lambda: add_users_to_cohort(request, unicode(course.id), cohort.id)
             )
         else:
-            response = add_users_to_cohort(request, course.id.to_deprecated_string(), cohort.id)
+            response = add_users_to_cohort(request, unicode(course.id), cohort.id)
             self.assertEqual(response.status_code, 200)
             return json.loads(response.content)
 
@@ -632,7 +632,7 @@ class AddUsersToCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             add_users_to_cohort,
             "POST",
-            [self.course.id.to_deprecated_string(), cohort.id]
+            [unicode(self.course.id), cohort.id]
         )
 
     def test_empty(self):
@@ -863,7 +863,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         else:
             request = RequestFactory().post("dummy_url")
         request.user = self.staff_user
-        response = remove_user_from_cohort(request, self.course.id.to_deprecated_string(), cohort.id)
+        response = remove_user_from_cohort(request, unicode(self.course.id), cohort.id)
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
@@ -889,7 +889,7 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         self._verify_non_staff_cannot_access(
             remove_user_from_cohort,
             "POST",
-            [self.course.id.to_deprecated_string(), cohort.id]
+            [unicode(self.course.id), cohort.id]
         )
 
     def test_no_username_given(self):
