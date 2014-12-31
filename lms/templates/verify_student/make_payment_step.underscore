@@ -140,11 +140,11 @@
         <a class="next action-primary is-disabled" id="pay_button">
           <%- gettext( "Go to payment" ) %>
         </a>
-        <% } else { %>
+    <% } else { %>
         <a class="next action-primary is-disabled" id="activate_button">
           <%- gettext( "Activate Your Account" ) %>
         </a>
-        <% } %>
+    <% } %>
   </nav>
 
   <form id="payment-processor-form"></form>

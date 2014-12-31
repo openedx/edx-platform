@@ -34,6 +34,14 @@ var edx = edx || {};
             // Track a virtual pageview, for easy funnel reconstruction.
             window.analytics.page( 'payment', this.templateName );
 
+            // Set the payment button to disabled by default
+            this.setPaymentEnabled( false );
+
+            // The activate button is always disabled
+            $( '#activate_button' )
+                .addClass( 'is-disabled' )
+                .prop( 'disabled', true );
+
             // Update the contribution amount with the amount the user
             // selected in a previous screen.
             if ( templateContext.contributionAmount ) {
@@ -69,8 +77,9 @@ var edx = edx || {};
             if ( _.isUndefined( isEnabled ) ) {
                 isEnabled = true;
             }
-
-            $( '#pay_button' ).toggleClass( 'is-disabled', !isEnabled );
+            $( '#pay_button' )
+                .toggleClass( 'is-disabled', !isEnabled )
+                .prop( 'disabled', !isEnabled );
         },
 
         createOrder: function() {
@@ -142,7 +151,7 @@ var edx = edx || {};
             });
 
             // Re-enable the button so the user can re-try
-            $( '#pay_button' ).removeClass( 'is-disabled' );
+            this.setPaymentEnabled( true );
         },
 
         getPaymentAmount: function() {

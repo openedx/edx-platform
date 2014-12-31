@@ -78,7 +78,10 @@ define([
             };
 
             var expectPaymentButtonEnabled = function( isEnabled ) {
-                var isDisabled = $( '#pay_button' ).hasClass('is-disabled');
+                var appearsDisabled = $( '#pay_button' ).hasClass( 'is-disabled' ),
+                    isDisabled = $( '#pay_button' ).prop( 'disabled' );
+
+                expect( !appearsDisabled ).toEqual( isEnabled );
                 expect( !isDisabled ).toEqual( isEnabled );
             };
 
@@ -92,6 +95,7 @@ define([
                 // Activate button should be displayed and disabled
                 expect( activateButton.length ).toEqual(1);
                 expect( activateButton.hasClass( 'is-disabled' ) ).toBe( true );
+                expect( activateButton.prop( 'disabled' ) ).toBe( true );
             };
 
             var goToPayment = function( requests, kwargs ) {
