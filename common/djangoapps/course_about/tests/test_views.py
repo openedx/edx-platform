@@ -87,6 +87,7 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
         kwargs = dict()
         kwargs["course_id"] = self.course.id
         kwargs["course_runtime"] = self.course.runtime
+        kwargs["user_id"] = self.user.id
         CourseAboutFactory.create(**kwargs)
         resp = self.client.get(
             reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})

@@ -16,7 +16,6 @@ from nose.tools import assert_less_equal, assert_greater_equal
 import factory
 import threading
 from xmodule.modulestore.django import modulestore
-from student.tests.factories import UserFactory
 
 
 class Dummy(object):
@@ -377,13 +376,13 @@ class CourseAboutFactory(XModuleFactory):
 
         video : video link
         """
-        user = UserFactory.create()
+        user_id = kwargs.pop('user_id', None)
         course_id, course_runtime = kwargs.pop("course_id"), kwargs.pop("course_runtime")
         store = modulestore()
         for about_key in ABOUT_ATTRIBUTES:
             about_item = store.create_xblock(course_runtime, course_id, 'about', about_key)
             about_item.data = ABOUT_ATTRIBUTES[about_key]
-            store.update_item(about_item, user.id, allow_not_found=True)
+            store.update_item(about_item, user_id, allow_not_found=True)
         about_item = store.create_xblock(course_runtime, course_id, 'about', 'video')
         about_item.data = "www.youtube.com/embed/testing-video-link"
-        store.update_item(about_item, user.id, allow_not_found=True)
+        store.update_item(about_item, user_id, allow_not_found=True)
