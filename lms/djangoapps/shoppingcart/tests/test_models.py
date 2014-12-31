@@ -249,7 +249,7 @@ class OrderTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEquals('Order Payment Confirmation', mail.outbox[0].subject)
         self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, mail.outbox[0].body)
         self.assertIn(unicode(cart.total_cost), mail.outbox[0].body)
-        self.assertIn(item.additional_instruction_text, mail.outbox[0].body)
+        self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
         # Assert Google Analytics event fired for purchase.
         self.mock_tracker.track.assert_called_once_with(  # pylint: disable=maybe-no-member
@@ -280,7 +280,7 @@ class OrderTest(UrlResetMixin, ModuleStoreTestCase):
 
         self.assertEquals(len(mail.outbox), 1)
         # Verify that the verification reminder appears in the sent email.
-        self.assertIn(item.additional_instruction_text, mail.outbox[0].body)
+        self.assertIn(item.additional_instruction_text(), mail.outbox[0].body)
 
     def test_purchase_item_failure(self):
         # once again, we're testing against the specific implementation of

@@ -754,15 +754,14 @@ def create_order(request):
     """
     Submit PhotoVerification and create a new Order for this verified cert
     """
-    # TODO (ECOM-188): Once the A/B test of separating the payment/verified flow
-    # has completed, we can remove this flag and delete the photo verification
-    # step entirely (since it will be handled in a separate view).
-    submit_photo = True
-    if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
-        submit_photo = (
-            'face_image' in request.POST and
-            'photo_id_image' in request.POST
-        )
+    # Only submit photos if photo data is provided by the client.
+    # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
+    # completes, we may be able to remove photo submission from this step
+    # entirely.
+    submit_photo = (
+        'face_image' in request.POST and
+        'photo_id_image' in request.POST
+    )
 
     if (
         submit_photo and not
