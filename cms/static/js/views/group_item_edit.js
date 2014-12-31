@@ -6,7 +6,7 @@ function(ListItemEdit, $) {
 
     var GroupItemEdit = ListItemEdit.extend({
         tagName: 'div',
-        className: 'group-configuration-details',
+        className: 'group-configuration-edit',
         events: {
             'submit': 'setAndClose',
             'click .action-cancel': 'cancel'
