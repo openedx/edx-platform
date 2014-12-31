@@ -12,17 +12,17 @@ env:
     # - TEST_SUITE=unit-js
 
     # Still working on these.
-    - TEST_SUITE=quality
+    # - TEST_SUITE=quality
     # - TEST_SUITE=unit-lms
     # - TEST_SUITE=lettuce-cms
     # - TEST_SUITE=lettuce-lms
 
     # Break out the bok-choy for troubleshooting
-    # - TEST_SUITE=bok-1
-    # - TEST_SUITE=bok-2
-    # - TEST_SUITE=bok-3
-    # - TEST_SUITE=bok-4
-    # - TEST_SUITE=bok-5
+    - TEST_SUITE=bok-1
+    - TEST_SUITE=bok-2
+    - TEST_SUITE=bok-3
+    - TEST_SUITE=bok-4
+    - TEST_SUITE=bok-5
 
 
 language: python

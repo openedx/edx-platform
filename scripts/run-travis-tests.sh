@@ -43,23 +43,44 @@ case "${TEST_SUITE}" in
         ;;
 
     "bok-1")
-        paver test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/test_annotatable.py common/test/acceptance/tests/test_ora.py
+        paver test_bokchoy --skip_firefox_version_validation -t test_annotatable.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t test_ora.py
         ;;
 
     "bok-2")
-        paver test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/discussion/test_cohort_management.py common/test/acceptance/tests/discussion/test_cohorts.py common/test/acceptance/tests/discussion/test_discussion.py
+        paver test_bokchoy --skip_firefox_version_validation -t discussion/test_cohort_management.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t discussion/test_cohorts.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t discussion/test_discussion.py
         ;;
 
     "bok-3")
-        paver test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/lms/test_lms.py common/test/acceptance/tests/lms/test_lms_acid_xblock.py common/test/acceptance/tests/lms/test_lms_courseware.py common/test/acceptance/tests/lms/test_lms_instructor_dashboard.py common/test/acceptance/tests/lms/test_lms_matlab_problem.py common/test/acceptance/tests/lms/test_lms_staff_view.py
+        paver test_bokchoy --skip_firefox_version_validation -t lms/test_lms.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t lms/test_lms_acid_xblock.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t lms/test_lms_courseware.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t lms/test_lms_instructor_dashboard.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t lms/test_lms_matlab_problem.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t lms/test_lms_staff_view.py
         ;;
 
     "bok-4")
-        paver test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/studio/test_studio_acid_xblock.py common/test/acceptance/tests/studio/test_studio_bad_data.py common/test/acceptance/tests/studio/test_studio_container.py common/test/acceptance/tests/studio/test_studio_general.py common/test/acceptance/tests/studio/test_studio_outline.py common/test/acceptance/tests/studio/test_studio_rerun.py common/test/acceptance/tests/studio/test_studio_settings.py common/test/acceptance/tests/studio/test_studio_split_test.py common/test/acceptance/tests/studio/test_studio_with_ora_component.py
+        paver test_bokchoy --skip_firefox_version_validation -t studio/test_studio_acid_xblock.py studio/test_studio_bad_data.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_container.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_general.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_outline.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_rerun.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_settings.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_split_test.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_with_ora_component.py
         ;;
 
     "bok-5")
-        paver test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/video/test_studio_video_editor.py common/test/acceptance/tests/video/test_studio_video_module.py common/test/acceptance/tests/video/test_studio_video_transcript.py common/test/acceptance/tests/video/test_video_handout.py common/test/acceptance/tests/video/test_video_module.py common/test/acceptance/tests/video/test_video_times.py
+        paver test_bokchoy --skip_firefox_version_validation -t
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_editor.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_module.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_transcript.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_video_handout.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_video_module.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_video_times.py
         ;;
 
     "bok-shard1")
