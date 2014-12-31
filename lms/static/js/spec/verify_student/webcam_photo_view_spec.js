@@ -73,7 +73,10 @@ define([
             };
 
             var expectSubmitEnabled = function( isEnabled ) {
-                var isDisabled = $( '#submit_button' ).hasClass( 'is-disabled' );
+                var appearsDisabled = $( '#submit_button' ).hasClass( 'is-disabled' ),
+                    isDisabled = $( '#submit_button' ).prop( 'disabled' );
+
+                expect( !appearsDisabled ).toEqual( isEnabled );
                 expect( !isDisabled ).toEqual( isEnabled );
             };
 
@@ -82,7 +85,7 @@ define([
 
                 setFixtures(
                     '<div id="current-step-container"></div>' +
-                    '<input type="button" id="submit_button" class="is-disabled"></input>'
+                    '<input type="button" id="submit_button"></input>'
                 );
                 TemplateHelpers.installTemplate( 'templates/verify_student/webcam_photo' );
             });

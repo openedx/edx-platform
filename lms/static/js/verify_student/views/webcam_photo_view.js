@@ -231,6 +231,9 @@
         render: function() {
             var renderedHtml;
 
+            // Set the submit button to disabled by default
+            this.setSubmitButtonEnabled( false );
+
             // Load the template for the webcam into the DOM
             renderedHtml = _.template( $( this.template ).html(), {} );
             $( this.el ).html( renderedHtml );
@@ -258,7 +261,7 @@
 
         reset: function() {
             // Disable the submit button
-            $( this.submitButton ).addClass( "is-disabled" );
+            this.setSubmitButtonEnabled( false );
 
             // Reset the video capture
             this.backend.reset();
@@ -288,7 +291,7 @@
                 this.model.set( this.modelAttribute, this.backend.getImageData() );
 
                 // Enable the submit button
-                $( this.submitButton ).removeClass( "is-disabled" );
+                this.setSubmitButtonEnabled( true );
             }
         },
 
@@ -305,6 +308,12 @@
                     shown: true
                 });
             }
+        },
+
+        setSubmitButtonEnabled: function( isEnabled ) {
+            $( this.submitButton )
+                .toggleClass( 'is-disabled', !isEnabled )
+                .prop( 'disabled', !isEnabled );
         }
     });
 

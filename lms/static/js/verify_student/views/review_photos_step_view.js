@@ -50,7 +50,7 @@ var edx = edx || {};
             var fullName = $( '#new-name' ).val();
 
             // Disable the submit button to prevent duplicate submissions
-            $( '#next_step_button' ).addClass( 'is-disabled' );
+            this.setSubmitButtonEnabled( false );
 
             // On success, move on to the next step
             this.listenToOnce( this.model, 'sync', _.bind( this.nextStep, this ) );
@@ -69,7 +69,7 @@ var edx = edx || {};
             var errorMsg = gettext( 'An unexpected error occurred. Please try again later.' );
 
             // Re-enable the submit button to allow the user to retry
-            $( '#next_step_button' ).removeClass( 'is-disabled' );
+            this.setSubmitButtonEnabled( true );
 
             if ( xhr.status === 400 ) {
                 errorMsg = xhr.responseText;
@@ -91,6 +91,12 @@ var edx = edx || {};
             title = $( this ).parent();
             title.toggleClass( 'is-expanded' );
             title.attr( 'aria-expanded', !title.attr( 'aria-expanded' ) );
+        },
+
+        setSubmitButtonEnabled: function( isEnabled ) {
+            $( '#next_step_button' )
+                .toggleClass( 'is-disabled', !isEnabled )
+                .prop( 'disabled', !isEnabled );
         }
     });
 
