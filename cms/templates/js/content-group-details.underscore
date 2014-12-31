@@ -1,7 +1,7 @@
 <div class="wrapper-group-configuration">
     <header class="group-configuration-header">
         <h3 class="group-configuration-title">
-            <%= name %>
+            <%- name %>
         </h3>
     </header>
 
