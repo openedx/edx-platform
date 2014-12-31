@@ -6,7 +6,7 @@ from util.parsing_utils import parse_video_tag
 from lms.djangoapps.courseware.courses import course_image_url
 
 
-def _serialize_content(course_descriptor, about_descriptor):
+def serialize_content(course_descriptor, about_descriptor):
     """
     Returns a serialized representation of the course_descriptor and about_descriptor
     Args:

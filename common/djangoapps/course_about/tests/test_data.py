@@ -13,6 +13,7 @@ from student.tests.factories import UserFactory
 from course_about import data
 from course_about.errors import CourseNotFoundError
 from util.parsing_utils import parse_video_tag
+from nose.tools import raises
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -41,8 +42,9 @@ class CourseAboutDataTest(ModuleStoreTestCase):
         course_info = data.get_course_about_details(unicode(self.course.id))
         self.assertIsNotNone(course_info)
 
+    @raises(CourseNotFoundError)
     def test_non_existent_course(self):
-        self.assertRaises(CourseNotFoundError, data.get_course_about_details, "this/is/bananas")
+        data.get_course_about_details("this/is/bananas")
 
     def test_parsing_utils_valid_data(self):
         video_html = '<iframe width="560" height="315" src="//www.youtube.com/embed/myvdolink?rel=0" frameborder="0" ' \
