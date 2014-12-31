@@ -138,8 +138,10 @@ case "$TEST_SUITE" in
 END
         exitcode=$EXIT
 
-        # Update the pip-download-cache.tar.gz in S3
-        if [[ ${JOB_NAME} == *'edx-all-tests-auto-master'* ]]; then
+        # Update the pip-download-cache.tar.gz in S3 if JOB_NAME starts with "edx-all-tests-auto-master/"
+        # (for old jenkins) or "edx-platform-all-tests-master/" (for new jenkins).
+        # The JOB_NAME is something along the lines of "edx-all-tests-auto-master/SHARD=1,TEST_SUITE=quality".
+        if [[ ${JOB_NAME} == 'edx-all-tests-auto-master/'* ]] || [[ ${JOB_NAME} == 'edx-platform-all-tests-master/'* ]]; then
             python scripts/pip_cache_store.py upload -b edx-platform.dependency-cache -f v1/master -d $HOME/.pip/download-cache/ -t $HOME/pip-download-cache.tar.gz
         fi
         exit $exitcode
