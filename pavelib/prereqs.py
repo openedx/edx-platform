@@ -6,7 +6,6 @@ import os
 import hashlib
 from distutils import sysconfig
 from paver.easy import *
-import subprocess
 from .utils.envs import Env
 
 
