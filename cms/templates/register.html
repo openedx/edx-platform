@@ -28,17 +28,20 @@
           <ol class="list-input">
             <li class="field text required" id="field-email">
               <label for="email">${_("E-mail")}</label>
-              <input id="email" type="email" name="email" placeholder="example: username@domain.com" />
+              ## Translators: This is the placeholder text for a field that requests an email address.
+              <input id="email" type="email" name="email" placeholder="${_("example: username@domain.com")}" />
             </li>
 
             <li class="field text required" id="field-name">
               <label for="name">${_("Full Name")}</label>
-              <input id="name" type="text" name="name" placeholder="example: Jane Doe" />
+              ## Translators: This is the placeholder text for a field that requests the user's full name.
+              <input id="name" type="text" name="name" placeholder="${_("example: Jane Doe")}" />
             </li>
 
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
-              <input id="username" type="text" name="username" placeholder="example: JaneDoe" />
+              ## Translators: This is the placeholder text for a field that asks the user to pick a username
+              <input id="username" type="text" name="username" placeholder="$(_("example: JaneDoe")}" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
