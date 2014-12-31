@@ -94,22 +94,8 @@ if [ -e $HOME/edx-venv_clean.tar.gz ]; then
     tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
 fi
 
-# Activate a new Python virtualenv
-virtualenv $HOME/edx-venv-$GIT_COMMIT
-source $HOME/edx-venv-$GIT_COMMIT/bin/activate
-
-# boto and path.py are requirements of scripts/pip_cache_store.py which is used
-# to download the pip download cache from S3.
-# We are installing just boto and path.py here to avoid installing all of base.txt
-# and paver.txt before getting the download cache. If versions of these are changed
-# in requirements files, they will be updated by install_prereqs.
-pip install -q boto>=2.32.1 path.py>=3.0.1
-
-# Download the pip-download-cache
-python scripts/pip_cache_store.py download -b edx-platform.dependency-cache -f v1/master -d $HOME/.pip/download-cache/ -t $HOME/pip-download-cache.tar.gz
-
-# Now install paver requirements
-pip install -q -r requirements/edx/paver.txt
+# Activate the Python virtualenv
+source $HOME/edx-venv/bin/activate
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -136,15 +122,7 @@ case "$TEST_SUITE" in
 <testcase classname="quality" name="quality" time="0.604"></testcase>
 </testsuite>
 END
-        exitcode=$EXIT
-
-        # Update the pip-download-cache.tar.gz in S3 if JOB_NAME starts with "edx-all-tests-auto-master/"
-        # (for old jenkins) or "edx-platform-all-tests-master/" (for new jenkins).
-        # The JOB_NAME is something along the lines of "edx-all-tests-auto-master/SHARD=1,TEST_SUITE=quality".
-        if [[ ${JOB_NAME} == 'edx-all-tests-auto-master/'* ]] || [[ ${JOB_NAME} == 'edx-platform-all-tests-master/'* ]]; then
-            python scripts/pip_cache_store.py upload -b edx-platform.dependency-cache -f v1/master -d $HOME/.pip/download-cache/ -t $HOME/pip-download-cache.tar.gz
-        fi
-        exit $exitcode
+        exit $EXIT
         ;;
 
     "unit")
@@ -224,8 +202,3 @@ END
         ;;
 
 esac
-
-
-# Deactivate and clean up python virtualenv
-deactivate
-rm -r $HOME/edx-venv-$GIT_COMMIT
