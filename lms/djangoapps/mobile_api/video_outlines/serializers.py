@@ -4,9 +4,6 @@ Serializer for video outline
 from rest_framework.reverse import reverse
 
 from courseware.access import has_access
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.django import modulestore
-
 
 
 from edxval.api import (
@@ -52,33 +49,46 @@ class BlockOutline(object):
             return reversed(block_path)
 
         def find_urls(block):
-            """section and unit urls for block"""
+            """
+            Find the section and unit urls for a block. If a unit block cannot
+            be found, an empty unit url will be returned. If a section block
+            cannot be found, an empty url will be returned for both section
+            and unit.
+
+            Returns:
+                unit_url, section_url:
+                    unit_url (str): The url of a unit
+                    section_url (str): The url of a section
+
+            """
+
             block_path = []
             while block in child_to_parent:
                 block = child_to_parent[block]
                 block_path.append(block)
 
-            try:
-                course, chapter, section, unit = list(reversed(block_path))[:4]
+            block_list = list(reversed(block_path))
+
+            n = len(block_list)
+
+            chapter = block_list[1].location.block_id if n > 1 else None
+            section = block_list[2] if n > 2 else None
+
+            if n > 3:
                 position = 1
                 for block in section.children:
-                    if block.name == unit.url_name:
+                    if block.name == block_list[3].url_name:
                         break
                     position += 1
-                chapter=chapter.url_name
-                section=section.url_name
-                course=course.id.to_deprecated_string()
-
-            except ValueError:
-                (course, chapter, section, unit) = \
-                    path_to_location(modulestore(), block_path[0].location)
-                position = unit
+            else:
+                position = ""
 
             kwargs = dict(
-                course_id=course,
+                course_id=self.course_id,
                 chapter=chapter,
-                section=section
+                section=section.url_name
             )
+
             section_url = reverse(
                 "courseware_section",
                 kwargs=kwargs,
@@ -90,9 +100,10 @@ class BlockOutline(object):
                 kwargs=kwargs,
                 request=self.request,
             )
-            return unit_url, section_url, block_path
+            return unit_url, section_url
 
         user = self.request.user
+
 
         while stack:
             curr_block = stack.pop()
@@ -112,7 +123,7 @@ class BlockOutline(object):
 
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(curr_block))
-                unit_url, section_url, _ = find_urls(curr_block)
+                unit_url, section_url = find_urls(curr_block)
 
                 yield {
                     "path": block_path,
