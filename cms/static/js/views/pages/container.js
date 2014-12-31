@@ -140,7 +140,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             onXBlockRefresh: function(xblockView, block_added) {
                 this.xblockView.refresh(block_added);
-                this.updateBlockActions();
                 // Update publish and last modified information from the server.
                 this.model.fetch();
             },
@@ -161,12 +160,6 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 }
             },
 
-            updateBlockActions: function() {
-                if (!this.options.canEdit) {
-                    this.xblockView.$el.find('.action-duplicate, .action-delete, .action-drag').remove();
-                }
-            },
-
             editXBlock: function(event) {
                 var xblockElement = this.findXBlockElement(event.target),
                     self = this,
@@ -174,6 +167,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 event.preventDefault();
 
                 modal.edit(xblockElement, this.model, {
+                    readOnlyView: !this.options.canEdit,
                     refresh: function() {
                         self.refreshXBlock(xblockElement, false);
                     }
