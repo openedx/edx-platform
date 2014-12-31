@@ -67,7 +67,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             **(other_settings or {})
         )
 
-    def _refresh_children(self, lib_content_block):
+    def _refresh_children(self, lib_content_block, status_code_expected=200):
         """
         Helper method: Uses the REST API to call the 'refresh_children' handler
         of a LibraryContent block
@@ -76,7 +76,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             lib_content_block.runtime._services['user'] = Mock(user_id=self.user.id)  # pylint: disable=protected-access
         handler_url = reverse_usage_url('component_handler', lib_content_block.location, kwargs={'handler': 'refresh_children'})
         response = self.client.ajax_post(handler_url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status_code_expected)
         return modulestore().get_item(lib_content_block.location)
 
     def _bind_module(self, descriptor, user=None):
@@ -556,3 +556,37 @@ class TestLibraryAccess(LibraryTestCase):
         self.assertIn(response.status_code, (200, 403))  # 400 would be ambiguous
         duplicate_action_allowed = (response.status_code == 200)
         self.assertEqual(duplicate_action_allowed, expected_result)
+
+    @ddt.data(
+        (LibraryUserRole, CourseStaffRole, True),
+        (CourseStaffRole, CourseStaffRole, True),
+        (None, CourseStaffRole, False),
+        (LibraryUserRole, None, False),
+    )
+    @ddt.unpack
+    def test_refresh_library_content_permissions(self, library_role, course_role, expected_result):
+        """
+        Test that the LibraryContent block's 'refresh_children' handler will correctly
+        handle permissions and allow/refuse when updating its content with the latest
+        version of a library. We try updating from a library with (write, read, or no)
+        access to a course with (write or no) access.
+        """
+        # As staff user, add a block to self.library:
+        ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        # And create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        self._login_as_non_staff_user()
+
+        # Assign roles:
+        if library_role:
+            library_role(self.lib_key).add_users(self.non_staff_user)
+        if course_role:
+            course_role(course.location.course_key).add_users(self.non_staff_user)
+
+        # Try updating our library content block:
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        self._bind_module(lc_block, user=self.non_staff_user)  # We must use the CMS's module system in order to get permissions checks.
+        lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
+        self.assertEqual(len(lc_block.children), 1 if expected_result else 0)

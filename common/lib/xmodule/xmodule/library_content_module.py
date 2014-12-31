@@ -279,6 +279,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
 
 @XBlock.wants('user')
 @XBlock.wants('library_tools')  # Only needed in studio
+@XBlock.wants('studio_user_permissions')  # Only available in studio
 class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDescriptor, StudioEditableDescriptor):
     """
     Descriptor class for LibraryContentModule XBlock.
@@ -307,8 +308,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         lib_tools = self.runtime.service(self, 'library_tools')
         user_service = self.runtime.service(self, 'user')
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
         user_id = user_service.user_id if user_service else None  # May be None when creating bok choy test fixtures
-        lib_tools.update_children(self, user_id, update_db)
+        lib_tools.update_children(self, user_id, user_perms, update_db)
         return Response()
 
     def validate(self):

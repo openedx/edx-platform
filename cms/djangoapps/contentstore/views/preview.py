@@ -22,6 +22,7 @@ from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
+from student.auth import has_studio_read_access, has_studio_write_access
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -124,6 +125,28 @@ class StudioUserService(object):
         return self._request.user.id
 
 
+class StudioPermissionsService(object):
+    """
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentDescriptor (and library_tools.py).
+    """
+
+    def __init__(self, request):
+        super(StudioPermissionsService, self).__init__()
+        self._request = request
+
+    def can_read(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_read_access(self._request.user, course_key)
+
+    def can_write(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_write_access(self._request.user, course_key)
+
+
 def _preview_module_system(request, descriptor, field_data):
     """
     Returns a ModuleSystem for the specified descriptor that is specialized for
@@ -153,6 +176,7 @@ def _preview_module_system(request, descriptor, field_data):
     ]
 
     descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
+    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
