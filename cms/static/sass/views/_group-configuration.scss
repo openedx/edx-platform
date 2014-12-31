@@ -27,7 +27,7 @@
       margin-bottom: ($baseline*1.5);
 
       .title {
-        @extend %t-title5;
+        @extend %t-title4;
         @extend %t-strong;
       }
 
@@ -49,14 +49,16 @@
           .group-configuration-header {
             margin-bottom: 0;
             border-bottom: 0;
+            padding-bottom: 0;
           }
 
           .group-configuration-title {
-            @extend %t-title4;
+            @extend %t-title5;
             @extend %t-strong;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
+            color: $black;
 
             .group-toggle {
               display: inline-block;
