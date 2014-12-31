@@ -5,9 +5,10 @@
           <%= gettext(error.message) %>
         </div>
     <% } %>
-        <fieldset class="groups-fields">
+        <fieldset class="group-configuration-fields">
             <div class="input-wrap field text required add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
-                <input name="group-<%= index %>-name" class="group-name long" value="<%= name %>" type="text">
+                <label for="group-<%= index %>-name"><%= gettext("Cohort Name") %></label>
+                <input name="group-<%= index %>-name" class="group-configuration-name-input input-text" value="<%= name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
             </div>
         </fieldset>
     </div>
