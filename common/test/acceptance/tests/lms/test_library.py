@@ -28,7 +28,10 @@ class LibraryContentTestBase(UniqueCourseTest):
     STAFF_EMAIL = "staff101@example.com"
 
     def populate_library_fixture(self, library_fixture):
-        pass
+        """
+        To be overwritten by subclassed tests. Used to install a library to
+        run tests on.
+        """
 
     def setUp(self):
         """
@@ -207,7 +210,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
 
     def _get_problem_select_text(self, name, items, correct):
         """ Generates Select Option CAPA problem XML """
-        items_text = ",".join(map(lambda item: "'{0}'".format(item), items))
+        items_text = ",".join(["'{0}'".format(item) for item in items])
 
         return """<problem>
 <p>{name}</p>
@@ -281,7 +284,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         self.assertEqual(len(children_headers), 1)
         self.assertLessEqual(
             children_headers,
-            set(map(lambda header: header.upper(), ["Problem Choice Group 1", "Problem Choice Group 2"]))
+            set([header.upper() for header in ["Problem Choice Group 1", "Problem Choice Group 2"]])
         )
 
         # Choice group test
@@ -289,7 +292,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         self.assertEqual(len(children_headers), 2)
         self.assertLessEqual(
             children_headers,
-            set(map(lambda header: header.upper(), ["Problem Select 1", "Problem Select 2"]))
+            set([header.upper() for header in ["Problem Select 1", "Problem Select 2"]])
         )
 
         # Missing problem type test
