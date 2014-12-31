@@ -24,7 +24,7 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
     """
     Return course information for a given course id.
     Args:
-        course_id : The course id to retrieve course information for.
+        course_id(str) : The course id to retrieve course information for.
     Returns:
         Serializable dictionary of the Course About Information.
     Raises:

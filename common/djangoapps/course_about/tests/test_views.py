@@ -20,6 +20,8 @@ from lms.djangoapps.courseware.courses import course_image_url
 from course_about import api
 from course_about.errors import CourseNotFoundError
 from mock import patch
+from xmodule.modulestore.django import modulestore
+from datetime import datetime
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -82,6 +84,34 @@ class CourseInfoTest(ModuleStoreTestCase, APITestCase):
                           'effort', 'media', 'video', 'course_image']
         for attr in all_attributes:
             self.assertIn(attr, str(resp_data))
+
+    def test_get_course_about_valid_date(self):
+        module_store = modulestore()
+        self.course.start = datetime.now()
+        self.course.end = datetime.now()
+        self.course.announcement = datetime.now()
+        module_store.update_item(self.course, self.user.id)
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        course_info = json.loads(resp.content)
+        self.assertIsNotNone(course_info["start"])
+        self.assertIsNotNone(course_info["end"])
+        self.assertIsNotNone(course_info["announcement"])
+
+    def test_get_course_about_none_date(self):
+        module_store = modulestore()
+        self.course.start = None
+        self.course.end = None
+        self.course.announcement = None
+        module_store.update_item(self.course, self.user.id)
+        resp = self.client.get(
+            reverse('courseabout', kwargs={"course_id": unicode(self.course.id)})
+        )
+        course_info = json.loads(resp.content)
+        self.assertIsNone(course_info["start"])
+        self.assertIsNone(course_info["end"])
+        self.assertIsNone(course_info["announcement"])
 
     def test_get_course_details(self):
         kwargs = dict()

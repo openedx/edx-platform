@@ -17,9 +17,12 @@ def serialize_content(course_descriptor, about_descriptor):
     """
     data = dict()
     data['display_name'] = getattr(course_descriptor, 'display_name', None)
-    data['start'] = getattr(course_descriptor, 'start', None)
-    data['end'] = getattr(course_descriptor, 'end', None)
-    data["announcement"] = getattr(course_descriptor, 'announcement', None)
+    start = getattr(course_descriptor, 'start', None)
+    end = getattr(course_descriptor, 'end', None)
+    announcement = getattr(course_descriptor, 'announcement', None)
+    data['start'] = start.strftime('%Y-%m-%d') if start else None
+    data['end'] = end.strftime('%Y-%m-%d') if end else None
+    data["announcement"] = announcement.strftime('%Y-%m-%d') if announcement else None
     data['advertised_start'] = getattr(course_descriptor, 'advertised_start', None)
     data['is_new'] = getattr(course_descriptor, 'is_new', None)
 

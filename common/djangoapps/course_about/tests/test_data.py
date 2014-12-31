@@ -14,6 +14,8 @@ from course_about import data
 from course_about.errors import CourseNotFoundError
 from util.parsing_utils import parse_video_tag
 from nose.tools import raises
+from xmodule.modulestore.django import modulestore
+from datetime import datetime
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.
@@ -42,9 +44,35 @@ class CourseAboutDataTest(ModuleStoreTestCase):
         course_info = data.get_course_about_details(unicode(self.course.id))
         self.assertIsNotNone(course_info)
 
+    def test_get_course_about_valid_date(self):
+        module_store = modulestore()
+        self.course.start = datetime.now()
+        self.course.end = datetime.now()
+        self.course.announcement = datetime.now()
+        module_store.update_item(self.course, self.user.id)
+        course_info = data.get_course_about_details(unicode(self.course.id))
+        self.assertIsNotNone(course_info["start"])
+        self.assertIsNotNone(course_info["end"])
+        self.assertIsNotNone(course_info["announcement"])
+
+    def test_get_course_about_none_date(self):
+        module_store = modulestore()
+        self.course.start = None
+        self.course.end = None
+        self.course.announcement = None
+        module_store.update_item(self.course, self.user.id)
+        course_info = data.get_course_about_details(unicode(self.course.id))
+        self.assertIsNone(course_info["start"])
+        self.assertIsNone(course_info["end"])
+        self.assertIsNone(course_info["announcement"])
+
     @raises(CourseNotFoundError)
     def test_non_existent_course(self):
         data.get_course_about_details("this/is/bananas")
+
+    @raises(CourseNotFoundError)
+    def test_invalid_key(self):
+        data.get_course_about_details("invalid:key:k")
 
     def test_parsing_utils_valid_data(self):
         video_html = '<iframe width="560" height="315" src="//www.youtube.com/embed/myvdolink?rel=0" frameborder="0" ' \
