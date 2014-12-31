@@ -5,6 +5,7 @@ LibraryContent: The XBlock used to include blocks from a library in a course.
 from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
+from capa.responsetypes import registry
 
 from .mako_module import MakoModuleDescriptor
 from opaque_keys import InvalidKeyError
@@ -33,34 +34,18 @@ def enum(**enums):
     return type('Enum', (), enums)
 
 
+def _get_human_name(problem_class):
+    """
+    Get the human-friendly name for a problem type.
+    """
+    return getattr(problem_class, 'human_name', problem_class.__name__)
+
+
 def _get_capa_types():
     """
     Gets capa types tags and labels
     """
-    capa_types = {
-        # basic tab
-        'choiceresponse': _('Checkboxes'),
-        'optionresponse': _('Dropdown'),
-        'multiplechoiceresponse': _('Multiple Choice'),
-        'truefalseresponse': _('True/False Choice'),
-        'numericalresponse': _('Numerical Input'),
-        'stringresponse': _('Text Input'),
-
-        # advanced tab
-        'schematicresponse': _('Circuit Schematic Builder'),
-        'customresponse': _('Custom Evaluated Script'),
-        'imageresponse': _('Image Mapped Input'),
-        'formularesponse': _('Math Expression Input'),
-        'jsmeresponse': _('Molecular Structure'),
-
-        # not in "Add Component" menu
-        'javascriptresponse': _('Javascript Input'),
-        'symbolicresponse': _('Symbolic Math Input'),
-        'coderesponse': _('Code Input'),
-        'externalresponse': _('External Grader'),
-        'annotationresponse': _('Annotation Input'),
-        'choicetextresponse': _('Checkboxes With Text Input'),
-    }
+    capa_types = {tag: _get_human_name(registry.get_class_for_tag(tag)) for tag in registry.registered_tags()}
 
     return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
         {'value': capa_type, 'display_name': caption}
@@ -429,9 +414,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'There are no content matching configured filters in the selected libraries.'),
+                    _(u'There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Problem Type Filter")
+                    action_label=_(u"Select another problem type")
                 )
             )
 
@@ -440,10 +425,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'Configured to fetch {count} blocks, library and filter settings yield only {actual} blocks.')
+                    _(u'The specified libraries are configured to fetch {count} problems, '
+                      u'but there are only {actual} matching problems.')
                     .format(actual=matching_children_count, count=self.max_count),
                     action_class='edit-button',
-                    action_label=_(u"Edit block configuration")
+                    action_label=_(u"Edit configuration")
                 )
             )
 
