@@ -54,7 +54,10 @@ define([
             };
 
             var expectSubmitEnabled = function( isEnabled ) {
-                var isDisabled = $('#next_step_button').hasClass('is-disabled');
+                var appearsDisabled = $( '#next_step_button' ).hasClass( 'is-disabled' ),
+                    isDisabled = $( '#next_step_button' ).prop( 'disabled' );
+
+                expect( !appearsDisabled ).toBe( isEnabled );
                 expect( !isDisabled ).toBe( isEnabled );
             };
 
