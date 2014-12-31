@@ -54,20 +54,23 @@ from django.utils.translation import ugettext as _
                     <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
             </article>
-            <aside class="content-supplementary" role="complimentary">
+            <aside class="content-supplementary" role="complementary">
                 <div class="library-location">
                     <h4 class="bar-mod-title">${_("Library ID")}</h4>
                     <div class="wrapper-library-id bar-mod-content">
                         <h5 class="title">${_("Library ID")}</h5>
                         <p class="library-id">
                             <span class="library-id-value">${context_library.location.library_key | h}</span>
-                            <span class="tip"><span class="sr">${_("Tip:")}</span> ${_("Use this ID when you want to add content from this library to a course using a Library Content component. You enter this ID in the Libraries field.")}</span>
+                            <span class="tip"><span class="sr">${_("Tip:")}</span> ${_("To add content from this library to a course that uses a Randomized Content Block, copy this ID and enter it in the Libraries field in the Randomized Content Block settings.")}</span>
                         </p>
                     </div>
                 </div>
                 <div class="bit">
-                    <h3 class="title-3">${_("Adding content components")}</h3>
-                    <p>${_("You can add components to the library. Help text here.")}</p>
+                    <h3 class="title-3">${_("Adding content to your library")}</h3>
+                    <p>${_("Add components to your library for use in courses, using Add New Component at the bottom of this page.")}</p>
+                    <p>${_("Components are listed in the order in which they are added, with the most recently added at the bottom. Use the pagination arrows to navigate from page to page if you have more than one page of components in your library.")}</p>
+                    <h3 class="title-3">${_("Using library content in courses")}</h3>
+                    <p>${_("Use library content in courses by adding a Randomized Content Block to your courseware, and enter the Library ID for each library from which you want to draw content. In the settings for each Randomized Content Block you can specify the number of problems to be randomly selected and displayed to each student. ")}</p>
                 </div>
                 <div class="bit external-help">
                     <a href="${get_online_help_info('library')['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about content libraries")}</a>
