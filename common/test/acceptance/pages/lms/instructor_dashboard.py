@@ -6,6 +6,7 @@ Instructor (2) dashboard page.
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
 import os
+from bok_choy.promise import EmptyPromise
 
 
 class InstructorDashboardPage(CoursePage):
@@ -87,6 +88,8 @@ class MembershipPageCohortManagementSection(PageObject):
     url = None
     csv_browse_button_selector = '.csv-upload #file-upload-form-file'
     csv_upload_button_selector = '.csv-upload #file-upload-form-submit'
+    content_group_selector = '.input-group-other option'
+    no_content_group_button = '.cohort-management-details-association-course input.radio-no'
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management.membership-section').present
@@ -144,17 +147,24 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Selects the given cohort in the drop-down.
         """
+        EmptyPromise(
+            lambda: cohort_name in self.get_cohorts(),
+            "Waiting for cohort selector to populate"
+        ).fulfill()
         self.q(css=self._bounded_selector("#cohort-select option")).filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
 
-    def add_cohort(self, cohort_name):
+    def add_cohort(self, cohort_name, content_group=None):
         """
         Adds a new manual cohort with the specified name.
+        If a content group should also be associated, the name of the content group should be specified.
         """
         self.q(css=self._bounded_selector("div.cohort-management-nav .action-create")).first.click()
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
+        if content_group:
+            self._select_associated_content_group(content_group)
         self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
 
     def get_cohort_group_setup(self):
@@ -184,6 +194,68 @@ class MembershipPageCohortManagementSection(PageObject):
             css=self._bounded_selector("#cohort-management-group-add-students")
         ).results[0].get_attribute("value")
 
+    def get_all_content_groups(self):
+        """
+        Returns all the content groups available for associating with the cohort currently being edited.
+        """
+        select = self.q(css=self._bounded_selector(self.content_group_selector))
+        groups = []
+        for option in select:
+            if option.text != "Choose a content group to associate":
+                groups.append(option.text)
+
+        return groups
+
+    def get_cohort_associated_content_group(self):
+        """
+        Returns the content group associated with the cohort currently being edited.
+        If no content group is associated, returns None.
+        """
+        self.select_cohort_settings()
+        radio_button = self.q(css=self._bounded_selector(self.no_content_group_button)).results[0]
+        if radio_button.get_attribute("checked") == "true":
+            return None
+        option_selector = self.q(css=self._bounded_selector(self.content_group_selector))
+        return option_selector.filter(lambda el: el.is_selected())[0].text
+
+    def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
+        """
+        Sets the content group associated with the cohort currently being edited.
+        If content_group is None, un-links the cohort group from any content group.
+        Presses Save to update the cohort's settings.
+        """
+        if select_settings:
+            self.select_cohort_settings()
+        if content_group is None:
+            self.q(css=self._bounded_selector(self.no_content_group_button)).first.click()
+        else:
+            self._select_associated_content_group(content_group)
+        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+
+    def _select_associated_content_group(self, content_group):
+        """
+        Selects the specified content group from the selector. Assumes that content_group is not None.
+        """
+        option_selector = self.q(css=self._bounded_selector(self.content_group_selector))
+        option_selector.filter(lambda el: el.text == content_group).first.click()
+
+    def select_cohort_settings(self):
+        """
+        Selects the settings tab for the cohort currently being edited.
+        """
+        self.q(css=self._bounded_selector(".cohort-management-settings li.tab-settings>a")).first.click()
+
+    def get_cohort_settings_messages(self, type="confirmation", wait_for_messages=True):
+        """
+        Returns an array of messages related to modifying cohort settings. If wait_for_messages
+        is True, will wait for a message to appear.
+        """
+        # Note that the class name should change because it is no longer a "create"
+        title_css = "div.cohort-management-settings .message-" + type + " .message-title"
+        detail_css = "div.cohort-management-settings .message-" + type + " .summary-item"
+
+        return self._get_messages(title_css, detail_css, wait_for_messages=wait_for_messages)
+
     def _get_cohort_messages(self, type):
         """
         Returns array of messages related to manipulating cohorts directly through the UI for the given type.
@@ -201,10 +273,15 @@ class MembershipPageCohortManagementSection(PageObject):
         detail_css = ".csv-upload .summary-item"
         return self._get_messages(title_css, detail_css)
 
-    def _get_messages(self, title_css, details_css):
+    def _get_messages(self, title_css, details_css, wait_for_messages=False):
         """
         Helper method to get messages given title and details CSS.
         """
+        if wait_for_messages:
+            EmptyPromise(
+                lambda: self.q(css=self._bounded_selector(title_css)).results != 0,
+                "Waiting for messages to appear"
+            ).fulfill()
         message_title = self.q(css=self._bounded_selector(title_css))
         if len(message_title.results) == 0:
             return []
@@ -227,6 +304,16 @@ class MembershipPageCohortManagementSection(PageObject):
         The first entry in the array is the title. Any further entries are the details.
         """
         return self._get_cohort_messages("errors")
+
+    def get_cohort_related_content_group_message(self):
+        """
+        Gets the error message shown next to the content group selector for the currently selected cohort.
+        If no message, returns None.
+        """
+        message = self.q(css=self._bounded_selector(".input-group-other .copy-error"))
+        if not message:
+            return None
+        return message.results[0].text
 
     def select_data_download(self):
         """
