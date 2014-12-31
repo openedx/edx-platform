@@ -163,13 +163,19 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
                 * status (str): One of the enumerated status codes.
                 * days_until_deadline (int): Number of days until the verification deadline.
                 * verification_good_until (str): Date string for the verification expiration date.
-    """
 
+    """
     status_by_course = {}
 
     # Retrieve all verifications for the user, sorted in descending
     # order by submission datetime
     verifications = SoftwareSecurePhotoVerification.objects.filter(user=user)
+
+    # Check whether the user has an active or pending verification attempt
+    # To avoid another database hit, we re-use the queryset we have already retrieved.
+    has_active_or_pending = SoftwareSecurePhotoVerification.user_has_valid_or_pending(
+        user, queryset=verifications
+    )
 
     for course, enrollment in course_enrollment_pairs:
 
@@ -210,7 +216,13 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             )
             if status is None and not submitted:
                 if deadline is None or deadline > datetime.now(UTC):
-                    status = VERIFY_STATUS_NEED_TO_VERIFY
+                    # If a user already has an active or pending verification,
+                    # but it will expire by the deadline, the we do NOT show the
+                    # verification message.  This is because we don't currently
+                    # allow users to resubmit an attempt before their current
+                    # attempt expires.
+                    if not has_active_or_pending:
+                        status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
                     status = VERIFY_STATUS_MISSED_DEADLINE
 
