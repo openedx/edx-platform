@@ -7,24 +7,22 @@ env:
   - LETTUCE_BROWSER=firefox
   matrix:
     # These work. Disable while getting the rest of the commands to work also.
-    - TEST_SUITE=quality
-    # - TEST_SUITE=unit-lms
-    - TEST_SUITE=unit-cms
-    - TEST_SUITE=unit-lib
-    - TEST_SUITE=unit-js
+    # - TEST_SUITE=unit-cms
+    # - TEST_SUITE=unit-lib
+    # - TEST_SUITE=unit-js
 
     # Still working on these.
-    # - PAVER_CMD="test_acceptance -s lms"
-    # - PAVER_CMD="test_acceptance -s cms"
-    # - PAVER_CMD="test_system -s lms --fasttest"  # Issues with the bulk email xml to plaintext via lynx process
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation --extra_args=\"-a shard_1\"'
+    - TEST_SUITE=quality
+    # - TEST_SUITE=unit-lms
+    # - TEST_SUITE=lettuce-cms
+    # - TEST_SUITE=lettuce-lms
 
     # Break out the bok-choy for troubleshooting
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/test_annotatable.py common/test/acceptance/tests/test_ora.py
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/discussion/test_cohort_management.py common/test/acceptance/tests/discussion/test_cohorts.py common/test/acceptance/tests/discussion/test_discussion.py
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/lms/test_lms.py common/test/acceptance/tests/lms/test_lms_acid_xblock.py common/test/acceptance/tests/lms/test_lms_courseware.py common/test/acceptance/tests/lms/test_lms_instructor_dashboard.py common/test/acceptance/tests/lms/test_lms_matlab_problem.py common/test/acceptance/tests/lms/test_lms_staff_view.py
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/studio/test_studio_acid_xblock.py common/test/acceptance/tests/studio/test_studio_bad_data.py common/test/acceptance/tests/studio/test_studio_container.py common/test/acceptance/tests/studio/test_studio_general.py common/test/acceptance/tests/studio/test_studio_outline.py common/test/acceptance/tests/studio/test_studio_rerun.py common/test/acceptance/tests/studio/test_studio_settings.py common/test/acceptance/tests/studio/test_studio_split_test.py common/test/acceptance/tests/studio/test_studio_with_ora_component.py
-    # - PAVER_CMD='test_bokchoy --skip_firefox_version_validation -t common/test/acceptance/tests/video/test_studio_video_editor.py common/test/acceptance/tests/video/test_studio_video_module.py common/test/acceptance/tests/video/test_studio_video_transcript.py common/test/acceptance/tests/video/test_video_handout.py common/test/acceptance/tests/video/test_video_module.py common/test/acceptance/tests/video/test_video_times.py
+    # - TEST_SUITE=bok-1
+    # - TEST_SUITE=bok-2
+    # - TEST_SUITE=bok-3
+    # - TEST_SUITE=bok-4
+    # - TEST_SUITE=bok-5
 
 
 language: python
