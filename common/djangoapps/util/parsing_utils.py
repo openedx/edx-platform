@@ -1,24 +1,17 @@
 """
 Utility function for some parsing stuff
 """
-
-__author__ = 'aamir'
-
-import re
+from xmodule.contentstore.content import StaticContent
 
 
-def parse_video_tag(video_with_html):
+def course_image_url(course):
     """
-    Gives the video ID from video's html
-    Because the client really only wants the author to specify the youtube key, that's all we send to and get from the
-    client. The problem is that the db stores the html markup as well (which, of course, makes any sitewide changes to
-    how we do videos next to impossible.)
+    Return url of course image.
+    Args:
+        course(CourseDescriptor) : The course id to retrieve course image url.
+    Returns:
+        Absolute url of course image.
     """
-    video_id = None
-    if video_with_html:
-        string_matcher = re.search(r'(?<=embed/)[a-zA-Z0-9_-]+', video_with_html)
-        if string_matcher is None:
-            string_matcher = re.search(r'<?=\d+:[a-zA-Z0-9_-]+', video_with_html)
-        if string_matcher:
-            video_id = string_matcher.group(0)
-    return video_id
+    loc = StaticContent.compute_location(course.id, course.course_image)
+    url = StaticContent.serialize_asset_key_with_slash(loc)
+    return url

@@ -12,7 +12,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
 from course_about import data
 from course_about.errors import CourseNotFoundError
-from util.parsing_utils import parse_video_tag
 from nose.tools import raises
 from xmodule.modulestore.django import modulestore
 from datetime import datetime
@@ -73,20 +72,3 @@ class CourseAboutDataTest(ModuleStoreTestCase):
     @raises(CourseNotFoundError)
     def test_invalid_key(self):
         data.get_course_about_details("invalid:key:k")
-
-    def test_parsing_utils_valid_data(self):
-        video_html = '<iframe width="560" height="315" src="//www.youtube.com/embed/myvdolink?rel=0" frameborder="0" ' \
-                     'allowfullscreen=""></iframe>'
-        video_id = parse_video_tag(video_html)
-        self.assertIsNotNone(video_id)
-
-    def test_parsing_utils_invalid_data(self):
-        video_html = '<iframe width="560" height="315" src="//www.google.com?rel=0" frameborder="0" ' \
-                     'allowfullscreen=""></iframe>'
-        video_id = parse_video_tag(video_html)
-        self.assertIsNone(video_id)
-
-    def test_parsing_utils_no_data(self):
-        video_html = None
-        video_id = parse_video_tag(video_html)
-        self.assertIsNone(video_id)
