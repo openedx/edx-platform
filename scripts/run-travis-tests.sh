@@ -63,7 +63,8 @@ case "${TEST_SUITE}" in
         ;;
 
     "bok-4")
-        paver test_bokchoy --skip_firefox_version_validation -t studio/test_studio_acid_xblock.py studio/test_studio_bad_data.py
+        paver test_bokchoy --skip_firefox_version_validation -t studio/test_studio_acid_xblock.py
+        paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_bad_data.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_container.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_general.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t studio/test_studio_outline.py
