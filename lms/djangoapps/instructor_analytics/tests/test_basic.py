@@ -238,8 +238,6 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_order_record['company_contact_name'], order.company_contact_name)
             self.assertEqual(sale_order_record['company_contact_email'], order.company_contact_email)
             self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
-            self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
-            self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
             self.assertEqual(sale_order_record['unit_cost'], item.unit_cost)
             self.assertEqual(sale_order_record['list_price'], item.list_price)
             self.assertEqual(sale_order_record['status'], item.status)
@@ -281,7 +279,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         order.save()
 
         registration_code_redemption = RegistrationCodeRedemption(
-            order=order, registration_code_id=1, redeemed_by=self.instructor
+            registration_code_id=1, redeemed_by=self.instructor
         )
         registration_code_redemption.save()
         registration_codes = CourseRegistrationCode.objects.all()

@@ -1862,30 +1862,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for res in res_json['sale']:
             self.validate_sale_records_response(res, course_registration_code, self.sale_invoice_1, 0)
 
-    def test_get_sale_records_features_with_used_code(self):
-        """
-        Test that the response from get_sale_records is in json format and using one of the registration codes.
-        """
-        for i in range(5):
-            course_registration_code = CourseRegistrationCode(
-                code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1
-            )
-            course_registration_code.save()
-
-        PaidCourseRegistration.add_to_order(self.cart, self.course.id)
-
-        # now using registration code
-        self.client.post(reverse('shoppingcart.views.use_code'), {'code': 'qwerty0'})
-
-        url = reverse('get_sale_records', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.get(url, {})
-        res_json = json.loads(response.content)
-        self.assertIn('sale', res_json)
-
-        for res in res_json['sale']:
-            self.validate_sale_records_response(res, course_registration_code, self.sale_invoice_1, 1)
-
     def test_get_sale_records_features_with_multiple_invoices(self):
         """
         Test that the response from get_sale_records is in json format for multiple invoices
@@ -3038,7 +3014,8 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         for i in range(5):
             i += 1
             registration_code_redemption = RegistrationCodeRedemption(
-                order_id=i, registration_code_id=i, redeemed_by=self.instructor
+                registration_code_id=i,
+                redeemed_by=self.instructor
             )
             registration_code_redemption.save()
 
@@ -3220,7 +3197,8 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         for i in range(9):
             i += 13
             registration_code_redemption = RegistrationCodeRedemption(
-                order_id=i, registration_code_id=i, redeemed_by=self.instructor
+                registration_code_id=i,
+                redeemed_by=self.instructor
             )
             registration_code_redemption.save()
 
