@@ -75,7 +75,7 @@ case "${TEST_SUITE}" in
         ;;
 
     "bok-5")
-        paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_editor.py
+        paver test_bokchoy --skip_firefox_version_validation -t video/test_studio_video_editor.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_module.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_studio_video_transcript.py
         paver test_bokchoy --skip_firefox_version_validation --fasttest -t video/test_video_handout.py

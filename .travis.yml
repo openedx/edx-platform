@@ -21,8 +21,8 @@ env:
     # - TEST_SUITE=bok-1
     # - TEST_SUITE=bok-2
     # - TEST_SUITE=bok-3
-    - TEST_SUITE=bok-4
-    # - TEST_SUITE=bok-5
+    # - TEST_SUITE=bok-4
+    - TEST_SUITE=bok-5
 
 
 language: python
