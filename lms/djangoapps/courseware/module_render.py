@@ -871,7 +871,7 @@ def hash_resource(resource):
     """
     md5 = hashlib.md5()
     for data in resource:
-        md5.update(data)
+        md5.update(repr(data))
     return md5.hexdigest()
 
 
