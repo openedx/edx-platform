@@ -25,6 +25,21 @@
         ]
       }
     });
+    MathJax.Hub.signal.Interest(function(message) {
+        if(message[0] === "End Math") {
+            set_mathjax_display_div_settings();
+        }
+    });
+  function set_mathjax_display_div_settings() {
+  $('.MathJax_Display').each(function( index ) {
+    var input_id = this.parentElement.id.replace("_preview", "");
+    var input_id = input_id.replace("input_", "");
+    this.setAttribute('id', input_id + '_mathjax');
+    this.setAttribute('tabindex', '0');
+    this.removeAttribute('role');
+    this.removeAttribute('aria-readonly');
+    });
+    }
   %endif
   MathJax.Hub.Configured();
   window.HUB = MathJax.Hub;
