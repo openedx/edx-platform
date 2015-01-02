@@ -10,9 +10,6 @@
         />
 
       <p class="status" 
-         %if status != 'unsubmitted':
-         aria-hidden="true"
-         %endif
          >
           <span class="sr equation">
               %if value:
@@ -25,7 +22,7 @@
 
       <div id="input_${id}_preview" class="equation">
         \[\]
-        <img src="${STATIC_URL}images/spinner.gif" class="loading"/>
+        <img src="${STATIC_URL}images/spinner.gif" class="loading" alt="loading"/>
       </div>
     <p id="answer_${id}" class="answer"></p>
   </div>
