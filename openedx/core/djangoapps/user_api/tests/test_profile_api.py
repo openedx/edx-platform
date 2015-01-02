@@ -7,6 +7,7 @@ import ddt
 from django.test.utils import override_settings
 from nose.tools import raises
 from dateutil.parser import parse as parse_datetime
+from pytz import UTC
 from xmodule.modulestore.tests.factories import CourseFactory
 import datetime
 
@@ -167,7 +168,7 @@ class ProfileApiTest(TestCase):
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
         profile = UserProfile.objects.get(user=user)
-        year_of_birth = datetime.datetime.now().year - age  # pylint: disable=maybe-no-member
+        year_of_birth = datetime.datetime.now(UTC).year - age  # pylint: disable=maybe-no-member
         profile.year_of_birth = year_of_birth
         profile.save()
 
