@@ -576,6 +576,16 @@ div.problem {
     visibility: visible;
   }
 
+  .CodeMirror-code pre {
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
+    width: fit-content;
+  }
+
+  .CodeMirror-scroll {
+    margin-right: 0px;
+  }
+
   hr {
     float: none;
     clear: both;
