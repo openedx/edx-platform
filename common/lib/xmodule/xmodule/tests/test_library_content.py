@@ -5,7 +5,7 @@ Basic unit tests for LibraryContentModule
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 import ddt
-from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE
+from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
@@ -242,3 +242,12 @@ class TestLibraries(MixedSplitTestCase):
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 4)
+
+    def test_non_editable_settings(self):
+        """
+        Test the settings that are marked as "non-editable".
+        """
+        non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
+        self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
+        self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
+
