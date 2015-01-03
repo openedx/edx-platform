@@ -494,6 +494,15 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                             containerPage.$(".new-component .new-component-type a.single-template")[index].click();
                         };
 
+                        it('Attaches a handler to new component button', function() {
+                            containerPage = getContainerPage();
+                            containerPage.render();
+                            // Stub jQuery.scrollTo module.
+                            $.scrollTo = jasmine.createSpy('jQuery.scrollTo');
+                            containerPage.$('.new-component-button').click();
+                            expect($.scrollTo).toHaveBeenCalled();
+                        });
+
                         it('sends the correct JSON to the server', function () {
                             renderContainerPage(this, mockContainerXBlockHtml);
                             clickNewComponent(0);

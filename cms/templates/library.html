@@ -43,7 +43,19 @@ from django.utils.translation import ugettext as _
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
                 <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${context_library.display_name_with_default | h}</span></h1>
+            </div>
         </div>
+
+        <nav class="nav-actions">
+            <h3 class="sr">${_("Page Actions")}</h3>
+            <ul>
+                <li class="nav-item">
+                    <a href="#" class="button new-button new-component-button">
+                        <i class="icon-plus icon-inline"></i> <span class="action-button-text">${_("Add Component")}</span>
+                    </a>
+              </li>
+            </ul>
+        </nav>
     </header>
 </div>
 
