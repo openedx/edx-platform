@@ -26,8 +26,6 @@ from mongodb_proxy import MongoProxy, autoretry_read
 from path import path
 from pytz import UTC
 from contracts import contract, new_contract
-from operator import itemgetter
-from sortedcontainers import SortedListWithKey
 
 from importlib import import_module
 from opaque_keys.edx.keys import UsageKey, CourseKey, AssetKey
@@ -1535,34 +1533,14 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             user_id (int|long): user ID saving the asset metadata
             import_only (bool): True if edited_on/by data should remain unchanged.
         """
-        course_assets = self._find_course_assets(asset_metadata_list[0].asset_id.course_key)
-
-        changed_asset_types = set()
-        assets_by_type = {}
-        for asset_md in asset_metadata_list:
-            asset_type = asset_md.asset_id.asset_type
-            changed_asset_types.add(asset_type)
-            # Lazily create a sorted list if not already created.
-            if asset_type not in assets_by_type:
-                assets_by_type[asset_type] = SortedListWithKey(course_assets.get(asset_type, []), key=itemgetter('filename'))
-            all_assets = assets_by_type[asset_type]
-            asset_idx = self._find_asset_in_list(assets_by_type[asset_type], asset_md.asset_id)
-            if not import_only:
-                asset_md.update({'edited_by': user_id, 'edited_on': datetime.now(UTC)})
-
-            # Translate metadata to Mongo format.
-            metadata_to_insert = asset_md.to_storable()
-            if asset_idx is None:
-                # Add new metadata sorted into the list.
-                all_assets.add(metadata_to_insert)
-            else:
-                # Replace existing metadata.
-                all_assets[asset_idx] = metadata_to_insert
+        course_key = asset_metadata_list[0].asset_id.course_key
+        course_assets = self._find_course_assets(course_key)
+        assets_by_type = self._save_assets_by_type(course_key, asset_metadata_list, course_assets, user_id, import_only)
 
         # Build an update set with potentially multiple embedded fields.
         updates_by_type = {}
-        for asset_type in changed_asset_types:
-            updates_by_type[self._make_mongo_asset_key(asset_type)] = assets_by_type[asset_type].as_list()
+        for asset_type, assets in assets_by_type.iteritems():
+            updates_by_type[self._make_mongo_asset_key(asset_type)] = assets.as_list()
 
         # Update the document.
         self.asset_collection.update(
