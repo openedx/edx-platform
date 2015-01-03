@@ -11,7 +11,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.tests import get_test_system
 from mock import Mock
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 
@@ -29,6 +28,8 @@ class TestLibraries(ModuleStoreTestCase):
 
         self.lib_key = self._create_library()
         self.library = modulestore().get_library(self.lib_key)
+
+        self.session_data = {}  # Used by _bind_module
 
     def _create_library(self, org="org", library="lib", display_name="Test Library"):
         """
@@ -73,6 +74,17 @@ class TestLibraries(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200)
         return modulestore().get_item(lib_content_block.location)
 
+    def _bind_module(self, descriptor, user=None):
+        """
+        Helper to use the CMS's module system so we can access student-specific fields.
+        """
+        if user is None:
+            user = self.user
+        if user not in self.session_data:
+            self.session_data[user] = {}
+        request = Mock(user=user, session=self.session_data[user])
+        _load_preview_module(request, descriptor)  # pylint: disable=protected-access
+
     def _update_item(self, usage_key, metadata):
         """
         Helper method: Uses the REST API to update the fields of an XBlock.
@@ -111,7 +123,7 @@ class TestLibraries(ModuleStoreTestCase):
         # chosen for a given student.
         # In order to be able to call get_child_descriptors(), we must first
         # call bind_for_student:
-        lc_block.bind_for_student(get_test_system(), lc_block._field_data)  # pylint: disable=protected-access
+        self._bind_module(lc_block)
         self.assertEqual(len(lc_block.children), num_to_create)
         self.assertEqual(len(lc_block.get_child_descriptors()), num_expected)
 
@@ -119,15 +131,6 @@ class TestLibraries(ModuleStoreTestCase):
         """
         Test that the same student will always see the same selected child block
         """
-        session_data = {}
-
-        def bind_module(descriptor):
-            """
-            Helper to use the CMS's module system so we can access student-specific fields.
-            """
-            request = Mock(user=self.user, session=session_data)
-            return _load_preview_module(request, descriptor)  # pylint: disable=protected-access
-
         # Create many blocks in the library and add them to a course:
         for num in range(0, 8):
             ItemFactory.create(
@@ -151,7 +154,7 @@ class TestLibraries(ModuleStoreTestCase):
             return children[0]
 
         # Check which child a student will see:
-        bind_module(lc_block)
+        self._bind_module(lc_block)
         chosen_child = get_child_of_lc_block(lc_block)
         chosen_child_defn_id = chosen_child.definition_locator.definition_id
         lc_block.save()
@@ -165,7 +168,7 @@ class TestLibraries(ModuleStoreTestCase):
             """
             for _ in range(0, 6):  # Repeat many times b/c blocks are randomized
                 lc_block = modulestore().get_item(lc_block_key)  # Reload block from the database
-                bind_module(lc_block)
+                self._bind_module(lc_block)
                 current_child = get_child_of_lc_block(lc_block)
                 self.assertEqual(current_child.location, chosen_child.location)
                 self.assertEqual(current_child.data, chosen_child.data)
