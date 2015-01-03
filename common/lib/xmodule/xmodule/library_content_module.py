@@ -322,6 +322,15 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js = {'coffee': [resource_string(__name__, 'js/src/vertical/edit.coffee')]}
     js_module_name = "VerticalDescriptor"
 
+    @property
+    def non_editable_metadata_fields(self):
+        non_editable_fields = super(LibraryContentDescriptor, self).non_editable_metadata_fields
+        # The only supported mode is currently 'random'.
+        # Add the mode field to non_editable_metadata_fields so that it doesn't
+        # render in the edit form.
+        non_editable_fields.append(LibraryContentFields.mode)
+        return non_editable_fields
+
     @XBlock.handler
     def refresh_children(self, request=None, suffix=None):  # pylint: disable=unused-argument
         """
