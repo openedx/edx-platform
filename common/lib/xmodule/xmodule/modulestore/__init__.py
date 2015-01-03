@@ -9,6 +9,7 @@ import json
 import datetime
 from uuid import uuid4
 
+from pytz import UTC
 from collections import namedtuple, defaultdict
 import collections
 from contextlib import contextmanager
@@ -36,7 +37,6 @@ log = logging.getLogger('edx.modulestore')
 new_contract('CourseKey', CourseKey)
 new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
-new_contract('SortedListWithKey', SortedListWithKey)
 
 
 class ModuleStoreEnum(object):
@@ -276,27 +276,65 @@ class BulkOperationsMixin(object):
         return self._get_bulk_ops_record(course_key, ignore_case).active
 
 
-class ModuleStoreAssetInterface(object):
+class IncorrectlySortedList(Exception):
     """
-    The methods for accessing assets and their metadata
+    Thrown when calling find() on a SortedAssetList not sorted by filename.
     """
-    @contract(asset_list='SortedListWithKey', asset_id='AssetKey')
-    def _find_asset_in_list(self, asset_list, asset_id):
+    pass
+
+
+class SortedAssetList(SortedListWithKey):
+    """
+    List of assets that is sorted based on an asset attribute.
+    """
+    def __init__(self, **kwargs):
+        self.filename_sort = False
+        key_func = kwargs.get('key', None)
+        if key_func is None:
+            kwargs['key'] = itemgetter('filename')
+            self.filename_sort = True
+        super(SortedAssetList, self).__init__(**kwargs)
+
+    @contract(asset_id=AssetKey)
+    def find(self, asset_id):
         """
-        Given a asset list that's a SortedListWithKey, find the index of a particular asset.
+        Find the index of a particular asset in the list. This method is only functional for lists
+        sorted by filename. If the list is sorted on any other key, find() raises a
         Returns: Index of asset, if found. None if not found.
         """
+        # Don't attempt to find an asset by filename in a list that's not sorted by filename.
+        if not self.filename_sort:
+            raise IncorrectlySortedList()
         # See if this asset already exists by checking the external_filename.
         # Studio doesn't currently support using multiple course assets with the same filename.
         # So use the filename as the unique identifier.
         idx = None
-        idx_left = asset_list.bisect_left({'filename': asset_id.path})
-        idx_right = asset_list.bisect_right({'filename': asset_id.path})
+        idx_left = self.bisect_left({'filename': asset_id.path})
+        idx_right = self.bisect_right({'filename': asset_id.path})
         if idx_left != idx_right:
             # Asset was found in the list.
             idx = idx_left
         return idx
 
+    @contract(asset_md=AssetMetadata)
+    def insert_or_update(self, asset_md):
+        """
+        Insert asset metadata if asset is not present. Update asset metadata if asset is already present.
+        """
+        metadata_to_insert = asset_md.to_storable()
+        asset_idx = self.find(asset_md.asset_id)
+        if asset_idx is None:
+            # Add new metadata sorted into the list.
+            self.add(metadata_to_insert)
+        else:
+            # Replace existing metadata.
+            self[asset_idx] = metadata_to_insert
+
+
+class ModuleStoreAssetBase(object):
+    """
+    The methods for accessing assets and their metadata
+    """
     def _find_course_asset(self, asset_key):
         """
         Returns same as _find_course_assets plus the index to the given asset or None. Does not convert
@@ -311,11 +349,11 @@ class ModuleStoreAssetInterface(object):
             - the index of asset in list (None if asset does not exist)
         """
         course_assets = self._find_course_assets(asset_key.course_key)
-        all_assets = SortedListWithKey([], key=itemgetter('filename'))
+        all_assets = SortedAssetList(iterable=[])
         # Assets should be pre-sorted, so add them efficiently without sorting.
         # extend() will raise a ValueError if the passed-in list is not sorted.
         all_assets.extend(course_assets.setdefault(asset_key.block_type, []))
-        idx = self._find_asset_in_list(all_assets, asset_key)
+        idx = all_assets.find(asset_key)
 
         return course_assets, idx
 
@@ -334,9 +372,8 @@ class ModuleStoreAssetInterface(object):
         if asset_idx is None:
             return None
 
-        info = asset_key.block_type
         mdata = AssetMetadata(asset_key, asset_key.path, **kwargs)
-        all_assets = course_assets[info]
+        all_assets = course_assets[asset_key.asset_type]
         mdata.from_storable(all_assets[asset_idx])
         return mdata
 
@@ -364,7 +401,7 @@ class ModuleStoreAssetInterface(object):
         course_assets = self._find_course_assets(course_key)
 
         # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
-        key_func = itemgetter('filename')
+        key_func = None
         sort_order = ModuleStoreEnum.SortOrder.ascending
         if sort:
             if sort[0] == 'uploadDate':
@@ -374,12 +411,12 @@ class ModuleStoreAssetInterface(object):
 
         if asset_type is None:
             # Add assets of all types to the sorted list.
-            all_assets = SortedListWithKey([], key=key_func)
+            all_assets = SortedAssetList(iterable=[], key=key_func)
             for asset_type, val in course_assets.iteritems():
                 all_assets.update(val)
         else:
             # Add assets of a single type to the sorted list.
-            all_assets = SortedListWithKey(course_assets.get(asset_type, []), key=key_func)
+            all_assets = SortedAssetList(iterable=course_assets.get(asset_type, []), key=key_func)
         num_assets = len(all_assets)
 
         start_idx = start
@@ -405,10 +442,32 @@ class ModuleStoreAssetInterface(object):
         return ret_assets
 
 
-class ModuleStoreAssetWriteInterface(ModuleStoreAssetInterface):
+class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
     """
     The write operations for assets and asset metadata
     """
+    def _save_assets_by_type(self, course_key, asset_metadata_list, course_assets, user_id, import_only):
+        """
+        Common private method that saves/updates asset metadata items in the internal modulestore
+        structure used to store asset metadata items.
+        """
+        # Lazily create a sorted list if not already created.
+        assets_by_type = defaultdict(lambda: SortedAssetList(iterable=course_assets.get(asset_type, [])))
+
+        for asset_md in asset_metadata_list:
+            if asset_md.asset_id.course_key != course_key:
+                # pylint: disable=logging-format-interpolation
+                log.warning("Asset's course {} does not match other assets for course {} - not saved.".format(
+                    asset_md.asset_id.course_key, course_key
+                ))
+                continue
+            if not import_only:
+                asset_md.update({'edited_by': user_id, 'edited_on': datetime.datetime.now(UTC)})
+            asset_type = asset_md.asset_id.asset_type
+            all_assets = assets_by_type[asset_type]
+            all_assets.insert_or_update(asset_md)
+        return assets_by_type
+
     @contract(asset_metadata='AssetMetadata')
     def save_asset_metadata(self, asset_metadata, user_id, import_only):
         """
@@ -485,7 +544,7 @@ class ModuleStoreAssetWriteInterface(ModuleStoreAssetInterface):
 
 
 # pylint: disable=abstract-method
-class ModuleStoreRead(ModuleStoreAssetInterface):
+class ModuleStoreRead(ModuleStoreAssetBase):
     """
     An abstract interface for a database backend that stores XModuleDescriptor
     instances and extends read-only functionality
