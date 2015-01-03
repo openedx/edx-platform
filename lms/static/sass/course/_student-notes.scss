@@ -173,8 +173,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
             }
 
             .note-comment-p {
-              overflow: hidden;
-              text-overflow: ellipsis;
+              @extend %text-truncated;
             }
 
             .note-comment-ul,
