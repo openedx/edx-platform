@@ -73,7 +73,7 @@ from opaque_keys.edx.locator import (
 from xmodule.modulestore.exceptions import InsufficientSpecificationError, VersionConflictError, DuplicateItemError, \
     DuplicateCourseError
 from xmodule.modulestore import (
-    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, BulkOpsRecord, BulkOperationsMixin
+    inheritance, ModuleStoreWriteBase, ModuleStoreEnum, BulkOpsRecord, BulkOperationsMixin, SortedAssetList
 )
 
 from ..exceptions import ItemNotFoundError
@@ -2416,27 +2416,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         return self._lookup_course(course_key).structure.get('assets', {})
 
-    def _find_course_asset(self, asset_key):
-        """
-        Return the raw dict of assets type as well as the index to the one being sought from w/in
-        it's subvalue (or None)
-        """
-        assets = self._lookup_course(asset_key.course_key).structure.get('assets', {})
-        return assets, self._lookup_course_asset(assets, asset_key)
-
-    def _lookup_course_asset(self, structure, asset_key):
-        """
-        Find the course asset in the structure or return None if it does not exist
-        """
-        # See if this asset already exists by checking the external_filename.
-        # Studio doesn't currently support using multiple course assets with the same filename.
-        # So use the filename as the unique identifier.
-        accessor = asset_key.block_type
-        for idx, asset in enumerate(structure.setdefault(accessor, [])):
-            if asset['filename'] == asset_key.path:
-                return idx
-        return None
-
     def _update_course_assets(self, user_id, asset_key, update_function):
         """
         A wrapper for functions wanting to manipulate assets. Gets and versions the structure,
@@ -2450,12 +2429,17 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             original_structure = self._lookup_course(asset_key.course_key).structure
             index_entry = self._get_index_if_valid(asset_key.course_key)
             new_structure = self.version_structure(asset_key.course_key, original_structure, user_id)
+            course_assets = new_structure.setdefault('assets', {})
 
-            asset_idx = self._lookup_course_asset(new_structure.setdefault('assets', {}), asset_key)
+            asset_type = asset_key.asset_type
+            all_assets = SortedAssetList(iterable=[])
+            # Assets should be pre-sorted, so add them efficiently without sorting.
+            # extend() will raise a ValueError if the passed-in list is not sorted.
+            all_assets.extend(course_assets.setdefault(asset_type, []))
+            asset_idx = all_assets.find(asset_key)
 
-            new_structure['assets'][asset_key.block_type] = update_function(
-                new_structure['assets'][asset_key.block_type], asset_idx
-            )
+            all_assets_updated = update_function(all_assets, asset_idx)
+            new_structure['assets'][asset_type] = all_assets_updated.as_list()
 
             # update index if appropriate and structures
             self.update_structure(asset_key.course_key, new_structure)
@@ -2466,13 +2450,12 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def save_asset_metadata_list(self, asset_metadata_list, user_id, import_only=False):
         """
-        A wrapper for functions wanting to manipulate assets. Gets and versions the structure,
-        passes the mutable array for all asset types as well as the idx to the function for it to
-        update, then persists the changed data back into the course.
-
-        The update function can raise an exception if it doesn't want to actually do the commit. The
-        surrounding method probably should catch that exception.
+        Saves a list of AssetMetadata to the modulestore. The list can be composed of multiple
+        asset types. This method is optimized for multiple inserts at once - it only re-saves the structure
+        at the end of all saves/updates.
         """
+        # Determine course key to use in bulk operation. Use the first asset assuming that
+        # all assets will be for the same course.
         asset_key = asset_metadata_list[0].asset_id
         course_key = asset_key.course_key
 
@@ -2480,20 +2463,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             original_structure = self._lookup_course(course_key).structure
             index_entry = self._get_index_if_valid(course_key)
             new_structure = self.version_structure(course_key, original_structure, user_id)
+            course_assets = new_structure.setdefault('assets', {})
 
-            # Add all asset metadata to the structure at once.
-            for asset_metadata in asset_metadata_list:
-                metadata_to_insert = asset_metadata.to_storable()
-                asset_md_key = asset_metadata.asset_id
+            assets_by_type = self._save_assets_by_type(
+                course_key, asset_metadata_list, course_assets, user_id, import_only
+            )
 
-                asset_idx = self._lookup_course_asset(new_structure.setdefault('assets', {}), asset_md_key)
-
-                all_assets = new_structure['assets'][asset_md_key.asset_type]
-                if asset_idx is None:
-                    all_assets.append(metadata_to_insert)
-                else:
-                    all_assets[asset_idx] = metadata_to_insert
-                new_structure['assets'][asset_md_key.asset_type] = all_assets
+            for asset_type, assets in assets_by_type.iteritems():
+                new_structure['assets'][asset_type] = assets.as_list()
 
             # update index if appropriate and structures
             self.update_structure(course_key, new_structure)
@@ -2504,21 +2481,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
     def save_asset_metadata(self, asset_metadata, user_id, import_only=False):
         """
-        The guts of saving a new or updated asset
+        Saves or updates a single asset. Simply makes it a list and calls the list save above.
         """
-        metadata_to_insert = asset_metadata.to_storable()
-
-        def _internal_method(all_assets, asset_idx):
-            """
-            Either replace the existing entry or add a new one
-            """
-            if asset_idx is None:
-                all_assets.append(metadata_to_insert)
-            else:
-                all_assets[asset_idx] = metadata_to_insert
-            return all_assets
-
-        return self._update_course_assets(user_id, asset_metadata.asset_id, _internal_method)
+        return self.save_asset_metadata_list([asset_metadata, ], user_id, import_only)
 
     @contract(asset_key='AssetKey', attr_dict=dict)
     def set_asset_metadata_attrs(self, asset_key, attr_dict, user_id):
