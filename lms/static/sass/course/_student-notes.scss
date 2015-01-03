@@ -45,7 +45,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     margin-bottom: $baseline;
 
     .wrapper-title {
-      float: left;
+      @include float(left);
       width: flex-grid(7,12);
 
       .page-title {
@@ -65,9 +65,9 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     }
 
     .wrapper-notes-search {
-      float: right;
+      @include float(right);
       width: flex-grid(5,12);
-      text-align: right;
+      @include text-align(right);
     }
 
     .search-notes-input, .search-notes-submit {
@@ -77,7 +77,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .search-notes-input {
       width: 55%;
-      margin-right: ($baseline/4);
+      @include margin-right($baseline/4);
       padding: ($baseline/2) ($baseline*0.75);
       color: $active-color;
     }
@@ -142,7 +142,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           @extend %t-weight2;
           @extend %shame-link-text;
           display: inline;
-          margin-left: ($baseline/4);
+          @include margin-left($baseline/4);
         }
 
         // note - comment made on highlighted content
@@ -271,7 +271,8 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         @extend %hd-lv5;
         display: inline;
         margin-bottom: 0;
-        padding: ($baseline*0.75) $baseline ($baseline*0.75) 0;
+        padding: ($baseline*0.75) 0;
+        @include padding-right($baseline);
         color: $gray-l2;
         font-weight: $font-semibold !important; // needed for poor base LMS styling scope
       }
@@ -291,11 +292,13 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
           @extend %shame-link-base;
           display: inline-block;
           vertical-align: middle;
-          padding: ($baseline/2) $baseline ($baseline/2) ($baseline*0.75);
+          padding: ($baseline/2) 0;
+          @include padding-right($baseline);
+          @include padding-left($baseline*0.75);
           text-align: center;
 
           .icon {
-            margin-right: ($baseline/10);
+            @include margin-right($baseline/10);
           }
         }
 
@@ -312,7 +315,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
         .action-close {
           @extend %shame-link-base;
           position: relative;
-          left: -($baseline*0.75);
+          @include left(-($baseline*0.75));
           display: inline-block;
           vertical-align: middle;
           border-bottom: ($baseline/5) solid $gray-d3;
