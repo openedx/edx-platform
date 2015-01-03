@@ -63,14 +63,14 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             CreateCourseUtils.createCourse(course_info, function (errorMessage) {
                 $('.create-course .wrap-error').addClass('is-shown');
                 $('#course_creation_error').html('<p>' + errorMessage + '</p>');
-                $('.new-course-save').addClass('is-disabled');
+                $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
             });
         };
 
         var makeCancelHandler = function (addType) {
             return function(e) {
                 e.preventDefault();
-                $('.new-'+addType+'-button').removeClass('is-disabled');
+                $('.new-'+addType+'-button').removeClass('is-disabled').attr('aria-disabled', false);
                 $('.wrapper-create-'+addType).removeClass('is-shown');
                 // Clear out existing fields and errors
                 $('#create-'+addType+'-form input[type=text]').val('');
@@ -82,8 +82,8 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
 
         var addNewCourse = function (e) {
             e.preventDefault();
-            $('.new-course-button').addClass('is-disabled');
-            $('.new-course-save').addClass('is-disabled');
+            $('.new-course-button').addClass('is-disabled').attr('aria-disabled', true);
+            $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
             var $newCourse = $('.wrapper-create-course').addClass('is-shown');
             var $cancelButton = $newCourse.find('.new-course-cancel');
             var $courseName = $('.new-course-name');
@@ -117,14 +117,14 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             CreateLibraryUtils.createLibrary(lib_info, function (errorMessage) {
                 $('.create-library .wrap-error').addClass('is-shown');
                 $('#library_creation_error').html('<p>' + errorMessage + '</p>');
-                $('.new-library-save').addClass('is-disabled');
+                $('.new-library-save').addClass('is-disabled').attr('aria-disabled', true);
             });
         };
 
         var addNewLibrary = function (e) {
             e.preventDefault();
-            $('.new-library-button').addClass('is-disabled');
-            $('.new-library-save').addClass('is-disabled');
+            $('.new-library-button').addClass('is-disabled').attr('aria-disabled', true);
+            $('.new-library-save').addClass('is-disabled').attr('aria-disabled', true);
             var $newLibrary = $('.wrapper-create-library').addClass('is-shown');
             var $cancelButton = $newLibrary.find('.new-library-cancel');
             var $libraryName = $('.new-library-name');
