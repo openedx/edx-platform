@@ -66,6 +66,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                 expect($('.create-course .wrap-error')).toHaveClass('is-shown');
                 expect($('#course_creation_error')).toContainText('error message');
                 expect($('.new-course-save')).toHaveClass('is-disabled');
+                expect($('.new-course-save')).toHaveAttr('aria-disabled', 'true');
             });
 
             it("saves new libraries", function () {
@@ -97,6 +98,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                     fillInLibraryFields.apply(this, values_with_blank);
                     expect($('.create-library li.field.text input[value=]').parent()).toHaveClass('error');
                     expect($('.new-library-save')).toHaveClass('is-disabled');
+                    expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
                     $('.new-library-save').click();
                     expect(requests.length).toEqual(requests_count); // Expect no new requests
                 }
@@ -123,6 +125,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                 expect($('.create-library .wrap-error')).toHaveClass('is-shown');
                 expect($('#library_creation_error')).toContainText('error message');
                 expect($('.new-library-save')).toHaveClass('is-disabled');
+                expect($('.new-library-save')).toHaveAttr('aria-disabled', 'true');
             });
 
             it("can switch tabs", function() {
