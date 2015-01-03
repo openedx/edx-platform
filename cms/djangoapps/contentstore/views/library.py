@@ -142,7 +142,7 @@ def _create_library(request):
             'ErrMsg': _(
                 'There is already a library defined with the same '
                 'organization and library code. Please '
-                'change either organization or library code to be unique.'
+                'change your library code so that it is unique within your organization.'
             )
         })
 
