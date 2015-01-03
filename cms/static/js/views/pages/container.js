@@ -16,7 +16,8 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
             events: {
                 "click .edit-button": "editXBlock",
                 "click .duplicate-button": "duplicateXBlock",
-                "click .delete-button": "deleteXBlock"
+                "click .delete-button": "deleteXBlock",
+                "click .new-component-button": "scrollToNewComponentButtons"
             },
 
             options: {
@@ -321,6 +322,11 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                         temporaryView.unbind();  // Remove the temporary view
                     }
                 });
+            },
+
+            scrollToNewComponentButtons: function(event) {
+                event.preventDefault();
+                $.scrollTo(this.$('.add-xblock-component'));
             }
         });
 
