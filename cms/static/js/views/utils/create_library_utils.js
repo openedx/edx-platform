@@ -5,13 +5,18 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         "use strict";
         return function (selectors, classes) {
-            var validateTotalKeyLength, setNewLibraryFieldInErr, hasInvalidRequiredFields,
-                createLibrary, validateFilledFields, configureHandlers;
+            var toggleSaveButton, validateTotalKeyLength, setNewLibraryFieldInErr,
+                hasInvalidRequiredFields, createLibrary, validateFilledFields, configureHandlers;
 
             var validateRequiredField = ViewUtils.validateRequiredField;
             var validateURLItemEncoding = ViewUtils.validateURLItemEncoding;
 
             var keyLengthViolationMessage = gettext("The combined length of the organization and library code fields cannot be more than <%=limit%> characters.");
+
+            toggleSaveButton = function (is_enabled) {
+                var is_disabled = !is_enabled;
+                $(selectors.save).toggleClass(classes.disabled, is_disabled).attr('aria-disabled', is_disabled);
+            };
 
             // Ensure that org/librarycode passes validateTotalKeyLength check
             validateTotalKeyLength = function () {
@@ -26,14 +31,14 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                 if (message) {
                     element.addClass(classes.error);
                     element.children(selectors.tipError).addClass(classes.showing).removeClass(classes.hiding).text(message);
-                    $(selectors.save).addClass(classes.disabled);
+                    toggleSaveButton(false);
                 }
                 else {
                     element.removeClass(classes.error);
                     element.children(selectors.tipError).addClass(classes.hiding).removeClass(classes.showing);
                     // One "error" div is always present, but hidden or shown
                     if ($(selectors.error).length === 1) {
-                        $(selectors.save).removeClass(classes.disabled);
+                        toggleSaveButton(true);
                     }
                 }
             };
@@ -101,7 +106,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                             setNewLibraryFieldInErr($element.parent(), error);
                             validateTotalKeyLength();
                             if (!validateFilledFields()) {
-                                $(selectors.save).addClass(classes.disabled);
+                                toggleSaveButton(false);
                             }
                         });
                     }
@@ -112,7 +117,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                     setNewLibraryFieldInErr($name.parent(), error);
                     validateTotalKeyLength();
                     if (!validateFilledFields()) {
-                        $(selectors.save).addClass(classes.disabled);
+                        toggleSaveButton(false);
                     }
                 });
             };

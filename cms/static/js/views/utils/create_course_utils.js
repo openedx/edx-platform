@@ -4,13 +4,18 @@
 define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         return function (selectors, classes) {
-            var validateTotalCourseItemsLength, setNewCourseFieldInErr, hasInvalidRequiredFields,
-                createCourse, validateFilledFields, configureHandlers;
+            var toggleSaveButton, validateTotalCourseItemsLength, setNewCourseFieldInErr,
+                hasInvalidRequiredFields, createCourse, validateFilledFields, configureHandlers;
 
             var validateRequiredField = ViewUtils.validateRequiredField;
             var validateURLItemEncoding = ViewUtils.validateURLItemEncoding;
 
             var keyLengthViolationMessage = gettext('The combined length of the organization, course number, and course run fields cannot be more than <%=limit%> characters.');
+
+            toggleSaveButton = function (is_enabled) {
+                var is_disabled = !is_enabled;
+                $(selectors.save).toggleClass(classes.disabled, is_disabled).attr('aria-disabled', is_disabled);
+            };
 
             // Ensure that org, course_num and run passes checkTotalKeyLengthViolations
             validateTotalCourseItemsLength = function () {
@@ -25,14 +30,14 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                 if (msg) {
                     el.addClass(classes.error);
                     el.children(selectors.tipError).addClass(classes.showing).removeClass(classes.hiding).text(msg);
-                    $(selectors.save).addClass(classes.disabled);
+                    toggleSaveButton(false);
                 }
                 else {
                     el.removeClass(classes.error);
                     el.children(selectors.tipError).addClass(classes.hiding).removeClass(classes.showing);
                     // One "error" div is always present, but hidden or shown
                     if ($(selectors.error).length === 1) {
-                        $(selectors.save).removeClass(classes.disabled);
+                        toggleSaveButton(true);
                     }
                 }
             };
@@ -94,7 +99,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                             setNewCourseFieldInErr($ele.parent(), error);
                             validateTotalCourseItemsLength();
                             if (!validateFilledFields()) {
-                                $(selectors.save).addClass(classes.disabled);
+                                toggleSaveButton(false);
                             }
                         });
                     }
@@ -105,7 +110,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                     setNewCourseFieldInErr($name.parent(), error);
                     validateTotalCourseItemsLength();
                     if (!validateFilledFields()) {
-                        $(selectors.save).addClass(classes.disabled);
+                        toggleSaveButton(false);
                     }
                 });
             };
