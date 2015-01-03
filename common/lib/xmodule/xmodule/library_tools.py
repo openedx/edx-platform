@@ -28,7 +28,7 @@ class LibraryToolsService(object):
         assert library_key.version_guid is None
 
         try:
-            return self.store.get_library(library_key, remove_version=False)
+            return self.store.get_library(library_key, remove_version=False, remove_branch=False)
         except ItemNotFoundError:
             return None
 
@@ -42,16 +42,6 @@ class LibraryToolsService(object):
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
-        return None
-
-    def get_library_display_name(self, lib_key):
-        """
-        Get the display_name of the given library.
-        Returns None if the library does not exist.
-        """
-        library = self._get_library(lib_key)
-        if library:
-            return library.display_name
         return None
 
     def update_children(self, dest_block, user_id, update_db=True):
