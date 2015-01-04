@@ -66,6 +66,7 @@ $annotatable--body-font-size: em(14);
   display: inline;
 
   $highlight_index: 0;
+
   @each $highlight in (
     (yellow rgba(255,255,10,0.3) rgba(255,255,10,0.9)),
     (red rgba(178,19,16,0.3) rgba(178,19,16,0.9)),
@@ -85,7 +86,7 @@ $annotatable--body-font-size: em(14);
         &.selected { background-color: $selected_color; }
       }
     }
-    &.highlight-#{$marker} {
+    &.highlight-#{""+$marker} {
       background-color: $color;
       &.selected { background-color: $selected_color; }
     }
