@@ -1,3 +1,8 @@
+// Bourbon 4.1.0
+// http://bourbon.io
+// Copyright 2011-2014 thoughtbot, inc.
+// MIT License
+
 // Settings
 @import "settings/prefixer";
 @import "settings/px-to-em";
@@ -5,6 +10,7 @@
 
 // Custom Helpers
 @import "helpers/convert-units";
+@import "helpers/font-source-declaration";
 @import "helpers/gradient-positions-parser";
 @import "helpers/is-num";
 @import "helpers/linear-angle-parser";
@@ -21,16 +27,16 @@
 // Custom Functions
 @import "functions/assign";
 @import "functions/color-lightness";
-@import "functions/flex-grid";
-@import "functions/golden-ratio";
-@import "functions/grid-width";
-@import "functions/modular-scale";
+@import "functions/contains";
+@import "functions/is-length";
+@import "functions/is-size";
 @import "functions/px-to-em";
 @import "functions/px-to-rem";
 @import "functions/strip-units";
 @import "functions/tint-shade";
 @import "functions/transition-property-name";
 @import "functions/unpack";
+@import "functions/modular-scale";
 
 // CSS3 Mixins
 @import "css3/animation";
@@ -47,20 +53,21 @@
 @import "css3/flex-box";
 @import "css3/font-face";
 @import "css3/font-feature-settings";
-@import "css3/hyphens";
 @import "css3/hidpi-media-query";
+@import "css3/hyphens";
 @import "css3/image-rendering";
 @import "css3/keyframes";
 @import "css3/linear-gradient";
 @import "css3/perspective";
+@import "css3/placeholder";
 @import "css3/radial-gradient";
+@import "css3/selection";
+@import "css3/text-decoration";
 @import "css3/transform";
 @import "css3/transition";
 @import "css3/user-select";
-@import "css3/placeholder";
 
 // Addons & other mixins
-@import "addons/button";
 @import "addons/clearfix";
 @import "addons/directional-values";
 @import "addons/ellipsis";
