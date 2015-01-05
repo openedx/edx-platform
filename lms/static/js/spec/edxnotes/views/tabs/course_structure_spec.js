@@ -54,7 +54,7 @@ define([
             expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Location in Course',
                 identifier: 'view-course-structure',
-                icon: 'icon-list-ul',
+                icon: 'fa fa-list-ul',
                 is_active: true,
                 is_closable: false
             });

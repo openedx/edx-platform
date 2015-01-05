@@ -61,7 +61,7 @@ define([
             expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Recent Activity',
                 identifier: 'view-recent-activity',
-                icon: 'icon-time',
+                icon: 'fa fa-clock-o',
                 is_active: true,
                 is_closable: false
             });

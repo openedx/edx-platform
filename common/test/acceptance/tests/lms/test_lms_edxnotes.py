@@ -412,13 +412,13 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         self.assertGroupContent(
             groups[0],
-            title=u"TEST SECTION 1",
-            subtitles=[u"TEST SUBSECTION 1", u"TEST SUBSECTION 2"]
+            title=u"Test Section 1",
+            subtitles=[u"Test Subsection 1", u"Test Subsection 2"]
         )
 
         self.assertSectionContent(
             sections[0],
-            title=u"TEST SUBSECTION 1",
+            title=u"Test Subsection 1",
             notes=[u"Fifth note", u"Third note", None]
         )
 
@@ -447,7 +447,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         self.assertSectionContent(
             sections[1],
-            title=u"TEST SUBSECTION 2",
+            title=u"Test Subsection 2",
             notes=[u"Fourth note"]
         )
 
@@ -460,13 +460,13 @@ class EdxNotesPageTest(EdxNotesTestMixin):
 
         self.assertGroupContent(
             groups[1],
-            title=u"TEST SECTION 2",
-            subtitles=[u"TEST SUBSECTION 3"],
+            title=u"Test Section 2",
+            subtitles=[u"Test Subsection 3"],
         )
 
         self.assertSectionContent(
             sections[2],
-            title=u"TEST SUBSECTION 3",
+            title=u"Test Subsection 3",
             notes=[u"First note"]
         )
 
