@@ -64,43 +64,40 @@
         <div class="video-player-post"></div>
 
         <section class="video-controls is-hidden">
-          <!-- Row: Position slider -->
+          ## Row: Position slider
           <div class="slider" title="${_('Video position')}"></div>
 
-          <!-- Row: Controls -->
+          ## Row: Controls
           <div class="video-playback-controls">
-            <!-- Playback actions (play, pause, time) -->
+            ## Playback actions (play, pause, time)
             <ul class="video-controls-options">
               <li class="video-control"><a class="video_control" href="#" title="${_('Play')}" role="button" aria-disabled="false"><i class="icon icon-play" aria-hidden="true"></i></a></li>
-              <!-- ### <li class="video-control"><a class="video_control" href="#" title="${_('Pause')}" role="button" aria-disabled="false"><i class="icon icon-pause" aria-hidden="true"></i></a></li> ### When video is paused -->
               <li class="video-control"><div class="vidtime">0:00 / 0:00</div></li>
             </ul>
-            <!-- Playback controls -->
+            ## Playback controls
             <div class="secondary-controls">
-              <!-- Playback speed -->
+              ## Playback speed
               <div class="speeds menu-container">
                 <a class="speed-button" href="#" title="${_('Speeds')}" role="button" aria-disabled="false">
                   <i class="icon icon-caret-right" aria-hidden="true"></i>
-                  <!-- ### <i class="icon icon-caret-up" aria-hidden="true"></i>  ### On hover, when menu is visible-->
                   <span class="label">${_('Speed')}</span>
                   <span class="value"></span>
                 </a>
                 <ol class="video-speeds menu" role="menu"></ol>
               </div>
-              <!-- Playback volume -->
+              ## Playback volume
               <div class="volume">
                 <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"><i class="icon icon-volume-up" aria-hidden="true"></i></a>
-                <!-- ### <a href="#" role="button" aria-disabled="false" title="${_('Volume')}" aria-label="${_('Click on this button to mute or unmute this video or press UP or DOWN buttons to increase or decrease volume level.')}"><i class="icon icon-volume-off" aria-hidden="true"></i></a> ### When audio is muted -->
                 <div role="presentation" class="volume-slider-container">
                   <div class="volume-slider"></div>
                 </div>
               </div>
-              <!-- Size and quality -->
+              ## Size and quality
               <ul class="size-quality-controls">
                 <li class="size-control"><a href="#" class="add-fullscreen" title="${_('Fill browser')}" role="button" aria-disabled="false"><i class="icon icon-fullscreen" aria-hidden="true"></i><span class="sr">${_('Fill browser')}</span></a></li>
                 <li class="quality-control"><a href="#" class="quality-toggle-control is-hidden" title="${_('HD off')}" role="button" aria-disabled="false">${_('HD off')}</a></li>
               </ul>
-              <!-- Captioning/Subtitles -->
+              ## Captioning/Subtitles
               <div class="language-control menu-container">
                 <a href="#" class="subtitles-control hide-subtitles" title="${_('Turn off captions')}" role="button" aria-disabled="false"><i class="icon icon-quote-left" aria-hidden="true"></i><span class="sr">${_('Turn off captions')}</span></a>
               </div>
@@ -162,15 +159,8 @@
 
       % if branding_info:
       <li id="branding" class="branding">
-        <!--
-        Branding
-        We only show this container if the video is hosted elsewhere, for instance in China.
-        The image src can be swapped out depending on the CDN provider.
-        The image alt can be swapped out depending on the CDN provider.
-        -->
         <span class="host-tag">${branding_info['logo_tag']}</span>
         <a href="${branding_info['url']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
-        <!-- // -->
       </li>
       % endif
     </ul>
