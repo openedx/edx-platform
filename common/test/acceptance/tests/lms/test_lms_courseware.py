@@ -67,7 +67,7 @@ class CoursewareTest(UniqueCourseTest):
 
         """
         self.course_outline.q(css=".subsection-header-actions .configure-button").first.click()
-        self.course_outline.q(css="#start_date").fill("01/01/2015")
+        self.course_outline.q(css="#start_date").fill("01/01/2030")
         self.course_outline.q(css=".action-save").first.click()
 
     def _auto_auth(self, username, email, staff):
