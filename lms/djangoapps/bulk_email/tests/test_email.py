@@ -108,7 +108,6 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
         # We should get back a HttpResponseForbidden (status code 403)
         self.assertContains(response, "Email is not enabled for this course.", status_code=403)
 
-
     @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
     def test_send_to_self(self):
         """
@@ -230,7 +229,7 @@ class TestEmailSendFromDashboard(ModuleStoreTestCase):
             '[' + self.course.display_name + '] ' + uni_subject
         )
 
-    @skipIf(os.environ.get("Travis")=='true', "Skip this test in Travis CI.")
+    @skipIf(os.environ.get("Travis") == 'true', "Skip this test in Travis CI.")
     def test_unicode_message_send_to_all(self):
         """
         Make sure email (with Unicode characters) send to all goes there.
