@@ -9,6 +9,7 @@ var edx = edx || {};
         model: edx.search.Result,
         pageSize: 20,
         totalCount: 0,
+        accessDeniedCount: 0,
         searchTerm: '',
         page: 0,
         url: '/search',
@@ -26,6 +27,7 @@ var edx = edx || {};
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
             this.totalCount = 0;
+            this.accessDeniedCount = 0;
             this.page = 0;
             this.fetchXhr = this.fetch({
                 data: {
@@ -66,10 +68,13 @@ var edx = edx || {};
             this.fetchXhr &&  this.fetchXhr.abort();
             this.page = 0;
             this.totalCount = 0;
+            this.accessDeniedCount = 0;
         },
 
         parse: function(response) {
             this.totalCount = response.total;
+            this.accessDeniedCount += response.access_denied_count;
+            this.totalCount -= this.accessDeniedCount;
             return _.map(response.results, function(result){ return result.data; });
         },
 
