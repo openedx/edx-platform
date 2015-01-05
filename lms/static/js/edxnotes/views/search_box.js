@@ -9,7 +9,7 @@ define([
             'submit': 'submitHandler'
         },
 
-        errorMessage: gettext('This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'),
+        errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
         emptyFieldMessage: gettext('Search field cannot be blank.'),
 
         initialize: function (options) {
