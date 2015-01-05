@@ -361,7 +361,7 @@ class LibraryUsersPageTest(StudioLibraryTest):
             self.assertFalse(user.can_demote)
             self.assertFalse(user.can_delete)
             self.assertTrue(user.has_no_change_warning)
-            self.assertIn("Promote another member to Admin to remove admin rights", user.no_change_warning_text)
+            self.assertIn("Promote another member to Admin to remove your admin rights", user.no_change_warning_text)
 
         self.assertEqual(len(self.page.users), 1)
         user = self.page.users[0]

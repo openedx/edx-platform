@@ -44,7 +44,7 @@
                   <li class="field text required create-user-email">
                     <label for="user-email-input">${_("User's Email Address")}</label>
                     <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
-                    <span class="tip tip-stacked">${_("Please provide the email address of the user you'd like to add")}</span>
+                    <span class="tip tip-stacked">${_("Provide the email address of the user you want to add")}</span>
                   </li>
                 </ol>
             </fieldset>
@@ -99,7 +99,7 @@
                 </li>
               % else:
                 <li class="action action-role">
-                  <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove admin rights")}</span>
+                  <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
                 </li>
               % endif
             % elif is_staff:
@@ -133,7 +133,7 @@
         <div class="msg">
           <h3 class="title">${_('Add More Users to This Library')}</h3>
           <div class="copy">
-            <p>${_('Adding team members makes content authoring collaborative. Users must be signed up for Studio and have an active account. ')}</p>
+            <p>${_('Grant other members of your course team access to this library. New library users must have an active {studio_name} account.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
           </div>
         </div>
 
@@ -149,22 +149,11 @@
     <aside class="content-supplementary" role="complimentary">
       <div class="bit">
         <h3 class="title-3">${_("Library Access Roles")}</h3>
-        <p>${_("Library staff are content co-authors. They have full writing and editing privileges on all content in the library.")}</p>
-        <p>${_("Admins are library team members who can also add and remove other team members.")}</p>
-        <p>${_("Library users cannot edit content in the library, but can view the content and are able to reference or use library elements in their own courses.")}</p>
+        <p>${_("There are three access roles for libraries: User, Staff, and Admin.")}</p>
+        <p>${_("Users can view library content and can reference or use library components in their courses, but they cannot edit the contents of a library.")}</p>
+        <p>${_("Staff are content co-authors. They have full editing privileges on the contents of a library.")}</p>
+        <p>${_("Admins have full editing privileges and can also add and remove other team members. There must be at least one user with Admin privileges in a library.")}</p>
       </div>
-
-      <div class="bit">
-        <h3 class="title-3">${_("Organization-Wide Access")}</h3>
-        <p>${_("Users who have been granted admin, staff, or user access at the organization level may not be listed here but will still have access to this library.")}</p>
-      </div>
-
-      % if allow_actions:
-      <div class="bit">
-        <h3 class="title-3">${_("Transferring Ownership")}</h3>
-        <p>${_("Every library must have an Admin. If you're the Admin and you want transfer ownership of the library, click Add admin access to make another user the Admin, then ask that user to remove you from the library admin list.")}</p>
-      </div>
-      % endif
     </aside>
   </section>
 </div>

@@ -32,7 +32,7 @@ define(['jquery', 'underscore', 'gettext', 'js/views/feedback_prompt'], function
                 msg = new PromptView.Warning({
                     title: gettext('Already a course team member'),
                     message: _.template(
-                        gettext("{email} is already on the “{course}” team. If you're trying to add a new member, please double-check the email address you provided."), {
+                        gettext("{email} is already on the {course} team. Recheck the email address if you want to add a new member."), {
                             email: email,
                             course: course.escape('name')
                         }, {interpolate: /\{(.+?)\}/g}
