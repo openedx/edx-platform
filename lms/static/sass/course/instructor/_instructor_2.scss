@@ -1261,22 +1261,33 @@ input[name="subject"] {
     line-height: 1.3em;
   }
   .error-msgs {
-    background: #FFEEF5;color:#B72667;text-align: center;padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+    background: #FFEEF5;
+    color:#B72667;
+    text-align: center;
+    padding: ($baseline/2) 0;
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-size: 15px;
     border-bottom: 1px solid #B72667;
     margin-bottom: $baseline;
     display: none;
-    }
+  }
+
   .success-msgs {
-    background: #D0F5D5;color:#008801;text-align: center;padding: ($baseline/2) 0;
-    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;font-size: 15px;
+    background: #D0F5D5;
+    color:#008801;
+    text-align: center;
+    padding: ($baseline/2) 0;
+    font-family: "Open Sans",Verdana,Geneva,sans-serif,sans-serif;
+    font-size: 15px;
     border-bottom: 1px solid #008801;
     margin-bottom: $baseline;
     display: none;
-    }
+  }
+
   .content{
     padding: 0 !important;
   }
+
   input[name="download_company_name"],
   input[name="active_company_name"], input[name="spent_company_name"] {
     margin-right: 8px;
