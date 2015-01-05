@@ -9,6 +9,7 @@ if Backbone?
       "click .add-response-btn": "scrollToAddResponse"
       "click .forum-thread-expand": "expand"
       "click .forum-thread-collapse": "collapse"
+      "click .forum-thread-list-btn": "goToThreadList"
 
     $: (selector) ->
       @$el.find(selector)
@@ -341,3 +342,6 @@ if Backbone?
         url: url
         type: "POST"
         success: (response, textStatus) =>
+
+    goToThreadList: (event) =>
+      $('.discussion-body > .forum-nav, .discussion-body > .discussion-column').toggleClass('selected')

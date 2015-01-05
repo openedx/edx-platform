@@ -1,27 +1,43 @@
 <%! from django.utils.translation import ugettext as _ %>
 <script type="text/template" id="thread-list-template">
+    % if course.forum_posts_allowed:
+    <div class="right">
+      <div>
+        <a href="#" class="new-post-btn" role="button"><i class="icon icon-edit-sign new-post-icon"></i>${_("New Post")}</a>
+      </div>
+    </div>
+    % endif
     <div class="forum-nav-header">
-        <a href="#" class="forum-nav-browse" aria-haspopup="true">
-            ## There is no whitespace between these because the front-end JS code
-            ## needs to precisely compute the available width for forum-nav-
-            ## browse-current in order to do truncation of topic names.
-            <i class="icon icon-reorder"></i><span class="sr">${_("Discussion topics; current selection is: ")}</span><span class="forum-nav-browse-current">${_("All Discussions")}</span><span class="forum-nav-browse-drop-arrow">▾</span>
-        </a>
-        <form class="forum-nav-search">
+        <div class="forum-nav-toggle">
+          <ul>
+            <li class="icon-search selected"></li>
+            <li class="icon-reorder"></li>
+          </ul>
+        </div>
+        <form class="forum-nav-search selected">
             <div class="forum-nav-search-ff-position-fix">
                 <label>
                     <span class="sr">${_("Search")}</span>
                     <input class="forum-nav-search-input" type="text" placeholder="${_("Search all posts")}">
+                    <i class="icon icon-remove"></i>
                     <i class="icon icon-search"></i>
                 </label>
             </div>
         </form>
+        <a href="#" class="forum-nav-browse" aria-haspopup="true">
+            ## There is no whitespace between these because the front-end JS code
+            ## needs to precisely compute the available width for forum-nav-
+            ## browse-current in order to do truncation of topic names.
+            ##<i class="icon icon-reorder"></i>
+            <span class="sr">${_("Discussion topics; current selection is: ")}</span><span class="forum-nav-browse-current">${_("All Discussions")}</span><span class="forum-nav-browse-drop-arrow">▾</span>
+        </a>
     </div>
     <%include file="_filter_dropdown.html" />
     <div class="forum-nav-thread-list-wrapper">
         <div class="forum-nav-refine-bar">
             <label class="forum-nav-filter-main">
                 ## Translators: This labels a filter menu in forum navigation
+                <i class="icon-filter"></i> 
                 <span class="sr">${_("Filter:")}</span>
                 <select class="forum-nav-filter-main-control">
                     ## Translators: This is a menu option for showing all forum threads unfiltered
@@ -54,6 +70,7 @@
 ## Lack of indentation is intentional to avoid whitespace between this and siblings
 <label class="forum-nav-sort">
                 ## Translators: This labels a sort menu in forum navigation
+                <i class="icon-sort"></i> 
                 <span class="sr">${_("Sort:")}</span>
                 <select class="forum-nav-sort-control">
                     ## Translators: This is a menu option for sorting forum threads

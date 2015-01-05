@@ -61,6 +61,10 @@
   margin-top: -6px;
   top: 50%;
   right: ($baseline/4 + 1px + $baseline / 4); // Wrapper padding + border + input padding
+
+  &.icon-remove {
+    display: none;
+  }
 }
 
 .forum-nav-search-input {

@@ -100,6 +100,7 @@
       ${'<% if (mode == "tab" && obj.courseware_url) { %>'}
           <div class="post-context">${'<%'}${js_block}${'%>'}</div>
       ${'<% } %>'}
+      <footer><a href="#" class="forum-thread-list-btn">${_("Thread list")}</a></footer>
   </div>
 </script>
 
@@ -283,7 +284,8 @@
         <span class="sr">${"<%= sr_text %>"}</span>
         <i class="icon ${"<%= icon_class %>"}"></i>
       </div><div class="forum-nav-thread-wrapper-1">
-        <span class="forum-nav-thread-title">${"<%- title %>"}</span>
+        <span class="forum-nav-thread-title title">${"<%- title %>"}</span>
+        <span class="forum-nav-thread-title body">${"<%- body %>"}</span>
         <%
         js_block = u"""
         var labels = "";
@@ -366,6 +368,7 @@
       % if course and course.display_name_with_default:
         <h1 class="home-title">${course.display_name_with_default}</h1>
       % endif
+      <a href="#" class="forum-thread-list-btn">${_("Thread list")}</a>
     </section>
 
       % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
@@ -385,11 +388,15 @@
               <i class="icon icon-sort"></i>
               <span class="row-description">${_("Sort by date, vote, or comments")}</span>
             </td>
+            <td class="row-item">
+              <i class="icon icon-filter"></i>
+              <span class="row-description">${_("Filter out topics")}</span>
+            </td>
           </tr>
           <tr class="helpgrid-row helpgrid-row-participation">
             <td class="row-title">${_("Engage with posts")}</td>
             <td class="row-item">
-              <i class="icon icon-plus"></i>
+              <i class="icon icon-thumbs-up-alt"></i>
               <span class="row-description">${_("Upvote posts and good responses")}</span>
             </td>
             <td class="row-item">
@@ -400,10 +407,11 @@
               <i class="icon icon-star"></i>
               <span class="row-description">${_("Follow posts for updates")}</span>
             </td>
+            <td class="row-item"></td>
           </tr>
           <tr class="helpgrid-row helpgrid-row-notification">
             <td class="row-title">${_('Receive updates')}</td>
-            <td class="row-item-full" colspan="3">
+            <td class="row-item-full" colspan="4">
               <label for="email-setting-checkbox">
                 <span class="sr">${_("Toggle Notifications Setting")}</span>
                 <span class="notification-checkbox">
@@ -416,6 +424,26 @@
           </tr>
         </table>
       % endif
+        <div class="forum-guideline"> 
+          <span class="label" style="background-color:#b9b9b9; color:#333; margin-top:2.5rem;">ディスカッションガイドライン</span>
+          <p>gaccoは、受講するみなさんが創り上げる新しい学びの場です。
+目標を共にする世界中の受講生への質問や、意見の交換を通し、お互いがより深く学ぶことができます。
+また、受講生とのやりとりが、学びの継続につながります。
+その為、以下のガイドラインをお読みの上、適切な発言をしていただけますよう、ご協力お願いします。</p>
+          <ul>
+            <li>礼儀正しく発言しましょう。gaccoは教室と同じです。相手の人格を思いやった発言は、議論を健全化します。</li>
+            <li>多様な仲間へ配慮をしましょう。gaccoは、あなたと異なる性別、世代、国籍、価値観をもつ仲間が利用しています。特に人種や宗教、政治問題などについて議論をする際には、他の受講生の人格を思いやり、誹謗中傷などはやめましょう。</li>
+            <li>わかりやすいタイトルをつけましょう。タイトルで、あなたの投稿の内容を端的に表現してください。仲間があなたの投稿を見つけやすくなり、議論が深まります。</li>
+            <li>良い発言、役立つ発言に投票（【＋】）ボタンを押しましょう。</li>
+            <li>具体的に書きましょう。理由を簡潔かつ明快に。</li>
+            <li>スレッドの乱立を避けましょう。掲示板の検索機能を活用してください。</li>
+            <li>用途にそったスレッドを利用しましょう。</li>
+            <li>ディスカッションは議論の場であり、答えを教えあう場ではありません。選択肢の正誤が判明してしまう書き込みは控えてください。<br/>
+良い例：問Xについて、私は〜と解釈し、〜と回答しました。<br/>
+悪い例：問Xについて、私は〜と解釈し、〜と回答した結果、正答or誤答でした。<br/>
+悪い例：私は全問正解でしたが、問Xについては〜と回答しました。</li>
+          </ul>
+        </div>
      </div>
 </script>
 
@@ -434,20 +462,20 @@
 <script aria-hidden="true" type="text/template" id="new-post-template">
     <form class="forum-new-post-form">
         <ul class="post-errors" style="display: none"></ul>
-        <div class="post-field">
+        <div class="post-field hidden-post-field">
             <div class="field-label">
                 <span class="field-label-text">
                     ## Translators: This is the label for a control to
                     ## select a forum post type
                     ${_("Post type:")}
                 </span><fieldset class="field-input">
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question" checked>
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
                     <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
                         <i class="icon icon-question"></i>
                         ## Translators: This is a forum post type
                         ${_("Question")}
                     </label>
-                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion">
+                    <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
                     <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
                         <i class="icon icon-comments"></i>
                         ## Translators: This is a forum post type
@@ -578,7 +606,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
             </span>
 
             <span class="action-icon" aria-hidden="true">
-                <i class="icon icon-plus"></i>
+                <i class="icon icon-thumbs-up-alt"></i>
             </span>
         </a>
     </li>

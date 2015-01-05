@@ -7,11 +7,14 @@ if Backbone?
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
       "click .forum-nav-browse-title": "selectTopic"
       "keydown .forum-nav-search-input": "performSearch"
+      "click .forum-nav-search .icon-search": "performSearch"
+      "click .forum-nav-search .icon-remove": "retrieveAllThreads"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
       "change .forum-nav-filter-main-control": "chooseFilter"
       "change .forum-nav-filter-cohort-control": "chooseCohort"
+      "click .forum-nav-toggle li": "toggleNavigation"
 
     initialize: ->
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
@@ -106,11 +109,12 @@ if Backbone?
       sidebarHeight = Math.min(sidebarHeight + 1, discussionBody.outerHeight())
       sidebar.css 'height', sidebarHeight
 
+      newpostHeight = @$(".right").outerHeight()
       headerHeight = @$(".forum-nav-header").outerHeight()
       refineBarHeight = @$(".forum-nav-refine-bar").outerHeight()
       browseFilterHeight = @$(".forum-nav-browse-filter").outerHeight()
-      @$('.forum-nav-thread-list').css('height', (sidebarHeight - headerHeight - refineBarHeight - 2) + 'px')
-      @$('.forum-nav-browse-menu').css('height', (sidebarHeight - headerHeight - browseFilterHeight - 2) + 'px')
+      @$('.forum-nav-thread-list').css('height', (sidebarHeight - newpostHeight - headerHeight - refineBarHeight - 2) + 'px')
+      @$('.forum-nav-browse-menu').css('height', (sidebarHeight - newpostHeight - headerHeight - browseFilterHeight - 2) + 'px')
 
 
     # Because we want the behavior that when the body is clicked the menu is
@@ -232,6 +236,9 @@ if Backbone?
       thread_id = $(e.target).closest(".forum-nav-thread").attr("data-id")
       @setActiveThread(thread_id)
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
+      $('.discussion-body > .forum-nav, .discussion-body > .discussion-column').toggleClass('selected')
+      $(".discussion-column > .new-post-article").hide()
+      $(window).scrollTop(0)
       false
 
     threadRemoved: (thread_id) =>
@@ -246,6 +253,7 @@ if Backbone?
       $(".forum-content").html(@template)
       $(".forum-nav-thread-list a").removeClass("is-active")
       $("input.email-setting").bind "click", @updateEmailNotifications
+      $(".forum-thread-list-btn").bind "click", @goToThreadList
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
           url: url
@@ -418,7 +426,7 @@ if Backbone?
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
-      if event.which == 13
+      if event.which == 13 or event.target.className == "icon icon-search"
         event.preventDefault()
         @hideBrowseMenu()
         @setCurrentTopicDisplay(gettext("Search Results"))
@@ -517,4 +525,9 @@ if Backbone?
           error: () =>
             $('input.email-setting').attr('checked','checked')
 
+    toggleNavigation: () =>
+      if ! $(this).hasClass('selected')
+        $('.forum-nav-toggle li, .forum-nav-header > .forum-nav-search, .forum-nav-header > .forum-nav-browse').toggleClass('selected')
 
+    goToThreadList: () =>
+        return $('.discussion-body > .forum-nav, .discussion-body > .discussion-column').toggleClass('selected')

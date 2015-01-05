@@ -222,6 +222,11 @@ body.discussion {
       margin-bottom: 18px;
     }
   }
+  .forum-guideline,
+  .forum-nav-toggle,
+  .forum-thread-list-btn {
+    display: none;
+  }
 }
 
 .container .discussion-body {
@@ -402,7 +407,7 @@ body.discussion {
   }
 
   .helpgrid-row-participation {
-    .icon-plus {color: $green;}
+    .icon-thumbs-up-alt {color: $green;}
     .icon-flag {color: $pink;}
     .icon-star {color: $blue;}
   }
@@ -643,6 +648,14 @@ body.discussion {
 
   .wmd-button {
     width: 15px;
+  }
+  .forum-nav .new-post-btn {
+    @include blue-button;
+    display: block;
+    border: none;
+    border-radius: 0;
+    font-size: 13px;
+    text-align: center;
   }
 }
 

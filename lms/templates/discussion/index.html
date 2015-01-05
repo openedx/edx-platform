@@ -21,7 +21,8 @@
 <%static:js group='discussion'/>
 </%block>
 
-<%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
+<%include file="../courseware/course_navigation.html" args="active_page='discussion'" />
+
 
 <section class="discussion container" id="discussion-container"
          data-roles="${roles}"
@@ -36,7 +37,7 @@
          data-course-settings="${course_settings}">
     <div class="discussion-body">
         <div class="forum-nav"></div>
-        <div class="discussion-column">
+        <div class="discussion-column selected">
           <article class="new-post-article" style="display: none"></article>
           <div class="forum-content"></div>
         </div>

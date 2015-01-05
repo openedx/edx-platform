@@ -289,8 +289,9 @@ class @Problem
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
-    if not @check_save_waitfor(@check_internal)
-      @check_internal()
+    if confirm gettext('Is this your final answer?')
+      if not @check_save_waitfor(@check_internal)
+        @check_internal()
 
   check_internal: =>
     @enableCheckButton false
