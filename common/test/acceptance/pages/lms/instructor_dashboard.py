@@ -201,7 +201,7 @@ class MembershipPageCohortManagementSection(PageObject):
         select = self.q(css=self._bounded_selector(self.content_group_selector))
         groups = []
         for option in select:
-            if option.text != "Choose a content group to associate":
+            if option.text != "":
                 groups.append(option.text)
 
         return groups
@@ -213,7 +213,7 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         self.select_cohort_settings()
         radio_button = self.q(css=self._bounded_selector(self.no_content_group_button)).results[0]
-        if radio_button.get_attribute("checked") == "true":
+        if radio_button.is_selected():
             return None
         option_selector = self.q(css=self._bounded_selector(self.content_group_selector))
         return option_selector.filter(lambda el: el.is_selected())[0].text
