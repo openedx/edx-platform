@@ -3,6 +3,7 @@
 End-to-end tests for LibraryContent block in LMS
 """
 import ddt
+import textwrap
 
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
@@ -201,23 +202,25 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
             for item, correct in items
         ])
 
-        return """<problem>
-    <p>{name}</p>
-    <multiplechoiceresponse>
-        <choicegroup label="{name}" type="MultipleChoice">{items}</choicegroup>
-    </multiplechoiceresponse>
-</problem>""".format(name=name, items=items_text)
+        return textwrap.dedent("""
+        <problem>
+            <p>{name}</p>
+            <multiplechoiceresponse>
+                <choicegroup label="{name}" type="MultipleChoice">{items}</choicegroup>
+            </multiplechoiceresponse>
+        </problem>""").format(name=name, items=items_text)
 
     def _get_problem_select_text(self, name, items, correct):
         """ Generates Select Option CAPA problem XML """
         items_text = ",".join(["'{0}'".format(item) for item in items])
 
-        return """<problem>
-<p>{name}</p>
-<optionresponse>
-  <optioninput label="{name}" options="({options})" correct="{correct}"></optioninput>
-</optionresponse>
-</problem>""".format(name=name, options=items_text, correct=correct)
+        return textwrap.dedent("""
+        <problem>
+            <p>{name}</p>
+            <optionresponse>
+              <optioninput label="{name}" options="({options})" correct="{correct}"></optioninput>
+            </optionresponse>
+        </problem>""").format(name=name, options=items_text, correct=correct)
 
     def populate_library_fixture(self, library_fixture):
         """
