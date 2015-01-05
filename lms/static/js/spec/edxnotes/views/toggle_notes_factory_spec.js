@@ -75,18 +75,18 @@ define([
             var requests = AjaxHelpers.requests(this),
                 errorContainer = $('.annotator-notice');
 
-            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
                 "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
             );
+            expect(errorContainer).toBeVisible();
+            expect(errorContainer).toHaveClass('annotator-notice-show');
             expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
-            expect(errorContainer).toBeEmpty();
-            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
+            expect(errorContainer).not.toHaveClass('annotator-notice-show');
         });
     });
 });
