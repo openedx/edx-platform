@@ -356,7 +356,9 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
                         _(u'This component is out of date. The library has new content.'),
-                        action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                        # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                        # See https://openedx.atlassian.net/browse/TNL-993
+                        action_class='library-update-btn',
                         action_label=_(u"↻ Update now")
                     )
                 )
