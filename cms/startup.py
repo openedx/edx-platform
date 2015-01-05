@@ -21,6 +21,12 @@ def run():
 
     add_mimetypes()
 
+    if settings.FEATURES.get('USE_CUSTOM_THEME'):
+        theme_root = settings.ENV_ROOT / 'themes' / settings.THEME_NAME
+        settings.STATICFILES_DIRS.append(
+            (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
+        )
+
 
 def add_mimetypes():
     """
