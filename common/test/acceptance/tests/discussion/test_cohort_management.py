@@ -88,11 +88,12 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         """
         self.verify_cohort_description(
             self.manual_cohort_name,
-            'Students are added to this group only when you provide their email addresses or usernames on this page',
+            'Students are added to this cohort group only when you provide '
+            'their email addresses or usernames on this page',
         )
         self.verify_cohort_description(
             self.auto_cohort_name,
-            'Students are added to this group automatically',
+            'Students are added to this cohort group automatically',
         )
 
     def test_no_content_groups(self):
@@ -110,7 +111,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(self.manual_cohort_name)
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertEqual(
-            "You haven't configured any content groups yet. You need to create a content group before you can create assignments. Create a content group",
+            "No content groups exist. Create a content group to associate with cohort groups. Create a content group",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         # TODO: test can't select radio button
@@ -346,7 +347,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Please allow a few minutes for processing.".format(filename)
+            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
         # student_user is moved from manual cohort group to auto cohort group
@@ -601,7 +602,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.browser.refresh()
         self.cohort_management_page.wait_for_page()
         self.cohort_management_page.select_cohort(new_cohort)
-        self.assertEqual("Some content group that's been deleted", self.cohort_management_page.get_cohort_associated_content_group())
+        self.assertEqual("Deleted Content Group", self.cohort_management_page.get_cohort_associated_content_group())
         self.assertEquals(["Bananas", "Pears", "Some content group that's been deleted"], self.cohort_management_page.get_all_content_groups())
         self.assertEqual(
             "The selected content group has been deleted, you may wish to reassign this cohort group.",
@@ -610,9 +611,8 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.set_cohort_associated_content_group("Pears")
         confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
         self.assertEqual(["Saved cohort group."], confirmation_messages)
-        # TODO: uncomment
-        # self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
-        # self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
+        self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
+        self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
 
     def _create_new_cohort_linked_to_content_group(self, new_cohort, cohort_group):
         """

@@ -8,7 +8,8 @@ var edx = edx || {};
     edx.groups.ContentGroupModel = Backbone.Model.extend({
         idAttribute: 'id',
         defaults: {
-            name: ''
+            name: '',
+            user_partition_id: null
         }
     });
 }).call(this, Backbone);
