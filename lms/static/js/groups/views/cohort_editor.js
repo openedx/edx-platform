@@ -15,9 +15,8 @@ var edx = edx || {};
         initialize: function(options) {
             this.template = _.template($('#cohort-editor-tpl').text());
             this.cohorts = options.cohorts;
-            this.cohortUserPartitionId = options.cohortUserPartitionId;
             this.contentGroups = options.contentGroups;
-            this.advanced_settings_url = options.advanced_settings_url;
+            this.context = options.context;
         },
 
         // Any errors that are currently being displayed to the instructor (for example, unknown email addresses).
@@ -28,14 +27,12 @@ var edx = edx || {};
         render: function() {
             this.$el.html(this.template({
                 cohort: this.model,
-                cohortUserPartitionId: this.cohortUserPartitionId,
-                contentGroups: this.contentGroups,
-                advanced_settings_url: this.advanced_settings_url
+                studioAdvancedSettingsUrl: this.context.studioAdvancedSettingsUrl
             }));
             this.cohortFormView = new CohortFormView({
                 model: this.model,
-                cohortUserPartitionId: this.cohortUserPartitionId,
-                contentGroups: this.contentGroups
+                contentGroups: this.contentGroups,
+                context: this.context
             });
             this.cohortFormView.render();
             this.$('.tab-content-settings').append(this.cohortFormView.$el);
@@ -53,8 +50,12 @@ var edx = edx || {};
         },
 
         saveSettings: function(event) {
+            var cohortFormView = this.cohortFormView;
             event.preventDefault();
-            this.cohortFormView.saveForm();
+            cohortFormView.saveForm()
+                .done(function() {
+                    cohortFormView.showMessage(gettext('Saved cohort group.'));
+                });
         },
 
         setCohort: function(cohort) {
@@ -94,7 +95,7 @@ var edx = edx || {};
                     self.showErrorMessage(gettext('Error adding students.'), true);
                 });
             } else {
-                self.showErrorMessage(gettext('Please enter a username or email.'), true);
+                self.showErrorMessage(gettext('Enter a username or email.'), true);
                 input.val('');
             }
         },
