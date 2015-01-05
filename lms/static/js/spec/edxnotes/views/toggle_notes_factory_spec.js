@@ -37,6 +37,7 @@ define([
         afterEach(function () {
             VisibilityDecorator._setVisibility(null);
             _.invoke(Annotator._instances, 'destroy');
+            $('.annotator-notice').remove();
         });
 
         it('can toggle notes', function() {
@@ -72,7 +73,7 @@ define([
 
         it('can handle errors', function() {
             var requests = AjaxHelpers.requests(this),
-                errorContainer = $('.edx-notes-visibility-error');
+                errorContainer = $('.annotator-notice');
 
             expect(this.toggleNotes.$el).not.toHaveClass('has-error');
             this.button.click();
@@ -80,7 +81,7 @@ define([
             expect(errorContainer).toContainText(
                 'Cannot save your state. This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'
             );
-            expect(this.toggleNotes.$el).toHaveClass('has-error');
+            expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
