@@ -205,12 +205,20 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             descriptor.data_dir = course_dir
 
+            if descriptor.scope_ids.usage_id in xmlstore.modules[course_id]:
+                # keep the parent pointer if any but allow everything else to overwrite
+                other_copy = xmlstore.modules[course_id][descriptor.scope_ids.usage_id]
+                descriptor.parent = other_copy.parent
+                if descriptor != other_copy:
+                    log.warning("%s has more than one definition", descriptor.scope_ids.usage_id)
             xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
             if descriptor.has_children:
                 for child in descriptor.get_children():
-                    child.parent = descriptor.location
-                    child.save()
+                    # parent is alphabetically least
+                    if child.parent is None or child.parent > descriptor.scope_ids.usage_id:
+                        child.parent = descriptor.location
+                        child.save()
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
