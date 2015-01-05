@@ -1,8 +1,9 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'backbone', 'gettext', 'js/edxnotes/views/visibility_decorator'
-], function($, _, Backbone, gettext, EdxnotesVisibilityDecorator) {
+    'jquery', 'underscore', 'backbone', 'gettext',
+    'annotator', 'js/edxnotes/views/visibility_decorator'
+], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
     var ToggleNotesView = Backbone.View.extend({
         events: {
             'click .action-toggle-notes': 'toogleHandler'
@@ -16,6 +17,7 @@ define([
             this.checkboxIcon = this.$('.checkbox-icon');
             this.actionLink = this.$('.action-toggle-notes');
             this.actionLink.removeClass('is-disabled');
+            this.notification = new Annotator.Notification();
         },
 
         toogleHandler: function (event) {
@@ -38,13 +40,11 @@ define([
         },
 
         hideErrorMessage: function() {
-            this.$el.removeClass('has-error');
-            this.$('.edx-notes-visibility-error').text('');
+            this.notification.hide();
         },
 
         showErrorMessage: function(message) {
-            this.$el.addClass('has-error');
-            this.$('.edx-notes-visibility-error').text(message);
+            this.notification.show(message, Annotator.Notification.ERROR);
         },
 
         sendRequest: function () {
