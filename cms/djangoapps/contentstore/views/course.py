@@ -1193,11 +1193,17 @@ class GroupConfiguration(object):
         Generate unique id for the group configuration.
         If this id is already used, we generate new one.
         """
-        # TODO: refactor me to be deterministic
-        cid = random.randint(100, 10 ** 12)
+        def random_sql_int():
+            """
+            Generate a random number that can fit in a MySQL INT
+            field, since group and group configuration IDs are stored
+            in the `CourseUserGroupPartitionGroup` table.
+            """
+            return random.randrange(100, 2 ** 31)
+        cid = random_sql_int()
 
         while cid in used_ids:
-            cid = random.randint(100, 10 ** 12)
+            cid = random_sql_int()
 
         return cid
 
