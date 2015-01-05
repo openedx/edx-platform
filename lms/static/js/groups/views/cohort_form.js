@@ -8,15 +8,14 @@ var edx = edx || {};
     edx.groups.CohortFormView = Backbone.View.extend({
         events : {
             'change .cohort-management-details-association-course input': 'onRadioButtonChange',
-            'change .input-cohort-group-association': 'onGroupAssociationChange',
             'click .tab-content-settings .action-save': 'saveSettings',
             'submit .cohort-management-group-add-form': 'addStudents'
         },
 
         initialize: function(options) {
             this.template = _.template($('#cohort-form-tpl').text());
-            this.cohortUserPartitionId = options.cohortUserPartitionId;
             this.contentGroups = options.contentGroups;
+            this.context = options.context;
         },
 
         showNotification: function(options, beforeElement) {
@@ -26,9 +25,6 @@ var edx = edx || {};
                 model: model
             });
             this.notification.render();
-            if (!beforeElement) {
-                beforeElement = this.$('.cohort-management-group');
-            }
             beforeElement.before(this.notification.$el);
         },
 
@@ -41,7 +37,8 @@ var edx = edx || {};
         render: function() {
             this.$el.html(this.template({
                 cohort: this.model,
-                contentGroups: this.contentGroups
+                contentGroups: this.contentGroups,
+                studioGroupConfigurationsUrl: this.context.studioGroupConfigurationsUrl
             }));
             return this;
         },
@@ -51,22 +48,29 @@ var edx = edx || {};
                 groupsEnabled = target.val() === 'yes';
             if (!groupsEnabled) {
                 // If the user has chosen 'no', then clear the selection by setting
-                // it to the first option ('Choose a content group to associate').
+                // it to the first option which represents no selection.
                 this.$('.input-cohort-group-association').val('None');
             }
+            // Enable the select if the user has chosen groups, else disable it
+            this.$('.input-cohort-group-association').prop('disabled', !groupsEnabled);
         },
 
-        onGroupAssociationChange: function(event) {
-            // Since the user has chosen a content group, click the 'Yes' button too
-            this.$('.cohort-management-details-association-course .radio-yes').click();
-        },
-
-        getSelectedGroupId: function() {
-            var selectValue = this.$('.input-cohort-group-association').val();
+        getSelectedContentGroup: function() {
+            var selectValue = this.$('.input-cohort-group-association').val(),
+                ids, groupId, userPartitionId, i, contentGroup;
             if (!this.$('.radio-yes').prop('checked') || selectValue === 'None') {
                 return null;
             }
-            return parseInt(selectValue);
+            ids = selectValue.split(':');
+            groupId = parseInt(ids[0]);
+            userPartitionId = parseInt(ids[1]);
+            for (i=0; i < this.contentGroups.length; i++) {
+                contentGroup = this.contentGroups[i];
+                if (contentGroup.get('id') === groupId && contentGroup.get('user_partition_id') === userPartitionId) {
+                    return contentGroup;
+                }
+            }
+            return null;
         },
 
         getUpdatedCohortName: function() {
@@ -74,37 +78,43 @@ var edx = edx || {};
             return cohortName ? cohortName.trim() : this.model.get('name');
         },
 
+        showMessage: function(message, type) {
+            this.showNotification(
+                {type: type || 'confirmation', title: message},
+                this.$('.form-fields')
+            );
+        },
+
         saveForm: function() {
             var self = this,
                 cohort = this.model,
                 saveOperation = $.Deferred(),
-                cohortName, groupId, showMessage, showAddError;
+                isUpdate = this.model.id !== null,
+                cohortName, selectedContentGroup, showErrorMessage;
             this.removeNotification();
-            showMessage = function(message, type) {
-                self.showNotification(
-                    {type: type || 'confirmation', title: message},
-                    self.$('.form-fields')
-                );
-            };
-            showAddError = function(message, type) {
-                showMessage(message, 'error');
+            showErrorMessage = function(message) {
+                self.showMessage(message, 'error');
             };
             cohortName = this.getUpdatedCohortName();
             if (cohortName.length === 0) {
-                showAddError(gettext('Please enter a name for your new cohort group.'));
+                showErrorMessage(gettext('Enter a name for your cohort group.'));
                 saveOperation.reject();
             } else {
-                groupId = this.getSelectedGroupId();
+                selectedContentGroup = this.getSelectedContentGroup();
                 cohort.save(
-                    {name: cohortName, user_partition_id: this.cohortUserPartitionId, group_id: groupId},
-                    {patch: true}
+                    {
+                        name: cohortName,
+                        group_id: selectedContentGroup ? selectedContentGroup.id : null,
+                        user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null
+                    },
+                    {patch: isUpdate}
                 ).done(function(result) {
                     if (!result.error) {
                         cohort.id = result.id;
-                        showMessage(gettext('Saved cohort group.'));
+                        self.render();    // re-render to remove any now invalid error messages
                         saveOperation.resolve();
                     } else {
-                        showAddError(result.error);
+                        showErrorMessage(result.error);
                         saveOperation.reject();
                     }
                 }).fail(function(result) {
@@ -116,9 +126,9 @@ var edx = edx || {};
                         // Ignore the exception and show the default error message instead.
                     }
                     if (!errorMessage) {
-                        errorMessage = gettext("We've encountered an error. Please refresh your browser and then try again.");
+                        errorMessage = gettext("We've encountered an error. Refresh your browser and then try again.");
                     }
-                    showAddError(errorMessage);
+                    showErrorMessage(errorMessage);
                     saveOperation.reject();
                 });
             }

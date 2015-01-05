@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
+<%! from courseware.courses import get_studio_url %>
 <%! from microsite_configuration import microsite %>
 <%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
 
@@ -264,11 +265,13 @@
             var cohortManagementElement = $('.cohort-management');
             if (cohortManagementElement.length > 0) {
                 var cohorts = new edx.groups.CohortCollection(),
+                    cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
                     contentGroups = [
                         % for content_group in content_groups:
                             new edx.groups.ContentGroupModel({
                                 id: ${content_group.id},
-                                name: "${content_group.name | h}"
+                                name: "${content_group.name | h}",
+                                user_partition_id: cohortUserPartitionId
                             }),
                         % endfor
                     ];
@@ -276,10 +279,12 @@
                 var cohortsView = new edx.groups.CohortsView({
                     el: cohortManagementElement,
                     model: cohorts,
-                    cohortUserPartitionId: ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
                     contentGroups: contentGroups,
-                    advanced_settings_url: cohortManagementElement.data('advanced-settings-url'),
-                    upload_cohorts_csv_url: cohortManagementElement.data('upload_cohorts_csv_url')
+                    context: {
+                        uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
+                        studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
+                        studioGroupConfigurationsUrl: '${get_studio_url(course, 'group_configurations') | h}'
+                    }
                 });
                 cohorts.fetch().done(function() {
                     cohortsView.render();
