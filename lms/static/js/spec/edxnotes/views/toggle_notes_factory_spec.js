@@ -75,18 +75,18 @@ define([
             var requests = AjaxHelpers.requests(this),
                 errorContainer = $('.annotator-notice');
 
-            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
                 'Cannot save your state. This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'
             );
+            expect(errorContainer).toBeVisible();
+            expect(errorContainer).toHaveClass('annotator-notice-show');
             expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
-            expect(errorContainer).toBeEmpty();
-            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
+            expect(errorContainer).not.toHaveClass('annotator-notice-show');
         });
     });
 });
