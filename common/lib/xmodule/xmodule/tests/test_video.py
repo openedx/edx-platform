@@ -569,7 +569,7 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertEqual(
-            get_video_from_cdn(fake_cdn_url, original_video_url),
+            get_video_from_cdn(fake_cdn_url, original_video_url, cdn_branding_logo_url),
             cdn_response_video_url
         )
 
@@ -581,4 +581,4 @@ class VideoCdnTest(unittest.TestCase):
         original_video_url = "http://www.original_video.com/original_video.mp4"
         cdn_response.return_value = Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
-        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+        self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url, cdn_branding_logo_url))

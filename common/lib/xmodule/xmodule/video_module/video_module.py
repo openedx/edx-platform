@@ -220,7 +220,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             branding_info = get_branding_info(cdn_info.get('BRANDING'))
 
             for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
+                new_url = get_video_from_cdn(cdn_url, source_url, branding_url)
                 if new_url:
                     sources[index] = new_url
 
