@@ -29,7 +29,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from opaque_keys.edx.locator import LibraryLocator
+from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -42,6 +42,8 @@ from xmodule.x_module import XModuleMixin
 from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.exceptions import ItemNotFoundError
+
 
 log = logging.getLogger(__name__)
 
@@ -700,6 +702,11 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         course = courses[0]
         # Confirm that no specified asset collection name means empty asset metadata.
         self.assertEquals(self.draft_store.get_all_asset_metadata(course.id, 'asset'), [])
+
+    def test_no_asset_invalid_key(self):
+        course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)
+        # Confirm that invalid course key raises ItemNotFoundError
+        self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
 
 
 class TestMongoKeyValueStore(object):
