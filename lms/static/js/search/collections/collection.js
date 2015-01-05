@@ -14,6 +14,14 @@ var edx = edx || {};
         url: '/search',
         fetchXhr: null,
 
+        initialize: function (models, options) {
+            // call super constructor
+            Backbone.Collection.prototype.initialize.apply(this, arguments);
+            if (options && options.course_id) {
+                this.url += '/' + options.course_id;
+            }
+        },
+
         performSearch: function (searchTerm) {
             this.fetchXhr && this.fetchXhr.abort();
             this.searchTerm = searchTerm || '';
@@ -26,10 +34,10 @@ var edx = edx || {};
                     page_index: 0
                 },
                 type: 'POST',
-                success: function (self) {
+                success: function (self, xhr) {
                     self.trigger('search');
                 },
-                error: function (self) {
+                error: function (self, xhr) {
                     self.trigger('error');
                 }
             });
@@ -44,11 +52,11 @@ var edx = edx || {};
                     page_index: this.page + 1
                 },
                 type: 'POST',
-                success: function (self) {
+                success: function (self, xhr) {
                     self.page += 1;
                     self.trigger('next');
                 },
-                error: function (self) {
+                error: function (self, xhr) {
                     self.trigger('error');
                 }
             });

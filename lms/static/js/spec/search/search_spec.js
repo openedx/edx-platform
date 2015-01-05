@@ -135,6 +135,11 @@ function($, Sinon, Backbone, TemplateHelpers) {
             this.server.restore();
         });
 
+        it('appends course_id to url', function () {
+            var collection = new edx.search.Collection([], { course_id: 'edx101' });
+            expect(collection.url).toEqual('/search/edx101');
+        });
+
         it('sends a request and parses the json result', function () {
             this.collection.performSearch('search string');
             var response = {
