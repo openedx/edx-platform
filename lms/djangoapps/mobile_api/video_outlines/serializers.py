@@ -5,6 +5,7 @@ from rest_framework.reverse import reverse
 
 from courseware.access import has_access
 
+
 from edxval.api import (
     get_video_info_for_course_and_profile, ValInternalError
 )
@@ -48,23 +49,37 @@ class BlockOutline(object):
             return reversed(block_path)
 
         def find_urls(block):
-            """section and unit urls for block"""
+            """
+            Find the section and unit urls for a block.
+
+            Returns:
+                unit_url, section_url:
+                    unit_url (str): The url of a unit
+                    section_url (str): The url of a section
+
+            """
             block_path = []
             while block in child_to_parent:
                 block = child_to_parent[block]
                 block_path.append(block)
 
-            course, chapter, section, unit = list(reversed(block_path))[:4]
-            position = 1
-            unit_name = unit.url_name
-            for block in section.children:
-                if block.name == unit_name:
-                    break
-                position += 1
+            block_list = list(reversed(block_path))
+            n = len(block_list)
+
+            chapter = block_list[1].location.block_id if n > 1 else None
+            section = block_list[2] if n > 2 else None
+            position = ""
+
+            if n > 3:
+                position = 1
+                for block in section.children:
+                    if block.name == block_list[3].url_name:
+                        break
+                    position += 1
 
             kwargs = dict(
-                course_id=course.id.to_deprecated_string(),
-                chapter=chapter.url_name,
+                course_id=self.course_id,
+                chapter=chapter,
                 section=section.url_name
             )
             section_url = reverse(
@@ -78,7 +93,7 @@ class BlockOutline(object):
                 kwargs=kwargs,
                 request=self.request,
             )
-            return unit_url, section_url, block_path
+            return unit_url, section_url
 
         user = self.request.user
 
@@ -100,7 +115,7 @@ class BlockOutline(object):
 
                 summary_fn = self.categories_to_outliner[curr_block.category]
                 block_path = list(path(curr_block))
-                unit_url, section_url, _ = find_urls(curr_block)
+                unit_url, section_url = find_urls(curr_block)
 
                 yield {
                     "path": block_path,
