@@ -76,6 +76,7 @@ from verify_student.views import PayAndVerifyView
       data-is-active='${is_active}'
     ></div>
 
+    % if is_active:
     ## Support
     <div class="wrapper-content-supplementary">
       <aside class="content-supplementary">
@@ -98,6 +99,7 @@ from verify_student.views import PayAndVerifyView
           </ul>
         </aside>
     </div>
+    % endif
 
   </section>
 </div>
