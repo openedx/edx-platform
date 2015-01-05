@@ -86,16 +86,10 @@ define([
             };
 
             var expectPaymentDisabledBecauseInactive = function() {
-                var payButton = $( '#pay_button'),
-                    activateButton = $( '#activate_button' );
+                var payButton = $( '#pay_button' );
 
                 // Payment button should be hidden
                 expect( payButton.length ).toEqual(0);
-
-                // Activate button should be displayed and disabled
-                expect( activateButton.length ).toEqual(1);
-                expect( activateButton.hasClass( 'is-disabled' ) ).toBe( true );
-                expect( activateButton.prop( 'disabled' ) ).toBe( true );
             };
 
             var goToPayment = function( requests, kwargs ) {
