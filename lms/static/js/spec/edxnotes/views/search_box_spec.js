@@ -77,7 +77,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithJson(requests, {});
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
-                'This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.',
+                'An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.',
                 'test_text'
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
@@ -90,7 +90,7 @@ define([
             submitForm(this.searchBox, 'test_text');
             AjaxHelpers.respondWithError(requests);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
-                'This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.',
+                'An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.',
                 'test_text'
             );
             expect(this.searchBox.options.complete).toHaveBeenCalledWith(
