@@ -247,6 +247,28 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                     expect(assetsView.largeFileErrorMsg).toBeNull();
                 });
 
+                it('returns the registered info for a filter column', function () {
+                    assetsView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                    assetsView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
+                    var filterInfo = assetsView.filterableColumnInfo('js-asset-type-col');
+                    expect(filterInfo.displayName).toBe('Type');
+                    expect(filterInfo.fieldName).toBe('asset_type');
+                });
+
+                it('throws an exception for an unregistered filter column', function () {
+                    expect(function() {
+                        assetsView.filterableColumnInfo('no-such-column');
+                    }).toThrow();
+                });
+
+
+                it('make sure selectFilter sets collection filter if undefined', function () {
+                    expect(assetsView).toBeDefined();
+                    assetsView.collection.filterField = '';
+                    assetsView.selectFilter('js-asset-type-col');
+                    expect(assetsView.collection.filterField).toEqual('asset_type');
+                });
+
                 it('make sure _toggleFilterColumn filters asset list', function () {
                     expect(assetsView).toBeDefined();
                     var requests = AjaxHelpers.requests(this);
@@ -255,7 +277,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                         assetsView.setPage(0);
                         respondWithMockAssets(requests);
                         var assetsNumber = assetsView.collection.length;
-                        assetsView._toggleFilterColumn('Images');
+                        assetsView._toggleFilterColumn('Images', 'Images');
                         respondWithMockAssets(requests);
                         var assetsNumberFiltered = assetsView.collection.length;
                         expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
@@ -277,6 +299,24 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "j
                         $typeColumn.find('.wrapper-nav-sub').trigger('click');
                         expect($typeColumn.find('.wrapper-nav-sub').hasClass('is-shown')).toBe(false);
                     });
+                });
+
+                it('check filtering works with sorting by column on', function () {
+                    expect(assetsView).toBeDefined();
+                    var requests = AjaxHelpers.requests(this);
+                    assetsView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
+                    assetsView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
+                    assetsView.setInitialSortColumn('name-col');
+                    assetsView.setPage(0);
+                    respondWithMockAssets(requests);
+                    var sortInfo = assetsView.sortableColumnInfo('name-col');
+                    expect(sortInfo.defaultSortDirection).toBe('asc');
+                    var $firstFilter = $($('#js-asset-type-col').find('li.nav-item a')[1]);
+                    $firstFilter.trigger('click');
+                    respondWithMockAssets(requests);
+                    var assetsNumberFiltered = assetsView.collection.length;
+                    expect(assetsNumberFiltered).toBe(1);
+
                 });
 
                 it('shows type select menu, selects type, and filters results', function () {

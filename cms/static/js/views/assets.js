@@ -262,10 +262,10 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
             toggleFilterColumn: function(event) {
                 event.preventDefault();
                 var $filterColumn = $(event.currentTarget);
-                this._toggleFilterColumn($filterColumn.data('assetfilter'));
+                this._toggleFilterColumn($filterColumn.data('assetfilter'), $filterColumn.text());
             },
 
-            _toggleFilterColumn: function(assettype) {
+            _toggleFilterColumn: function(assettype, assettypeLabel) {
                 var collection = this.collection;
                 var filterColumn = this.$el.find('.filterable-column');
                 var resetFilter = filterColumn.find('.reset-filter');
@@ -281,7 +281,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                     title.addClass('column-selected-link');
                 }
 
-                this.filterableColumns['js-asset-type-col'].displayName = assettype;
+                this.filterableColumns['js-asset-type-col'].displayName = assettypeLabel;
                 this.selectFilter('js-asset-type-col');
                 this.closeFilterPopup(this.$el.find(
                     '.column-filter-link[data-assetfilter="' + assettype + '"]'));
