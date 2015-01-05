@@ -14,6 +14,16 @@
   <%static:css group='style-course'/>
 </%block>
 
+<%block name="jsextra">
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <style>
+    .ui-timepicker-list { z-index: 100000; }
+    .ui-datepicker { z-index: 100000 !important; }
+    input.date, input.time { width: auto !important; display: inline !important; }
+  </style>
+</%block>
+
 <%include file="/courseware/course_navigation.html" args="active_page='poc_coach'" />
 
 <section class="container">

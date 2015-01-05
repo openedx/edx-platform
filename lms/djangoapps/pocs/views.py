@@ -231,6 +231,22 @@ def set_grading_policy(request, course):
     return redirect(url)
 
 
+def validate_date(year, month, day, hour, minute):
+    # avoid corrupting db if bad dates come in
+    valid = True
+    if year < 0:
+        valid = False
+    if month < 1 or month > 12:
+        valid = False
+    if day < 1 or day > 31:
+        valid = False
+    if hour < 0 or hour > 23:
+        valid = False
+    if minute < 0 or minute > 59:
+        valid = False
+    return valid
+
+
 def parse_date(datestring):
     """
     Generate a UTC datetime.datetime object from a string of the form
@@ -240,8 +256,9 @@ def parse_date(datestring):
         date, time = datestring.split(' ')
         year, month, day = map(int, date.split('-'))
         hour, minute = map(int, time.split(':'))
-        return datetime.datetime(
-            year, month, day, hour, minute, tzinfo=pytz.UTC)
+        if validate_date(year, month, day, hour, minute):
+            return datetime.datetime(
+                year, month, day, hour, minute, tzinfo=pytz.UTC)
 
     return None
 
