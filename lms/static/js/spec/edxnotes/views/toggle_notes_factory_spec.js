@@ -37,6 +37,7 @@ define([
         afterEach(function () {
             VisibilityDecorator._setVisibility(null);
             _.invoke(Annotator._instances, 'destroy');
+            $('.annotator-notice').remove();
         });
 
         it('can toggle notes', function() {
@@ -72,7 +73,7 @@ define([
 
         it('can handle errors', function() {
             var requests = AjaxHelpers.requests(this),
-                errorContainer = $('.edx-notes-visibility-error');
+                errorContainer = $('.annotator-notice');
 
             expect(this.toggleNotes.$el).not.toHaveClass('has-error');
             this.button.click();
@@ -80,7 +81,7 @@ define([
             expect(errorContainer).toContainText(
                 "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
             );
-            expect(this.toggleNotes.$el).toHaveClass('has-error');
+            expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
