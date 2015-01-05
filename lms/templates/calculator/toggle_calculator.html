@@ -16,16 +16,20 @@
 
             <ul id="calculator_input_help" class="help" aria-activedescendant="hint-moreinfo" role="tooltip" aria-hidden="true">
               <li class="hint-item" id="hint-moreinfo" tabindex="-1">
-                <p><span class="bold">${_("For detailed information, see <a href='http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html'>Entering Mathematical and Scientific Expressions</a> in the <a href='http://edx-guide-for-students.readthedocs.org/en/latest/index.html'>edX Guide for Students</a>.")}</span></p>
+                <p><span class="bold">
+                  ${_("For detailed information, see {link_mathexpressions_start}Entering Mathematical and Scientific Expressions{link_mathexpressions_end} in the {link_studentguide_start}edX Guide for Students{link_studentguide_end}.format(
+                    link_mathexpressions_start='<a href="http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html">', link_mathexpressions_end="</a>,
+                    link_studentguide_start='<a href="hhttp://edx-guide-for-students.readthedocs.org/en/latest/index.html">', link_studentguide_end="</a>"
+                </span></p>
               </li>
 
               <li class="hint-item" id="hint-tips" tabindex="-1"><p><span class="bold">${_("Tips")}:</span> </p>
                 <ul>
-                  <li class="hint-item" id="hint-paren" tabindex="-1"><p>Use parentheses () to make expressions clear. You can use parentheses inside other parentheses.</p></li>
-                  <li class="hint-item" id="hint-spaces" tabindex="-1"><p>Do not use spaces in expressions.</p></li>
-                  <li class="hint-item" id="hint-howto-constants" tabindex="-1"><p>For constants, indicate multiplication explicitly (example: 5*c).</p></li>
-                  <li class="hint-item" id="hint-howto-maffixes" tabindex="-1"><p>For affixes, type the number and affix without a space (example: 5c).</p></li>
-                  <li class="hint-item" id="hint-howto-functions" tabindex="-1"><p>For functions, type the name of the function, then the expression in parentheses.</p></li>
+                  <li class="hint-item" id="hint-paren" tabindex="-1"><p>${_("Use parentheses () to make expressions clear. You can use parentheses inside other parentheses.")}</p></li>
+                  <li class="hint-item" id="hint-spaces" tabindex="-1"><p>${_("Do not use spaces in expressions.")}</p></li>
+                  <li class="hint-item" id="hint-howto-constants" tabindex="-1"><p>${_("For constants, indicate multiplication explicitly (example: 5*c).")}</p></li>
+                  <li class="hint-item" id="hint-howto-maffixes" tabindex="-1"><p>${_("For affixes, type the number and affix without a space (example: 5c).")}</p></li>
+                  <li class="hint-item" id="hint-howto-functions" tabindex="-1"><p>${_("For functions, type the name of the function, then the expression in parentheses.")}</p></li>
                 </ul>
               </li>
 
@@ -39,9 +43,9 @@
                     </tr>
                     <tr>
                       <th scope="row">${_("Numbers")}</th>
-                      <td>Integers<br />
-                        Fractions<br />
-                        Decimals
+                      <td>${_("Integers")}<br />
+                        ${_("Fractions")}<br />
+                        ${_("Decimals")}
                       </td>
                       <td>2520<br />
                         2/3<br />
@@ -50,10 +54,14 @@
                     </tr>
                     <tr>
                       <th scope="row">${_("Operators")}</th>
-                      <td>+ - * / (add, subtract, multiply, divide)<br />
-                        ^ (raise to a power)<br />
-                        _ (add a subscript)<br />
-                        || (parallel resistors)
+                      ## Translators: Please do not translate mathematical symbols.
+                      <td>${_("+ - * / (add, subtract, multiply, divide)")}<br />
+                        ## Translators: Please do not translate mathematical symbols.
+                        ${_("^ (raise to a power)")}<br />
+                        ## Translators: Please do not translate mathematical symbols.
+                        ${_("_ (add a subscript)")}<br />
+                        ## Translators: Please do not translate mathematical symbols.
+                        ${_("|| (parallel resistors)")}
                       </td>
                       <td>x+(2*y)/x-1
                         x^(n+1)<br />
@@ -63,7 +71,7 @@
                     </tr>
                     <tr>
                       <th scope="row">${_("Greek letters")}</th>
-                      <td>Name of letter</td>
+                      <td>${_("Name of letter")}</td>
                       <td>alpha<br />
                         lambda
                       </td>
@@ -77,7 +85,7 @@
                     </tr>
                     <tr>
                       <th scope="row">${_("Affixes")}</th>
-                      <td>Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)</td>
+                      <td>${_("Percent sign (%) and metric affixes (d, c, m, u, n, p, k, M, G, T)")}</td>
                       <td>20%<br />
                         20c<br />
                         418T
@@ -101,13 +109,17 @@
                       <td></td>
                     </tr>
                     <tr>
+                      ## Translators: Please see http://en.wikipedia.org/wiki/Scientific_notation
                       <th scope="row">${_("Scientific notation")}</th>
-                      <td>10^ and the exponent</td>
+                      ## Translators: 10^ is a mathematical symbol. Please do not translate.
+                      <td>${_("10^ and the exponent")}</td>
                       <td>10^-9</td>
                     </tr>
                     <tr>
+                      ## Translators: this is part of scientific notation. Please see http://en.wikipedia.org/wiki/Scientific_notation#E_notation
                       <th scope="row">${_("e notation")}</th>
-                      <td>1e and the exponent</td>
+                      ## Translators: 1e is a mathematical symbol. Please do not translate.
+                      <td>${_("1e and the exponent")}</td>
                       <td>1e-9</td>
                     </tr>
                   </tbody>
