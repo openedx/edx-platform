@@ -64,6 +64,11 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
             metadata={'graded': True, 'format': 'Homework'},
             display_name=None,
         )
+        self.split_unit = ItemFactory.create(
+            parent_location=self.sub_section.location,
+            category="vertical",
+            display_name=u"split test vertical\u03a9",
+        )
 
         self.edx_video_id = 'testing-123'
 
@@ -205,6 +210,48 @@ class TestVideoOutline(ModuleStoreTestCase, APITestCase):
         course_outline = self._get_video_summary_list()
         self.assertEqual(len(course_outline), 1)
         self.assertEqual(course_outline[0]['path'][2]['name'], self.nameless_unit.location.block_id)
+
+    def test_course_list_with_video_in_sub_section(self):
+        """
+        Tests a non standard xml format where a video is underneath a sequential
+
+        We are expecting to return the same unit and section url since there is
+        no unit vertical.
+        """
+        ItemFactory.create(
+            parent_location=self.sub_section.location,
+            category="video",
+            edx_video_id=self.edx_video_id,
+            display_name=u"test draft video omega 2 \u03a9"
+        )
+        course_outline = self._get_video_summary_list()
+        self.assertEqual(len(course_outline), 1)
+        self.assertEqual(len(course_outline[0]['path']), 2)
+        self.assertEqual(course_outline[0]["section_url"], course_outline[0]["unit_url"])
+
+    def test_course_list_with_split_test(self):
+        self.split_test = ItemFactory.create(
+            parent_location=self.split_unit.location,
+            category="split_test",
+            display_name=u"split test unit"
+        )
+        ItemFactory.create(
+            parent_location=self.split_test.location,
+            category="video",
+            display_name=u"split test vertical a",
+        )
+        ItemFactory.create(
+            parent_location=self.split_test.location,
+            category="video",
+            display_name=u"split test vertical b",
+        )
+        course_outline = self._get_video_summary_list()
+        self.assertEqual(len(course_outline), 2)
+        self.assertEqual(len(course_outline[0]["path"]), 4)
+        self.assertEqual(len(course_outline[1]["path"]), 4)
+        self.assertEqual(course_outline[0]["summary"]["name"], u"split test vertical a")
+        self.assertEqual(course_outline[1]["summary"]["name"], u"split test vertical b")
+
 
     def test_course_list_with_hidden_blocks(self):
         hidden_subsection = ItemFactory.create(

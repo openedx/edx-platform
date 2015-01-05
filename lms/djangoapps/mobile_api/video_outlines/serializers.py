@@ -50,10 +50,7 @@ class BlockOutline(object):
 
         def find_urls(block):
             """
-            Find the section and unit urls for a block. If a unit block cannot
-            be found, an empty unit url will be returned. If a section block
-            cannot be found, an empty url will be returned for both section
-            and unit.
+            Find the section and unit urls for a block.
 
             Returns:
                 unit_url, section_url:
@@ -61,18 +58,17 @@ class BlockOutline(object):
                     section_url (str): The url of a section
 
             """
-
             block_path = []
             while block in child_to_parent:
                 block = child_to_parent[block]
                 block_path.append(block)
 
             block_list = list(reversed(block_path))
-
             n = len(block_list)
 
             chapter = block_list[1].location.block_id if n > 1 else None
             section = block_list[2] if n > 2 else None
+            position = ""
 
             if n > 3:
                 position = 1
@@ -80,15 +76,12 @@ class BlockOutline(object):
                     if block.name == block_list[3].url_name:
                         break
                     position += 1
-            else:
-                position = ""
 
             kwargs = dict(
                 course_id=self.course_id,
                 chapter=chapter,
                 section=section.url_name
             )
-
             section_url = reverse(
                 "courseware_section",
                 kwargs=kwargs,
@@ -103,7 +96,6 @@ class BlockOutline(object):
             return unit_url, section_url
 
         user = self.request.user
-
 
         while stack:
             curr_block = stack.pop()
