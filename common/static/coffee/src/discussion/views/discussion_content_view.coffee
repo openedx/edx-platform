@@ -138,6 +138,8 @@ if Backbone?
       closed: (closed) ->
         @updateButtonState(".action-close", closed)
         @$(".post-label-closed").toggleClass("is-hidden", not closed)
+        @$(".action-vote").toggle(not closed)
+        @$(".display-vote").toggle(closed)
     })
 
     toggleSecondaryActions: (event) =>
