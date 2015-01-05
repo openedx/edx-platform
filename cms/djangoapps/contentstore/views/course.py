@@ -1353,6 +1353,7 @@ class GroupConfiguration(object):
             store.update_item(course, user_id)
         return cohorted_partition
 
+
 @require_http_methods(("GET", "POST"))
 @login_required
 @ensure_csrf_cookie
