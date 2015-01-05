@@ -208,16 +208,7 @@ BULK_EMAIL_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 
 # Marketing link overrides
-MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {
-    'ABOUT': 'gacco-about',
-    'FAQ': 'gacco-support',
-    'COURSES': 'gacco-courses',
-    'ROOT': 'gacco-root',
-    'TOS': 'gacco-tos',
-    'PRIVACY': 'gacco-privacy',
-    'NEWS': 'gacco-news',
-    'BLOG': 'gacco-blog',
-}))
+MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 MKTG_URL_LINK_MAP_URLS = ENV_TOKENS.get('MKTG_URL_LINK_MAP_URLS', {})
 
 # Timezone overrides
