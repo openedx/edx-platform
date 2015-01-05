@@ -92,7 +92,7 @@ class EdxNotesPageItem(NoteChild):
 
     @property
     def text(self):
-        return self._get_element_text(".note-comments")
+        return self._get_element_text(".note-comment-p")
 
     @property
     def quote(self):

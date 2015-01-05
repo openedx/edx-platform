@@ -29,7 +29,7 @@ define([
             view.$('.note-excerpt-more-link').click();
 
             expect(view.$el).toContainText(Helpers.LONG_TEXT);
-            expect(view.$el).toContainText('(Less)');
+            expect(view.$el).toContainText('Less');
 
             view = getView({quote: Helpers.SHORT_TEXT});
             expect(view.$el).not.toContain('.note-excerpt-more-link');
