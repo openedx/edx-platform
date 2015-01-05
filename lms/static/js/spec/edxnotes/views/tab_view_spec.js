@@ -105,5 +105,14 @@ define([
             expect(errorHolder).toHaveClass('is-hidden');
             expect(errorHolder.find('.copy')).toBeEmpty();
         });
+
+        it('should hide error messages before rendering', function () {
+            var view = getView(this.tabsCollection),
+                errorHolder = view.$('.wrapper-msg');
+            view.showErrorMessage('<p>error message is here</p>');
+            view.render();
+            expect(errorHolder).toHaveClass('is-hidden');
+            expect(errorHolder.find('.copy')).toBeEmpty();
+        });
     });
 });
