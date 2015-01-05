@@ -26,6 +26,10 @@ define([
             this.listenTo(this.collection, 'add', this.addNewItemView);
             this.listenTo(this.collection, 'remove', this.handleDestory);
             this.template = this.loadTemplate('add-list-item');
+            // Don't render the add button when editing a form
+            this.listenTo(this.collection, 'change:editing', this.toggleAddButton);
+            this.listenTo(this.collection, 'add', this.toggleAddButton);
+            this.listenTo(this.collection, 'remove', this.renderAddButton);
         },
 
         render: function() {
@@ -45,15 +49,29 @@ define([
             return this;
         },
 
-        renderAddButton: function() {
+        removeAddButton: function() {
             var addItemElement = this.$('.action-add');
             if (addItemElement.length) {
                 addItemElement.remove();
             }
-            this.$el.append(this.template({
-                itemCategory: this.itemCategory,
-                itemCategoryDisplayName: this.itemCategoryDisplayName
-            }));
+        },
+
+        renderAddButton: function() {
+            this.removeAddButton();
+            if (this.collection.length) {
+                this.$el.append(this.template({
+                    itemCategory: this.itemCategory,
+                    itemCategoryDisplayName: this.itemCategoryDisplayName
+                }));
+            }
+        },
+
+        toggleAddButton: function(model) {
+            if (model.get('editing')) {
+                this.removeAddButton();
+            } else {
+                this.renderAddButton();
+            }
         },
 
         addNewItemView: function (model) {
@@ -66,7 +84,6 @@ define([
             } else {
                 this.$el.html(view.render().el);
             }
-            this.renderAddButton();
 
             view.$el.focus();
         },
