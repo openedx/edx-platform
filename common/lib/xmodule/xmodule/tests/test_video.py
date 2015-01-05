@@ -568,6 +568,7 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response_content = '{{"sources":["{cdn_url}"]}}'.format(cdn_url=cdn_response_video_url)
         cdn_response.return_value = Mock(status_code=200, content=cdn_response_content)
         fake_cdn_url = 'http://fake_cdn.com/'
+        cdn_branding_logo_url = 'http://fake_cdn.com/fake_image.png'
         self.assertEqual(
             get_video_from_cdn(fake_cdn_url, original_video_url, cdn_branding_logo_url),
             cdn_response_video_url
