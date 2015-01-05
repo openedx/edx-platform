@@ -4,12 +4,14 @@ define([
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
-    'js/student_account/views/LoginView'
-], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView) {
+    'js/student_account/views/LoginView',
+    'js/student_account/models/PasswordResetModel'
+], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
     'use strict';
     describe('edx.student.account.LoginView', function() {
 
         var model = null,
+            resetModel = null,
             view = null,
             requests = null,
             authComplete = false,
@@ -79,10 +81,17 @@ define([
                 method: FORM_DESCRIPTION.method
             });
 
+            // Initialize the passwordReset model
+            resetModel = new PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
+
             // Initialize the login view
             view = new LoginView({
                 fields: FORM_DESCRIPTION.fields,
                 model: model,
+                resetModel: resetModel,
                 thirdPartyAuth: THIRD_PARTY_AUTH,
                 platformName: PLATFORM_NAME
             });

@@ -21,7 +21,7 @@ var edx = edx || {};
             this.urlRoot = options.url;
         },
 
-        sync: function(method, model) {
+        sync: function( method, model ) {
             var headers = {
                 'X-CSRFToken': $.cookie('csrftoken')
             };
