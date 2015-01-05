@@ -45,10 +45,12 @@ define([
             expect(this.button).not.toHaveClass('is-disabled');
             expect(this.icon).toHaveClass('icon-check');
             expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.button).toHaveClass('is-active');
 
             this.button.click();
             expect(this.icon).toHaveClass('icon-check-empty');
             expect(this.icon).not.toHaveClass('icon-check');
+            expect(this.button).not.toHaveClass('is-active');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -59,6 +61,7 @@ define([
             this.button.click();
             expect(this.icon).toHaveClass('icon-check');
             expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.button).toHaveClass('is-active');
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -71,15 +74,18 @@ define([
             var requests = AjaxHelpers.requests(this),
                 errorContainer = $('.edx-notes-visibility-error');
 
+            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
                 'Cannot save your state. This may be happening because of an error with our server or your internet connection. Try refreshing the page or making sure you are online.'
             );
+            expect(this.toggleNotes.$el).toHaveClass('has-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
             expect(errorContainer).toBeEmpty();
+            expect(this.toggleNotes.$el).not.toHaveClass('has-error');
         });
     });
 });

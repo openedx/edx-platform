@@ -14,7 +14,8 @@ define([
             this.visibility = options.visibility;
             this.visibilityUrl = options.visibilityUrl;
             this.checkboxIcon = this.$('.checkbox-icon');
-            this.$('.action-toggle-notes').removeClass('is-disabled');
+            this.actionLink = this.$('.action-toggle-notes');
+            this.actionLink.removeClass('is-disabled');
         },
 
         toogleHandler: function (event) {
@@ -28,17 +29,21 @@ define([
             if (this.visibility) {
                 _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
                 this.checkboxIcon.removeClass('icon-check-empty').addClass('icon-check');
+                this.actionLink.addClass('is-active');
             } else {
                 EdxnotesVisibilityDecorator.disableNotes();
                 this.checkboxIcon.removeClass('icon-check').addClass('icon-check-empty');
+                this.actionLink.removeClass('is-active');
             }
         },
 
         hideErrorMessage: function() {
+            this.$el.removeClass('has-error');
             this.$('.edx-notes-visibility-error').text('');
         },
 
         showErrorMessage: function(message) {
+            this.$el.addClass('has-error');
             this.$('.edx-notes-visibility-error').text(message);
         },
 
