@@ -243,7 +243,12 @@ ${fragment.foot_html()}
 
             <ul id="calculator_input_help" class="help" aria-activedescendant="hint-moreinfo" role="tooltip" aria-hidden="true">
               <li class="hint-item" id="hint-moreinfo" tabindex="-1">
-                <p><span class="bold">${_("For detailed information, see <a href='http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html'>Entering Mathematical and Scientific Expressions</a> in the <a href='http://edx-guide-for-students.readthedocs.org/en/latest/index.html'>edX Guide for Students</a>.")}</span></p>
+                <p><span class="bold">${_("For detailed information, see {math_link_start}Entering Mathematical and Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for Students{guide_link_end}.").format(
+                  math_link_start='<a href="http://edx-guide-for-students.readthedocs.org/en/latest/SFD_mathformatting.html">',
+                  math_link_end='</a>',
+                  guide_link_start='<a href="http://edx-guide-for-students.readthedocs.org/en/latest/index.html">',
+                  guide_link_end='</a>',
+                )}</span></p>
               </li>
 
               <li class="hint-item" id="hint-tips" tabindex="-1"><p><span class="bold">${_("Tips")}:</span> </p>

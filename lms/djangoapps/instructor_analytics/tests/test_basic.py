@@ -2,6 +2,7 @@
 Tests for instructor.basic
 """
 
+import json
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from mock import patch
@@ -32,6 +33,12 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
         self.instructor = InstructorFactory(course_key=self.course_key)
+        for user in self.users:
+            user.profile.meta = json.dumps({
+                "position": "edX expert {}".format(user.id),
+                "company": "Open edX Inc {}".format(user.id),
+            })
+            user.profile.save()
 
     def test_enrolled_students_features_username(self):
         self.assertIn('username', AVAILABLE_FEATURES)
@@ -53,6 +60,19 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(userreport['username'], [user.username for user in self.users])
             self.assertIn(userreport['email'], [user.email for user in self.users])
             self.assertIn(userreport['name'], [user.profile.name for user in self.users])
+
+    def test_enrolled_students_meta_features_keys(self):
+        """
+        Assert that we can query individual fields in the 'meta' field in the UserProfile
+        """
+        query_features = ('meta.position', 'meta.company')
+        with self.assertNumQueries(1):
+            userreports = enrolled_students_features(self.course_key, query_features)
+        self.assertEqual(len(userreports), len(self.users))
+        for userreport in userreports:
+            self.assertEqual(set(userreport.keys()), set(query_features))
+            self.assertIn(userreport['meta.position'], ["edX expert {}".format(user.id) for user in self.users])
+            self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
 
     def test_enrolled_students_features_keys_cohorted(self):
         course = CourseFactory.create(course_key=self.course_key)
@@ -218,8 +238,6 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             self.assertEqual(sale_order_record['company_contact_name'], order.company_contact_name)
             self.assertEqual(sale_order_record['company_contact_email'], order.company_contact_email)
             self.assertEqual(sale_order_record['customer_reference_number'], order.customer_reference_number)
-            self.assertEqual(sale_order_record['total_used_codes'], order.registrationcoderedemption_set.all().count())
-            self.assertEqual(sale_order_record['total_codes'], len(CourseRegistrationCode.objects.filter(order=order)))
             self.assertEqual(sale_order_record['unit_cost'], item.unit_cost)
             self.assertEqual(sale_order_record['list_price'], item.list_price)
             self.assertEqual(sale_order_record['status'], item.status)
@@ -261,7 +279,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         order.save()
 
         registration_code_redemption = RegistrationCodeRedemption(
-            order=order, registration_code_id=1, redeemed_by=self.instructor
+            registration_code_id=1, redeemed_by=self.instructor
         )
         registration_code_redemption.save()
         registration_codes = CourseRegistrationCode.objects.all()

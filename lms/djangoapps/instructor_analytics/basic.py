@@ -3,6 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+import json
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
@@ -59,7 +60,6 @@ def sale_order_record_features(course_id, features):
         """
 
         sale_order_features = [x for x in SALE_ORDER_FEATURES if x in features]
-        course_reg_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
         order_item_features = [x for x in ORDER_ITEM_FEATURES if x in features]
 
         # Extracting order information
@@ -73,9 +73,6 @@ def sale_order_record_features(course_id, features):
         sale_order_dict.update({"logged_in_username": purchased_course.order.user.username})
         sale_order_dict.update({"logged_in_email": purchased_course.order.user.email})
 
-        sale_order_dict.update({"total_codes": 'N/A'})
-        sale_order_dict.update({'total_used_codes': 'N/A'})
-
         # Extracting OrderItem information of unit_cost, list_price and status
         order_item_dict = dict((feature, getattr(purchased_course, feature, None))
                                for feature in order_item_features)
@@ -88,22 +85,6 @@ def sale_order_record_features(course_id, features):
             order_item_dict.update({'coupon_code': ", ".join(coupon_codes)})
 
         sale_order_dict.update(dict(order_item_dict.items()))
-        if getattr(purchased_course.order, 'order_type') == OrderTypes.BUSINESS:
-            registration_codes = CourseRegistrationCode.objects.filter(order=purchased_course.order, course_id=course_id)
-            sale_order_dict.update({"total_codes": registration_codes.count()})
-            total_used_codes = RegistrationCodeRedemption.objects.filter(registration_code__in=registration_codes).count()
-            sale_order_dict.update({'total_used_codes': total_used_codes})
-
-            codes = [reg_code.code for reg_code in registration_codes]
-
-            # Extracting registration code information
-            obj_course_reg_code = registration_codes.all()[:1].get()
-            course_reg_dict = dict((feature, getattr(obj_course_reg_code, feature))
-                                   for feature in course_reg_features)
-
-            course_reg_dict['course_id'] = course_id.to_deprecated_string()
-            course_reg_dict.update({'codes': ", ".join(codes)})
-            sale_order_dict.update(dict(course_reg_dict.items()))
 
         return sale_order_dict
 
@@ -187,6 +168,15 @@ def enrolled_students_features(course_key, features):
         student_features = [x for x in STUDENT_FEATURES if x in features]
         profile_features = [x for x in PROFILE_FEATURES if x in features]
 
+        # For data extractions on the 'meta' field
+        # the feature name should be in the format of 'meta.foo' where
+        # 'foo' is the keyname in the meta dictionary
+        meta_features = []
+        for feature in features:
+            if 'meta.' in feature:
+                meta_key = feature.split('.')[1]
+                meta_features.append((feature, meta_key))
+
         student_dict = dict((feature, getattr(student, feature))
                             for feature in student_features)
         profile = student.profile
@@ -194,6 +184,11 @@ def enrolled_students_features(course_key, features):
             profile_dict = dict((feature, getattr(profile, feature))
                                 for feature in profile_features)
             student_dict.update(profile_dict)
+
+            # now featch the requested meta fields
+            meta_dict = json.loads(profile.meta) if profile.meta else {}
+            for meta_feature, meta_key in meta_features:
+                student_dict[meta_feature] = meta_dict.get(meta_key)
 
         if include_cohort_column:
             # Note that we use student.course_groups.all() here instead of

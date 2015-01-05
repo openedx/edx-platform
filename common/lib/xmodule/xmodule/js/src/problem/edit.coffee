@@ -25,7 +25,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       $(@element.find('.xml-box')).hide()
     else
       @createXMLEditor()
-      @xml_editor.display.wrapper.className += " CodeMirror-advanced";
 
   ###
   Creates the XML Editor and sets it as the current editor. If text is passed in,
@@ -54,7 +53,6 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       @toggleCheatsheetVisibility()
     if @confirmConversionToXml()
       @createXMLEditor(MarkdownEditingDescriptor.markdownToXml(@markdown_editor.getValue()))
-      @xml_editor.display.wrapper.className += " CodeMirror-advanced";
       # Need to refresh to get line numbers to display properly (and put cursor position to 0)
       @xml_editor.setCursor(0)
       @xml_editor.refresh()

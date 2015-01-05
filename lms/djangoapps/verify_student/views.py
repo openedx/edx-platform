@@ -47,6 +47,7 @@ from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
 
 from util.json_request import JsonResponse
+from util.date_utils import get_default_time_display
 
 log = logging.getLogger(__name__)
 
@@ -259,10 +260,9 @@ class PayAndVerifyView(View):
         ENROLLMENT_CONFIRMATION_STEP
     ]
 
-    # These are steps that can be skipped, since there are no barring requirements.
+    # These steps can be skipped using the ?skip-first-step GET param
     SKIP_STEPS = [
         INTRO_STEP,
-        PAYMENT_CONFIRMATION_STEP
     ]
 
     Step = namedtuple(
@@ -279,27 +279,27 @@ class PayAndVerifyView(View):
             template_name="intro_step"
         ),
         MAKE_PAYMENT_STEP: Step(
-            title=ugettext_lazy("Make Payment"),
+            title=ugettext_lazy("Make payment"),
             template_name="make_payment_step"
         ),
         PAYMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Payment Confirmation"),
+            title=ugettext_lazy("Payment confirmation"),
             template_name="payment_confirmation_step"
         ),
         FACE_PHOTO_STEP: Step(
-            title=ugettext_lazy("Take Face Photo"),
+            title=ugettext_lazy("Take photo"),
             template_name="face_photo_step"
         ),
         ID_PHOTO_STEP: Step(
-            title=ugettext_lazy("ID Photo"),
+            title=ugettext_lazy("Take a photo of your ID"),
             template_name="id_photo_step"
         ),
         REVIEW_PHOTOS_STEP: Step(
-            title=ugettext_lazy("Review Photos"),
+            title=ugettext_lazy("Review your info"),
             template_name="review_photos_step"
         ),
         ENROLLMENT_CONFIRMATION_STEP: Step(
-            title=ugettext_lazy("Enrollment Confirmation"),
+            title=ugettext_lazy("Enrollment confirmation"),
             template_name="enrollment_confirmation_step"
         ),
     }
@@ -318,55 +318,6 @@ class PayAndVerifyView(View):
     UPGRADE_MSG = 'upgrade'
     PAYMENT_CONFIRMATION_MSG = 'payment-confirmation'
 
-    Message = namedtuple(
-        'Message',
-        [
-            'page_title',
-            'top_level_msg',
-            'status_msg',
-            'intro_title',
-            'intro_msg'
-        ]
-    )
-
-    MESSAGES = {
-        FIRST_TIME_VERIFY_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolling as"),
-            intro_title=ugettext_lazy("What You Will Need To Enroll"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to enroll in the {course_mode} track.")
-        ),
-        VERIFY_NOW_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title=ugettext_lazy("What You Will Need To Enroll"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to enroll in the {course_mode} track.")
-        ),
-        VERIFY_LATER_MSG: Message(
-            page_title=ugettext_lazy("Enroll In {course_name}"),
-            top_level_msg=ugettext_lazy("Congrats! You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title=ugettext_lazy("What You Will Need To Verify"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to complete verification.")
-        ),
-        UPGRADE_MSG: Message(
-            page_title=ugettext_lazy("Upgrade Your Enrollment For {course_name}."),
-            top_level_msg=ugettext_lazy("You are upgrading your enrollment for {course_name}."),
-            status_msg=ugettext_lazy("Upgrading to"),
-            intro_title=ugettext_lazy("What You Will Need To Upgrade"),
-            intro_msg=ugettext_lazy("There are {num_requirements} things you will need to complete upgrade to the {course_mode} track.")
-        ),
-        PAYMENT_CONFIRMATION_MSG: Message(
-            page_title=ugettext_lazy("Payment Confirmation"),
-            top_level_msg=ugettext_lazy("You are now enrolled in {course_name}."),
-            status_msg=ugettext_lazy("Enrolled as"),
-            intro_title="",
-            intro_msg=""
-        )
-    }
-
     # Requirements
     #
     # These explain to the user what he or she
@@ -380,12 +331,10 @@ class PayAndVerifyView(View):
     ACCOUNT_ACTIVATION_REQ = "account-activation-required"
     PHOTO_ID_REQ = "photo-id-required"
     WEBCAM_REQ = "webcam-required"
-    CREDIT_CARD_REQ = "credit-card-required"
 
     STEP_REQUIREMENTS = {
         ID_PHOTO_STEP: [PHOTO_ID_REQ, WEBCAM_REQ],
         FACE_PHOTO_STEP: [WEBCAM_REQ],
-        MAKE_PAYMENT_STEP: [CREDIT_CARD_REQ],
     }
 
     @method_decorator(login_required)
@@ -424,12 +373,22 @@ class PayAndVerifyView(View):
 
         # Verify that the course exists and has a verified mode
         if course is None:
+            log.warn(u"No course specified for verification flow request.")
             raise Http404
 
         # Verify that the course has a verified mode
         course_mode = CourseMode.verified_mode_for_course(course_key)
         if course_mode is None:
+            log.warn(
+                u"No verified course mode found for course '{course_id}' for verification flow request"
+                .format(course_id=course_id)
+            )
             raise Http404
+
+        log.info(
+            u"Entering verified workflow for user '{user}', course '{course_id}', with current step '{current_step}'."
+            .format(user=request.user, course_id=course_id, current_step=current_step)
+        )
 
         # Check whether the user has verified, paid, and enrolled.
         # A user is considered "paid" if he or she has an enrollment
@@ -491,9 +450,13 @@ class PayAndVerifyView(View):
             'donation_for_course', {}
         ).get(unicode(course_key), '')
 
+        # Remember whether the user is upgrading
+        # so we can fire an analytics event upon payment.
+        request.session['attempting_upgrade'] = (message == self.UPGRADE_MSG)
+
         # Render the top-level page
         context = {
-            'user_full_name': full_name,
+            'contribution_amount': contribution_amount,
             'course': course,
             'course_key': unicode(course_key),
             'course_mode': course_mode,
@@ -501,18 +464,16 @@ class PayAndVerifyView(View):
             'current_step': current_step,
             'disable_courseware_js': True,
             'display_steps': display_steps,
-            'contribution_amount': contribution_amount,
-            'is_active': request.user.is_active,
-            'messages': self._messages(
-                message,
-                course.display_name,
-                course_mode,
-                requirements
-            ),
+            'is_active': json.dumps(request.user.is_active),
             'message_key': message,
             'platform_name': settings.PLATFORM_NAME,
             'purchase_endpoint': get_purchase_endpoint(),
             'requirements': requirements,
+            'user_full_name': full_name,
+            'verification_deadline': (
+                get_default_time_display(course_mode.expiration_datetime)
+                if course_mode.expiration_datetime else ""
+            ),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
 
@@ -650,7 +611,6 @@ class PayAndVerifyView(View):
             self.ACCOUNT_ACTIVATION_REQ: not is_active,
             self.PHOTO_ID_REQ: False,
             self.WEBCAM_REQ: False,
-            self.CREDIT_CARD_REQ: False
         }
 
         display_steps = set(step['name'] for step in display_steps)
@@ -661,42 +621,6 @@ class PayAndVerifyView(View):
                     all_requirements[requirement] = True
 
         return all_requirements
-
-    def _messages(self, message_key, course_name, course_mode, requirements):
-        """Construct messages based on how the user arrived at the page.
-
-        Arguments:
-            message_key (string): One of the keys in `MESSAGES`.
-            course_name (unicode): The name of the course the user wants to enroll in.
-            course_mode (CourseMode): The course mode for the course.
-            requirements (dict): The requirements for verifying and/or paying.
-
-        Returns:
-            `Message` (namedtuple)
-
-        """
-        messages = self.MESSAGES[message_key]
-
-        # Count requirements
-        num_requirements = sum([
-            1 if requirement else 0
-            for requirement in requirements.values()
-        ])
-
-        context = {
-            'course_name': course_name,
-            'course_mode': course_mode.name,
-            'num_requirements': num_requirements
-        }
-
-        # Interpolate the course name / mode into messaging strings
-        # Implicitly force lazy translations to unicode
-        return self.Message(
-            **{
-                key: value.format(**context)
-                for key, value in messages._asdict().iteritems()  # pylint: disable=protected-access
-            }
-        )
 
     def _check_already_verified(self, user):
         """Check whether the user has a valid or pending verification.
@@ -743,15 +667,14 @@ def create_order(request):
     """
     Submit PhotoVerification and create a new Order for this verified cert
     """
-    # TODO (ECOM-188): Once the A/B test of separating the payment/verified flow
-    # has completed, we can remove this flag and delete the photo verification
-    # step entirely (since it will be handled in a separate view).
-    submit_photo = True
-    if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT"):
-        submit_photo = (
-            'face_image' in request.POST and
-            'photo_id_image' in request.POST
-        )
+    # Only submit photos if photo data is provided by the client.
+    # TODO (ECOM-188): Once the A/B test of decoupling verified / payment
+    # completes, we may be able to remove photo submission from this step
+    # entirely.
+    submit_photo = (
+        'face_image' in request.POST and
+        'photo_id_image' in request.POST
+    )
 
     if (
         submit_photo and not
@@ -762,6 +685,7 @@ def create_order(request):
             b64_face_image = request.POST['face_image'].split(",")[1]
             b64_photo_id_image = request.POST['photo_id_image'].split(",")[1]
         except IndexError:
+            log.error(u"Invalid image data during photo verification.")
             context = {
                 'success': False,
             }
@@ -791,6 +715,7 @@ def create_order(request):
 
     # make sure this course has a verified mode
     if not current_mode:
+        log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
     if current_mode.slug == 'professional':
@@ -1087,6 +1012,9 @@ class MidCourseReverifyView(View):
         """
         course_id = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_id)
+        if course is None:
+            raise Http404
+
         course_enrollment = CourseEnrollment.get_or_create_enrollment(request.user, course_id)
         course_enrollment.update_enrollment(mode="verified")
         course_enrollment.emit_event(EVENT_NAME_USER_ENTERED_MIDCOURSE_REVERIFY_VIEW)

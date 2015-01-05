@@ -289,9 +289,15 @@ class DashboardTest(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': course_reg_code.code})
         self.assertEqual(resp.status_code, 200)
 
-        # freely enroll the user into course
-        resp = self.client.get(reverse('shoppingcart.views.register_courses'))
-        self.assertIn('success', resp.content)
+        redeem_url = reverse('register_code_redemption', args=[course_reg_code.code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
 
         response = self.client.get(reverse('dashboard'))
         self.assertIn('You can no longer access this course because payment has not yet been received', response.content)

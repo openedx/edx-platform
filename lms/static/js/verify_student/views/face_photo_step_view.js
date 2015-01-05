@@ -10,6 +10,12 @@ var edx = edx || {};
 
     edx.verify_student.FacePhotoStepView = edx.verify_student.StepView.extend({
 
+        defaultContext: function() {
+            return {
+                platformName: ''
+            };
+        },
+
         postRender: function() {
             var webcam = new edx.verify_student.WebcamPhotoView({
                 el: $( '#facecam' ),
@@ -18,6 +24,9 @@ var edx = edx || {};
                 submitButton: '#next_step_button',
                 errorModel: this.errorModel
             }).render();
+
+            // Track a virtual pageview, for easy funnel reconstruction.
+            window.analytics.page( 'verification', this.templateName );
 
             this.listenTo( webcam, 'imageCaptured', function() {
                 // Track the user's successful image capture

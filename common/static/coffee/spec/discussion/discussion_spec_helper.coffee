@@ -321,7 +321,7 @@ browser and pasting the output.  When that file changes, this one should be rege
             <label class="field-label">
                 <span class="field-label-text">
                     Visible To:
-                </span><select class="field-input js-group-select" name="group_id">
+                </span><select class="field-input js-group-select" name="group_id" <% if (!is_commentable_cohorted) { %>disabled<% } %>>
                     <option value="">All Groups</option>
                     <% _.each(cohort_options, function(opt) { %>
                     <option value="<%= opt.value %>" <% if (opt.selected) { %>selected<% } %>><%- opt.text %></option>

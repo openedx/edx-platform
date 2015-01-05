@@ -3,6 +3,8 @@ Tests for Shopping Cart views
 """
 import pytz
 from urlparse import urlparse
+from decimal import Decimal
+import json
 
 from django.http import HttpRequest
 from django.conf import settings
@@ -27,6 +29,8 @@ from xmodule.modulestore.tests.django_utils import (
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from util.date_utils import get_default_time_display
+from util.testing import UrlResetMixin
+
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
     Order, CertificateItem, PaidCourseRegistration, CourseRegCodeItem,
@@ -42,8 +46,6 @@ from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.views import initialize_report
 from shoppingcart.tests.payment_fake import PaymentFakeView
-from decimal import Decimal
-import json
 
 
 def mock_render_purchase_form_html(*args, **kwargs):
@@ -489,12 +491,18 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
 
-        # unit price should be updated to 0 for that course
-        item = self.cart.orderitem_set.all().select_subclasses()[0]
-        self.assertEquals(item.unit_cost, 0)
-        self.assertEqual(self.cart.total_cost, 0)
+        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
 
         # now testing registration code already used scenario, reusing the same code
+        # the item has been removed when using the registration code for the first time
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 400)
         self.assertIn("Oops! The code '{0}' you entered is either invalid or expired".format(self.reg_code), resp.content)
@@ -544,38 +552,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
 
     @patch('shoppingcart.views.log.info')
-    def test_reset_redemption_for_registration_code(self, info_log):
-
-        self.add_reg_code(self.course_key)
-        reg_item = self.add_course_to_user_cart(self.course_key)
-
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 200)
-
-        resp = self.client.post(reverse('shoppingcart.views.reset_code_redemption', args=[]))
-
-        self.assertEqual(resp.status_code, 200)
-        info_log.assert_called_with(
-            'Registration code redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
-
-    @patch('shoppingcart.views.log.info')
-    def test_existing_reg_code_redemption_on_removing_item(self, info_log):
-
-        self.add_reg_code(self.course_key)
-        reg_item = self.add_course_to_user_cart(self.course_key)
-
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 200)
-
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': reg_item.id})
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertEquals(self.cart.orderitem_set.count(), 0)
-        info_log.assert_called_with(
-            'Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.reg_code, self.user, reg_item.id))
-
-    @patch('shoppingcart.views.log.info')
     def test_coupon_discount_for_multiple_courses_in_cart(self, info_log):
 
         reg_item = self.add_course_to_user_cart(self.course_key)
@@ -594,7 +570,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             elif item.id == cert_item.id:
                 self.assertEquals(item.list_price, None)
 
-        # Delete the discounted item, corresponding coupon redemption should be removed for that particular discounted item
+        # Delete the discounted item, corresponding coupon redemption should
+        # be removed for that particular discounted item
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
                                 {'id': reg_item.id})
 
@@ -602,34 +579,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
             'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
-
-    @patch('shoppingcart.views.log.info')
-    def test_reg_code_free_discount_with_multiple_courses_in_cart(self, info_log):
-
-        reg_item = self.add_course_to_user_cart(self.course_key)
-        self.add_reg_code(self.course_key)
-        cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
-        self.assertEquals(self.cart.orderitem_set.count(), 2)
-
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 200)
-
-        # unit_cost should be 0 for that particular course for which registration code is registered
-        items = self.cart.orderitem_set.all().select_subclasses()
-        for item in items:
-            if item.id == reg_item.id:
-                self.assertEquals(item.unit_cost, 0)
-            elif item.id == cert_item.id:
-                self.assertEquals(item.list_price, None)
-
-        # Delete the discounted item, corresponding reg code redemption should be removed for that particular item
-        resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                {'id': reg_item.id})
-
-        self.assertEqual(resp.status_code, 200)
-        self.assertEquals(self.cart.orderitem_set.count(), 1)
-        info_log.assert_called_with(
-            'Registration code "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.reg_code, self.user, reg_item.id))
 
     @patch('shoppingcart.views.log.info')
     def test_delete_certificate_item(self, info_log):
@@ -664,24 +613,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         info_log.assert_called_with(
             'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
-
-    @patch('shoppingcart.views.log.info')
-    def test_remove_registration_code_redemption_on_clear_cart(self, info_log):
-
-        reg_item = self.add_course_to_user_cart(self.course_key)
-        CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
-        self.assertEquals(self.cart.orderitem_set.count(), 2)
-
-        self.add_reg_code(self.course_key)
-        resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
-        self.assertEqual(resp.status_code, 200)
-
-        resp = self.client.post(reverse('shoppingcart.views.clear_cart', args=[]))
-        self.assertEqual(resp.status_code, 200)
-        self.assertEquals(self.cart.orderitem_set.count(), 0)
-
-        info_log.assert_called_with(
-            'Registration code redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
@@ -962,12 +893,16 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
-        resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
-        self.assertIn('Register', resp.content)
 
-        # freely enroll the user into course
-        resp = self.client.get(reverse('shoppingcart.views.register_courses'))
-        self.assertIn('success', resp.content)
+        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        response = self.client.get(redeem_url)
+        self.assertEquals(response.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in response.content)
+
+        #now activate the user by enrolling him/her to the course
+        response = self.client.post(redeem_url)
+        self.assertEquals(response.status_code, 200)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_reg_code_with_multiple_courses_and_checkout_scenario(self):
@@ -975,12 +910,22 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         # Two courses in user shopping cart
         self.login_user()
-        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
-        PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
+        item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        item2 = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': self.reg_code})
         self.assertEqual(resp.status_code, 200)
+
+        redeem_url = reverse('register_code_redemption', args=[self.reg_code])
+        resp = self.client.get(redeem_url)
+        self.assertEquals(resp.status_code, 200)
+        # check button text
+        self.assertTrue('Activate Course Enrollment' in resp.content)
+
+        #now activate the user by enrolling him/her to the course
+        resp = self.client.post(redeem_url)
+        self.assertEquals(resp.status_code, 200)
 
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertIn('Payment', resp.content)
@@ -996,6 +941,14 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         course_enrollment = CourseEnrollment.objects.filter(user=self.user)
         self.assertEqual(course_enrollment.count(), 2)
+
+        # make sure the enrollment_ids were stored in the PaidCourseRegistration items
+        # refetch them first since they are updated
+        # item1 has been deleted from the the cart.
+        #  User has been enrolled for the item1
+        item2 = PaidCourseRegistration.objects.get(id=item2.id)
+        self.assertIsNotNone(item2.course_enrollment)
+        self.assertEqual(item2.course_enrollment.course_id, self.testing_course.id)
 
     @patch('shoppingcart.views.render_to_response', render_mock)
     def test_show_receipt_success_with_valid_reg_code(self):
@@ -1111,9 +1064,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         redeem_url = reverse('register_code_redemption', args=[context['reg_code_info_list'][0]['code']])
 
         #now activate the user by enrolling him/her to the course
-        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('View Course' in response.content)
+        self.assertTrue('View Dashboard' in response.content)
 
         # now view the receipt page again to see if any registration codes
         # has been expired or not
@@ -1228,7 +1181,94 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self._assert_404(reverse('shoppingcart.views.update_user_cart', args=[]))
         self._assert_404(reverse('shoppingcart.views.reset_code_redemption', args=[]), use_post=True)
         self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
-        self._assert_404(reverse('shoppingcart.views.register_courses', args=[]))
+
+
+# TODO (ECOM-188): Once we complete the A/B test of separate
+# verified/payment flows, we can replace these tests
+# with something more general.
+@override_settings(MODULESTORE=MODULESTORE_CONFIG)
+class ReceiptRedirectTest(UrlResetMixin, ModuleStoreTestCase):
+    """Test special-case redirect from the receipt page. """
+
+    COST = 40
+    PASSWORD = 'password'
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def setUp(self):
+        super(ReceiptRedirectTest, self).setUp('verify_student.urls')
+        self.user = UserFactory.create()
+        self.user.set_password(self.PASSWORD)
+        self.user.save()
+        self.course = CourseFactory.create()
+        self.course_key = self.course.id
+        self.course_mode = CourseMode(
+            course_id=self.course_key,
+            mode_slug="verified",
+            mode_display_name="verified cert",
+            min_price=self.COST
+        )
+        self.course_mode.save()
+        self.cart = Order.get_cart_for_user(self.user)
+
+        self.client.login(
+            username=self.user.username,
+            password=self.PASSWORD
+        )
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def test_show_receipt_redirect_to_verify_student(self):
+        # Purchase a verified certificate
+        CertificateItem.add_to_order(
+            self.cart,
+            self.course_key,
+            self.COST,
+            'verified'
+        )
+        self.cart.purchase()
+
+        # Set the session flag indicating that the user is in the
+        # experimental group
+        session = self.client.session
+        session['separate-verified'] = True
+        session.save()
+
+        # Visit the receipt page
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url)
+
+        # Expect to be redirected to the payment confirmation
+        # page in the verify_student app
+        redirect_url = reverse(
+            'verify_student_payment_confirmation',
+            kwargs={'course_id': unicode(self.course_key)}
+        )
+        redirect_url += '?payment-order-num={order_num}'.format(
+            order_num=self.cart.id
+        )
+
+        self.assertRedirects(resp, redirect_url)
+
+    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
+    def test_no_redirect_if_not_in_experimental_group(self):
+        # Purchase a verified certificate
+        CertificateItem.add_to_order(
+            self.cart,
+            self.course_key,
+            self.COST,
+            'verified'
+        )
+        self.cart.purchase()
+
+        # We do NOT set the session flag indicating that the user is in
+        # the experimental group.
+
+        # Visit the receipt page
+        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
+        resp = self.client.get(url)
+
+        # Since the user is not in the experimental group, expect
+        # that we see the usual receipt page (no redirect)
+        self.assertEqual(resp.status_code, 200)
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
@@ -1379,7 +1419,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
         for i in xrange(30):  # pylint: disable=unused-variable
-            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
+            response = self.client.post(url)
             self.assertEquals(response.status_code, 404)
 
         # then the rate limiter should kick in and give a HttpForbidden response
@@ -1389,7 +1429,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         # now reset the time to 5 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=300)
         with freeze_time(reset_time):
-            response = self.client.post(url, **{'HTTP_HOST': 'localhost'})
+            response = self.client.post(url)
             self.assertEquals(response.status_code, 404)
 
         cache.clear()
@@ -1403,7 +1443,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         url = reverse('register_code_redemption', args=['asdasd'])
         self.login_user()
         for i in xrange(30):  # pylint: disable=unused-variable
-            response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
+            response = self.client.get(url)
             self.assertEquals(response.status_code, 404)
 
         # then the rate limiter should kick in and give a HttpForbidden response
@@ -1413,7 +1453,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         # now reset the time to 5 mins from now in future in order to unblock
         reset_time = datetime.now(UTC) + timedelta(seconds=300)
         with freeze_time(reset_time):
-            response = self.client.get(url, **{'HTTP_HOST': 'localhost'})
+            response = self.client.get(url)
             self.assertEquals(response.status_code, 404)
 
         cache.clear()
@@ -1436,31 +1476,31 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
         }
 
-        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(url, data)
         self.assertEquals(response.status_code, 200)
         # get the first registration from the newly created registration codes
         registration_code = CourseRegistrationCode.objects.all()[0].code
         redeem_url = reverse('register_code_redemption', args=[registration_code])
         self.login_user()
 
-        response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
+        response = self.client.get(redeem_url)
         self.assertEquals(response.status_code, 200)
         # check button text
         self.assertTrue('Activate Course Enrollment' in response.content)
 
         #now activate the user by enrolling him/her to the course
-        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
-        self.assertTrue('View Course' in response.content)
+        self.assertTrue('View Dashboard' in response.content)
 
         #now check that the registration code has already been redeemed and user is already registered in the course
         RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)
-        response = self.client.get(redeem_url, **{'HTTP_HOST': 'localhost'})
+        response = self.client.get(redeem_url)
         self.assertEquals(len(RegistrationCodeRedemption.objects.filter(registration_code__code=registration_code)), 1)
         self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
 
         #now check that the registration code has already been redeemed
-        response = self.client.post(redeem_url, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(redeem_url)
         self.assertTrue("You've clicked a link for an enrollment code that has already been used." in response.content)
 
         #now check the response of the dashboard page

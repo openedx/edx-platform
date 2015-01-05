@@ -10,7 +10,7 @@
  */
 var edx = edx || {};
 
-(function($) {
+(function( $, _ ) {
     'use strict';
     var errorView,
         el = $('#pay-and-verify-container');
@@ -36,9 +36,9 @@ var edx = edx || {};
         currentStep: el.data('current-step'),
         stepInfo: {
             'intro-step': {
+                courseName: el.data('course-name'),
+                hasPaid: el.data('msg-key') === 'verify-now' || el.data('msg-key') === 'verify-later',
                 isActive: el.data('is-active'),
-                introTitle: el.data('intro-title'),
-                introMsg: el.data('intro-msg'),
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
@@ -46,16 +46,29 @@ var edx = edx || {};
                 isActive: el.data('is-active'),
                 requirements: el.data('requirements'),
                 courseKey: el.data('course-key'),
+                courseName: el.data('course-name'),
+                hasVisibleReqs: _.some(
+                    el.data('requirements'),
+                    function( isVisible ) { return isVisible; }
+                ),
+                upgrade: el.data('msg-key') === 'upgrade',
                 minPrice: el.data('course-mode-min-price'),
-                suggestedPrices: (el.data('course-mode-suggested-prices') || "").split(","),
                 contributionAmount: el.data('contribution-amount'),
+                suggestedPrices: _.filter(
+                    (el.data('course-mode-suggested-prices') || "").split(","),
+                    function( price ) { return Boolean( price ); }
+                ),
                 currency: el.data('course-mode-currency'),
-                purchaseEndpoint: el.data('purchase-endpoint')
+                purchaseEndpoint: el.data('purchase-endpoint'),
+                verificationDeadline: el.data('verification-deadline')
             },
             'payment-confirmation-step': {
+                courseKey: el.data('course-key'),
                 courseName: el.data('course-name'),
                 courseStartDate: el.data('course-start-date'),
-                coursewareUrl: el.data('courseware-url')
+                coursewareUrl: el.data('courseware-url'),
+                platformName: el.data('platform-name'),
+                requirements: el.data('requirements')
             },
             'review-photos-step': {
                 fullName: el.data('full-name'),
@@ -64,8 +77,15 @@ var edx = edx || {};
             'enrollment-confirmation-step': {
                 courseName: el.data('course-name'),
                 courseStartDate: el.data('course-start-date'),
-                coursewareUrl: el.data('courseware-url')
+                coursewareUrl: el.data('courseware-url'),
+                platformName: el.data('platform-name')
+            },
+            'face-photo-step': {
+                platformName: el.data('platform-name')
+            },
+            'id-photo-step': {
+                platformName: el.data('platform-name')
             }
         }
     }).render();
-})(jQuery);
+})( jQuery, _ );

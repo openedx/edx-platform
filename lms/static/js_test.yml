@@ -79,6 +79,7 @@ fixture_paths:
     - templates/dashboard
     - templates/student_account
     - templates/student_profile
+    - templates/verify_student
     - templates/file-upload.underscore
 
 requirejs:
