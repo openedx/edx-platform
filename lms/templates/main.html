@@ -6,16 +6,6 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-##    <meta property="fb:app_id" content="${settings.FB_APPID}"/>
-##    <meta property="og:site_name" content="${settings.FB_SITE}"/>
-##    <meta property="og:title" content="${settings.FB_TITLE}"/>
-##    <meta property="og:type" content="${settings.FB_TYPE}"/>
-##    <meta property="og:description" content="${settings.FB_DESC}"/>
-##    <meta property="og:url" content="${settings.FB_URL}"/>
-##    <meta property="og:image" content="${settings.FB_IMG}"/>
-##    <meta name="twitter:card" content="summary"/>
-##    <meta name="twitter:site" content=""/>
-
 <%! from django.utils.translation import ugettext as _ %>
 <%! from microsite_configuration import microsite %>
 <%! from microsite_configuration import page_title_breadcrumbs %>
@@ -128,8 +118,6 @@
 
 <body class="<%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
   <a class="nav-skip" href="<%block name="nav_skip">#content</%block>">${_("Skip to this view's content")}</a>
-
-  <div id="fb-root"></div>
 
   <%include file="mathjax_accessible.html" />
 

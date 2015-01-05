@@ -22,23 +22,6 @@ elif cert_status['status'] == 'notpassing':
 else:
     status_css_class = 'course-status-processing'
 %>
-
-<%namespace name='static' file='../static_content.html'/>
-<%! from django.conf import settings %>
-<%
-    facebook_url = settings.FB_URL
-    facebook_action_type = settings.FB_ACTION_TYPE
-    twitter_url = settings.TW_URL
-%>
-
-<%block name="headextra">
-<style type="text/css">
-.action-certificate > a {
-  margin-left:5px;
-}
-</style>
-</%block>
-
 <div class="message message-status ${status_css_class} is-shown">
 
 % if cert_status['status'] == 'processing':
@@ -62,43 +45,33 @@ else:
 % endif
 
 % if cert_status['show_disabled_download_button'] or cert_status['show_download_url'] or cert_status['show_survey_button']:
-  <div class="actions">
+  <ul class="actions">
     % if cert_status['show_disabled_download_button']:
-      <div class="action"><span class="disabled">
-          ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}</span>
-      </div>
+      <li class="action"><span class="disabled">
+          ${_("Your {cert_name_short} is Generating").format(cert_name_short=cert_name_short)}</span></li>
     % elif cert_status['show_download_url'] and (enrollment.mode == 'honor' or enrollment.mode == 'audit'):
-      <div class="action action-certificate panel clearfix">
-        ${_("Congratulations! You've got the {cert_name_short} of this course. Download your {cert_name_short} and Share it below.").format(cert_name_short=cert_name_short,)}<br/>
-        <a class="f_button radius left" href="${cert_status['download_url']}"
-          title="${_('This link will open/download a PDF document')}" target="_blank">
-         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a>
-        <a class="right" href="#" onclick='postToFB({"url":"${facebook_url}", "action_type":"${facebook_action_type}"}); return false;'>
-          <img src="/static/images/gacco_icon_facebook.png" alt="${_("facebook")}"></a>
-        <a class="right" href="#" onclick="javascript:window.open('https://twitter.com/intent/tweet?url=${twitter_url}&text=${_("Successfully passed the Certificate of gacco")}(${course.display_name_with_default})','','width=550,height=480,scrollbars=1,resizable=1',0);">
-           <img src="/static/images/gacco_icon_twitter.png" alt="${_("twitter")}"></a>
-      </div>
+      <li class="action action-certificate">
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document')}">
+         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
-      <div class="action">
-        <p>${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}</p>
-        <a class="f_button radius" href="${cert_status['download_url']}"
-          title="${_('This link will open/download a PDF document')}" target="_blank">
-          ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a>
-      </div>
+      <li class="action">
+      <p>${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}</p>
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document')}">
+         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified':
-      <div class="action">
-        <a class="f_button radius" href="${cert_status['download_url']}"
-          title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}" target="_blank">
-          ${_("Download Your ID Verified {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a>
-      </div>
+      <li class="action">
+      <a class="btn" href="${cert_status['download_url']}"
+         title="${_('This link will open/download a PDF document of your verified {cert_name_long}.').format(cert_name_long=cert_name_long)}">
+         ${_("Download Your ID Verified {cert_name_short} (PDF)").format(cert_name_short=cert_name_short)}</a></li>
     % endif
+
     % if cert_status['show_survey_button']:
-      <div class="action">
-        <a class="cta" href="${cert_status['survey_url']}">
-          ${_("Complete our course feedback survey")}</a>
-      </div>
+      <li class="action"><a class="cta" href="${cert_status['survey_url']}">
+             ${_("Complete our course feedback survey")}</a></li>
     % endif
-  </div>
+  </ul>
 % endif
 </div>
 
