@@ -797,7 +797,7 @@ class EdxNotesViewsTest(TestCase):
         """
         enable_edxnotes_for_the_course(self.course, self.user.id)
         response = self.client.get(self.notes_page_url)
-        self.assertContains(response, '<h1 class="page-title">Notes')
+        self.assertContains(response, 'Highlights and notes you\'ve made in course content')
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_EDXNOTES": False})
     def test_edxnotes_view_is_disabled(self):
