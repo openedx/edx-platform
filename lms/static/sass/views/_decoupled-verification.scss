@@ -23,6 +23,12 @@
             }
         }
 
+        .placeholder-cam {
+            .copy {
+                font-weight: bold !important;
+            }
+        }
+
         .requirements-container {
 
             .list-reqs {
@@ -41,7 +47,7 @@
                 }
 
                 &.account-not-activated {
-                    width: 990px;
+                    width: 300px;
 
                     .req {
                         height: 290px;
@@ -75,6 +81,7 @@
                 display: inline;
                 float: left;
                 line-height: 45px;
+                color: black;
             }
 
             .wizard-steps {
@@ -119,11 +126,23 @@
 
             .expandable-area {
                 margin-top: 5px;
+                padding-bottom: 20px;
             }
         }
 
         .help-tips {
             margin-left: 0 !important;
+
+            .title {
+                font-size: 16px !important;
+            }
+
+            .list-tips {
+                .tip {
+                    font-size: 16px;
+                    line-height: 1.5em;
+                }
+            }
         }
 
         .photo-tip {
@@ -135,6 +154,12 @@
         .list-help {
             list-style: disc;
             padding-left: 20px;
+        }
+
+        .list-faq {
+            dd {
+                color: black;
+            }
         }
 
         .wrapper-task {
