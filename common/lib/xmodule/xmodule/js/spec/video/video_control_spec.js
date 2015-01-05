@@ -58,7 +58,7 @@
                     'aria-disabled': 'false'
                 });
 
-                expect(playControl).toContain('i.icon-play');
+                expect(playControl).toContain('.icon-play');
             });
 
             it('add ARIA attributes to fullscreen control', function () {
@@ -647,7 +647,7 @@
                 expect($('.video_control')).not.toHaveClass('play');
                 expect($('.video_control')).toHaveClass('pause');
                 expect($('.video_control')).toHaveAttr('title', 'Pause');
-                expect($('.video_control')).toContain('i.icon-pause');
+                expect($('.video_control')).toContain('.icon-pause');
             });
         });
 
@@ -661,7 +661,7 @@
                 expect($('.video_control')).not.toHaveClass('pause');
                 expect($('.video_control')).toHaveClass('play');
                 expect($('.video_control')).toHaveAttr('title', 'Play');
-                expect($('.video_control')).toContain('i.icon-play');
+                expect($('.video_control')).toContain('.icon-play');
             });
         });
 
