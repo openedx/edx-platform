@@ -1491,6 +1491,9 @@ def reset_student_attempts(request, course_id):
     all_students = request.GET.get('all_students', False) in ['true', 'True', True]
     delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
 
+    # if we are resetting attempts counter for entrance exam
+
+
     # parameter combinations
     if all_students and student:
         return HttpResponseBadRequest(
