@@ -57,10 +57,15 @@
 
   // TYPE: inline
   .msg-inline {
-    @extend %t-copy-sub2;
+    // @extend %t-copy-sub1;
     display: inline-block;
     margin: 0 0 0 $baseline;
     padding: 0;
+
+    .icon,
+    .fa {
+      margin-right: ($baseline/2);
+    }
   }
 
   // TYPE: warning
@@ -1085,7 +1090,7 @@
 
       a {
         display: inline-block;
-        padding: $baseline;
+        padding: ($baseline - 5);
         -webkit-transition: none;
         -moz-transition: none;
         -ms-transition: none;
@@ -1096,7 +1101,7 @@
       &.is-selected { // Active or selected tabs (<li>) get this class. Also useful for aria stuff if ever implemented in the future.
 
         a {
-          padding-bottom: ($baseline+($baseline/5));
+          padding-bottom: ($baseline - 5);
           border-style: solid;
           border-width: ($baseline/5) ($baseline/5) 0 ($baseline/5);
           border-color: $gray-l4;

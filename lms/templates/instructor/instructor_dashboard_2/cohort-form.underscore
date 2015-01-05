@@ -14,12 +14,12 @@
                 <div class="form-field">
                     <div class="cohort-management-settings-form-name field field-text">
                         <label for="cohort-name" class="label">
-                            <%- gettext('Cohort Name') %> *
+                            <%- gettext('Cohort Group Name') %> *
                             <span class="sr"><%- gettext('(Required Field)')%></span>
                         </label>
                         <input type="text" name="cohort-name" value="<%- cohort ? cohort.get('name') : '' %>" class="input cohort-name"
                                id="cohort-name"
-                               placeholder="<%- gettext("Enter Your Cohort Group's Name") %>" required="required" />
+                               placeholder="<%- gettext("Enter the name of the cohort group") %>" required="required" />
                     </div>
                 </div>
             <% } %>
@@ -28,20 +28,21 @@
             var foundSelected = false;
             var selectedContentGroupId = cohort.get('group_id');
             var hasSelectedContentGroup = selectedContentGroupId != null;
+            var hasContentGroups = contentGroups.length > 0;
             %>
             <div class="form-field">
                 <div class="cohort-management-details-association-course field field-radio">
                     <label class="label">
-                        <%- gettext('Is this cohort group associated with course-based content groups?') %>
+                        <%- gettext('Associate this cohort group with a content group') %>
                     </label>
-                    <label><input type="radio" class="radio-no" name="cohort-association-course" value="no"  <%- !hasSelectedContentGroup ? 'checked="checked"' : '' %>/> <%- gettext("No") %></label>
+                    <label><input type="radio" class="radio-no" name="cohort-association-course" value="no"  <%- !hasSelectedContentGroup ? 'checked="checked"' : '' %>/> <%- gettext("No Content Group") %></label>
                     <div class="input-group has-other-input-text">
-                        <label><input type="radio" class="radio-yes" name="cohort-association-course" value="yes" <%- hasSelectedContentGroup ? 'checked="checked"' : '' %> /> <%- gettext("Yes") %></label>
-                        <% if (contentGroups.length > 0) { %>
+                        <label><input type="radio" class="radio-yes" name="cohort-association-course" value="yes" <%- !hasContentGroups ? 'disabled="disabled"' : '' %> <%- hasSelectedContentGroup ? 'checked="checked"' : '' %> /> <%- gettext("Select a Content Group") %></label>
+                        <% if (hasContentGroups) { %>
                             <div class="input-group-other">
                                 <label class="sr" for="cohort-group-association"><%- gettext("Choose a content group to associate") %></label>
-                                <select name="cohort-group-association" class="input input-lg has-option-unavailable input-cohort-group-association">
-                                    <option value="None"><%- gettext("Choose a content group to associate") %></option>
+                                <select name="cohort-group-association" class="input input-lg has-option-unavailable input-cohort-group-association" <%- !hasSelectedContentGroup ? 'disabled="disabled"' : '' %>>
+                                    <option value="None"></option>
 
                                     <%
                                     var orderedContentGroups = _.sortBy(
@@ -49,33 +50,34 @@
                                         function(group) { return group.get('name'); }
                                     );
                                     for (var i=0; i < orderedContentGroups.length; i++) {
-                                        var contentGroup = orderedContentGroups[i];
-                                        var contentGroupId = contentGroup.get('id');
-                                        var isSelected = contentGroupId == selectedContentGroupId;
+                                        var contentGroup = orderedContentGroups[i],
+                                            contentGroupUserPartitionId = contentGroup.get('user_partition_id'),
+                                            contentGroupId = contentGroup.get('id'),
+                                            isSelected = contentGroupId == selectedContentGroupId;
                                         if (isSelected) {
                                             foundSelected = true;
                                         }
                                     %>
-                                        <option value="<%- contentGroupId %>" <%- isSelected ? 'selected="selected"' : '' %>><%- contentGroup.get('name') %></option>
+                                        <option value="<%- contentGroupId %>:<%- contentGroupUserPartitionId %>" <%- isSelected ? 'selected="selected"' : '' %>><%- contentGroup.get('name') %></option>
                                     <%
                                     }
                                     %>
 
                                     <% if (hasSelectedContentGroup && !foundSelected) { %>
-                                        <option value="<%- contentGroupId %>" class="option-unavailable" selected="selected"><%- gettext("Some content group that's been deleted") %></option>
+                                        <option value="<%- contentGroupId %>:<%- contentGroupUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
                                     <% } %>
                                 </select>
 
                                 <% if (hasSelectedContentGroup && !foundSelected) { %>
                                     <div class="msg-inline">
-                                        <p class="copy-error"><i class="icon icon-warning-sign"></i><%- gettext("The selected content group has been deleted, you may wish to reassign this cohort group.") %></p>
+                                        <p class="copy-error"><i class="icon icon-warning-sign"></i><%- gettext("The previously selected content group was deleted. Select another content group.") %></p>
                                     </div>
                                 <% } %>
                             </div>
                         <% } else { // no content groups available %>
-                            <div class="input-group-other is-visible">
+                            <div class="input-group-other">
                                 <div class="msg-inline">
-                                    <p class="copy-error"><i class="icon icon-warning-sign"></i> You haven't configured any content groups yet. You need to create a content group before you can create assignments. <a href="#">Create a content group</a></p>
+                                    <p class="copy-error"><i class="icon icon-warning-sign"></i><%- gettext("No content groups exist. Create a content group to associate with cohort groups.") %> <a href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a></p>
                                 </div>
                             </div>
                         <% } %>
