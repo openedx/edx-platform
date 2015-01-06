@@ -441,7 +441,7 @@ class JavascriptResponse(LoncapaResponse):
     Javascript using Node.js.
     """
 
-    human_name = _('Javascript Input')
+    human_name = _('JavaScript Input')
     tags = ['javascriptresponse']
     max_inputfields = 1
     allowed_inputfields = ['javascriptinput']

@@ -1,6 +1,7 @@
 """
 Acceptance tests for Library Content in LMS
 """
+import textwrap
 import ddt
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture
@@ -45,11 +46,13 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
             XBlockFixtureDesc(
                 "problem", "Dropdown",
-                data="""
-<problem>
-    <p>Dropdown</p>
-    <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
-</problem>""")
+                data=textwrap.dedent("""
+                    <problem>
+                        <p>Dropdown</p>
+                        <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
+                    </problem>
+                    """)
+            )
         )
 
     def populate_course_fixture(self, course_fixture):
