@@ -34,6 +34,17 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
         });
 
+        it('handles calls to doSearch', function () {
+            var term = '  search string  ';
+            $('.search-field').val(term);
+            this.form.doSearch(term);
+            expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
+            expect($('.search-field').val()).toEqual(term);
+            expect($('.search-field')).toHaveClass('is-active');
+            expect($('.search-button')).toBeHidden();
+            expect($('.cancel-button')).toBeVisible();
+        });
+
         it('triggers a search event and changes to active state', function () {
             var term = 'search string';
             $('.search-field').val(term);
@@ -351,6 +362,15 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeVisible();
             this.listView.renderNext();
             expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeHidden();
+        });
+
+    });
+
+
+    describe('edx.search.App', function () {
+
+        beforeEach(function () {
+
         });
 
     });

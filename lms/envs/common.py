@@ -1039,6 +1039,7 @@ courseware_js += (
     'js/search/views/form.js',
     'js/search/views/list.js',
     'js/search/views/item.js',
+    'js/search/router.js',
     'js/search/search.js',
 )
 

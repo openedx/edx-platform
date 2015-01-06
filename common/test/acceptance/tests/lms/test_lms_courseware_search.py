@@ -6,7 +6,6 @@ Test courseware search
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
 from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.studio.overview import CourseOutlinePage
 from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...pages.common.logout import LogoutPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
