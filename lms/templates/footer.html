@@ -47,7 +47,12 @@
         </p>
       </div>
 
-      <p class="copyright">${_("&copy; 2014 {platform_name}, some rights reserved").format(platform_name=settings.PLATFORM_NAME)}</p>
+      ## Translators: '&copy;' is an HTML character code for the copyright symbol. Please don't remove or change it.
+      <p class="copyright">${_("&copy; {copyright_year} {platform_name}, some rights reserved").format(
+	platform_name=settings.PLATFORM_NAME,
+	copyright_year=settings.COPYRIGHT_YEAR
+	)}
+      </p>
         <nav class="nav-legal">
           <ul>
             <li class="nav-legal-01">
