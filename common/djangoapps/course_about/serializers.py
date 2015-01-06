@@ -3,6 +3,7 @@ Serializers for all Course Descriptor and Course About Descriptor related return
 
 """
 from util.parsing_utils import course_image_url
+from django.conf import settings
 
 
 def serialize_content(course_descriptor, about_descriptor):
@@ -18,14 +19,15 @@ def serialize_content(course_descriptor, about_descriptor):
         Serializable  dictionary of course information.
 
     """
+    date_format = getattr(settings, 'API_DATE_FORMAT', '%Y-%m-%d')
     data = dict({"media": {}})
     data['display_name'] = getattr(course_descriptor, 'display_name', None)
     start = getattr(course_descriptor, 'start', None)
     end = getattr(course_descriptor, 'end', None)
     announcement = getattr(course_descriptor, 'announcement', None)
-    data['start'] = start.strftime('%Y-%m-%d') if start else None
-    data['end'] = end.strftime('%Y-%m-%d') if end else None
-    data["announcement"] = announcement.strftime('%Y-%m-%d') if announcement else None
+    data['start'] = start.strftime(date_format) if start else None
+    data['end'] = end.strftime(date_format) if end else None
+    data["announcement"] = announcement.strftime(date_format) if announcement else None
     data['advertised_start'] = getattr(course_descriptor, 'advertised_start', None)
     data['is_new'] = getattr(course_descriptor, 'is_new', None)
     image_url = ''
