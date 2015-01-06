@@ -16,6 +16,7 @@ from ...fixtures.course import CourseFixture
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
 import uuid
 
@@ -114,8 +115,15 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             "No content groups exist. Create a content group to associate with cohort groups. Create a content group",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
-        # TODO: test can't select radio button
-        # TODO: test link to Studio
+        self.assertFalse(self.cohort_management_page.select_content_group_radio_button())
+        self.cohort_management_page.select_studio_group_settings()
+        group_settings_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        group_settings_page.wait_for_page()
 
     def test_link_to_studio(self):
         """
@@ -603,9 +611,12 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.wait_for_page()
         self.cohort_management_page.select_cohort(new_cohort)
         self.assertEqual("Deleted Content Group", self.cohort_management_page.get_cohort_associated_content_group())
-        self.assertEquals(["Bananas", "Pears", "Some content group that's been deleted"], self.cohort_management_page.get_all_content_groups())
+        self.assertEquals(
+            ["Bananas", "Pears", "Deleted Content Group"],
+            self.cohort_management_page.get_all_content_groups()
+        )
         self.assertEqual(
-            "The selected content group has been deleted, you may wish to reassign this cohort group.",
+            "The previously selected content group was deleted. Select another content group.",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         self.cohort_management_page.set_cohort_associated_content_group("Pears")

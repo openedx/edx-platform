@@ -12,6 +12,7 @@ from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
+from selenium.webdriver.support.select import Select
 
 
 def skip_if_browser(browser):
@@ -170,6 +171,29 @@ def enable_css_animations(page):
 
         head.removeChild(styles)
     """)
+
+
+def select_option_by_text(select_browser_query, option_text):
+    """
+    Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
+    """
+    select = Select(select_browser_query.first.results[0])
+    select.select_by_visible_text(option_text)
+
+
+def get_selected_option_text(select_browser_query):
+    """
+    Returns the text value for the first selected option within a select.
+    """
+    select = Select(select_browser_query.first.results[0])
+    return select.first_selected_option.text
+
+
+def get_options(select_browser_query):
+    """
+    Returns all the options for the given select.
+    """
+    return Select(select_browser_query.first.results[0]).options
 
 
 class UniqueCourseTest(WebAppTest):

@@ -387,8 +387,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
             self.course, self.cohort1, data={'name': self.cohort1.name, 'group_id': None}
         )
         self.assertEqual((None, None), get_group_info_for_cohort(self.cohort1))
-        self.assertEqual(None, response_dict.get("group_id"))
-        self.assertEqual(None, response_dict.get("user_partition_id"))
+        self.assertIsNone(response_dict.get("group_id"))
+        self.assertIsNone(response_dict.get("user_partition_id"))
 
     def test_change_cohort_group_id(self):
         """

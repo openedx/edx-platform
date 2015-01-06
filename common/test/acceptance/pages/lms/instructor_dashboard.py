@@ -7,6 +7,7 @@ from bok_choy.page_object import PageObject
 from .course_page import CoursePage
 import os
 from bok_choy.promise import EmptyPromise
+from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
 class InstructorDashboardPage(CoursePage):
@@ -86,10 +87,11 @@ class MembershipPageCohortManagementSection(PageObject):
     The cohort management subsection of the Membership section of the Instructor dashboard.
     """
     url = None
-    csv_browse_button_selector = '.csv-upload #file-upload-form-file'
-    csv_upload_button_selector = '.csv-upload #file-upload-form-submit'
-    content_group_selector = '.input-group-other option'
-    no_content_group_button = '.cohort-management-details-association-course input.radio-no'
+    csv_browse_button_selector_css = '.csv-upload #file-upload-form-file'
+    csv_upload_button_selector_css = '.csv-upload #file-upload-form-submit'
+    content_group_selector_css = 'select.input-cohort-group-association'
+    no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
+    select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management.membership-section').present
@@ -151,7 +153,8 @@ class MembershipPageCohortManagementSection(PageObject):
             lambda: cohort_name in self.get_cohorts(),
             "Waiting for cohort selector to populate"
         ).fulfill()
-        self.q(css=self._bounded_selector("#cohort-select option")).filter(
+        # Note: can't use Select to select by text because the count is also included in the displayed text.
+        self._get_cohort_options().filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
 
@@ -194,17 +197,21 @@ class MembershipPageCohortManagementSection(PageObject):
             css=self._bounded_selector("#cohort-management-group-add-students")
         ).results[0].get_attribute("value")
 
+    def select_studio_group_settings(self):
+        """
+        When no content groups have been defined, a messages appears with a link
+        to go to Studio group settings. This method assumes the link is visible and clicks it.
+        """
+        return self.q(css=self._bounded_selector("a.link-to-group-settings")).first.click()
+
     def get_all_content_groups(self):
         """
         Returns all the content groups available for associating with the cohort currently being edited.
         """
-        select = self.q(css=self._bounded_selector(self.content_group_selector))
-        groups = []
-        for option in select:
-            if option.text != "":
-                groups.append(option.text)
-
-        return groups
+        selector_query = self.q(css=self._bounded_selector(self.content_group_selector_css))
+        return [
+            option.text for option in get_options(selector_query) if option.text != ""
+        ]
 
     def get_cohort_associated_content_group(self):
         """
@@ -212,11 +219,10 @@ class MembershipPageCohortManagementSection(PageObject):
         If no content group is associated, returns None.
         """
         self.select_cohort_settings()
-        radio_button = self.q(css=self._bounded_selector(self.no_content_group_button)).results[0]
+        radio_button = self.q(css=self._bounded_selector(self.no_content_group_button_css)).results[0]
         if radio_button.is_selected():
             return None
-        option_selector = self.q(css=self._bounded_selector(self.content_group_selector))
-        return option_selector.filter(lambda el: el.is_selected())[0].text
+        return get_selected_option_text(self.q(css=self._bounded_selector(self.content_group_selector_css)))
 
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
@@ -227,7 +233,7 @@ class MembershipPageCohortManagementSection(PageObject):
         if select_settings:
             self.select_cohort_settings()
         if content_group is None:
-            self.q(css=self._bounded_selector(self.no_content_group_button)).first.click()
+            self.q(css=self._bounded_selector(self.no_content_group_button_css)).first.click()
         else:
             self._select_associated_content_group(content_group)
         self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
@@ -236,8 +242,19 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Selects the specified content group from the selector. Assumes that content_group is not None.
         """
-        option_selector = self.q(css=self._bounded_selector(self.content_group_selector))
-        option_selector.filter(lambda el: el.text == content_group).first.click()
+        self.select_content_group_radio_button()
+        select_option_by_text(
+            self.q(css=self._bounded_selector(self.content_group_selector_css)), content_group
+        )
+
+    def select_content_group_radio_button(self):
+        """
+        Clicks the radio button for "No Content Group" association.
+        Returns whether or not the radio button is in the selected state after the click.
+        """
+        radio_button = self.q(css=self._bounded_selector(self.select_content_group_button_css)).results[0]
+        radio_button.click()
+        return radio_button.is_selected()
 
     def select_cohort_settings(self):
         """
@@ -250,7 +267,6 @@ class MembershipPageCohortManagementSection(PageObject):
         Returns an array of messages related to modifying cohort settings. If wait_for_messages
         is True, will wait for a message to appear.
         """
-        # Note that the class name should change because it is no longer a "create"
         title_css = "div.cohort-management-settings .message-" + type + " .message-title"
         detail_css = "div.cohort-management-settings .message-" + type + " .summary-item"
 
@@ -330,9 +346,9 @@ class MembershipPageCohortManagementSection(PageObject):
         if cvs_upload_toggle:
             cvs_upload_toggle.click()
         path = InstructorDashboardPage.get_asset_path(filename)
-        file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector)).results[0]
+        file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
-        self.q(css=self._bounded_selector(self.csv_upload_button_selector)).first.click()
+        self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.click()
 
 
 class MembershipPageAutoEnrollSection(PageObject):
