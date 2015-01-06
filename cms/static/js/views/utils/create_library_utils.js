@@ -5,29 +5,32 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
     function ($, _, gettext, ViewUtils) {
         "use strict";
         return function (selectors, classes) {
-            var toggleSaveButton, validateTotalKeyLength, setNewLibraryFieldInErr,
-                hasInvalidRequiredFields, createLibrary, validateFilledFields, configureHandlers;
+            var toggleSaveButton, validateTotalKeyLength, setFieldInErr,
+                hasInvalidRequiredFields, create, validateFilledFields, configureHandlers;
 
             var validateRequiredField = ViewUtils.validateRequiredField;
             var validateURLItemEncoding = ViewUtils.validateURLItemEncoding;
 
             var keyLengthViolationMessage = gettext("The combined length of the organization and library code fields cannot be more than <%=limit%> characters.");
 
+            var keyFieldSelectors = [selectors.org, selectors.number];
+            var nonEmptyCheckFieldSelectors = [selectors.name, selectors.org, selectors.number];
+
             toggleSaveButton = function (is_enabled) {
                 var is_disabled = !is_enabled;
                 $(selectors.save).toggleClass(classes.disabled, is_disabled).attr('aria-disabled', is_disabled);
             };
 
-            // Ensure that org/librarycode passes validateTotalKeyLength check
+            // Ensure that key fields passes checkTotalKeyLengthViolations check
             validateTotalKeyLength = function () {
                 ViewUtils.checkTotalKeyLengthViolations(
                     selectors, classes,
-                    [selectors.org, selectors.number],
+                    keyFieldSelectors,
                     keyLengthViolationMessage
                 );
             };
 
-            setNewLibraryFieldInErr = function (element, message) {
+            setFieldInErr = function (element, message) {
                 if (message) {
                     element.addClass(classes.error);
                     element.children(selectors.tipError).addClass(classes.showing).removeClass(classes.hiding).text(message);
@@ -46,18 +49,18 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // One final check for empty values
             hasInvalidRequiredFields = function () {
                 return _.reduce(
-                    [selectors.name, selectors.org, selectors.number],
+                    nonEmptyCheckFieldSelectors,
                     function (acc, element) {
                         var $element = $(element);
                         var error = validateRequiredField($element.val());
-                        setNewLibraryFieldInErr($element.parent(), error);
+                        setFieldInErr($element.parent(), error);
                         return error ? true : acc;
                     },
                     false
                 );
             };
 
-            createLibrary = function (libraryInfo, errorHandler) {
+            create = function (libraryInfo, errorHandler) {
                 $.postJSON(
                     '/library/',
                     libraryInfo
@@ -80,7 +83,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // Ensure that all fields are not empty
             validateFilledFields = function () {
                 return _.reduce(
-                    [selectors.org, selectors.number, selectors.name],
+                    nonEmptyCheckFieldSelectors,
                     function (acc, element) {
                         var $element = $(element);
                         return $element.val().length !== 0 ? acc : false;
@@ -92,7 +95,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
             // Handle validation asynchronously
             configureHandlers = function () {
                 _.each(
-                    [selectors.org, selectors.number],
+                    keyFieldSelectors,
                     function (element) {
                         var $element = $(element);
                         $element.on('keyup', function (event) {
@@ -103,7 +106,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                                 return;
                             }
                             var error = validateURLItemEncoding($element.val(), $(selectors.allowUnicode).val() === 'True');
-                            setNewLibraryFieldInErr($element.parent(), error);
+                            setFieldInErr($element.parent(), error);
                             validateTotalKeyLength();
                             if (!validateFilledFields()) {
                                 toggleSaveButton(false);
@@ -114,7 +117,7 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
                 var $name = $(selectors.name);
                 $name.on('keyup', function () {
                     var error = validateRequiredField($name.val());
-                    setNewLibraryFieldInErr($name.parent(), error);
+                    setFieldInErr($name.parent(), error);
                     validateTotalKeyLength();
                     if (!validateFilledFields()) {
                         toggleSaveButton(false);
@@ -124,9 +127,9 @@ define(["jquery", "underscore", "gettext", "js/views/utils/view_utils"],
 
             return {
                 validateTotalKeyLength: validateTotalKeyLength,
-                setNewLibraryFieldInErr: setNewLibraryFieldInErr,
+                setFieldInErr: setFieldInErr,
                 hasInvalidRequiredFields: hasInvalidRequiredFields,
-                createLibrary: createLibrary,
+                create: create,
                 validateFilledFields: validateFilledFields,
                 configureHandlers: configureHandlers
             };

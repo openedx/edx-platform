@@ -62,7 +62,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
             describe("Error messages", function () {
                 var setErrorMessage = function(selector, message) {
                     var element = $(selector).parent();
-                    CreateCourseUtils.setNewCourseFieldInErr(element, message);
+                    CreateCourseUtils.setFieldInErr(element, message);
                     return element;
                 };
 
