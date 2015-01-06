@@ -1,3 +1,8 @@
+"""
+Views handling read (GET) requests for the Discussion tab and inline discussions.
+"""
+
+from functools import wraps
 import json
 import logging
 import xml.sax.saxutils as saxutils
@@ -22,6 +27,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
     
 )
 from courseware.access import has_access
+from xmodule.modulestore.django import modulestore
 
 from django_comment_client.permissions import cached_has_permission
 from django_comment_client.utils import (
@@ -34,7 +40,7 @@ from django_comment_client.utils import (
 import django_comment_client.utils as utils
 import lms.lib.comment_client as cc
 
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
@@ -166,13 +172,27 @@ def _set_group_names(course_id, threads):
 
 
 
+def use_bulk_ops(view_func):
+    """
+    Wraps internal request handling inside a modulestore bulk op, significantly
+    reducing redundant database calls.  Also converts the course_id parsed from
+    the request uri to a CourseKey before passing to the view.
+    """
+    @wraps(view_func)
+    def wrapped_view(request, course_id, *args, **kwargs):  # pylint: disable=missing-docstring
+        course_key = CourseKey.from_string(course_id)
+        with modulestore().bulk_operations(course_key):
+            return view_func(request, course_key, *args, **kwargs)
+    return wrapped_view
+
+
 @login_required
-def inline_discussion(request, course_id, discussion_id):
+@use_bulk_ops
+def inline_discussion(request, course_key, discussion_id):
     """
     Renders JSON for DiscussionModules
     """
     nr_transaction = newrelic.agent.current_transaction()
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
     cc_user = cc.User.from_django_user(request.user)
@@ -202,11 +222,11 @@ def inline_discussion(request, course_id, discussion_id):
 
 
 @login_required
-def forum_form_discussion(request, course_id):
+@use_bulk_ops
+def forum_form_discussion(request, course_key):
     """
     Renders the main Discussion page, potentially filtered by a search query
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
@@ -270,8 +290,12 @@ def forum_form_discussion(request, course_id):
 
 @require_GET
 @login_required
-def single_thread(request, course_id, discussion_id, thread_id):
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+@use_bulk_ops
+def single_thread(request, course_key, discussion_id, thread_id):
+    """
+    Renders a response to display a single discussion thread.
+    """
+
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
@@ -364,8 +388,13 @@ def single_thread(request, course_id, discussion_id, thread_id):
 
 @require_GET
 @login_required
-def user_profile(request, course_id, user_id):
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+@use_bulk_ops
+def user_profile(request, course_key, user_id):
+    """
+    Renders a response to display the user profile page (shown after clicking
+    on a post author's username).
+    """
+
     nr_transaction = newrelic.agent.current_transaction()
 
     #TODO: Allow sorting?
@@ -423,8 +452,12 @@ def user_profile(request, course_id, user_id):
 
 
 @login_required
-def followed_threads(request, course_id, user_id):
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+@use_bulk_ops
+def followed_threads(request, course_key, user_id):
+    """
+    Ajax-only endpoint retrieving the threads followed by a specific user.
+    """
+
     nr_transaction = newrelic.agent.current_transaction()
 
     course = get_course_with_access(request.user, 'load_forum', course_key)
