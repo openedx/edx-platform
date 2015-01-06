@@ -1,6 +1,6 @@
 define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils", "js/views/utils/view_utils"],
     function (domReady, $, _, CreateCourseUtilsFactory, ViewUtils) {
-        var CreateCourseUtils = CreateCourseUtilsFactory({
+        var CreateCourseUtils = new CreateCourseUtilsFactory({
             name: '.rerun-course-name',
             org: '.rerun-course-org',
             number: '.rerun-course-number',
