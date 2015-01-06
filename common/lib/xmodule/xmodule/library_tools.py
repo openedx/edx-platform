@@ -64,7 +64,7 @@ class LibraryToolsService(object):
         Returns generator containing (child_key, child) for all children matching filter criteria
         """
         children = (
-            (child_key, self.store.get_item(child_key, depth=9))
+            (child_key, self.store.get_item(child_key, depth=None))
             for child_key in from_block.children
         )
         return (
