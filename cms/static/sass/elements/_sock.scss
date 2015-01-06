@@ -33,7 +33,7 @@
       padding: ($baseline/2) $baseline;
       color: $gray;
 
-      [class^="icon-"] {
+      .icon {
         @extend %t-icon6;
         @include margin-right($baseline/4);
       }
@@ -95,11 +95,10 @@
             @extend %t-action4;
             display: block;
 
-            [class^="icon-"] {
+            .icon {
               @extend %t-icon4;
               vertical-align: middle;
               @include margin-right($baseline/4);
-
             }
 
             &:hover, &:active {

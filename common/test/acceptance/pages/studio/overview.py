@@ -495,7 +495,7 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         """
         element_css = self.BOTTOM_ADD_SECTION_BUTTON
         if click_child_icon:
-            element_css += " .icon-plus"
+            element_css += " .fa-plus"
 
         click_css(self, element_css)
 

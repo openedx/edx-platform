@@ -278,30 +278,6 @@ section.wiki {
           color: $link-color;
           font-weight: bold;
           background-color: $gray-l4;
-
-          .icon-view,
-          .icon-home {
-            background-position: -25px 0;
-          }
-
-          .icon-edit {
-            background-position: -25px -25px;
-          }
-
-          .icon-changes,
-          .icon-time {
-            background-position: -25px -49px;
-          }
-
-          .icon-attachments,
-          .icon-file {
-            background-position: -25px -73px;
-          }
-
-          .icon-settings {
-            background-position: -25px -99px;
-          }
-
         }
       }
     }
@@ -318,36 +294,12 @@ section.wiki {
         float: left;
         display: block;
         width: 25px;
-        height: 25px;
         margin-right: 3px;
-        background: url(../images/wiki-icons.png) no-repeat;
+        margin-top: 5px;
       }
 
       [class^="icon-"] {
         padding-right: ($baseline/4);
-      }
-
-      .icon-view,
-      .icon-home {
-        background-position: 0 0;
-      }
-
-      .icon-edit {
-        background-position: 0 -25px;
-      }
-
-      .icon-changes,
-      .icon-time {
-        background-position: 0 -49px;
-      }
-
-      .icon-attachments,
-      .icon-file {
-        background-position: 0 -73px;
-      }
-
-      .icon-settings {
-        background-position: 0 -99px;
       }
 
       &:hover, &:focus {

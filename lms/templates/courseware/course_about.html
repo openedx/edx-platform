@@ -232,10 +232,10 @@
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon icon-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
               </a>
               <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon icon-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
               </a>
             % else:
               <%
@@ -271,13 +271,13 @@
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon icon-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon icon-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
+                <i class="icon fa fa-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon icon-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
               </a>
             % endif
           </div>
@@ -285,15 +285,15 @@
         </header>
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon icon-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><i class="icon fa fa-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
           % if not course.start_date_is_still_default:
-            <li class="important-dates-item"><i class="icon icon-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
             ## We plan to ditch end_date (which is not stored in course metadata),
             ## but for backwards compatibility, show about/end_date blob if it exists.
             % if get_course_about_section(course, "end_date") or course.end:
             <li class="important-dates-item">
-                <i class="icon icon-calendar"></i>
+                <i class="icon fa fa-calendar"></i>
                 <p class="important-dates-item-title">${_("Classes End")}</p>
                 <span class="important-dates-item-text final-date">
                     % if get_course_about_section(course, "end_date"):
@@ -306,10 +306,10 @@
             % endif
 
           % if get_course_about_section(course, "effort"):
-            <li class="important-dates-item"><i class="icon icon-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(course, "effort")}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-pencil"></i><p class="important-dates-item-title">${_("Estimated Effort")}</p><span class="important-dates-item-text effort">${get_course_about_section(course, "effort")}</span></li>
           % endif
 
-          ##<li class="important-dates-item"><i class="icon icon-time"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
+          ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
           %if is_shopping_cart_enabled and registration_price:
             <li class="important-dates-item">
@@ -320,7 +320,7 @@
           % endif
 
           % if get_course_about_section(course, "prerequisites"):
-            <li class="important-dates-item"><i class="icon icon-book"></i><p class="important-dates-item-title">${_("Prerequisites")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
+            <li class="important-dates-item"><i class="icon fa fa-book"></i><p class="important-dates-item-title">${_("Prerequisites")}</p><span class="important-dates-item-text prerequisites">${get_course_about_section(course, "prerequisites")}</span></li>
           % endif
         </ol>
       </section>

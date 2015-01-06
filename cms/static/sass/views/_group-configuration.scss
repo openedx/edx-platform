@@ -31,7 +31,7 @@
       @extend %t-action3;
       margin-left: $baseline;
 
-      [class^="icon-"] {
+      .icon {
         margin-right: ($baseline/2);
       }
     }
@@ -204,12 +204,12 @@
                 font-weight: 600;
               }
 
-              .icon-warning-sign {
+              .fa-warning {
                 margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
                 color: $orange;
               }
 
-              .icon-exclamation-sign {
+              .fa-times-circle {
                 margin: ($baseline/4) ($baseline/2) 0 ($baseline*1.5);
                 color: $red-l2;
               }
@@ -224,7 +224,7 @@
         margin-top: $baseline;
         padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
 
-        .icon-warning-sign {
+        .fa-warning {
           margin: ($baseline/2) $baseline 0 0;
           color: $orange;
           float: left;

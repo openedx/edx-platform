@@ -45,7 +45,7 @@
 
     .action {
 
-      [class^="icon"] {
+      .icon {
         @extend %t-icon2;
         display: inline-block;
         vertical-align: middle;

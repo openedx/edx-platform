@@ -19,7 +19,7 @@
                 <div class="response-count"/>
                 <div class="add-response">
                     <button class="button add-response-btn">
-                        <i class="icon icon-reply"></i>
+                        <i class="icon fa fa-reply"></i>
                         <span class="add-response-btn-text">${_('Add A Response')}</span>
                     </button>
                 </div>
@@ -41,8 +41,8 @@
             </div>
         </div>
         <div class="post-tools">
-            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon icon-plus"/> ${_("Expand discussion")}</a>
-            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon icon-minus"/> ${_("Collapse discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-expand"><span class="icon fa fa-plus"/> ${_("Expand discussion")}</a>
+            <a href="javascript:void(0)" class="forum-thread-collapse"><span class="icon fa fa-minus"/> ${_("Collapse discussion")}</a>
         </div>
     </article>
 </script>
@@ -72,7 +72,7 @@
     <div class="discussion-response"></div>
     <a href="#" class="action-show-comments">
         ${u"<%- interpolate('{}', {{num_comments: comments.length}}, true) %>".format(escapejs(_("Show Comments (%(num_comments)s)")))}
-        <i class="icon icon-caret-down"></i>
+        <i class="icon fa fa-caret-down"></i>
     </a>
     <ol class="comments">
         <li class="new-comment">
@@ -126,7 +126,7 @@
               ${"<% if (obj.endorsement) { %> - <%="}${js_block}${"%><% } %>"}
           </p>
           <div class="post-labels">
-              <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+              <span class="post-label-reported"><i class="icon fa fa-flag"></i>${_("Reported")}</span>
           </div>
           </div>
           <div class="response-header-actions">
@@ -188,7 +188,7 @@
     ${'<%='}${js_block}${'%>'}
     </p>
     <div class="post-labels">
-      <span class="post-label-reported"><i class="icon icon-flag"></i>${_("Reported")}</span>
+      <span class="post-label-reported"><i class="icon fa fa-flag"></i>${_("Reported")}</span>
     </div>
   </div>
 </script>
@@ -212,13 +212,13 @@
         ${u"""<%
         var icon_class, sr_text;
         if (thread_type == "discussion") {{
-            icon_class = "icon-comments";
+            icon_class = "fa-comments";
             sr_text = "{discussion}";
         }} else if (endorsed) {{
-            icon_class = "icon-ok";
+            icon_class = "fa-check-square-o";
             sr_text = "{answered_question}";
         }} else {{
-            icon_class = "icon-question";
+            icon_class = "fa-question";
             sr_text = "{unanswered_question}";
         }}
         %>""".format(
@@ -230,23 +230,23 @@
             unanswered_question=escapejs(_("unanswered question"))
         )}
         <span class="sr">${"<%= sr_text %>"}</span>
-        <i class="icon ${"<%= icon_class %>"}"></i>
+        <i class="icon fa ${"<%= icon_class %>"}"></i>
       </div><div class="forum-nav-thread-wrapper-1">
         <span class="forum-nav-thread-title">${"<%- title %>"}</span>
         <%
         js_block = u"""
         var labels = "";
         if (pinned) {{
-            labels += '<li class="post-label-pinned"><i class="icon icon-pushpin"></i>{pinned_text}</li> ';
+            labels += '<li class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i>{pinned_text}</li> ';
         }}
         if (typeof(subscribed) != "undefined" && subscribed) {{
-            labels += '<li class="post-label-following"><i class="icon icon-star"></i>{following_text}</li> ';
+            labels += '<li class="post-label-following"><i class="icon fa fa-star"></i>{following_text}</li> ';
         }}
         if (staff_authored) {{
-            labels += '<li class="post-label-by-staff"><i class="icon icon-user"></i>{staff_text}</li> ';
+            labels += '<li class="post-label-by-staff"><i class="icon fa fa-user"></i>{staff_text}</li> ';
         }}
         if (community_ta_authored) {{
-            labels += '<li class="post-label-by-community-ta"><i class="icon icon-user"></i>{community_ta_text}</li> ';
+            labels += '<li class="post-label-by-community-ta"><i class="icon fa fa-user"></i>{community_ta_text}</li> ';
         }}
         if (labels != "") {{
             print('<ul class="forum-nav-thread-labels">' + labels + '</ul>');
@@ -323,30 +323,30 @@
           <tr class="helpgrid-row helpgrid-row-navigation">
             <td class="row-title">${_("Find discussions")}</td>
             <td class="row-item">
-              <i class="icon icon-reorder"></i>
+              <i class="icon fa fa-reorder"></i>
               <span class="row-description">${_("Focus in on specific topics")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-search"></i>
+              <i class="icon fa fa-search"></i>
               <span class="row-description">${_("Search for specific posts ")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-sort"></i>
+              <i class="icon fa fa-sort"></i>
               <span class="row-description">${_("Sort by date, vote, or comments")}</span>
             </td>
           </tr>
           <tr class="helpgrid-row helpgrid-row-participation">
             <td class="row-title">${_("Engage with posts")}</td>
             <td class="row-item">
-              <i class="icon icon-plus"></i>
+              <i class="icon fa fa-plus"></i>
               <span class="row-description">${_("Upvote posts and good responses")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-flag"></i>
+              <i class="icon fa fa-flag"></i>
               <span class="row-description">${_("Report Forum Misuse")}</span>
             </td>
             <td class="row-item">
-              <i class="icon icon-star"></i>
+              <i class="icon fa fa-star"></i>
               <span class="row-description">${_("Follow posts for updates")}</span>
             </td>
           </tr>
@@ -357,7 +357,7 @@
                 <span class="sr">${_("Toggle Notifications Setting")}</span>
                 <span class="notification-checkbox">
                   <input type="checkbox" id="email-setting-checkbox" class="email-setting" name="email-notification"/>
-                  <i class="icon icon-envelope"></i>
+                  <i class="icon fa fa-envelope"></i>
                 </span>
               </label>
               <span class="row-description">${_("Check this box to receive an email digest once a day notifying you about new, unread activity from posts you are following.")}</span>
@@ -375,7 +375,7 @@
         </div>
 
         <div class="search-alert-controls">
-          <a href="#" class="dismiss control control-dismiss"><i class="icon icon-remove"></i></a>
+          <a href="#" class="dismiss control control-dismiss"><i class="icon fa fa-remove"></i></a>
         </div>
     </div>
 </script>
@@ -413,7 +413,7 @@
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
-                <i class="icon icon-star"></i>${_("follow this post")}
+                <i class="icon fa fa-star"></i>${_("follow this post")}
             </label>
             ${'<% if (allow_anonymous) { %>'}
             <label class="post-option">
@@ -445,13 +445,13 @@
             </span><fieldset class="field-input">
                 <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
                 <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
-                    <i class="icon icon-question"></i>
+                    <i class="icon fa fa-question"></i>
                     ## Translators: This is a forum post type
                     ${_("Question")}
                 </label>
                 <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
                 <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
-                    <i class="icon icon-comments"></i>
+                    <i class="icon fa fa-comments"></i>
                     ## Translators: This is a forum post type
                     ${_("Discussion")}
                 </label>
@@ -506,7 +506,7 @@
                     <span class="label-unchecked">${unchecked_label}</span>
                     <span class="label-checked">${checked_label}</span>
                 </span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-icon"><i class="icon fa fa-${icon}"></i></span>
             </a>
         </li>
     </script>
@@ -531,7 +531,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
             </span>
 
             <span class="action-icon" aria-hidden="true">
-                <i class="icon icon-plus"></i>
+                <i class="icon fa fa-plus"></i>
             </span>
         </a>
     </li>
@@ -547,7 +547,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
                     <span class="label-checked">${checked_label}</span>
                 </span>
                 <span class="action-icon">
-                  <i class="icon icon-${icon}"></i>
+                  <i class="icon fa fa-${icon}"></i>
                 </span>
             </a>
         </li>
@@ -555,7 +555,7 @@ ${primaryAction("follow", "star", _("Follow"), _("Follow"), _("Unfollow"))}
 </%def>
 
 ${secondaryStateAction("report", "flag", _("Report abuse"), _("Report"), _("Unreport"))}
-${secondaryStateAction("pin", "pushpin", _("Pin"), _("Pin"), _("Unpin"))}
+${secondaryStateAction("pin", "thumb-tack", _("Pin"), _("Pin"), _("Unpin"))}
 ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
 
 <%def name="secondaryAction(action_class, icon, label)">
@@ -563,7 +563,7 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-${action_class}" role="button">
                 <span class="action-label">${label}</span>
-                <span class="action-icon"><i class="icon icon-${icon}"></i></span>
+                <span class="action-icon"><i class="icon fa fa-${icon}"></i></span>
             </a>
         </li>
     </script>
@@ -579,7 +579,7 @@ ${secondaryAction("delete", "remove", _("Delete"))}
             <div class="more-wrapper">
                 <a href="javascript:void(0)" class="action-button action-more" role="button" aria-haspopup="true" aria-controls="action-menu-${"<%= contentId %>"}">
                     <span class="action-label">${_("More")}</span>
-                    <span class="action-icon"><i class="icon icon-ellipsis-horizontal"></i></span>
+                    <span class="action-icon"><i class="icon fa fa-ellipsis-h"></i></span>
                 </a>
                 <div class="actions-dropdown" id="action-menu-${"<%= contentType %>"}" aria-expanded="false">
                   <ul class="actions-dropdown-list">

@@ -410,17 +410,17 @@ describe "DiscussionThreadListView", ->
     describe "post type renders correctly", ->
       it "for discussion", ->
         renderSingleThreadWithProps({thread_type: "discussion"})
-        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-comments")
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("fa-comments")
         expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("discussion")
 
       it "for answered question", ->
         renderSingleThreadWithProps({thread_type: "question", endorsed: true})
-        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-ok")
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("fa-check")
         expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("answered question")
 
       it "for unanswered question", ->
         renderSingleThreadWithProps({thread_type: "question", endorsed: false})
-        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("icon-question")
+        expect($(".forum-nav-thread-wrapper-0 .icon")).toHaveClass("fa-question")
         expect($(".forum-nav-thread-wrapper-0 .sr")).toHaveText("unanswered question")
 
     describe "post labels render correctly", ->

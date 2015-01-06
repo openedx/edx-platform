@@ -11,11 +11,11 @@
     </span></span>
     <header>
         <h3 class="checklist-title title-2 is-selectable" title="Collapse/Expand this Checklist">
-            <i class="icon-caret-down ui-toggle-expansion"></i>
+            <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
             <%= checklistShortDescription %></h3>
               <span class="checklist-status status">
                 <%= gettext("Tasks Completed:") %> <span class="status-count"><%= itemsChecked %></span>/<span class="status-amount"><%= items.length %></span>
-                <i class="icon-ok"></i>
+                <i class="icon fa fa-check-square-o"></i>
               </span>
     </header>
 

@@ -92,11 +92,11 @@
         }
 
         &.action-visible .toggle-checkbox ~ .action-button {
-          .icon-eye-open {
+          .fa-eye {
             display: inline-block;
           }
 
-          .icon-eye-close {
+          .fa-eye-slash {
             display: none;
           }
         }
@@ -105,11 +105,11 @@
           background-color: $gray;
           color: $white;
 
-          .icon-eye-open {
+          .fa-eye {
             display: none;
           }
 
-          .icon-eye-close {
+          .fa-eye-slash {
             display: inline-block;
           }
         }
@@ -274,7 +274,7 @@
           }
         }
 
-        [class^="icon-"] {
+        .icon {
           display: inline-block;
           vertical-align: bottom;
         }
