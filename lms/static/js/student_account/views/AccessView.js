@@ -172,7 +172,8 @@ var edx = edx || {};
         toggleForm: function( e ) {
             var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
-                $anchor = $('#' + type + '-anchor');
+                $anchor = $('#' + type + '-anchor'),
+                queryParams = '?' + url('?');
 
             e.preventDefault();
 
@@ -190,7 +191,7 @@ var edx = edx || {};
             this.element.scrollTop( $anchor );
 
             // Update url without reloading page
-            History.pushState( null, document.title, '/account/' + type + '/' );
+            History.pushState( null, document.title, '/account/' + type + queryParams );
             analytics.page( 'login_and_registration', type );
         },
 
