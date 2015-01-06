@@ -58,6 +58,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
+            color: $black;
 
             .group-toggle {
               display: inline-block;
