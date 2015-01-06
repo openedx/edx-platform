@@ -218,6 +218,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
             cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get(self.system.user_location)
             branding_info = get_branding_info(cdn_info.get('BRANDING'))
+            branding_url = branding_info['logo_src']
 
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url, branding_url)
