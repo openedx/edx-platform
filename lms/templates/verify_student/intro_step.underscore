@@ -31,7 +31,7 @@
 
             <div class="copy">
               <p>
-                <span class="copy-super"><%- gettext( "Check your email" ) %></span>
+                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
               </p>
             </div>
           </li>
@@ -46,7 +46,7 @@
 
             <div class="copy">
               <p>
-                <span class="copy-sub"><%- gettext( "A driver's license, passport, or government-issued ID with your name and picture" ) %></span>
+                <span class="copy-sub"><%- gettext( "A driver's license, passport, or other government-issued ID with your name and photo" ) %></span>
               </p>
             </div>
           </li>

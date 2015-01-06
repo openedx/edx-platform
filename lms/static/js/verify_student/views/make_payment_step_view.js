@@ -134,7 +134,7 @@ var edx = edx || {};
         },
 
         handleCreateOrderError: function( xhr ) {
-            var errorMsg = gettext( 'An unexpected error occurred.  Please try again.' );
+            var errorMsg = gettext( 'An error has occurred. Please try again.' );
 
             if ( xhr.status === 400 ) {
                 errorMsg = xhr.responseText;
