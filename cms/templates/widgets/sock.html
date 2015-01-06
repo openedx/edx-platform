@@ -30,7 +30,7 @@
           </li>
 
         <li class="action-item">
-          <a href="http://help.edge.edx.org/" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
+          <a href="${settings.TENDER_URL}/" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
           <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
         </li>
         <li class="action-item">
@@ -50,7 +50,7 @@
         <ul class="list-actions">
           <li class="action-item">
 
-            <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon-comments"></i>${_("Contact Us")}</a>
+            <a href="${settings.TENDER_URL}/discussion/new" class="action action-primary show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon-comments"></i>${_("Contact Us")}</a>
           </li>
         </ul>
       </div>

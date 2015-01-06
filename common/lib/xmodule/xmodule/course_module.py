@@ -16,6 +16,7 @@ import json
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer
 from .fields import Date
 from django.utils.timezone import UTC
+from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -444,7 +445,7 @@ class CourseFields(object):
                         "short_description": _("Explore the Studio Help Forum"),
                         "long_description": _("Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio."),
                         "is_checked": False,
-                        "action_url": "http://help.edge.edx.org/",
+                        "action_url": settings.TENDER_URL + "/",
                         "action_text": _("Visit Studio Help"),
                         "action_external": True,
                     },

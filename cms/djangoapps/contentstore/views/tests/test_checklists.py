@@ -1,4 +1,5 @@
 """ Unit tests for checklist methods in views.py. """
+from django.conf import settings
 from contentstore.utils import reverse_course_url
 from contentstore.views.checklist import expand_checklist_action_url
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -138,7 +139,7 @@ class ChecklistTestCase(CourseTestCase):
 
         test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/mitX/333/Checklists_Course/')
         test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/mitX/333/Checklists_Course')
-        test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
+        test_expansion(self.course.checklists[2], 0, settings.TENDER_URL + '/', settings.TENDER_URL + '/')
 
 
 def get_first_item(checklist):
