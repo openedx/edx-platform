@@ -34,14 +34,12 @@
                 <div class="inline-error is-hidden" tabindex="-1"></div>
             % if notes:
                 <div class="ui-loading" tabindex="-1">
-                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading...")}</span></p>
+                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
             % else:
                 <section class="is-empty">
                     <article>
                         <h2>${_('You have not made any notes in this course yet.')}</h2>
-                        <p>${_('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')}</p>
-
                         <h2>${_('Other students in this course are using notes to:')}</h2>
                         <ul>
                             <li>${_("Mark a passage or concept so that it's easy to find later.")}</li>
@@ -80,8 +78,8 @@
 % if notes:
 <script type="text/javascript">
     (function (require) {
-        require(['js/edxnotes/views/page_factory'], function (NotesFactory) {
-            var pageView = new NotesFactory({
+        require(['js/edxnotes/views/page_factory'], function (NotesPageFactory) {
+            var pageView = new NotesPageFactory({
                 notesList: ${notes},
                 debugMode: ${debug}
             });
