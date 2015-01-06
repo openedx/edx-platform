@@ -1661,6 +1661,7 @@ class CapaModuleTest(unittest.TestCase):
                               ('answerpool', ['choice_1', 'choice_3', 'choice_2', 'choice_0']))
             self.assertEquals(event_info['success'], 'incorrect')
 
+
 @ddt.ddt
 class CapaDescriptorTest(unittest.TestCase):
     def _create_descriptor(self, xml):
