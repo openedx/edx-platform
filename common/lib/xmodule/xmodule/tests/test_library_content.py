@@ -80,28 +80,33 @@ class TestLibraries(MixedSplitTestCase):
         module_system.get_module = get_module
         module.xmodule_runtime = module_system
 
-    def _get_capa_problem_type_xml(self, problem_type):
+    def _get_capa_problem_type_xml(self, *args):
         """ Helper function to create empty CAPA problem definition """
-        return "<problem><{problem_type}></{problem_type}></problem>".format(problem_type=problem_type)
+        problem = "<problem>"
+        for problem_type in args:
+            problem += "<{problem_type}></{problem_type}>".format(problem_type=problem_type)
+        problem += "</problem>"
+        return problem
 
     def _create_capa_problems(self):
-        """ Helper function to create two capa problems: multiplechoiceresponse and optionresponse """
-        ItemFactory.create(
-            category="problem",
-            parent_location=self.library.location,
-            user_id=self.user_id,
-            publish_item=False,
-            data=self._get_capa_problem_type_xml("multiplechoiceresponse"),
-            modulestore=self.store,
-        )
-        ItemFactory.create(
-            category="problem",
-            parent_location=self.library.location,
-            user_id=self.user_id,
-            publish_item=False,
-            data=self._get_capa_problem_type_xml("optionresponse"),
-            modulestore=self.store,
-        )
+        """
+        Helper function to create a set of capa problems to test against.
+
+        Creates four blocks total.
+        """
+        problem_types = [
+            ["multiplechoiceresponse"], ["optionresponse"], ["optionresponse", "coderesponse"],
+            ["coderesponse", "optionresponse"]
+        ]
+        for problem_type in problem_types:
+            ItemFactory.create(
+                category="problem",
+                parent_location=self.library.location,
+                user_id=self.user_id,
+                publish_item=False,
+                data=self._get_capa_problem_type_xml(*problem_type),
+                modulestore=self.store,
+            )
 
     def test_lib_content_block(self):
         """
@@ -184,7 +189,7 @@ class TestLibraries(MixedSplitTestCase):
         self.assertTrue(self.lc_block.validate())
 
         # ... unless requested more blocks than exists in library
-        self.lc_block.max_count = 3
+        self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
@@ -213,7 +218,11 @@ class TestLibraries(MixedSplitTestCase):
 
         self.lc_block.capa_type = "optionresponse"
         self.lc_block.refresh_children(None, None)
-        self.assertEqual(len(self.lc_block.children), 1)
+        self.assertEqual(len(self.lc_block.children), 3)
+
+        self.lc_block.capa_type = "coderesponse"
+        self.lc_block.refresh_children(None, None)
+        self.assertEqual(len(self.lc_block.children), 2)
 
         self.lc_block.capa_type = "customresponse"
         self.lc_block.refresh_children(None, None)
@@ -221,4 +230,4 @@ class TestLibraries(MixedSplitTestCase):
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
         self.lc_block.refresh_children(None, None)
-        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 2)
+        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 4)
