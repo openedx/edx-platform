@@ -7,7 +7,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
                 createMockCohort, createMockCohorts, createMockContentGroups, createCohortsView, cohortsView,
                 requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage, verifyHeader,
-                expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup,
+                expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup, saveFormAndExpectErrors,
                 MOCK_COHORTED_USER_PARTITION_ID, MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                 MOCK_STUDIO_GROUP_CONFIGURATIONS_URL;
 
@@ -147,6 +147,21 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         {count: expectedCount}
                     )
                 );
+            };
+
+            saveFormAndExpectErrors = function(action, errors) {
+                var requestCount = requests.length,
+                    form, expectedTitle;
+                if (action === 'add') {
+                    expectedTitle = 'The cohort group cannot be added';
+                    form = getAddModal();
+                } else {
+                    expectedTitle = 'The cohort group cannot be saved';
+                    form = cohortsView.$('.cohort-management-settings-form');
+                }
+                form.find('.action-save').click();
+                expect(requests.length).toBe(requestCount);
+                verifyDetailedMessage(expectedTitle, 'error', errors);
             };
 
             unknownUserMessage = function (name) {
@@ -300,12 +315,27 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 it("does not allow a blank cohort name to be submitted", function() {
                     createCohortsView(this, {selectCohort: 1});
                     cohortsView.$('.action-create').click();
-                    expect(getAddModal().find('.cohort-management-settings-form').length).toBe(1);
+                    cohortsView.$('.cohort-name').val('  ');
+                    saveFormAndExpectErrors('add', ['You must specify a name for the cohort group']);
+                });
+
+                it("shows a message saving when choosing to have content groups but not selecting one", function() {
+                    createCohortsView(this, {selectCohort: 1});
+                    cohortsView.$('.action-create').click();
+                    cohortsView.$('.cohort-name').val('New Cohort');
+                    cohortsView.$('.radio-yes').prop('checked', true).change();
+                    saveFormAndExpectErrors('add', ['You did not select a cohorted content group']);
+                });
+
+                it("shows two message when both fields have problems", function() {
+                    createCohortsView(this, {selectCohort: 1});
+                    cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('');
-                    expect(cohortsView.$('.cohort-management-nav')).toHaveClass('is-disabled');
-                    getAddModal().find('.action-save').click();
-                    expect(requests.length).toBe(0);
-                    verifyMessage('Enter a name for your cohort group.', 'error');
+                    cohortsView.$('.radio-yes').prop('checked', true).change();
+                    saveFormAndExpectErrors('add', [
+                        'You must specify a name for the cohort group',
+                        'You did not select a cohorted content group'
+                    ]);
                 });
 
                 it("shows a message when adding a cohort returns a server error", function() {
@@ -355,8 +385,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     // First try to save a blank name to create a message
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('');
-                    cohortsView.$('.action-save').click();
-                    verifyMessage('Enter a name for your cohort group.', 'error');
+                    saveFormAndExpectErrors('add', ['You must specify a name for the cohort group']);
 
                     // Now switch to a different cohort
                     cohortsView.$('.cohort-select').val('2').change();
@@ -370,8 +399,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     // First try to save a blank name to create a message
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('');
-                    cohortsView.$('.action-save').click();
-                    verifyMessage('Enter a name for your cohort group.', 'error');
+                    saveFormAndExpectErrors('add', ['You must specify a name for the cohort group']);
 
                     // Now cancel the form
                     cohortsView.$('.action-cancel').click();
@@ -524,6 +552,22 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
             describe("Cohort Settings", function() {
                 describe("Content Group Setting", function() {
+                    var createCohortsViewWithDeletedContentGroup;
+
+                    createCohortsViewWithDeletedContentGroup = function(test) {
+                        createCohortsView(test, {
+                            cohorts: [
+                                {
+                                    id: 1,
+                                    name: 'Cat Lovers',
+                                    group_id: 999,
+                                    user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
+                                }
+                            ],
+                            selectCohort: 1
+                        });
+                    };
+
                     it("shows a select element with an option for each content group", function () {
                         var options;
                         createCohortsView(this, {selectCohort: 1});
@@ -531,7 +575,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         expect(cohortsView.$('.input-cohort-group-association').prop('disabled')).toBeTruthy();
                         options = cohortsView.$('.input-cohort-group-association option');
                         expect(options.length).toBe(3);
-                        expect($(options[0]).text().trim()).toBe('');
+                        expect($(options[0]).text().trim()).toBe('Not selected');
                         expect($(options[1]).text().trim()).toBe('Cat Content');
                         expect($(options[2]).text().trim()).toBe('Dog Content');
                     });
@@ -589,13 +633,25 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         verifyMessage('Saved cohort group.', 'confirmation');
                     });
 
+                    it("shows a message saving when choosing to have content groups but not selecting one", function() {
+                        createCohortsView(this, {selectCohort: 1});
+                        cohortsView.$('.tab-settings a').click();
+                        cohortsView.$('.cohort-name').val('New Cohort');
+                        cohortsView.$('.radio-yes').prop('checked', true).change();
+                        saveFormAndExpectErrors('update', ['You did not select a cohorted content group']);
+                    });
+
+                    it("shows a message when the selected content group does not exist", function () {
+                        createCohortsViewWithDeletedContentGroup(this);
+                        cohortsView.$('.tab-settings a').click();
+                        expect(cohortsView.$('option.option-unavailable').text().trim()).toBe('Deleted Content Group');
+                        expect(cohortsView.$('.copy-error').text().trim()).toBe(
+                            'The previously selected content group was deleted. Select another content group.'
+                        );
+                    });
+
                     it("can clear a selected content group which had been deleted", function () {
-                        createCohortsView(this, {
-                            cohorts: [
-                                {id: 1, name: 'Cat Lovers', group_id: 999}
-                            ],
-                            selectCohort: 1
-                        });
+                        createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
                         expect(cohortsView.$('.radio-yes').prop('checked')).toBeTruthy();
                         clearContentGroup();
@@ -613,18 +669,10 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         expect(cohortsView.$('.copy-error').text().trim()).toBe('');
                     });
 
-                    it("shows a message when the selected content group does not exist", function () {
-                        createCohortsView(this, {
-                            cohorts: [
-                                {id: 1, name: 'Cat Lovers', group_id: 999}
-                            ],
-                            selectCohort: 1
-                        });
+                    it("shows an error when saving with a deleted content group", function () {
+                        createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
-                        expect(cohortsView.$('option.option-unavailable').text().trim()).toBe('Deleted Content Group');
-                        expect(cohortsView.$('.copy-error').text().trim()).toBe(
-                            'The previously selected content group was deleted. Select another content group.'
-                        );
+                        saveFormAndExpectErrors('save', ['The selected cohorted content group does not exist']);
                     });
 
                     it("shows an error when the save fails", function () {

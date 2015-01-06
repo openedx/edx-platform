@@ -27,13 +27,14 @@
             <%
             var foundSelected = false;
             var selectedContentGroupId = cohort.get('group_id');
+            var selectedUserPartitionId = cohort.get('user_partition_id');
             var hasSelectedContentGroup = selectedContentGroupId != null;
             var hasContentGroups = contentGroups.length > 0;
             %>
             <div class="form-field">
                 <div class="cohort-management-details-association-course field field-radio">
                     <h4 class="form-label">
-                        <%- gettext('Associate this cohort group with a content group') %>
+                        <%- gettext('Associated Cohorted Content Group') %>
                     </h4>
                     <label><input type="radio" class="radio-no" name="cohort-association-course" value="no"  <%- !hasSelectedContentGroup ? 'checked="checked"' : '' %>/> <%- gettext("No Content Group") %></label>
                     <div class="input-group has-other-input-text">
@@ -42,7 +43,7 @@
                             <div class="input-group-other">
                                 <label class="sr" for="cohort-group-association"><%- gettext("Choose a content group to associate") %></label>
                                 <select name="cohort-group-association" class="input input-lg has-option-unavailable input-cohort-group-association" <%- !hasSelectedContentGroup ? 'disabled="disabled"' : '' %>>
-                                    <option value="None"></option>
+                                    <option value="None" <%- !hasSelectedContentGroup ? 'selected="selected"' : '' %> disabled="disabled"><%- gettext("Not selected") %></option>
 
                                     <%
                                     var orderedContentGroups = _.sortBy(
@@ -64,7 +65,7 @@
                                     %>
 
                                     <% if (hasSelectedContentGroup && !foundSelected) { %>
-                                        <option value="<%- contentGroupId %>:<%- contentGroupUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
+                                        <option value="<%- selectedContentGroupId %>:<%- selectedUserPartitionId %>" class="option-unavailable" selected="selected"><%- gettext("Deleted Content Group") %></option>
                                     <% } %>
                                 </select>
 
