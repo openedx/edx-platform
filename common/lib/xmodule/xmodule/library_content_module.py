@@ -361,7 +361,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
                         # Translators: ↻ is an UTF icon symbol, no need translating it.
-                        action_label=_(u"↻ Update now.")
+                        action_label=_(u"{0} Update now.").format(u"↻")
                     )
                 )
                 return False
@@ -453,8 +453,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         If source_libraries has been edited, refresh_children automatically.
         """
         old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
-        if set(old_source_libraries) != set(self.source_libraries) or \
-                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type:
+        if (set(old_source_libraries) != set(self.source_libraries) or
+                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
                 self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
             except ValueError:
