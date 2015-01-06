@@ -134,9 +134,10 @@
                   </li>
 
                   <li class="field text required" id="field-library-number">
-                    <label for="new-library-number">${_("Major Version Number")}</label>
-                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required value="1" aria-describedby="tip-new-library-number tip-error-new-library-number" />
-                    <span class="tip" id="tip-new-library-number">${_("The {em_start}major version number{em_end} of your library. Minor revisions are tracked as edits happen within a library.").format(em_start='<strong>', em_end='</strong>')}</span>
+                    <label for="new-library-number">${_("Library Code")}</label>
+                    ## Translators: This is an example for the "code" used to identify a library, seen when filling out the form to create a new library. This example is short for "Computer Science Problems". The example number may contain letters but must not contain spaces.
+                    <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" required placeholder="${_('e.g. CSPROB')}" aria-describedby="tip-new-library-number tip-error-new-library-number" />
+                    <span class="tip" id="tip-new-library-number">${_("The unique code that identifies this library.")} <strong>${_("Note: This is part of your library URL, so no spaces or special characters are allowed.")}</strong> ${_("This cannot be changed.")}</span>
                     <span class="tip tip-error is-hiding" id="tip-error-new-library-number"></span>
                   </li>
                 </ol>
