@@ -114,7 +114,7 @@
                 <a href="#" class="admin-role toggle-admin-role ${'remove' if is_instuctor else 'add'}-admin-role">${_("Remove Admin Access") if is_instuctor else _("Add Admin Access")}</a>
               % endif
             </li>
-            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}">
+            <li class="action action-delete ${"is-disabled" if request.user.id == user.id else ""}" aria-disabled="${'true' if request.user.id == user.id else 'false'}">
                 <a href="#" class="delete remove-user action-icon" data-id="${user.email}"><i class="icon-trash"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
             </li>
           </ul>

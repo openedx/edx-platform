@@ -44,13 +44,13 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             CreateCourseUtils.createCourse(course_info, function (errorMessage) {
                 $('.wrap-error').addClass('is-shown');
                 $('#course_creation_error').html('<p>' + errorMessage + '</p>');
-                $('.new-course-save').addClass('is-disabled');
+                $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
             });
         };
 
         var cancelNewCourse = function (e) {
             e.preventDefault();
-            $('.new-course-button').removeClass('is-disabled');
+            $('.new-course-button').removeClass('is-disabled').attr('aria-disabled', false);
             $('.wrapper-create-course').removeClass('is-shown');
             // Clear out existing fields and errors
             _.each(
@@ -66,8 +66,8 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
 
         var addNewCourse = function (e) {
             e.preventDefault();
-            $('.new-course-button').addClass('is-disabled');
-            $('.new-course-save').addClass('is-disabled');
+            $('.new-course-button').addClass('is-disabled').attr('aria-disabled', true);
+            $('.new-course-save').addClass('is-disabled').attr('aria-disabled', true);
             var $newCourse = $('.wrapper-create-course').addClass('is-shown');
             var $cancelButton = $newCourse.find('.new-course-cancel');
             var $courseName = $('.new-course-name');

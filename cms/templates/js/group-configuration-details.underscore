@@ -50,7 +50,7 @@
             </li>
         <% } else { %>
             <li class="action action-delete wrapper-delete-button" data-tooltip="<%= gettext('Cannot delete when in use by an experiment') %>">
-                <button class="delete action-icon is-disabled"><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
+                <button class="delete action-icon is-disabled" aria-disabled="true" ><i class="icon-trash"></i><span><%= gettext("Delete") %></span></button>
             </li>
         <% } %>
     </ul>

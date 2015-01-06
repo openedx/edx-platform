@@ -136,10 +136,10 @@
         setCohortEditorVisibility: function(showEditor) {
             if (showEditor) {
                 this.$('.cohort-management-group').removeClass(hiddenClass);
-                this.$('.cohort-management-nav').removeClass(disabledClass);
+                this.$('.cohort-management-nav').removeClass(disabledClass).attr('aria-disabled', false);
             } else {
                 this.$('.cohort-management-group').addClass(hiddenClass);
-                this.$('.cohort-management-nav').addClass(disabledClass);
+                this.$('.cohort-management-nav').addClass(disabledClass).attr('aria-disabled', true);
             }
         },
 

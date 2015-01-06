@@ -88,9 +88,9 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
          * a JQuery promise.
          */
         disableElementWhileRunning = function(element, operation) {
-            element.addClass("is-disabled");
+            element.addClass("is-disabled").attr('aria-disabled', true);
             return operation().always(function() {
-                element.removeClass("is-disabled");
+                element.removeClass("is-disabled").attr('aria-disabled', false);
             });
         };
 

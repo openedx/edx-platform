@@ -80,7 +80,8 @@ var edx = edx || {};
             }
             $( '#pay_button' )
                 .toggleClass( 'is-disabled', !isEnabled )
-                .prop( 'disabled', !isEnabled );
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         },
 
         createOrder: function() {

@@ -313,7 +313,8 @@
         setSubmitButtonEnabled: function( isEnabled ) {
             $( this.submitButton )
                 .toggleClass( 'is-disabled', !isEnabled )
-                .prop( 'disabled', !isEnabled );
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         }
     });
 
