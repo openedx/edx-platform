@@ -37,7 +37,7 @@ from path import path
 from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
-from dealer.git import git
+import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 
 ############################ FEATURE CONFIGURATION #############################
@@ -301,7 +301,12 @@ MANAGERS = ADMINS
 EDX_PLATFORM_REVISION = os.environ.get('EDX_PLATFORM_REVISION')
 
 if not EDX_PLATFORM_REVISION:
-    EDX_PLATFORM_REVISION = git.revision
+    try:
+        # Get git revision of the current file
+        EDX_PLATFORM_REVISION = dealer.git.Backend(path=REPO_ROOT).revision
+    except TypeError:
+        # Not a git repository
+        EDX_PLATFORM_REVISION = 'unknown'
 
 # Static content
 STATIC_URL = '/static/' + EDX_PLATFORM_REVISION + "/"
