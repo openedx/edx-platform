@@ -29,40 +29,23 @@ def get_course_about_details(course_id):
     Returns:
         A JSON serializable dictionary of metadata describing the course.
 
-    Raises:
-        TODO: Describe all errors
-
     Example:
         >>> get_course_about_details('edX/Demo/2014T2')
         {
             "advertised_start": "FALL",
             "announcement": "YYYY-MM-DD",
-            "copy": {
-                (To be implemented with Marketing Descriptors)
-            }
-            "course_id": "EXAMPLE/COURSE101",
-            "course_number": "COURSE101",
+            "course_id": "edx/DemoCourse",
+            "course_number": "DEMO101",
             "start": "YYYY-MM-DD",
             "end": "YYYY-MM-DD",
             "effort": "HH:MM",
             "display_name": "Demo Course",
-            "is_mobile_enabled": true,
             "is_new": true,
             "media": {
-                (To be implemented with Marketing Descriptors)
+                "course_image": "/some/image/location.png"
             },
-            "organizations": {
-                (To be implemented with new Organization Models)
-            },
-            "subjects": {
-                (To be implemented with new Subjects Models)
-            },
-            "xseries": {
-                (To be implemented with new XSeries Models)
-            }
         }
     """
-    # TODO Implement all validation and error handling
     return _data_api().get_course_about_details(course_id)
 
 
@@ -70,12 +53,11 @@ def _data_api():
     """Returns a Data API.
     This relies on Django settings to find the appropriate data API.
 
+    We retrieve the settings in-line here (rather than using the
+    top-level constant), so that @override_settings will work
+    in the test suite.
     """
-    # We retrieve the settings in-line here (rather than using the
-    # top-level constant), so that @override_settings will work
-    # in the test suite.
     api_path = getattr(settings, "COURSE_ABOUT_DATA_API", DEFAULT_DATA_API)
-
     try:
         return importlib.import_module(api_path)
     except (ImportError, ValueError):

@@ -16,3 +16,8 @@ class CourseAboutError(Exception):
 class CourseAboutApiLoadError(CourseAboutError):
     """The data API could not be loaded. """
     pass
+
+
+class CourseNotFoundError(CourseAboutError):
+    """The Course Not Found. """
+    pass
