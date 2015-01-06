@@ -1937,3 +1937,6 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # which access.py permission name to check in order to determine if a course about page is
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
+
+COURSE_INFO_API_CACHE_PREFIX = 'course_info_api_'
+COURSE_INFO_API_CACHE_TIME_OUT = 20
