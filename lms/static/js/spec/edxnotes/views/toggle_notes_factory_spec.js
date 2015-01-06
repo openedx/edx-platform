@@ -37,6 +37,7 @@ define([
         afterEach(function () {
             VisibilityDecorator._setVisibility(null);
             _.invoke(Annotator._instances, 'destroy');
+            $('.annotator-notice').remove();
         });
 
         it('can toggle notes', function() {
@@ -45,10 +46,12 @@ define([
             expect(this.button).not.toHaveClass('is-disabled');
             expect(this.icon).toHaveClass('icon-check');
             expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.button).toHaveClass('is-active');
 
             this.button.click();
             expect(this.icon).toHaveClass('icon-check-empty');
             expect(this.icon).not.toHaveClass('icon-check');
+            expect(this.button).not.toHaveClass('is-active');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -59,6 +62,7 @@ define([
             this.button.click();
             expect(this.icon).toHaveClass('icon-check');
             expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.button).toHaveClass('is-active');
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -69,17 +73,20 @@ define([
 
         it('can handle errors', function() {
             var requests = AjaxHelpers.requests(this),
-                errorContainer = $('.edx-notes-visibility-error');
+                errorContainer = $('.annotator-notice');
 
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
                 "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
             );
+            expect(errorContainer).toBeVisible();
+            expect(errorContainer).toHaveClass('annotator-notice-show');
+            expect(errorContainer).toHaveClass('annotator-notice-error');
 
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
-            expect(errorContainer).toBeEmpty();
+            expect(errorContainer).not.toHaveClass('annotator-notice-show');
         });
     });
 });

@@ -1,8 +1,9 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'backbone', 'gettext', 'js/edxnotes/views/visibility_decorator'
-], function($, _, Backbone, gettext, EdxnotesVisibilityDecorator) {
+    'jquery', 'underscore', 'backbone', 'gettext',
+    'annotator', 'js/edxnotes/views/visibility_decorator'
+], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
     var ToggleNotesView = Backbone.View.extend({
         events: {
             'click .action-toggle-notes': 'toogleHandler'
@@ -14,7 +15,9 @@ define([
             this.visibility = options.visibility;
             this.visibilityUrl = options.visibilityUrl;
             this.checkboxIcon = this.$('.checkbox-icon');
-            this.$('.action-toggle-notes').removeClass('is-disabled');
+            this.actionLink = this.$('.action-toggle-notes');
+            this.actionLink.removeClass('is-disabled');
+            this.notification = new Annotator.Notification();
         },
 
         toogleHandler: function (event) {
@@ -28,18 +31,20 @@ define([
             if (this.visibility) {
                 _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
                 this.checkboxIcon.removeClass('icon-check-empty').addClass('icon-check');
+                this.actionLink.addClass('is-active');
             } else {
                 EdxnotesVisibilityDecorator.disableNotes();
                 this.checkboxIcon.removeClass('icon-check').addClass('icon-check-empty');
+                this.actionLink.removeClass('is-active');
             }
         },
 
         hideErrorMessage: function() {
-            this.$('.edx-notes-visibility-error').text('');
+            this.notification.hide();
         },
 
         showErrorMessage: function(message) {
-            this.$('.edx-notes-visibility-error').text(message);
+            this.notification.show(message, Annotator.Notification.ERROR);
         },
 
         sendRequest: function () {
