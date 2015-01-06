@@ -5,6 +5,7 @@ from lettuce import world, step
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from terrain.steps import reload_the_page
 from selenium.common.exceptions import StaleElementReferenceException
+from django.conf import settings
 
 
 ############### ACTIONS ####################
@@ -85,7 +86,7 @@ def i_am_brought_to_help_page_in_new_window(step):
     windows = world.browser.windows
     assert_equal(2, len(windows))
     world.browser.switch_to_window(windows[1])
-    assert_equal('http://help.edge.edx.org/', world.browser.url)
+    assert_equal(settings.TENDER_URL + '/', world.browser.url)
 
 
 ############### HELPER METHODS ####################

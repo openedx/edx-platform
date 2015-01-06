@@ -57,6 +57,8 @@ DISCUSSION_SETTINGS = {
     'MAX_COMMENT_DEPTH': 2,
 }
 
+# Base url for course author support service
+TENDER_URL = 'http://help.example.com'
 
 # Features
 FEATURES = {
