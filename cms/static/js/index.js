@@ -2,7 +2,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
     "js/views/utils/create_library_utils", "js/views/utils/view_utils"],
     function (domReady, $, _, CancelOnEscape, CreateCourseUtilsFactory, CreateLibraryUtilsFactory, ViewUtils) {
         "use strict";
-        var CreateCourseUtils = CreateCourseUtilsFactory({
+        var CreateCourseUtils = new CreateCourseUtilsFactory({
             name: '.new-course-name',
             org: '.new-course-org',
             number: '.new-course-number',
@@ -21,7 +21,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             error: 'error'
         });
 
-        var CreateLibraryUtils = CreateLibraryUtilsFactory({
+        var CreateLibraryUtils = new CreateLibraryUtilsFactory({
             name: '.new-library-name',
             org: '.new-library-org',
             number: '.new-library-number',

@@ -26,7 +26,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                 },
                 mockCreateCourseRerunHTML = readFixtures('mock/mock-create-course-rerun.underscore');
 
-            var CreateCourseUtils = CreateCourseUtilsFactory(selectors, classes);
+            var CreateCourseUtils = new CreateCourseUtilsFactory(selectors, classes);
 
             var fillInFields = function (org, number, run, name) {
                 $(selectors.org).val(org);
