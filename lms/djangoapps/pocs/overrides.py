@@ -147,7 +147,9 @@ class PocMiddleware(object):
                 )
                 _POC_CONTEXT.poc = membership.poc
             except PocMembership.DoesNotExist:
-                pass
+                # if there is no membership, be sure to unset the active poc
+                _POC_CONTEXT.poc = None
+                request.session.pop(ACTIVE_POC_KEY)
 
     def process_response(self, request, response):
         """

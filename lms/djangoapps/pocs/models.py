@@ -23,18 +23,25 @@ class PocMembership(models.Model):
     active = models.BooleanField(default=False)
 
     @classmethod
-    def auto_enroll(cls, student=None, future_membership=None):
-        assert student is not None and future_membership is not None
+    def auto_enroll(cls, student, future_membership):
+        """convert future_membership to an active membership
+        """
+        if not future_membership.auto_enroll:
+            msg = "auto enrollment not allowed for {}"
+            raise ValueError(msg.format(future_membership))
         membership = cls(
             poc=future_membership.poc, student=student, active=True
         )
         try:
-            CourseEnrollment.enroll(student, future_membership.poc.course_id)
+            CourseEnrollment.enroll(
+                student, future_membership.poc.course_id, check_access=True
+            )
         except AlreadyEnrolledError:
+            # if the user is already enrolled in the course, great!
             pass
-        else:
-            membership.save()
-            future_membership.delete()
+
+        membership.save()
+        future_membership.delete()
 
 
 class PocFutureMembership(models.Model):
