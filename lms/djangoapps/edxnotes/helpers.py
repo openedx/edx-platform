@@ -68,7 +68,7 @@ def get_token_url(course_id):
     Returns token url for the course.
     """
     return reverse("get_token", kwargs={
-        "course_id": course_id.to_deprecated_string(),
+        "course_id": unicode(course_id),
     })
 
 
@@ -205,22 +205,22 @@ def get_module_context(course, item):
     Returns dispay_name and url for the parent module.
     """
     item_dict = {
-        'location': item.location.to_deprecated_string(),
+        'location': unicode(item.location),
         'display_name': item.display_name_with_default,
     }
 
     if item.category == 'chapter' and item.get_parent():
         course = item.get_parent()
-        ancestor_children = [child.to_deprecated_string() for child in course.children]
+        ancestor_children = [unicode(child) for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
         item_dict['url'] = reverse("jump_to_id", kwargs={
-            "course_id": course.id.to_deprecated_string(),
+            "course_id": unicode(course.id),
             "module_id": item.url_name,
         })
 
     if item.category in ('chapter', 'sequential'):
-        item_dict['children'] = [child.to_deprecated_string() for child in item.children]
+        item_dict['children'] = [unicode(child) for child in item.children]
 
     return item_dict
 
@@ -290,7 +290,7 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {'course_id': course_module.id.to_deprecated_string()}
+    urlargs = {'course_id': unicode(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
