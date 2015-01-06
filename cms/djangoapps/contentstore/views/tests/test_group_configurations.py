@@ -7,6 +7,7 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
+from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage
@@ -207,6 +208,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'First name')
         self.assertContains(response, 'Group C')
+        self.assertContains(response, 'Cohort Group Configuration')
 
     def test_unsupported_http_accept_header(self):
         """
@@ -232,12 +234,9 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
                 {u'name': u'Group B', u'version': 1},
             ],
         }
-        response = self.client.post(
+        response = self.client.ajax_post(
             self._url(),
-            data=json.dumps(GROUP_CONFIGURATION_JSON),
-            content_type="application/json",
-            HTTP_ACCEPT="application/json",
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+            data=json.dumps(GROUP_CONFIGURATION_JSON)
         )
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)
@@ -255,6 +254,27 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(len(user_partititons[0].groups), 2)
         self.assertEqual(user_partititons[0].groups[0].name, u'Group A')
         self.assertEqual(user_partititons[0].groups[1].name, u'Group B')
+
+    def test_lazily_creates_cohort_configuration(self):
+        """
+        Test that a cohort schemed user partition is created if it
+        doesn't already exist.
+        """
+        def verify_cohorted_partition_exists():
+            self.assertEqual(len(self.course.user_partitions), 1)
+            user_partition = self.course.user_partitions[0]
+            self.assertEqual(user_partition.name, 'Cohort Group Configuration')
+            self.assertEqual(user_partition.groups, [])
+            self.assertEqual(user_partition.scheme, CohortPartitionScheme)
+
+        self.assertEqual(self.course.user_partitions, [])
+
+        # A single cohort schemed user partition should be present
+        # after the first GET and all subsequent requests.
+        for __ in xrange(2):
+            self.client.get(self._url())
+            self.reload_course()
+            verify_cohorted_partition_exists()
 
 
 # pylint: disable=no-member
