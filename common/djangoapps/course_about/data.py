@@ -14,8 +14,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 log = logging.getLogger(__name__)
 
 ABOUT_ATTRIBUTES = [
-    'effort',
-    'video'
+    'effort'
 ]
 
 

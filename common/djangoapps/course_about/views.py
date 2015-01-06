@@ -27,7 +27,7 @@ class CourseAboutView(APIView):
     throttle_classes = CourseAboutThrottle,
 
     def get(self, request, course_id=None):  # pylint: disable=unused-argument
-        """read course information.
+        """Read course information.
 
         HTTP Endpoint for course info api.
 
