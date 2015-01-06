@@ -107,6 +107,9 @@ class PaginationTestCase(AssetsTestCase):
         self.assert_correct_sort_response(self.url, 'date_added', 'desc')
         self.assert_correct_sort_response(self.url, 'display_name', 'asc')
         self.assert_correct_sort_response(self.url, 'display_name', 'desc')
+        self.assert_correct_filter_response(self.url, 'asset_type', '')
+        self.assert_correct_filter_response(self.url, 'asset_type', 'OTHER')
+        self.assert_correct_filter_response(self.url, 'asset_type', 'Documents')
 
         # Verify querying outside the range of valid pages
         self.assert_correct_asset_response(self.url + "?page_size=2&page=-1", 0, 2, 3)
@@ -140,6 +143,26 @@ class PaginationTestCase(AssetsTestCase):
         else:
             self.assertGreaterEqual(name1, name2)
             self.assertGreaterEqual(name2, name3)
+
+    def assert_correct_filter_response(self, url, filter_type, filter_value):
+        """
+        Get from the url w/ a filter option and ensure items honor that filter
+        """
+        requested_file_types = settings.FILES_AND_UPLOAD_TYPE_FILTERS.get(filter_value, None)
+        resp = self.client.get(url + '?' + filter_type + '=' + filter_value, HTTP_ACCEPT='application/json')
+        json_response = json.loads(resp.content)
+        assets_response = json_response['assets']
+        if filter_value is not '':
+            content_types = [asset['content_type'].lower() for asset in assets_response]
+            if filter_value is 'OTHER':
+                all_file_type_extensions = []
+                for file_type in settings.FILES_AND_UPLOAD_TYPE_FILTERS:
+                    all_file_type_extensions.extend(file_type)
+                for content_type in content_types:
+                    self.assertNotIn(content_type, all_file_type_extensions)
+            else:
+                for content_type in content_types:
+                    self.assertIn(content_type, requested_file_types)
 
 
 @ddt
@@ -229,13 +252,13 @@ class AssetToJsonTestCase(AssetsTestCase):
     @override_settings(LMS_BASE="lms_base_url")
     def test_basic(self):
         upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
-
+        content_type = 'image/jpg'
         course_key = SlashSeparatedCourseKey('org', 'class', 'run')
         location = course_key.make_asset_key('asset', 'my_file_name.jpg')
         thumbnail_location = course_key.make_asset_key('thumbnail', 'my_file_name_thumb.jpg')
 
         # pylint: disable=protected-access
-        output = assets._get_asset_json("my_file", upload_date, location, thumbnail_location, True)
+        output = assets._get_asset_json("my_file", content_type, upload_date, location, thumbnail_location, True)
 
         self.assertEquals(output["display_name"], "my_file")
         self.assertEquals(output["date_added"], "Jun 01, 2013 at 10:30 UTC")
@@ -246,7 +269,7 @@ class AssetToJsonTestCase(AssetsTestCase):
         self.assertEquals(output["id"], unicode(location))
         self.assertEquals(output['locked'], True)
 
-        output = assets._get_asset_json("name", upload_date, location, None, False)
+        output = assets._get_asset_json("name", content_type, upload_date, location, None, False)
         self.assertIsNone(output["thumbnail"])
 
 
@@ -267,6 +290,7 @@ class LockAssetTestCase(AssetsTestCase):
 
         def post_asset_update(lock, course):
             """ Helper method for posting asset update. """
+            content_type = 'application/txt'
             upload_date = datetime(2013, 6, 1, 10, 30, tzinfo=UTC)
             asset_location = course.id.make_asset_key('asset', 'sample_static.txt')
             url = reverse_course_url('assets_handler', course.id, kwargs={'asset_key_string': unicode(asset_location)})
@@ -274,7 +298,7 @@ class LockAssetTestCase(AssetsTestCase):
             resp = self.client.post(
                 url,
                 # pylint: disable=protected-access
-                json.dumps(assets._get_asset_json("sample_static.txt", upload_date, asset_location, None, lock)),
+                json.dumps(assets._get_asset_json("sample_static.txt", content_type, upload_date, asset_location, None, lock)),
                 "application/json"
             )
             self.assertEqual(resp.status_code, 201)
