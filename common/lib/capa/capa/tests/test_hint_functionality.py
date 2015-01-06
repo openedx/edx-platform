@@ -83,7 +83,6 @@ class TextInputHintsTest(HintTest):
         self._check_student_selection_result(problem_id, choice, expected_string, expect_failure)
 
 
-
 @ddt
 class TextInputHintsManyCombinations(HintTest):
     xml = load_fixture('extended_hints_text_input.xml')
@@ -96,20 +95,17 @@ class TextInputHintsManyCombinations(HintTest):
         {'problem_id': u'1_5_1', 'choice': 'b', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
         {'problem_id': u'1_5_1', 'choice': 'C', 'expected_string': '<div class="feedback_hint_correct">Correct: hint3</div>'},
         {'problem_id': u'1_5_1', 'choice': 'c', 'expected_string': ''},
-        
         {'problem_id': u'1_5_1', 'choice': 'D', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
         {'problem_id': u'1_5_1', 'choice': 'd', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
-        
         {'problem_id': u'1_5_1', 'choice': 'E', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint5</div>'},
         {'problem_id': u'1_5_1', 'choice': 'e', 'expected_string': ''},
 
-
         {'problem_id': u'1_5_1', 'choice': 'FGG', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
         {'problem_id': u'1_5_1', 'choice': 'fgG', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
-        
+
         {'problem_id': u'1_5_1', 'choice': 'HIII', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint7</div>'},
         {'problem_id': u'1_5_1', 'choice': 'hiIi', 'expected_string': ''},
-        
+
         {'problem_id': u'1_5_1', 'choice': 'abc', 'expected_string': ''},
 
         # verify the implicit ^ .. $ of regex matching, so none of these match
@@ -119,8 +115,9 @@ class TextInputHintsManyCombinations(HintTest):
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
-    		message_text = self._grade_problem(problem_id, choice)
-    		self.assertEqual(message_text, expected_string)
+        message_text = self._grade_problem(problem_id, choice)
+        self.assertEqual(message_text, expected_string)
+
 
 @ddt
 class NumericInputHintsTest(HintTest):
@@ -169,12 +166,12 @@ class CheckboxHintsTest(HintTest):
         {'problem_id': u'1_3_1', 'choice': [u'choice_1', u'choice_2'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">poor banana.</div><div class="feedback_hint_text">Mushroom is a fungus, not a vegetable.</div><div class="feedback_hint_text">Brussel sprout is the only vegetable in this list.</div></div>'},
         {'problem_id': u'1_3_1', 'choice': [u'choice_0', u'choice_2'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">No, sorry, a banana is a fruit.</div><div class="feedback_hint_text">Mushroom is a fungus, not a vegetable.</div><div class="feedback_hint_text">Brussel sprout is the only vegetable in this list.</div></div>'},
 
-				# check for interaction between booleanhint and correct/incorrect
+        # check for interaction between booleanhint and correct/incorrect
         {'problem_id': u'1_4_1', 'choice': [u'choice_0', u'choice_1'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">AB</div></div>'},
         {'problem_id': u'1_4_1', 'choice': [u'choice_0', u'choice_2'], 'expected_string': u'<div class="feedback_hint_correct">Correct: <div class="feedback_hint_text">AC</div></div>'},
 
-				# check for labeling where multiple child hints have labels
-				# These are some tricky cases
+        # check for labeling where multiple child hints have labels
+        # These are some tricky cases
         {'problem_id': '1_5_1', 'choice': ['choice_0', 'choice_1'], 'expected_string': '<div class="feedback_hint_correct">AA: <div class="feedback_hint_text">aa</div></div>'},
         {'problem_id': '1_5_1', 'choice': ['choice_0'], 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">aa</div><div class="feedback_hint_text">bb</div></div>'},
         {'problem_id': '1_5_1', 'choice': ['choice_1'], 'expected_string': ''},
@@ -184,6 +181,7 @@ class CheckboxHintsTest(HintTest):
     @unpack
     def test_checkbox_hints(self, problem_id, choice, expected_string):
         self._check_student_selection_result(problem_id, choice, expected_string, False)
+
 
 @ddt
 class MultpleChoiceHintsTest(HintTest):
@@ -225,7 +223,6 @@ class DropdownHintsTest(HintTest):
     @unpack
     def test_dropdown_hints(self, problem_id, choice, expected_string):
         self._check_student_selection_result(problem_id, choice, expected_string, False)
-
 
 
 class ErrorConditionsTest(HintTest):

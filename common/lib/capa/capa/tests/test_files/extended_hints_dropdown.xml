@@ -1,7 +1,7 @@
 <problem>
 <p>Translation between Dropdown and ________ is straightforward.</p>
 <optionresponse>
-    <optioninput options="bug">
+    <optioninput>
         <option correct="True">Multiple Choice
            <optionhint label="Good Job">Yes, multiple choice is the right answer.
            </optionhint> </option>
@@ -15,7 +15,7 @@
 </optionresponse>
 <p>Clowns have funny _________ to make people laugh.</p>
 <optionresponse>
-    <optioninput options="bug">
+    <optioninput>
         <option correct="False">dogs
            <optionhint label="NOPE">Not dogs, not cats, not toads
            </optionhint> </option>

@@ -206,6 +206,9 @@ class InputTypeBase(object):
                 "input id state is None. xml is {0}".format(etree.tostring(xml))
             )
 
+        if hasattr(self, 'synthesize_xml'):
+            self.synthesize_xml()
+
         self.value = state.get('value', '')
 
         feedback = state.get('feedback', {})
@@ -371,19 +374,17 @@ class OptionInput(InputTypeBase):
     template = "optioninput.html"
     tags = ['optioninput']
 
-    def __init__(self, system, xml, state):
-        super(OptionInput, self).__init__(system, xml, state)
-        self.synthesize_option_attributes()
-
-
-    def synthesize_option_attributes(self):
+    def synthesize_xml(self):
         """
-        The original optioninput has an option="...." attribute. With extended hints, there is 
+        Called at init time, so we can fiddle with the xml to provide compatibility.
+        This is not changing the capa xml as it is stored. This is changing the xml
+        to support the downstream runtime.
+        In this case, we use it to provide an option= attribute for <optioninput> as follows:
+        The original optioninput has an option="...." attribute. With extended hints, there is
         format with an <option> tag for each option. This method looks for <option> tags, and uses them to
         synthesize and install (overwriting) the old options= and correct= attributes, so all the
-        downstream logic works unchanged with the <option> tag format.
+        downstream logic works unchanged with the new <option> tag format.
         """
-        # TODO (nparlante) the xml schema currently requires an option= attribute, which is no longer correct, then update extended_hints_dropdown.xml
         correct_option = None
         child_options = []
         for option_element in self.xml.xpath('//optioninput[@id=$id]/option', id=self.input_id):
