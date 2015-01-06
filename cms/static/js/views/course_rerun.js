@@ -41,7 +41,7 @@ define(["domReady", "jquery", "underscore", "js/views/utils/create_course_utils"
             };
 
             analytics.track('Reran a Course', course_info);
-            CreateCourseUtils.createCourse(course_info, function (errorMessage) {
+            CreateCourseUtils.create(course_info, function (errorMessage) {
                 $('.wrapper-error').addClass('is-shown').removeClass('is-hidden');
                 $('#course_rerun_error').html('<p>' + errorMessage + '</p>');
                 $('.rerun-course-save').addClass('is-disabled').attr('aria-disabled', true).removeClass('is-processing').html(gettext('Create Re-run'));
