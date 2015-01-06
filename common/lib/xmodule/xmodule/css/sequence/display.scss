@@ -295,7 +295,7 @@ nav.sequence-nav {
       }
 
       &.prev {
-        @include left(-10px);
+        @include left(-40px);
         @include border-radius(35px, 0, 0, 35px);
 
         a {
@@ -314,7 +314,7 @@ nav.sequence-nav {
       }
 
       &.next {
-        @include right(-10px);
+        @include right(-40px);
         @include border-radius(0, 35px, 35px, 0);
 
         a {
