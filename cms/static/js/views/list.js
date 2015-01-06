@@ -18,7 +18,8 @@ define([
     'use strict';
     var List = BaseView.extend({
         events: {
-            'click .action-add': 'addOne'
+            'click .action-add': 'addOne',
+            'click .new-button': 'addOne'
         },
 
         initialize: function() {
@@ -26,6 +27,7 @@ define([
             this.listenTo(this.collection, 'add', this.addNewItemView);
             this.listenTo(this.collection, 'remove', this.handleDestory);
             this.template = this.loadTemplate('add-list-item');
+
             // Don't render the add button when editing a form
             this.listenTo(this.collection, 'change:editing', this.toggleAddButton);
             this.listenTo(this.collection, 'add', this.toggleAddButton);
