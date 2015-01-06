@@ -66,7 +66,7 @@ var edx = edx || {};
         },
 
         handleSubmissionError: function( xhr ) {
-            var errorMsg = gettext( 'An unexpected error occurred. Please try again later.' );
+            var errorMsg = gettext( 'An error has occurred. Please try again later.' );
 
             // Re-enable the submit button to allow the user to retry
             this.setSubmitButtonEnabled( true );
