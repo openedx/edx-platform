@@ -32,10 +32,6 @@ define([
             return initializePage().render();
         };
 
-        var  clickNewConfiguration = function (view) {
-            view.$('.experiment-groups .action-add').click();
-        };
-
         beforeEach(function () {
             setFixtures(mockGroupConfigurationsPage);
             TemplateHelpers.installTemplates([
@@ -114,20 +110,6 @@ define([
                 expect($.fn.focus).not.toHaveBeenCalled();
                 expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
             });
-        });
-
-        it('can create a new group configuration', function () {
-            var view = renderPage();
-
-            clickNewConfiguration(view);
-            expect($('.group-configuration-edit').length).toBeGreaterThan(0);
-        });
-
-        it('can create a new cohort group', function () {
-            var view = renderPage();
-
-            view.$('.cohort-groups .new-button').click();
-            expect($('.group-configuration-edit-form').length).toBeGreaterThan(0);
         });
     });
 });

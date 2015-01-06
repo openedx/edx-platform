@@ -1,7 +1,7 @@
 define([
-    'js/views/list_item_edit', 'jquery'
+    'js/views/list_item_edit'
 ],
-function(ListItemEdit, $) {
+function(ListItemEdit) {
     'use strict';
 
     var GroupItemEdit = ListItemEdit.extend({
@@ -26,7 +26,7 @@ function(ListItemEdit, $) {
         },
 
         setValues: function() {
-            this.model.set({name: this.$('input').val()});
+            this.model.set({name: this.$('input').val().trim()});
             return this;
         },
 

@@ -5,16 +5,6 @@ define([
 function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
-        events: function() {
-            var events = {
-                'click .cohort-groups .new-button': this.cohortGroupsListView.addOne.bind(this.cohortGroupsListView)
-            };
-            if (this.experimentsEnabled) {
-                events['click .experiment-groups .new-button'] = this.experimentGroupsListView.addOne.bind(this.experimentGroupsListView);
-            }
-            return events;
-        },
-
         initialize: function(options) {
             BasePage.prototype.initialize.call(this);
             this.experimentsEnabled = options.experimentsEnabled;
