@@ -8,7 +8,7 @@ define([
             'click .action-toggle-notes': 'toogleHandler'
         },
 
-        errorMessage: gettext("We couldn't <show/hide> your notes. Make sure that you are connected to the Internet, and then try refreshing the page."),
+        errorMessage: gettext("An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."),
 
         initialize: function (options) {
             this.visibility = options.visibility;

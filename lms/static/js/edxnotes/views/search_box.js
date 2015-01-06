@@ -10,7 +10,7 @@ define([
         },
 
         errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
-        emptyFieldMessage: gettext('Search field cannot be blank.'),
+        emptyFieldMessage: gettext('Please enter a term in the search field.'),
 
         initialize: function (options) {
             _.bindAll(this, 'onSuccess', 'onError', 'onComplete');
