@@ -175,7 +175,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Returns `jump_to_id` url for the `vertical`.
         """
         return reverse("jump_to_id", kwargs={
-            "course_id": self.course.id.to_deprecated_string(),
+            "course_id": unicode(self.course.id),
             "module_id": vertical.url_name,
         })
 
@@ -720,9 +720,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Returns a position that leads to COURSE/CHAPTER if this isn't the users's
         first time.
         """
-        mock_course_module = MagicMock()
-        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
-        mock_course_module.position = 3
+        mock_course_module = MagicMock(id=self.course.id, position=3)
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
@@ -739,9 +737,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Returns `None` if no section found.
         """
-        mock_course_module = MagicMock()
-        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
-        mock_course_module.position = None
+        mock_course_module = MagicMock(id=self.course.id, position=None)
         mock_course_module.get_display_items.return_value = [MagicMock()]
         self.assertIsNone(helpers.get_course_position(mock_course_module))
 
@@ -750,9 +746,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Returns a position that leads to COURSE/CHAPTER/SECTION if this is the
         user's first time.
         """
-        mock_course_module = MagicMock()
-        mock_course_module.id.to_deprecated_string.return_value = unicode(self.course.id)
-        mock_course_module.position = None
+        mock_course_module = MagicMock(id=self.course.id, position=None)
 
         mock_chapter = MagicMock()
         mock_chapter.url_name = 'chapter_url_name'
