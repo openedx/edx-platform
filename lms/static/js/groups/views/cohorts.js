@@ -13,8 +13,8 @@ var edx = edx || {};
         events : {
             'change .cohort-select': 'onCohortSelected',
             'click .action-create': 'showAddCohortForm',
-            'click .cohort-management-add-modal .action-save': 'saveAddCohortForm',
-            'click .cohort-management-add-modal .action-cancel': 'cancelAddCohortForm',
+            'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
+            'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
             'click .link-cross-reference': 'showSection',
             'click .toggle-cohort-management-secondary': 'showCsvUpload'
         },
@@ -148,7 +148,7 @@ var edx = edx || {};
                 context: this.context
             });
             this.cohortFormView.render();
-            this.$('.cohort-management-add-modal').append(this.cohortFormView.$el);
+            this.$('.cohort-management-add-form').append(this.cohortFormView.$el);
             this.setCohortEditorVisibility(false);
         },
 

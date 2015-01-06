@@ -25,7 +25,7 @@
 </div>
 
 <!-- Add modal -->
-<div class="cohort-management-add-modal"></div>
+<div class="cohort-management-add-form"></div>
 
 <!-- individual group -->
 <div class="cohort-management-group"></div>
