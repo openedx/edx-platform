@@ -87,7 +87,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             };
 
             getAddModal = function() {
-                return cohortsView.$('.cohort-management-add-modal');
+                return cohortsView.$('.cohort-management-add-form');
             };
 
             selectContentGroup = function(groupId, userPartitionId) {
