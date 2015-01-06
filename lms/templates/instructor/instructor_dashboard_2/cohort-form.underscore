@@ -77,7 +77,7 @@
                         <% } else { // no content groups available %>
                             <div class="input-group-other">
                                 <div class="msg-inline">
-                                    <p class="copy-error"><i class="icon icon-warning-sign"></i><%- gettext("No content groups exist. Create a content group to associate with cohort groups.") %> <a href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a></p>
+                                    <p class="copy-error"><i class="icon icon-warning-sign"></i><%- gettext("No content groups exist. Create a content group to associate with cohort groups.") %> <a class="link-to-group-settings" href="<%- studioGroupConfigurationsUrl %>"><%- gettext("Create a content group") %></a></p>
                                 </div>
                             </div>
                         <% } %>

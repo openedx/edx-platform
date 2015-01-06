@@ -97,7 +97,6 @@ def cohort_handler(request, course_key_string, cohort_id=None):
                 _get_cohort_representation(c, course)
                 for c in cohorts.get_course_cohorts(course)
             ]
-            # TODO: change to just directly returning the lists.
             return JsonResponse({'cohorts': all_cohorts})
         else:
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
