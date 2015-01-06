@@ -118,8 +118,10 @@ def get_parent_unit(xblock):
 
 def preprocess_collection(user, course, collection):
     """
-    Reprocess provided `collection(list)`: adds information about ancestor,
-    converts "updated" date, sorts the collection in descending order.
+    Prepare `collection(notes_list)` provided by edx-notes-api
+    for rendering in a template:
+       add information about ancestor blocks,
+       convert "updated" to date
 
     Raises:
         ItemNotFoundError - when appropriate module is not found.
@@ -260,7 +262,7 @@ def get_notes(user, course):
 
 def get_endpoint(path=""):
     """
-    Returns endpoint.
+    Returns edx-notes-api endpoint.
     """
     try:
         url = settings.EDXNOTES_INTERFACE['url']
