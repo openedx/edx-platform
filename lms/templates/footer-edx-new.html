@@ -31,7 +31,8 @@
       </div>
 
       <div class="footer-about-copyright">
-        <p>${_("&copy; 2014 edX, some rights reserved.")}</p>
+        ## Translators: '&copy;' is an HTML character code for the copyright symbol. Please don't remove or change it.
+        <p>${_("&copy; {copyright_year} edX, some rights reserved.").format(copyright_year=settings.COPYRIGHT_YEAR)}</p>
       </div>
 
       <div class="footer-about-links">
