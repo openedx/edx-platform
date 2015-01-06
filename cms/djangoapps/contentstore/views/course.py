@@ -28,7 +28,6 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseErr
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 
 from django_future.csrf import ensure_csrf_cookie
@@ -69,6 +68,7 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
+from xmodule.split_test_module import get_split_user_partitions
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
@@ -1243,26 +1243,24 @@ class GroupConfiguration(object):
     @staticmethod
     def get_usage_info(course, store):
         """
-        Get usage information for all Group Configurations.
+        Get usage information for all Group Configurations that can be referenced by split_test instances.
         """
         split_tests = store.get_items(course.id, qualifiers={'category': 'split_test'})
         return GroupConfiguration._get_usage_info(store, course, split_tests)
 
     @staticmethod
-    def add_usage_info(course, store):
+    def get_split_test_partitions_with_usage(course, store):
         """
-        Add usage information to group configurations jsons in course.
+        Add usage information to group configurations jsons that can be used by split_test.
 
-        Returns json of group configurations updated with usage information.
+        Returns json split_test group configurations updated with usage information.
         """
         usage_info = GroupConfiguration.get_usage_info(course, store)
         configurations = []
-        # TODO: Usage info is currently defined for the 'random' partition scheme.
-        for partition in course.user_partitions:
-            if partition.scheme == RandomUserPartitionScheme:
-                configuration = partition.to_json()
-                configuration['usage'] = usage_info.get(partition.id, [])
-                configurations.append(configuration)
+        for partition in get_split_user_partitions(course.user_partitions):
+            configuration = partition.to_json()
+            configuration['usage'] = usage_info.get(partition.id, [])
+            configurations.append(configuration)
         return configurations
 
     @staticmethod
@@ -1374,7 +1372,7 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            random_configurations = GroupConfiguration.add_usage_info(course, store)
+            random_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
             cohort_configuration = GroupConfiguration.get_or_create_cohorted_user_partition(
                 course, store, request.user.id
             ).to_json()

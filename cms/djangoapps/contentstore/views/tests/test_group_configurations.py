@@ -445,7 +445,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         Test that right data structure will be created if group configuration is not used.
         """
         self._add_user_partitions()
-        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+        actual = GroupConfiguration.get_split_test_partitions_with_usage(self.course, self.store)
         expected = [{
             'id': 0,
             'name': 'Name 0',
@@ -469,7 +469,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
         self._create_content_experiment(name_suffix='1')
 
-        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+        actual = GroupConfiguration.get_split_test_partitions_with_usage(self.course, self.store)
 
         expected = [{
             'id': 0,
@@ -512,7 +512,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         vertical, __ = self._create_content_experiment(cid=0, name_suffix='0')
         vertical1, __ = self._create_content_experiment(cid=0, name_suffix='1')
 
-        actual = GroupConfiguration.add_usage_info(self.course, self.store)
+        actual = GroupConfiguration.get_split_test_partitions_with_usage(self.course, self.store)
 
         expected = [{
             'id': 0,
@@ -576,7 +576,7 @@ class GroupConfigurationsValidationTestCase(CourseTestCase, HelperMethods):
         validation.add(mocked_message)
         mocked_validation_messages.return_value = validation
 
-        group_configuration = GroupConfiguration.add_usage_info(self.course, self.store)[0]
+        group_configuration = GroupConfiguration.get_split_test_partitions_with_usage(self.course, self.store)[0]
         self.assertEqual(expected_result.to_json(), group_configuration['usage'][0]['validation'])
 
     def test_error_message_present(self):

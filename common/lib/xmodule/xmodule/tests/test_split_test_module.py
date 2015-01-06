@@ -12,8 +12,10 @@ from xmodule.tests.xml import XModuleXmlImportTest
 from xmodule.tests import get_test_system
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
-from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields
+from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
 from xmodule.partitions.partitions import Group, UserPartition
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from unittest import TestCase
 
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
@@ -21,6 +23,38 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     Factory for generating SplitTestModules for testing purposes
     """
     tag = 'split_test'
+
+
+class SplitTestUtilitiesTest(TestCase):
+    """
+    Tests for utility methods related to split_test module.
+    """
+
+    def test_split_user_partitions(self):
+        """
+        Tests the get_split_user_partitions helper method.
+        """
+        first_random_partition = UserPartition(
+            0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')],
+            RandomUserPartitionScheme
+        )
+        second_random_partition = UserPartition(
+            0, 'second_partition', 'Second Partition', [Group("4", 'zeta'), Group("5", 'omega')],
+            RandomUserPartitionScheme
+        )
+        all_partitions = [
+            first_random_partition,
+            # Only UserPartitions with scheme "random" will be returned as available options.
+            UserPartition(
+                1, 'non_random_partition', 'Will Not Be Returned', [Group("1", 'apple'), Group("2", 'banana')],
+                MockUserPartitionScheme
+            ),
+            second_random_partition
+        ]
+        self.assertEqual(
+            [first_random_partition, second_random_partition],
+            get_split_user_partitions(all_partitions)
+        )
 
 
 class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
@@ -221,7 +255,15 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
 
         # Populate user_partitions and call editable_metadata_fields again
         self.split_test_module.user_partitions = [
-            UserPartition(0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')])
+            UserPartition(
+                0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')],
+                RandomUserPartitionScheme
+            ),
+            # Only UserPartitions with scheme "random" will be returned as available options.
+            UserPartition(
+                1, 'non_random_partition', 'Will Not Be Returned', [Group("1", 'apple'), Group("2", 'banana')],
+                MockUserPartitionScheme
+            )
         ]
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
         partitions = SplitTestDescriptor.user_partition_id.values
