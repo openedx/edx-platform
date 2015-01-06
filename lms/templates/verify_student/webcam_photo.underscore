@@ -9,11 +9,11 @@
 
 <div class="controls photo-controls">
   <div class="control control-retake is-hidden" id="webcam_reset_button">
-    <a class="action action-redo"><%- gettext( "Retake photo" ) %></a>
+    <a class="action action-redo"><%- gettext( "Retake Photo" ) %></a>
   </div>
   <div class="control control-do is-hidden" id="webcam_capture_button">
     <a class="action action-do">
-      <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take photo" ) %></span>
+      <i class="icon-camera"></i> <span class="sr"><%- gettext( "Take Photo" ) %></span>
     </a>
   </div>
 </div>

@@ -46,7 +46,7 @@
         handleError: function( errorTitle, errorMsg ) {
             this.errorModel.set({
                 errorTitle: errorTitle || gettext( "Error" ),
-                errorMsg: errorMsg || gettext( "An unexpected error occurred.  Please reload the page to try again." ),
+                errorMsg: errorMsg || gettext( "An error has occurred. Please try reloading the page." ),
                 shown: true
             });
         },
