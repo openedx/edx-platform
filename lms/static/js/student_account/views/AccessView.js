@@ -173,7 +173,8 @@ var edx = edx || {};
             var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
                 $anchor = $('#' + type + '-anchor'),
-                queryParams = '?' + url('?');
+                queryParams = url('?'),
+                queryStr = queryParams.length > 0 ? '?' + queryParams : '';
 
             e.preventDefault();
 
@@ -191,7 +192,7 @@ var edx = edx || {};
             this.element.scrollTop( $anchor );
 
             // Update url without reloading page
-            History.pushState( null, document.title, '/account/' + type + queryParams );
+            History.pushState( null, document.title, '/account/' + type + '/' + queryStr );
             analytics.page( 'login_and_registration', type );
         },
 
