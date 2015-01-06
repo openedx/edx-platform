@@ -14,6 +14,7 @@ from xmodule.studio_editable import StudioEditableModule, StudioEditableDescript
 from xmodule.x_module import XModule, module_attr, STUDENT_VIEW
 from xmodule.validation import StudioValidation, StudioValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 
 from lxml import etree
 
@@ -49,8 +50,10 @@ class SplitTestFields(object):
         # Add "No selection" value if there is not a valid selected user partition.
         if not selected_user_partition:
             SplitTestFields.user_partition_values.append(SplitTestFields.no_partition_selected)
-        for user_partition in all_user_partitions:
-            SplitTestFields.user_partition_values.append({"display_name": user_partition.name, "value": user_partition.id})
+        for user_partition in get_split_user_partitions(all_user_partitions):
+            SplitTestFields.user_partition_values.append(
+                {"display_name": user_partition.name, "value": user_partition.id}
+            )
         return SplitTestFields.user_partition_values
 
     display_name = String(
@@ -84,6 +87,14 @@ class SplitTestFields(object):
         help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
     )
+    
+    
+def get_split_user_partitions(user_partitions):
+    """
+    Helper method that filters a list of user_partitions and returns just the 
+    ones that are suitable for the split_test module.
+    """
+    return [user_partition for user_partition in user_partitions if user_partition.scheme == RandomUserPartitionScheme]
 
 
 @XBlock.needs('user_tags')  # pylint: disable=abstract-method
