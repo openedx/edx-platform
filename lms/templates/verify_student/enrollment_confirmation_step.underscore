@@ -47,7 +47,7 @@
     <div class="enrollment-status-footer">
       <h4 class="title"><%- gettext( "Verified Status" ) %></h4>
       <p class="verify-pending-msg">
-        <%- gettext( "Thank you for submitting your identification photos, we will review them soon. If there is a problem with any of the items, we will contact you to resubmit. You can now enroll in any of the verified certificate courses for one year without having to re-verify." ) %></p>
+        <%- _.sprintf( gettext( "Thank you for submitting your photos. We will review them shortly. You can now sign up for any %(platformName)s course that offers verified certificates. Verification is good for one year. After one year, you must submit photos for verification again." ), { platformName: platformName } ) %></p>
     </div>
   </article>
 </div>
