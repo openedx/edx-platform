@@ -74,7 +74,7 @@ define([
             this.button.click();
             AjaxHelpers.respondWithError(requests);
             expect(errorContainer).toContainText(
-                "We couldn't <show/hide> your notes. Make sure that you are connected to the Internet, and then try refreshing the page."
+                "An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."
             );
 
             this.button.click();
