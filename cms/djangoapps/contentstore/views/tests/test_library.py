@@ -4,12 +4,14 @@ Unit tests for contentstore.views.library
 More important high-level tests are in contentstore/tests/test_libraries.py
 """
 from contentstore.tests.utils import AjaxEnabledTestClient, parse_json
+from contentstore.utils import reverse_course_url, reverse_library_url
 from contentstore.views.component import get_component_templates
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import LibraryFactory
 from mock import patch
 from opaque_keys.edx.locator import CourseKey, LibraryLocator
 import ddt
+from student.roles import LibraryUserRole
 
 LIBRARY_REST_URL = '/library/'  # URL for GET/POST requests involving libraries
 
@@ -197,3 +199,27 @@ class UnitTestLibraries(ModuleStoreTestCase):
         self.assertIn('problem', templates)
         self.assertNotIn('discussion', templates)
         self.assertNotIn('advanced', templates)
+
+    def test_manage_library_users(self):
+        """
+        Simple test that the Library "User Access" view works.
+        Also tests that we can use the REST API to assign a user to a library.
+        """
+        library = LibraryFactory.create()
+        extra_user, _ = self.create_non_staff_user()
+        manage_users_url = reverse_library_url('manage_library_users', unicode(library.location.library_key))
+
+        response = self.client.get(manage_users_url)
+        self.assertEqual(response.status_code, 200)
+        # extra_user has not been assigned to the library so should not show up in the list:
+        self.assertNotIn(extra_user.username, response.content)
+
+        # Now add extra_user to the library:
+        user_details_url = reverse_course_url('course_team_handler', library.location.library_key, kwargs={'email': extra_user.email})
+        edit_response = self.client.ajax_post(user_details_url, {"role": LibraryUserRole.ROLE})
+        self.assertIn(edit_response.status_code, (200, 204))
+
+        # Now extra_user should apear in the list:
+        response = self.client.get(manage_users_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(extra_user.username, response.content)

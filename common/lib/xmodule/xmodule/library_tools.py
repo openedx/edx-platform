@@ -2,6 +2,7 @@
 XBlock runtime services for LibraryContentModule
 """
 import hashlib
+from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 from xblock.fields import Scope
 from xmodule.library_content_module import LibraryVersionReference
@@ -44,7 +45,7 @@ class LibraryToolsService(object):
             return library.location.library_key.version_guid
         return None
 
-    def update_children(self, dest_block, user_id, update_db=True):
+    def update_children(self, dest_block, user_id, user_perms=None, update_db=True):
         """
         This method is to be used when any of the libraries that a LibraryContentModule
         references have been updated. It will re-fetch all matching blocks from
@@ -62,6 +63,8 @@ class LibraryToolsService(object):
         anyways. Otherwise, orphaned blocks may be created.
         """
         root_children = []
+        if user_perms and not user_perms.can_write(dest_block.location.course_key):
+            raise PermissionDenied()
 
         with self.store.bulk_operations(dest_block.location.course_key):
             # Currently, ALL children are essentially deleted and then re-added
@@ -76,6 +79,8 @@ class LibraryToolsService(object):
                 library = self._get_library(library_key)
                 if library is None:
                     raise ValueError("Required library not found.")
+                if user_perms and not user_perms.can_read(library_key):
+                    raise PermissionDenied()
                 libraries.append((library_key, library))
 
             # Next, delete all our existing children to avoid block_id conflicts when we add them:

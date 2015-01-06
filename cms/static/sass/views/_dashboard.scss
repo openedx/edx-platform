@@ -495,25 +495,20 @@
       .metadata-item {
         display: inline-block;
 
-        &:after {
+        & + .metadata-item:before {
           content: "/";
           margin-left: ($baseline/10);
           margin-right: ($baseline/10);
           color: $gray-l4;
         }
 
-        &:last-child {
-
-          &:after {
-            content: "";
-            margin-left: 0;
-            margin-right: 0;
-          }
-        }
-
         .label {
           @extend %cont-text-sr;
         }
+      }
+
+      .extra-metadata {
+        margin-left: ($baseline/10);
       }
     }
 

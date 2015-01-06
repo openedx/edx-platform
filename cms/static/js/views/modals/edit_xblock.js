@@ -65,7 +65,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
 
             onDisplayXBlock: function() {
                 var editorView = this.editorView,
-                    title = this.getTitle();
+                    title = this.getTitle(),
+                    readOnlyView = (this.editOptions && this.editOptions.readOnlyView) || !editorView.xblock.save;
 
                 // Notify the runtime that the modal has been shown
                 editorView.notifyRuntime('modal-shown', this);
@@ -88,7 +89,7 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                    if (!editorView.xblock.save) {
+                    if (readOnlyView) {
                         this.disableSave();
                     }
                     this.getActionBar().show();
@@ -101,8 +102,8 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal", "js/vie
             disableSave: function() {
                 var saveButton = this.getActionButton('save'),
                     cancelButton = this.getActionButton('cancel');
-                saveButton.hide();
-                cancelButton.text(gettext('OK'));
+                saveButton.parent().hide();
+                cancelButton.text(gettext('Close'));
                 cancelButton.addClass('action-primary');
             },
 

@@ -49,7 +49,7 @@ define(["jquery", "underscore", "js/common_helpers/ajax_helpers", "js/spec_helpe
                     var requests = AjaxHelpers.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.action-save')).not.toBeVisible();
-                    expect(modal.$('.action-cancel').text()).toBe('OK');
+                    expect(modal.$('.action-cancel').text()).toBe('Close');
                 });
 
                 it('shows the correct title', function() {
