@@ -1,9 +1,8 @@
 @mixin idashbutton ($color) {
   @include button(simple, $color);
   @extend .button-reset;
-
   margin-bottom: 1em;
-  padding: 8px 17px 8px 17px;
+  padding: 8px 17px;
   font-size: em(13);
   line-height: 1.3em;
 
@@ -21,14 +20,14 @@
   .olddash-button-wrapper {
     position: absolute;
     top: 16px;
-    right: 15px;
+    @include right(15px);
     @include font-size(16);
   }
 
   .studio-edit-link{
     position: absolute;
     top: 40px;
-    right: 15px;
+    @include right(15px);
     @include font-size(16);
   }
 
@@ -57,30 +56,29 @@
 
   // TYPE: inline
   .msg-inline {
-    // @extend %t-copy-sub1;
     display: inline-block;
-    margin: 0 0 0 $baseline;
+    @include margin-left($baseline);
     padding: 0;
 
     .icon,
     .fa {
-      margin-right: ($baseline/2);
+      @include margin-right($baseline/2);
     }
   }
 
   // TYPE: warning
   .msg-warning {
-    border-top: 2px solid $warning-color;
-    background: tint($warning-color,95%);
     display: none;
+    background: tint($warning-color,95%);
+    border-top: 2px solid $warning-color;
     color: $warning-color;
   }
 
   // TYPE: confirm
   .msg-confirm {
-    border-top: 2px solid $confirm-color;
-    background: tint($confirm-color,95%);
     display: none;
+    background: tint($confirm-color,95%);
+    border-top: 2px solid $confirm-color;
     color: $confirm-color;
   }
 
@@ -104,12 +102,14 @@
   }
 
   .copy-error {
+    @include font-size(14);
     color: $error-color;
   }
 
   .list-advice {
-    @extend %ui-no-list;
     margin: $baseline 0;
+    padding: 0;
+    list-style: none;
 
     .item {
       font-weight: 600;
@@ -139,8 +139,8 @@
 // ====================
 .instructor-dashboard-content-2 {
   @extend .content;
-  padding: 40px;
   width: 100%;
+  padding: 40px;
 
   .wrap-instructor-info {
     display: inline;
@@ -159,14 +159,10 @@
   }
 
   .slickgrid {
-    margin-left: 1px;
-    color:#333333;
-    font-size:12px;
+    @include margin-left(1px);
+    @include font-size(12px);
     font-family: verdana,arial,sans-serif;
-
-    .slick-header-column {
-      // height: 100%
-    }
+    color: #333333;
 
     .slick-cell {
       border: 1px dotted silver;
@@ -179,25 +175,19 @@
   h1 {
     @extend .top-header;
     display: inline-block;
+    margin-bottom: ($baseline*.75);
     padding-bottom: 0;
     border-bottom: 0;
-    margin-bottom: ($baseline*0.75);
   }
 
   input[type="button"] {
     @include idashbutton(#eee);
-
-    &.molly-guard {
-      // @include idashbutton($danger-red);
-      // @include idashbutton($black);
-      // border: 2px solid $danger-red;
-    }
   }
 
   .instructor_dash_glob_info {
     position: absolute;
+    @include right(50px);
     top: 46px;
-    right: 50px;
     text-align: right;
   }
 
@@ -229,11 +219,11 @@
 
   // messages
   .message {
+    display: block;
     margin-top: $baseline;
     margin-bottom: $baseline;
-    display: block;
-    border-radius: 1px;
     padding: ($baseline*0.75) $baseline;
+    border-radius: 1px;
   }
 
   .message-title {
@@ -322,15 +312,15 @@
     margin-bottom: ($baseline/2);
 
     .value {
-      float: left;
+      @include float(left);
     }
 
     .description {
       @extend %t-title7;
-      float: right;
+      @include float(right);
+      @include text-align(right);
       text-transform: none;
       letter-spacing: 0;
-      text-align: right;
       color: $gray;
     }
   }
@@ -368,15 +358,15 @@
       width: 300px;
       cursor: pointer;
       div {
-        float:left;
+        @include float(left);
       }
 
       h2 {
-        float: left;
+        @include float(left);
       }
 
       .triangle {
-        float: left;
+        @include float(left);
         width: 20px;
         height: 20px;
         background-image: url('/static/images/bullet-closed.png');
@@ -391,7 +381,7 @@
 
       .course-error {
         margin-bottom: 1em;
-        margin-left: 0.5em;
+        @include margin-left(0.5em);
 
         code {
           &.course-error-first {
@@ -426,8 +416,8 @@
       .tip {
         display: block;
         margin-top: ($baseline/4);
-        color: tint(rgb(127,127,127),50%);
         @include font-size(12);
+        color: tint(rgb(127,127,127),50%);
       }
     }
   }
@@ -450,11 +440,15 @@
 
     .form-fields {
 
-      .label, .input, .tip {
+      .label,
+      .form-label,
+      .input,
+      .tip {
         display: block;
       }
 
-      .label {
+      .label,
+      .form-label {
         @extend %t-title7;
         @extend %t-weight4;
         margin-bottom: ($baseline/2);
@@ -508,7 +502,7 @@
 
     .cohort-management-nav-form {
       width: 60%;
-      float: left;
+      @include float(left);
     }
 
     .cohort-select {
@@ -519,8 +513,8 @@
     .action-create {
       @include idashbutton($blue);
       @extend %t-weight4;
-      float: right;
-      text-align: right;
+      @include float(right);
+      @include text-align(right);
       text-shadow: none;
     }
 
@@ -550,41 +544,35 @@
   .cohort-management-settings,
   .cohort-management-edit {
     @extend %cohort-management-form;
-    border: 1px solid $gray-l5;
     margin-bottom: $baseline;
-
-    .message {
-      margin-left: $baseline;
-      margin-right: $baseline;
-    }
 
     .form-title {
       @extend %t-title5;
       @extend %t-weight4;
-      border-bottom: ($baseline/10) solid $gray-l4;
-      background: $gray-l5;
       padding: $baseline;
+      background: $gray-l5;
+      border-bottom: ($baseline/10) solid $gray-l4;
     }
 
     .form-field {
-      padding: $baseline;
+      // padding: $baseline;
     }
 
     .form-actions {
-      padding: 0 $baseline $baseline $baseline;
+      @include padding($baseline 0 $baseline 0);
     }
   }
 
   // cohort group
   .cohort-management-group-header {
+    padding: $baseline;
     border-bottom: ($baseline/10) solid $gray-l4;
     background: $gray-l5;
-    padding: $baseline;
 
     .group-header-title {
       margin-bottom: ($baseline/2);
-      border-bottom: 1px solid $gray-l4;
       padding-bottom: ($baseline/2);
+      border-bottom: 1px solid $gray-l4;
 
       &:hover, &:active, &:focus {
 
@@ -603,7 +591,7 @@
     .title-value {
       @extend %t-title5;
       @extend %t-weight4;
-      margin-right: ($baseline/4);
+      @include margin-right($baseline/4);
     }
 
     .group-count {
@@ -616,11 +604,11 @@
       @include transition(opacity $tmg-f2 ease-in-out);
       @include font-size(14);
       @include line-height(14);
-      margin-left: ($baseline/2);
+      @include margin-left($baseline/2);
+      padding: ($baseline/4) ($baseline/2);
       margin-bottom: 0;
       opacity: 0.0;
       pointer-events: none;
-      padding: ($baseline/4) ($baseline/2);
     }
   }
 
@@ -630,22 +618,21 @@
     color: $gray-l2;
 
     .setup-value {
-      float: left;
+      @include float(left);
+      @include margin-right(5%);
       width: 70%;
-      margin-right: 5%;
     }
 
     .setup-actions {
-      float: right;
+      @include float(right);
+      @include text-align(right);
       width: 20%;
-      text-align: right;
     }
   }
 
   .cohort-management-group-add {
     @extend %cohort-management-form;
     border: 1px solid $gray-l5;
-    padding: $baseline $baseline 0 $baseline;
 
     .message-title {
       @extend %t-title7;
@@ -655,9 +642,9 @@
       @extend %t-title6;
       @extend %t-weight4;
       margin-bottom: ($baseline/4);
+      padding: 0;
       border: none;
       background: transparent;
-      padding: 0;
     }
 
     .form-introduction {
@@ -731,7 +718,7 @@
 
 
     .icon {
-      margin-right: ($baseline/4);
+      @include margin-right($baseline/4);
       color: $gray-l1;
     }
   }
@@ -762,8 +749,6 @@
         padding: 0;
         list-style-type: none;
         line-height: 1.5em;
-        li {
-        }
       }
     }
   }
@@ -773,7 +758,7 @@
 
     }
     .enrollment_signup_button {
-      margin-right: ($baseline/4);
+      @include margin-right($baseline/4);
     }
     // Custom File upload
     .customBrowseBtn {
@@ -783,18 +768,18 @@
         position:relative;
         overflow:hidden;
         display: inline;
-        margin-left: -5px;
+        @include margin-left(-5px);
         span.browse{
           @include button(simple, $blue);
+          @include margin-right($baseline);
           padding: 6px ($baseline/2);
           font-size: 12px;
           border-radius: 0 3px 3px 0;
-          margin-right: ($baseline);
         }
         input.file_field {
           position:absolute;
+          @include right(0);
           top:0;
-          right:0;
           margin:0;
           padding:0;
           cursor:pointer;
@@ -806,10 +791,10 @@
         vertical-align: middle;
       }
       input[disabled] {
-        cursor: not-allowed;
+        @include border-radius(4px 0 0 4px);
+        @include padding(6px 6px 5px);
         border: 1px solid $lightGrey1;
-        border-radius: 4px 0 0 4px;
-        padding: 6px 6px 5px;
+        cursor: not-allowed;
       }
     }
   }
@@ -827,7 +812,7 @@
       display: none;
       position: absolute;
       top: 15px;
-      left: ($baseline*10);
+      @include left($baseline*10);
       padding: ($baseline/2);
       width: 50%;
       background-color: $light-gray;
@@ -837,11 +822,11 @@
         display: block;
         position: absolute;
         top: 0;
-        left: -15px;
+        @include left(-15px);
+        @include border-right(8px solid $light-gray);
+        @include border-left(8px solid transparent);
         border-top: 8px solid $light-gray;
-        border-right: 8px solid $light-gray;
         border-bottom: 8px solid transparent;
-        border-left: 8px solid transparent;
       }
     }
   }
@@ -872,8 +857,8 @@
   .member-lists-management {
 
     .wrapper-member-select {
-      background-color: $light-gray;
       padding: ($baseline/2);
+      background-color: $light-gray;
     }
 
     .member-lists-selector {
@@ -906,7 +891,8 @@
           @include font-size(16);
         }
 
-        .label {
+        .label,
+        .form-label {
           @extend %t-copy-sub1;
           color: $lighter-base-font-color;
         }
@@ -938,10 +924,10 @@
           td {
             @extend %t-copy-sub1;
             vertical-align: middle;
-            word-wrap: break-word;
             padding: ($baseline/2) ($baseline/4);
-            border-left:  1px solid $light-gray;
-            border-right: 1px solid $light-gray;
+            @include border-left(1px solid $light-gray);
+            @include border-right(1px solid $light-gray);
+            word-wrap: break-word;
           }
         }
 
@@ -976,12 +962,6 @@
     }
   }
 
-  /*
-   * Begin additional/override styles for cohort management.
-   * Placed for merge, but will need to be cleaned up and
-   * refactored in this stylesheet.
-   */
-
   .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
     display: inline-block;
 
@@ -995,7 +975,7 @@
       overflow: auto;
       width: 100%;
       height: auto;
-      margin: 0 0 0 $baseline;
+      margin: 0;
       padding: inherit;
       border: inherit;
       clip: auto;
@@ -1023,8 +1003,8 @@
       border-bottom: 0;
 
       .group-header-title {
-        padding: $baseline;
         margin-bottom: 0;
+        padding: $baseline;
         border-bottom: 1px solid $gray-l3;
         text-transform: none;
         letter-spacing: normal;
@@ -1042,14 +1022,14 @@
           display: inline-block;
           width: flex-grid(3);
           vertical-align: top;
-          text-align: right;
+          @include text-align(right);
         }
       }
     }
 
     .cohort-management-details,
     .cohort-management-group-add {
-      border-top: ($baseline/5) solid $gray-l4;
+      border-top: 1px solid $gray-l4;
       background: $white;
 
       .cohort-management-settings {
@@ -1068,7 +1048,7 @@
 
       .cohort-section-header {
         margin-top: ($baseline*1.5);
-        padding: $baseline 0 ($baseline/2) 0;
+        @include padding($baseline 0 ($baseline/2) 0);
       }
 
       .cohort-section-header > .form-field {
@@ -1081,7 +1061,7 @@
     @extend %ui-no-list;
     @extend %ui-depth1;
     position: relative;
-    top: (($baseline/5));
+    top: 1px;
     padding: 0 $baseline;
 
     .tab {
@@ -1091,6 +1071,7 @@
       a {
         display: inline-block;
         padding: ($baseline - 5);
+        // These transitions null out previously/globally set transitions
         -webkit-transition: none;
         -moz-transition: none;
         -ms-transition: none;
@@ -1103,7 +1084,7 @@
         a {
           padding-bottom: ($baseline - 5);
           border-style: solid;
-          border-width: ($baseline/5) ($baseline/5) 0 ($baseline/5);
+          @include border-width(1px 1px 0 1px);
           border-color: $gray-l4;
           background: $white;
           color: inherit;
@@ -1112,11 +1093,12 @@
       }
     }
   }
+
+  .tab-content {
+    @include padding($baseline $baseline 0 $baseline);
+    border: 1px solid $gray-l5;
+  }
 }
-/*
- * End of additions/overrides
- * Don't forget to refactor.
- */
 
 // view - student admin
 // --------------------
@@ -1129,28 +1111,14 @@
     margin-top: 0.7em;
   }
 
-  // .task-history-single-table { .slickgrid
-  //   max-height: 500px;
-  // } }
-
-  // .running-tasks-table { .slickgrid {
-  //   max-height: 500px;
-  // } }
-
   .task-history-all-table    {
     margin-top: 1em;
-    // height: 300px;
-    // overflow-y: scroll
   }
   .task-history-single-table {
     margin-top: 1em;
-    // height: 300px;
-    // overflow-y: scroll
   }
   .running-tasks-table {
     margin-top: 1em;
-    // height: 500px;
-    // overflow-y: scroll
   }
 }
 
@@ -1158,7 +1126,6 @@
 // --------------------
 .instructor-dashboard-wrapper-2 section.idash-section#data_download {
   input {
-    // display: block;
     margin-bottom: 1em;
     line-height: 1.3em;
   }
@@ -1188,16 +1155,16 @@
 
   .metrics-container, .metrics-header-container {
     position: relative;
-    width: 100%;
-    float: left;
     clear: both;
+    width: 100%;
+    @include float(left);
     margin-top: 25px;
 
     .metrics-left, .metrics-left-header {
       position: relative;
       width: 30%;
-      float: left;
-      margin-right: 2.5%;
+      @include float(left);
+      @include margin-right(2.5%);
 
       svg {
         width: 100%;
@@ -1210,8 +1177,8 @@
     .metrics-right, .metrics-right-header {
       position: relative;
       width: 65%;
-      float: left;
-      margin-left: 2.5%;
+      @include float(left);
+      @include margin-left(2.5%);
       margin-bottom: 25px;
 
       svg {
@@ -1231,18 +1198,18 @@
 
     .metrics-tooltip {
       width: 250px;
-      background-color: lightgray;
       padding: 3px;
+      background-color: lightgray;
     }
 
     .metrics-overlay {
       position: absolute;
+      display: none;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
       background-color: rgba(255,255,255, .75);
-      display: none;
 
       .metrics-overlay-content-wrapper {
         position: relative;
@@ -1287,13 +1254,13 @@
         .download-csv {
           position: absolute;
           display: none;
-          right: 2%;
+          @include right(2%);
           bottom: 2%;
         }
 
         .close-button {
           position: absolute;
-          right: 1.5%;
+          @include right(1.5%);
           top: 2%;
           font-size: 2em;
         }
@@ -1324,9 +1291,7 @@
 
 
 .profile-distribution-widget {
-  margin-bottom: $baseline * 2;
-
-  .display-text {}
+  margin-bottom: ($baseline * 2);
 
   .display-graph .graph-placeholder {
     width: 750px;
@@ -1384,7 +1349,7 @@ input[name="subject"] {
     height: 26px;
     line-height: 26px;
     span{
-      float: right;
+      @include float(right);
       font-size: 16px;
       font-weight: bold;
       span{
@@ -1397,8 +1362,8 @@ input[name="subject"] {
     }
   }
   span.tip{
-    padding: 10px 15px;
     display: block;
+    padding: 10px 15px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     background: #f8f4ec;
@@ -1408,14 +1373,14 @@ input[name="subject"] {
       @include button(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
-      float: right;
+      @include float(right);
     }
   }
 
 }
 #e-commerce{
   input[name='list-order-sale-csv'] {
-    margin-right: 14px;
+    @include margin-right(14px);
   }
   input {
     margin-bottom: 1em;
@@ -1444,14 +1409,13 @@ input[name="subject"] {
     margin-bottom: $baseline;
     display: none;
   }
-
   .content{
     padding: 0 !important;
   }
 
   input[name="download_company_name"],
   input[name="active_company_name"], input[name="spent_company_name"] {
-    margin-right: 8px;
+    @include margin-right(8px);
     height: 36px;
     width: 254px;
     border-radius: 3px;
@@ -1545,35 +1509,35 @@ input[name="subject"] {
         line-height: normal;
         font-size: 14px;
         span.old-price{
-          left: -75px;
+          top: -1px;
+          @include left(-75px);
           position: relative;
           text-decoration: line-through;
           color: red;
           font-size: 12px;
-          top: -1px;
         }
       }
       td:nth-child(5),td:first-child{
-        padding-left: $baseline;
+        @include padding-left($baseline);
       }
       td:nth-child(2){
-         line-height: 22px;
-        padding-right: 0px;
+        line-height: 22px;
+        @include padding-right(0px);
         word-wrap: break-word;
       }
       td:nth-child(5){
-        padding-left: 0;
+        @include padding-left(0);
         text-align: center;
       }
       td{
         a.edit-right{
-          margin-left: ($baseline*0.75);
+          @include margin-left(15px);
         }
       }
     }
   }
   section#registration_code_generation_modal {
-      margin-left: -442px;
+      @include margin-left(-442px);
       width: 930px;
     }
   // coupon edit and add modals
@@ -1582,14 +1546,14 @@ input[name="subject"] {
       background: $white;
     }
     span.tip-text {
-      font-size: 12px;
       display: block;
       margin-top: ($baseline/4);
+      font-size: 12px;
       color: #646464
     }
     top:-95px !important;
     width: 650px;
-    margin-left: -325px;
+    @include margin-left(-325px);
     border-radius: 2px;
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
     input[type="button"]#set_course_button {
@@ -1606,12 +1570,12 @@ input[name="subject"] {
       @extend .button-reset;
     }
     .modal-form-error {
+      @include margin($baseline 0 ($baseline/2) 0);
+      padding: $baseline;
       box-shadow: inset 0 -1px 2px 0 #f3d9db;
       -webkit-box-sizing: border-box;
       -moz-box-sizing: border-box;
       box-sizing: border-box;
-      margin: 20px 0 10px 0 !important;
-      padding: 20px;
       border: none;
       border-bottom: 3px solid #a0050e;
       background: #fbf2f3;
@@ -1619,18 +1583,18 @@ input[name="subject"] {
     ol.list-input{
       li{
         width: 278px;
-        float: left;
+        @include float(left);
         label.required:after {
           content: "*";
-          margin-left: ($baseline/4);
+          @include margin-left(5px);
         }
       }
       li:nth-child(even){
-        margin-left: 30px !important;
+        @include margin-left(30px !important);
       }
       li:nth-child(3), li:nth-child(4){
-        margin-left: 0px !important;
         width: 100%;
+        @include margin-left(0px !important);
       }
       li:nth-child(3) {
         margin-bottom: 0px !important;
@@ -1645,10 +1609,10 @@ input[name="subject"] {
     form#generate_codes ol.list-input{
       li{
         width: 278px;
-        float: left;
+        @include float(left);
         label.required:after {
           content: "*";
-          margin-left: ($baseline/4);
+          @include margin-left(5px);
         }
         min-height: 120px;
       }
@@ -1661,28 +1625,28 @@ input[name="subject"] {
       }
       li#generate-registration-modal-field-country {
         width: 204px;
-        margin-left: 15px !important;
+        @include margin-left(15px !important);
         margin-bottom: $baseline;
       }
       li:nth-child(even){
-        margin-left: 0px !important;
+        @include margin-left(0px !important);
       }
       li:nth-child(3n) {
-        margin-left: 15px !important;
+        @include margin-left(15px !important);
       }
       li#generate-registration-modal-field-company-contact-name,
       li#generate-registration-modal-field-address-line-3,
       li#generate-registration-modal-field-zipcode {
-        margin-left: 15px !important;
+        @include margin-left(15px !important);
       }
       li:last-child{
         label {
-          float: right;
+          @include float(right);
+          @include right(27px);
           margin-top: -5px;
-          right: 27px;
         }
         min-height: 5px;
-        margin-left: 0px !important;
+        @include margin-left(0px !important);
         input[type='checkbox'] {
           width: auto;
           height: auto;
@@ -1690,8 +1654,8 @@ input[name="subject"] {
       }
       li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-total-price,
       li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
-        margin-left: 0px !important;
-        margin-right: 15px !important;
+        @include margin-left(0px !important);
+        @include margin-right(15px !important);
       }
       li#generate-registration-modal-field-custom-reference-number {
         width: auto;
@@ -1705,7 +1669,7 @@ input[name="subject"] {
       }
     }
     li#set-course-mode-modal-field-currency{
-      margin-left: 0px !important;
+      @include margin-left(0px !important);
       select {
         width: 100%;
       }
@@ -1717,7 +1681,7 @@ input[name="subject"] {
           border-radius: 3px;
         }
     #coupon-content, #course-content, #registration-content {
-      padding: 20px;
+      padding: $baseline;
       header {
         margin: 0;
         padding: 0;
@@ -1725,18 +1689,18 @@ input[name="subject"] {
           font-size: 24px;
           font-weight: 100;
           color: #1580b0;
-          text-align: left;
+          @include text-align(left);
         }
       }
       .instructions p {
         margin-bottom: ($baseline/4);
       }
       form {
+        margin: 0;
+        padding: 0;
         border-radius: 0;
         box-shadow: none;
-        margin: 0;
         border: none;
-        padding: 0;
         .group-form {
           margin: 0;
           padding-top: 0;
@@ -1758,10 +1722,10 @@ input[name="subject"] {
           font-weight: 600;
         }
         .field label {
+          margin: 0 0 5px 0;
           -webkit-transition: color 0.15s ease-in-out 0s;
           -moz-transition: color 0.15s ease-in-out 0s;
           transition: color 0.15s ease-in-out 0s;
-          margin: 0 0 5px 0;
           color: #333;
         }
         .field.text input {
@@ -1775,18 +1739,15 @@ input[name="subject"] {
         }
       }
     }
-    #registration-content form .group-form {
-
-    }
     #registration-content form {
       .field {
         margin: 0;
       }
-    .group-form {
-      margin: 0;
-      padding-top: 0;
-      padding-bottom: 0px;
-    }
+      .group-form {
+        margin: 0;
+        padding-top: 0;
+        padding-bottom: 0px;
+      }
     }
   }
   #add-coupon-modal{
@@ -1801,9 +1762,7 @@ input[name="subject"] {
 }
 
 .profile-distribution-widget {
-  margin-bottom: $baseline * 2;
-
-  .display-text {}
+  margin-bottom: ($baseline * 2);
 
   .display-graph .graph-placeholder {
     width: 750px;
@@ -1818,7 +1777,7 @@ input[name="subject"] {
 }
 
 .grade-distributions-widget {
-  margin-bottom: $baseline * 2;
+  margin-bottom: ($baseline * 2);
 
   .last-updated {
     line-height: 2.2em;
@@ -1852,23 +1811,23 @@ input[name="subject"] {
   h2{
     height: 26px;
     line-height: 26px;
-    padding-left: 25px;
+    @include padding-left(25px);
     span{
-      float: right;
+      @include float(right);
       font-size: 16px;
       font-weight: bold;
       span{
-        background: #ddd;
-        padding: 2px 9px;
-        border-radius: 2px;
         float: none;
+        padding: 2px 9px;
+        background: #ddd;
+        border-radius: 2px;
         font-weight: 400;
       }
     }
   }
   span.tip{
-    padding: 10px 15px;
     display: block;
+    padding: 10px 15px;
     border-top: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     background: #f8f4ec;
@@ -1878,55 +1837,53 @@ input[name="subject"] {
       @include button(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
-      float: right;
+      @include float(right);
     }
   }
   span.code_tip {
+    display: block;
+    margin-bottom: 6px;
+    @include padding(($baseline/2) 15px ($baseline/2) $baseline);
     background: none repeat scroll 0 0 #F8F4EC;
     border-bottom: 1px solid #DDDDDD;
     border-top: 1px solid #DDDDDD;
     color: #3C3C3C;
-    display: block;
     line-height: 30px;
-    margin-bottom: 6px;
-    padding: 10px 15px 10px 20px;
     .add{
       @include button(simple, $blue);
       @extend .button-reset;
+      @include float(right);
       font-size: em(13);
-      float: right;
     }
   }
     span.csv_tip {
-
     display: block;
     line-height: 30px;
     margin-bottom: 6px;
-    padding: 10px 15px 10px 1px;
+    @include padding(($baseline/2) 15px ($baseline/2) 1px);
     .add{
       font-size: em(13);
-      float: right;
+      @include float(right);
     }
   }
    span.invalid_sale {
-    background: none repeat scroll 0 0 #F8F4EC;
-    color: #3C3C3C;
     display: block;
-    line-height: 30px;
     height: 37px;
     margin-bottom: 6px;
-    padding: 10px 15px 10px 1px;
+    @include padding(($baseline/2) 15px ($baseline/2) 1px);
+    background: none repeat scroll 0 0 #F8F4EC;
+    color: #3C3C3C;
+    line-height: 30px;
     .add{
       @include button(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
-
     }
   }
 }
 
 .rtl .instructor-dashboard-wrapper-2 .olddash-button-wrapper,
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
-  left: 2em;
-  right: auto;
+  @include left(2em);
+  @include right(auto);
 }
