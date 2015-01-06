@@ -210,7 +210,7 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         selector_query = self.q(css=self._bounded_selector(self.content_group_selector_css))
         return [
-            option.text for option in get_options(selector_query) if option.text != ""
+            option.text for option in get_options(selector_query) if option.text != "Not selected"
         ]
 
     def get_cohort_associated_content_group(self):
