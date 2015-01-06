@@ -293,7 +293,7 @@ class StudioLibraryContainerCapaFilterTest(LibraryContentTestBase):
         # Choice group test
         children_headers = self._set_library_content_settings(count=2, capa_type="Dropdown")
         self.assertEqual(len(children_headers), 2)
-        self.assertLessEqual(
+        self.assertEqual(
             children_headers,
             set([header.upper() for header in ["Problem Select 1", "Problem Select 2"]])
         )
