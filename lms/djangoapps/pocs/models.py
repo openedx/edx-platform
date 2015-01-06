@@ -43,6 +43,10 @@ class PocMembership(models.Model):
         membership.save()
         future_membership.delete()
 
+    @classmethod
+    def memberships_for_user(cls, user, active=True):
+        return cls.objects.filter(student=user, active__exact=active)
+
 
 class PocFutureMembership(models.Model):
     """
