@@ -49,10 +49,11 @@
           .group-configuration-header {
             margin-bottom: 0;
             border-bottom: 0;
+            padding-bottom: 0;
           }
 
           .group-configuration-title {
-            @extend %t-title4;
+            @extend %t-title5;
             @extend %t-strong;
             overflow: hidden;
             text-overflow: ellipsis;
