@@ -124,6 +124,8 @@ def _write_js(output_root, classes):
         module_js = class_.get_javascript()
         for filetype in ('coffee', 'js'):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
+                if filetype != 'js':
+                    idx += 1
                 js_fragments.add((idx, filetype, fragment))
 
     for idx, filetype, fragment in sorted(js_fragments):
