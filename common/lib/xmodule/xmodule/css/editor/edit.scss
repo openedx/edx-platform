@@ -7,16 +7,16 @@
   }
 
   .editor-bar {
-    position: relative;
+    @include clearfix();
     @include linear-gradient(top, #d4dee8, #c9d5e2);
-    padding: 5px;
+    position: relative;
+    padding: ($baseline/4);
     border-bottom-color: #a5aaaf;
-    @include clearfix;
 
     a {
       display: block;
       float: left;
-      padding: 3px 10px 7px;
+      padding: 3px ($baseline/2) 7px;
       margin-left: 7px;
       border-radius: 2px;
 
@@ -33,7 +33,7 @@
 
     li {
       float: left;
-      margin-right: 5px;
+      margin-right: ($baseline/4);
 
       &:last-child {
         margin-right: 0;
@@ -46,15 +46,15 @@
       padding: 7px 20px 3px;
       border: 1px solid #a5aaaf;
       border-radius: 3px 3px 0 0;
-      @include linear-gradient(top, rgba(0, 0, 0, 0) 87%, rgba(0, 0, 0, .06));
+      @include linear-gradient(top, $transparent 87%, rgba(0, 0, 0, .06));
       background-color: #e5ecf3;
       font-size: 13px;
       color: #3c3c3c;
       box-shadow: 1px -1px 1px rgba(0, 0, 0, .05);
 
       &.current {
-        background: #fff;
-        border-bottom-color: #fff;
+        background: $white;
+        border-bottom-color: $white;
       }
     }
   }

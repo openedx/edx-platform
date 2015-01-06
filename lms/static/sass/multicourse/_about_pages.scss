@@ -2,7 +2,7 @@
   padding: 20px 30px 120px;
 
   > nav {
-    margin-bottom: 80px;
+    margin-bottom: ($baseline*4);
     text-align: center;
     width: flex-grid(12);
 
@@ -34,12 +34,12 @@
 
   .vision {
     h1 + hr {
-      margin-bottom: 80px;
+      margin-bottom: ($baseline*4);
     }
 
     .our-mission {
       border-bottom: 1px solid rgb(220,220,220);
-      @include clearfix;
+      @include clearfix();
       margin: 0 auto 100px;
       padding-bottom: 40px;
 
@@ -64,7 +64,7 @@
         float: right;
         font-style: italic;
         line-height: 1.4;
-        margin: 0px;
+        margin: 0;
         padding: 5px 0px 5px 20px;
         text-transform: none;
         width: flex-grid(9);
@@ -73,15 +73,15 @@
 
     .message {
       border-bottom: 1px solid rgb(220,220,220);
-      @include clearfix;
-      margin-bottom: 80px;
+      @include clearfix();
+      margin-bottom: ($baseline*4);
       padding-bottom: 80px;
       position: relative;
 
       hr {
         bottom: 0px;
         display: none;
-        margin: 0px;
+        margin: 0;
         position: absolute;
         width: 100%;
       }
@@ -109,7 +109,7 @@
       > article {
         @include box-sizing(border-box);
         float: left;
-        padding-left: 20px;
+        padding-left: $baseline;
         width: flex-grid(9);
       }
 
@@ -133,7 +133,7 @@
     }
 
     .partners {
-      @include clearfix;
+      @include clearfix();
 
       > article {
         float: left;
@@ -148,7 +148,7 @@
 
 
   .faq {
-    @include clearfix;
+    @include clearfix();
 
     nav.categories {
       border: 1px solid rgb(220,220,220);
@@ -185,18 +185,18 @@
 
         > h2 {
           border-bottom: 1px solid rgb(220,220,220);
-          margin-bottom: 40px;
-          padding-bottom: 20px;
+          margin-bottom: ($baseline*2);
+          padding-bottom: $baseline;
         }
       }
 
       .response {
-        margin-bottom: 40px;
+        margin-bottom: ($baseline*2);
 
         h3 {
           font-family: $sans-serif;
           font-weight: 700;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*0.75);
         }
       }
     }
@@ -205,13 +205,13 @@
   .press {
     .press-story {
       border-bottom: 1px solid rgb(220,220,220);
-      @include clearfix;
-      margin-bottom: 40px;
+      @include clearfix();
+      margin-bottom: ($baseline*2);
       padding-bottom: 40px;
 
       &:last-child {
         border: none;
-        margin: 0px;
+        margin: 0;
         padding: 0px;
       }
 
@@ -237,17 +237,17 @@
         width: flex-grid(10);
 
         header {
-          margin-bottom: 10px;
+          margin-bottom: ($baseline/2);
 
           h3 {
             font-family: $sans-serif;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: ($baseline/4);
           }
 
           span.post-date {
             color: $lighter-base-font-color;
-            margin-right: 10px;
+            margin-right: ($baseline/2);
           }
         }
       }
@@ -255,7 +255,7 @@
   }
 
   .contact {
-    @include clearfix;
+    @include clearfix();
     margin: 0 auto;
 
     .photo {
@@ -279,11 +279,11 @@
 
       ul {
         list-style: none;
-        margin: 0px;
+        margin: 0;
         padding: 0px;
 
         li {
-          margin-bottom: 10px;
+          margin-bottom: ($baseline/2);
         }
       }
     }

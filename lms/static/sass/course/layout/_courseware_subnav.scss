@@ -1,5 +1,5 @@
 nav.course-material {
-  @include clearfix;
+  @include clearfix();
   @include box-sizing(border-box);
   background: none;
   margin: 0px auto 0px;
@@ -14,7 +14,7 @@ nav.course-material {
 
   ol.course-tabs {
     @include border-top-radius(4px);
-    @include clearfix;
+    @include clearfix();
     padding: 10px 0 0 0;
 
     li {
@@ -44,7 +44,7 @@ nav.course-material {
 }
 
 .course-content {
-  margin-top: 30px;
+  margin-top: ($baseline*1.5);
 
   .courseware {
     min-height: 300px;

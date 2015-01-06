@@ -21,9 +21,9 @@ div.book-wrapper {
     @extend .sidebar;
     @extend .tran;
     @include box-sizing(border-box);
-    padding: 10px 0;
+    padding: ($baseline/2) 0;
     border-radius: 3px 0 0 3px;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
     border-right: none;
     width: 180px;
 
@@ -56,7 +56,7 @@ div.book-wrapper {
         padding-left: ($baseline/2);
 
         a {
-          @include clearfix;
+          @include clearfix();
           padding: 0;
           color: $link-color;
           cursor: pointer;
@@ -89,13 +89,13 @@ div.book-wrapper {
           padding-top: lh(.25);
 
           li {
-            padding-bottom: 10px;
+            padding-bottom: ($baseline/2);
           }
         }
       }
 
       > li {
-        padding: 5px 6px;
+        padding: ($baseline/4) 6px;
         margin: ($baseline/4) ($baseline/2);
       }
     }
@@ -174,7 +174,7 @@ div.book-wrapper {
 
     section.page {
       border-left: 1px solid $border-color;
-      background-color: #fff;
+      background-color: $white;
       position: relative;
       text-align: center;
       border-radius: 0 3px 3px 0;
@@ -190,10 +190,10 @@ div.book-wrapper {
       div {
         text-align: left;
       	line-height: 1.6em;
-      	margin: 5px;
+      	margin: ($baseline/4);
 
 	.Paragraph, h2 {
-	   margin-top: 10px;
+	   margin-top: ($baseline/2);
 	}
       }
     }

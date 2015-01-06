@@ -1,7 +1,18 @@
 // studio - elements - forms
 // ====================
 
-// forms - general
+// Table of Contents 
+// * +Forms - General
+// * +Field - Is Editable
+// * +Field - With Error
+// * +Forms - Additional UI
+// * +Form - Create New
+// * +Form - Inline Name Edit
+// * +Form - Create New Wrapper
+// * +Form - Grandfathered
+
+// +Forms - General
+// ==================== 
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -31,9 +42,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// forms - fields - not editable
+// +Fields - Not Editable
+// ==================== 
 .field.is-not-editable {
 
   & label.is-focused {
@@ -45,9 +55,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// field with error
+// +Fields - With Error
+// ==================== 
 .field.error {
 
   input, textarea {
@@ -55,9 +64,8 @@ textarea.text {
   }
 }
 
-// ====================
-
-// forms - additional UI
+// +Forms - Additional UI
+// ==================== 
 form {
 
   // CASE: cosmetic checkbox input
@@ -138,7 +146,8 @@ form {
   }
 }
 
-// ELEM: form
+// +Form - Create New
+// ==================== 
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.
 .form-create {
@@ -355,9 +364,10 @@ form {
   }
 }
 
+// +Form - Inline Name Edit 
+// ==================== 
 // form - inline xblock name edit on unit, container, outline
-
-// TOOD: abstract this out into a Sass placeholder
+// TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
 
   .incontext-editor-value,
@@ -391,7 +401,8 @@ form {
   }
 }
 
-// ELEM: form wrapper
+// +Form - Create New Wrapper 
+// ==================== 
 .wrapper-create-element {
   height: 0;
   margin-bottom: $baseline;
@@ -410,9 +421,8 @@ form {
   }
 }
 
-// ====================
-
-// forms - grandfathered
+// +Form - Grandfathered 
+// ==================== 
 input.search {
   padding: 6px 15px 8px 30px;
   @include box-sizing(border-box);
@@ -441,7 +451,7 @@ code {
 
 .CodeMirror {
   @extend %t-copy-sub1;
-  background: #fff;
+  background: $white;
   font-family: $f-monospace;
 }
 

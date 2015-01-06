@@ -4,7 +4,7 @@
 // UI: form structure
 .forum-new-post-form,
 .edit-post-form {
-  @include clearfix;
+  @include clearfix();
   box-sizing: border-box;
   margin: 0;
   border-radius: 3px;
@@ -71,7 +71,7 @@
     @include white-button;
     @extend %cont-truncated;
     z-index: 1000;
-    padding: 0 $baseline 0 ($baseline*.75);
+    padding: 0 $baseline 0 ($baseline*0.75);
     height: 40px;
     font-size: 14px;
     line-height: 36px;
@@ -101,7 +101,7 @@
     line-height: 36px;
 
     .icon {
-      margin-right: 5px;
+      margin-right: ($baseline/4);
     }
   }
 
@@ -208,10 +208,10 @@
 
   .topic-menu-wrapper {
     @include box-sizing(border-box);
+    @extend %ui-depth4;
     position: absolute;
     top: 40px;
     left: 0;
-    z-index: 9999;
     border: 1px solid $gray-l3;
     width: 100%;
     background: $white;

@@ -5,14 +5,14 @@
 .notifications {
   @include news-font;
   font-size: 0.9em;
-  padding-left: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-left: $baseline;
+  padding-top: $baseline;
+  padding-bottom: $baseline;
   
   .notification {
     @include news-font;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: ($baseline*0.75);
+    margin-bottom: ($baseline*0.75);
 
     a {
       @include news-font;

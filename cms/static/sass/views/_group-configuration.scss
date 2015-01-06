@@ -115,7 +115,7 @@
           }
 
           &.is-selectable {
-            cursor: pointer;
+            @extend %ui-fake-link;
 
             &:hover {
               color: $blue;
@@ -220,7 +220,7 @@
 
       .wrapper-group-configuration-validation {
         @extend %t-copy-sub1;
-        background-color: #f8f8f8;
+        background-color: $gray-l6;
         margin-top: $baseline;
         padding: $baseline ($baseline*1.5) $baseline ($baseline*1.5);
 
@@ -470,7 +470,7 @@
             }
 
             .action-close {
-              @include transition(color 0.25s ease-in-out);
+              @include transition(color $tmg-f2 ease-in-out);
               @extend %t-action1;
               display: inline-block;
               border: 0;

@@ -22,7 +22,7 @@
 
   .CodeMirror {
     border: 1px solid #3c3c3c;
-    background: #fff;
+    background: $white;
     color: #3c3c3c;
   }
 }
@@ -41,12 +41,12 @@
     }
 
     &.editing {
+      @extend %ui-depth4;
       position: relative;
-      z-index: 1001;
       padding: 0;
       border-top: none;
       border-radius: 3px;
-      background: #fff;
+      background: $white;
 
       .post-preview {
         display: none;
@@ -88,7 +88,7 @@
 
     .primary {
       border: 1px solid #ddd;
-      background: #f6f6f6;
+      background: $gray-l6;
       padding: 20px;
     }
 
@@ -198,13 +198,13 @@
 }
 
 .edit-handouts-form {
+  @extend %ui-depth4;
   @include edit-box;
   position: absolute;
   right: 0;
   top: 0;
-  z-index: 10001;
   width: 800px;
-  padding: 30px;
+  padding: ($baseline*1.5);
 
   textarea {
     height: 300px;

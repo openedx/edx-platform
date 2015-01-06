@@ -37,7 +37,7 @@
 
     dd {
       @extend %t-copy-base;
-      margin-bottom: 20px;
+      margin-bottom: $baseline;
     }
 
     .course_text {

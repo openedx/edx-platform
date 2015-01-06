@@ -2,7 +2,7 @@ div.calc-main {
   bottom: -126px;
   left: 0;
   position: fixed;
-  @include transition(bottom 0.75s linear 0s);
+  @include transition(bottom $tmg-avg linear 0s);
   -webkit-appearance: none;
   width: 100%;
   z-index: 99;
@@ -16,11 +16,11 @@ div.calc-main {
     background: url("../images/calc-icon.png") rgba(#111, .9) no-repeat center;
     border-bottom: 0;
     border-radius: 3px 3px 0 0;
-    color: #fff;
+    color: $white;
     float: right;
     height: 20px;
     display: inline-block;
-    margin-right: 10px;
+    margin-right: ($baseline/2);
     padding: 8px 12px;
     position: relative;
     top: -45px;
@@ -61,11 +61,11 @@ div.calc-main {
 
       input#calculator_button {
         background: #111;
-        border: 1px solid #000;
+        border: 1px solid $black;
         border-radius: 0;
         box-shadow: none;
         @include box-sizing(border-box);
-        color: #fff;
+        color: $white;
         float: left;
         font-size: 30px;
         font-weight: bold;
@@ -86,7 +86,7 @@ div.calc-main {
         border: 0;
         box-shadow: none;
         @include box-sizing(border-box);
-        color: #fff;
+        color: $white;
         float: left;
         font-size: 16px;
         font-weight: bold;
@@ -136,7 +136,7 @@ div.calc-main {
 
           .help {
             @include transition(none);
-            background: #fff;
+            background: $white;
             border-radius: 3px;
             box-shadow: 0 0 3px #999;
             color: #333;

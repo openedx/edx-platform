@@ -2,19 +2,19 @@
 @import 'neat/neat'; // lib - Neat
 
 header.global {
+  @extend %ui-depth1;
   border-bottom: 1px solid $m-gray;
-  box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
+  box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
   height: 76px;
   position: relative;
   width: 100%;
-  z-index: 10;
 
   nav {
-    @include clearfix;
+    @include clearfix();
     height: 40px;
     margin: 0 auto;
-    padding: 18px 10px 0px;
+    padding: 18px ($baseline/2) 0;
     max-width: grid-width(12);
     min-width: 760px;
   }
@@ -39,12 +39,12 @@ header.global {
 
   > li {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: $baseline;
     position: relative;
     vertical-align: middle;
 
     &:last-child {
-      margin-right: 0px;
+      margin-right: 0;
     }
 
     a {
@@ -59,13 +59,13 @@ header.global {
       display: block;
       font-family: $sans-serif;
       display: inline-block;
-      margin: 0px 30px 0px 0px;
+      margin: 0 ($baseline*1.5) 0 0;
       text-decoration: none;
       text-transform: uppercase;
       text-shadow: 0 1px rgba(255,255,255, 0.6);
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus {
@@ -75,7 +75,7 @@ header.global {
   }
 
   .primary {
-    margin-right: 5px;
+    margin-right: ($baseline/4);
 
     > a {
       @include background-image($button-bg-image);
@@ -97,7 +97,7 @@ header.global {
       vertical-align: middle;
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus, &:active {
@@ -113,11 +113,11 @@ header.global {
     > .primary {
       display: block;
       @include float(left);
-      margin: 0px;
+      margin: 0;
       position: relative;
 
       > a {
-        margin: 0px;
+        margin: 0;
         @include border-right-radius(0px);
       }
 
@@ -339,7 +339,7 @@ header.global-new {
   position: relative;
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
-  box-shadow: 0 1px 5px 0 rgba(0,0,0, 0.1);
+  box-shadow: 0 1px 5px 0 $shadow-l1;
   background: $header-bg;
 
   nav {
@@ -371,12 +371,12 @@ header.global-new {
 
   > li {
     display: inline-block;
-    margin-right: 20px;
+    margin-right: $baseline;
     position: relative;
     vertical-align: middle;
 
     &:last-child {
-      margin-right: 0px;
+      margin-right: 0;
     }
 
     a {
@@ -389,13 +389,13 @@ header.global-new {
       color: $link-color;
       font-family: $sans-serif;
       display: inline-block;
-      margin: 0px 30px 0px 0px;
+      margin: 0 ($baseline*1.5) 0 0;
       text-decoration: none;
       text-transform: uppercase;
       text-shadow: 0 1px rgba(255,255,255, 0.6);
 
       &:last-child {
-        margin-right: 0px;
+        margin-right: 0;
       }
 
       &:hover, &:focus {
@@ -446,7 +446,7 @@ header.global-new {
       position: relative;
 
       > a {
-        margin: 0px;
+        margin: 0;
         @include border-right-radius(0);
       }
 
@@ -459,7 +459,7 @@ header.global-new {
           &.shopping-cart {
             border-radius: 4px;
             border: 1px solid $border-color-2;
-            margin-right: 10px;
+            margin-right: ($baseline/2);
             padding-bottom: 6px;
           }
         }
@@ -610,7 +610,7 @@ header.global-new {
       position: relative;
 
       &:last-child {
-        margin-right: 10px;
+        margin-right: ($baseline/2);
       }
 
       a {
@@ -734,7 +734,7 @@ header.global-new {
         width: auto;
         top: inherit;
         left: inherit;
-        margin-left: 10px;
+        margin-left: ($baseline/2);
 
         img {
           width: auto;
@@ -770,7 +770,7 @@ header.global-new {
 
       .nav-courseware {
         div:last-child {
-          margin-right: 10px;
+          margin-right: ($baseline/2);
         }
       }
 

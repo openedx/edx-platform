@@ -2,12 +2,12 @@ $annotation-yellow: rgba(255,255,10,0.3);
 
 h2 {
   margin-top: 0;
-  margin-bottom: 15px;
+  margin-bottom: ($baseline*0.75);
 
   &.problem-header {
     display: inline-block;
     section.staff {
-      margin-top: 30px;
+      margin-top: ($baseline*1.5);
       font-size: 80%;
     }
   }
@@ -33,7 +33,7 @@ iframe[seamless]{
 
 div.problem-progress {
   display: inline-block;
-  padding-left: 5px;
+  padding-left: ($baseline/4);
   color: #666;
   font-weight: 100;
   font-size: em(16);
@@ -55,7 +55,7 @@ div.problem {
   }
 
   .choicegroup {
-    @include clearfix;
+    @include clearfix();
     min-width: 100px;
     width: auto !important;
     width: 100px;
@@ -63,18 +63,18 @@ div.problem {
     label {
       @include float(left);
       clear: both;
-      margin-bottom: 5px;
+      margin-bottom: ($baseline/4);
 
       &.choicegroup_correct {
         &:after {
-          margin-left: 15px;
+          margin-left: ($baseline*0.75);
           content: url('../images/correct-icon.png');
         }
       }
 
       &.choicegroup_incorrect {
         &:after {
-          margin-left: 15px;
+          margin-left: ($baseline*0.75);
           content: url('../images/incorrect-icon.png');
         }
       }
@@ -123,7 +123,7 @@ div.problem {
       display: block;
       border: 1px solid #ddd;
       padding: 9px 15px $baseline;
-      background: #fff;
+      background: $white;
       position: relative;
       box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
@@ -138,9 +138,9 @@ div.problem {
     > span {
       margin: $baseline 0;
       display: block;
-      border: 1px solid #000;
+      border: 1px solid $black;
       padding: 9px 15px $baseline;
-      background: #fff;
+      background: $white;
       position: relative;
       box-shadow: inset 0 0 0 1px #eee;
       border-radius: 3px;
@@ -214,7 +214,7 @@ div.problem {
 
     > span {
       display: block;
-      margin-bottom: lh(.5);
+      margin-bottom: lh(0.5);
     }
 
     p.answer {
@@ -246,7 +246,7 @@ div.problem {
 
       img.loading {
         display: inline-block;
-        padding-left: 10px;
+        padding-left: ($baseline/2);
       }
 
       span {
@@ -317,11 +317,11 @@ div.problem {
 
 
     .grader-status {
-      @include clearfix;
+      @include clearfix();
       margin: $baseline/2 0;
       padding: $baseline/2;
       border-radius: 5px;
-      background: #F6F6F6;
+      background: $gray-l6;
 
       span {
         display: block;
@@ -350,7 +350,7 @@ div.problem {
         padding: $baseline 0 0 0;
         border: 0;
         border-top: 1px solid #eee;
-        background: #fff;
+        background: $white;
 
         p.debug {
           display: none;
@@ -364,7 +364,7 @@ div.problem {
     }
     .evaluation {
       p {
-        margin-bottom: 4px;
+        margin-bottom: ($baseline/5);
       }
     }
 
@@ -393,7 +393,7 @@ div.problem {
           margin-left: 50px;
 
           &:first-child {
-            margin-left: 0px;
+            margin-left: 0;
           }
 
           label {
@@ -449,7 +449,7 @@ div.problem {
   }
 
   li {
-    margin-bottom: lh(.5);
+    margin-bottom: lh(0.5);
     line-height: 1.4em;
 
     &:last-child {
@@ -513,7 +513,7 @@ div.problem {
     padding: 0px 5px;
     border: 1px solid #eaeaea;
     border-radius: 3px;
-    background-color: #f8f8f8;
+    background-color: $gray-l6;
     white-space: nowrap;
     font-size: .9em;
   }
@@ -521,9 +521,9 @@ div.problem {
   pre {
     overflow: auto;
     padding: 6px $baseline/2;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
     border-radius: 3px;
-    background-color: #f8f8f8;
+    background-color: $gray-l6;
     font-size: .9em;
     line-height: 1.4;
 
@@ -562,12 +562,12 @@ div.problem {
       resize: none;
 
       &.CodeMirror-cursor {
+        @extend %ui-depth1;
         position: absolute;
-        z-index: 10;
         visibility: hidden;
         width: 0;
         border-right: none;
-        border-left: 1px solid black;
+        border-left: 1px solid $black;
       }
     }
   }
@@ -602,7 +602,7 @@ div.problem {
     display: block;
     margin: lh() 0;
     padding: lh();
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
   }
 
   div.action {
@@ -631,7 +631,7 @@ div.problem {
       // border: 1px solid #ddd;
       // border-radius: 3px;
       // padding: 8px 12px;
-      // margin-top: 10px;
+      // margin-top: ($baseline/2);
       display: inline-block;
       margin-top: 8px;
       @include margin-left($baseline/2);
@@ -711,13 +711,13 @@ div.problem {
   }
 
   .hints {
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
 
     h3 {
       padding: 9px;
       border-bottom: 1px solid #e3e3e3;
       background: #eee;
-      text-shadow: 0 1px 0 #fff;
+      text-shadow: 0 1px 0 $white;
       font-weight: bold;
       font-size: em(16);
     }
@@ -737,8 +737,8 @@ div.problem {
         a {
           display: block;
           padding: 9px;
-          background: #f6f6f6;
-          box-shadow: inset 0 0 0 1px #fff;
+          background: $gray-l6;
+          box-shadow: inset 0 0 0 1px $white;
         }
       }
 
@@ -765,11 +765,11 @@ div.problem {
 
     > section {
       position: relative;
-      margin-bottom: $baseline/2;
+      margin-bottom: ($baseline/2);
       padding: 9px 9px $baseline;
       border: 1px solid #ddd;
       border-radius: 3px;
-      background: #fff;
+      background: $white;
       box-shadow: inset 0 0 0 1px #eee;
 
       p:last-of-type {
@@ -781,20 +781,20 @@ div.problem {
       }
 
       a.full {
-        @include position(absolute, 0 0px 1px 0px);
+        @include position(absolute, 0 0 1px 0);
         @include box-sizing(border-box);
         display: block;
-        padding: 4px;
-        background: #f3f3f3;
+        padding: ($baseline/5);
+        background: $gray-l4;
         text-align: right;
         font-size: 1em;
 
         &.full-top {
-          @include position(absolute, 1px 0px auto 0px);
+          @include position(absolute, 1px 0 auto 0);
         }
 
         &.full-bottom {
-          @include position(absolute, auto 0px 1px 0px);
+          @include position(absolute, auto 0 1px 0);
         }
       }
     }
@@ -822,8 +822,8 @@ div.problem {
         padding: 0;
 
         .result-errors {
-          margin: $baseline/4;
-          padding: $baseline/2 $baseline/2 $baseline/2 $baseline*2;
+          margin: ($baseline/4);
+          padding: ($baseline/2) ($baseline/2) ($baseline/2) ($baseline*2);
           background: url('../images/incorrect-icon.png') center left no-repeat;
 
           li {
@@ -833,7 +833,7 @@ div.problem {
 
         .result-output {
           margin: $baseline/4;
-          padding: $baseline 0 15px 50px;
+          padding: $baseline 0 ($baseline*0.75) 50px;
           border-top: 1px solid #ddd;
           border-left: $baseline solid #fafafa;
 
@@ -872,7 +872,7 @@ div.problem {
         }
 
         .markup-text{
-          margin: 5px;
+          margin: ($baseline/4);
           padding: $baseline 0 15px 50px;
           border-top: 1px solid #ddd;
           border-left: 20px solid #fafafa;
@@ -891,19 +891,19 @@ div.problem {
 
   .rubric {
     tr {
-      margin: $baseline/2 0;
+      margin: ($baseline/2) 0;
       height: 100%;
     }
 
     td {
-      margin: $baseline/2 0;
+      margin: ($baseline/2) 0;
       padding: $baseline 0;
       height: 100%;
     }
 
     th {
-      margin: $baseline/4;
-      padding: $baseline/4;
+      margin: ($baseline/4);
+      padding: ($baseline/4);
     }
 
     label,
@@ -911,12 +911,12 @@ div.problem {
       position: relative;
       display: inline-block;
       margin: 3px;
-      padding: 15px;
+      padding: ($baseline*0.75);
       min-width: 50px;
       min-height: 50px;
       width: 150px;
       height: 100%;
-      background-color: #ccc;
+      background-color: $gray-l3;
       font-size: .9em;
     }
 
@@ -924,7 +924,7 @@ div.problem {
       position: absolute;
       right: 0;
       bottom: 0;
-      margin: $baseline/2;
+      margin: ($baseline/2);
     }
 
     .selected-grade {
@@ -944,12 +944,12 @@ div.problem {
 
   .annotation-input {
     margin: 0 0 1em 0;
-    border: 1px solid #ccc;
+    border: 1px solid $gray-l3;
     border-radius: 1em;
 
     .annotation-header {
       padding: .5em 1em;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid $gray-l3;
       font-weight: bold;
     }
 
@@ -989,10 +989,10 @@ div.problem {
         margin: 1em 0 0 0;
 
         .tag {
+          @extend %ui-fake-link;
           display: inline-block;
-          margin-left: $baseline*2;
+          margin-left: ($baseline*2);
           border: 1px solid rgb(102,102,102);
-          cursor: pointer;
 
           &.selected {
             background-color: $annotation-yellow;
@@ -1022,13 +1022,13 @@ div.problem {
     .debug-value {
       margin: 1em 0;
       padding: 1em;
-      border: 1px solid #000;
+      border: 1px solid $black;
       background-color: #999;
-      color: #fff;
+      color: $white;
 
       input[type="text"] { width: 100%; }
 
-      pre { background-color: #CCC; color: #000; }
+      pre { background-color: $gray-l3; color: $black; }
 
       &:before {
         display: block;

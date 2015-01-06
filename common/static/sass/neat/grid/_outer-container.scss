@@ -1,5 +1,5 @@
 @mixin outer-container {
-  @include clearfix;
+  @include clearfix();
   max-width: $max-width;
   margin: {
     left: auto;

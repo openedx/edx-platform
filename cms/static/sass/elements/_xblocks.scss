@@ -371,7 +371,7 @@
     &.is-inactive {
       margin: ($baseline*1.5) 0 0 0;
       border-top: 2px dotted $gray-l2;
-      padding: ($baseline*.75) 0;
+      padding: ($baseline*0.75) 0;
       background-color: $gray-l4;
 
       .wrapper-xblock.level-nesting {
@@ -450,9 +450,7 @@
 
   //settings-list
   .list-input.settings-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    @extend %cont-no-list;
     overflow: auto;
     max-height: 400px;
 
@@ -573,9 +571,9 @@
       width: 25px;
       height: 25px;
       vertical-align: middle;
-      padding: 5px;
+      padding: ($baseline/4);
       border-radius: 50%;
-      margin: 0 $baseline/2;
+      margin: 0 ($baseline/2);
       box-shadow: none;
       text-shadow: none;
       border: 1px solid $gray-l1;
@@ -659,7 +657,7 @@
       }
 
       .remove-setting {
-        @include transition(color 0.25s ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out);
         @extend %t-action1;
         display: inline-block;
         background: transparent;
@@ -680,7 +678,7 @@
       // label
       .setting-label {
           vertical-align: top;
-          margin-top: ($baseline*.75);
+          margin-top: ($baseline*0.75);
       }
 
       // inputs and labels
@@ -713,7 +711,7 @@
 
       .setting-clear {
         vertical-align: top;
-        margin: ($baseline*.75) 0 0 0;
+        margin: ($baseline*0.75) 0 0 0;
       }
 
       .create-setting {
@@ -730,7 +728,7 @@
       }
 
       .remove-setting {
-        @include transition(color 0.25s ease-in-out);
+        @include transition(color $tmg-f2 ease-in-out);
         @extend %t-action1;
         display: inline-block;
         background: transparent;

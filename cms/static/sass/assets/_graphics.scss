@@ -1,9 +1,12 @@
+// studio - assets - graphics
+// ====================
+
 .drag-handle {
 	display: inline-block;
 	float: right;
 	width: 7px;
 	height: 22px;
-	margin-left: 10px;
+	margin-left: ($baseline/2);
 	background: url(../images/drag-handles.png) no-repeat;
 	cursor: move;
 }
@@ -12,7 +15,7 @@
 	display: inline-block;
 	width: 100px;
 	height: 60px;
-	margin-right: 5px;
+	margin-right: ($baseline/4);
 	background: url(../images/large-advanced-icon.png) center no-repeat;
 }
 
@@ -20,7 +23,7 @@
 	display: inline-block;
 	width: 100px;
 	height: 60px;
-	margin-right: 5px;
+	margin-right: ($baseline/4);
 	background: url(../images/large-discussion-icon.png) center no-repeat;
 }
 
@@ -28,7 +31,7 @@
 	display: inline-block;
 	width: 100px;
 	height: 60px;
-	margin-right: 5px;
+	margin-right: ($baseline/4);
 	background: url(../images/large-html-icon.png) center no-repeat;
 }
 
@@ -36,7 +39,7 @@
 	display: inline-block;
 	width: 100px;
 	height: 60px;
-	margin-right: 5px;
+	margin-right: ($baseline/4);
 	background: url(../images/large-problem-icon.png) center no-repeat;
 }
 
@@ -44,6 +47,6 @@
 	display: inline-block;
 	width: 100px;
 	height: 60px;
-	margin-right: 5px;
+	margin-right: ($baseline/4);
 	background: url(../images/large-video-icon.png) center no-repeat;
 }
