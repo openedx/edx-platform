@@ -139,7 +139,7 @@ define([
             expect(requests).toHaveLength(0);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
-                'Search field cannot be blank.',
+                'Please enter a term in the search field.',
                 '   '
             );
         });

@@ -519,7 +519,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         Given I have a course with 5 notes
         When I open Notes page
         When I run the search with "   " query
-        Then I see the following error message "Search field cannot be blank."
+        Then I see the following error message "Please enter a term in the search field."
         And I do not see "Search Results" tab
         When I run the search with "note" query
         Then I see that error message disappears
@@ -531,7 +531,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         self.notes_page.search("   ")
         # Displays error message
         self.assertTrue(self.notes_page.is_error_visible)
-        self.assertEqual(self.notes_page.error_text, u"Search field cannot be blank.")
+        self.assertEqual(self.notes_page.error_text, u"Please enter a term in the search field.")
         # Search results tab does not appear
         self.assertNotIn(u"Search Results", self.notes_page.tabs)
         # Run the search with correct query
