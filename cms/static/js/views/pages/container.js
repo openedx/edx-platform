@@ -326,7 +326,7 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
 
             scrollToNewComponentButtons: function(event) {
                 event.preventDefault();
-                $.scrollTo(this.$('.add-xblock-component'));
+                $.scrollTo(this.$('.add-xblock-component'), {duration: 250});
             }
         });
 
