@@ -5,7 +5,7 @@ Basic unit tests for LibraryContentModule
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 import ddt
-from xmodule.library_content_module import LibraryVersionReference
+from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
@@ -80,6 +80,29 @@ class TestLibraries(MixedSplitTestCase):
         module_system.get_module = get_module
         module.xmodule_runtime = module_system
 
+    def _get_capa_problem_type_xml(self, problem_type):
+        """ Helper function to create empty CAPA problem definition """
+        return "<problem><{problem_type}></{problem_type}></problem>".format(problem_type=problem_type)
+
+    def _create_capa_problems(self):
+        """ Helper function to create two capa problems: multiplechoiceresponse and optionresponse """
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user_id,
+            publish_item=False,
+            data=self._get_capa_problem_type_xml("multiplechoiceresponse"),
+            modulestore=self.store,
+        )
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user_id,
+            publish_item=False,
+            data=self._get_capa_problem_type_xml("optionresponse"),
+            modulestore=self.store,
+        )
+
     def test_lib_content_block(self):
         """
         Test that blocks from a library are copied and added as children
@@ -140,3 +163,62 @@ class TestLibraries(MixedSplitTestCase):
         # Now if we update the block, all validation should pass:
         self.lc_block.refresh_children(None, None)
         self.assertTrue(self.lc_block.validate())
+
+        # Set max_count to higher value than exists in library
+        self.lc_block.max_count = 50
+        result = self.lc_block.validate()
+        self.assertFalse(result)  # Validation fails due to at least one warning/message
+        self.assertTrue(result.summary)
+        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
+        self.assertIn("only 4 matching problems", result.summary.text)
+
+        # Add some capa problems so we can check problem type validation messages
+        self.lc_block.max_count = 1
+        self._create_capa_problems()
+        self.lc_block.refresh_children(None, None)
+        self.assertTrue(self.lc_block.validate())
+
+        # Existing problem type should pass validation
+        self.lc_block.max_count = 1
+        self.lc_block.capa_type = 'multiplechoiceresponse'
+        self.assertTrue(self.lc_block.validate())
+
+        # ... unless requested more blocks than exists in library
+        self.lc_block.max_count = 3
+        self.lc_block.capa_type = 'multiplechoiceresponse'
+        result = self.lc_block.validate()
+        self.assertFalse(result)  # Validation fails due to at least one warning/message
+        self.assertTrue(result.summary)
+        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
+        self.assertIn("only 1 matching problem", result.summary.text)
+
+        # Missing problem type should always fail validation
+        self.lc_block.max_count = 1
+        self.lc_block.capa_type = 'customresponse'
+        result = self.lc_block.validate()
+        self.assertFalse(result)  # Validation fails due to at least one warning/message
+        self.assertTrue(result.summary)
+        self.assertEqual(StudioValidationMessage.WARNING, result.summary.type)
+        self.assertIn("no matching problem types", result.summary.text)
+
+    def test_capa_type_filtering(self):
+        """
+        Test that the capa type filter is actually filtering children
+        """
+        self._create_capa_problems()
+        self.assertEqual(len(self.lc_block.children), 0)  # precondition check
+        self.lc_block.capa_type = "multiplechoiceresponse"
+        self.lc_block.refresh_children(None, None)
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        self.lc_block.capa_type = "optionresponse"
+        self.lc_block.refresh_children(None, None)
+        self.assertEqual(len(self.lc_block.children), 1)
+
+        self.lc_block.capa_type = "customresponse"
+        self.lc_block.refresh_children(None, None)
+        self.assertEqual(len(self.lc_block.children), 0)
+
+        self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
+        self.lc_block.refresh_children(None, None)
+        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 2)
