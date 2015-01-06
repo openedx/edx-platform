@@ -333,10 +333,9 @@ def is_feature_enabled(course):
         2) present in the course tab configuration.
         3) Harvard Annotation Tool must be disabled for the course.
     """
-    tab_found = next((True for t in course.tabs if t["type"] == "edxnotes"), False)
-    feature_enabled = settings.FEATURES.get("ENABLE_EDXNOTES")
-
-    return (feature_enabled and tab_found) and not is_harvard_notes_enabled(course)
+    return (settings.FEATURES.get("ENABLE_EDXNOTES")
+            and [t for t in course.tabs if t["type"] == "edxnotes"]  # tab found
+            and not is_harvard_notes_enabled(course))
 
 
 def is_harvard_notes_enabled(course):
