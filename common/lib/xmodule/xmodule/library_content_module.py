@@ -6,6 +6,7 @@ from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
 from capa.responsetypes import registry
+from gettext import ngettext
 
 from .mako_module import MakoModuleDescriptor
 from opaque_keys import InvalidKeyError
@@ -359,7 +360,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                         # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
-                        action_label=_(u"↻ Update now")
+                        # Translators: ↻ is an UTF icon symbol, no need translating it.
+                        action_label=_(u"↻ Update now.")
                     )
                 )
                 return False
@@ -369,7 +371,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.ERROR,
                     _(u'Library is invalid, corrupt, or has been deleted.'),
                     action_class='edit-button',
-                    action_label=_(u"Edit Library List")
+                    action_label=_(u"Edit Library List.")
                 )
             )
             return False
@@ -395,7 +397,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.NOT_CONFIGURED,
                     _(u"A library has not yet been selected."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Library")
+                    action_label=_(u"Select a Library.")
                 )
             )
             return validation
@@ -418,7 +420,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     _(u'There are no matching problem types in the specified libraries.'),
                     action_class='edit-button',
-                    action_label=_(u"Select another problem type")
+                    action_label=_(u"Select another problem type.")
                 )
             )
 
@@ -427,11 +429,20 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 validation,
                 StudioValidationMessage(
                     StudioValidationMessage.WARNING,
-                    _(u'The specified libraries are configured to fetch {count} problems, '
-                      u'but there are only {actual} matching problems.')
-                    .format(actual=matching_children_count, count=self.max_count),
+                    (
+                        ngettext(
+                            u'The specified libraries are configured to fetch {count} problem, ',
+                            u'The specified libraries are configured to fetch {count} problems, ',
+                            self.max_count
+                        ) +
+                        ngettext(
+                            u'but there are only {actual} matching problem.',
+                            u'but there are only {actual} matching problems.',
+                            matching_children_count
+                        )
+                    ).format(count=self.max_count, actual=matching_children_count),
                     action_class='edit-button',
-                    action_label=_(u"Edit configuration")
+                    action_label=_(u"Edit the library configuration.")
                 )
             )
 
