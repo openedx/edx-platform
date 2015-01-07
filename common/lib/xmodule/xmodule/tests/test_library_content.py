@@ -138,9 +138,10 @@ class TestLibraries(MixedSplitTestCase):
         # Check that get_content_titles() doesn't return titles for hidden/unused children
         self.assertEqual(len(self.lc_block.get_content_titles()), 1)
 
-    def test_validation(self):
+    def test_validation_of_course_libraries(self):
         """
-        Test that the validation method of LibraryContent blocks is working.
+        Test that the validation method of LibraryContent blocks can validate
+        the source_libraries setting.
         """
         # When source_libraries is blank, the validation summary should say this block needs to be configured:
         self.lc_block.source_libraries = []
@@ -166,11 +167,17 @@ class TestLibraries(MixedSplitTestCase):
         self.assertIn("out of date", result.summary.text)
 
         # Now if we update the block, all validation should pass:
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertTrue(self.lc_block.validate())
 
+    def test_validation_of_matching_blocks(self):
+        """
+        Test that the validation method of LibraryContent blocks can warn
+        the user about problems with other settings (max_count and capa_type).
+        """
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
+        self.lc_block.refresh_children()  # In the normal studio editing process, editor_saved() calls refresh_children at this point
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
@@ -180,17 +187,19 @@ class TestLibraries(MixedSplitTestCase):
         # Add some capa problems so we can check problem type validation messages
         self.lc_block.max_count = 1
         self._create_capa_problems()
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertTrue(self.lc_block.validate())
 
         # Existing problem type should pass validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'multiplechoiceresponse'
+        self.lc_block.refresh_children()
         self.assertTrue(self.lc_block.validate())
 
         # ... unless requested more blocks than exists in library
         self.lc_block.max_count = 10
         self.lc_block.capa_type = 'multiplechoiceresponse'
+        self.lc_block.refresh_children()
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
@@ -200,6 +209,7 @@ class TestLibraries(MixedSplitTestCase):
         # Missing problem type should always fail validation
         self.lc_block.max_count = 1
         self.lc_block.capa_type = 'customresponse'
+        self.lc_block.refresh_children()
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
@@ -213,21 +223,21 @@ class TestLibraries(MixedSplitTestCase):
         self._create_capa_problems()
         self.assertEqual(len(self.lc_block.children), 0)  # precondition check
         self.lc_block.capa_type = "multiplechoiceresponse"
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), 1)
 
         self.lc_block.capa_type = "optionresponse"
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), 3)
 
         self.lc_block.capa_type = "coderesponse"
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), 2)
 
         self.lc_block.capa_type = "customresponse"
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), 0)
 
         self.lc_block.capa_type = ANY_CAPA_TYPE_VALUE
-        self.lc_block.refresh_children(None, None)
+        self.lc_block.refresh_children()
         self.assertEqual(len(self.lc_block.children), len(self.lib_blocks) + 4)
