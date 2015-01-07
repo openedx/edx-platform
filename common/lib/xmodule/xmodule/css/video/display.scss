@@ -83,7 +83,9 @@ div.video {
       vertical-align: top;
 
       .host-tag {
-        @extend %text-sr;
+        // The @extend %cont-text-hide wasn't working for some reason...
+        position: absolute;
+        left: -9999em;
         display: inline-block;
         vertical-align: middle;
         font-size: 70%;
