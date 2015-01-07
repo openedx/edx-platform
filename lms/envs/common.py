@@ -1720,14 +1720,6 @@ PASSWORD_DICTIONARY = []
 INSTALLED_APPS += ('django_openid_auth',)
 
 
-############################ LinkedIn Integration #############################
-INSTALLED_APPS += ('linkedin',)
-LINKEDIN_API = {
-    'EMAIL_WHITELIST': [],
-    'COMPANY_ID': '2746406',
-}
-
-
 ############################ ORA 2 ############################################
 
 # By default, don't use a file prefix
