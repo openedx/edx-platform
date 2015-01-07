@@ -153,7 +153,7 @@
       <%
         if theme_enabled() and not is_microsite():
           footer_file = 'theme-footer.html'
-        elif settings.FEATURES['IS_EDX_DOMAIN'] and not is_microsite():
+        elif settings.FEATURES.get('IS_EDX_DOMAIN', False) and not is_microsite():
           footer_file = microsite.get_template_path('footer-edx-new.html')
         else:
           footer_file = microsite.get_template_path('footer.html')
