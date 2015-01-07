@@ -64,7 +64,7 @@ def get_logo_url():
     university = microsite.get_value('university')
 
     if university is None and settings.FEATURES.get('IS_EDX_DOMAIN', False):
-        return '{static_url}images/edx-logo-77x36.png'.format(
+        return '{static_url}images/edx-theme/edx-logo-77x36.png'.format(
             static_url=settings.STATIC_URL
         )
     elif university:
