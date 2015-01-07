@@ -326,6 +326,99 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.data, data_value)
 
+    def test_refreshes_children_if_libraries_change(self):
+        library2key = self._create_library("org2", "lib2", "Library2")
+        library2 = modulestore().get_library(library2key)
+        data1, data2 = "Hello world!", "Hello other world!"
+        ItemFactory.create(
+            category="html",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+            display_name="Lib1: HTML BLock",
+            data=data1,
+        )
+
+        ItemFactory.create(
+            category="html",
+            parent_location=library2.location,
+            user_id=self.user.id,
+            publish_item=False,
+            display_name="Lib 2: HTML BLock",
+            data=data2,
+        )
+
+        # Create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add a LibraryContent block to the course:
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 1)
+
+        # Now, change the block settings to have an invalid library key:
+        resp = self._update_item(
+            lc_block.location,
+            {"source_libraries": [[str(library2key)]]},
+        )
+        self.assertEqual(resp.status_code, 200)
+        lc_block = modulestore().get_item(lc_block.location)
+
+        self.assertEqual(len(lc_block.children), 1)
+        html_block = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block.data, data2)
+
+    def test_refreshes_children_if_capa_type_change(self):
+        name1, name2 = "Option Problem", "Multiple Choice Problem"
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+            display_name=name1,
+            data="<problem><optionresponse></optionresponse></problem>",
+        )
+        ItemFactory.create(
+            category="problem",
+            parent_location=self.library.location,
+            user_id=self.user.id,
+            publish_item=False,
+            display_name=name2,
+            data="<problem><multiplechoiceresponse></multiplechoiceresponse></problem>",
+        )
+
+        # Create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add a LibraryContent block to the course:
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 2)
+
+        resp = self._update_item(
+            lc_block.location,
+            {"capa_type": 'optionresponse'},
+        )
+        self.assertEqual(resp.status_code, 200)
+        lc_block = modulestore().get_item(lc_block.location)
+
+        self.assertEqual(len(lc_block.children), 1)
+        html_block = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block.display_name, name1)
+
+        resp = self._update_item(
+            lc_block.location,
+            {"capa_type": 'multiplechoiceresponse'},
+        )
+        self.assertEqual(resp.status_code, 200)
+        lc_block = modulestore().get_item(lc_block.location)
+
+        self.assertEqual(len(lc_block.children), 1)
+        html_block = modulestore().get_item(lc_block.children[0])
+        self.assertEqual(html_block.display_name, name2)
+
 
 @ddt.ddt
 class TestLibraryAccess(LibraryTestCase):
