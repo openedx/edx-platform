@@ -63,11 +63,15 @@ def get_logo_url():
     # otherwise, use the legacy means to configure this
     university = microsite.get_value('university')
 
-    if university is None:
-        return '{static_url}images/logo-edX-77x36.png'.format(
+    if university is None and settings.FEATURES.get('IS_EDX_DOMAIN', False):
+        return '{static_url}images/edx-logo-77x36.png'.format(
             static_url=settings.STATIC_URL
         )
-
-    return '{static_url}images/{uni}-on-edx-logo.png'.format(
-        static_url=settings.STATIC_URL, uni=university
-    )
+    elif university:
+        return '{static_url}images/{uni}-on-edx-logo.png'.format(
+            static_url=settings.STATIC_URL, uni=university
+        )
+    else:
+        return '{static_url}images/logo-placeholder.png'.format(
+            static_url=settings.STATIC_URL
+        )
