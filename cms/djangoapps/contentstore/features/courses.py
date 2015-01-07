@@ -33,6 +33,7 @@ def i_create_a_course(step):
     create_a_course()
 
 
+# pylint disable=unused-argument, invalid-name
 @step('I click the course link in Studio Home$')
 def i_click_the_course_link_in_studio_home(step):
     course_css = 'a.course-link'
@@ -53,6 +54,7 @@ def courseware_page_has_loaded_in_studio(step):
 
 
 @step('I see the course listed in Studio Home$')
+# pylint disable=unused-argument
 def i_see_the_course_in_studio_home(step):
     course_css = 'h3.class-title'
     assert world.css_has_text(course_css, world.scenario_dict['COURSE'].display_name)
