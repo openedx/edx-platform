@@ -318,7 +318,9 @@
     </section>
 
       % if settings.FEATURES.get('ENABLE_DISCUSSION_HOME_PANEL'):
-        <span class="label label-settings">${_("HOW TO USE EDX DISCUSSIONS")}</span>
+        <span class="label label-settings">
+          ${_("How to use {platform_name} discussions").format(platform_name=settings.PLATFORM_NAME)}
+        </span>
         <table class="home-helpgrid">
           <tr class="helpgrid-row helpgrid-row-navigation">
             <td class="row-title">${_("Find discussions")}</td>
