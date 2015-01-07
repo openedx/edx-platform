@@ -255,7 +255,7 @@
           color: $gray-l3;
         }
 
-        .is-focused .tip{
+        .is-focused .tip {
           color: $gray;
         }
 
@@ -276,12 +276,12 @@
           // add a group is below with groups styling
           .action-primary {
             @extend %btn-primary-blue;
-            padding: ($baseline*.3) $baseline;
+            padding: ($baseline/4) $baseline;
           }
 
           .action-secondary {
             @extend %btn-secondary-gray;
-            padding: ($baseline*.3) $baseline;
+            padding: ($baseline/4) $baseline;
           }
 
           .wrapper-delete-button {
@@ -509,7 +509,7 @@
       .icon {
         display: inline-block;
         vertical-align: middle;
-        margin-right: ($baseline/2);
+        @include margin-right($baseline/2);
       }
     }
   }
