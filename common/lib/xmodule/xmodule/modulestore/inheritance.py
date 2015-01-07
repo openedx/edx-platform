@@ -211,8 +211,8 @@ def inherit_metadata(descriptor, inherited_data):
 
 def own_metadata(module):
     """
-    Return a dictionary that contains only non-inherited field keys,
-    mapped to their serialized values
+    Return a JSON-friendly dictionary that contains only non-inherited field
+    keys, mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
@@ -283,6 +283,8 @@ class InheritanceKeyValueStore(KeyValueStore):
 
     def default(self, key):
         """
-        Check to see if the default should be from inheritance rather than from the field's global default
+        Check to see if the default should be from inheritance. If not
+        inheriting, this will raise KeyError which will cause the caller to use
+        the field's global default.
         """
         return self.inherited_settings[key.field_name]
