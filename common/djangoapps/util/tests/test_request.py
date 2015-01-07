@@ -53,3 +53,10 @@ class ResponseTestCase(unittest.TestCase):
         self.assertEqual(course_id.org, 'edX')
         self.assertEqual(course_id.course, 'maths')
         self.assertEqual(course_id.run, '2020')
+
+        course_id = course_id_from_url(
+            '/api/courses/slashes:sample+course+id/static/detail?tab=tab_name'
+        )
+        self.assertEqual(course_id.org, 'sample')
+        self.assertEqual(course_id.course, 'course')
+        self.assertEqual(course_id.run, 'id')
