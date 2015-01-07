@@ -2843,7 +2843,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._filter_blacklist(copy.copy(new_block['fields']), blacklist),
                 new_block['definition'],
                 destination_version,
-                raw=True
+                raw=True,
+                block_defaults=new_block.get('defaults')
             )
 
         # introduce new edit info field for tracing where copied/published blocks came
@@ -2882,7 +2883,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
             del structure['blocks'][orphan]
 
-    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False):
+    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
         """
         Create the core document structure for a block.
 
@@ -2893,7 +2894,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
-        return {
+        document = {
             'block_type': category,
             'definition': definition_id,
             'fields': block_fields,
@@ -2904,6 +2905,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 'update_version': new_id
             }
         }
+        if block_defaults:
+            document['defaults'] = block_defaults
+        return document
 
     @contract(block_key=BlockKey)
     def _get_block_from_structure(self, structure, block_key):

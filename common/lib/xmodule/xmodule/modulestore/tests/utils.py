@@ -10,6 +10,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
 
@@ -108,3 +109,17 @@ class MixedSplitTestCase(TestCase):
         )
         self.addCleanup(self.store.close_all_connections)
         self.addCleanup(self.store._drop_database)  # pylint: disable=protected-access
+
+    def make_block(self, category, parent_block, **kwargs):
+        """
+        Create a block of type `category` as a child of `parent_block`, in any
+        course or library. You can pass any field values as kwargs.
+        """
+        extra = {"publish_item": False, "user_id": self.user_id}
+        extra.update(kwargs)
+        return ItemFactory.create(
+            category=category,
+            parent_location=parent_block.location,
+            modulestore=self.store,
+            **extra
+        )
