@@ -19,8 +19,8 @@
     course_index_overlay_text = microsite.get_value('course_index_overlay_text', _("Explore courses from {platform_name}.").format(platform_name=platform_name))
 
     if settings.FEATURES.get('IS_EDX_DOMAIN', False):
-      # For some reason, `static.url('images/edx-logo-bw.png')` breaks template rendering.
-      default_image_url = settings.STATIC_URL + 'images/edx-logo-bw.png'
+      # For some reason, `static.url('images/edx-theme/edx-logo-bw.png')` breaks template rendering.
+      default_image_url = settings.STATIC_URL + 'images/edx-theme/edx-logo-bw.png'
     else:
       default_image_url = settings.STATIC_URL + 'images/logo-placeholder-large.png'
 
