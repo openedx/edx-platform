@@ -281,6 +281,28 @@ CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
 
+######################### MARKETING SITE ###############################
+
+MKTG_URL_LINK_MAP = {
+    'ABOUT': 'about',
+    'CONTACT': 'contact',
+    'FAQ': 'help',
+    'COURSES': 'courses',
+    'ROOT': 'root',
+    'TOS': 'tos',
+    'HONOR': 'honor',
+    'PRIVACY': 'privacy',
+    'JOBS': 'jobs',
+    'NEWS': 'news',
+    'PRESS': 'press',
+    'BLOG': 'blog',
+    'DONATE': 'donate',
+
+    # Verified Certificates
+    'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
+}
+
+
 ############################ STATIC FILES #############################
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 MEDIA_ROOT = TEST_ROOT / "uploads"
