@@ -1,6 +1,6 @@
-define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date", "tinymce", "jquery.tinymce"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+define(["js/views/validation", "codemirror", "tinymce", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
+	"js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker",  "jquery.tinymce", "date"],
+       function(ValidatingView, CodeMirror, tinymce, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -41,7 +41,7 @@ var DetailsView = ValidatingView.extend({
         // Editor tinymce
         cachethis = this;
         tinymce.init({
-            selector: "textarea#course-overview",
+            selector: "#course-overview",
             setup: function(editor) {
                 editor.on('change', function(e){
                     var newVal = tinymce.activeEditor.getContent();
@@ -58,9 +58,9 @@ var DetailsView = ValidatingView.extend({
                 view: {title: 'View', items: 'visualaid'}, 
                 format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
                 table: {title: 'Table'}, 
-                tools: {title: 'Tools', items: 'inserttable code'} 
+                tools: {title: 'Tools', items: 'inserttable code'}
             },
-            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table | code",
+            toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table code",
         });
     },
 
@@ -75,7 +75,6 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
-//        this.codeMirrorize(null, $('#course-overview')[0]);
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
