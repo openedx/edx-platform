@@ -411,9 +411,9 @@ $homepage__header--background: lighten($gray, 15%);
 // IMAGES: backgrounds
 $homepage-bg-image: none;
 
-$login-banner-image: url(../images/edx-background-banner-account.png);
-$register-banner-image: url(../images/edx-background-banner-account.png);
-$passwordreset-banner-image: url(../images/edx-background-banner-account.png);
+$login-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
+$register-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
+$passwordreset-banner-image: url(../images/edx-theme/edx-background-banner-account.png);
 
 $video-thumb-url: '../images/homepage-hero-video-thumb.jpg';
 
