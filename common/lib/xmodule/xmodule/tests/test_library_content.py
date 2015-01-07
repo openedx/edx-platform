@@ -250,4 +250,3 @@ class TestLibraries(MixedSplitTestCase):
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
         self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
-
