@@ -14,6 +14,8 @@ ${_("You successfully changed the email address associated with your "
     )
 }
 
-## Farewell
-${_("Thanks,")}
-${_("- The edX Team")}
+## Translators: This is the signature of an email. "\n" is a newline character,
+## and should be placed between the closing word and the signing team's name.
+${_("Thanks,\n - The {platform_name} Team").format(
+  platform_name=settings.PLATFORM_NAME,
+)}

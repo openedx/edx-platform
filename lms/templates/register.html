@@ -148,7 +148,7 @@
         <p class="instructions">
           ## Translators: selected_provider is the name of an external, third-party user authentication service (like Google or LinkedIn).
           ${_("You've successfully signed in with {selected_provider}.").format(selected_provider='<strong>%s</strong>' % selected_provider)}<br />
-          ${_("We just need a little more information before you start learning with edX.")}
+          ${_("We just need a little more information before you start learning with {platform_name}.").format(platform_name=settings.PLATFORM_NAME)}
         </p>
 
         % endif
