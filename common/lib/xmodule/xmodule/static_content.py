@@ -12,6 +12,9 @@ import sys
 from collections import defaultdict
 from docopt import docopt
 from path import path
+import zlib
+from pkg_resources import resource_string
+
 
 from xmodule.x_module import XModuleDescriptor
 
@@ -120,12 +123,17 @@ def _write_js(output_root, classes):
     contents = {}
 
     js_fragments = set()
+    xmodule_js_fragment = resource_string(__name__, 'js/src/xmodule.js')
+    xmodule_js_crc = zlib.crc32(xmodule_js_fragment)
     for class_ in classes:
         module_js = class_.get_javascript()
         for filetype in ('coffee', 'js'):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
-                if filetype != 'js':
-                    idx += 1
+                idx += 1
+                if filetype == 'js':
+                    fragment_crc = zlib.crc32(fragment)
+                    if xmodule_js_crc == fragment_crc :
+                        idx = 0
                 js_fragments.add((idx, filetype, fragment))
 
     for idx, filetype, fragment in sorted(js_fragments):
