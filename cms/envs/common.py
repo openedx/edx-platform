@@ -792,3 +792,5 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
