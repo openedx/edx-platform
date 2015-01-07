@@ -88,7 +88,6 @@ class ProgressReportTask(object):
             raise ProgressreportException("Funcion is not celery task.")
 
         self.task_name = func.name
-        self.modulestore_name = 'default'
 
     def send_task(self, course_id):
         """Send task."""
@@ -106,7 +105,7 @@ class ProgressReportTask(object):
 
     def send_tasks(self):
         """Send task for all of active courses."""
-        store = modulestore(self.modulestore_name)
+        store = modulestore()
 
         for course in store.get_courses():
             if course.has_started() and not course.has_ended():
@@ -156,6 +155,8 @@ def update_table_task(task_id, course_id):
         update_table_task.update_state, task_id=task_id,
         meta={"hostname": socket.gethostname(), "pid": os.getpid()}
     )
+    import time
+    time.sleep(20)
 
     try: 
         update_pgreport_table(course_id, update_state)

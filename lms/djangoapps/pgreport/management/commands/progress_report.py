@@ -54,6 +54,7 @@ class Command(BaseCommand):
                 delete_pgreport_csv(course_id)
             except NotFoundError:
                 raise CommandError("CSV not found.")
+            call_command('create_report_task', *['clear_cache'], **{'course_id': course_id.to_deprecated_string()})
         elif create_report:
             call_command('create_report_task', *['create'], **{'course_id': course_id.to_deprecated_string()})
         else:

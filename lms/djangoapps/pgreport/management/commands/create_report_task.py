@@ -62,6 +62,8 @@ class Command(BaseCommand):
             if course_id is None:
                 raise CommandError('"create" subcommand required course_id.')
             task.send_task(course_id)
+            state = TaskState("pgreport.tasks.create_report_task", course_id)
+            state.delete_task_state()
         elif command == "clear_cache":
             if course_id is None:
                 raise CommandError('"clear_cache" subcommand required course_id.')

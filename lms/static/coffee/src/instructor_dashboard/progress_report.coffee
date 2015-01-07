@@ -13,7 +13,6 @@ class ProgressReport
     # attach self to html so that instructor_dashboard.coffee can find
     #  this object to call event handlers like 'onClickTitle'
     @$section.data 'wrapper', @
-    @instructor_tasks = new (PendingInstructorTasks()) @$section
 
     # gather elements
     @$pgreport_generate_btn = @$section.find("input[name='generate-pgreport-csv']'")
@@ -22,7 +21,7 @@ class ProgressReport
     @$pgreport_request_response_error = @$section.find '.request-response-error'
 
     @$pgreport_generate_btn.click (e) =>
-      #@clear_display()
+      @clear_display()
       url = @$pgreport_generate_btn.data 'endpoint'
       $.ajax
         dataType: 'json'
@@ -46,16 +45,8 @@ class ProgressReport
     $(".msg-confirm").css({"display":"none"})
     $(".msg-error").css({"display":"none"})
 
-  ###
   onClickTitle: ->
-    @clear_display()
-    @instructor_tasks.task_poller.start()
-    @report_downloads.downloads_poller.start()
-
   onExit: ->
-    @instructor_tasks.task_poller.stop()
-    @report_downloads.downloads_poller.stop()
-  ###
 
 # export for use
 # create parent namespaces if they do not already exist.

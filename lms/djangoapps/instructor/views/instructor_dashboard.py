@@ -439,8 +439,8 @@ def _section_progress_report(course_key, access):
     org, cnum, _dummy = course_key.to_deprecated_string().split('/')
 
     try:
-        content = store.fs.get_last_version('/i4x/{}/{}/{}/progress_students.csv.gz'.format(
-            org, cnum, "pgreport"))
+        content = store.fs.get_last_version('/c4x/{}/{}/asset/progress_students.csv.gz'.format(
+            org, cnum))
         utc = pytz.utc.localize(content.upload_date)
         tzdate = utc.astimezone(pytz.timezone(settings.TIME_ZONE))
         current_csv = tzdate.strftime('%Y-%m-%d %H:%M:%S')
