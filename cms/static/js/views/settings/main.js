@@ -50,7 +50,7 @@ var DetailsView = ValidatingView.extend({
                     }
                 });
             },
-            plugins: ["table code"],
+            plugins: ["table", "code"],
             menu: {
                 file: {title: 'File', items: 'save'},
                 edit: {title: 'Edit', items: 'undo redo | cut copy paste | selectall'}, 
@@ -58,7 +58,7 @@ var DetailsView = ValidatingView.extend({
                 view: {title: 'View', items: 'visualaid'}, 
                 format: {title: 'Format', items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'}, 
                 table: {title: 'Table'}, 
-                tools: {title: 'Tools', items: 'inserttable code'}
+                tools: {title: 'Tools', items: 'inserttable'}
             },
             toolbar1: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | table code",
         });
@@ -75,6 +75,7 @@ var DetailsView = ValidatingView.extend({
         this.setupDatePicker('enrollment_start');
         this.setupDatePicker('enrollment_end');
         this.$el.find('#' + this.fieldToSelectorMap['overview']).val(this.model.get('overview'));
+	tinyMCE.activeEditor.setContent(this.model.get('overview'));
 
         this.$el.find('#' + this.fieldToSelectorMap['short_description']).val(this.model.get('short_description'));
 
