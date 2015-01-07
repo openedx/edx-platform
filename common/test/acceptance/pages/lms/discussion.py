@@ -402,12 +402,24 @@ class DiscussionUserProfilePage(CoursePage):
 
     def click_prev_page(self):
         self._click_pager_with_text(self.TEXT_PREV, self.get_current_page() - 1)
+        EmptyPromise(
+            self.is_window_on_top,
+            "Window is on top"
+        ).fulfill()
 
     def click_next_page(self):
         self._click_pager_with_text(self.TEXT_NEXT, self.get_current_page() + 1)
+        EmptyPromise(
+            self.is_window_on_top,
+            "Window is on top"
+        ).fulfill()
 
     def click_on_page(self, page_number):
         self._click_pager_with_text(unicode(page_number), page_number)
+        EmptyPromise(
+            self.is_window_on_top,
+            "Window is on top"
+        ).fulfill()
 
 
 class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
