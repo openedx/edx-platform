@@ -1,6 +1,7 @@
 """
 Acceptance tests for Library Content in LMS
 """
+import textwrap
 import ddt
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture
@@ -171,3 +172,75 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
 
         self.assertFalse(library_block.has_validation_message)
         #self.assertIn("4 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
+
+    def test_no_content_message(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And I set Problem Type selector so that no libraries have matching content
+        Then I can see that "No matching content" warning is shown
+        When I set Problem Type selector so that there is matching content
+        Then I can see that warning messages are not shown
+        """
+        # Add a single "Dropdown" type problem to the library (which otherwise has only HTML blocks):
+        self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc(
+            "problem", "Dropdown",
+            data=textwrap.dedent("""
+                <problem>
+                    <p>Dropdown</p>
+                    <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
+                </problem>
+                """)
+        ))
+
+        expected_text = 'There are no matching problem types in the specified libraries. Select another problem type'
+
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        # precondition check - assert library has children matching filter criteria
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        self.assertEqual(edit_modal.capa_type, "Any Type")  # precondition check
+        edit_modal.capa_type = "Custom Evaluated Script"
+
+        library_container.save_settings()
+
+        self.assertTrue(library_container.has_validation_warning)
+        self.assertIn(expected_text, library_container.validation_warning_text)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        self.assertEqual(edit_modal.capa_type, "Custom Evaluated Script")  # precondition check
+        edit_modal.capa_type = "Dropdown"
+        library_container.save_settings()
+
+        # Library should contain single Dropdown problem, so now there should be no errors again
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
+
+    def test_not_enough_children_blocks(self):
+        """
+        Scenario: Given I have a library, a course and library content xblock in a course
+        When I go to studio unit page for library content block
+        And I set Problem Type selector so "Any"
+        Then I can see that "No matching content" warning is shown
+        """
+        expected_tpl = "The specified libraries are configured to fetch {count} problems, " \
+                       "but there are only {actual} matching problems."
+
+        library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
+
+        # precondition check - assert block is configured fine
+        self.assertFalse(library_container.has_validation_error)
+        self.assertFalse(library_container.has_validation_warning)
+
+        edit_modal = StudioLibraryContentXBlockEditModal(library_container.edit())
+        edit_modal.count = 50
+        library_container.save_settings()
+
+        self.assertTrue(library_container.has_validation_warning)
+        self.assertIn(
+            expected_tpl.format(count=50, actual=len(self.library_fixture.children)),
+            library_container.validation_warning_text
+        )

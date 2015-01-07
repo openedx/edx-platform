@@ -5,8 +5,9 @@ import hashlib
 from django.core.exceptions import PermissionDenied
 from opaque_keys.edx.locator import LibraryLocator
 from xblock.fields import Scope
-from xmodule.library_content_module import LibraryVersionReference
+from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.capa_module import CapaDescriptor
 
 
 class LibraryToolsService(object):
@@ -44,6 +45,20 @@ class LibraryToolsService(object):
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
         return None
+
+    def _filter_child(self, usage_key, capa_type):
+        """
+        Filters children by CAPA problem type, if configured
+        """
+        if capa_type == ANY_CAPA_TYPE_VALUE:
+            return True
+
+        if usage_key.block_type != "problem":
+            return False
+
+        descriptor = self.store.get_item(usage_key, depth=0)
+        assert isinstance(descriptor, CapaDescriptor)
+        return capa_type in descriptor.problem_types
 
     def update_children(self, dest_block, user_id, user_perms=None, update_db=True):
         """
@@ -91,13 +106,17 @@ class LibraryToolsService(object):
             new_libraries = []
             for library_key, library in libraries:
 
-                def copy_children_recursively(from_block):
+                def copy_children_recursively(from_block, filter_problem_type=False):
                     """
                     Internal method to copy blocks from the library recursively
                     """
                     new_children = []
-                    for child_key in from_block.children:
-                        child = self.store.get_item(child_key, depth=9)
+                    if filter_problem_type:
+                        filtered_children = [key for key in from_block.children if self._filter_child(key, dest_block.capa_type)]
+                    else:
+                        filtered_children = from_block.children
+                    for child_key in filtered_children:
+                        child = self.store.get_item(child_key, depth=None)
                         # We compute a block_id for each matching child block found in the library.
                         # block_ids are unique within any branch, but are not unique per-course or globally.
                         # We need our block_ids to be consistent when content in the library is updated, so
@@ -125,7 +144,7 @@ class LibraryToolsService(object):
                         )
                         new_children.append(new_child_info.location)
                     return new_children
-                root_children.extend(copy_children_recursively(from_block=library))
+                root_children.extend(copy_children_recursively(from_block=library, filter_problem_type=True))
                 new_libraries.append(LibraryVersionReference(library_key, library.location.library_key.version_guid))
             dest_block.source_libraries = new_libraries
             dest_block.children = root_children

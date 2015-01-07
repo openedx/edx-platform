@@ -5,6 +5,9 @@ LibraryContent: The XBlock used to include blocks from a library in a course.
 from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
+from capa.responsetypes import registry
+from gettext import ngettext
+
 from .mako_module import MakoModuleDescriptor
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator
@@ -19,13 +22,36 @@ from xmodule.studio_editable import StudioEditableModule, StudioEditableDescript
 from .xml_module import XmlDescriptor
 from pkg_resources import resource_string
 
+
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
+
+
+ANY_CAPA_TYPE_VALUE = 'any'
 
 
 def enum(**enums):
     """ enum helper in lieu of enum34 """
     return type('Enum', (), enums)
+
+
+def _get_human_name(problem_class):
+    """
+    Get the human-friendly name for a problem type.
+    """
+    return getattr(problem_class, 'human_name', problem_class.__name__)
+
+
+def _get_capa_types():
+    """
+    Gets capa types tags and labels
+    """
+    capa_types = {tag: _get_human_name(registry.get_class_for_tag(tag)) for tag in registry.registered_tags()}
+
+    return [{'value': ANY_CAPA_TYPE_VALUE, 'display_name': _('Any Type')}] + sorted([
+        {'value': capa_type, 'display_name': caption}
+        for capa_type, caption in capa_types.items()
+    ], key=lambda item: item.get('display_name'))
 
 
 class LibraryVersionReference(namedtuple("LibraryVersionReference", "library_id version")):
@@ -144,6 +170,13 @@ class LibraryContentFields(object):
         display_name=_("Count"),
         help=_("Enter the number of components to display to each student."),
         default=1,
+        scope=Scope.settings,
+    )
+    capa_type = String(
+        display_name=_("Problem Type"),
+        help=_('Choose a problem type to fetch from the library. If "Any Type" is selected no filtering is applied.'),
+        default=ANY_CAPA_TYPE_VALUE,
+        values=_get_capa_types(),
         scope=Scope.settings,
     )
     filters = String(default="")  # TBD
@@ -290,7 +323,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js_module_name = "VerticalDescriptor"
 
     @XBlock.handler
-    def refresh_children(self, request, suffix, update_db=True):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None, update_db=True):  # pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -313,6 +346,42 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         lib_tools.update_children(self, user_id, user_perms, update_db)
         return Response()
 
+    def _validate_library_version(self, validation, lib_tools, version, library_key):
+        """
+        Validates library version
+        """
+        latest_version = lib_tools.get_library_version(library_key)
+        if latest_version is not None:
+            if version is None or version != latest_version:
+                validation.set_summary(
+                    StudioValidationMessage(
+                        StudioValidationMessage.WARNING,
+                        _(u'This component is out of date. The library has new content.'),
+                        # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
+                        # See https://openedx.atlassian.net/browse/TNL-993
+                        action_class='library-update-btn',
+                        # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
+                        action_label=_(u"{refresh_icon} Update now.").format(refresh_icon=u"↻")
+                    )
+                )
+                return False
+        else:
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.ERROR,
+                    _(u'Library is invalid, corrupt, or has been deleted.'),
+                    action_class='edit-button',
+                    action_label=_(u"Edit Library List.")
+                )
+            )
+            return False
+        return True
+
+    def _set_validation_error_if_empty(self, validation, summary):
+        """  Helper method to only set validation summary if it's empty """
+        if validation.empty:
+            validation.set_summary(summary)
+
     def validate(self):
         """
         Validates the state of this Library Content Module Instance. This
@@ -328,43 +397,59 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.NOT_CONFIGURED,
                     _(u"A library has not yet been selected."),
                     action_class='edit-button',
-                    action_label=_(u"Select a Library")
+                    action_label=_(u"Select a Library.")
                 )
             )
             return validation
         lib_tools = self.runtime.service(self, 'library_tools')
         for library_key, version in self.source_libraries:
-            latest_version = lib_tools.get_library_version(library_key)
-            if latest_version is not None:
-                if version is None or version != latest_version:
-                    validation.set_summary(
-                        StudioValidationMessage(
-                            StudioValidationMessage.WARNING,
-                            _(u'This component is out of date. The library has new content.'),
-                            action_class='library-update-btn',  # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
-                            action_label=_(u"↻ Update now")
-                        )
-                    )
-                    break
-            else:
-                validation.set_summary(
-                    StudioValidationMessage(
-                        StudioValidationMessage.ERROR,
-                        _(u'Library is invalid, corrupt, or has been deleted.'),
-                        action_class='edit-button',
-                        action_label=_(u"Edit Library List")
-                    )
-                )
+            if not self._validate_library_version(validation, lib_tools, version, library_key):
                 break
+
+        # Note: we assume refresh_children() has been called since the last time fields like source_libraries or capa_types were changed.
+        matching_children_count = len(self.children)  # pylint: disable=no-member
+        if matching_children_count == 0:
+            self._set_validation_error_if_empty(
+                validation,
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    _(u'There are no matching problem types in the specified libraries.'),
+                    action_class='edit-button',
+                    action_label=_(u"Select another problem type.")
+                )
+            )
+
+        if matching_children_count < self.max_count:
+            self._set_validation_error_if_empty(
+                validation,
+                StudioValidationMessage(
+                    StudioValidationMessage.WARNING,
+                    (
+                        ngettext(
+                            u'The specified libraries are configured to fetch {count} problem, ',
+                            u'The specified libraries are configured to fetch {count} problems, ',
+                            self.max_count
+                        ) +
+                        ngettext(
+                            u'but there are only {actual} matching problem.',
+                            u'but there are only {actual} matching problems.',
+                            matching_children_count
+                        )
+                    ).format(count=self.max_count, actual=matching_children_count),
+                    action_class='edit-button',
+                    action_label=_(u"Edit the library configuration.")
+                )
+            )
 
         return validation
 
     def editor_saved(self, user, old_metadata, old_content):
         """
-        If source_libraries has been edited, refresh_children automatically.
+        If source_libraries or capa_type has been edited, refresh_children automatically.
         """
         old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
-        if set(old_source_libraries) != set(self.source_libraries):
+        if (set(old_source_libraries) != set(self.source_libraries) or
+                old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
                 self.refresh_children(None, None, update_db=False)  # update_db=False since update_item() is about to be called anyways
             except ValueError:
