@@ -6,10 +6,19 @@
 % if stanford_theme_enabled():
   ${_("We are sorry. Our course staff did not approve your request to change "
       "your name from {old_name} to {new_name}. If you need further "
-      "assistance, please e-mail the tech support at").format(old_name=old_name, new_name=new_name)}
-  ${settings.TECH_SUPPORT_EMAIL}.
+      "assistance, please e-mail the tech support at {email}"
+    ).format(
+      old_name=old_name,
+      new_name=new_name,
+      email=settings.TECH_SUPPORT_EMAIL,
+    )}
 % else:
   ${_("We are sorry. Our course staff did not approve your request to change "
       "your name from {old_name} to {new_name}. If you need further "
-      "assistance, please e-mail the course staff at ta@edx.org.").format(old_name=old_name, new_name=new_name)}
+      "assistance, please e-mail the course staff at {email}."
+    ).format(
+      old_name=old_name,
+      new_name=new_name,
+      email="ta@edx.org",
+    )}
 % endif
