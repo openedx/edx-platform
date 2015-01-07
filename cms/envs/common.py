@@ -770,3 +770,6 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
+COURSE_INFO_API_CACHE_PREFIX = 'course_info_api_'
+COURSE_INFO_API_CACHE_TIME_OUT = 300
