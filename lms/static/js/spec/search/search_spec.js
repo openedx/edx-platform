@@ -34,6 +34,17 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
         });
 
+        it('handles calls to doSearch', function () {
+            var term = '  search string  ';
+            $('.search-field').val(term);
+            this.form.doSearch(term);
+            expect(this.onSearch).toHaveBeenCalledWith($.trim(term));
+            expect($('.search-field').val()).toEqual(term);
+            expect($('.search-field')).toHaveClass('is-active');
+            expect($('.search-button')).toBeHidden();
+            expect($('.cancel-button')).toBeVisible();
+        });
+
         it('triggers a search event and changes to active state', function () {
             var term = 'search string';
             $('.search-field').val(term);

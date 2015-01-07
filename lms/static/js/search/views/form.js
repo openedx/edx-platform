@@ -11,7 +11,6 @@ var edx = edx || {};
             'submit form': 'submitForm',
             'click .cancel-button': 'clearSearch',
         },
-        emptySearchRegex: /^\s*$/,
 
         initialize: function () {
             this.$searchField = this.$el.find('.search-field');
@@ -20,15 +19,33 @@ var edx = edx || {};
         },
 
         submitForm: function () {
-            var searchTerm = $.trim(this.$searchField.val());
-            if (this.emptySearchRegex.test(searchTerm) === false) {
-                this.performSearch(searchTerm);
+            this.doSearch();
+            // prevent reload
+            return false;
+        },
+
+        doSearch: function (term) {
+            if (term) {
+                this.$searchField.val(term);
+            }
+            else {
+                term = this.$searchField.val();
+            }
+
+            var trimmed = $.trim(term);
+            if (trimmed) {
+                this.setActiveStyle();
+                this.trigger('search', trimmed);
             }
             else {
                 this.clearSearch();
             }
-            // prevent reload
-            return false;
+        },
+
+        clearSearch: function () {
+            this.$searchField.val('');
+            this.setInitialStyle();
+            this.trigger('clear');
         },
 
         setActiveStyle: function () {
@@ -41,17 +58,6 @@ var edx = edx || {};
             this.$searchField.removeClass('is-active');
             this.$searchButton.show();
             this.$cancelButton.hide();
-        },
-
-        performSearch: function (searchTerm) {
-            this.setActiveStyle();
-            this.trigger('search', searchTerm);
-        },
-
-        clearSearch: function () {
-            this.$searchField.val('');
-            this.setInitialStyle();
-            this.trigger('clear');
         }
 
     });
