@@ -17,7 +17,7 @@
   <div class=" msg msg-activate">
     <i class="msg-icon fa fa-warning"></i>
     <div class="msg-content">
-      <h3 class="title">${_("You need to activate your edX account before proceeding")}</h3>
+      <h3 class="title">${_("You need to activate your {platform_name} account before proceeding").format(platform_name=settings.PLATFORM_NAME)}</h3>
       <div class="copy">
         <p>${_("Please check your email for further instructions on activating your new account.")}</p>
       </div>
