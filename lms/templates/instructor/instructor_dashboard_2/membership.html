@@ -1,6 +1,8 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
+<%! from courseware.courses import get_studio_url %>
 <%! from microsite_configuration import microsite %>
+<%! from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition %>
 
 <script type="text/template" id="member-list-widget-template">
   <div class="member-list-widget">
@@ -244,7 +246,7 @@
 
 </div>
 
-%if course.is_cohorted:
+% if course.is_cohorted:
     <hr class="divider" />
     <div class="cohort-management membership-section"
          data-ajax_url="${section_data['cohorts_ajax_url']}"
@@ -254,17 +256,35 @@
     </div>
 
     <%block name="headextra">
+        <%
+        cohorted_user_partition = get_cohorted_user_partition(course.id)
+        content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
+        %>
         <script>
         $(document).ready(function() {
             var cohortManagementElement = $('.cohort-management');
             if (cohortManagementElement.length > 0) {
-                var cohorts = new CohortCollection();
+                var cohorts = new edx.groups.CohortCollection(),
+                    cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+                    contentGroups = [
+                        % for content_group in content_groups:
+                            new edx.groups.ContentGroupModel({
+                                id: ${content_group.id},
+                                name: "${content_group.name | h}",
+                                user_partition_id: cohortUserPartitionId
+                            }),
+                        % endfor
+                    ];
                 cohorts.url = cohortManagementElement.data('ajax_url');
-                var cohortsView = new CohortsView({
+                var cohortsView = new edx.groups.CohortsView({
                     el: cohortManagementElement,
                     model: cohorts,
-                    advanced_settings_url: cohortManagementElement.data('advanced-settings-url'),
-                    upload_cohorts_csv_url: cohortManagementElement.data('upload_cohorts_csv_url')
+                    contentGroups: contentGroups,
+                    context: {
+                        uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
+                        studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
+                        studioGroupConfigurationsUrl: '${get_studio_url(course, 'group_configurations') | h}'
+                    }
                 });
                 cohorts.fetch().done(function() {
                     cohortsView.render();
