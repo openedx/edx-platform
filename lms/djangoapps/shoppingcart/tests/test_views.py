@@ -910,7 +910,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         # Two courses in user shopping cart
         self.login_user()
-        item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         item2 = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
