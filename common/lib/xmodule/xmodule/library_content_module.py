@@ -360,8 +360,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                         # TODO: change this to action_runtime_event='...' once the unit page supports that feature.
                         # See https://openedx.atlassian.net/browse/TNL-993
                         action_class='library-update-btn',
-                        # Translators: ↻ is an UTF icon symbol, no need translating it.
-                        action_label=_(u"{0} Update now.").format(u"↻")
+                        # Translators: {refresh_icon} placeholder is substituted to "↻" (without double quotes)
+                        action_label=_(u"{refresh_icon} Update now.").format(refresh_icon=u"↻")
                     )
                 )
                 return False
@@ -445,7 +445,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     def editor_saved(self, user, old_metadata, old_content):
         """
-        If source_libraries has been edited, refresh_children automatically.
+        If source_libraries or capa_type has been edited, refresh_children automatically.
         """
         old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
         if (set(old_source_libraries) != set(self.source_libraries) or
