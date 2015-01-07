@@ -407,9 +407,6 @@ MAKO_TEMPLATES['main'].extend([
 ])
 
 
-######### LinkedIn ########
-LINKEDIN_API['COMPANY_ID'] = '0000000'
-
 # Setting for the testing of Software Secure Result Callback
 VERIFY_STUDENT["SOFTWARE_SECURE"] = {
     "API_ACCESS_KEY": "BBBBBBBBBBBBBBBBBBBB",
