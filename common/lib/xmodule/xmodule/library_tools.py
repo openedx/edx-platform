@@ -18,7 +18,7 @@ class LibraryToolsService(object):
     def __init__(self, modulestore):
         self.store = modulestore
 
-    def get_library(self, library_key):
+    def _get_library(self, library_key):
         """
         Given a library key like "library-v1:ProblemX+PR0B", return the
         'library' XBlock with meta-information about the library.
@@ -39,39 +39,26 @@ class LibraryToolsService(object):
         Get the version (an ObjectID) of the given library.
         Returns None if the library does not exist.
         """
-        library = self.get_library(lib_key)
+        library = self._get_library(lib_key)
         if library:
             # We need to know the library's version so ensure it's set in library.location.library_key.version_guid
             assert library.location.library_key.version_guid is not None
             return library.location.library_key.version_guid
         return None
 
-    def _filter_child(self, capa_type, child_descriptor):
+    def _filter_child(self, usage_key, capa_type):
         """
         Filters children by CAPA problem type, if configured
         """
         if capa_type == ANY_CAPA_TYPE_VALUE:
             return True
 
-        if not isinstance(child_descriptor, CapaDescriptor):
+        if usage_key.block_type != "problem":
             return False
 
-        return capa_type in child_descriptor.problem_types
-
-    def get_filtered_children(self, from_block, capa_type=ANY_CAPA_TYPE_VALUE):
-        """
-        Filters children of `from_block` that satisfy filter criteria
-        Returns generator containing (child_key, child) for all children matching filter criteria
-        """
-        children = (
-            (child_key, self.store.get_item(child_key, depth=None))
-            for child_key in from_block.children
-        )
-        return (
-            (child_key, child)
-            for child_key, child in children
-            if self._filter_child(capa_type, child)
-        )
+        descriptor = self.store.get_item(usage_key, depth=0)
+        assert isinstance(descriptor, CapaDescriptor)
+        return capa_type in descriptor.problem_types
 
     def update_children(self, dest_block, user_id, user_perms=None, update_db=True):
         """
@@ -104,7 +91,7 @@ class LibraryToolsService(object):
             # First, load and validate the source_libraries:
             libraries = []
             for library_key, old_version in dest_block.source_libraries:  # pylint: disable=unused-variable
-                library = self.get_library(library_key)
+                library = self._get_library(library_key)
                 if library is None:
                     raise ValueError("Required library not found.")
                 if user_perms and not user_perms.can_read(library_key):
@@ -124,9 +111,12 @@ class LibraryToolsService(object):
                     Internal method to copy blocks from the library recursively
                     """
                     new_children = []
-                    target_capa_type = dest_block.capa_type if filter_problem_type else ANY_CAPA_TYPE_VALUE
-                    filtered_children = self.get_filtered_children(from_block, target_capa_type)
-                    for child_key, child in filtered_children:
+                    if filter_problem_type:
+                        filtered_children = [key for key in from_block.children if self._filter_child(key, dest_block.capa_type)]
+                    else:
+                        filtered_children = from_block.children
+                    for child_key in filtered_children:
+                        child = self.store.get_item(child_key, depth=None)
                         # We compute a block_id for each matching child block found in the library.
                         # block_ids are unique within any branch, but are not unique per-course or globally.
                         # We need our block_ids to be consistent when content in the library is updated, so

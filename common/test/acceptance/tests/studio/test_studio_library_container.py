@@ -43,16 +43,6 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
             XBlockFixtureDesc("html", "Html1"),
             XBlockFixtureDesc("html", "Html2"),
             XBlockFixtureDesc("html", "Html3"),
-
-            XBlockFixtureDesc(
-                "problem", "Dropdown",
-                data=textwrap.dedent("""
-                    <problem>
-                        <p>Dropdown</p>
-                        <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
-                    </problem>
-                    """)
-            )
         )
 
     def populate_course_fixture(self, course_fixture):
@@ -189,9 +179,20 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         When I go to studio unit page for library content block
         And I set Problem Type selector so that no libraries have matching content
         Then I can see that "No matching content" warning is shown
-        When I set Problem Type selector so that there are matching content
+        When I set Problem Type selector so that there is matching content
         Then I can see that warning messages are not shown
         """
+        # Add a single "Dropdown" type problem to the library (which otherwise has only HTML blocks):
+        self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc(
+            "problem", "Dropdown",
+            data=textwrap.dedent("""
+                <problem>
+                    <p>Dropdown</p>
+                    <optionresponse><optioninput label="Dropdown" options="('1', '2')" correct="'2'"></optioninput></optionresponse>
+                </problem>
+                """)
+        ))
+
         expected_text = 'There are no matching problem types in the specified libraries. Select another problem type'
 
         library_container = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])

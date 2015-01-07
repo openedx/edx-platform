@@ -323,7 +323,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
     js_module_name = "VerticalDescriptor"
 
     @XBlock.handler
-    def refresh_children(self, request, suffix, update_db=True):  # pylint: disable=unused-argument
+    def refresh_children(self, request=None, suffix=None, update_db=True):  # pylint: disable=unused-argument
         """
         Refresh children:
         This method is to be used when any of the libraries that this block
@@ -402,17 +402,12 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             )
             return validation
         lib_tools = self.runtime.service(self, 'library_tools')
-        matching_children_count = 0
         for library_key, version in self.source_libraries:
             if not self._validate_library_version(validation, lib_tools, version, library_key):
                 break
 
-            library = lib_tools.get_library(library_key)
-            children_matching_filter = lib_tools.get_filtered_children(library, self.capa_type)
-            # get_filtered_children returns generator, so can't use len.
-            # And we don't actually need those children, so no point of constructing a list
-            matching_children_count += sum(1 for child in children_matching_filter)
-
+        # Note: we assume refresh_children() has been called since the last time fields like source_libraries or capa_types were changed.
+        matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
             self._set_validation_error_if_empty(
                 validation,
