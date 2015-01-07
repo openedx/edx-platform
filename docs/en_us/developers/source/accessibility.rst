@@ -38,12 +38,12 @@ Providing a *useful* text alternative is more nuanced than it sounds.  Asking yo
 	* Yes, and it’s a simple graphic or photograph: the alt attribute should briefly describe the image in a way that conveys the same meaning.  Context is important.  A detailed description of a photograph is rarely useful to the user, unless it is in the context of a photography or art class.
     * Yes, and it’s a graph or complex piece of information: include the information contained in the image elsewhere on the page.  The alt attribute should give a general description of the complex image.  You can programmatically link the image with the detailed information using ``aria-describedby``.
 	
-A very pragmatic guide on providing useful text alternatives is included in the ``HTML5 specification (4.7.1.1) <http://www.w3.org/TR/html5/embedded-content-0.html#alt>`_ and includes a variety of example images and appropriate text alternatives.
+A very pragmatic guide on providing useful text alternatives is included in the `HTML5 specification (4.7.1.1) <http://www.w3.org/TR/html5/embedded-content-0.html#alt>`_ and includes a variety of example images and appropriate text alternatives.
 
 Use labels on all form elements
 *******************************
 
-All form elements must have labels, either using the `label element <http://www.w3.org/TR/html5/forms.html#the-label-element>` or the `aria-label <http://www.w3.org/TR/wai-aria/states_and_properties#aria-label>` or `aria-labelledby <http://www.w3.org/TR/wai-aria/states_and_properties#aria-labelledby>` attributes.
+All form elements must have labels, either using the `label element <http://www.w3.org/TR/html5/forms.html#the-label-element>`_ or the `aria-label <http://www.w3.org/TR/wai-aria/states_and_properties#aria-label>`_ or `aria-labelledby <http://www.w3.org/TR/wai-aria/states_and_properties#aria-labelledby>`_ attributes.
 
 Sighted users have the benefit of visual context.  It's often quite obvious what text identifies the purpose of a given form field based on physical proximity or other visual cues.  However, to a user with a vision impairment, who does not have the benefit of visual context, these relationships are not obvious.  Users who rely on speech to interact with their computers also need a label for addressing form elements.  Correctly using the ``<label>`` element programmatically associates text with a given form element, which can be spoken to the user upon focus, or used to address the form element.
 
