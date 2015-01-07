@@ -366,4 +366,13 @@ function($, Sinon, Backbone, TemplateHelpers) {
 
     });
 
+
+    describe('edx.search.App', function () {
+
+        beforeEach(function () {
+
+        });
+
+    });
+
 });
