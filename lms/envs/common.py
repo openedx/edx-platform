@@ -1228,6 +1228,7 @@ PIPELINE_JS = {
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
             'js/src/string_utils.js',
+            'js/src/logger.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
