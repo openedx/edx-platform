@@ -1,19 +1,26 @@
+# -*- coding: utf-8 -*-
+"""
+Basic unit tests for LibraryRoot
+"""
 from mock import patch
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 from xmodule.x_module import AUTHOR_VIEW
 
-from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
+from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
-_dummy_render = lambda block, _: Fragment(block.data)
+dummy_render = lambda block, _: Fragment(block.data)
 
 
 @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
-@patch('xmodule.html_module.HtmlDescriptor.author_view', _dummy_render, create=True)
+@patch('xmodule.html_module.HtmlDescriptor.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryRoot(MixedSplitTestCase):
+    """
+    Basic unit tests for LibraryRoot (library_root_xblock.py)
+    """
     def test_library_author_view(self):
         """
         Test that LibraryRoot.author_view can run and includes content from its
@@ -62,8 +69,9 @@ class TestLibraryRoot(MixedSplitTestCase):
         library = self.store.get_library(library.location.library_key)
 
         def render_and_check_contents(page, page_size):
+            """ Renders block and asserts on returned content """
             context = {'reorderable_items': set(), 'paging': {'page_number': page, 'page_size': page_size}}
-            expected_blocks = blocks[page_size*page:page_size*(page+1)]
+            expected_blocks = blocks[page_size * page:page_size * (page + 1)]
             result = library.render(AUTHOR_VIEW, context)
 
             for expected_block in expected_blocks:
