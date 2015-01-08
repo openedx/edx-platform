@@ -787,6 +787,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
+        "is_entrance_exam": xblock.is_entrance_exam if getattr(xblock, "is_entrance_exam", None) else None
     }
     if data is not None:
         xblock_info["data"] = data
