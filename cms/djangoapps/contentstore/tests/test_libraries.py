@@ -327,6 +327,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(html_block.data, data_value)
 
     def test_refreshes_children_if_libraries_change(self):
+        """ Tests that children are automatically refreshed if libraries list changes """
         library2key = self._create_library("org2", "lib2", "Library2")
         library2 = modulestore().get_library(library2key)
         data1, data2 = "Hello world!", "Hello other world!"
@@ -370,6 +371,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(html_block.data, data2)
 
     def test_refreshes_children_if_capa_type_change(self):
+        """ Tests that children are automatically refreshed if capa type field changes """
         name1, name2 = "Option Problem", "Multiple Choice Problem"
         ItemFactory.create(
             category="problem",
@@ -420,6 +422,7 @@ class TestLibraries(LibraryTestCase):
         self.assertEqual(html_block.display_name, name2)
 
     def test_refresh_fails_for_unknown_library(self):
+        """ Tests that refresh children fails if unknown library is configured """
         # Create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
