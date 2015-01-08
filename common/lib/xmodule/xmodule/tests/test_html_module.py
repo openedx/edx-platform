@@ -9,6 +9,7 @@ from . import get_test_system, get_test_descriptor_system
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.fields import ScopeIds
 
+
 def instantiate_descriptor(**field_data):
     """
     Instantiate descriptor with most properties.
@@ -21,6 +22,7 @@ def instantiate_descriptor(**field_data):
         scope_ids=ScopeIds(None, None, usage_key, usage_key),
         field_data=DictFieldData(field_data),
     )
+
 
 class HtmlModuleSubstitutionTestCase(unittest.TestCase):
     descriptor = Mock()
@@ -51,7 +53,9 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
         module = HtmlModule(self.descriptor, module_system, field_data, Mock())
         self.assertEqual(module.get_html(), sample_xml)
 
+
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):
+
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """

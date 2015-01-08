@@ -48,6 +48,7 @@ Dobar dan!
 Kako ste danas?
 '''
 
+
 def instantiate_descriptor(**field_data):
     """
     Instantiate descriptor with most properties.
@@ -63,6 +64,7 @@ def instantiate_descriptor(**field_data):
 
 
 class VideoModuleTest(LogicTest):
+
     """Logic tests for Video Xmodule."""
     descriptor_class = VideoDescriptor
 
@@ -143,6 +145,7 @@ class VideoModuleTest(LogicTest):
 
 
 class VideoDescriptorTestBase(unittest.TestCase):
+
     """
     Base class for tests for VideoDescriptor
     """
@@ -152,9 +155,11 @@ class VideoDescriptorTestBase(unittest.TestCase):
 
 
 class TestCreateYoutubeString(VideoDescriptorTestBase):
+
     """
     Checks that create_youtube_string correcty extracts information from Video descriptor.
     """
+
     def test_create_youtube_string(self):
         """
         Test that Youtube ID strings are correctly created when writing back out to XML.
@@ -178,9 +183,11 @@ class TestCreateYoutubeString(VideoDescriptorTestBase):
 
 
 class VideoDescriptorImportTestCase(unittest.TestCase):
+
     """
     Make sure that VideoDescriptor can import an old XML-based video correctly.
     """
+
     def assert_attributes_equal(self, video, attrs):
         """
         Assert that `video` has the correct attributes. `attrs` is a map of {metadata_field: value}.
@@ -498,9 +505,11 @@ class VideoDescriptorImportTestCase(unittest.TestCase):
 
 
 class VideoExportTestCase(VideoDescriptorTestBase):
+
     """
     Make sure that VideoDescriptor can export itself to XML correctly.
     """
+
     def assertXmlEqual(self, expected, xml):
         for attr in ['tag', 'attrib', 'text', 'tail']:
             self.assertEqual(getattr(expected, attr), getattr(xml, attr))
@@ -576,6 +585,7 @@ class VideoExportTestCase(VideoDescriptorTestBase):
 
 
 class VideoCdnTest(unittest.TestCase):
+
     """
     Tests for Video CDN.
     """
@@ -604,7 +614,9 @@ class VideoCdnTest(unittest.TestCase):
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
+
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
+
     """
     Make sure that VideoDescriptor can format data for indexing as expected.
     """
