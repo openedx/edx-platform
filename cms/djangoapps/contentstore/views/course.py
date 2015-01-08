@@ -1243,7 +1243,7 @@ class GroupConfiguration(object):
     @staticmethod
     def get_usage_info(course, store):
         """
-        Get usage information for all Group Configurations that can be referenced by split_test instances.
+        Get usage information for all Group Configurations currently referenced by a split_test instance.
         """
         split_tests = store.get_items(course.id, qualifiers={'category': 'split_test'})
         return GroupConfiguration._get_usage_info(store, course, split_tests)
