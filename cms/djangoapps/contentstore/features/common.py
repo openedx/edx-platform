@@ -348,9 +348,19 @@ def attach_file(filename, sub_path):
 
 
 def upload_file(filename, sub_path=''):
+    # The file upload dialog is a faux modal, a div that takes over the display
     attach_file(filename, sub_path)
-    button_css = '.wrapper-modal-window-assetupload .action-upload'
+    modal_css = 'div.wrapper-modal-window-assetupload'
+    button_css = '{} .action-upload'.format(modal_css)
     world.css_click(button_css)
+
+    # Clicking the Upload button triggers an AJAX POST.
+    world.wait_for_ajax_complete()
+
+    # The modal stays up with a "File uploaded succeeded" confirmation message, then goes away.
+    # It should take under 2 seconds, so wait up to 10.
+    # Note that is_css_not_present will return as soon as the element is gone.
+    assert world.is_css_not_present(modal_css, wait_time=10)
 
 
 @step(u'"([^"]*)" logs in$')
