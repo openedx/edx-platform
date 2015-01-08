@@ -10,14 +10,15 @@ from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...pages.common.logout import LogoutPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
+
 class CoursewareSearchTest(UniqueCourseTest):
+
     """
     Test courseware search.
     """
 
     USERNAME = 'STUDENT_TESTER'
     EMAIL = 'student101@example.com'
-
 
     def setUp(self):
         """

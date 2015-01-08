@@ -80,7 +80,7 @@ urlpatterns = ('',  # nopep8
     url(r'^api/course/details/v0/', include('course_about.urls')),
 
     # Courseware search endpoints
-    url(r'^search', include('search.urls')),
+    url(r'^search/', include('search.urls')),
 
 )
 
