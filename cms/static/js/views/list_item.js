@@ -25,6 +25,16 @@ define([
             this.listenTo(this.model, 'remove', this.remove);
         },
 
+        className: function () {
+            var index = this.model.collection.indexOf(this.model);
+
+            return [
+                'group-configuration',
+                'group-configurations-list-item',
+                'group-configurations-list-item-' + index
+            ].join(' ');
+        },
+
         deleteItem: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
             if (!this.canDelete) { return; }
