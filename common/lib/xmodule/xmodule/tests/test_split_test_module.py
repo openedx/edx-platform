@@ -13,10 +13,9 @@ from xmodule.tests import get_test_system
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition
-from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
+from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
 from unittest import TestCase
-
+from stevedore.extension import Extension, ExtensionManager
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
     """
@@ -25,29 +24,28 @@ class SplitTestModuleFactory(xml.XmlImportFactory):
     tag = 'split_test'
 
 
-class SplitTestUtilitiesTest(TestCase):
+class SplitTestUtilitiesTest(PartitionTestCase):
     """
     Tests for utility methods related to split_test module.
     """
-
     def test_split_user_partitions(self):
         """
         Tests the get_split_user_partitions helper method.
         """
         first_random_partition = UserPartition(
             0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')],
-            RandomUserPartitionScheme
+            self.random_scheme
         )
         second_random_partition = UserPartition(
             0, 'second_partition', 'Second Partition', [Group("4", 'zeta'), Group("5", 'omega')],
-            RandomUserPartitionScheme
+            self.random_scheme
         )
         all_partitions = [
             first_random_partition,
             # Only UserPartitions with scheme "random" will be returned as available options.
             UserPartition(
                 1, 'non_random_partition', 'Will Not Be Returned', [Group("1", 'apple'), Group("2", 'banana')],
-                MockUserPartitionScheme
+                self.non_random_scheme
             ),
             second_random_partition
         ]
@@ -257,12 +255,12 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         self.split_test_module.user_partitions = [
             UserPartition(
                 0, 'first_partition', 'First Partition', [Group("0", 'alpha'), Group("1", 'beta')],
-                RandomUserPartitionScheme
+                self.random_scheme
             ),
             # Only UserPartitions with scheme "random" will be returned as available options.
             UserPartition(
                 1, 'non_random_partition', 'Will Not Be Returned', [Group("1", 'apple'), Group("2", 'banana')],
-                MockUserPartitionScheme
+                self.non_random_scheme
             )
         ]
         self.split_test_module.editable_metadata_fields  # pylint: disable=pointless-statement
@@ -457,6 +455,28 @@ class SplitTestModuleStudioTest(SplitTestModuleTest):
         verify_validation_message(
             validation.messages[0],
             u"The experiment uses a deleted group configuration. "
+            u"Select a valid group configuration or delete this experiment.",
+            StudioValidationMessage.ERROR
+        )
+        verify_summary_message(
+            validation.summary,
+            u"This content experiment has issues that affect content visibility.",
+            StudioValidationMessage.ERROR
+        )
+
+        # Verify the message for a split test referring to a non-random user partition
+        split_test_module.user_partitions = [
+            UserPartition(
+                10, 'incorrect_partition', 'Non Random Partition', [Group("0", 'alpha'), Group("2", 'gamma')],
+                scheme=self.non_random_scheme
+            )
+        ]
+        split_test_module.user_partition_id = 10
+        validation = split_test_module.validate()
+        self.assertEqual(len(validation.messages), 1)
+        verify_validation_message(
+            validation.messages[0],
+            u"The experiment uses a group configuration that is not supported for experiments. "
             u"Select a valid group configuration or delete this experiment.",
             StudioValidationMessage.ERROR
         )
