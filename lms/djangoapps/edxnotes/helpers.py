@@ -24,6 +24,7 @@ from dateutil.parser import parse as dateutil_parse
 from provider.oauth2.models import AccessToken, Client
 import oauth2_provider.oidc as oidc
 from provider.utils import now
+from opaque_keys.edx.keys import UsageKey
 from .exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 
 log = logging.getLogger(__name__)
@@ -143,7 +144,10 @@ def preprocess_collection(user, course, collection):
                 filtered_collection.append(model)
                 continue
 
-            usage_key = course.id.make_usage_key_from_deprecated_string(usage_id)
+            usage_key = UsageKey.from_string(usage_id)
+            # Add a course run if necessary.
+            usage_key = usage_key.replace(course_key=store.fill_in_run(usage_key.course_key))
+
             try:
                 item = store.get_item(usage_key)
             except ItemNotFoundError:
