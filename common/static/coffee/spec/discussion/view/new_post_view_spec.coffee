@@ -10,6 +10,15 @@ describe "NewPostView", ->
         )
         @discussion = new Discussion([], {pages: 1})
 
+    checkVisibility = (view, expectedVisible, noRender) =>
+      if !noRender
+        view.render()
+      # Can also be undefined if the element does not exist.
+      expect(view.$('.group-selector-wrapper').is(":visible") or false).toEqual(expectedVisible)
+      disabled = view.$(".js-group-select").prop("disabled") or false
+      if expectedVisible
+        expect(disabled).toEqual(false)
+
     describe "cohort selector", ->
       beforeEach ->
         @course_settings = new DiscussionCourseSettings({
@@ -32,15 +41,9 @@ describe "NewPostView", ->
           el: $("#fixture-element"),
           collection: @discussion,
           course_settings: @course_settings,
+          is_commentable_cohorted: true,
           mode: "tab"
         )
-
-      checkVisibility = (view, expectedVisible, noRender) =>
-        if !noRender
-          view.render()
-        expect(view.$(".js-group-select").is(":visible")).toEqual(expectedVisible)
-        if expectedVisible
-          expect(view.$(".js-group-select").prop("disabled")).toEqual(false)
 
       it "is not visible to students", ->
         checkVisibility(@view, false)
@@ -64,7 +67,7 @@ describe "NewPostView", ->
         # Select the cohorted topic again
         $('.topic-title:contains(Topic)').click()
         # It should be visible once more.
-        checkVisibility(@view, true, false)
+        checkVisibility(@view, true, true)
 
       it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
@@ -87,6 +90,46 @@ describe "NewPostView", ->
             expect($.ajax).toHaveBeenCalled()
             $.ajax.reset()
         )
+
+    describe "always cohort inline discussions ", ->
+      beforeEach ->
+        @course_settings = new DiscussionCourseSettings({
+          "category_map": {
+            "children": [],
+            "entries": {}
+          },
+          "allow_anonymous": false,
+          "allow_anonymous_to_peers": false,
+          "is_cohorted": true,
+          "cohorts": [
+            {"id": 1, "name": "Cohort1"},
+            {"id": 2, "name": "Cohort2"}
+          ]
+        })
+        @view = new NewPostView(
+          el: $("#fixture-element"),
+          collection: @discussion,
+          course_settings: @course_settings,
+          mode: "tab"
+        )
+
+      it "hides the cohort menu if it is set false", ->
+        DiscussionSpecHelper.makeModerator()
+        @view.is_commentable_cohorted = false
+        checkVisibility(@view, false)
+
+      it "shows the cohort menu if it is set true", ->
+        DiscussionSpecHelper.makeModerator()
+        @view.is_commentable_cohorted = true
+        checkVisibility(@view, true)
+
+      it "is not visible to students when set false", ->
+        @view.is_commentable_cohorted = false
+        checkVisibility(@view, false)
+
+      it "is not visible to students when set true", ->
+        @view.is_commentable_cohorted = true
+        checkVisibility(@view, false)
 
     describe "cancel post resets form ", ->
       beforeEach ->
