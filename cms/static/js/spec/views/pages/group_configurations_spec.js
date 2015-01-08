@@ -37,7 +37,7 @@ define([
             TemplateHelpers.installTemplates([
                 'no-group-configurations', 'group-configuration-edit',
                 'group-configuration-details', 'add-list-item',
-                'no-groups', 'group-details', 'group-item-edit',
+                'no-content-groups', 'content-group-details', 'content-group-edit',
                 'group-edit'
             ]);
 

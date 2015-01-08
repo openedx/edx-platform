@@ -3,7 +3,7 @@ define([
 ], function(BaseView) {
     'use strict';
 
-    var GroupDetails = BaseView.extend({
+    var ContentGroupDetails = BaseView.extend({
         tagName: 'div', // TODO: confirm class and tag
         className: 'group-configuration-details',
 
@@ -16,7 +16,7 @@ define([
         },
 
         initialize: function() {
-            this.template = this.loadTemplate('group-details');
+            this.template = this.loadTemplate('content-group-details');
         },
 
         render: function() {
@@ -24,5 +24,5 @@ define([
         }
     });
 
-    return GroupDetails;
+    return ContentGroupDetails;
 });

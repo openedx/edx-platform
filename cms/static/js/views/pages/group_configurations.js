@@ -1,6 +1,6 @@
 define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
-    'js/views/group_configurations_list', 'js/views/group_list'
+    'js/views/group_configurations_list', 'js/views/content_group_list'
 ],
 function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
     'use strict';

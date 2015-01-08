@@ -1,9 +1,9 @@
 define([
-    'js/views/list_item', 'js/views/group_item_edit', 'js/views/group_details'
+    'js/views/list_item', 'js/views/content_group_edit', 'js/views/content_group_details'
 ], function(ListItem, GroupItemEdit, GroupDetails) {
     'use strict';
 
-    var GroupItem = ListItem.extend({
+    var ContentGroupItem = ListItem.extend({
         tagName: 'section', // TODO: confirm class and tag
 
         createEditView: function() {
@@ -15,5 +15,5 @@ define([
         }
     });
 
-    return GroupItem;
+    return ContentGroupItem;
 });
