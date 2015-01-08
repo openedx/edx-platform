@@ -97,10 +97,10 @@ var edx = edx || {};
             }
             if (this.hasAssociatedContentGroup() && fieldData.group_id === null) {
                 if (this.$('.input-cohort-group-association').val() === 'None') {
-                    errorMessages.push(gettext('You did not select a cohorted content group'));
+                    errorMessages.push(gettext('You did not select a content group'));
                 } else {
                     // If a value was selected, then it must be for a non-existent/deleted content group
-                    errorMessages.push(gettext('The selected cohorted content group does not exist'));
+                    errorMessages.push(gettext('The selected content group does not exist'));
                 }
             }
             return errorMessages;
