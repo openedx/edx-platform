@@ -89,12 +89,12 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         """
         self.verify_cohort_description(
             self.manual_cohort_name,
-            'Students are added to this cohort group only when you provide '
+            'Students are added to this cohort only when you provide '
             'their email addresses or usernames on this page',
         )
         self.verify_cohort_description(
             self.auto_cohort_name,
-            'Students are added to this cohort group automatically',
+            'Students are added to this cohort automatically',
         )
 
     def test_no_content_groups(self):
@@ -104,7 +104,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
         Given I have a course with a cohort defined but no content groups
         When I view the cohort in the instructor dashboard and select settings
-        Then the cohort group is not linked to a content group
+        Then the cohort is not linked to a content group
         And there is text stating that no content groups are defined
         And I cannot select the radio button to enable content group association
         And there is a link I can select to open Group settings in Studio
@@ -113,7 +113,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertEqual(
             "Warning:\nNo content groups exist. "
-            "Create a content group to associate with cohort groups. Create a content group",
+            "Create a content group to associate with cohorts. Create a content group",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         self.assertFalse(self.cohort_management_page.select_content_group_radio_button())
@@ -167,7 +167,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
         self.assertEqual(
             [
-                "2 students have been added to this cohort group",
+                "2 students have been added to this cohort",
                 "1 student was removed from " + self.manual_cohort_name
             ],
             confirmation_messages
@@ -235,8 +235,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
         self.assertEqual(
             [
-                "0 students have been added to this cohort group",
-                "1 student was already in the cohort group"
+                "0 students have been added to this cohort",
+                "1 student was already in the cohort"
             ],
             self.cohort_management_page.get_cohort_confirmation_messages()
         )
@@ -359,7 +359,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
-        # student_user is moved from manual cohort group to auto cohort group
+        # student_user is moved from manual cohort to auto cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -378,7 +378,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # instructor_user (previously unassigned) is added to manual cohort group
+        # instructor_user (previously unassigned) is added to manual cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -388,7 +388,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # unicode_student_user (previously unassigned) is added to manual cohort group
+        # unicode_student_user (previously unassigned) is added to manual cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -467,7 +467,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
 
 class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
     """
-    Tests for linking between content groups and cohort groups in the instructor dashboard.
+    Tests for linking between content groups and cohort in the instructor dashboard.
     """
 
     def setUp(self):
@@ -515,7 +515,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
 
         Given I have a course with a cohort defined and content groups defined
         When I view the cohort in the instructor dashboard and select settings
-        Then the cohort group is not linked to a content group
+        Then the cohort is not linked to a content group
         And there is no text stating that content groups are undefined
         And the content groups are listed in the selector
         """
@@ -622,7 +622,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         )
         self.cohort_management_page.set_cohort_associated_content_group("Pears")
         confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
-        self.assertEqual(["Saved cohort group."], confirmation_messages)
+        self.assertEqual(["Saved cohort"], confirmation_messages)
         self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
         self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
 
@@ -652,7 +652,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         Then refreshes the page and selects the cohort.
         """
         confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
-        self.assertEqual(["Saved cohort group."], confirmation_messages)
+        self.assertEqual(["Saved cohort"], confirmation_messages)
         self.browser.refresh()
         self.cohort_management_page.wait_for_page()
         self.cohort_management_page.select_cohort(cohort_name)

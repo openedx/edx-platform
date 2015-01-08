@@ -36,10 +36,10 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
     """
     def setup_cohorts(self):
         """
-        Sets up the course to use cohorting with a single defined cohort group.
+        Sets up the course to use cohorting with a single defined cohort.
         """
         self.setup_cohort_config(self.course_fixture)
-        self.cohort_1_name = "Cohort Group 1"
+        self.cohort_1_name = "Cohort 1"
         self.cohort_1_id = self.add_manual_cohort(self.course_fixture, self.cohort_1_name)
 
     def test_cohort_visibility_label(self):

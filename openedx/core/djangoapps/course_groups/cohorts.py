@@ -1,5 +1,5 @@
 """
-This file contains the logic for cohort groups, as exposed internally to the
+This file contains the logic for cohorts, as exposed internally to the
 forums, and to the cohort admin views.
 """
 
@@ -88,8 +88,8 @@ class CohortAssignmentType(object):
     # No automatic rules are applied to this cohort; users must be manually added.
     NONE = "none"
 
-    # One of (possibly) multiple cohort groups to which users are randomly assigned.
-    # Note: The 'default cohort' group is included in this category iff it exists and
+    # One of (possibly) multiple cohorts to which users are randomly assigned.
+    # Note: The 'default' cohort is included in this category iff it exists and
     # there are no other random groups. (Also see Note 2 above.)
     RANDOM = "random"
 
