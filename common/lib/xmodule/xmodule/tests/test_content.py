@@ -1,8 +1,13 @@
+"""Tests for contents"""
+
+import os
 import unittest
 import ddt
+from path import path
 from xmodule.contentstore.content import StaticContent, StaticContentStream
 from xmodule.contentstore.content import ContentStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
+from xmodule.static_content import _write_js, _list_descriptors
 
 SAMPLE_STRING = """
 This is a sample string with more than 1024 bytes, the default STREAM_DATA_CHUNK_SIZE
@@ -155,3 +160,13 @@ class ContentTest(unittest.TestCase):
             total_length += len(chunck)
 
         self.assertEqual(total_length, last_byte - first_byte + 1)
+
+    def test_static_content_write_js(self):
+        """
+        Test that only one filename starts with 000.
+        """
+        output_root = path(u'common/static/xmodule/descriptors/js')
+        js_file_paths = _write_js(output_root, _list_descriptors())
+        js_file_paths = [file_path for file_path in js_file_paths if os.path.basename(file_path).startswith('000-')]
+        self.assertEqual(len(js_file_paths), 1)
+        self.assertIn("XModule.Descriptor = (function () {", open(js_file_paths[0]).read())
