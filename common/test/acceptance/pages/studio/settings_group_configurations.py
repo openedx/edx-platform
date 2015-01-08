@@ -34,22 +34,27 @@ class GroupConfigurationsPage(CoursePage):
         """
         Return list of the group configurations for the course.
         """
-        css = '.experiment-groups .group-configurations-list-item'
-        return [GroupConfiguration(self, '.experiment-groups', index) for index in xrange(len(self.q(css=css)))]
-
-    def create_group_configuration(self):
-        """
-        Creates new group configuration.
-        """
-        self.q(css=".experiment-groups .new-button").first.click()
+        return self._get_groups(".experiment-groups")
 
     @property
     def content_groups(self):
         """
         Return list of the content groups for the course.
         """
-        css = '.content-groups .group-configurations-list-item'
-        return [GroupConfiguration(self, '.content-groups', index) for index in xrange(len(self.q(css=css)))]
+        return self._get_groups(".content-groups")
+
+    def _get_groups(self, prefix):
+        """
+        Return list of the group-configurations-list-item's of specified type for the course.
+        """
+        css = prefix + ' .group-configurations-list-item'
+        return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
+
+    def create_group_configuration(self):
+        """
+        Creates new group configuration.
+        """
+        self.q(css=".experiment-groups .new-button").first.click()
 
     def create_first_content_group(self):
         """
@@ -65,19 +70,25 @@ class GroupConfigurationsPage(CoursePage):
 
     @property
     def no_group_configuration_message_is_present(self):
-        return self.q(css='.wrapper-content .experiment-groups .no-group-configurations-content').present
-
-    @property
-    def no_group_configuration_message_text(self):
-        return self.q(css='.wrapper-content .experiment-groups .no-group-configurations-content').text[0]
+        return self._no_content_message(".experiment-groups").present
 
     @property
     def no_content_groups_message_is_present(self):
-        return self.q(css='.wrapper-content .content-groups .no-group-configurations-content').present
+        return self._no_content_message(".content-groups").present
+
+    @property
+    def no_group_configuration_message_text(self):
+        return self._no_content_message(".experiment-groups").text[0]
 
     @property
     def no_content_groups_message_text(self):
-        return self.q(css='.wrapper-content .content-groups .no-group-configurations-content').text[0]
+        return self._no_content_message(".content-groups").text[0]
+
+    def _no_content_message(self, prefix):
+        """
+        Returns the message about "no content" for the specified type.
+        """
+        return self.q(css='.wrapper-content ' + prefix + ' .no-group-configurations-content')
 
 
 class GroupConfiguration(object):
