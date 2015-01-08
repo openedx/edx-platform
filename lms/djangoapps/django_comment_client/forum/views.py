@@ -199,6 +199,8 @@ def forum_form_discussion(request, course_key):
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
+    user_info["can_create_comment"] = cached_has_permission(user, "create_comment", course.id)
+
     try:
         unsafethreads, query_params = get_threads(request, course_key)   # This might process a search query
         is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)

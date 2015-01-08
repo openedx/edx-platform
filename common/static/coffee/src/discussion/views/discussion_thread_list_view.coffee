@@ -247,7 +247,7 @@ if Backbone?
       @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
 
     goHome: ->
-      @template = _.template($("#discussion-home").html())
+      @template = _.template($("#discussion-home-template").html())
       $(".forum-content").html(@template)
       $(".forum-nav-thread-list a").removeClass("is-active")
       $("input.email-setting").bind "click", @updateEmailNotifications
