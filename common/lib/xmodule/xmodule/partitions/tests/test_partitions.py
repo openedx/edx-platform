@@ -116,7 +116,7 @@ class PartitionTestCase(TestCase):
     def setUp(self):
         # Set up two user partition schemes: mock and random
         self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
-        self.random_scheme =  MockUserPartitionScheme("random")
+        self.random_scheme = MockUserPartitionScheme("random")
         extensions = [
             Extension(
                 self.non_random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.non_random_scheme, None

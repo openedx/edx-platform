@@ -377,4 +377,3 @@ class TestMasqueradedGroup(StaffMasqueradeTestCase):
         self._verify_masquerade_for_group(self.user_partition.groups[0])
         self._verify_masquerade_for_group(self.user_partition.groups[1])
         self._verify_masquerade_for_group(None)
-

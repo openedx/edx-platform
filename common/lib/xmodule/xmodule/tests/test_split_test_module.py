@@ -13,9 +13,8 @@ from xmodule.tests import get_test_system
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.validation import StudioValidationMessage
 from xmodule.split_test_module import SplitTestDescriptor, SplitTestFields, get_split_user_partitions
-from xmodule.partitions.partitions import Group, UserPartition, USER_PARTITION_SCHEME_NAMESPACE
-from unittest import TestCase
-from stevedore.extension import Extension, ExtensionManager
+from xmodule.partitions.partitions import Group, UserPartition
+
 
 class SplitTestModuleFactory(xml.XmlImportFactory):
     """
