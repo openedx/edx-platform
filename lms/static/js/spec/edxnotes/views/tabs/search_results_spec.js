@@ -76,7 +76,7 @@ define([
             expect(this.tabsCollection.at(0).toJSON()).toEqual({
                 name: 'Search Results',
                 identifier: 'view-search-results',
-                icon: 'icon-search',
+                icon: 'fa fa-search',
                 is_active: true,
                 is_closable: true
             });
