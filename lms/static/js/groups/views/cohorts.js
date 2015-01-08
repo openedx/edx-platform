@@ -78,8 +78,8 @@ var edx = edx || {};
                 additionalCohortControlElement.addClass(hiddenClass);
                 this.showNotification({
                     type: 'warning',
-                    title: gettext('You currently have no cohort groups configured'),
-                    actionText: gettext('Add Cohort Group'),
+                    title: gettext('You currently have no cohorts configured'),
+                    actionText: gettext('Add Cohort'),
                     actionClass: 'action-create',
                     actionIconClass: 'fa-plus'
                 });
@@ -182,7 +182,7 @@ var edx = edx || {};
                         self.showNotification({
                             type: 'confirmation',
                             title: interpolate_text(
-                                gettext('The {cohortGroupName} cohort group has been created. You can manually add students to this group below.'),
+                                gettext('The {cohortGroupName} cohort has been created. You can manually add students to this cohort below.'),
                                 {cohortGroupName: newCohort.get('name')}
                             )
                         });
@@ -212,7 +212,7 @@ var edx = edx || {};
             if (!this.fileUploaderView) {
                 this.fileUploaderView = new FileUploaderView({
                     el: uploadElement,
-                    title: gettext("Assign students to cohort groups by uploading a CSV file."),
+                    title: gettext("Assign students to cohorts by uploading a CSV file."),
                     inputLabel: gettext("Choose a .csv file"),
                     inputTip: gettext("Only properly formatted .csv files will be accepted."),
                     submitButtonText: gettext("Upload File and Assign Students"),
