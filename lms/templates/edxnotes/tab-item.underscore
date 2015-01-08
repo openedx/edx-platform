@@ -6,7 +6,7 @@
 
 <% if (is_closable) { %>
   <a href="#" class="action-close">
-    <i class="icon-remove-sign"></i>
+    <i class="icon fa fa-times-circle"></i>
     <span class="sr"><%- gettext("Clear search results") %></span>
   </a>
 <% } %>
