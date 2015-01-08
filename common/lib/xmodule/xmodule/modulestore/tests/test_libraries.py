@@ -13,7 +13,6 @@ from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, che
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
 
-
 @ddt.ddt
 class TestLibraries(MixedSplitTestCase):
     """
