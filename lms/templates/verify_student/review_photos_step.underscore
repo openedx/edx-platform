@@ -1,8 +1,8 @@
 <div id="wrapper-review" class="wrapper-view review-photos-step">
   <div class="review view">
-    <h3 class="title"><%- gettext( "Review your photos" ) %></h3>
+    <h3 class="title"><%- gettext( "Review Your Photos" ) %></h3>
     <div class="instruction">
-      <p><%- gettext( "Make sure we can verify your identity from the photos below." ) %></p>
+      <p><%- gettext( "Make sure we can verify your identity with the photos and information you have provided." ) %></p>
     </div>
 
     <div class="wrapper-task">
@@ -30,12 +30,12 @@
               <li class="tip"><%- _.sprintf(  gettext( "Does the name on your ID match your account name: %(fullName)s?" ), { fullName: fullName } ) %>
                 <div class="help-tip is-expandable">
                   <a href="#" class="title title-expand" aria-expanded="false" role="link">
-                    <%- gettext( "Edit your name" ) %>
+                    <%- gettext( "Edit Your Name" ) %>
                   </a>
 
                   <div class="copy expandable-area">
-                    <p><%- gettext( "You should change the name on your account to match your ID." ) %></p>
-                    <input type="text" name="new-name" id="new-name" placeholder=<%= fullName %>>
+                    <p><%- gettext( "Make sure that the full name on your account matches the name on your ID." ) %></p>
+                    <input type="text" name="new-name" id="new-name" placeholder="<%= fullName %>">
                   </div>
                 </div>
               </li>
@@ -48,7 +48,7 @@
             <p>
               <%- gettext( "Photos don't meet the requirements?" ) %>
               <a id="retake_photos_button" class="retake-photos">
-                <%- gettext( "Retake your photos" ) %>
+                <%- gettext( "Retake Your Photos" ) %>
               </a>
             </p>
           </div>

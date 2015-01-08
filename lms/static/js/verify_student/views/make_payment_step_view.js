@@ -38,11 +38,6 @@ var edx = edx || {};
             // Set the payment button to disabled by default
             this.setPaymentEnabled( false );
 
-            // The activate button is always disabled
-            $( '#activate_button' )
-                .addClass( 'is-disabled' )
-                .prop( 'disabled', true );
-
             // Update the contribution amount with the amount the user
             // selected in a previous screen.
             if ( templateContext.contributionAmount ) {
@@ -140,7 +135,7 @@ var edx = edx || {};
         },
 
         handleCreateOrderError: function( xhr ) {
-            var errorMsg = gettext( 'An unexpected error occurred.  Please try again.' );
+            var errorMsg = gettext( 'An error has occurred. Please try again.' );
 
             if ( xhr.status === 400 ) {
                 errorMsg = xhr.responseText;

@@ -15,7 +15,7 @@
           ) %>
       </h3>
       <div class="instruction">
-        <%- gettext( "We've already verified your identity through the photos of you and your ID you provided earlier. You can now pay and complete registration." ) %>
+        <%- gettext( "We have successfully verified your identity. You can now enter your payment information and complete your enrollment." ) %>
       </div>
     <% } %>
 
@@ -79,7 +79,7 @@
 
           <% } else {%>
           <li class="review-task review-task-contribution">
-            <h4 class="title"><%- gettext( "Your Course Total" ) %></h4>
+            <h4 class="title"><%- gettext( "Your Total Contribution" ) %></h4>
             <div class="copy">
               <p><%- gettext( "To complete your enrollment, you will need to pay:" ) %></p>
             </div>
@@ -105,6 +105,8 @@
             gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
             { date: verificationDeadline }
           ) %>
+        <% } else if ( !isActive ) { %>
+          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
         <% } else if ( !upgrade ) { %>
             <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
         <% } %>
@@ -116,66 +118,60 @@
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
         <% if ( requirements['account-activation-required'] ) { %>
-        <li class="req req-0 req-activate">
-          <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
-          <div class="placeholder-art">
-            <i class="icon-envelope-alt"></i>
-          </div>
+          <li class="req req-0 req-activate">
+            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <div class="placeholder-art">
+              <i class="icon-envelope-alt"></i>
+            </div>
 
-          <div class="copy">
-            <p>
-              <span class="copy-super"><%- gettext( "Check your email" ) %></span>
-              <span class="copy-sub"><%-
-                  gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email." )
-                %>
-              </span>
-            </p>
-          </div>
-        </li>
-        <% } %>
+            <div class="copy">
+              <p>
+                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
+              </p>
+            </div>
+          </li>
+        <% } else {%>
+          <% if ( requirements['photo-id-required'] ) { %>
+          <li class="req req-1 req-id">
+            <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
+            <div class="placeholder-art">
+              <i class="icon-list-alt icon-under"></i>
+              <i class="icon-user icon-over"></i>
+            </div>
 
-        <% if ( requirements['photo-id-required'] ) { %>
-        <li class="req req-1 req-id">
-          <h4 class="title"><%- gettext( "Government-issued Photo ID" ) %></h4>
-          <div class="placeholder-art">
-            <i class="icon-list-alt icon-under"></i>
-            <i class="icon-user icon-over"></i>
-          </div>
+            <div class="copy"></div>
+          </li>
+          <% } %>
 
-          <div class="copy"></div>
-        </li>
-        <% } %>
+          <% if ( requirements['webcam-required'] ) { %>
+          <li class="req req-2 req-webcam">
+            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <div class="placeholder-art">
+              <i class="icon-facetime-video"></i>
+            </div>
 
-        <% if ( requirements['webcam-required'] ) { %>
-        <li class="req req-2 req-webcam">
-          <h4 class="title"><%- gettext( "Webcam" ) %></h4>
-          <div class="placeholder-art">
-            <i class="icon-facetime-video"></i>
-          </div>
-
-          <div class="copy"></div>
-        </li>
+            <div class="copy"></div>
+          </li>
+          <% } %>
         <% } %>
       </ul>
     </div>
     <% } %>
 
 
+  <% if ( isActive ) { %>
   <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
     <% if ( upgrade ) { %>
         <a class="next action-primary is-disabled right" id="pay_button" aria-disabled="true">
           <%- gettext( "Next: Make payment" ) %>
         </a>
-    <% } else if ( isActive ) { %>
-        <a class="next action-primary is-disabled" id="pay_button" aria-disabled="true">
-          <%- gettext( "Continue to payment" ) %>
-        </a>
     <% } else { %>
-        <a class="next action-primary is-disabled" id="activate_button" aria-disabled="true">
-          <%- gettext( "Activate your account" ) %>
+        <a class="next action-primary is-disabled" id="pay_button">
+          <%- gettext( "Continue to payment" ) %>
         </a>
     <% } %>
   </nav>
+  <% } %>
 
   <form id="payment-processor-form"></form>
 </div>
