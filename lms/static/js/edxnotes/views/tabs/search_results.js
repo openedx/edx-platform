@@ -54,7 +54,7 @@ define([
         tabInfo: {
             identifier: 'view-search-results',
             name: gettext('Search Results'),
-            icon: 'icon-search',
+            icon: 'fa fa-search',
             is_closable: true
         },
 
