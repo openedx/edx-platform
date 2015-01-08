@@ -18,7 +18,7 @@
                 <th scope="col" ><%- gettext( "Order No." ) %></th>
                 <th scope="col" ><%- gettext( "Description" ) %></th>
                 <th scope="col" ><%- gettext( "Date" ) %></th>
-                <th scope="col" ><%- gettext( "Description" ) %></th>
+                <th scope="col" ><%- gettext( "Amount" ) %></th>
               </tr>
             </thead>
 
