@@ -2000,8 +2000,8 @@ PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/log
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
-# Use ElasticSearch as the search engine herein
-from search.elastic import ElasticSearchEngine
-SEARCH_ENGINE = ElasticSearchEngine
+# Use MockSearchEngine as the search engine for test scenario
+from search.tests.mock_search_engine import MockSearchEngine
+SEARCH_ENGINE = MockSearchEngine
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"

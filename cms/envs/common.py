@@ -823,11 +823,6 @@ ADVANCED_PROBLEM_TYPES = [
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
-# Use ElasticSearch for the search engine
-from search.elastic import ElasticSearchEngine
-SEARCH_ENGINE = ElasticSearchEngine
-ELASTIC_SEARCH_MAPPINGS = {
-    "start_date": {
-        "type": "date"
-    }
-}
+# Use MockSearchEngine as the search engine for test scenario
+from search.tests.mock_search_engine import MockSearchEngine
+SEARCH_ENGINE = MockSearchEngine

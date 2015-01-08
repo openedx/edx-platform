@@ -492,3 +492,6 @@ PDF_RECEIPT_LOGO_HEIGHT_MM = ENV_TOKENS.get('PDF_RECEIPT_LOGO_HEIGHT_MM', PDF_RE
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = ENV_TOKENS.get(
     'PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM', PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM
 )
+# Use ElasticSearch as the search engine herein
+from search.elastic import ElasticSearchEngine
+SEARCH_ENGINE = ElasticSearchEngine
