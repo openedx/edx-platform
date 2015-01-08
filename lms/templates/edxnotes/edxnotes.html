@@ -21,7 +21,7 @@
                     <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
                         <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
                         <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}">
-                        <button type="submit" class="search-notes-submit"><i class="icon-search"></i> ${_('Search')}</button>
+                        <button type="submit" class="search-notes-submit"><i class="icon fa fa-search"></i> ${_('Search')}</button>
                     </form>
                 </div>
             % endif
@@ -34,7 +34,7 @@
                 <div class="inline-error is-hidden" tabindex="-1"></div>
             % if notes:
                 <div class="ui-loading" tabindex="-1">
-                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
+                    <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
                 </div>
             % else:
                 <section class="is-empty">
