@@ -324,7 +324,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('New Cohort');
                     cohortsView.$('.radio-yes').prop('checked', true).change();
-                    saveFormAndExpectErrors('add', ['You did not select a cohorted content group']);
+                    saveFormAndExpectErrors('add', ['You did not select a content group']);
                 });
 
                 it("shows two message when both fields have problems", function() {
@@ -334,7 +334,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.radio-yes').prop('checked', true).change();
                     saveFormAndExpectErrors('add', [
                         'You must specify a name for the cohort',
-                        'You did not select a cohorted content group'
+                        'You did not select a content group'
                     ]);
                 });
 
@@ -638,7 +638,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         cohortsView.$('.tab-settings a').click();
                         cohortsView.$('.cohort-name').val('New Cohort');
                         cohortsView.$('.radio-yes').prop('checked', true).change();
-                        saveFormAndExpectErrors('update', ['You did not select a cohorted content group']);
+                        saveFormAndExpectErrors('update', ['You did not select a content group']);
                     });
 
                     it("shows a message when the selected content group does not exist", function () {
@@ -672,7 +672,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     it("shows an error when saving with a deleted content group", function () {
                         createCohortsViewWithDeletedContentGroup(this);
                         cohortsView.$('.tab-settings a').click();
-                        saveFormAndExpectErrors('save', ['The selected cohorted content group does not exist']);
+                        saveFormAndExpectErrors('save', ['The selected content group does not exist']);
                     });
 
                     it("shows an error when the save fails", function () {
