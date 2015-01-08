@@ -200,10 +200,8 @@ class HTMLSnippet(object):
         coffee = cls.js.setdefault('coffee', [])
         js = cls.js.setdefault('js', [])
 
-        fragment = resource_string(__name__, 'js/src/xmodule.js')
-
-        if fragment not in js:
-            js.insert(0, fragment)
+        # Added xmodule.js separately to enforce 000 prefix for this only.
+        cls.js.setdefault('xmodule_js', resource_string(__name__, 'js/src/xmodule.js'))
 
         return cls.js
 
