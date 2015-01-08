@@ -7,9 +7,13 @@ from xmodule.x_module import AUTHOR_VIEW
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
+_dummy_render = lambda block, _: Fragment(block.data)
 
+
+@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
+@patch('xmodule.html_module.HtmlDescriptor.author_view', _dummy_render, create=True)
+@patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryRoot(MixedSplitTestCase):
-    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
     def test_library_author_view(self):
         """
         Test that LibraryRoot.author_view can run and includes content from its
@@ -17,6 +21,7 @@ class TestLibraryRoot(MixedSplitTestCase):
         We have to patch the runtime (module system) in order to be able to
         render blocks in our test environment.
         """
+        message = u"Hello world"
         library = LibraryFactory.create(modulestore=self.store)
         # Add one HTML block to the library:
         ItemFactory.create(
@@ -25,19 +30,16 @@ class TestLibraryRoot(MixedSplitTestCase):
             user_id=self.user_id,
             publish_item=False,
             modulestore=self.store,
+            data=message
         )
         library = self.store.get_library(library.location.library_key)
 
         context = {'reorderable_items': set(), }
         # Patch the HTML block to always render "Hello world"
-        message = u"Hello world"
-        hello_render = lambda _, context: Fragment(message)
-        with patch('xmodule.html_module.HtmlDescriptor.author_view', hello_render, create=True):
-            with patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: []):
-                result = library.render(AUTHOR_VIEW, context)
+
+        result = library.render(AUTHOR_VIEW, context)
         self.assertIn(message, result.content)
 
-    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
     def test_library_author_view_with_paging(self):
         """
         Test that LibraryRoot.author_view can apply paging
@@ -67,10 +69,7 @@ class TestLibraryRoot(MixedSplitTestCase):
             for expected_block in expected_blocks:
                 self.assertIn(expected_block.data, result.content)
 
-        hello_render = lambda block, _: Fragment(block.data)
-        with patch('xmodule.html_module.HtmlDescriptor.author_view', hello_render, create=True):
-            with patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: []):
-                render_and_check_contents(0, 3)
-                render_and_check_contents(1, 3)
-                render_and_check_contents(0, 2)
-                render_and_check_contents(1, 2)
+        render_and_check_contents(0, 3)
+        render_and_check_contents(1, 3)
+        render_and_check_contents(0, 2)
+        render_and_check_contents(1, 2)

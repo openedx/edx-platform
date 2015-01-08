@@ -5,6 +5,12 @@ Basic unit tests for LibraryContentModule
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 import ddt
+from mock import patch
+
+from xblock.fragment import Fragment
+from xblock.runtime import Runtime as VanillaRuntime
+
+from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
 from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
@@ -12,13 +18,15 @@ from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 
 
-@ddt.ddt
-class TestLibraries(MixedSplitTestCase):
+_dummy_render = lambda block, _: Fragment(block.data)
+
+
+class BaseTestLibraryContainer(MixedSplitTestCase):
     """
-    Basic unit tests for LibraryContentModule (library_content_module.py)
+    Base class for TestLibraryContainer and TestLibraryContainerRender
     """
     def setUp(self):
-        super(TestLibraries, self).setUp()
+        super(BaseTestLibraryContainer, self).setUp()
 
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
@@ -62,7 +70,7 @@ class TestLibraries(MixedSplitTestCase):
             }
         )
 
-    def _bind_course_module(self, module):
+    def _bind_course_module(self, module, render=None):
         """
         Bind a module (part of self.course) so we can access student-specific data.
         """
@@ -108,6 +116,11 @@ class TestLibraries(MixedSplitTestCase):
                 modulestore=self.store,
             )
 
+@ddt.ddt
+class TestLibraryContainer(BaseTestLibraryContainer):
+    """
+    Basic unit tests for LibraryContentModule (library_content_module.py)
+    """
     def test_lib_content_block(self):
         """
         Test that blocks from a library are copied and added as children
@@ -250,3 +263,31 @@ class TestLibraries(MixedSplitTestCase):
         non_editable_metadata_fields = self.lc_block.non_editable_metadata_fields
         self.assertIn(LibraryContentDescriptor.mode, non_editable_metadata_fields)
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
+
+
+@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
+@patch('xmodule.html_module.HtmlModule.author_view', _dummy_render, create=True)
+@patch('xmodule.html_module.HtmlModule.student_view', _dummy_render, create=True)
+@patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
+class TestLibraryContentRender(BaseTestLibraryContainer):
+    """
+    Rendering unit tests for LibraryContentModule (library_content_module.py)
+    """
+    def test_preivew_view(self):
+        """ Test preview view rendering """
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        self._bind_course_module(self.lc_block)
+        rendered = self.lc_block.render(AUTHOR_VIEW, {'root_xblock': self.lc_block})
+        self.assertIn("Hello world from block 1", rendered.content)
+
+    def test_author_view(self):
+        """ Test author view rendering """
+        self.lc_block.refresh_children()
+        self.lc_block = self.store.get_item(self.lc_block.location)
+        self.assertEqual(len(self.lc_block.children), len(self.lib_blocks))
+        self._bind_course_module(self.lc_block)
+        rendered = self.lc_block.render(AUTHOR_VIEW, {})
+        self.assertEqual("", rendered.content)  # content should be empty
+        self.assertEqual("LibraryContentAuthorView", rendered.js_init_fn)  # but some js initialization should happen
