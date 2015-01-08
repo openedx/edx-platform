@@ -24,7 +24,7 @@ from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 
 
-dummy_render = lambda block, _: Fragment(block.data)
+dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
 class BaseTestLibraryContainer(MixedSplitTestCase):
