@@ -184,6 +184,7 @@ LOGGING = get_logger_config(LOG_DIR,
 
 #theming start:
 PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
+STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
