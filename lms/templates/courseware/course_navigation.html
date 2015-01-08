@@ -35,7 +35,7 @@ def url_class(is_active):
             <ol class="preview-actions">
                 <li class="action-preview">
                     <form action="#" class="action-preview-form" method="post">
-                        <label for="action-preview-select" class="action-preview-label">${_("previewing as:")}</label>
+                        <label for="action-preview-select" class="action-preview-label">${_("View this course as:")}</label>
                         <select class="action-preview-select" id="action-preview-select" name="select">
                             <option value="staff" ${"selected" if not is_student_masquerade else ""}>${_("Staff")}</option>
                             <option value="student" ${"selected" if is_student_masquerade and not masquerade_group_id else ""}>${_("Student")}</option>
