@@ -167,16 +167,16 @@ define([
                 })
             );
 
-            expect(view.$('.inline-error')).not.toHaveClass('is-hidden');
-            expect(view.$('.inline-error')).toContainText('test error message');
+            expect(view.$('.wrapper-msg')).not.toHaveClass('is-hidden');
+            expect(view.$('.wrapper-msg .copy')).toContainText('test error message');
             expect(view.$('.note-highlight')).not.toExist();
             expect(view.$('.ui-loading')).toHaveClass('is-hidden');
 
             submitForm(view.searchBox, 'Second');
             AjaxHelpers.respondWithJson(requests, responseJson);
 
-            expect(view.$('.inline-error')).toHaveClass('is-hidden');
-            expect(view.$('.inline-error')).toBeEmpty();
+            expect(view.$('.wrapper-msg')).toHaveClass('is-hidden');
+            expect(view.$('.wrapper-msg .copy')).toBeEmpty();
             expect(view.$('.note-highlight')).toExist();
         });
 

@@ -3,68 +3,93 @@
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
+<%block name="bodyclass">view-student-notes is-in-course course</%block>
 <%block name="pagetitle">${_("Student Notes")}</%block>
 <%block name="headextra">
-    <%static:css group='style-course'/>
+<%static:css group='style-course'/>
 </%block>
 
 <%include file="/courseware/course_navigation.html" args="active_page='edxnotes'" />
-<section class="container wrapper-student-notes">
-    <div class="info-wrapper">
-        <section class="updates">
-            <div class="title-search-container">
-                <div class="wrapper-title">
-                    <h1 class="page-title">${_('Notes')} <small class="page-subtitle">${_("Highlights and notes you've made in course content")}</small></h1>
-                </div>
-            % if notes:
-                <div class="wrapper-notes-search">
-                    <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
-                        <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
-                        <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}">
-                        <button type="submit" class="search-notes-submit"><i class="icon-search"></i> ${_('Search')}</button>
-                    </form>
-                </div>
-            % endif
+<section class="container">
+  <div class="wrapper-student-notes">
+    <div class="student-notes">
+
+      <div class="title-search-container">
+        <div class="wrapper-title">
+          <h1 class="page-title">
+            ${_('Notes')}
+            <small class="page-subtitle">${_("Highlights and notes you've made in course content")}</small>
+          </h1>
+        </div>
+
+        % if notes:
+        <div class="wrapper-notes-search">
+          <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
+            <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
+            <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}">
+            <button type="submit" class="search-notes-submit">
+              <i class="icon icon-search"></i>
+              <span class="sr">${_('Search')}</span>
+            </button>
+          </form>
+        </div>
+        % endif
+      </div>
+
+      <div class="wrapper-msg is-hidden error urgency-high inline-error">
+        <div class="msg msg-error" tabindex="-1">
+          <div class="msg-content">
+            <p class="copy"></p>
+          </div>
+        </div>
+      </div>
+
+      <section class="wrapper-tabs">
+        <div class="tab-list is-hidden">
+          <h2 id="tab-view" class="tabs-label">${_('View notes by:')}</h2>
+        </div>
+
+        % if notes:
+        <div class="ui-loading" tabindex="-1">
+          <span class="spin">
+            <i class="icon icon-refresh"></i>
+          </span>
+          <span class="copy">${_("Loading...")}</span>
+        </div>
+
+        % else:
+        <section class="is-empty">
+          <article>
+            <h2>${_('You have not made any notes in this course yet.')}</h2>
+
+            <p>${_('Other students in this course are using notes to:')}</p>
+            <ul>
+                <li>${_("Mark a passage or concept so that it's easy to find later.")}</li>
+                <li>${_('Record thoughts about a specific passage or concept.')}</li>
+                <li>${_('Highlight important information to review later in the course or in future courses.')}</li>
+            </ul>
+
+            % if position is not None:
+            <div class="student-notes-cta">
+              <h3 class="sr">${_('Start creating notes')}</h3>
+
+              <p>${_('Get started by making a note in something you just read, like {section_link}.').format(
+                section_link='<a href="{url}">{section_name}</a>'.format(
+                  url=position['url'],
+                  section_name=position['display_name'],
+                  )
+                )}</p>
             </div>
-
-            <section class="wrapper-tabs">
-                <div class="tab-list is-hidden">
-                    <h2 id="tab-view" class="tabs-label">${_('View notes by:')}</h2>
-                </div>
-                <div class="inline-error is-hidden" tabindex="-1"></div>
-            % if notes:
-                <div class="ui-loading" tabindex="-1">
-                    <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
-                </div>
-            % else:
-                <section class="is-empty">
-                    <article>
-                        <h2>${_('You have not made any notes in this course yet.')}</h2>
-                        <h2>${_('Other students in this course are using notes to:')}</h2>
-                        <ul>
-                            <li>${_("Mark a passage or concept so that it's easy to find later.")}</li>
-                            <li>${_('Record thoughts about a specific passage or concept.')}</li>
-                            <li>${_('Highlight important information to review later in the course or in future courses.')}</li>
-                        </ul>
-
-                    % if position is not None:
-                        <div class="student-notes-cta">
-                            <h3 class="sr">${_('Start creating notes')}</h3>
-                            <p>${_('Get started by making a note in something you just read, like {section_link}.').format(
-                                section_link='<a href="{url}">{section_name}</a>'.format(
-                                    url=position['url'],
-                                    section_name=position['display_name'],
-                                )
-                            )}</p>
-                        </div>
-                    % endif
-                    </article>
-                </section>
             % endif
-            </section>
+          </article>
         </section>
+        % endif
+      </section>
+
     </div>
+  </div>
 </section>
+
 
 ## Include Underscore templates
 <%block name="header_extras">
@@ -77,14 +102,14 @@
 <%block name="js_extra">
 % if notes:
 <script type="text/javascript">
-    (function (require) {
-        require(['js/edxnotes/views/page_factory'], function (NotesPageFactory) {
-            var pageView = new NotesPageFactory({
-                notesList: ${notes},
-                debugMode: ${debug}
-            });
-        });
-    }).call(this, require || RequireJS.require);
+  (function (require) {
+      require(['js/edxnotes/views/page_factory'], function (NotesPageFactory) {
+          var pageView = new NotesPageFactory({
+              notesList: ${notes},
+              debugMode: ${debug}
+          });
+    });
+  }).call(this, require || RequireJS.require);
 </script>
 % endif
 </%block>

@@ -78,7 +78,7 @@ define([
         it('can remove the content if tab is closed', function () {
             var view = getView(this.tabsCollection);
             view.onClose =  jasmine.createSpy();
-            view.$('.tab .btn-close').click();
+            view.$('.tab .action-close').click();
             expect(view.$('.tab')).toHaveLength(0);
             expect(view.$('.wrapper-tabs')).not.toContainHtml('<p>test view content</p>');
             expect(view.tabModel).toBeNull();
@@ -95,15 +95,24 @@ define([
 
         it('can show/hide error messages', function () {
             var view = getView(this.tabsCollection),
-                errorHolder = view.$('.inline-error');
+                errorHolder = view.$('.wrapper-msg');
             view.showErrorMessage('<p>error message is here</p>');
             expect(errorHolder).not.toHaveClass('is-hidden');
-            expect(errorHolder).toBeFocused();
-            expect(errorHolder).toContainText('<p>error message is here</p>');
+            expect(errorHolder.find('.msg')).toBeFocused();
+            expect(errorHolder.find('.copy')).toContainText('<p>error message is here</p>');
 
             view.hideErrorMessage();
             expect(errorHolder).toHaveClass('is-hidden');
-            expect(errorHolder).toBeEmpty();
+            expect(errorHolder.find('.copy')).toBeEmpty();
+        });
+
+        it('should hide error messages before rendering', function () {
+            var view = getView(this.tabsCollection),
+                errorHolder = view.$('.wrapper-msg');
+            view.showErrorMessage('<p>error message is here</p>');
+            view.render();
+            expect(errorHolder).toHaveClass('is-hidden');
+            expect(errorHolder.find('.copy')).toBeEmpty();
         });
     });
 });

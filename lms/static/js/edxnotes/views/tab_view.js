@@ -48,7 +48,7 @@ define([
          * Renders content for the view.
          */
         render: function () {
-            this.showLoadingIndicator();
+            this.hideErrorMessage().showLoadingIndicator();
             // If the view is already rendered, destroy it.
             this.destroySubView();
             this.renderContent().always(this.hideLoadingIndicator);
@@ -98,6 +98,7 @@ define([
          */
         showLoadingIndicator: function() {
             this.getLoadingIndicator().removeClass('is-hidden');
+            return this;
         },
 
         /**
@@ -105,6 +106,7 @@ define([
          */
         hideLoadingIndicator: function() {
             this.getLoadingIndicator().addClass('is-hidden');
+            return this;
         },
 
 
@@ -112,19 +114,24 @@ define([
          * Shows error message.
          */
         showErrorMessage: function (message) {
-            this.$('.inline-error')
-                .text(message)
+            this.$('.wrapper-msg')
                 .removeClass('is-hidden')
+                .find('.msg-content .copy').text(message)
+                .closest('.msg')
                 .focus();
+
+            return this;
         },
 
         /**
          * Hides error message.
          */
         hideErrorMessage: function () {
-            this.$('.inline-error')
-                .text('')
-                .addClass('is-hidden');
+            this.$('.wrapper-msg')
+                .addClass('is-hidden')
+                .find('.msg-content .copy').text('');
+
+            return this;
         }
     });
 
