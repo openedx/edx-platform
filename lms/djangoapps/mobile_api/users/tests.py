@@ -3,149 +3,74 @@ Tests for users API
 """
 
 import datetime
-import ddt
-import json
-
-from rest_framework.test import APITestCase
-from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.django import modulestore
-from courseware.tests.factories import UserFactory
-from django.core.urlresolvers import reverse
 from django.utils import timezone
-from mobile_api.users.serializers import CourseEnrollmentSerializer
-from mobile_api import errors
+
+from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
-from mobile_api.tests import ROLE_CASES
+
+from .. import errors
+from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin
+from .serializers import CourseEnrollmentSerializer
 
 
-@ddt.ddt
-class TestUserApi(ModuleStoreTestCase, APITestCase):
+class TestUserDetailApi(MobileAPITestCase, MobileAuthUserTestMixin):
     """
-    Test the user info API
+    Tests for /api/mobile/v0.5/users/<user_name>...
     """
-    def setUp(self):
-        super(TestUserApi, self).setUp()
-        self.course = CourseFactory.create(mobile_available=True)
-        self.user = UserFactory.create()
-        self.password = 'test'
-        self.username = self.user.username
+    REVERSE_INFO = {'name': 'user-detail', 'params': ['username']}
 
-    def tearDown(self):
-        super(TestUserApi, self).tearDown()
-        self.client.logout()
+    def test_success(self):
+        self.login()
 
-    def _enrollment_url(self):
-        """
-        api url that gets the current user's course enrollments
-        """
-        return reverse('courseenrollment-detail', kwargs={'username': self.user.username})
+        response = self.api_response()
+        self.assertEqual(response.data['username'], self.user.username)
+        self.assertEqual(response.data['email'], self.user.email)
 
-    def _enroll(self, course):
-        """
-        enroll test user in test course
-        """
-        resp = self.client.post(reverse('change_enrollment'), {
-            'enrollment_action': 'enroll',
-            'course_id': course.id.to_deprecated_string(),
-            'check_access': True,
-        })
-        self.assertEqual(resp.status_code, 200)
 
-    def _verify_single_course_enrollment(self, course, should_succeed):
-        """
-        check that enrolling in course adds us to it
-        """
+class TestUserInfoApi(MobileAPITestCase, MobileAuthTestMixin):
+    """
+    Tests for /api/mobile/v0.5/my_user_info
+    """
+    def reverse_url(self, reverse_args=None, **kwargs):
+        return '/api/mobile/v0.5/my_user_info'
 
-        url = self._enrollment_url()
-        self.client.login(username=self.username, password=self.password)
-        self._enroll(course)
-        response = self.client.get(url)
+    def test_success(self):
+        """Verify the endpoint redirects to the user detail endpoint"""
+        self.login()
 
-        courses = response.data   # pylint: disable=maybe-no-member
-
-        self.assertEqual(response.status_code, 200)
-
-        if should_succeed:
-            self.assertEqual(len(courses), 1)
-            found_course = courses[0]['course']
-            self.assertTrue('video_outline' in found_course)
-            self.assertTrue('course_handouts' in found_course)
-            self.assertEqual(found_course['id'], unicode(course.id))
-            self.assertEqual(courses[0]['mode'], 'honor')
-        else:
-            self.assertEqual(len(courses), 0)
-
-    @ddt.data(*ROLE_CASES)
-    @ddt.unpack
-    def test_non_mobile_enrollments(self, role, should_succeed):
-        non_mobile_course = CourseFactory.create(mobile_available=False)
-
-        if role:
-            role(non_mobile_course.id).add_users(self.user)
-
-        self._verify_single_course_enrollment(non_mobile_course, should_succeed)
-
-    def test_mobile_enrollments(self):
-        self._verify_single_course_enrollment(self.course, True)
-
-    def test_user_overview(self):
-        self.client.login(username=self.username, password=self.password)
-        url = reverse('user-detail', kwargs={'username': self.user.username})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        data = response.data  # pylint: disable=maybe-no-member
-        self.assertEqual(data['username'], self.user.username)
-        self.assertEqual(data['email'], self.user.email)
-
-    def test_overview_anon(self):
-        # anonymous disallowed
-        url = reverse('user-detail', kwargs={'username': self.user.username})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
-        # can't get info on someone else
-        other = UserFactory.create()
-        self.client.login(username=self.username, password=self.password)
-        response = self.client.get(reverse('user-detail', kwargs={'username': other.username}))
-        self.assertEqual(response.status_code, 403)
-
-    def test_redirect_userinfo(self):
-        url = '/api/mobile/v0.5/my_user_info'
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
-
-        self.client.login(username=self.username, password=self.password)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
+        response = self.api_response(expected_response_code=302)
         self.assertTrue(self.username in response['location'])
 
-    def test_course_serializer(self):
-        self.client.login(username=self.username, password=self.password)
-        self._enroll(self.course)
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
-        self.assertEqual(serialized['course']['video_outline'], None)
-        self.assertEqual(serialized['course']['name'], self.course.display_name)
-        self.assertEqual(serialized['course']['number'], self.course.id.course)
-        self.assertEqual(serialized['course']['org'], self.course.id.org)
 
-    def test_course_serializer_with_display_overrides(self):
-        self.course.display_coursenumber = "overridden_number"
-        self.course.display_organization = "overridden_org"
-        modulestore().update_item(self.course, self.user.id)
+class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+    """
+    Tests for /api/mobile/v0.5/users/<user_name>/course_enrollments/
+    """
+    REVERSE_INFO = {'name': 'courseenrollment-detail', 'params': ['username']}
 
-        self.client.login(username=self.username, password=self.password)
-        self._enroll(self.course)
-        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
-        self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
-        self.assertEqual(serialized['course']['org'], self.course.display_organization)
+    def verify_success(self, response):
+        super(TestUserEnrollmentApi, self).verify_success(response)
+        courses = response.data
+        self.assertEqual(len(courses), 1)
 
-# Tests for user-course-status
+        found_course = courses[0]['course']
+        self.assertTrue('video_outline' in found_course)
+        self.assertTrue('course_handouts' in found_course)
+        self.assertEqual(found_course['id'], unicode(self.course.id))
+        self.assertEqual(courses[0]['mode'], 'honor')
 
-    def _course_status_url(self):
-        """
-        Convenience to fetch the url for our user and course
-        """
-        return reverse('user-course-status', kwargs={'username': self.username, 'course_id': unicode(self.course.id)})
+    def verify_failure(self, response):
+        self.assertEqual(response.status_code, 200)
+        courses = response.data
+        self.assertEqual(len(courses), 0)
+
+
+class CourseStatusAPITestCase(MobileAPITestCase):
+    """
+    Base test class for /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    """
+    REVERSE_INFO = {'name': 'user-course-status', 'params': ['username', 'course_id']}
 
     def _setup_course_skeleton(self):
         """
@@ -163,154 +88,134 @@ class TestUserApi(ModuleStoreTestCase, APITestCase):
         other_unit = ItemFactory.create(
             parent_location=sub_section.location,
         )
-
         return section, sub_section, unit, other_unit
 
-    def test_course_status_course_not_found(self):
-        self.client.login(username=self.username, password=self.password)
-        url = reverse('user-course-status', kwargs={'username': self.username, 'course_id': 'a/b/c'})
-        response = self.client.get(url)
-        json_data = json.loads(response.content)
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(json_data, errors.ERROR_INVALID_COURSE_ID)
 
-    def test_course_status_wrong_user(self):
-        url = reverse('user-course-status', kwargs={'username': 'other_user', 'course_id': unicode(self.course.id)})
-        self.client.login(username=self.username, password=self.password)
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
-
-    def test_course_status_no_auth(self):
-        url = self._course_status_url()
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 401)
-
-    def test_default_value(self):
+class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+    """
+    Tests for GET of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    """
+    def test_success(self):
+        self.login_and_enroll()
         (section, sub_section, unit, __) = self._setup_course_skeleton()
-        self.client.login(username=self.username, password=self.password)
 
-        url = self._course_status_url()
-        result = self.client.get(url)
-        json_data = json.loads(result.content)
-
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(json_data["last_visited_module_id"], unicode(unit.location))
+        response = self.api_response()
+        self.assertEqual(response.data["last_visited_module_id"], unicode(unit.location))
         self.assertEqual(
-            json_data["last_visited_module_path"],
+            response.data["last_visited_module_path"],
             [unicode(module.location) for module in [unit, sub_section, section, self.course]]
         )
 
-    def test_course_update_no_args(self):
-        self.client.login(username=self.username, password=self.password)
 
-        url = self._course_status_url()
-        result = self.client.patch(url)  # pylint: disable=no-member
-        self.assertEqual(result.status_code, 200)
+class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
+    """
+    Tests for PATCH of /api/mobile/v0.5/users/<user_name>/course_status_info/{course_id}
+    """
+    def url_method(self, url, **kwargs):
+        # override implementation to use PATCH method.
+        return self.client.patch(url, data=kwargs.get('data', None))  # pylint: disable=no-member
 
-    def test_course_update(self):
+    def test_success(self):
+        self.login_and_enroll()
         (__, __, __, other_unit) = self._setup_course_skeleton()
-        self.client.login(username=self.username, password=self.password)
 
-        url = self._course_status_url()
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {"last_visited_module_id": unicode(other_unit.location)}
-        )
-        self.assertEqual(result.status_code, 200)
-        result = self.client.get(url)
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(json_data["last_visited_module_id"], unicode(other_unit.location))
+        response = self.api_response(data={"last_visited_module_id": unicode(other_unit.location)})
+        self.assertEqual(response.data["last_visited_module_id"], unicode(other_unit.location))
 
-    def test_course_update_bad_module(self):
-        self.client.login(username=self.username, password=self.password)
+    def test_invalid_module(self):
+        self.login_and_enroll()
+        response = self.api_response(data={"last_visited_module_id": "abc"}, expected_response_code=400)
+        self.assertEqual(response.data, errors.ERROR_INVALID_MODULE_ID)
 
-        url = self._course_status_url()
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {"last_visited_module_id": "abc"},
-        )
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 400)
-        self.assertEqual(json_data, errors.ERROR_INVALID_MODULE_ID)
+    def test_nonexistent_module(self):
+        self.login_and_enroll()
+        non_existent_key = self.course.id.make_usage_key('video', 'non-existent')
+        response = self.api_response(data={"last_visited_module_id": non_existent_key}, expected_response_code=400)
+        self.assertEqual(response.data, errors.ERROR_INVALID_MODULE_ID)
 
-    def test_course_update_no_timezone(self):
+    def test_no_timezone(self):
+        self.login_and_enroll()
         (__, __, __, other_unit) = self._setup_course_skeleton()
-        self.client.login(username=self.username, password=self.password)
-        url = self._course_status_url()
+
         past_date = datetime.datetime.now()
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {
+        response = self.api_response(
+            data={
                 "last_visited_module_id": unicode(other_unit.location),
                 "modification_date": past_date.isoformat()  # pylint: disable=maybe-no-member
             },
+            expected_response_code=400
         )
+        self.assertEqual(response.data, errors.ERROR_INVALID_MODIFICATION_DATE)
 
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 400)
-        self.assertEqual(json_data, errors.ERROR_INVALID_MODIFICATION_DATE)
-
-    def _test_course_update_date_sync(self, date, initial_unit, update_unit, expected_unit):
+    def _date_sync(self, date, initial_unit, update_unit, expected_unit):
         """
         Helper for test cases that use a modification to decide whether
         to update the course status
         """
-        self.client.login(username=self.username, password=self.password)
-        url = self._course_status_url()
+        self.login_and_enroll()
+
         # save something so we have an initial date
-        self.client.patch(  # pylint: disable=no-member
-            url,
-            {"last_visited_module_id": unicode(initial_unit.location)}
-        )
+        self.api_response(data={"last_visited_module_id": unicode(initial_unit.location)})
 
         # now actually update it
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {
+        response = self.api_response(
+            data={
                 "last_visited_module_id": unicode(update_unit.location),
                 "modification_date": date.isoformat()
-            },
+            }
         )
+        self.assertEqual(response.data["last_visited_module_id"], unicode(expected_unit.location))
 
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(json_data["last_visited_module_id"], unicode(expected_unit.location))
-
-    def test_course_update_old_date(self):
+    def test_old_date(self):
+        self.login_and_enroll()
         (__, __, unit, other_unit) = self._setup_course_skeleton()
         date = timezone.now() + datetime.timedelta(days=-100)
-        self._test_course_update_date_sync(date, unit, other_unit, unit)
+        self._date_sync(date, unit, other_unit, unit)
 
-    def test_course_update_new_date(self):
+    def test_new_date(self):
+        self.login_and_enroll()
         (__, __, unit, other_unit) = self._setup_course_skeleton()
 
         date = timezone.now() + datetime.timedelta(days=100)
-        self._test_course_update_date_sync(date, unit, other_unit, other_unit)
+        self._date_sync(date, unit, other_unit, other_unit)
 
-    def test_course_update_no_initial_date(self):
+    def test_no_initial_date(self):
+        self.login_and_enroll()
         (__, __, _, other_unit) = self._setup_course_skeleton()
-        self.client.login(username=self.username, password=self.password)
-        url = self._course_status_url()
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {
+        response = self.api_response(
+            data={
                 "last_visited_module_id": unicode(other_unit.location),
                 "modification_date": timezone.now().isoformat()
             }
         )
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 200)
-        self.assertEqual(json_data["last_visited_module_id"], unicode(other_unit.location))
+        self.assertEqual(response.data["last_visited_module_id"], unicode(other_unit.location))
 
-    def test_course_update_invalid_date(self):
-        self.client.login(username=self.username, password=self.password)
+    def test_invalid_date(self):
+        self.login_and_enroll()
+        response = self.api_response(data={"modification_date": "abc"}, expected_response_code=400)
+        self.assertEqual(response.data, errors.ERROR_INVALID_MODIFICATION_DATE)
 
-        url = self._course_status_url()
-        result = self.client.patch(  # pylint: disable=no-member
-            url,
-            {"modification_date": "abc"}
-        )
-        json_data = json.loads(result.content)
-        self.assertEqual(result.status_code, 400)
-        self.assertEqual(json_data, errors.ERROR_INVALID_MODIFICATION_DATE)
+
+class TestCourseEnrollmentSerializer(MobileAPITestCase):
+    """
+    Test the course enrollment serializer
+    """
+    def test_success(self):
+        self.login_and_enroll()
+
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
+        self.assertEqual(serialized['course']['video_outline'], None)
+        self.assertEqual(serialized['course']['name'], self.course.display_name)
+        self.assertEqual(serialized['course']['number'], self.course.id.course)
+        self.assertEqual(serialized['course']['org'], self.course.id.org)
+
+    def test_with_display_overrides(self):
+        self.login_and_enroll()
+
+        self.course.display_coursenumber = "overridden_number"
+        self.course.display_organization = "overridden_org"
+        modulestore().update_item(self.course, self.user.id)
+
+        serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
+        self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
+        self.assertEqual(serialized['course']['org'], self.course.display_organization)

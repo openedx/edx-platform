@@ -19,6 +19,7 @@ from xblock.core import XBlock
 from external_auth.models import ExternalAuthMap
 from courseware.masquerade import is_masquerading_as_student
 from django.utils.timezone import UTC
+from student import auth
 from student.roles import (
     GlobalStaff, CourseStaffRole, CourseInstructorRole,
     OrgStaffRole, OrgInstructorRole, CourseBetaTesterRole
@@ -46,6 +47,7 @@ def has_access(user, action, obj, course_key=None):
     - visible_to_staff_only for modules
     - DISABLE_START_DATES
     - different access for instructor, staff, course staff, and students.
+    - mobile_available flag for course modules
 
     user: a Django user object. May be anonymous. If none is passed,
                     anonymous is assumed
@@ -108,6 +110,8 @@ def _has_access_course_desc(user, action, course):
 
     'load' -- load the courseware, see inside the course
     'load_forum' -- can load and contribute to the forums (one access level for now)
+    'load_mobile' -- can load from a mobile context
+    'load_mobile_no_enrollment_check' -- can load from a mobile context without checking for enrollment
     'enroll' -- enroll.  Checks for enrollment window,
                   ACCESS_REQUIRE_STAFF_FOR_COURSE,
     'see_exists' -- can see that the course exists.
@@ -132,6 +136,36 @@ def _has_access_course_desc(user, action, course):
             can_load() and
             (
                 CourseEnrollment.is_enrolled(user, course.id) or
+                _has_staff_access_to_descriptor(user, course, course.id)
+            )
+        )
+
+    def can_load_mobile():
+        """
+        Can this user access this course from a mobile device?
+        """
+        return (
+            # check mobile requirements
+            can_load_mobile_no_enroll_check() and
+            # check enrollment
+            (
+                CourseEnrollment.is_enrolled(user, course.id) or
+                _has_staff_access_to_descriptor(user, course, course.id)
+            )
+        )
+
+    def can_load_mobile_no_enroll_check():
+        """
+        Can this enrolled user access this course from a mobile device?
+        Note: does not check for enrollment since it is assumed the caller has done so.
+        """
+        return (
+            # check start date
+            can_load() and
+            # check mobile_available flag
+            (
+                course.mobile_available or
+                auth.has_access(user, CourseBetaTesterRole(course.id)) or
                 _has_staff_access_to_descriptor(user, course, course.id)
             )
         )
@@ -234,6 +268,8 @@ def _has_access_course_desc(user, action, course):
     checkers = {
         'load': can_load,
         'load_forum': can_load_forum,
+        'load_mobile': can_load_mobile,
+        'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
         'enroll': can_enroll,
         'see_exists': see_exists,
         'staff': lambda: _has_staff_access_to_descriptor(user, course, course.id),
