@@ -301,3 +301,12 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get(
 ################ VIDEO UPLOAD PIPELINE ###############
 
 VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIPELINE)
+
+# Use ElasticSearch for the search engine
+from search.elastic import ElasticSearchEngine
+SEARCH_ENGINE = ElasticSearchEngine
+ELASTIC_SEARCH_MAPPINGS = {
+    "start_date": {
+        "type": "date"
+    }
+}
