@@ -36,15 +36,15 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         )
         self.pet_groups = [Group(1, 'Cat Lovers'), Group(2, 'Dog Lovers')]
 
-    def create_cohorted_content_groups(self, groups):
+    def create_content_groups(self, content_groups):
         """
-        Create a cohorted content partition with specified groups.
+        Create a cohorted user partition with the specified content groups.
         """
         self.content_partition = UserPartition(
             1,
             'Content Groups',
             'Contains Groups for Cohorted Courseware',
-            groups,
+            content_groups,
             scheme_id='cohort'
         )
         self.course.user_partitions = [self.content_partition]
@@ -76,11 +76,11 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
 
     def test_html_empty_partition(self):
-        self.create_cohorted_content_groups([])
+        self.create_content_groups([])
         self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
 
     def test_html_populated_partition(self):
-        self.create_cohorted_content_groups(self.pet_groups)
+        self.create_content_groups(self.pet_groups)
         self.verify_visibility_view_contains(self.video, ['Cat Lovers', 'Dog Lovers'])
 
     def test_html_no_partition_staff_locked(self):
@@ -88,26 +88,26 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.verify_visibility_view_contains(self.video, ['You have not set up any groups to manage visibility with.'])
 
     def test_html_empty_partition_staff_locked(self):
-        self.create_cohorted_content_groups([])
+        self.create_content_groups([])
         self.set_staff_only(self.vertical)
         self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
 
     def test_html_populated_partition_staff_locked(self):
-        self.create_cohorted_content_groups(self.pet_groups)
+        self.create_content_groups(self.pet_groups)
         self.set_staff_only(self.vertical)
         self.verify_visibility_view_contains(
             self.video, ['The Unit this component is contained in is hidden from students.', 'Cat Lovers', 'Dog Lovers']
         )
 
     def test_html_false_content_group(self):
-        self.create_cohorted_content_groups(self.pet_groups)
+        self.create_content_groups(self.pet_groups)
         self.set_group_access(self.video, ['false_group_id'])
         self.verify_visibility_view_contains(
             self.video, ['Cat Lovers', 'Dog Lovers', 'Content group no longer exists.']
         )
 
     def test_html_false_content_group_staff_locked(self):
-        self.create_cohorted_content_groups(self.pet_groups)
+        self.create_content_groups(self.pet_groups)
         self.set_staff_only(self.vertical)
         self.set_group_access(self.video, ['false_group_id'])
         self.verify_visibility_view_contains(
