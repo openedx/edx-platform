@@ -32,8 +32,8 @@
      * Example usages:
      *     interpolate_text('{title} ({count})', {title: expectedTitle, count: expectedCount}
      *     interpolate_text(
-     *         ngettext("{numUsersAdded} student has been added to this cohort group",
-     *             "{numUsersAdded} students have been added to this cohort group", numUsersAdded),
+     *         ngettext("{numUsersAdded} student has been added to this cohort",
+     *             "{numUsersAdded} students have been added to this cohort", numUsersAdded),
      *         {numUsersAdded: numUsersAdded}
      *     );
      *

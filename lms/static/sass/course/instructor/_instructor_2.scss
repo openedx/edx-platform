@@ -540,7 +540,7 @@
     }
   }
 
-  // create or edit cohort group
+  // create or edit cohort
   .cohort-management-settings,
   .cohort-management-edit {
     @extend %cohort-management-form;
@@ -567,7 +567,7 @@
     }
   }
 
-  // cohort group
+  // cohort
   .cohort-management-group-header {
     padding: $baseline;
     border-bottom: ($baseline/10) solid $gray-l4;
