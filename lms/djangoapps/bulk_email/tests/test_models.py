@@ -7,12 +7,13 @@ from django.conf import settings
 
 from student.tests.factories import UserFactory
 
-from mock import patch
+from mock import patch, Mock
 
 from bulk_email.models import CourseEmail, SEND_TO_STAFF, CourseEmailTemplate, CourseAuthorization
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class CourseEmailTest(TestCase):
     """Test the CourseEmail model."""
 
