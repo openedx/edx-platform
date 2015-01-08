@@ -6,8 +6,6 @@ define([
     var GroupItem = ListItem.extend({
         tagName: 'section', // TODO: confirm class and tag
 
-        className: 'group-configuration group-configurations-list-item',
-
         createEditView: function() {
             return new GroupItemEdit({model: this.model});
         },

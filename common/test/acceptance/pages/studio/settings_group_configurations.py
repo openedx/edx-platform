@@ -34,14 +34,34 @@ class GroupConfigurationsPage(CoursePage):
         """
         Return list of the group configurations for the course.
         """
-        css = '.group-configurations-list-item'
-        return [GroupConfiguration(self, index) for index in xrange(len(self.q(css=css)))]
+        css = '.experiment-groups .group-configurations-list-item'
+        return [GroupConfiguration(self, '.experiment-groups', index) for index in xrange(len(self.q(css=css)))]
 
-    def create(self):
+    def create_group_configuration(self):
         """
         Creates new group configuration.
         """
         self.q(css=".experiment-groups .new-button").first.click()
+
+    @property
+    def content_groups(self):
+        """
+        Return list of the content groups for the course.
+        """
+        css = '.content-groups .group-configurations-list-item'
+        return [GroupConfiguration(self, '.content-groups', index) for index in xrange(len(self.q(css=css)))]
+
+    def create_first_content_group(self):
+        """
+        Creates new content group when there are none initially defined.
+        """
+        self.q(css=".content-groups .new-button").first.click()
+
+    def add_content_group(self):
+        """
+        Creates new content group when at least one already exists
+        """
+        self.q(css=".content-groups .action-add").first.click()
 
     @property
     def no_group_configuration_message_is_present(self):
@@ -51,15 +71,23 @@ class GroupConfigurationsPage(CoursePage):
     def no_group_configuration_message_text(self):
         return self.q(css='.wrapper-content .experiment-groups .no-group-configurations-content').text[0]
 
+    @property
+    def no_content_groups_message_is_present(self):
+        return self.q(css='.wrapper-content .content-groups .no-group-configurations-content').present
+
+    @property
+    def no_content_groups_message_text(self):
+        return self.q(css='.wrapper-content .content-groups .no-group-configurations-content').text[0]
+
 
 class GroupConfiguration(object):
     """
     Group Configuration wrapper.
     """
 
-    def __init__(self, page, index):
+    def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = '.group-configurations-list-item-{}'.format(index)
+        self.SELECTOR = prefix + ' .group-configurations-list-item-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):

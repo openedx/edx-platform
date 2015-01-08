@@ -10,9 +10,8 @@ define([
 
         emptyTemplateName: 'no-groups',
 
-        // Translators: This refers to a group which allows cohoroted
-        // students to access specific content.
-        itemCategoryDisplayName: gettext('cohorted content group'),
+        // Translators: This refers to a content group that can be linked to a student cohort.
+        itemCategoryDisplayName: gettext('content group'),
 
         createItemView: function(options) {
             return new GroupItemView(options);

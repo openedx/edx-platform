@@ -202,31 +202,6 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @attr('shard_1')
-class SettingsMenuTest(StudioCourseTest):
-    """
-    Tests that Settings menu is rendered correctly in Studio
-    """
-
-    def setUp(self):
-        super(SettingsMenuTest, self).setUp()
-        self.advanced_settings = AdvancedSettingsPage(
-            self.browser,
-            self.course_info['org'],
-            self.course_info['number'],
-            self.course_info['run']
-        )
-        self.advanced_settings.visit()
-
-    def test_link_exist(self):
-        """
-        Ensure that the link to the "Group Configurations" page is shown in the
-        Settings menu.
-        """
-        link_css = 'li.nav-course-settings-group-configurations a'
-        self.assertTrue(self.advanced_settings.q(css=link_css).present)
-
-
-@attr('shard_1')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -365,7 +340,6 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Given I have a course without group configurations
         When I go to the Group Configuration page in Studio
         Then I see "You haven't created any group configurations yet." message
-        And "Create new Group Configuration" button is available
         """
         self.page.visit()
         self.assertTrue(self.page.no_group_configuration_message_is_present)
@@ -440,7 +414,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.page.visit()
         self.assertEqual(len(self.page.group_configurations), 0)
         # Create new group configuration
-        self.page.create()
+        self.page.create_group_configuration()
         config = self.page.group_configurations[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
@@ -496,7 +470,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.page.visit()
         # Create new group configuration
-        self.page.create()
+        self.page.create_group_configuration()
         config = self.page.group_configurations[0]
         config.name = "New Group Configuration Name"
         # Add new group
@@ -593,7 +567,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.assertEqual(len(self.page.group_configurations), 0)
         # Create new group configuration
-        self.page.create()
+        self.page.create_group_configuration()
 
         config = self.page.group_configurations[0]
         config.name = "Name of the Group Configuration"
@@ -674,7 +648,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.page.visit()
         # Create new group configuration
-        self.page.create()
+        self.page.create_group_configuration()
         # Leave empty required field
         config = self.page.group_configurations[0]
         config.description = "Description of the group configuration."
