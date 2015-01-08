@@ -95,6 +95,40 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config = self.create_and_verify_content_group("New Content Group", 0)
         self.assertTrue(config.delete_button_is_absent)
 
+    def test_must_supply_name(self):
+        """
+        Scenario: Ensure that validation of the content group works correctly.
+        Given I have a course without content groups
+        And I create new content group without specifying a name click the button 'Create'
+        Then I see error message "Content Group name is required."
+        When I set a name and click the button 'Create'
+        Then I see the content group is saved successfully
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.save()
+        self.assertEqual(config.mode, 'edit')
+        self.assertEqual("Group name is required", config.validation_message)
+        config.name = "Content Group Name"
+        config.save()
+        self.assertIn("Content Group Name", config.name)
+
+    def test_can_cancel_creation_of_content_group(self):
+        """
+        Scenario: Ensure that creation of a content group can be canceled correctly.
+        Given I have a course without content groups
+        When I click button 'Add your first Content Group'
+        And I set new the name and click the button 'Cancel'
+        Then I see that there is no content groups in the course
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.name = "Content Group"
+        config.cancel()
+        self.assertEqual(0, len(self.group_configurations_page.group_configurations))
+
 
 @attr('shard_1')
 class AdvancedSettingsValidationTest(StudioCourseTest):
