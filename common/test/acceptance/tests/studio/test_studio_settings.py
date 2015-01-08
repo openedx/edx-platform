@@ -127,7 +127,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config = self.group_configurations_page.content_groups[0]
         config.name = "Content Group"
         config.cancel()
-        self.assertEqual(0, len(self.group_configurations_page.group_configurations))
+        self.assertEqual(0, len(self.group_configurations_page.content_groups))
 
 
 @attr('shard_1')

@@ -12,6 +12,8 @@ class GroupConfigurationsPage(CoursePage):
     """
 
     url_path = "group_configurations"
+    experiment_groups_css = ".experiment-groups"
+    content_groups_css = ".content-groups"
 
     def is_browser_on_page(self):
         """
@@ -30,18 +32,18 @@ class GroupConfigurationsPage(CoursePage):
         return True
 
     @property
-    def group_configurations(self):
+    def experiment_groups(self):
         """
-        Return list of the group configurations for the course.
+        Return list of the experiment group configurations for the course.
         """
-        return self._get_groups(".experiment-groups")
+        return self._get_groups(self.experiment_groups_css)
 
     @property
     def content_groups(self):
         """
         Return list of the content groups for the course.
         """
-        return self._get_groups(".content-groups")
+        return self._get_groups(self.content_groups_css)
 
     def _get_groups(self, prefix):
         """
@@ -50,45 +52,52 @@ class GroupConfigurationsPage(CoursePage):
         css = prefix + ' .group-configurations-list-item'
         return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
 
-    def create_group_configuration(self):
+    def create_experiment_group_configuration(self):
         """
         Creates new group configuration.
         """
-        self.q(css=".experiment-groups .new-button").first.click()
+        self.q(css=self.experiment_groups_css + " .new-button").first.click()
 
     def create_first_content_group(self):
         """
         Creates new content group when there are none initially defined.
         """
-        self.q(css=".content-groups .new-button").first.click()
+        self.q(css=self.content_groups_css + " .new-button").first.click()
 
     def add_content_group(self):
         """
         Creates new content group when at least one already exists
         """
-        self.q(css=".content-groups .action-add").first.click()
+        self.q(css=self.content_groups_css + " .action-add").first.click()
 
     @property
-    def no_group_configuration_message_is_present(self):
-        return self._no_content_message(".experiment-groups").present
+    def no_experiment_groups_message_is_present(self):
+        return self._no_content_message(self.experiment_groups_css).present
 
     @property
     def no_content_groups_message_is_present(self):
-        return self._no_content_message(".content-groups").present
+        return self._no_content_message(self.content_groups_css).present
 
     @property
-    def no_group_configuration_message_text(self):
-        return self._no_content_message(".experiment-groups").text[0]
+    def no_experiment_groups_message_text(self):
+        return self._no_content_message(self.experiment_groups_css).text[0]
 
     @property
     def no_content_groups_message_text(self):
-        return self._no_content_message(".content-groups").text[0]
+        return self._no_content_message(self.content_groups_css).text[0]
 
     def _no_content_message(self, prefix):
         """
         Returns the message about "no content" for the specified type.
         """
         return self.q(css='.wrapper-content ' + prefix + ' .no-group-configurations-content')
+
+    @property
+    def experiment_group_sections_present(self):
+        """
+        Returns whether or not anything related to content experiments is present.
+        """
+        return self.q(css=self.experiment_groups_css).present
 
 
 class GroupConfiguration(object):

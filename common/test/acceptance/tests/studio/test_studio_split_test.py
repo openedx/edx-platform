@@ -202,6 +202,32 @@ class SplitTest(ContainerBase, SplitTestMixin):
 
 
 @attr('shard_1')
+class GroupConfigurationsNoSplitTest(StudioCourseTest):
+    """
+    Tests how the Group Configuration page should look when the split_test module is not enabled.
+    """
+    def setUp(self):
+        super(GroupConfigurationsNoSplitTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def test_no_content_experiment_sections(self):
+        """
+        Scenario: if split_test module is not present in Advanced Settings, content experiment
+           parts of the Group Configurations page are not shown.
+        Given I have a course with split_test module not enabled
+        Then when I go to the Group Configurations page there are no content experiment sections
+        """
+        self.group_configurations_page.visit()
+        # TODO: uncomment this and update the test case appropriatley
+        # self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
+
+
+@attr('shard_1')
 class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
     """
     Tests that Group Configurations page works correctly with previously
@@ -304,7 +330,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Go to the Group Configuration Page
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
 
         if associate_experiment:
             return config, split_test
@@ -342,10 +368,10 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see "You haven't created any group configurations yet." message
         """
         self.page.visit()
-        self.assertTrue(self.page.no_group_configuration_message_is_present)
+        self.assertTrue(self.page.no_experiment_groups_message_is_present)
         self.assertIn(
             "You haven't created any group configurations yet.",
-            self.page.no_group_configuration_message_text
+            self.page.no_experiment_groups_message_text
         )
 
     def test_group_configurations_have_correct_data(self):
@@ -379,7 +405,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         })
 
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         # no groups when the the configuration is collapsed
         self.assertEqual(len(config.groups), 0)
         self._assert_fields(
@@ -389,7 +415,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             groups=["Group 0", "Group 1"]
         )
 
-        config = self.page.group_configurations[1]
+        config = self.page.experiment_groups[1]
 
         self._assert_fields(
             config,
@@ -412,10 +438,10 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         Then I see the group configuration is saved successfully and has the new data
         """
         self.page.visit()
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_groups), 0)
         # Create new group configuration
-        self.page.create_group_configuration()
-        config = self.page.group_configurations[0]
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_groups[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
         config.groups[1].name = "New Group Name"
@@ -470,8 +496,8 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.page.visit()
         # Create new group configuration
-        self.page.create_group_configuration()
-        config = self.page.group_configurations[0]
+        self.page.create_experiment_group_configuration()
+        config = self.page.experiment_groups[0]
         config.name = "New Group Configuration Name"
         # Add new group
         config.add_group()
@@ -521,7 +547,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         split_test = self._add_split_test_to_vertical(number=0, group_configuration_metadata={'user_partition_id': 0})
 
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.edit()
         config.name = "Second Group Configuration Name"
         # `Group C` -> `Second Group`
@@ -565,11 +591,11 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         """
         self.page.visit()
 
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_groups), 0)
         # Create new group configuration
-        self.page.create_group_configuration()
+        self.page.create_experiment_group_configuration()
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.name = "Name of the Group Configuration"
         config.description = "Description of the group configuration."
         # Add new group
@@ -577,7 +603,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Cancel the configuration
         config.cancel()
 
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_groups), 0)
 
     def test_can_cancel_editing_of_group_configuration(self):
         """
@@ -607,7 +633,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
             },
         })
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.name = "New Group Configuration Name"
         config.description = "New Description of the group configuration."
         # Add 2 new groups
@@ -648,9 +674,9 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         self.page.visit()
         # Create new group configuration
-        self.page.create_group_configuration()
+        self.page.create_experiment_group_configuration()
         # Leave empty required field
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.description = "Description of the group configuration."
 
         try_to_save_and_verify_error_message("Group Configuration name is required.")
@@ -699,7 +725,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Go to the Group Configuration Page and click on outline anchor
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.toggle()
         config.click_outline_anchor()
 
@@ -744,7 +770,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.toggle()
         usage = config.usages[0]
         config.click_unit_anchor()
@@ -789,18 +815,18 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         })
         self.page.visit()
 
-        self.assertEqual(len(self.page.group_configurations), 2)
-        config = self.page.group_configurations[1]
+        self.assertEqual(len(self.page.experiment_groups), 2)
+        config = self.page.experiment_groups[1]
         # Delete first group configuration via detail view
         config.delete()
-        self.assertEqual(len(self.page.group_configurations), 1)
+        self.assertEqual(len(self.page.experiment_groups), 1)
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         config.edit()
         self.assertFalse(config.delete_button_is_disabled)
         # Delete first group configuration via edit view
         config.delete()
-        self.assertEqual(len(self.page.group_configurations), 0)
+        self.assertEqual(len(self.page.experiment_groups), 0)
 
     def test_cannot_delete_used_group_configuration(self):
         """
@@ -832,7 +858,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         # Go to the Group Configuration Page and click unit anchor
         self.page.visit()
 
-        config = self.page.group_configurations[0]
+        config = self.page.experiment_groups[0]
         self.assertTrue(config.delete_button_is_disabled)
         self.assertIn('Cannot delete when in use by an experiment', config.delete_note)
 
@@ -889,12 +915,12 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         self.page.wait_for_page()
 
         # Appropriate Group Configuration is expanded.
-        self.assertFalse(self.page.group_configurations[0].is_expanded)
-        self.assertTrue(self.page.group_configurations[1].is_expanded)
+        self.assertFalse(self.page.experiment_groups[0].is_expanded)
+        self.assertTrue(self.page.experiment_groups[1].is_expanded)
 
         self.assertEqual(
             group_configuration_link_name,
-            self.page.group_configurations[1].name
+            self.page.experiment_groups[1].name
         )
 
     def test_details_error_validation_message(self):
