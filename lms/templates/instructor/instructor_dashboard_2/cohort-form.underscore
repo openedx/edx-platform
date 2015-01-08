@@ -34,7 +34,7 @@
             <div class="form-field">
                 <div class="cohort-management-details-association-course field field-radio">
                     <h4 class="form-label">
-                        <%- gettext('Associated Cohorted Content Group') %>
+                        <%- gettext('Associated Content Group') %>
                     </h4>
                     <label><input type="radio" class="radio-no" name="cohort-association-course" value="no"  <%- !hasSelectedContentGroup ? 'checked="checked"' : '' %>/> <%- gettext("No Content Group") %></label>
                     <div class="input-group has-other-input-text">
