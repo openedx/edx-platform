@@ -22,7 +22,7 @@ define([
         tabInfo: {
             identifier: 'view-recent-activity',
             name: gettext('Recent Activity'),
-            icon: 'icon-time'
+            icon: 'fa fa-clock-o'
         }
     });
 
