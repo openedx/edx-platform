@@ -223,8 +223,7 @@ class GroupConfigurationsNoSplitTest(StudioCourseTest):
         Then when I go to the Group Configurations page there are no content experiment sections
         """
         self.group_configurations_page.visit()
-        # TODO: uncomment this and update the test case appropriatley
-        # self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
+        self.assertFalse(self.group_configurations_page.experiment_group_sections_present)
 
 
 @attr('shard_1')
@@ -365,12 +364,13 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
         shown when group configurations were not added.
         Given I have a course without group configurations
         When I go to the Group Configuration page in Studio
-        Then I see "You haven't created any group configurations yet." message
+        Then I see "You have not created any group configurations yet." message
         """
         self.page.visit()
+        self.assertTrue(self.page.experiment_group_sections_present)
         self.assertTrue(self.page.no_experiment_groups_message_is_present)
         self.assertIn(
-            "You haven't created any group configurations yet.",
+            "You have not created any group configurations yet.",
             self.page.no_experiment_groups_message_text
         )
 

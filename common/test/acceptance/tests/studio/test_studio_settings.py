@@ -49,12 +49,12 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         shown when no content groups exist.
         Given I have a course without
         When I go to the Group Configuration page in Studio
-        Then I see "You haven't created any content groups yet." message
+        Then I see "You have not created any content groups yet." message
         """
         self.group_configurations_page.visit()
         self.assertTrue(self.group_configurations_page.no_content_groups_message_is_present)
         self.assertIn(
-            "You haven't created any content groups yet.",
+            "You have not created any content groups yet.",
             self.group_configurations_page.no_content_groups_message_text
         )
 

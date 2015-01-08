@@ -23,9 +23,9 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
         renderPage: function() {
             var hash = this.getLocationHash();
             if (this.experimentsEnabled) {
-                this.$('.experiment-groups').append(this.experimentGroupsListView.render().el);
+                this.$('.wrapper-groups.experiment-groups').append(this.experimentGroupsListView.render().el);
             }
-            this.$('.content-groups').append(this.cohortGroupsListView.render().el);
+            this.$('.wrapper-groups.content-groups').append(this.cohortGroupsListView.render().el);
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match
