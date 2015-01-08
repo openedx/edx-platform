@@ -7,6 +7,127 @@ from nose.plugins.attrib import attr
 from base_studio_test import StudioCourseTest
 
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+
+
+@attr('shard_1')
+class ContentGroupConfigurationTest(StudioCourseTest):
+    """
+    Tests for content groups in the Group Configurations Page.
+    There are tests for the experiment groups in test_studio_split_test.
+    """
+    def setUp(self):
+        super(ContentGroupConfigurationTest, self).setUp()
+        self.group_configurations_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def create_and_verify_content_group(self, name, existing_groups):
+        """
+        Creates a new content group and verifies that it was properly created.
+        """
+        self.assertEqual(existing_groups, len(self.group_configurations_page.content_groups))
+        if existing_groups == 0:
+            self.group_configurations_page.create_first_content_group()
+        else:
+            self.group_configurations_page.add_content_group()
+        config = self.group_configurations_page.content_groups[existing_groups]
+        config.name = name
+        # Save the content group
+        self.assertEqual(config.get_text('.action-primary'), "Create")
+        self.assertTrue(config.delete_button_is_absent)
+        config.save()
+        self.assertIn(name, config.name)
+        return config
+
+    def test_no_content_groups_by_default(self):
+        """
+        Scenario: Ensure that message telling me to create a new content group is
+            shown when no content groups exist.
+        Given I have a course without content groups
+        When I go to the Group Configuration page in Studio
+        Then I see "You have not created any content groups yet." message
+        """
+        self.group_configurations_page.visit()
+        self.assertTrue(self.group_configurations_page.no_content_groups_message_is_present)
+        self.assertIn(
+            "You have not created any content groups yet.",
+            self.group_configurations_page.no_content_groups_message_text
+        )
+
+    def test_can_create_and_edit_content_groups(self):
+        """
+        Scenario: Ensure that the content groups can be created and edited correctly.
+        Given I have a course without content groups
+        When I click button 'Add your first Content Group'
+        And I set new the name and click the button 'Create'
+        Then I see the new content is added and has correct data
+        And I click 'New Content Group' button
+        And I set the name and click the button 'Create'
+        Then I see the second content group is added and has correct data
+        When I edit the second content group
+        And I change the name and click the button 'Save'
+        Then I see the second content group is saved successfully and has the new name
+        """
+        self.group_configurations_page.visit()
+        self.create_and_verify_content_group("New Content Group", 0)
+        second_config = self.create_and_verify_content_group("Second Content Group", 1)
+
+        # Edit the second content group
+        second_config.edit()
+        second_config.name = "Updated Second Content Group"
+        self.assertEqual(second_config.get_text('.action-primary'), "Save")
+        second_config.save()
+
+        self.assertIn("Updated Second Content Group", second_config.name)
+
+    def test_cannot_delete_content_group(self):
+        """
+        Scenario: Delete is not currently supported for content groups.
+        Given I have a course without content groups
+        When I create a content group
+        Then there is no delete button
+        """
+        self.group_configurations_page.visit()
+        config = self.create_and_verify_content_group("New Content Group", 0)
+        self.assertTrue(config.delete_button_is_absent)
+
+    def test_must_supply_name(self):
+        """
+        Scenario: Ensure that validation of the content group works correctly.
+        Given I have a course without content groups
+        And I create new content group without specifying a name click the button 'Create'
+        Then I see error message "Content Group name is required."
+        When I set a name and click the button 'Create'
+        Then I see the content group is saved successfully
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.save()
+        self.assertEqual(config.mode, 'edit')
+        self.assertEqual("Group name is required", config.validation_message)
+        config.name = "Content Group Name"
+        config.save()
+        self.assertIn("Content Group Name", config.name)
+
+    def test_can_cancel_creation_of_content_group(self):
+        """
+        Scenario: Ensure that creation of a content group can be canceled correctly.
+        Given I have a course without content groups
+        When I click button 'Add your first Content Group'
+        And I set new the name and click the button 'Cancel'
+        Then I see that there is no content groups in the course
+        """
+        self.group_configurations_page.visit()
+        self.group_configurations_page.create_first_content_group()
+        config = self.group_configurations_page.content_groups[0]
+        config.name = "Content Group"
+        config.cancel()
+        self.assertEqual(0, len(self.group_configurations_page.content_groups))
 
 
 @attr('shard_1')
