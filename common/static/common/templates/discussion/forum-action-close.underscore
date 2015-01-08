@@ -1,0 +1,12 @@
+<li class="actions-item">
+    <a href="javascript:void(0)" class="action-list-item action-close" role="checkbox" aria-checked="false">
+        <span class="sr"><%- gettext("Close") %></span>
+        <span class="action-label" aria-hidden="true">
+            <span class="label-unchecked"><%- gettext("Close") %></span>
+            <span class="label-checked"><%- gettext("Open") %></span>
+        </span>
+        <span class="action-icon">
+          <i class="icon fa fa-lock"></i>
+        </span>
+    </a>
+</li>

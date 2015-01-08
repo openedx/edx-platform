@@ -1,0 +1,3 @@
+<li role="menuitem" class="topic-menu-item">
+    <a href="#" class="topic-title" data-discussion-id="<%- id %>" data-cohorted="<%- is_cohorted %>"><%- text %></a>
+</li>
