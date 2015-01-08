@@ -712,9 +712,9 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             {
                 "course_id": course.id,
                 "course_name": course.display_name,
-                "allow_donation": _allow_donation(course_modes, course.id)
+                "allow_donation": _allow_donation(course_modes, course.id, enrollment)
             }
-            for course in recently_enrolled_courses
+            for course, enrollment in recently_enrolled_courses
         ]
 
         return render_to_string(
@@ -745,7 +745,7 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
     ]
 
 
-def _allow_donation(course_modes, course_id):
+def _allow_donation(course_modes, course_id, enrollment):
     """Determines if the dashboard will request donations for the given course.
 
     Check if donations are configured for the platform, and if the current course is accepting donations.
@@ -761,7 +761,7 @@ def _allow_donation(course_modes, course_id):
     donations_enabled = DonationConfiguration.current().enabled
     is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
     has_payment_option = CourseMode.has_payment_options(course_id)
-    return donations_enabled and not is_verified_mode and not has_payment_option
+    return donations_enabled and (not is_verified_mode or (is_verified_mode and enrollment.mode in ['audit', 'honor']) )and not has_payment_option
 
 
 def try_change_enrollment(request):

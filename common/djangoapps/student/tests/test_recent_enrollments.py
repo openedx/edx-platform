@@ -112,10 +112,10 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         recent_course_list = _get_recently_enrolled_courses(courses_list)
         self.assertEqual(len(recent_course_list), 5)
 
-        self.assertEqual(recent_course_list[1], courses[0])
-        self.assertEqual(recent_course_list[2], courses[1])
-        self.assertEqual(recent_course_list[3], courses[2])
-        self.assertEqual(recent_course_list[4], courses[3])
+        self.assertEqual(recent_course_list[1][0], courses[0])
+        self.assertEqual(recent_course_list[2][0], courses[1])
+        self.assertEqual(recent_course_list[3][0], courses[2])
+        self.assertEqual(recent_course_list[4][0], courses[3])
 
     def test_dashboard_rendering(self):
         """
