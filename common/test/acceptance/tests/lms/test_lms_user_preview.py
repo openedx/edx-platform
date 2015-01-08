@@ -229,7 +229,7 @@ class StaffDebugTest(CourseWithoutContentGroupsTest):
 
 class CourseWithContentGroupsTest(StaffViewTest):
     """
-    Verifies that changing the "previewing as" selector works properly for content groups.
+    Verifies that changing the "View this course as" selector works properly for content groups.
     """
 
     def setUp(self):

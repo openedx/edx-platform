@@ -73,11 +73,11 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             self.assertIn(string, html)
 
     def test_html_no_partition(self):
-        self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
+        self.verify_visibility_view_contains(self.video, 'No content groups exist')
 
     def test_html_empty_partition(self):
         self.create_content_groups([])
-        self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
+        self.verify_visibility_view_contains(self.video, 'No content groups exist')
 
     def test_html_populated_partition(self):
         self.create_content_groups(self.pet_groups)
@@ -85,12 +85,12 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
 
     def test_html_no_partition_staff_locked(self):
         self.set_staff_only(self.vertical)
-        self.verify_visibility_view_contains(self.video, ['You have not set up any groups to manage visibility with.'])
+        self.verify_visibility_view_contains(self.video, ['No content groups exist'])
 
     def test_html_empty_partition_staff_locked(self):
         self.create_content_groups([])
         self.set_staff_only(self.vertical)
-        self.verify_visibility_view_contains(self.video, 'You have not set up any groups to manage visibility with.')
+        self.verify_visibility_view_contains(self.video, 'No content groups exist')
 
     def test_html_populated_partition_staff_locked(self):
         self.create_content_groups(self.pet_groups)
