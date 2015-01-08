@@ -257,24 +257,13 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
 
     def test_lazily_creates_cohort_configuration(self):
         """
-        Test that a cohort schemed user partition is created if it
-        doesn't already exist.
+        Test that a cohort schemed user partition is NOT created by
+        default for the user.
         """
-        def verify_cohorted_partition_exists():
-            self.assertEqual(len(self.course.user_partitions), 1)
-            user_partition = self.course.user_partitions[0]
-            self.assertEqual(user_partition.name, 'Cohort Group Configuration')
-            self.assertEqual(user_partition.groups, [])
-            self.assertEqual(user_partition.scheme, CohortPartitionScheme)
-
-        self.assertEqual(self.course.user_partitions, [])
-
-        # A single cohort schemed user partition should be present
-        # after the first GET and all subsequent requests.
-        for __ in xrange(2):
-            self.client.get(self._url())
-            self.reload_course()
-            verify_cohorted_partition_exists()
+        self.assertEqual(len(self.course.user_partitions), 0)
+        self.client.get(self._url())
+        self.reload_course()
+        self.assertEqual(len(self.course.user_partitions), 0)
 
 
 # pylint: disable=no-member

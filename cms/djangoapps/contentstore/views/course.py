@@ -1335,8 +1335,10 @@ class GroupConfiguration(object):
     def get_or_create_cohorted_user_partition(course, store, user_id):
         """
         Returns the first user partition from the course which uses the
-        CohortPartitionScheme, or creates one if no such partition is
-        found.
+        CohortPartitionScheme, or generates one if no such partition is
+        found.  The created partition is not saved to the course until
+        the client explicitly creates a group within the partition and
+        POSTs back.
         """
         cohorted_partition = get_cohorted_user_partition(course.id)
         if cohorted_partition is None:
@@ -1347,8 +1349,6 @@ class GroupConfiguration(object):
                 groups=[],
                 scheme_id='cohort'
             )
-            course.user_partitions.append(cohorted_partition)
-            store.update_item(course, user_id)
         return cohorted_partition
 
 
