@@ -43,7 +43,7 @@ class TestRecentEnrollments(ModuleStoreTestCase):
 
         # New Course
         course_location = locator.CourseLocator('Org1', 'Course1', 'Run1')
-        self.course, _ = self._create_course_and_enrollment(course_location)
+        self.course, self.enrollment = self._create_course_and_enrollment(course_location)
 
     def _create_course_and_enrollment(self, course_location):
         """ Creates a course and associated enrollment. """
@@ -127,15 +127,43 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
-        (['audit', 'honor', 'verified'], False),
-        (['professional'], False),
-        (['verified'], False),
-        (['audit'], True),
-        (['honor'], True),
-        ([], True)
+        # (['audit', 'honor'], 'honor', False),
+        (['professional'], 'honor', True),
+        (['verified'], 'honor', True),
+        (['professional', 'verified'], 'honor', True),
+        (['audit', 'honor', 'professional'], 'honor', True),
+        (['audit', 'honor', 'verified'], 'honor', True),
+        (['audit', 'honor', 'verified', 'professional'], 'honor', True),
+        # (['audit'], 'honor', False),
+        # (['honor'], 'honor', False),
+        # ([], 'honor', False),
+        #
+        # (['audit', 'honor'], 'audit', False),
+        # (['professional'], 'audit', True),
+        # (['verified'], 'audit', True),
+        # (['professional', 'verified'], 'audit', True),
+        # (['audit', 'honor', 'professional'], 'audit', True),
+        # (['audit', 'honor', 'verified'], 'audit', True),
+        # (['audit', 'honor', 'verified', 'professional'], 'audit', True),
+        # (['audit'], 'audit', True),
+        # (['honor'], 'audit', True),
+        # ([], 'audit', True),
+
+        # (['audit', 'honor'], 'verified', False),
+        (['professional'], 'verified', False),
+        (['verified'], 'verified', False),
+        (['professional', 'verified'], 'verified', False),
+        (['audit', 'honor', 'professional'], 'verified', False),
+        (['audit', 'honor', 'verified'], 'verified', False),
+        (['audit', 'honor', 'verified', 'professional'], 'verified', False),
+        # (['audit'], 'verified', False),
+        # (['honor'], 'verified', False),
+        # ([], 'verified', False)
     )
     @ddt.unpack
-    def test_donate_button(self, course_modes, show_donate):
+    def test_donate_button(self, course_modes, enrollment_mode, show_donate):
+        from nose.tools import set_trace;
+        set_trace()
         # Enable the enrollment success message
         self._configure_message_timeout(10000)
 
@@ -146,6 +174,9 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         for mode in course_modes:
             CourseModeFactory(mode_slug=mode, course_id=self.course.id)
 
+        self.enrollment.mode = enrollment_mode
+        self.enrollment.save()
+
         # Check that the donate button is or is not displayed
         self.client.login(username=self.student.username, password=self.PASSWORD)
         response = self.client.get(reverse("dashboard"))
@@ -154,6 +185,69 @@ class TestRecentEnrollments(ModuleStoreTestCase):
             self.assertContains(response, "donate-container")
         else:
             self.assertNotContains(response, "donate-container")
+
+    # @ddt.data(
+    #     (['audit', 'honor'], True),
+    #     (['professional'], True),
+    #     (['verified'], True),
+    #     (['audit'], True),
+    #     (['honor'], True),
+    #     ([], True)
+    # )
+    # @ddt.unpack
+    # def test_donate_button_enrollment_audit(self, course_modes, show_donate):
+    #     from nose.tools import set_trace; set_trace()
+    #     # Enable the enrollment success message
+    #     self._configure_message_timeout(10000)
+    #
+    #     # Enable donations
+    #     DonationConfiguration(enabled=True).save()
+    #
+    #     # Create the course mode(s)
+    #     for mode in course_modes:
+    #         CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+    #     self.enrollment.mode = 'audit'
+    #     self.enrollment.save()
+    #     # Check that the donate button is or is not displayed
+    #     self.client.login(username=self.student.username, password=self.PASSWORD)
+    #     response = self.client.get(reverse("dashboard"))
+    #
+    #     if show_donate:
+    #         self.assertContains(response, "donate-container")
+    #     else:
+    #         self.assertNotContains(response, "donate-container")
+    #
+    # @ddt.data(
+    #     (['audit', 'honor'], True),
+    #     (['professional'], True),
+    #     (['verified'], True),
+    #     (['audit'], True),
+    #     (['honor'], True),
+    #     ([], True)
+    # )
+    # @ddt.unpack
+    # def test_donate_button_verified_courses(self, course_modes, show_donate):
+    #     from nose.tools import set_trace; set_trace()
+    #     # Enable the enrollment success message
+    #     self._configure_message_timeout(10000)
+    #
+    #     # Enable donations
+    #     DonationConfiguration(enabled=True).save()
+    #
+    #     # Create the course mode(s)
+    #     for mode in course_modes:
+    #         CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+    #
+    #     self.enrollment.mode = ''
+    #
+    #     # Check that the donate button is or is not displayed
+    #     self.client.login(username=self.student.username, password=self.PASSWORD)
+    #     response = self.client.get(reverse("dashboard"))
+    #
+    #     if show_donate:
+    #         self.assertContains(response, "donate-container")
+    #     else:
+    #         self.assertNotContains(response, "donate-container")
 
     def test_donate_button_honor_with_price(self):
         # Enable the enrollment success message and donations
