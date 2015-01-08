@@ -419,6 +419,24 @@ class TestLibraries(LibraryTestCase):
         html_block = modulestore().get_item(lc_block.children[0])
         self.assertEqual(html_block.display_name, name2)
 
+    def test_refresh_fails_for_unknown_library(self):
+        # Create a course:
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            course = CourseFactory.create()
+
+        # Add a LibraryContent block to the course:
+        lc_block = self._add_library_content_block(course, self.lib_key)
+        lc_block = self._refresh_children(lc_block)
+        self.assertEqual(len(lc_block.children), 0)
+
+        # Now, change the block settings to have an invalid library key:
+        resp = self._update_item(
+            lc_block.location,
+            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+        )
+        self.assertEqual(resp.status_code, 200)
+        with self.assertRaises(ValueError):
+            self._refresh_children(lc_block, status_code_expected=400)
 
 @ddt.ddt
 class TestLibraryAccess(LibraryTestCase):
