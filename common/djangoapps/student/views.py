@@ -738,7 +738,7 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
     time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
     return [
-        course for course, enrollment in course_enrollment_pairs
+        (course, enrollment) for course, enrollment in course_enrollment_pairs
         # If the enrollment has no created date, we are explicitly excluding the course
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta
@@ -758,10 +758,15 @@ def _allow_donation(course_modes, course_id, enrollment):
         True if the course is allowing donations.
 
     """
+    # from nose.tools import set_trace;
+    # set_trace()
     donations_enabled = DonationConfiguration.current().enabled
     is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
     has_payment_option = CourseMode.has_payment_options(course_id)
-    return donations_enabled and (not is_verified_mode or (is_verified_mode and enrollment.mode in ['audit', 'honor']) )and not has_payment_option
+    return_val = donations_enabled and (not is_verified_mode or (is_verified_mode and enrollment.mode in ['audit', 'honor'])) and not has_payment_option
+    return_val
+    #TODO Hard coded for the time being
+    return True
 
 
 def try_change_enrollment(request):
