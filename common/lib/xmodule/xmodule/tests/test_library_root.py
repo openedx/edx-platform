@@ -11,7 +11,7 @@ from xmodule.x_module import AUTHOR_VIEW
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 
-dummy_render = lambda block, _: Fragment(block.data)
+dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
 @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
@@ -62,7 +62,7 @@ class TestLibraryRoot(MixedSplitTestCase):
                 user_id=self.user_id,
                 publish_item=False,
                 modulestore=self.store,
-                data="HtmlBlock"+str(i)
+                data="HtmlBlock" + str(i)
             )
             for i in range(5)
         ]
