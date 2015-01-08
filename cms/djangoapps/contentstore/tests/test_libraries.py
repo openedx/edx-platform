@@ -441,6 +441,7 @@ class TestLibraries(LibraryTestCase):
         with self.assertRaises(ValueError):
             self._refresh_children(lc_block, status_code_expected=400)
 
+
 @ddt.ddt
 class TestLibraryAccess(LibraryTestCase):
     """

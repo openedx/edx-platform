@@ -14,15 +14,17 @@ from opaque_keys.edx.locator import LibraryLocator
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
-from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
-from xmodule.library_content_module import LibraryVersionReference, LibraryList, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor 
+from xmodule.x_module import AUTHOR_VIEW
+from xmodule.library_content_module import (
+    LibraryVersionReference, LibraryList, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
+)
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
 from xmodule.validation import StudioValidationMessage
 
 
-_dummy_render = lambda block, _: Fragment(block.data)
+dummy_render = lambda block, _: Fragment(block.data)
 
 
 class BaseTestLibraryContainer(MixedSplitTestCase):
@@ -74,7 +76,7 @@ class BaseTestLibraryContainer(MixedSplitTestCase):
             }
         )
 
-    def _bind_course_module(self, module, render=None):
+    def _bind_course_module(self, module):
         """
         Bind a module (part of self.course) so we can access student-specific data.
         """
@@ -119,6 +121,7 @@ class BaseTestLibraryContainer(MixedSplitTestCase):
                 data=self._get_capa_problem_type_xml(*problem_type),
                 modulestore=self.store,
             )
+
 
 @ddt.ddt
 class TestLibraryContainer(BaseTestLibraryContainer):
@@ -270,8 +273,7 @@ class TestLibraryContainer(BaseTestLibraryContainer):
 
 
 @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
-@patch('xmodule.html_module.HtmlModule.author_view', _dummy_render, create=True)
-@patch('xmodule.html_module.HtmlModule.student_view', _dummy_render, create=True)
+@patch('xmodule.html_module.HtmlModule.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(BaseTestLibraryContainer):
     """
@@ -321,7 +323,7 @@ class TestLibraryList(TestCase):
         lib_list = LibraryList()
         lib1_key, lib1_version = u'library-v1:Org1+Lib1', '5436ffec56c02c13806a4c1b'
         lib2_key, lib2_version = u'library-v1:Org2+Lib2', '112dbaf312c0daa019ce9992'
-        raw = [lib1_key+','+lib1_version, lib2_key+','+lib2_version]
+        raw = [lib1_key + ',' + lib1_version, lib2_key + ',' + lib2_version]
         parsed = lib_list.from_json(raw)
         self.assertEqual(len(parsed), 2)
         self.assertEquals(parsed[0].library_id, LibraryLocator.from_string(lib1_key))
