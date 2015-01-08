@@ -13,6 +13,8 @@ from milestones.api import (
     add_course_milestone,
     remove_course_milestone,
     get_course_milestones_fulfillment_paths,
+    add_user_milestone,
+    get_user_milestones,
 )
 from django.conf import settings
 
@@ -114,6 +116,22 @@ def get_prerequisite_courses_display(course_descriptor):  # pylint: disable=inva
                 required_course_descriptor.display_number_with_default
             ]))
     return pre_requisite_courses
+
+
+def fulfill_course_milestone(course_key, user):
+    """
+    It would save course milestone collected by user.
+    """
+    course_milestones = get_course_milestones(course_key=course_key, relationship="fulfills")
+    for milestone in course_milestones:
+        add_user_milestone({'id': user.id}, milestone)
+
+
+def milestones_achieved_by_user(user):
+    """
+    It would fetch list of milestones completed by user
+    """
+    return get_user_milestones({'id': user.id})
 
 
 def is_valid_course_key(key):
