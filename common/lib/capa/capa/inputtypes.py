@@ -517,10 +517,10 @@ class ChoiceGroup(InputTypeBase):
             if choice.tag == 'choice':
                 choices.append((choice.get("name"), stringify_children(choice)))
             else:
-                if choice.tag != 'booleanhint':
+                if choice.tag != 'compoundhint':
                     msg = u'[capa.inputtypes.extract_choices] {error_message}'.format(
-                        # Translators: '<choice>' and '<booleanhint>' are tag names and should not be translated.
-                        error_message=_('Expected a <choice> or <booleanhint> tag; got {given_tag} instead').format(
+                        # Translators: '<choice>' and '<compoundhint>' are tag names and should not be translated.
+                        error_message=_('Expected a <choice> or <compoundhint> tag; got {given_tag} instead').format(
                             given_tag=choice.tag
                         )
                     )

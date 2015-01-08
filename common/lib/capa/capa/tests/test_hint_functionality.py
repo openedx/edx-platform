@@ -22,9 +22,9 @@ class HintTest(unittest.TestCase):
         """
         student_answers = {problem_id: choice}
         resulting_cmap = self.problem.grade_answers(answers=student_answers)    # pylint: disable=no-member
-        dict = resulting_cmap.cmap.get(problem_id)
-        if dict:
-            return dict['msg']
+        adict = resulting_cmap.cmap.get(problem_id)
+        if adict:
+            return adict['msg']
         else:
             return ''
 
@@ -85,6 +85,9 @@ class TextInputHintsTest(HintTest):
 
 @ddt
 class TextInputHintsManyCombinations(HintTest):
+    """
+    Test text input combinations with additional answers.
+    """
     xml = load_fixture('extended_hints_text_input.xml')
     problem = new_loncapa_problem(xml)
 
@@ -166,7 +169,7 @@ class CheckboxHintsTest(HintTest):
         {'problem_id': u'1_3_1', 'choice': [u'choice_1', u'choice_2'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">poor banana.</div><div class="feedback_hint_text">Mushroom is a fungus, not a vegetable.</div><div class="feedback_hint_text">Brussel sprout is the only vegetable in this list.</div></div>'},
         {'problem_id': u'1_3_1', 'choice': [u'choice_0', u'choice_2'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">No, sorry, a banana is a fruit.</div><div class="feedback_hint_text">Mushroom is a fungus, not a vegetable.</div><div class="feedback_hint_text">Brussel sprout is the only vegetable in this list.</div></div>'},
 
-        # check for interaction between booleanhint and correct/incorrect
+        # check for interaction between compoundhint and correct/incorrect
         {'problem_id': u'1_4_1', 'choice': [u'choice_0', u'choice_1'], 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: <div class="feedback_hint_text">AB</div></div>'},
         {'problem_id': u'1_4_1', 'choice': [u'choice_0', u'choice_2'], 'expected_string': u'<div class="feedback_hint_correct">Correct: <div class="feedback_hint_text">AC</div></div>'},
 

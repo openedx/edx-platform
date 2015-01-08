@@ -12,7 +12,9 @@
 
   <div class="action">
     <input type="hidden" name="problem_id" value="${ problem['name'] }" />
-    <div hidden class="problem_hint">MARKER</div>
+    % if show_hint_button:
+    <div hidden class="problem_hint"></div>
+    % endif
 
     % if check_button:
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />

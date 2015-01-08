@@ -752,55 +752,6 @@ class ChoiceResponse(LoncapaResponse):
         self.correct_choices = set([choice.get(
             'name') for choice in correct_xml])
 
-    def get_extended_hints(self, student_answers, new_cmap):
-        """
-        Extract extended hint information from the xml based on the student_answers.
-        The hint information goes into the msg= in new_cmap for display.
-        Each choice in the checkboxgroup can have 2 extended hints, matching the
-        case that the student has or has not selected that choice:
-          <checkboxgroup label="Select the best snack" direction="vertical">
-             <choice correct="true">Donut
-               <choicehint selected="true">A Hint!</choicehint>
-               <choicehint selected="false">Another hint!</choicehint>
-             </choice>
-        """
-        if self.answer_id in student_answers:
-            # Compound hints are special thing just for checkboxgroup, trying
-            # them first before the regular extended hints.
-            if self.get_compound_hints(new_cmap, student_answers):
-                return
-
-            # Look at all the choices - each can generate some hint text
-            choices = self.xml.xpath('//checkboxgroup[@id=$id]/choice', id=self.answer_id)
-            ##from nose.tools import set_trace
-            ##set_trace()
-            hint_divs = ''
-            label = ''
-            label_count = 0
-            # We build up several hints in hint_divs, then wrap it once at the end.
-            for choice in choices:
-                name = choice.get('name')  # generated name, e.g. choice_2
-                if name in student_answers[self.answer_id]:
-                    # TODO nparlante not sure about case sensitivity here
-                    # xpath syntax to use: matches(@attr,'blah','i')
-                    selector = 'true'  # true/false attribute used in the hint xml
-                else:
-                    selector = 'false'
-                hint_node = choice.find('./choicehint[@selected="{0}"]'.format(selector))
-                if hint_node is not None:
-                    text = hint_node.text.strip()
-                    if hint_node.get('label'):
-                        label = hint_node.get('label')
-                        label_count += 1
-                    if text:
-                        # Unique case: there can be multiple of these hint divs
-                        hint_divs += '<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, text)
-            if hint_divs:
-                # Complication: if there is only a single label specified, we use it. However if there are multiple, we use none.
-                if label_count > 1:
-                    label = ''
-                new_cmap[self.answer_id]['msg'] = self.make_hint_div(None, new_cmap[self.answer_id]['correctness'] == 'correct', label, hint_divs)
-
     def assign_choice_names(self):
         """
         Initialize name attributes in <choice> tags for this response.
@@ -835,17 +786,65 @@ class ChoiceResponse(LoncapaResponse):
     def get_answers(self):
         return {self.answer_id: list(self.correct_choices)}
 
+    def get_extended_hints(self, student_answers, new_cmap):
+        """
+        Extract compound and extended hint information from the xml based on the student_answers.
+        The hint information goes into the msg= in new_cmap for display.
+        Each choice in the checkboxgroup can have 2 extended hints, matching the
+        case that the student has or has not selected that choice:
+          <checkboxgroup label="Select the best snack" direction="vertical">
+             <choice correct="true">Donut
+               <choicehint selected="tRuE">A Hint!</choicehint>
+               <choicehint selected="false">Another hint!</choicehint>
+             </choice>
+        """
+        if self.answer_id in student_answers:
+            # Compound hints are a special thing just for checkboxgroup, trying
+            # them first before the regular extended hints.
+            if self.get_compound_hints(new_cmap, student_answers):
+                return
+
+            # Look at all the choices - each can generate some hint text
+            choices = self.xml.xpath('//checkboxgroup[@id=$id]/choice', id=self.answer_id)
+            hint_divs = ''
+            label = ''
+            label_count = 0
+            # We build up several hints in hint_divs, then wrap it once at the end.
+            for choice in choices:
+                name = choice.get('name')  # generated name, e.g. choice_2
+                if name in student_answers[self.answer_id]:
+                    selector = 'true'  # true/false attribute used in the hint xml
+                else:
+                    selector = 'false'
+                # We find the matching <choicehint> in python vs xpath so we can case-insensitive
+                hint_nodes = choice.findall('./choicehint')
+                for hint_node in hint_nodes:
+                    if hint_node.get('selected', '').lower() == selector:
+                        text = hint_node.text.strip()
+                        if hint_node.get('label'):
+                            label = hint_node.get('label')
+                            label_count += 1
+                        if text:
+                            # Unusual: there can be multiple hint divs across the choices, all cat'd together
+                            hint_divs += '<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, text)
+                        break
+            if hint_divs:
+                # Complication: if there is only a single label specified, we use it. However if there are multiple, we use none.
+                if label_count > 1:
+                    label = ''
+                new_cmap[self.answer_id]['msg'] += self.make_hint_div(None, new_cmap[self.answer_id]['correctness'] == 'correct',
+                                                                     label, hint_divs)
+
     def get_compound_hints(self, new_cmap, student_answers):
         """
         Compound hints are a type of extended hint specific to checkboxgroup with the
-        <booleanhint value="A C"> meaning choices A and C were selected.
+        <compoundhint value="A C"> meaning choices A and C were selected.
         Checks for a matching compound hint, installing it in new_cmap.
         Returns True if compound condition hints were matched.
         """
         compound_hint_matched = False
         if self.answer_id in student_answers:
-            choice_test = '[@id="' + self.answer_id + '"]'
-            # First create a list of the student's selected ids
+            # First create a set of the student's selected ids
             student_set = set()
             for student_answer in student_answers[self.answer_id]:
                 choice_list = self.xml.xpath('//checkboxgroup[@id=$id]/choice[@name=$name]',
@@ -854,21 +853,20 @@ class ChoiceResponse(LoncapaResponse):
                     choice = choice_list[0]
                     student_set.add(choice.get('id').upper())
 
-            for boolean_hint in self.xml.xpath('//checkboxgroup[@id=$id]/booleanhint', id=self.answer_id):
+            for compound_hint in self.xml.xpath('//checkboxgroup[@id=$id]/compoundhint', id=self.answer_id):
                 # Selector words are space separated and not case-sensitive
-                selectors = boolean_hint.get('value').upper().split()
+                selectors = compound_hint.get('value').upper().split()
                 selector_set = set(selectors)
 
                 if selector_set == student_set:
                     # This is the atypical case where the hint text is in an inner div with its own style.
-                    hint_text = boolean_hint.text.strip()
+                    hint_text = compound_hint.text.strip()
                     hint_text = '<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, hint_text)
                     new_cmap[self.answer_id]['msg'] += self.make_hint_div(
-                        boolean_hint, new_cmap[self.answer_id]['correctness'] == 'correct',
+                        compound_hint, new_cmap[self.answer_id]['correctness'] == 'correct',
                         label='', hint_text=hint_text)
                     compound_hint_matched = True
                     break
-                    # having delivered the next sequential hint, we can stop looking for the hint to deliver
         return compound_hint_matched
 
 #-----------------------------------------------------------------------------
@@ -928,13 +926,13 @@ class MultipleChoiceResponse(LoncapaResponse):
           ...
         Any hint text is installed in the new_cmap.
         """
-        if self.answer_id in student_answer_dict:  # if we should process this student answer
+        if self.answer_id in student_answer_dict:
             student_answer = student_answer_dict[self.answer_id]
 
-            # TODO nparlante: this logic seems fishy. Like was is the contract here?
-            # a multiple choice component should have only a single answer
-            if isinstance(student_answer, list):  # if the answer is not in the form of a *single* answer
-                student_answer = student_answer[0]  # force the first answer to be *the* answer
+            # TODO nparlante: really?
+            # Warning: mostly student_answer is a string, but sometimes it is a list of strings.
+            if isinstance(student_answer, list):
+                student_answer = student_answer[0]
 
             # Find the named choice used by the student (according to the unit tests, silently ignore a bad choice-name)
             choice = self.xml.find('./choicegroup[@id="{0}"]/choice[@name="{1}"]'.format(self.answer_id, student_answer))
@@ -1240,32 +1238,14 @@ class OptionResponse(LoncapaResponse):
     tags = ['optionresponse']
     hint_tag = 'optionhint'
     allowed_inputfields = ['optioninput']
-    ##answer_fields = None  ## njp - what is this for?
+    answer_fields = None
 
     def setup_response(self):
-        # njp: self.inputfields is functional at this time, so make the answers dict now
-        #self.saved_answers = dict([(af.get('id'), contextualize_text(af.get(
-        #    'correct'), self.context)) for af in self.inputfields])
         self.answer_fields = self.inputfields
 
     def get_score(self, student_answers):
-        # njp: the .options and .correct in the xml nodes are blanked out when this runs, seemingly
-        # 1. changing the xml seems like it could break many things, like stuff is not there
-        # 2. here we grab the state
-        #from nose.tools import set_trace
-        #set_trace()
-
-        ## njp: do we need this stuff with the size-1 cmap?
-        ##answer_id = ''
-        ##if len(self.answer_ids) > 0:
-        ##    answer_id = self.answer_ids[0]
-        ##cmap = CorrectMap(answer_id, 'incorrect')      # default to a new cmap with an incorrect value
-
-        # TODO nparlante backout - this might be a slight change in semantcs
         cmap = CorrectMap()
         amap = self.get_answers()
-        #from nose.tools import set_trace
-        #set_trace()
         for aid in amap:
             if aid in student_answers and student_answers[aid] == amap[aid]:
                 cmap.set(aid, 'correct')
@@ -1274,34 +1254,18 @@ class OptionResponse(LoncapaResponse):
         return cmap
 
     def get_answers(self):
-        # We return the dict computed earlier
-        #return self.saved_answers
         amap = dict([(af.get('id'), contextualize_text(af.get(
             'correct'), self.context)) for af in self.answer_fields])
         return amap
 
-    # pullup 3 - optioninput
     def get_extended_hints(self, student_answers, new_cmap):
         """
-        <optionresponse>
-        <optioninput correct="Multiple Choice" options="(Multiple Choice),Text Input,Numerical Input">
-        <option correct="True">Multiple Choice <optionhint label="Good Job">Yes, multiple choice is the right answer.</optionhint> </option>
-        <option correct="False">Text Input <optionhint>No, text input problems do not present options.</optionhint> </option>
-        <option correct="False">Numerical Input <optionhint>No, numerical input problems do not present options.</optionhint> </option>
-        </optioninput>
-        </optionresponse>
-        Check the XML for any hints which should be delivered to the student based
-        on the answer choices made.
-
-        :param new_cmap:        the 'correct map' to which applicable hints will be
-                                added for display by downstream code
-        :param student_answers: the set of answer choices made by the student
-        :return:                nothing
+        Extract optioninput extended hint, e.g.
+        <optioninput correct="Multiple Choice">
+          <option correct="True">Donut <optionhint>Of course</optionhint> </option>
         """
-        #from nose.tools import set_trace
-        #set_trace()
-        answer_id = self.answer_ids[0]  # TODO nparlante   there's a list but we always use the first one, is that correct?
-        if answer_id in student_answers:  # if we should process this student answer
+        answer_id = self.answer_ids[0]  # TODO nparlante- this works, but I'm not sure why
+        if answer_id in student_answers:
             student_answer = student_answers[answer_id]
             # Note: old-style optioninput does not have <option> tags, so we simply don't find them
             options = self.xml.xpath('//optioninput[@id=$id]/option[contains(.,$ans)]', id=answer_id, ans=student_answer)
@@ -1311,28 +1275,6 @@ class OptionResponse(LoncapaResponse):
                 if hint_node is not None:
                     new_cmap[answer_id]['msg'] += self.make_hint_div(hint_node, option.get('correct').upper() == 'TRUE')
 
-# OLD CODE
-#         for student_answer_id in student_answers:
-#             if unicode(self.answer_ids[0]) == student_answer_id:  # if this is a student answer this instance should process
-#                 optiongroup_test = '[@id="' + student_answer_id + '"]'
-#                 for option in self.xml.xpath('//optioninput' + optiongroup_test + '/option'):
-#                     if unicode(option.text.strip()) == student_answers[student_answer_id]:
-#                         for option_hint in option.iter('optionhint'):
-# 
-#                             option_hint_text = option_hint.text.strip()
-#                             if len(option_hint_text) > 0:
-#                                 option_hint_label = option_hint.get('label')
-# 
-#                                 message_style_class = QUESTION_HINT_INCORRECT_STYLE  # assume the answer was incorrect
-#                                 if option.get('correct').upper() == 'TRUE':
-#                                     message_style_class = QUESTION_HINT_CORRECT_STYLE  # guessed wrong, answer was correct
-# 
-#                                 correctness_string = self._get_hint_label(option_hint_label, new_cmap, student_answer_id)
-# 
-#                                 new_cmap[student_answer_id]['msg'] = new_cmap[student_answer_id]['msg'] + \
-#                                     '<div class="' + message_style_class + '">' \
-#                                     + correctness_string + option_hint_text + '</div>'
-#                 break  # our particular answer was found, we can stop looking
 #-----------------------------------------------------------------------------
 
 
@@ -1510,42 +1452,18 @@ class NumericalResponse(LoncapaResponse):
     def get_answers(self):
         return {self.answer_id: self.correct_answer}
 
-    # pullup 4 - numeric
     def get_extended_hints(self, student_answers, new_cmap):
         """
-        Check the XML for any hints which should be delivered to the student based
-        on the answer choices made.
-
-        :param new_cmap:        the 'correct map' to which applicable hints will be
-                                added for display by downstream code
-        :param student_answers: the set of answer choices made by the student
-        :return:                True if a single choice hint was found
+        Extract numericalresponse extended hint, e.g.
+          <correcthint>Yes, 1+1 IS 2<correcthint>
         """
         if self.answer_id in student_answers:
             if new_cmap.cmap[self.answer_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-                # TODO nparlante: do not understand self.id vs. self.answer_id  here
-                #hints1 = self.original_xml.xpath('//numericalresponse/correcthint')  # this works
-                #hints2 = self.xml.xpath('//numericalresponse/correcthint')  # this does not work .. why?
+                # Note: using self.id here, not the more typical self.answer_id
                 hints = self.xml.xpath('//numericalresponse[@id=$id]/correcthint', id=self.id)
                 if hints:
-                    # Grab first <correcthint>, could support multiple ones
                     hint_node = hints[0]
                     new_cmap[self.answer_id]['msg'] += self.make_hint_div(hint_node, True)
-
-# OLD CODE
-#         for problem_id in student_answers:
-#             if self.answer_id == problem_id:
-#                 if new_cmap.cmap[problem_id]['correctness'] == 'correct':  # if the grader liked the student's answer
-#                     correct_hints = self.original_xml.xpath('//numericalresponse/correcthint')
-#                     if correct_hints:
-#                         for correct_hint in correct_hints:
-#                             correctness_string = self._get_hint_label(correct_hint, new_cmap, self.answer_id)
-#                             new_cmap[problem_id]['msg'] += \
-#                                 '<div class="' + QUESTION_HINT_CORRECT_STYLE + '">' + \
-#                                 correctness_string + correct_hint.text.strip() + '</div>'
-#                             hint_found = True
-#         return hint_found
-
 
 #-----------------------------------------------------------------------------
 
@@ -1613,8 +1531,7 @@ class StringResponse(LoncapaResponse):
         correct_answers = [self.xml.get('answer')] + [element.text for element in self.xml.findall('additional_answer')]
         self.correct_answer = [contextualize_text(answer, self.context).strip() for answer in correct_answers]
 
-        # remove additional_answer from xml, otherwise they will be displayed
-        # TODO nparlante - experiment where we screen out non-display nodes later
+        # TODO nparlante - explain how tag removal works
         #for additional_answer in self.xml.findall('additional_answer'):
         #    self.xml.remove(additional_answer)
 
@@ -1634,7 +1551,7 @@ class StringResponse(LoncapaResponse):
             return given.lower() in [i.lower() for i in expected]
         return given in expected
 
-    # pullup 5 - stringresponse - ugh!
+    # TODO nparlante - fix comment
     def get_extended_hints(self, student_answers, new_cmap):
         """
         Check the XML for any hints which should be delivered to the student based
@@ -1718,6 +1635,37 @@ class StringResponse(LoncapaResponse):
                         new_cmap[self.answer_id]['msg'] += self.make_hint_div(node, False)
                         return
 
+    def match_additional_node(self, node, given, regex_mode):
+        """
+        <additional_answer>^thre+</additional_answer>
+        Return the boolean match of a given student answer vs. additional_answer and regexphint nodes
+        which contain an answer="xxx" attribute, and possibly type="ci".
+        A regular expression with an error will not match anything.
+        """
+        answer = node.get('answer', '').strip()
+        if not answer:
+            return False
+
+        ci = False
+        if node.get('type') == 'ci':
+            ci = True
+
+        if regex_mode:
+            flags = 0
+            if ci:
+                flags = re.IGNORECASE
+            try:
+                # We follow the check_string convention, adding ^ and $
+                regex = re.compile('^' + answer + '$', flags=flags | re.UNICODE)
+                return re.search(regex, given)
+            except Exception:
+                return False
+
+        if ci:
+            return answer.lower() == given.lower()
+        else:
+            return answer == given
+            
     def match_hint_node(self, node, given, regex_mode):
         """
         Return the boolean match of a given student answer vs. additional_answer and regexphint nodes
