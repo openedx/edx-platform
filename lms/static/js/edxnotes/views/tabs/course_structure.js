@@ -45,7 +45,7 @@ define([
         tabInfo: {
             name: gettext('Location in Course'),
             identifier: 'view-course-structure',
-            icon: 'icon-list-ul'
+            icon: 'fa fa-list-ul'
         }
     });
 
