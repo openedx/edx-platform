@@ -189,7 +189,7 @@ class EdxNotesPage(CoursePage):
     """
     EdxNotes page.
     """
-    url_path = "edxnotes"
+    url_path = "edxnotes/"
     MAPPING = {
         "recent": RecentActivityView,
         "structure": CourseStructureView,
