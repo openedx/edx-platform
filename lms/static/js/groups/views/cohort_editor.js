@@ -54,7 +54,7 @@ var edx = edx || {};
             event.preventDefault();
             cohortFormView.saveForm()
                 .done(function() {
-                    cohortFormView.showMessage(gettext('Saved cohort group.'));
+                    cohortFormView.showMessage(gettext('Saved cohort'));
                 });
         },
 
@@ -145,8 +145,8 @@ var edx = edx || {};
             numPresent = modifiedUsers.present.length;
             if (numUsersAdded > 0 || numPresent > 0) {
                 title = interpolate_text(
-                    ngettext("{numUsersAdded} student has been added to this cohort group",
-                        "{numUsersAdded} students have been added to this cohort group", numUsersAdded),
+                    ngettext("{numUsersAdded} student has been added to this cohort",
+                        "{numUsersAdded} students have been added to this cohort", numUsersAdded),
                     {numUsersAdded: numUsersAdded}
                 );
 
@@ -174,8 +174,8 @@ var edx = edx || {};
                 if (numPresent > 0) {
                     details.push(
                         interpolate_text(
-                            ngettext("{numPresent} student was already in the cohort group",
-                                "{numPresent} students were already in the cohort group", numPresent),
+                            ngettext("{numPresent} student was already in the cohort",
+                                "{numPresent} students were already in the cohort", numPresent),
                             {numPresent: numPresent}
                         )
                     );

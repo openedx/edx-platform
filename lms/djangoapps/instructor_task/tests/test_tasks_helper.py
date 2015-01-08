@@ -75,7 +75,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
             report_csv_filename = report_store.links_for(course_id)[0][0]
             with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
-                    cohort_groups_in_csv.append(row['Cohort Group Name'])
+                    cohort_groups_in_csv.append(row['Cohort Name'])
 
         self.assertEqual(cohort_groups_in_csv, expected_cohort_groups)
 
@@ -97,12 +97,12 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
     def test_unicode_cohort_data_in_grading(self):
         """
-        Test that cohort groups can contain unicode characters.
+        Test that cohorts can contain unicode characters.
         """
         cohort_groups = [u'ÞrÖfessÖr X', u'MàgnëtÖ']
         course = CourseFactory.create(cohort_config={'cohorted': True})
 
-        # Create users and manually assign cohort groups
+        # Create users and manually assign cohorts
         user1 = UserFactory.create(username='user1')
         user2 = UserFactory.create(username='user2')
         CourseEnrollment.enroll(user1, course.id)

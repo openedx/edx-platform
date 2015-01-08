@@ -93,7 +93,7 @@ var edx = edx || {};
             var errorMessages;
             errorMessages = [];
             if (!fieldData.name) {
-                errorMessages.push(gettext('You must specify a name for the cohort group'));
+                errorMessages.push(gettext('You must specify a name for the cohort'));
             }
             if (this.hasAssociatedContentGroup() && fieldData.group_id === null) {
                 if (this.$('.input-cohort-group-association').val() === 'None') {
@@ -125,8 +125,7 @@ var edx = edx || {};
             errorMessages = this.validate(fieldData);
             if (errorMessages.length > 0) {
                 showErrorMessage(
-                    isUpdate ? gettext("The cohort group cannot be saved")
-                        : gettext("The cohort group cannot be added"),
+                    isUpdate ? gettext("The cohort cannot be saved") : gettext("The cohort cannot be added"),
                     errorMessages
                 );
                 saveOperation.reject();

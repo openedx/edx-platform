@@ -104,7 +104,7 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def _get_cohort_options(self):
         """
-        Returns the available options in the cohort dropdown, including the initial "Select a cohort group".
+        Returns the available options in the cohort dropdown, including the initial "Select a cohort".
         """
         return self.q(css=self._bounded_selector("#cohort-select option"))
 
@@ -122,7 +122,7 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def get_cohorts(self):
         """
-        Returns, as a list, the names of the available cohorts in the drop-down, filtering out "Select a cohort group".
+        Returns, as a list, the names of the available cohorts in the drop-down, filtering out "Select a cohort".
         """
         return [
             self._cohort_name(opt.text)
@@ -227,7 +227,7 @@ class MembershipPageCohortManagementSection(PageObject):
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
         Sets the content group associated with the cohort currently being edited.
-        If content_group is None, un-links the cohort group from any content group.
+        If content_group is None, un-links the cohort from any content group.
         Presses Save to update the cohort's settings.
         """
         if select_settings:
