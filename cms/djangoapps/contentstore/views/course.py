@@ -1372,6 +1372,7 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
+            should_show_experiment_groups = should_show_content_experiment_groups(course)
             random_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
             cohort_configuration = GroupConfiguration.get_or_create_cohorted_user_partition(
                 course, store, request.user.id
@@ -1380,7 +1381,8 @@ def group_configurations_list_handler(request, course_key_string):
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'experiment_configurations': random_configurations if should_show_content_experiment_groups(course) else None,
+                'experiment_configurations': random_configurations if should_show_experiment_groups else None,
+                'should_show_experiment_groups': should_show_experiment_groups,
                 'cohort_configuration': cohort_configuration
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):

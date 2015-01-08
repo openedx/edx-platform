@@ -20,7 +20,7 @@
 
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${json.dumps(experiment_configurations)}, ${json.dumps(cohort_configuration)}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(${json.dumps(should_show_experiment_groups)}, ${json.dumps(experiment_configurations)}, ${json.dumps(cohort_configuration)}, "${group_configuration_url}", "${course_outline_url}");
   });
 </%block>
 
@@ -45,6 +45,7 @@
             </div>
         </div>
 
+      % if should_show_experiment_groups:
         <div class="wrapper-groups experiment-groups">
           <h3 class="title">${_("Experiment Groups")}</h3>
           <p class="copy">${_("An experiment group configuration defines how many groups of students are in an experiment. You can then add a content experiment to any unit in the {a_start}Course Outline{a_end}. [Copy TBD]").format(a_start='<a href="{}">'.format(course_outline_url), a_end="</a>")}</p>
@@ -60,6 +61,7 @@
             </div>
           % endif
         </div>
+      % endif
       </article>
       <aside class="content-supplementary" role="complementary">
       <div class="bit">
