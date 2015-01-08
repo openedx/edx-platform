@@ -25,7 +25,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
             if (this.experimentsEnabled) {
                 this.$('.experiment-groups').append(this.experimentGroupsListView.render().el);
             }
-            this.$('.cohort-groups').append(this.cohortGroupsListView.render().el);
+            this.$('.content-groups').append(this.cohortGroupsListView.render().el);
             this.addWindowActions();
             if (hash) {
                 // Strip leading '#' to get id string to match

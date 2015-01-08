@@ -19,16 +19,6 @@ define([
             };
         },
 
-        className: function () {
-            var index = this.model.collection.indexOf(this.model);
-
-            return [
-                'group-configuration',
-                'group-configurations-list-item',
-                'group-configurations-list-item-' + index
-            ].join(' ');
-        },
-
         itemDisplayName: 'Group Configuration',
 
         canDelete: true,
