@@ -301,7 +301,7 @@ class EditVisibilityModalTest(ContainerBase):
     MISSING_GROUP_LABEL = 'Deleted Content Group\nContent group no longer exists. Please choose another or allow access to All Students and staff'
     VALIDATION_ERROR_LABEL = 'This component has validation issues.'
     VALIDATION_ERROR_MESSAGE = 'Error:\nThis component refers to deleted or invalid content groups.'
-    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is only visible to particular groups'
+    GROUP_VISIBILITY_MESSAGE = 'Some content in this unit is visible only to particular content groups'
 
     def setUp(self):
         super(EditVisibilityModalTest, self).setUp()
@@ -429,7 +429,7 @@ class EditVisibilityModalTest(ContainerBase):
             When I go to the container page for that unit
             And I open the visibility editor modal for that unit's component
             Then the default visibility selection should be 'All Students and Staff'
-            And the container page should not display 'Some content in this unit is only visible to particular groups'
+            And the container page should not display the content visibility warning
         """
         self.verify_selected_labels(self.edit_component_visibility(self.html_component), [self.VISIBILITY_LABEL_ALL])
         self.verify_visibility_set(self.html_component, False)
@@ -442,12 +442,12 @@ class EditVisibilityModalTest(ContainerBase):
             And I open the visibility editor modal for that unit's component
             And I select 'Dogs'
             And I save the modal
-            Then the container page should display 'Some content in this unit is only visible to particular groups'
+            Then the container page should display the content visibility warning
             And I re-open the visibility editor modal for that unit's component
             And I select 'All Students and Staff'
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display 'Some content in this unit is only visible to particular groups'
+            And the container page should not display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, ['Dogs'])
         self.verify_visibility_set(self.html_component, True)
@@ -463,7 +463,7 @@ class EditVisibilityModalTest(ContainerBase):
             And I select 'Dogs'
             And I save the modal
             Then the visibility selection should be 'Dogs' and 'Specific Content Groups'
-            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, ['Dogs'])
         self.verify_visibility_set(self.html_component, True)
@@ -477,7 +477,7 @@ class EditVisibilityModalTest(ContainerBase):
             And I select 'Dogs' and 'Cats'
             And I save the modal
             Then the visibility selection should be 'Dogs', 'Cats', and 'Specific Content Groups'
-            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And the container page should display the content visibility warning
         """
         self.select_and_verify_saved(self.html_component, ['Dogs', 'Cats'])
         self.verify_visibility_set(self.html_component, True)
@@ -492,7 +492,7 @@ class EditVisibilityModalTest(ContainerBase):
             And I select 'Specific Content Groups'
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
-            And the container page should not display 'Some content in this unit is only visible to particular groups'
+            And the container page should not display the content visibility warning
         """
         self.select_and_verify_saved(
             self.html_component, [self.VISIBILITY_LABEL_SPECIFIC], expected_labels=[self.VISIBILITY_LABEL_ALL]
@@ -509,12 +509,12 @@ class EditVisibilityModalTest(ContainerBase):
             Then I should see a validation error message on that unit's component
             And I open the visibility editor modal for that unit's component
             Then I should see that I have selected multiple deleted groups
-            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And the container page should display the content visibility warning
             And I de-select the missing groups
             And I save the modal
             Then the visibility selection should be 'All Students and Staff'
             And I should not see any validation errors on the component
-            And the container page should not display 'Some content in this unit is only visible to particular groups'
+            And the container page should not display the content visibility warning
         """
         self.update_component(self.html_component, {'group_access': {0: [2, 3]}})
         self.verify_component_validation_error(self.html_component)
@@ -533,12 +533,12 @@ class EditVisibilityModalTest(ContainerBase):
             Then I should see a validation error message on that unit's component
             And I open the visibility editor modal for that unit's component
             Then I should see that I have selected multiple deleted groups
-            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And the container page should display the content visibility warning
             And I de-select the missing groups
             And I save the modal
             Then the visibility selection should be the names of the valid groups.
             And I should not see any validation errors on the component
-            And the container page should display 'Some content in this unit is only visible to particular groups'
+            And the container page should display the content visibility warning
         """
         self.update_component(self.html_component, {'group_access': {0: [0, 1, 2, 3]}})
         self.verify_component_validation_error(self.html_component)
