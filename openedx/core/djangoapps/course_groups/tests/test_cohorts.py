@@ -207,6 +207,31 @@ class TestCohorts(TestCase):
             "other_user should be assigned to the default cohort"
         )
 
+    def test_get_cohort_with_assign(self):
+        """
+        Make sure cohorts.get_cohort() returns None if no group is already
+        assigned to a user instead of assigning/creating a group automatically
+        """
+        course = modulestore().get_course(self.toy_course_key)
+        self.assertFalse(course.is_cohorted)
+
+        user = UserFactory(username="test", email="a@b.com")
+
+        # Add an auto_cohort_group to the course...
+        config_course_cohorts(
+            course,
+            discussions=[],
+            cohorted=True,
+            auto_cohort_groups=["AutoGroup"]
+        )
+
+        # get_cohort should return None as no group is assigned to user
+        self.assertIsNone(cohorts.get_cohort(user, course.id, assign=False))
+
+        # get_cohort should return a group for user
+        self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
+
+
     def test_auto_cohorting(self):
         """
         Make sure cohorts.get_cohort() does the right thing with auto_cohort_groups
