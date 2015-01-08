@@ -127,6 +127,7 @@ def preprocess_collection(user, course, collection):
     Raises:
         ItemNotFoundError - when appropriate module is not found.
     """
+    # pylint: disable=too-many-statements
 
     store = modulestore()
     filtered_collection = list()
