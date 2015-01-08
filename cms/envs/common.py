@@ -793,3 +793,8 @@ ADVANCED_PROBLEM_TYPES = [
 
 from search.elastic import ElasticSearchEngine
 SEARCH_ENGINE = ElasticSearchEngine
+ELASTIC_SEARCH_MAPPINGS = {
+    "start_date": {
+        "type": "date"
+    }
+}
