@@ -910,7 +910,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         # Two courses in user shopping cart
         self.login_user()
-        item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
+        PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         item2 = PaidCourseRegistration.add_to_order(self.cart, self.testing_course.id)
         self.assertEquals(self.cart.orderitem_set.count(), 2)
 
@@ -1217,7 +1217,14 @@ class ReceiptRedirectTest(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
     def test_show_receipt_redirect_to_verify_student(self):
+        # Create other carts first
+        # This ensures that the order ID and order item IDs do not match
+        Order.get_cart_for_user(self.user).start_purchase()
+        Order.get_cart_for_user(self.user).start_purchase()
+        Order.get_cart_for_user(self.user).start_purchase()
+
         # Purchase a verified certificate
+        self.cart = Order.get_cart_for_user(self.user)
         CertificateItem.add_to_order(
             self.cart,
             self.course_key,
