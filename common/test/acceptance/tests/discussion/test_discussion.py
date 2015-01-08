@@ -112,6 +112,33 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
 
 
 @attr('shard_1')
+class DiscussionHomePageTest(UniqueCourseTest):
+    """
+    Tests for the discussion home page.
+    """
+
+    SEARCHED_USERNAME = "gizmo"
+
+    def setUp(self):
+        super(DiscussionHomePageTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+
+    def test_new_post_button(self):
+        """
+        Scenario: I can create new posts from the Discussion home page.
+            Given that I am on the Discussion home page
+            When I click on the 'New Post' button
+            Then I should be shown the new post form
+        """
+        self.assertIsNotNone(self.page.new_post_button)
+        self.page.click_new_post_button()
+        self.assertIsNotNone(self.page.new_post_form)
+
+
+@attr('shard_1')
 class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
