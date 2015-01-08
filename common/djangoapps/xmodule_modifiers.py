@@ -8,9 +8,11 @@ import logging
 import static_replace
 import uuid
 import markupsafe
+from lxml import html, etree
 
 from django.conf import settings
 from django.utils.timezone import UTC
+from django.utils.html import escape
 from edxmako.shortcuts import render_to_string
 from xblock.exceptions import InvalidScopeError
 from xblock.fragment import Fragment
@@ -278,3 +280,63 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
                      'has_instructor_access': has_instructor_access,
                      }
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
+
+
+def get_course_update_items(course_updates, provided_index=0):
+    """
+    Returns list of course_updates data dictionaries either from new format if available or
+    from old. This function don't modify old data to new data (in db), instead returns data
+    in common old dictionary format.
+    New Format: {"items" : [{"id": computed_id, "date": date, "content": html-string}],
+                 "data": "<ol>[<li><h2>date</h2>content</li>]</ol>"}
+    Old Format: {"data": "<ol>[<li><h2>date</h2>content</li>]</ol>"}
+    """
+    def _course_info_content(html_parsed):
+        """
+        Constructs the HTML for the course info update, not including the header.
+        """
+        if len(html_parsed) == 1:
+            # could enforce that update[0].tag == 'h2'
+            content = html_parsed[0].tail
+        else:
+            content = html_parsed[0].tail if html_parsed[0].tail is not None else ""
+            content += "\n".join([html.tostring(ele) for ele in html_parsed[1:]])
+        return content
+
+    if course_updates and getattr(course_updates, "items", None):
+        if provided_index and 0 < provided_index <= len(course_updates.items):
+            return course_updates.items[provided_index - 1]
+        else:
+            # return list in reversed order (old format: [4,3,2,1]) for compatibility
+            return list(reversed(course_updates.items))
+
+    course_update_items = []
+    if course_updates:
+        # old method to get course updates
+        # purely to handle free formed updates not done via editor. Actually kills them, but at least doesn't break.
+        try:
+            course_html_parsed = html.fromstring(course_updates.data)
+        except (etree.XMLSyntaxError, etree.ParserError):
+            log.error("Cannot parse: " + course_updates.data)
+            escaped = escape(course_updates.data)
+            course_html_parsed = html.fromstring("<ol><li>" + escaped + "</li></ol>")
+
+        # confirm that root is <ol>, iterate over <li>, pull out <h2> subs and then rest of val
+        if course_html_parsed.tag == 'ol':
+            # 0 is the newest
+            for index, update in enumerate(course_html_parsed):
+                if len(update) > 0:
+                    content = _course_info_content(update)
+                    # make the id on the client be 1..len w/ 1 being the oldest and len being the newest
+                    computed_id = len(course_html_parsed) - index
+                    payload = {
+                        "id": computed_id,
+                        "date": update.findtext("h2"),
+                        "content": content
+                    }
+                    if provided_index == 0:
+                        course_update_items.append(payload)
+                    elif provided_index == computed_id:
+                        return payload
+
+    return course_update_items

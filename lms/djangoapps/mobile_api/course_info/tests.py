@@ -2,6 +2,7 @@
 Tests for course_info
 """
 
+import ddt
 from django.conf import settings
 
 from xmodule.html_module import CourseInfoModule
@@ -43,6 +44,7 @@ class TestAbout(MobileAPITestCase, MobileAuthTestMixin, MobileCourseAccessTestMi
         self.assertNotIn('\"/static/', response.data['overview'])
 
 
+@ddt.ddt
 class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
     """
     Tests for /api/mobile/v0.5/course_info/{course_id}/updates
@@ -53,9 +55,15 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAc
         super(TestUpdates, self).verify_success(response)
         self.assertEqual(response.data, [])
 
-    def test_updates_static_rewrite(self):
+    @ddt.data(True, False)
+    def test_updates(self, new_format):
+        """
+        Tests updates endpoint with /static in the content.
+        Tests both new updates format (using "items") and old format (using "data").
+        """
         self.login_and_enroll()
 
+        # create course Updates item in modulestore
         updates_usage_key = self.course.id.make_usage_key('course_info', 'updates')
         course_updates = modulestore().create_item(
             self.user.id,
@@ -63,22 +71,32 @@ class TestUpdates(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAc
             updates_usage_key.block_type,
             block_id=updates_usage_key.block_id
         )
-        course_update_data = {
-            "id": 1,
-            "date": "Some date",
-            "content": "<a href=\"/static/\">foo</a>",
-            "status": CourseInfoModule.STATUS_VISIBLE
-        }
 
-        course_updates.items = [course_update_data]
+        # store content in Updates item (either new or old format)
+        if new_format:
+            course_update_data = {
+                "id": 1,
+                "date": "Some date",
+                "content": "<a href=\"/static/\">foo</a>",
+                "status": CourseInfoModule.STATUS_VISIBLE
+            }
+            course_updates.items = [course_update_data]
+        else:
+            update_data = u"<ol><li><h2>Date</h2><a href=\"/static/\">foo</a></li></ol>"
+            course_updates.data = update_data
         modulestore().update_item(course_updates, self.user.id)
 
+        # call API
         response = self.api_response()
         content = response.data[0]["content"]  # pylint: disable=maybe-no-member
+
+        # verify static URLs are replaced in the content returned by the API
         self.assertNotIn("\"/static/", content)
 
-        underlying_updates_module = modulestore().get_item(updates_usage_key)
-        self.assertIn("\"/static/", underlying_updates_module.items[0]['content'])
+        # verify static URLs remain in the underlying content
+        underlying_updates = modulestore().get_item(updates_usage_key)
+        underlying_content = underlying_updates.items[0]['content'] if new_format else underlying_updates.data
+        self.assertIn("\"/static/", underlying_content)
 
 
 class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
