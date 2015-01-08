@@ -4,7 +4,7 @@ define([
 function(ListItemEdit) {
     'use strict';
 
-    var GroupItemEdit = ListItemEdit.extend({
+    var ContentGroupEdit = ListItemEdit.extend({
         tagName: 'div',
         className: 'group-configuration-edit',
         events: {
@@ -14,7 +14,7 @@ function(ListItemEdit) {
 
         initialize: function() {
             ListItemEdit.prototype.initialize.call(this);
-            this.template = this.loadTemplate('group-item-edit');
+            this.template = this.loadTemplate('content-group-edit');
         },
 
         getTemplateOptions: function() {
@@ -35,5 +35,5 @@ function(ListItemEdit) {
         }
     });
 
-    return GroupItemEdit;
+    return ContentGroupEdit;
 });

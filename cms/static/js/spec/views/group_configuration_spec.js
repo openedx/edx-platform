@@ -4,7 +4,7 @@ define([
     'js/views/group_configuration_details',
     'js/views/group_configurations_list', 'js/views/group_configuration_edit',
     'js/views/group_configuration_item',
-    'js/views/group_edit', 'js/views/group_list', 'js/views/group_item', 'js/views/group_item_edit',
+    'js/views/group_edit', 'js/views/content_group_list', 'js/views/content_group_item', 'js/views/content_group_edit',
     'js/views/feedback_notification', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
     'js/spec_helpers/view_helpers', 'jasmine-stealth'
 ], function(
@@ -491,7 +491,7 @@ define([
     });
 
     describe('GroupConfigurationsList', function() {
-        var emptyMessage = 'You haven\'t created any group configurations yet.';
+        var emptyMessage = 'You have not created any group configurations yet.';
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
@@ -658,7 +658,9 @@ define([
         };
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['add-list-item', 'no-groups', 'group-item-edit', 'group-details']);
+            TemplateHelpers.installTemplates(
+                ['add-list-item', 'no-content-groups', 'content-group-edit', 'content-group-details']
+            );
         });
 
         it('shows a message when no groups are present', function() {
@@ -698,7 +700,7 @@ define([
         var renderView;
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['group-item-edit', 'group-details']);
+            TemplateHelpers.installTemplates(['content-group-edit', 'content-group-details']);
         });
 
         renderView = function(groupName) {
@@ -730,7 +732,7 @@ define([
             group, groupConfiguration, view, respondToSaveAndVerify;
 
         beforeEach(function() {
-            TemplateHelpers.installTemplates(['group-item-edit']);
+            TemplateHelpers.installTemplates(['content-group-edit']);
             group = new GroupModel({name: 'Original Group Name'});
             groupConfiguration = new GroupConfigurationModel({
                 id: 0,

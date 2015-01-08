@@ -11,7 +11,7 @@
 <%block name="bodyclass">is-signedin course view-group-configurations</%block>
 
 <%block name="header_extras">
-% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "no-groups", "group-edit", "group-item-edit", "group-details", "basic-modal", "modal-button", "add-list-item"]:
+% for template_name in ["group-configuration-details", "group-configuration-edit", "no-group-configurations", "no-content-groups", "group-edit", "content-group-edit", "content-group-details", "basic-modal", "modal-button", "add-list-item"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
