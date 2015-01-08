@@ -15,14 +15,14 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
 <div class="modal-section visibility-summary">
     % if len(groups) == 0:
         <div class="is-not-configured has-actions">
-            <h4 class="title">${_('You have not set up any groups to manage visibility with.')}</h4>
+            <h4 class="title">${_('No content groups exist')}</h4>
 
             <div class="copy">
-                <p>${_('Groups are a way for you to organize content in your course with a particular student experience in mind. They are commonly used to facilitate content and pedagogical experiments as well as provide different tracks of content.')}</p>
+                <p>${_('Use content groups to give groups of students access to a specific set of course content. Create one or more content groups, and make specific components visible to them.')}</p>
             </div>
 
             <div class="actions">
-                <a href="${manage_groups_url}" class="action action-primary action-settings">${_('Manage groups in this course')}</a>
+                <a href="${manage_groups_url}" class="action action-primary action-settings">${_('Manage content groups')}</a>
             </div>
         </div>
     % elif is_staff_locked:
@@ -46,7 +46,7 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
     <form class="visibility-controls-form" method="post" action="">
 
         <div class="modal-section visibility-controls">
-            <h3 class="modal-section-title">${_('Set visibility to:')}</h3>
+            <h3 class="modal-section-title">${_('Make visible to:')}</h3>
 
             <div class="modal-section-content">
 

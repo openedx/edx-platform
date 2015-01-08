@@ -112,8 +112,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(self.manual_cohort_name)
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertEqual(
-            "Warning:\nNo content groups exist. "
-            "Create a content group to associate with cohorts. Create a content group",
+            "Warning:\nNo content groups exist. Create a content group",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         self.assertFalse(self.cohort_management_page.select_content_group_radio_button())

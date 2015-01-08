@@ -693,7 +693,6 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         expect(cohortsView.$('.radio-yes').prop('disabled')).toBeTruthy();
                         message = cohortsView.$('.msg-inline').text().trim();
                         expect(message).toContain('Warning: No content groups exist.');
-                        expect(message).toContain('Create a content group to associate with cohorts.');
                         expect(message).toContain('Create a content group');
                         expect(
                             cohortsView.$('.msg-inline a').attr('href'),
