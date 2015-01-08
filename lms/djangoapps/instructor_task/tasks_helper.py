@@ -551,7 +551,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     course = get_course_by_id(course_id)
-    cohorts_header = ['Cohort Group Name'] if course.is_cohorted else []
+    cohorts_header = ['Cohort Name'] if course.is_cohorted else []
 
     partition_service = LmsPartitionService(user=None, course_id=course_id)
     partitions = partition_service.course_partitions
