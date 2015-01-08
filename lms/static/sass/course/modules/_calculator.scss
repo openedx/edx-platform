@@ -17,13 +17,12 @@ div.calc-main {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
     background: url("../images/calc-icon.png") $black-t3 no-repeat center;
     border-bottom: 0;
-    border-radius: 3px 3px 0 0;
+    border-radius: ($baseline/10);
     color: $white;
     float: right;
-    height: 20px;
-    display: inline-block;
+    height: $baseline;
     margin-right: ($baseline/2);
-    padding: 8px 12px;
+    padding: $baseline;
     position: relative;
     top: -42px;
     width: ($baseline*0.75);
