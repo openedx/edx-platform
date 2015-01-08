@@ -1,5 +1,5 @@
 """
-My Courses page in Studio
+Studio Home page
 """
 
 from bok_choy.page_object import PageObject
@@ -8,7 +8,7 @@ from . import BASE_URL
 
 class DashboardPage(PageObject):
     """
-    My Courses page in Studio
+    Studio Home page
     """
 
     url = BASE_URL + "/course/"
@@ -27,13 +27,6 @@ class DashboardPage(PageObject):
     @property
     def has_processing_courses(self):
         return self.q(css='.courses-processing').present
-
-    @property
-    def page_subheader(self):
-        """
-        Get the text of the introductory copy seen below the Welcome header. ("Here are all of...")
-        """
-        return self.q(css='.content-primary .introduction .copy p').first.text[0]
 
     def create_rerun(self, display_name):
         """

@@ -66,6 +66,6 @@ def login_page(request):
 def howitworks(request):
     "Proxy view"
     if request.user.is_authenticated():
-        return redirect('/course/')
+        return redirect('/home/')
     else:
         return render_to_response('howitworks.html', {})

@@ -42,7 +42,7 @@ class TestCourseIndex(CourseTestCase):
         """
         Test getting the list of courses and then pulling up their outlines
         """
-        index_url = '/course/'
+        index_url = '/home/'
         index_response = authed_client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
         course_link_eles = parsed_html.find_class('course-link')
@@ -68,7 +68,7 @@ class TestCourseIndex(CourseTestCase):
         # Add a library:
         lib1 = LibraryFactory.create()
 
-        index_url = '/course/'
+        index_url = '/home/'
         index_response = self.client.get(index_url, {}, HTTP_ACCEPT='text/html')
         parsed_html = lxml.html.fromstring(index_response.content)
         library_link_elements = parsed_html.find_class('library-link')
