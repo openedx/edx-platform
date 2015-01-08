@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 import ddt
 
-from mock import patch
+from mock import patch, Mock, PropertyMock
 from pytz import UTC
 from webob import Response
 
@@ -17,6 +17,7 @@ from contentstore.views.preview import StudioUserService
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
+
 
 from contentstore.views.item import create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name
 from contentstore.tests.utils import CourseTestCase
@@ -86,12 +87,18 @@ class ItemTest(CourseTestCase):
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
 
-    def _get_container_preview(self, usage_key):
+    def _get_preview(self, usage_key, data=None):
+        """ Makes a request to xblock preview handler """
+        preview_url = reverse_usage_url("xblock_view_handler", usage_key, {'view_name': 'container_preview'})
+        data = data if data else {}
+        resp = self.client.get(preview_url, data, HTTP_ACCEPT='application/json')
+        return resp
+
+    def _get_container_preview(self, usage_key, data=None):
         """
         Returns the HTML and resources required for the xblock at the specified UsageKey
         """
-        preview_url = reverse_usage_url("xblock_view_handler", usage_key, {'view_name': 'container_preview'})
-        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, 200)
         resp_content = json.loads(resp.content)
         html = resp_content['html']
@@ -99,6 +106,14 @@ class GetItemTest(ItemTest):
         resources = resp_content['resources']
         self.assertIsNotNone(resources)
         return html, resources
+
+    def _get_container_preview_with_error(self, usage_key, expected_code, data=None, content_contains=None):
+        """ Make request and asserts on response code and response contents """
+        resp = self._get_preview(usage_key, data)
+        self.assertEqual(resp.status_code, expected_code)
+        if content_contains:
+            self.assertIn(content_contains, resp.content)
+        return resp
 
     @ddt.data(
         (1, 21, 23, 35, 37),
@@ -246,6 +261,40 @@ class GetItemTest(ItemTest):
         self.assertNotIn('beta', html)
         self.assertIn('New_NAME_A', html)
         self.assertIn('New_NAME_B', html)
+
+    def test_valid_paging(self):
+        """
+        Tests that valid paging is passed along to underlying block
+        """
+        with patch('contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+            retval = Mock()
+            type(retval).content = PropertyMock(return_value="Some content")
+            type(retval).resources = PropertyMock(return_value=[])
+            patched_get_preview_fragment.return_value = retval
+
+            root_usage_key = self._create_vertical()
+            _, _ = self._get_container_preview(
+                root_usage_key,
+                {'enable_paging': 'true', 'page_number': 0, 'page_size': 2}
+            )
+            call_args = patched_get_preview_fragment.call_args[0]
+            _, _, context = call_args
+            self.assertIn('paging', context)
+            self.assertEqual({'page_number': 0, 'page_size': 2}, context['paging'])
+
+    @ddt.data([1, 'invalid'], ['invalid', 2])
+    @ddt.unpack
+    def test_invalid_paging(self, page_number, page_size):
+        """
+        Tests that valid paging is passed along to underlying block
+        """
+        root_usage_key = self._create_vertical()
+        self._get_container_preview_with_error(
+            root_usage_key,
+            400,
+            data={'enable_paging': 'true', 'page_number': page_number, 'page_size': page_size},
+            content_contains="Couldn't parse paging parameters"
+        )
 
 
 class DeleteItem(ItemTest):
