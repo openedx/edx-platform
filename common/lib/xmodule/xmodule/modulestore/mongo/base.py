@@ -428,16 +428,16 @@ class MongoBulkOpsRecord(BulkOpsRecord):
     def __init__(self):
         super(MongoBulkOpsRecord, self).__init__()
         self.dirty = False
-        self.resource_fs = None
+        self.resources_fs = None
         self.runtime = None
 
     def update_data_dir(self, fs_root, data_dir):
-        if self.resource_fs is None:
+        if self.resources_fs is None:
             root = fs_root / data_dir
 
             root.makedirs_p()  # create directory if it doesn't exist
 
-            self.runtime.resource_fs = OSFS(root)
+            self.runtime.resources_fs = OSFS(root)
 
 
 class MongoBulkOpsMixin(BulkOperationsMixin):
