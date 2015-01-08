@@ -6,12 +6,16 @@ Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
 import ddt
 from mock import patch
+from unittest import TestCase
+from bson.objectid import ObjectId
+
+from opaque_keys.edx.locator import LibraryLocator
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
 
 from xmodule.x_module import AUTHOR_VIEW, STUDENT_VIEW
-from xmodule.library_content_module import LibraryVersionReference, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor
+from xmodule.library_content_module import LibraryVersionReference, LibraryList, ANY_CAPA_TYPE_VALUE, LibraryContentDescriptor 
 from xmodule.modulestore.tests.factories import LibraryFactory, CourseFactory, ItemFactory
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
 from xmodule.tests import get_test_system
@@ -291,3 +295,44 @@ class TestLibraryContentRender(BaseTestLibraryContainer):
         rendered = self.lc_block.render(AUTHOR_VIEW, {})
         self.assertEqual("", rendered.content)  # content should be empty
         self.assertEqual("LibraryContentAuthorView", rendered.js_init_fn)  # but some js initialization should happen
+
+
+class TestLibraryList(TestCase):
+    """ Tests for LibraryList XBlock Field """
+    def test_from_json_runtime_style(self):
+        """
+        Test that LibraryList can parse raw libraries list as passed by runtime
+        """
+        lib_list = LibraryList()
+        lib1_key, lib1_version = u'library-v1:Org1+Lib1', '5436ffec56c02c13806a4c1b'
+        lib2_key, lib2_version = u'library-v1:Org2+Lib2', '112dbaf312c0daa019ce9992'
+        raw = [[lib1_key, lib1_version], [lib2_key, lib2_version]]
+        parsed = lib_list.from_json(raw)
+        self.assertEqual(len(parsed), 2)
+        self.assertEquals(parsed[0].library_id, LibraryLocator.from_string(lib1_key))
+        self.assertEquals(parsed[0].version, ObjectId(lib1_version))
+        self.assertEquals(parsed[1].library_id, LibraryLocator.from_string(lib2_key))
+        self.assertEquals(parsed[1].version, ObjectId(lib2_version))
+
+    def test_from_json_studio_editor_style(self):
+        """
+        Test that LibraryList can parse raw libraries list as passed by studio editor
+        """
+        lib_list = LibraryList()
+        lib1_key, lib1_version = u'library-v1:Org1+Lib1', '5436ffec56c02c13806a4c1b'
+        lib2_key, lib2_version = u'library-v1:Org2+Lib2', '112dbaf312c0daa019ce9992'
+        raw = [lib1_key+','+lib1_version, lib2_key+','+lib2_version]
+        parsed = lib_list.from_json(raw)
+        self.assertEqual(len(parsed), 2)
+        self.assertEquals(parsed[0].library_id, LibraryLocator.from_string(lib1_key))
+        self.assertEquals(parsed[0].version, ObjectId(lib1_version))
+        self.assertEquals(parsed[1].library_id, LibraryLocator.from_string(lib2_key))
+        self.assertEquals(parsed[1].version, ObjectId(lib2_version))
+
+    def test_from_json_invalid_value(self):
+        """
+        Test that LibraryList raises Value error if invalid library key is given
+        """
+        lib_list = LibraryList()
+        with self.assertRaises(ValueError):
+            lib_list.from_json(["Not-a-library-key,whatever"])
