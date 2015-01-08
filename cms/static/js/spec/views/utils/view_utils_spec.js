@@ -40,5 +40,53 @@ define(["jquery", "underscore", "js/views/baseview", "js/views/utils/view_utils"
                     ViewHelpers.verifyNotificationShowing(notificationSpy, /Testing/);
                 });
             });
+
+            describe("course/library fields validation", function() {
+                describe("without unicode support", function() {
+                    it("validates presence of field", function() {
+                        var error = ViewUtils.validateURLItemEncoding('', false);
+                        expect(error).toBeTruthy();
+                    });
+
+                    it("checks for presence of special characters in the field", function() {
+                        var error;
+                        // Special characters are not allowed.
+                        error = ViewUtils.validateURLItemEncoding('my+field', false);
+                        expect(error).toBeTruthy();
+                        error = ViewUtils.validateURLItemEncoding('2014!', false);
+                        expect(error).toBeTruthy();
+                        error = ViewUtils.validateURLItemEncoding('*field*', false);
+                        expect(error).toBeTruthy();
+                        // Spaces not allowed.
+                        error = ViewUtils.validateURLItemEncoding('Jan 2014', false);
+                        expect(error).toBeTruthy();
+                        // -_~. are allowed.
+                        error = ViewUtils.validateURLItemEncoding('2015-Math_X1.0~', false);
+                        expect(error).toBeFalsy();
+                    });
+
+                    it("does not allow unicode characters", function() {
+                        var error = ViewUtils.validateURLItemEncoding('Field-\u010d', false);
+                        expect(error).toBeTruthy();
+                    });
+                });
+
+                describe("with unicode support", function() {
+                    it("validates presence of field", function() {
+                        var error = ViewUtils.validateURLItemEncoding('', true);
+                        expect(error).toBeTruthy();
+                    });
+
+                    it("checks for presence of spaces", function() {
+                        var error = ViewUtils.validateURLItemEncoding('My Field', true);
+                        expect(error).toBeTruthy();
+                    });
+
+                    it("allows unicode characters", function() {
+                        var error = ViewUtils.validateURLItemEncoding('Field-\u010d', true);
+                        expect(error).toBeFalsy();
+                    });
+                });
+            });
         });
     });

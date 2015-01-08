@@ -199,7 +199,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 }
             }
             else {
-                if (item !== encodeURIComponent(item)) {
+                if (item !== encodeURIComponent(item) || item.match(/[!'()*]/)) {
                     return gettext('Please do not use any spaces or special characters in this field.');
                 }
             }
