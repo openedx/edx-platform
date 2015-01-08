@@ -7,7 +7,6 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
 from contentstore.views.course import GroupConfiguration
 from contentstore.tests.utils import CourseTestCase
-from openedx.core.djangoapps.course_groups.partition_scheme import CohortPartitionScheme
 from xmodule.partitions.partitions import Group, UserPartition
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.validation import StudioValidation, StudioValidationMessage

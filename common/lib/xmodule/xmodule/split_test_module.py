@@ -86,11 +86,11 @@ class SplitTestFields(object):
         help=_("Which child module students in a particular group_id should see"),
         scope=Scope.content
     )
-    
-    
+
+
 def get_split_user_partitions(user_partitions):
     """
-    Helper method that filters a list of user_partitions and returns just the 
+    Helper method that filters a list of user_partitions and returns just the
     ones that are suitable for the split_test module.
     """
     return [user_partition for user_partition in user_partitions if user_partition.scheme.name == "random"]
