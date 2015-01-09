@@ -162,8 +162,6 @@ class TestRecentEnrollments(ModuleStoreTestCase):
     )
     @ddt.unpack
     def test_donate_button(self, course_modes, enrollment_mode, show_donate):
-        from nose.tools import set_trace;
-        set_trace()
         # Enable the enrollment success message
         self._configure_message_timeout(10000)
 
