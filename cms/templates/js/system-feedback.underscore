@@ -9,7 +9,7 @@
   >
   <div class="<%= type %> <%= intent %> <% if(obj.actions) { %>has-actions<% } %>">
     <% if(obj.icon) { %>
-      <% var iconClass = {"warning": "warning", "confirmation": "ok", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog"} %>
+      <% var iconClass = {"warning": "warning", "confirmation": "check", "error": "warning", "announcement": "bullhorn", "step-required": "exclamation-circle", "help": "question", "mini": "cog"} %>
       <i class="feedback-symbol fa fa-<%= iconClass[intent] %>"></i>
     <% } %>
 

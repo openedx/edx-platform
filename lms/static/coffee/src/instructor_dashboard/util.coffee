@@ -209,7 +209,7 @@ create_email_message_views = ($messages_wrapper, emails) ->
     $email_header.append $('<input>', type: "button", name: "copy-email-body-text", value: gettext("Copy Email To Editor"), id: "copy_email_" + email_id)
 
     $close_button = $ '<a>', href: '#', class: "close-modal"
-    $close_button.append $ '<i>', class: 'icon-remove'
+    $close_button.append $ '<i>', class: 'icon fa fa-times'
     $email_header.append $close_button
 
     # HTML escape the subject line
@@ -316,10 +316,10 @@ class KeywordValidator
         do (found_keyword) ->
           if found_keyword not in keywords
             invalid_keywords.push found_keyword
-      
+
       if invalid_keywords.length != 0
         is_valid = false
-      
+
       return {
         is_valid: is_valid,
         invalid_keywords: invalid_keywords

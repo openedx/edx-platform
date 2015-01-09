@@ -7,7 +7,7 @@ describe "DiscussionThreadListView", ->
         <script type="text/template" id="thread-list-template">
             <div class="forum-nav-header">
                 <a href="#" class="forum-nav-browse" aria-haspopup="true">
-                    <i class="icon icon-reorder"></i>
+                    <i class="icon fa fa-bars"></i>
                     <span class="sr">Discussion topics; current selection is: </span>
                     <span class="forum-nav-browse-current">All Discussions</span>
                     ▾
@@ -16,7 +16,7 @@ describe "DiscussionThreadListView", ->
                     <label>
                         <span class="sr">Search</span>
                         <input class="forum-nav-search-input" type="text" placeholder="Search all posts">
-                        <i class="icon icon-search"></i>
+                        <i class="icon fa fa-search"></i>
                     </label>
                 </form>
             </div>
@@ -32,7 +32,7 @@ describe "DiscussionThreadListView", ->
                         <a href="#" class="forum-nav-browse-title">All Discussions</a>
                     </li>
                     <li class="forum-nav-browse-menu-item forum-nav-browse-menu-following">
-                        <a href="#" class="forum-nav-browse-title"><i class="icon icon-star"></i>Posts I'm Following</a>
+                        <a href="#" class="forum-nav-browse-title"><i class="icon fa fa-star"></i>Posts I'm Following</a>
                     </li>
                     <li class="forum-nav-browse-menu-item">
                         <a href="#" class="forum-nav-browse-title">Parent</a>
@@ -343,7 +343,7 @@ describe "DiscussionThreadListView", ->
       it "perform search when search icon is clicked", ->
         setupAjax()
         spyOn(@view, "searchFor")
-        @view.$el.find(".icon-search").click()
+        @view.$el.find(".fa-search").click()
         expect(@view.searchFor).toHaveBeenCalled()
 
     describe "username search", ->

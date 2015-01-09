@@ -17,8 +17,8 @@ define(['jquery', 'js/models/xblock_validation', 'js/views/xblock_validation', '
             it('has a getIcon method', function() {
                 var getIcon = view.getIcon.bind(view);
 
-                expect(getIcon(model.WARNING)).toBe('fa-warning-sign');
-                expect(getIcon(model.NOT_CONFIGURED)).toBe('fa-warning-sign');
+                expect(getIcon(model.WARNING)).toBe('fa-exclamation-triangle');
+                expect(getIcon(model.NOT_CONFIGURED)).toBe('fa-exclamation-triangle');
                 expect(getIcon(model.ERROR)).toBe('fa-exclamation-circle');
                 expect(getIcon("unknown")).toBeNull();
             });

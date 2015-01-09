@@ -7,7 +7,7 @@ if Backbone?
       "click .forum-nav-browse-menu-wrapper": "ignoreClick"
       "click .forum-nav-browse-title": "selectTopicHandler"
       "keydown .forum-nav-search-input": "performSearch"
-      "click .icon-search": "performSearch"
+      "click .fa-search": "performSearch"
       "change .forum-nav-sort-control": "sortThreads"
       "click .forum-nav-thread-link": "threadSelected"
       "click .forum-nav-load-more-link": "loadMorePages"
@@ -171,7 +171,7 @@ if Backbone?
         @$(".forum-nav-thread-list").append("<li class='forum-nav-load-more'><a href='#' class='forum-nav-load-more-link'>" + gettext("Load more") + "</a></li>")
 
     getLoadingContent: (srText) ->
-      return '<div class="forum-nav-loading" tabindex="0"><span class="icon-spinner icon-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
+      return '<div class="forum-nav-loading" tabindex="0"><span class="icon fa fa-spinner fa-spin"/><span class="sr" role="alert">' + srText + '</span></div>'
 
     loadMorePages: (event) =>
       if event
@@ -426,7 +426,7 @@ if Backbone?
       @retrieveFirstPage(event)
 
     performSearch: (event) ->
-      #event.which 13 represent the Enter button 
+      #event.which 13 represent the Enter button
       if event.which == 13 or event.type == 'click'
         event.preventDefault()
         @hideBrowseMenu()
