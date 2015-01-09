@@ -742,6 +742,7 @@ def course_about(request, course_id):
         'COURSE_ABOUT_VISIBILITY_PERMISSION',
         settings.COURSE_ABOUT_VISIBILITY_PERMISSION
     )
+
     course = get_course_with_access(request.user, permission_name, course_key)
 
     if microsite.get_value(
