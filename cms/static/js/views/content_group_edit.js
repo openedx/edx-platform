@@ -1,7 +1,7 @@
 define([
-    'js/views/list_item_edit'
+    'js/views/list_item_edit', 'underscore'
 ],
-function(ListItemEdit) {
+function(ListItemEdit, _) {
     'use strict';
 
     var ContentGroupEdit = ListItemEdit.extend({
@@ -21,7 +21,8 @@ function(ListItemEdit) {
             return {
                 name: this.model.escape('name'),
                 index: this.model.collection.indexOf(this.model),
-                isNew: this.model.isNew()
+                isNew: this.model.isNew(),
+                uniqueId: _.uniqueId()
             };
         },
 
