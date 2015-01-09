@@ -119,6 +119,7 @@ class MixedSplitTestCase(TestCase):
         extra.update(kwargs)
         return ItemFactory.create(
             category=category,
+            parent=parent_block,
             parent_location=parent_block.location,
             modulestore=self.store,
             **extra
