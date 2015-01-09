@@ -753,6 +753,7 @@ def _allow_donation(course_modes, course_id, enrollment):
     Args:
         course_modes (dict): Mapping of course ID's to course mode dictionaries.
         course_id (str): The unique identifier for the course.
+        enrollment(CourseEnrollment): The enrollment object in which the user is enrolled
 
     Returns:
         True if the course is allowing donations.

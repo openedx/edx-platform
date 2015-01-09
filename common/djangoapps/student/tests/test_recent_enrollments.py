@@ -129,53 +129,32 @@ class TestRecentEnrollments(ModuleStoreTestCase):
     @ddt.data(
         #Register as an honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
-        # ([('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
-        # ([('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
-        # ([('professional', 0), ('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('verified', 0), ('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
         ([('audit', 0)], 'honor', True),
         ([('honor', 0)], 'honor', True),
         ([], 'honor', True),
         #Register as an honor in any course modes which has payment option
         ([('audit', 0), ('honor', 10)], 'honor', False),
+        ([('audit', 10), ('honor', 0)], 'honor', False),
         ([('professional', 20)], 'honor', True),
         ([('verified', 20)], 'honor', True),
         ([('professional', 20), ('verified', 20)], 'honor', True),
         ([('audit', 0), ('honor', 5), ('professional', 20)], 'honor', True),
         ([('audit', 0), ('honor', 10), ('verified', 20)], 'honor', True),
-        ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'honor', True),
+        ([('audit', 10), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
         ([('audit', 10)], 'honor', False),
         ([('honor', 10)], 'honor', False),
         ([], 'honor', True),
-
-
         #Register as an audit in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'audit', True),
-        # ([('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('professional', 0), ('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 0), ('verified', 0), ('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
         ([('audit', 0)], 'audit', True),
         ([('honor', 0)], 'audit', True),
         ([], 'audit', True),
         #Register as an audit in any course modes which has payment option
         ([('audit', 0), ('honor', 10)], 'audit', False),
-        # ([('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('professional', 20), ('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 5), ('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 10), ('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
-        # ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        ([('audit', 10), ('honor', 0)], 'audit', False),
         ([('audit', 10)], 'audit', False),
         ([('honor', 10)], 'audit', False),
         ([], 'audit', True),
-
-
-
         #Register as a verified in any course modes which has payment option
         ([('audit', 0), ('honor', 10)], 'verified', False),
         ([('professional', 20)], 'verified', False),
@@ -186,13 +165,9 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'verified', False),
         ([('audit', 10)], 'verified', False),
         ([('honor', 10)], 'verified', False),
-        # ([], 'audit', True),
-
     )
     @ddt.unpack
     def test_donate_button(self, course_modes, enrollment_mode, show_donate):
-        # from nose.tools import set_trace;
-        # set_trace()
         # Enable the enrollment success message
         self._configure_message_timeout(10000)
 
