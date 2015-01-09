@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 
-from instructor_analytics.basic import student_submissions
+from instructor_analytics.basic import student_submission_rows
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -23,11 +23,6 @@ class Command(BaseCommand):
         make_option('-o', '--output-file',
                     dest='filename',
                     help='Write CSV to FILENAME, defaults to stdout'),
-        make_option('--all-students',
-                    action='store_true',
-                    dest='all_students',
-                    default=False,
-                    help='Include students who have not answered any questions'),
         )
 
     def handle(self, *args, **options):
@@ -45,13 +40,16 @@ class Command(BaseCommand):
         if course is None:
             raise CommandError("Invalid course_id")
 
-        header, datarows = student_submissions(course, options['all_students'])
-        rows = [header] + datarows
+        rows = student_submission_rows(course)
+
+        def _utf8_encoded_rows(rows):
+            for row in rows:
+                yield [unicode(item).encode('utf-8') for item in row]
 
         if not options['filename']:
             csvwriter = csv.writer(self.stdout, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-            csvwriter.writerows(rows)
+            csvwriter.writerows(_utf8_encoded_rows(rows))
         else:
             with open(options['filename'], 'wb') as csvfile:
                 csvwriter = csv.writer(csvfile, dialect='excel', quotechar='"', quoting=csv.QUOTE_ALL)
-                csvwriter.writerows(rows)
+                csvwriter.writerows(_utf8_encoded_rows(rows))

@@ -3,6 +3,7 @@ Student and course analytics.
 
 Serve miscellaneous course and student data
 """
+from itertools import chain
 import json
 import logging
 
@@ -374,22 +375,9 @@ def dump_grading_context(course):
     msg = '<pre>%s</pre>' % msg.replace('<', '&lt;')
     return msg
 
-def student_submissions(course, all_students=False):
-    """
-    Returns student submissions for all problems in course as tuple
-    (headers, datarows) for writing out to a CSV file.
-    Set all_students to True to include students with no submissions.
-    """
-    if all_students:
-        students = [student.username for student in CourseEnrollment.users_enrolled_in(course.id).order_by('username')]
-    else:
-        students = list(StudentModule.objects.filter(course_id=course.id, grade__isnull=False).order_by('student__username').values_list('student__username', flat=True).distinct())
-    if not students:
-        return [],[]
-    header = ["Section","Subsection","Unit","Problem"] + students
-    student_cols = dict( (y,x) for x,y in enumerate(students) )
 
-    datarows = []
+def iterate_problem_components(course):
+    """ Helper function for iterating through all problems of a course """
     for section in course.get_children():
         section_name = section.display_name_with_default
         for subsection in section.get_children():
@@ -397,24 +385,44 @@ def student_submissions(course, all_students=False):
             for unit in subsection.get_children():
                 unit_name = unit.display_name_with_default
 
-                row = [section_name.encode('utf-8'), subsection_name.encode('utf-8'), unit_name.encode('utf-8'), '']
+                parent_metadata = [section_name, subsection_name, unit_name]
                 for component in unit.get_children():
                     if component.category == 'problem':
-                        row[-1] = component.display_name_with_default.encode('utf-8')
-                        modules = StudentModule.objects.filter(course_id=course.id, grade__isnull=False, module_state_key=component.location)
-                        if modules:
-                            answers = [''] * len(students)
-                            for module in modules:
-                                try:
-                                    state_dict = json.loads(module.state) if module.state else {}
-                                    raw_answers = state_dict.get("student_answers", {})
-                                except ValueError:
-                                    log.error("Student submissions: Could not parse module state for " +
-                                              "StudentModule id={}, course={}".format(module.id, course.id))
-                                    continue
-                                pretty_answers = u', '.join(u"{problem}={answer}".format(problem=problem, answer=answer) for (problem, answer) in raw_answers.items())
-                                answers[student_cols[module.student.username]] = pretty_answers.encode('utf-8')
-                            if any(answers):
-                                datarows.append(row + answers)
+                        yield component, parent_metadata
 
-    return header, datarows
+
+def student_submissions(course):
+    """
+    Yields student submissions for all problems in course for writing out to a CSV file.
+    """
+    order = 1
+    for problem_component, parent_metadata in iterate_problem_components(course):
+        problem_component_info = parent_metadata + [problem_component.display_name_with_default, order, problem_component.location]
+        modules = StudentModule.objects.filter(
+            course_id=course.id,
+            grade__isnull=False,
+            module_state_key=problem_component.location,
+        ).order_by('student__username')
+        if modules:
+            has_answer = False
+            for module in modules:
+                try:
+                    state_dict = json.loads(module.state) if module.state else {}
+                    raw_answers = state_dict.get("student_answers", {})
+                except ValueError:
+                    log.error("Student submissions: Could not parse module state for " +
+                              "StudentModule id={module_id}, course={course_id}".format(module_id=module.id, course_id=course.id))
+                    continue
+                pretty_answers = u', '.join(u"{problem}={answer}".format(problem=problem, answer=answer) for (problem, answer) in raw_answers.items())
+                yield problem_component_info + [module.student.username, pretty_answers]
+                if not has_answer:
+                    has_answer = True
+            if has_answer:
+                order += 1
+
+
+def student_submission_rows(course):
+    """ Wrapper to return all (header and data) rows for student submissions reports for a course """
+    header = ["Section", "Subsection", "Unit", "Problem", "Order In Course", "Location", "Student", "Response"]
+    rows = chain([header], student_submissions(course))
+    return rows
