@@ -19,7 +19,7 @@
 
     <a href="" class="action-primary action-create">
         <i class="icon fa fa-plus" aria-hidden="true"></i>
-        <%- gettext('Add Cohort Group') %>
+        <%- gettext('Add Cohort') %>
     </a>
 </div>
 

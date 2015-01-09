@@ -29,7 +29,7 @@
     </header>
 
     <ul class="wrapper-tabs">
-        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><a href="#"><span class="sr">Selected tab: </span><%- gettext("Manage Students") %></a></li>
+        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><a href="#"><span class="sr"><%- gettext('Selected tab') %> </span><%- gettext("Manage Students") %></a></li>
         <li class="tab tab-settings" data-tab="settings"><a href="#"><%- gettext("Settings") %></a></li>
     </ul>
 
