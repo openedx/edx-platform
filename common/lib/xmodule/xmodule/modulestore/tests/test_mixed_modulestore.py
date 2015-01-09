@@ -946,19 +946,20 @@ class TestMixedModuleStore(CourseComparisonTest):
                 self.assertEqual(new_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
             with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
                 self.assertEqual(old_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
-
+            old_parent_published_location = old_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
             self.verify_get_parent_locations_results([
                 (child_to_move_location, new_parent_location, None),
                 (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-                (child_to_move_location, old_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
+                (child_to_move_location, old_parent_published_location, ModuleStoreEnum.RevisionOption.published_only),
             ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
+        new_parent_published_location = new_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, new_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, new_parent_published_location, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft')
