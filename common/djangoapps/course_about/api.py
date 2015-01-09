@@ -66,12 +66,12 @@ def get_course_about_details(course_id):
             }
         }
     """
-    cache_key = safe_key(course_id, COURSE_INFO_API_CACHE_PREFIX, '')
+    cache_key = "{}_{}".format(course_id, COURSE_INFO_API_CACHE_PREFIX)
     cache_course_info = cache.get(cache_key)
 
     if cache_course_info:
         return cache_course_info
-    return _data_api().get_course_about_details(course_id, cache_key)
+    return _data_api().get_course_about_details(course_id)
 
 
 def _data_api():

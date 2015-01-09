@@ -2,7 +2,7 @@
 Serializers for all Course Descriptor and Course About Descriptor related return objects.
 
 """
-from util.parsing_utils import course_image_url
+from xmodule.contentstore.content import StaticContent
 
 
 def serialize_content(course_descriptor, about_descriptor):
@@ -16,6 +16,7 @@ def serialize_content(course_descriptor, about_descriptor):
     """
     data = {
         'media': {},
+        "course_id": unicode(course_descriptor.id),
         'display_name': getattr(course_descriptor, 'display_name', None),
         'course_number': course_descriptor.location.course,
         'course_id': None,
@@ -27,11 +28,8 @@ def serialize_content(course_descriptor, about_descriptor):
         'effort': about_descriptor.get("effort", None)
 
     }
-
-    content_id = unicode(course_descriptor.id)
-    data["course_id"] = unicode(content_id)
     if getattr(course_descriptor, 'course_image', False):
-        data['media']['image'] = course_image_url(course_descriptor)
+        data['media']['image'] = _course_image_url(course_descriptor)
 
     start = getattr(course_descriptor, 'start', None)
     end = getattr(course_descriptor, 'end', None)
@@ -44,3 +42,14 @@ def serialize_content(course_descriptor, about_descriptor):
     return data
 
 
+def _course_image_url(course):
+    """
+    Return url of course image.
+    Args:
+        course(CourseDescriptor) : The course id to retrieve course image url.
+    Returns:
+        Absolute url of course image.
+    """
+    loc = StaticContent.compute_location(course.id, course.course_image)
+    url = StaticContent.serialize_asset_key_with_slash(loc)
+    return url
