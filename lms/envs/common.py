@@ -312,7 +312,7 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
-    # let students save and manage their annotations
+    # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
     # Milestones application flag
@@ -320,6 +320,9 @@ FEATURES = {
 
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
+
+    # For easily adding modes to courses during acceptance testing
+    'MODE_CREATION_FOR_TESTING': False,
 }
 
 # Ignore static asset files on import which match this pattern
