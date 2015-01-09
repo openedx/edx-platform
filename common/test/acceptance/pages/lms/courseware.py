@@ -34,11 +34,18 @@ class CoursewarePage(CoursePage):
         return len(self.q(css=self.subsection_selector))
 
     @property
+    def xblock_components(self):
+        """
+        Return the xblock components within the unit on the page.
+        """
+        return self.q(css=self.xblock_component_selector)
+
+    @property
     def num_xblock_components(self):
         """
         Return the number of rendered xblocks within the unit on the page
         """
-        return len(self.q(css=self.xblock_component_selector))
+        return len(self.xblock_components)
 
     def xblock_component_type(self, index=0):
         """

@@ -58,12 +58,12 @@ class ContainerBase(StudioCourseTest):
     Base class for tests that do operations on the container page.
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False):
         """
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super(ContainerBase, self).setUp()
+        super(ContainerBase, self).setUp(is_staff=is_staff)
 
         self.outline = CourseOutlinePage(
             self.browser,

@@ -14,7 +14,6 @@ from bok_choy.promise import Promise, EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.overview import CourseOutlinePage, CourseOutlineUnit
-from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.container import ContainerPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ...pages.studio.utils import add_advanced_component
