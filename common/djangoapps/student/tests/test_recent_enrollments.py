@@ -127,43 +127,72 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
-        (['audit', 'honor'], 'honor', True),
-        (['professional'], 'honor', True),
-        (['verified'], 'honor', True),
-        (['professional', 'verified'], 'honor', True),
-        (['audit', 'honor', 'professional'], 'honor', True),
-        (['audit', 'honor', 'verified'], 'honor', True),
-        (['audit', 'honor', 'verified', 'professional'], 'honor', True),
-        (['audit'], 'honor', True),
-        (['honor'], 'honor', True),
+        #Register as an honor in any course modes with no payment option
+        ([('audit', 0), ('honor', 0)], 'honor', True),
+        # ([('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        # ([('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        # ([('professional', 0), ('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('verified', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('verified', 0), ('professional', 0)], 'honor', True), #This can not be the case as verified courses always has min_price
+        ([('audit', 0)], 'honor', True),
+        ([('honor', 0)], 'honor', True),
+        ([], 'honor', True),
+        #Register as an honor in any course modes which has payment option
+        ([('audit', 0), ('honor', 10)], 'honor', False),
+        ([('professional', 20)], 'honor', True),
+        ([('verified', 20)], 'honor', True),
+        ([('professional', 20), ('verified', 20)], 'honor', True),
+        ([('audit', 0), ('honor', 5), ('professional', 20)], 'honor', True),
+        ([('audit', 0), ('honor', 10), ('verified', 20)], 'honor', True),
+        ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'honor', True),
+        ([('audit', 10)], 'honor', False),
+        ([('honor', 10)], 'honor', False),
         ([], 'honor', True),
 
-        (['audit', 'honor'], 'audit', True),
-        (['professional'], 'audit', True),
-        (['verified'], 'audit', True),
-        (['professional', 'verified'], 'audit', True),
-        (['audit', 'honor', 'professional'], 'audit', True),
-        (['audit', 'honor', 'verified'], 'audit', True),
-        (['audit', 'honor', 'verified', 'professional'], 'audit', True),
-        (['audit'], 'audit', True),
-        (['honor'], 'audit', True),
+
+        #Register as an audit in any course modes with no payment option
+        ([('audit', 0), ('honor', 0)], 'audit', True),
+        # ([('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('professional', 0), ('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('verified', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 0), ('verified', 0), ('professional', 0)], 'audit', True), #This can not be the case as verified courses always has min_price
+        ([('audit', 0)], 'audit', True),
+        ([('honor', 0)], 'audit', True),
+        ([], 'audit', True),
+        #Register as an audit in any course modes which has payment option
+        ([('audit', 0), ('honor', 10)], 'audit', False),
+        # ([('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('professional', 20), ('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 5), ('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 10), ('verified', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        # ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'audit', True), #This can not be the case as verified courses always has min_price
+        ([('audit', 10)], 'audit', False),
+        ([('honor', 10)], 'audit', False),
         ([], 'audit', True),
 
-        (['audit', 'honor'], 'verified', False),
-        (['professional'], 'verified', False),
-        (['verified'], 'verified', False),
-        (['professional', 'verified'], 'verified', False),
-        (['audit', 'honor', 'professional'], 'verified', False),
-        (['audit', 'honor', 'verified'], 'verified', False),
-        (['audit', 'honor', 'verified', 'professional'], 'verified', False),
-        (['audit'], 'verified', False),
-        (['honor'], 'verified', False),
-        ([], 'verified', False)
+
+
+        #Register as a verified in any course modes which has payment option
+        ([('audit', 0), ('honor', 10)], 'verified', False),
+        ([('professional', 20)], 'verified', False),
+        ([('verified', 20)], 'verified', False),
+        ([('professional', 20), ('verified', 20)], 'verified', False),
+        ([('audit', 0), ('honor', 5), ('professional', 20)], 'verified', False),
+        ([('audit', 0), ('honor', 10), ('verified', 20)], 'verified', False),
+        ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'verified', False),
+        ([('audit', 10)], 'verified', False),
+        ([('honor', 10)], 'verified', False),
+        # ([], 'audit', True),
+
     )
     @ddt.unpack
     def test_donate_button(self, course_modes, enrollment_mode, show_donate):
-        from nose.tools import set_trace;
-        set_trace()
+        # from nose.tools import set_trace;
+        # set_trace()
         # Enable the enrollment success message
         self._configure_message_timeout(10000)
 
@@ -171,8 +200,8 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         DonationConfiguration(enabled=True).save()
 
         # Create the course mode(s)
-        for mode in course_modes:
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        for mode, min_price in course_modes:
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         self.enrollment.mode = enrollment_mode
         self.enrollment.save()
@@ -185,69 +214,6 @@ class TestRecentEnrollments(ModuleStoreTestCase):
             self.assertContains(response, "donate-container")
         else:
             self.assertNotContains(response, "donate-container")
-
-    # @ddt.data(
-    #     (['audit', 'honor'], True),
-    #     (['professional'], True),
-    #     (['verified'], True),
-    #     (['audit'], True),
-    #     (['honor'], True),
-    #     ([], True)
-    # )
-    # @ddt.unpack
-    # def test_donate_button_enrollment_audit(self, course_modes, show_donate):
-    #     from nose.tools import set_trace; set_trace()
-    #     # Enable the enrollment success message
-    #     self._configure_message_timeout(10000)
-    #
-    #     # Enable donations
-    #     DonationConfiguration(enabled=True).save()
-    #
-    #     # Create the course mode(s)
-    #     for mode in course_modes:
-    #         CourseModeFactory(mode_slug=mode, course_id=self.course.id)
-    #     self.enrollment.mode = 'audit'
-    #     self.enrollment.save()
-    #     # Check that the donate button is or is not displayed
-    #     self.client.login(username=self.student.username, password=self.PASSWORD)
-    #     response = self.client.get(reverse("dashboard"))
-    #
-    #     if show_donate:
-    #         self.assertContains(response, "donate-container")
-    #     else:
-    #         self.assertNotContains(response, "donate-container")
-    #
-    # @ddt.data(
-    #     (['audit', 'honor'], True),
-    #     (['professional'], True),
-    #     (['verified'], True),
-    #     (['audit'], True),
-    #     (['honor'], True),
-    #     ([], True)
-    # )
-    # @ddt.unpack
-    # def test_donate_button_verified_courses(self, course_modes, show_donate):
-    #     from nose.tools import set_trace; set_trace()
-    #     # Enable the enrollment success message
-    #     self._configure_message_timeout(10000)
-    #
-    #     # Enable donations
-    #     DonationConfiguration(enabled=True).save()
-    #
-    #     # Create the course mode(s)
-    #     for mode in course_modes:
-    #         CourseModeFactory(mode_slug=mode, course_id=self.course.id)
-    #
-    #     self.enrollment.mode = ''
-    #
-    #     # Check that the donate button is or is not displayed
-    #     self.client.login(username=self.student.username, password=self.PASSWORD)
-    #     response = self.client.get(reverse("dashboard"))
-    #
-    #     if show_donate:
-    #         self.assertContains(response, "donate-container")
-    #     else:
-    #         self.assertNotContains(response, "donate-container")
 
     def test_donate_button_honor_with_price(self):
         # Enable the enrollment success message and donations

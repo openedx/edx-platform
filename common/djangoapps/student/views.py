@@ -758,8 +758,6 @@ def _allow_donation(course_modes, course_id, enrollment):
         True if the course is allowing donations.
 
     """
-    # from nose.tools import set_trace;
-    # set_trace()
     donations_enabled = DonationConfiguration.current().enabled
     is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
     has_payment_option = CourseMode.has_payment_options(course_id)
@@ -771,8 +769,6 @@ def _allow_donation(course_modes, course_id, enrollment):
         else:
             if enrollment.mode in ['audit', 'honor']:
                 return_val = True
-    # return_val = donations_enabled and ((not is_verified_mode and not has_payment_option) or (is_verified_mode and enrollment.mode in ['audit', 'honor']))
-    # return_val = donations_enabled and not is_verified_mode and not has_payment_option
     return return_val
 
 
