@@ -41,7 +41,7 @@
             <li class="field text required" id="field-username">
               <label for="username">${_("Public Username")}</label>
               ## Translators: This is the placeholder text for a field that asks the user to pick a username
-              <input id="username" type="text" name="username" placeholder="$(_("example: JaneDoe")}" />
+              <input id="username" type="text" name="username" placeholder="${_("example: JaneDoe")}" />
               <span class="tip tip-stacked">${_("This will be used in public discussions with your courses and in our edX101 support forums")}</span>
             </li>
 
@@ -91,7 +91,7 @@
       </div>
 
       <div class="bit">
-        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in {studio_name}?")}</h3>
+        <h3 class="title-3">${_("How technically savvy do I need to be to create courses in {studio_name}?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
         <p>${_("{studio_name} is designed to be easy to use by almost anyone familiar with common web-based authoring environments (Wordpress, Moodle, etc.). No programming knowledge is required, but for some of the more advanced features, a technical background would be helpful. As always, we are here to help, so don't hesitate to dive right in.").format(
           studio_name=settings.STUDIO_SHORT_NAME,
         )}</p>
