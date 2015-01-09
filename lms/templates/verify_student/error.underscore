@@ -1,6 +1,6 @@
 <div id="error" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon-warning-sign"></i>
+    <i class="msg-icon icon fa fa-exclamation-triangle"></i>
     <div class="msg-content">
       <h3 class="title"><%- errorTitle %></h3>
       <div class="copy">

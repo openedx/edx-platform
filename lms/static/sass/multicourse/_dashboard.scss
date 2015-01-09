@@ -102,7 +102,7 @@
                 display: inline-block;
                 color: $gray-l2;
 
-                .icon-link {
+                .fa-link {
                   color: $base-font-color;
                 }
 
@@ -147,25 +147,25 @@
           border-bottom: 0;
           padding: 0;
 
-          [class^="icon-"] {
+          .icon {
             display: inline-block;
             vertical-align: top;
             margin: ($baseline/10) ($baseline/4) 0 0;
           }
 
-          &.is-open [class^="icon-"] {
+          &.is-open .icon {
             color: $action-primary-bg;
           }
 
-          &.is-pending [class^="icon-"] {
+          &.is-pending .icon {
             color: $warning-color;
           }
 
-          &.is-approved [class^="icon-"] {
+          &.is-approved .icon {
             color: $success-color;
           }
 
-          &.is-denied [class^="icon-"] {
+          &.is-denied .icon {
             color: $alert-color;
           }
 

@@ -142,7 +142,7 @@
         @extend %t-regular;
         @include float(right);
 
-        .icon-delete {
+        .fa-trash-o {
           @extend %t-icon7;
           display: inline-block;
           vertical-align: middle;
