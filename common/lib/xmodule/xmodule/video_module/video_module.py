@@ -34,6 +34,7 @@ from xmodule.x_module import XModule, module_attr
 from xmodule.editing_module import TabsEditingDescriptor
 from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
+from xmodule.exceptions import NotFoundError
 
 from .transcripts_utils import VideoTranscriptsMixin
 from .video_utils import create_youtube_string, get_video_from_cdn
@@ -619,17 +620,22 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             "display_name": self.display_name,
         }
 
+        def _update_transcript_for_index(language=None):
+            """ Find video transcript - if not found, don't update index """
+            try:
+                transcript = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
+                transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
+                video_body.update({transcript_index_name: transcript})
+            except NotFoundError:
+                pass
+
         if self.sub:
-            transcript = self.get_transcript(transcript_format='txt')[0].replace("\n", " ")
-            video_body.update({"transcript_" + self.transcript_language: transcript})
+            _update_transcript_for_index()
 
         #check to see if there are transcripts in other languages besides default transcript
         if self.transcripts:
-            transcripts_content = {}
             for language in self.transcripts.keys():
-                transcript_content = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
-                transcripts_content.update({"transcript_" + language: transcript_content})
-            video_body.update(transcripts_content)
+                _update_transcript_for_index(language)
 
         if "content" in xblock_body:
             xblock_body["content"].update(video_body)

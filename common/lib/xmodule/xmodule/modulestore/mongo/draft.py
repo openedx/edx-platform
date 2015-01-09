@@ -649,6 +649,9 @@ class DraftModuleStore(MongoModuleStore):
         """
         # TODO - inline for now, need to move this out to a celery task
         searcher = SearchEngine.get_search_engine(INDEX_NAME)
+        if not searcher:
+            return
+
         location_info = {
             "course": unicode(location.course_key),
         }

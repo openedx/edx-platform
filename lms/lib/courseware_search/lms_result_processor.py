@@ -1,4 +1,6 @@
-""" This file contains implementation override of SearchResultProcessor which will allow
+# pylint: disable=duplicate-code
+"""
+This file contains implementation override of SearchResultProcessor which will allow
     * Blends in "location" property
     * Confirms user access to object
 """
