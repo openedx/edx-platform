@@ -1,15 +1,16 @@
 define([
-    'js/edxnotes/utils/logger', 'js/spec/edxnotes/custom_matchers'
-], function(Logger, customMatchers) {
+    'logger', 'js/edxnotes/utils/logger', 'js/spec/edxnotes/custom_matchers'
+], function(Logger, NotesLogger, customMatchers) {
     'use strict';
-    describe('Edxnotes logger', function() {
+    describe('Edxnotes NotesLogger', function() {
         var getLogger = function(id, mode) {
-            return Logger.getLogger(id, mode);
+            return NotesLogger.getLogger(id, mode);
         };
 
         beforeEach(function () {
             spyOn(window.console, 'log');
             spyOn(window.console, 'error');
+            spyOn(Logger, 'log');
             customMatchers(this);
         });
 
@@ -108,8 +109,16 @@ define([
             expect(log[0]).toBe('log');
             expect(log[1][0]).toBe('id');
             expect(log[1][1]).toBe('timer');
-            expect(log[1][2]).toBeInRange(190, 210);
+            expect(log[1][2]).toBeInRange(180, 220);
             expect(log[1][3]).toBe('ms');
+        });
+
+        it('can emit an event properly', function () {
+            var logger = getLogger('id', 0);
+            logger.emit('event_name', {id: 'some_id'})
+            expect(Logger.log).toHaveBeenCalledWith('event_name', {
+                id: 'some_id'
+            });
         });
     });
 });

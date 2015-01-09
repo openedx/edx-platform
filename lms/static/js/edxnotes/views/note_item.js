@@ -1,8 +1,9 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'backbone', 'js/edxnotes/utils/template'
-], function ($, Backbone, templateUtils) {
+    'jquery', 'underscore','backbone', 'js/edxnotes/utils/template',
+    'js/edxnotes/utils/logger'
+], function ($, _, Backbone, templateUtils, NotesLogger) {
     var NoteItemView = Backbone.View.extend({
         tagName: 'article',
         className: 'note',
@@ -10,11 +11,13 @@ define([
             return 'note-' + _.uniqueId();
         },
         events: {
-            'click .note-excerpt-more-link': 'moreHandler'
+            'click .note-excerpt-more-link': 'moreHandler',
+            'click .reference-unit-link': 'unitLinkHandler',
         },
 
         initialize: function (options) {
             this.template = templateUtils.loadTemplate('note-item');
+            this.logger = NotesLogger.getLogger('note_item', options.debug);
             this.listenTo(this.model, 'change:is_expanded', this.render);
         },
 
@@ -39,6 +42,27 @@ define([
         moreHandler: function (event) {
             event.preventDefault();
             this.toggleNote();
+        },
+
+        unitLinkHandler: function (event) {
+            var REQUEST_TIMEOUT = 2000;
+            event.preventDefault();
+            this.logger.emit('edx.student_notes.used_unit_link', {
+                'note_id': this.model.get('id'),
+                'component_usage_id': this.model.get('usage_id')
+            }, REQUEST_TIMEOUT).always(_.bind(function () {
+                this.redirectTo(event.target.href);
+            }, this));
+        },
+
+        redirectTo: function (uri) {
+            window.location = uri;
+        },
+
+        remove: function () {
+            this.logger.destroy();
+            Backbone.View.prototype.remove.call(this);
+            return this;
         }
     });
 

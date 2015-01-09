@@ -1,8 +1,8 @@
 ;(function (define) {
 'use strict';
-define([], function () {
+define(['underscore', 'logger'], function (_, Logger) {
     var loggers = [],
-        Logger, now, destroyLogger;
+        NotesLogger, now, destroyLogger;
 
     now = function () {
         if (performance && performance.now) {
@@ -33,12 +33,12 @@ define([], function () {
     };
 
     /**
-     * Logger constructor.
+     * NotesLogger constructor.
      * @constructor
      * @param {String} id Id of the logger.
      * @param {Boolean|Number} mode Outputs messages to the Web Console if true.
      */
-    Logger = function (id, mode) {
+    NotesLogger = function (id, mode) {
         this.id = id;
         this.historyStorage = [];
         this.timeStorage = {};
@@ -53,7 +53,7 @@ define([], function () {
      * @param  {String} logType The type of the log message.
      * @param  {Arguments} args Information that will be stored.
      */
-    Logger.prototype._log = function (logType, args) {
+    NotesLogger.prototype._log = function (logType, args) {
         if (!this.logLevel) {
             return false;
         }
@@ -72,21 +72,21 @@ define([], function () {
     /**
      * Outputs a message to the Web Console and store it in the history.
      */
-    Logger.prototype.log = function () {
+    NotesLogger.prototype.log = function () {
         this._log('log', arguments);
     };
 
     /**
      * Outputs an error message to the Web Console and store it in the history.
      */
-    Logger.prototype.error = function () {
+    NotesLogger.prototype.error = function () {
         this._log('error', arguments);
     };
 
     /**
      * Adds information to the history.
      */
-    Logger.prototype.updateHistory = function () {
+    NotesLogger.prototype.updateHistory = function () {
         this.historyStorage.push(arguments);
     };
 
@@ -94,7 +94,7 @@ define([], function () {
      * Returns the history for the logger.
      * @return {Array}
      */
-    Logger.prototype.getHistory = function () {
+    NotesLogger.prototype.getHistory = function () {
         return this.historyStorage;
     };
 
@@ -102,15 +102,15 @@ define([], function () {
      * Starts a timer you can use to track how long an operation takes.
      * @param {String} label Timer name.
      */
-    Logger.prototype.time = function (label) {
+    NotesLogger.prototype.time = function (label) {
         this.timeStorage[label] = now();
     };
 
     /**
-     * Stops a timer that was previously started by calling Logger.prototype.time().
+     * Stops a timer that was previously started by calling NotesLogger.prototype.time().
      * @param {String} label Timer name.
      */
-    Logger.prototype.timeEnd = function (label) {
+    NotesLogger.prototype.timeEnd = function (label) {
         if (!this.timeStorage[label]) {
             return null;
         }
@@ -119,13 +119,28 @@ define([], function () {
         delete this.timeStorage[label];
     };
 
-    Logger.prototype.destroy = function () {
+    NotesLogger.prototype.destroy = function () {
         destroyLogger(this);
-    }
+    };
+
+    /**
+     * Emits the event.
+     * @param  {String}  eventName The name of the event.
+     * @param  {*}       data      Information about the event.
+     * @param  {Number}  timeout   Optional timeout for the ajax request in ms.
+     */
+    NotesLogger.prototype.emit = function (eventName, data, timeout) {
+        var args = [eventName, data];
+        this.log(eventName, data);
+        if (timeout) {
+            args.push(null, {'timeout': timeout});
+        }
+        return Logger.log.apply(Logger, args);
+    };
 
     return {
         getLogger: function (id, mode) {
-            var logger = new Logger(id, mode);
+            var logger = new NotesLogger(id, mode);
             loggers.push(logger);
             return logger;
         },
