@@ -15,7 +15,7 @@ import rfc6266
 from edxval.api import create_video, get_videos_for_ids
 from opaque_keys.edx.keys import CourseKey
 
-from contentstore.models import VideoEncodingDownloadConfig
+from contentstore.models import VideoUploadConfig
 from contentstore.utils import reverse_course_url
 from edxmako.shortcuts import render_to_response
 from util.json_request import expect_json, JsonResponse
@@ -33,6 +33,43 @@ VIDEO_ASSET_TYPE = "video"
 
 # Default expiration, in seconds, of one-time URLs used for uploading videos.
 KEY_EXPIRATION_IN_SECONDS = 86400
+
+
+class StatusDisplayStrings(object):
+    """
+    Enum of display strings for Video Status presented in Studio (e.g., in UI and in CSV download).
+    """
+    # Translators: This is the status of an active video upload
+    UPLOADING = _("Uploading")
+    # Translators: This is the status for a video that the servers are currently processing
+    IN_PROGRESS = _("In Progress")
+    # Translators: This is the status for a video that the servers have successfully processed
+    COMPLETE = _("Complete")
+    # Translators: This is the status for a video that the servers have failed to process
+    FAILED = _("Failed"),
+    # Translators: This is the status for a video for which an invalid
+    # processing token was provided in the course settings
+    INVALID_TOKEN = _("Invalid Token"),
+    # Translators: This is the status for a video that is in an unknown state
+    UNKNOWN = _("Unknown")
+
+
+def status_display_string(val_status):
+    """
+    Converts VAL status string to Studio status string.
+    """
+    status_map = {
+        "upload": StatusDisplayStrings.UPLOADING,
+        "ingest": StatusDisplayStrings.IN_PROGRESS,
+        "transcode_queue": StatusDisplayStrings.IN_PROGRESS,
+        "transcode_active": StatusDisplayStrings.IN_PROGRESS,
+        "file_delivered": StatusDisplayStrings.COMPLETE,
+        "file_complete": StatusDisplayStrings.COMPLETE,
+        "file_corrupt": StatusDisplayStrings.FAILED,
+        "pipeline_error": StatusDisplayStrings.FAILED,
+        "invalid_token": StatusDisplayStrings.INVALID_TOKEN
+    }
+    return status_map.get(val_status, StatusDisplayStrings.UNKNOWN)
 
 
 @expect_json
@@ -73,8 +110,8 @@ def video_encodings_download(request, course_key_string):
     Returns a CSV report containing the encoded video URLs for video uploads
     in the following format:
 
-    Video ID,Name,Profile1 URL,Profile2 URL
-    aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,http://example.com/profile1.mp4,http://example.com/profile2.mp4
+    Video ID,Name,Status,Profile1 URL,Profile2 URL
+    aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa,video.mp4,Complete,http://example.com/prof1.mp4,http://example.com/prof2.mp4
     """
     course = _get_and_validate_course(course_key_string, request.user)
 
@@ -88,14 +125,15 @@ def video_encodings_download(request, course_key_string):
         # (e.g. desktop, mobile high quality, mobile low quality)
         return _("{profile_name} URL").format(profile_name=profile)
 
-    profile_whitelist = VideoEncodingDownloadConfig.get_profile_whitelist()
-    status_whitelist = VideoEncodingDownloadConfig.get_status_whitelist()
+    profile_whitelist = VideoUploadConfig.get_profile_whitelist()
+    status_whitelist = VideoUploadConfig.get_status_whitelist()
 
     videos = list(_get_videos(course))
     name_col = _("Name")
     duration_col = _("Duration")
     added_col = _("Date Added")
     video_id_col = _("Video ID")
+    status_col = _("Status")
     profile_cols = [get_profile_header(profile) for profile in profile_whitelist]
 
     def make_csv_dict(video):
@@ -115,6 +153,7 @@ def video_encodings_download(request, course_key_string):
                 (duration_col, duration_val),
                 (added_col, video["created"].isoformat()),
                 (video_id_col, video["edx_video_id"]),
+                (status_col, video["status"]),
             ] +
             [
                 (get_profile_header(encoded_video["profile"]), encoded_video["url"])
@@ -138,7 +177,7 @@ def video_encodings_download(request, course_key_string):
     )
     writer = csv.DictWriter(
         response,
-        [name_col, duration_col, added_col, video_id_col] + profile_cols,
+        [name_col, duration_col, added_col, video_id_col, status_col] + profile_cols,
         dialect=csv.excel
     )
     writer.writeheader()
@@ -173,13 +212,20 @@ def _get_and_validate_course(course_key_string, user):
 def _get_videos(course):
     """
     Retrieves the list of videos from VAL corresponding to the videos listed in
-    the asset metadata store
+    the asset metadata store.
     """
     edx_videos_ids = [
         v.asset_id.path
         for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
     ]
-    return get_videos_for_ids(edx_videos_ids)
+
+    videos = list(get_videos_for_ids(edx_videos_ids))
+
+    # convert VAL's status to studio's Video Upload feature status.
+    for video in videos:
+        video["status"] = status_display_string(video["status"])
+
+    return videos
 
 
 def _get_index_videos(course):
