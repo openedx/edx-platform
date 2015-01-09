@@ -16,6 +16,7 @@ from ..helpers import (
     select_option_by_value,
 )
 from ...pages.lms.auto_auth import AutoAuthPage
+from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.common.logout import LogoutPage
 from ...pages.lms.find_courses import FindCoursesPage
 from ...pages.lms.course_about import CourseAboutPage
@@ -28,6 +29,8 @@ from ...pages.lms.problem import ProblemPage
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
+from ...pages.lms.track_selection import TrackSelectionPage
+from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from ...pages.studio.settings import SettingsPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
@@ -235,6 +238,128 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
     def test_toggle_to_login_form(self):
         self.register_page.visit().toggle_form()
         self.assertEqual(self.register_page.current_form, "login")
+
+
+@attr('shard_1')
+class PayAndVerifyTest(UniqueCourseTest):
+    """Test that we can proceed through the payment and verification flow."""
+    def setUp(self):
+        """Initialize the test.
+
+        Create the necessary page objects, create a test course and configure its modes,
+        create a user and log them in.
+        """
+        super(PayAndVerifyTest, self).setUp()
+        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id, separate_verified=True)
+        self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
+        self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
+        self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
+        self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
+        self.dashboard_page = DashboardPage(self.browser, separate_verified=True)
+
+        # Create a course
+        CourseFixture(
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run'],
+            self.course_info['display_name']
+        ).install()
+
+        # Add an honor mode to the course
+        ModeCreationPage(self.browser, self.course_id).visit()
+
+        # Add a verified mode to the course
+        ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
+
+    def test_immediate_verification_enrollment(self):
+        # Create a user and log them in
+        AutoAuthPage(self.browser).visit()
+
+        # Navigate to the track selection page with the appropriate GET parameter in the URL
+        self.track_selection_page.visit()
+
+        # Enter the payment and verification flow by choosing to enroll as verified
+        self.track_selection_page.enroll('verified')
+
+        # Proceed to the fake payment page
+        self.payment_and_verification_flow.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
+
+        # Proceed to verification
+        self.payment_and_verification_flow.immediate_verification()
+
+        # Take face photo and proceed to the ID photo step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Take ID photo and proceed to the review photos step
+        self.payment_and_verification_flow.webcam_capture()
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Submit photos and proceed to the enrollment confirmation step
+        self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
+
+        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        self.dashboard_page.visit()
+
+        # Expect that we're enrolled as verified in the course
+        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
+        self.assertEqual(enrollment_mode, 'verified')
+
+    def test_deferred_verification_enrollment(self):
+        # Create a user and log them in
+        AutoAuthPage(self.browser).visit()
+
+        # Navigate to the track selection page with the appropriate GET parameter in the URL
+        self.track_selection_page.visit()
+
+        # Enter the payment and verification flow by choosing to enroll as verified
+        self.track_selection_page.enroll('verified')
+
+        # Proceed to the fake payment page
+        self.payment_and_verification_flow.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
+
+        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        self.dashboard_page.visit()
+
+        # Expect that we're enrolled as verified in the course
+        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
+        self.assertEqual(enrollment_mode, 'verified')
+
+    def test_enrollment_upgrade(self):
+        # Create a user, log them in, and enroll them in the honor mode
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        self.dashboard_page.visit()
+
+        # Expect that we're enrolled as honor in the course
+        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
+        self.assertEqual(enrollment_mode, 'honor')
+
+        # Click the upsell button on the dashboard
+        self.dashboard_page.upgrade_enrollment(self.course_info["display_name"], self.upgrade_page)
+
+        # Select the first contribution option appearing on the page
+        self.upgrade_page.indicate_contribution()
+
+        # Proceed to the fake payment page
+        self.upgrade_page.proceed_to_payment()
+
+        # Submit payment
+        self.fake_payment_page.submit_payment()
+
+        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        self.dashboard_page.visit()
+
+        # Expect that we're enrolled as verified in the course
+        enrollment_mode = self.dashboard_page.get_enrollment_mode(self.course_info["display_name"])
+        self.assertEqual(enrollment_mode, 'verified')
 
 
 class LanguageTest(WebAppTest):

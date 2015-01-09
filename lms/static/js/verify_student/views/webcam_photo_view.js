@@ -25,7 +25,14 @@
 
                     // Start the capture
                     this.getUserMediaFunc()(
-                        { video: true },
+                        {
+                            video: true,
+
+                            // Specify the `fake` constraint if we detect we are running in a test
+                            // environment. In Chrome, this will do nothing, but in Firefox, it will
+                            // instruct the browser to use a fake video device.
+                            fake: window.location.hostname === 'localhost'
+                        },
                         _.bind( this.getUserMediaCallback, this ),
                         _.bind( this.handleVideoFailure, this )
                     );

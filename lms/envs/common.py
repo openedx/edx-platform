@@ -332,7 +332,7 @@ FEATURES = {
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 
-    # let students save and manage their annotations
+    # Let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
 
     # Milestones application flag
@@ -340,6 +340,9 @@ FEATURES = {
 
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
+
+    # For easily adding modes to courses during acceptance testing
+    'MODE_CREATION_FOR_TESTING': False,
 
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,

@@ -2,6 +2,15 @@
     "ANALYTICS_API_KEY": "",
     "AWS_ACCESS_KEY_ID": "",
     "AWS_SECRET_ACCESS_KEY": "",
+    "CC_PROCESSOR_NAME": "CyberSource2",
+    "CC_PROCESSOR": {
+        "CyberSource2": {
+            "SECRET_KEY": "abcd123",
+            "ACCESS_KEY": "abcd123",
+            "PROFILE_ID": "edx",
+            "PURCHASE_ENDPOINT": "/shoppingcart/payment_fake"
+        }
+    },
     "CELERY_BROKER_PASSWORD": "celery",
     "CELERY_BROKER_USER": "celery",
     "CONTENTSTORE": {
