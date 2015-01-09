@@ -6,7 +6,6 @@ import datetime
 from django.utils import timezone
 
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
 from .. import errors
@@ -82,6 +81,23 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
                 response.data[course_num]['course']['id'],  # pylint: disable=no-member
                 unicode(courses[num_courses - course_num - 1].id)
             )
+
+    def test_no_facebook_url(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertIsNone(course_data['social_urls']['facebook'])
+
+    def test_facebook_url(self):
+        self.login_and_enroll()
+
+        self.course.facebook_url = "http://facebook.com/test_group_page"
+        self.store.update_item(self.course, self.user.id)
+
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
@@ -232,7 +248,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase):
 
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
-        modulestore().update_item(self.course, self.user.id)
+        self.store.update_item(self.course, self.user.id)
 
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
