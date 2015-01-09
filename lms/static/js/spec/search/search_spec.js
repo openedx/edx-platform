@@ -340,6 +340,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
             this.collection.set(searchResults);
             this.collection.totalCount = 2;
             this.listView.renderNext();
+            expect(this.listView.$el.find('.search-count-total').text()).toEqual('2');
             expect(this.listView.$el.find('li')).toHaveLength(2);
         });
 

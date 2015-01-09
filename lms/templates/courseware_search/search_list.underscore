@@ -1,6 +1,8 @@
 <div class="search-info">
     <%- gettext("Searching") %> <%= courseName %>
-    <span class="search-count"><%- totalCount %>  <%- gettext("results") %></span>
+    <div class="search-count">
+        <span class="search-count-total"><%- totalCount %></span>  <%- gettext("results") %>
+    </div>
 </div>
 
 <% if (totalCount > 0 ) { %>
