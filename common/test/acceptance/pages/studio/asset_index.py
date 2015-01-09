@@ -2,6 +2,10 @@
 The Files and Uploads page for a course in Studio
 """
 
+import urllib
+import os
+from opaque_keys.edx.locator import CourseLocator
+from . import BASE_URL
 from .course_page import CoursePage
 from bok_choy.javascript import wait_for_js, requirejs
 
@@ -15,6 +19,22 @@ class AssetIndexPage(CoursePage):
 
     url_path = "assets"
     type_filter_element = '#js-asset-type-col'
+
+    @property
+    def url(self):
+        """
+        Construct a URL to the page within the course.
+        """
+        # TODO - is there a better way to make this agnostic to the underlying default module store?
+        default_store = os.environ.get('DEFAULT_STORE', 'draft')
+        course_key = CourseLocator(
+            self.course_info['course_org'],
+            self.course_info['course_num'],
+            self.course_info['course_run'],
+            deprecated=(default_store == 'draft')
+        )
+        url = "/".join([BASE_URL, self.url_path, urllib.quote_plus(unicode(course_key))])
+        return url if url[-1] is '/' else url + '/'
 
     @wait_for_js
     def is_browser_on_page(self):
