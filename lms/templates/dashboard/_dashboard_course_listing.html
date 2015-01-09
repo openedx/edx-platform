@@ -29,10 +29,25 @@ from student.helpers import (
 
 <li class="course-item">
   % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
-    <article class="course ${enrollment.mode}">
+    % if enrollment.mode == "verified":
+      % if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
+        % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+          <% mode_class = " verified" %>
+        % else:
+          <% mode_class = " honor" %>
+        % endif
+      % else:
+        <% mode_class = " verified" %>
+      % endif
+    % else:
+      <% mode_class = " " + enrollment.mode %>
+    % endif
   % else:
-    <article class="course">
-  %endif
+    <% mode_class = "" %>
+  % endif
+
+  <article class="course${mode_class}">
+
     <%
       course_target = reverse('info', args=[course.id.to_deprecated_string()])
     %>
