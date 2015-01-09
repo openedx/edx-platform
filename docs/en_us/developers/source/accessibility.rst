@@ -107,7 +107,7 @@ Use with *CAUTION*
 Don't forget to manage focus on pop-ups
 ***************************************
 
-Whenever a control inserts interactive content into the DOM or reveals previously hidden content (pop-up menus or modal dialog boxes), you must move focus to the container. While within the menu or dialog box, keyboard focus should remain trapped within its bounds. Hitting the ESC key or activating the "Save" or "Cancel" buttons in the dialog should close and exit the region and return focus to the element that triggered it. ``<div>``s and other container elements are not natively focusable. If you want to be able to move focus to the container it must have a ``tabindex="-1"`` attribute. It should also have an ``aria-label`` or ``aria-labelledby`` attribute defined that identifies the purpose of the dialog.
+Whenever a control inserts interactive content into the DOM or reveals previously hidden content (pop-up menus or modal dialog boxes), you must move focus to the container. While within the menu or dialog box, keyboard focus should remain trapped within its bounds. Hitting the ESC key or activating the "Save" or "Cancel" buttons in the dialog should close and exit the region and return focus to the element that triggered it. ``<div>`` and other container elements are not natively focusable. If you want to be able to move focus to the container it must have a ``tabindex="-1"`` attribute. It should also have an ``aria-label`` or ``aria-labelledby`` attribute defined that identifies the purpose of the dialog.
 
 Inform users when content changes dynamically
 *********************************************
@@ -144,7 +144,7 @@ Screen reader users have the option of listing and navigating links and form con
 Choose colors that meet WCAG 2.0's minimum contrast ratios
 **********************************************************
 
-A minimum contrast between foreground and background colors is critical for users with impaired vision. You can `check color contrast ratios <https://duckduckgo.com/l/?kh=-1&uddg=https%3A%2F%2Fleaverou.github.io%2Fcontrast-ratio%2F>`_ using any number of tools available for free online.
+A minimum contrast between foreground and background colors is critical for users with impaired vision. You can `check color contrast ratios <https://leaverou.github.io/contrast-ratio/>`_ using any number of tools available for free online.
 
 Testing and self-assessment
 ***************************
