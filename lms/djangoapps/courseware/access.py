@@ -358,9 +358,7 @@ def _has_group_access(descriptor, user, course_key):
 
     # finally: check that the user has a satisfactory group assignment
     # for each partition.
-    if not all(
-        user_groups.get(partition.id) in groups for partition, groups in partition_groups
-    ):
+    if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
         return False
 
     # all checks passed.
