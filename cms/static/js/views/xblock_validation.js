@@ -32,7 +32,7 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
                     return 'fa-exclamation-circle';
                 }
                 else if (messageType === this.model.WARNING || messageType === this.model.NOT_CONFIGURED) {
-                    return 'fa-warning-sign';
+                    return 'fa-exclamation-triangle';
                 }
                 return null;
             },

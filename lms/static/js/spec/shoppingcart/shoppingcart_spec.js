@@ -7,7 +7,7 @@ define(['js/common_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
             var requests = null;
 
             beforeEach(function() {
-                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><i class="icon-caret-right"></i><input type="submit" value="Payment"/></form></section>');
+                setFixtures('<section class="wrapper confirm-enrollment shopping-cart cart-view"><form action="" method="post"><input type="hidden" name="" value="" /><i class="icon fa fa-caret-right"></i><input type="submit" value="Payment"/></form></section>');
 
                 view = new edx.shoppingcart.showcart.CartView({
                     el: $('.confirm-enrollment.cart-view form')
@@ -17,7 +17,7 @@ define(['js/common_helpers/ajax_helpers', 'js/shoppingcart/shoppingcart'],
 
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(this);
-                
+
                 view.submit();
 
                 // Verify that the client contacts the server to

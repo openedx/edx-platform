@@ -65,7 +65,7 @@ from django.utils.translation import ugettext as _
                 <div class="counter">
                     <input maxlength="3" title="Input qty and press enter." max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
                 </div>
-                <div class="inc button"><i class="icon fa fa-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
+                <div class="inc button"><i class="icon fa fa-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon fa fa-caret-down"></i></div>
                     <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                 <span class="error-text hidden" id="students-${item.id}"></span>
             </div>
@@ -123,7 +123,7 @@ from django.utils.translation import ugettext as _
                 </p>
               </div>
               <div name="billing" class="hidden">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
                     <p>
                         ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
                     </p>

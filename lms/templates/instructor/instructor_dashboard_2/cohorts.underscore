@@ -19,7 +19,7 @@
     </form>
 
     <a href="" class="action-primary action-create">
-        <i class="icon icon-plus"></i>
+        <i class="icon fa fa-plus"></i>
         <%- gettext('Add Cohort Group') %>
     </a>
 </div>
@@ -37,7 +37,7 @@
 
     <div class="cohort-management-supplemental">
         <p class="">
-            <i class="icon icon-info-sign"></i>
+            <i class="icon fa fa-info-circle"></i>
             <%= interpolate(
             gettext('To review student cohort group assignments or see the results of uploading a CSV file, download course profile information or cohort results on %(link_start)s the Data Download page. %(link_end)s'),
                 {link_start: '<a href="" class="link-cross-reference" data-section="data_download">', link_end: '</a>'},

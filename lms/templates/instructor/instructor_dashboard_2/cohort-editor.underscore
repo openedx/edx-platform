@@ -56,7 +56,7 @@
 
         <div class="form-actions">
             <button class="form-submit button action-primary action-view">
-                <i class="button-icon icon icon-plus"></i> <%- gettext('Add Students') %>
+                <i class="button-icon icon fa fa-plus"></i> <%- gettext('Add Students') %>
             </button>
         </div>
     </form>

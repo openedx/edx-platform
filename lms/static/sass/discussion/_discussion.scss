@@ -392,7 +392,7 @@ body.discussion, .discussion-course, div.discussion-body {
           display: table-cell;
         }
 
-        .icon-stack i {
+        .fa-stack .icon {
           padding: 0 $baseline/2;
         }
 
@@ -435,20 +435,20 @@ body.discussion, .discussion-course, div.discussion-body {
     }
 
   .helpgrid-row-navigation {
-    .icon-reorder {color: $light-gray;}
-    .icon-search {color: $light-gray;}
-    .icon-sort {color: $light-gray;}
+    .fa-bars {color: $light-gray;}
+    .fa-search {color: $light-gray;}
+    .fa-sort {color: $light-gray;}
   }
 
   .helpgrid-row-participation {
-    .icon-plus {color: $green;}
-    .icon-flag {color: $pink;}
-    .icon-star {color: $blue;}
+    .fa-plus {color: $green;}
+    .fa-flag {color: $pink;}
+    .fa-star {color: $blue;}
   }
 
   .helpgrid-row-notification {
-    .icon-sign-blank {color: $green;}
-    .icon-envelope {color: $light-gray;}
+    .fa-square {color: $green;}
+    .fa-envelope {color: $light-gray;}
   }
 
   .discussion-article {
@@ -598,7 +598,7 @@ body.discussion, .discussion-course, div.discussion-body {
       text-align: $left;
       font-size: 13px;
 
-      .icon-reply:before {
+      .fa-reply:before {
         content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
       }
 
@@ -726,7 +726,7 @@ body.discussion, .discussion-course, div.discussion-body {
       box-shadow: 0 1px 1px $shadow-l1;
       text-align: $left;
 
-      .icon-reply:before {
+      .fa-icon-reply:before {
         content: flip("\f112", "\f064"); // RTL: Make it like fa-mail-forward
       }
 

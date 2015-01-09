@@ -17,7 +17,7 @@
 
         <div class="form-actions">
             <button class="form-submit button action-primary action-save">
-                <i class="icon icon-plus"></i>
+                <i class="icon fa fa-plus"></i>
                 <%- gettext('Save') %>
             </button>
             <a href="" class="form-cancel action-secondary action-cancel"><%- gettext('Cancel') %></a>

@@ -492,7 +492,7 @@
             &.green {
               color: $green1;
             }
-            
+
             .line-through {
               text-decoration: line-through;
             }
@@ -572,7 +572,7 @@
             &.disabled {
               .counter {
                 border: 2px solid $gray;
-                
+
                 &:hover {
                   cursor: not-allowed;
                 }
@@ -594,7 +594,7 @@
               float: right;
               font-size: 15px;
               padding: 25px 35px 25px 0;
-              
+
               &:focus {
                 outline: none;
               }
@@ -680,7 +680,7 @@
         padding: 8px 12px;
         font-weight: 600;
         width: 260px;
-        
+
         &:focus {
           border-color: $dark-gray2;
           box-shadow: none;
@@ -803,7 +803,7 @@
             margin-left: ($baseline/2);
           }
         }
-        
+
       .col-2{
         width: 65%;
         float: right;
@@ -828,7 +828,7 @@
         form{
           position: relative;
         }
-          i.icon-caret-right{
+          .fa-caret-right {
             position: absolute;
             right: 30px;
             top: 25px;
@@ -1100,7 +1100,7 @@
     }
 
     .bordered-bar {
-      
+
       h2 {
         font-size: 14px;
       }

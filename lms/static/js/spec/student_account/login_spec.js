@@ -26,13 +26,13 @@ define([
                 providers: [
                     {
                         name: 'Google',
-                        iconClass: 'icon-google-plus',
+                        iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
                         name: 'Facebook',
-                        iconClass: 'icon-facebook',
+                        iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
                         registerUrl: '/auth/login/facebook/?auth_entry=account_register'
                     }

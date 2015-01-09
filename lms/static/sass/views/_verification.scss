@@ -699,7 +699,7 @@
             @extend %btn-primary-blue;
             padding: ($baseline/2) ($baseline*0.75);
 
-            *[class^="icon-"] {
+            .icon {
               @extend %t-icon4;
               padding: ($baseline*.25) ($baseline*.5);
               display: block;
@@ -1517,15 +1517,15 @@
             color: $white;
           }
 
-          .icon-over, .icon-under {
+          .fa-stack-1x, .fa-stack-2x {
             position: relative;
           }
 
-          .icon-under {
+          .fa-stack-2x {
             @extend %ui-depth1;
           }
 
-          .icon-over {
+          .fa-stack-1x {
             @extend %ui-depth2;
             @extend %t-icon5;
             position: absolute;
@@ -1533,6 +1533,11 @@
             top: 34px;
             background: $verified-color-lvl3;
             padding: 3px 5px;
+          }
+
+          .id-photo {
+            width: 23px;
+            padding: 3px 0;
           }
         }
 
@@ -2150,7 +2155,7 @@
               @extend %btn-primary-blue;
               padding: ($baseline/2) ($baseline*0.75);
 
-              *[class^="icon-"] {
+              .icon {
                 @extend %t-icon4;
                 padding: ($baseline*.25) ($baseline*.5);
                 display: block;
