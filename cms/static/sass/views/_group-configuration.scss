@@ -20,20 +20,21 @@
     }
 
     .no-group-configurations-content {
-      @extend %ui-well;
-      padding: ($baseline*2);
-      background-color: $gray-l4;
-      text-align: center;
-      color: $gray;
+      @extend %no-content;
     }
 
-    .new-button {
-      @extend %t-action3;
-      margin-left: $baseline;
+    .wrapper-groups {
+      margin-bottom: ($baseline*1.5);
 
-      .icon {
-        margin-right: ($baseline/2);
+      .title {
+        @extend %t-title4;
+        @extend %t-strong;
       }
+
+      .copy {
+        @extend %t-copy-sub1;
+      }
+
     }
 
     .group-configuration {
@@ -48,14 +49,16 @@
           .group-configuration-header {
             margin-bottom: 0;
             border-bottom: 0;
+            padding-bottom: 0;
           }
 
           .group-configuration-title {
-            @extend %t-title4;
+            @extend %t-title5;
             @extend %t-strong;
             overflow: hidden;
             text-overflow: ellipsis;
             margin-right: ($baseline*14);
+            color: $black;
 
             .group-toggle {
               display: inline-block;
@@ -172,8 +175,7 @@
               margin-right: ($baseline/4);
 
               .edit {
-                @include blue-button;
-                @extend %t-action4;
+                @extend %ui-btn-non-blue;
               }
 
               .delete {
@@ -253,7 +255,7 @@
           color: $gray-l3;
         }
 
-        .is-focused .tip{
+        .is-focused .tip {
           color: $gray;
         }
 
@@ -273,23 +275,13 @@
 
           // add a group is below with groups styling
           .action-primary {
-            @include blue-button;
-            @include transition(all .15s);
-            @extend %t-action2;
-            @extend %t-strong;
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-            text-transform: uppercase;
+            @extend %btn-primary-blue;
+            padding: ($baseline/4) $baseline;
           }
 
           .action-secondary {
-            @include grey-button;
-            @include transition(all .15s);
-            @extend %t-action2;
-            @extend %t-strong;
-            display: inline-block;
-            padding: ($baseline/5) $baseline;
-            text-transform: uppercase;
+            @extend %btn-secondary-gray;
+            padding: ($baseline/4) $baseline;
           }
 
           .wrapper-delete-button {
@@ -503,6 +495,21 @@
         width: 100%;
         margin: ($baseline*1.5) 0 0 0;
         padding: ($baseline/2);
+      }
+    }
+
+    // add/new items
+    .action-add {
+      @extend %ui-btn-flat-outline;
+      display: block;
+      width: 100%;
+      margin-top: ($baseline*0.75);
+      padding: ($baseline/2) $baseline;
+
+      .icon {
+        display: inline-block;
+        vertical-align: middle;
+        @include margin-right($baseline/2);
       }
     }
   }

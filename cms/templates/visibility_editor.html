@@ -27,8 +27,17 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
         </div>
     % elif is_staff_locked:
         <div class="summary-message summary-message-warning visibility-summary-message">
-            <i class="icon icon-warning-sign"></i>
-            <p class="copy">${_('The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this.')}</p>
+            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <p class="copy">
+                ## Translators: The "Warning:" text is meant to communicate the type of message being communicated and should always end with an extra space
+                ${_(
+                    "{span_tag_start}Warning: {span_tag_end} The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this."
+                    ).format(
+                        span_tag_start='<span class="sr">',
+                        span_tag_end="</span>",
+                    )
+                }
+            </p>
         </div>
     % endif
 </div>

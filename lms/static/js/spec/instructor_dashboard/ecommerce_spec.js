@@ -20,7 +20,7 @@ define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce', 'js/common_he
                 expect(expiryCouponView.clicked).toHaveBeenCalled();
             });
 
-            it("shows the input field when the checkbox is checked", function () {
+            it("shows the input fielmd when the checkbox is checked", function () {
                 var target = expiryCouponView.$el.find('input[type="checkbox"]');
                 target.attr("checked","checked");
                 target.click();

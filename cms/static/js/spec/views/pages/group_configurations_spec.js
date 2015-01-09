@@ -1,21 +1,24 @@
 define([
     'jquery', 'underscore', 'js/views/pages/group_configurations',
-    'js/collections/group_configuration', 'js/common_helpers/template_helpers'
-], function ($, _, GroupConfigurationsPage, GroupConfigurationCollection, TemplateHelpers) {
+    'js/models/group_configuration', 'js/collections/group_configuration',
+    'js/common_helpers/template_helpers'
+], function ($, _, GroupConfigurationsPage, GroupConfigurationModel, GroupConfigurationCollection, TemplateHelpers) {
     'use strict';
     describe('GroupConfigurationsPage', function() {
         var mockGroupConfigurationsPage = readFixtures(
                 'mock/mock-group-configuration-page.underscore'
             ),
-            itemClassName = '.group-configurations-list-item';
+            groupConfigItemClassName = '.group-configurations-list-item';
 
         var initializePage = function (disableSpy) {
             var view = new GroupConfigurationsPage({
                 el: $('#content'),
-                collection: new GroupConfigurationCollection({
+                experimentsEnabled: true,
+                experimentGroupConfigurations: new GroupConfigurationCollection({
                     id: 0,
                     name: 'Configuration 1'
-                })
+                }),
+                contentGroupConfiguration: new GroupConfigurationModel({groups: []})
             });
 
             if (!disableSpy) {
@@ -29,15 +32,13 @@ define([
             return initializePage().render();
         };
 
-        var  clickNewConfiguration = function (view) {
-            view.$('.nav-actions .new-button').click();
-        };
-
         beforeEach(function () {
             setFixtures(mockGroupConfigurationsPage);
             TemplateHelpers.installTemplates([
                 'no-group-configurations', 'group-configuration-edit',
-                'group-configuration-details'
+                'group-configuration-details', 'add-list-item',
+                'no-content-groups', 'content-group-details', 'content-group-edit',
+                'group-edit'
             ]);
 
             this.addMatchers({
@@ -52,7 +53,8 @@ define([
                 var view = initializePage();
                 expect(view.$('.ui-loading')).toBeVisible();
                 view.render();
-                expect(view.$(itemClassName)).toExist();
+                expect(view.$(groupConfigItemClassName)).toExist();
+                expect(view.$('.content-groups .no-group-configurations-content')).toExist();
                 expect(view.$('.ui-loading')).toHaveClass('is-hidden');
             });
         });
@@ -74,7 +76,7 @@ define([
                     view = renderPage(),
                     message;
 
-                view.collection.at(0).set('name', 'Configuration 2');
+                view.experimentGroupConfigurations.at(0).set('name', 'Configuration 2');
                 message = view.onBeforeUnload();
                 expect(message).toBe(expectedMessage);
             });
@@ -92,29 +94,22 @@ define([
                 this.view.render();
                 // We cannot use .toBeFocused due to flakiness.
                 expect($.fn.focus).toHaveBeenCalled();
-                expect(this.view.$(itemClassName)).toBeExpanded();
+                expect(this.view.$(groupConfigItemClassName)).toBeExpanded();
             });
 
             it('should not focus on any group configuration if url hash is empty', function() {
                 spyOn(this.view, 'getLocationHash').andReturn('');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
-                expect(this.view.$(itemClassName)).not.toBeExpanded();
+                expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
             });
 
             it('should not focus on any group configuration if url hash contains wrong id', function() {
                 spyOn(this.view, 'getLocationHash').andReturn('#1');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
-                expect(this.view.$(itemClassName)).not.toBeExpanded();
+                expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
             });
-        });
-
-        it('create new group configuration', function () {
-            var view = renderPage();
-
-            clickNewConfiguration(view);
-            expect($('.group-configuration-edit').length).toBeGreaterThan(0);
         });
     });
 });
