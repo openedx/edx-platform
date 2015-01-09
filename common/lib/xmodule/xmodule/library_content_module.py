@@ -220,8 +220,11 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         if hasattr(self, "_selected_set"):
             # Already done:
             return self._selected_set  # pylint: disable=access-member-before-definition
+
+        lib_tools = self.runtime.service(self, 'library_tools')
+        format_block_keys = lambda block_keys: lib_tools.create_block_analytics_summary(self.location.course_key, block_keys)
+
         # Determine which of our children we will show:
-        jsonify_block_keys = lambda keys: [unicode(self.location.course_key.make_usage_key(*key)) for key in keys]
         selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples
         valid_block_keys = set([(c.block_type, c.block_id) for c in self.children])  # pylint: disable=no-member
         # Remove any selected blocks that are no longer valid:
@@ -231,8 +234,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             # Publish an event for analytics purposes:
             self.runtime.publish(self, "edx.librarycontentblock.content.removed", {
                 "location": unicode(self.location),
-                "blocks": jsonify_block_keys(invalid_block_keys),
+                "removed": format_block_keys(invalid_block_keys),
                 "reason": "invalid",  # Deleted from library or library being used has changed
+                "result": format_block_keys(selected),
             })
         # If max_count has been decreased, we may have to drop some previously selected blocks:
         overlimit_block_keys = set()
@@ -242,8 +246,9 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             # Publish an event for analytics purposes:
             self.runtime.publish(self, "edx.librarycontentblock.content.removed", {
                 "location": unicode(self.location),
-                "blocks": jsonify_block_keys(overlimit_block_keys),
+                "removed": format_block_keys(overlimit_block_keys),
                 "reason": "overlimit",
+                "result": format_block_keys(selected),
             })
         # Do we have enough blocks now?
         num_to_add = self.max_count - len(selected)
@@ -262,8 +267,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                 # Publish an event for analytics purposes:
                 self.runtime.publish(self, "edx.librarycontentblock.content.assigned", {
                     "location": unicode(self.location),
-                    "added": jsonify_block_keys(added_block_keys),
-                    "result": jsonify_block_keys(selected),
+                    "added": format_block_keys(added_block_keys),
+                    "result": format_block_keys(selected),
                 })
         # Save our selections to the user state, to ensure consistency:
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
