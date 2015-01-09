@@ -27,11 +27,12 @@ var edx = edx || {};
         self.results.on('next', self.collection.loadNextPage, self.collection);
 
         self.router.on('route:search', self.form.doSearch, self.form);
-        Backbone.history.start();
 
     };
 
     var course_id = $('#search-content').attr('data-course-id');
-    return new edx.search.App(course_id);
+    var app = new edx.search.App(course_id);
+    Backbone.history.start();
+    return  app;
 
 })(Backbone);

@@ -7,7 +7,9 @@ define([
     'js/search/views/item',
     'js/search/models/result',
     'js/search/collections/collection',
-    'js/search/views/list'
+    'js/search/views/list',
+    'js/search/router',
+    'js/search/app'
 ],
 function($, Sinon, Backbone, TemplateHelpers) {
     'use strict';
@@ -369,10 +371,99 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
+    describe('edx.search.Router', function () {
+
+        beforeEach(function () {
+            this.router = new edx.search.Router();
+        });
+
+        it ('has a search route', function () {
+            expect(this.router.routes['search/:query']).toEqual('search');
+        });
+
+    });
+
+
     describe('edx.search.App', function () {
 
         beforeEach(function () {
+            TemplateHelpers.installTemplate('templates/courseware_search/search_item');
+            TemplateHelpers.installTemplate('templates/courseware_search/search_list');
+            TemplateHelpers.installTemplate('templates/courseware_search/search_loading');
+            TemplateHelpers.installTemplate('templates/courseware_search/search_error');
+            this.app = new edx.search.App('a/b/c');
+        });
 
+        it ('has all necessary components', function () {
+            expect(this.app).toBeDefined();
+            expect(this.app.router).toBeDefined();
+            expect(this.app.form).toBeDefined();
+            expect(this.app.collection).toBeDefined();
+            expect(this.app.results).toBeDefined();
+        });
+
+        it ('shows loading message on search', function () {
+            spyOn(this.app.results, 'showErrorMessage');
+            this.app.form.trigger('search');
+            setTimeout(function() {
+                expect(this.app.results.showErrorMessage).toHaveBeenCalled();
+            }, 0);
+        });
+
+        it ('performs search', function () {
+            spyOn(this.app.collection, 'performSearch');
+            this.app.form.trigger('search');
+            setTimeout(function() {
+                expect(this.app.collection.performSearch).toHaveBeenCalled();
+            }, 0);
+        });
+
+        it ('updates navigation history on search', function () {
+            spyOn(this.app.router, 'navigate');
+            this.app.form.trigger('search');
+            setTimeout(function() {
+                expect(this.app.router.navigate).toHaveBeenCalledWith('search/');
+            }, 0);
+        });
+
+        it ('cancels search', function () {
+            spyOn(this.app.collection, 'cancelSearch');
+            this.app.form.trigger('clear');
+            setTimeout(function() {
+                expect(this.app.collection.cancelSearch).toHaveBeenCalled();
+            }, 0);
+        });
+
+        it ('clears results', function () {
+            spyOn(this.app.results, 'clear');
+            this.app.form.trigger('clear');
+            setTimeout(function() {
+                expect(this.app.results.clear).toHaveBeenCalled();
+            }, 0);
+        });
+
+        it ('updates navigation history on clear', function () {
+            spyOn(this.app.router, 'navigate');
+            this.app.form.trigger('clear');
+            setTimeout(function() {
+                expect(this.app.router.navigate).toHaveBeenCalledWith('');
+            }, 0);
+        });
+
+        it ('loads next page', function () {
+            spyOn(this.app.collection, 'loadNextPage');
+            this.app.form.trigger('next');
+            setTimeout(function() {
+                expect(this.app.collection.loadNextPage).toHaveBeenCalledWith('');
+            }, 0);
+        });
+
+        it ('navigates to search', function () {
+            spyOn(this.app.form, 'doSearch');
+            this.app.router.navigate('search/query', { trigger: true });
+            setTimeout(function() {
+                expect(this.app.form.doSearch).toHaveBeenCalledWith('query');
+            }, 0);
         });
 
     });
