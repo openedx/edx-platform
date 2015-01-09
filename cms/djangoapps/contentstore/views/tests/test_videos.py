@@ -15,8 +15,8 @@ from mock import Mock, patch
 
 from edxval.api import create_profile, create_video, get_video_info
 
-from contentstore.models import VideoEncodingDownloadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, VIDEO_ASSET_TYPE
+from contentstore.models import VideoUploadConfig
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, VIDEO_ASSET_TYPE, status_display_string
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.assetstore import AssetMetadata
@@ -59,7 +59,7 @@ class VideoUploadTestMixin(object):
                 "edx_video_id": "test1",
                 "client_video_id": "test1.mp4",
                 "duration": 42.0,
-                "status": "transcode_active",
+                "status": "upload",
                 "encoded_videos": [],
             },
             {
@@ -86,7 +86,7 @@ class VideoUploadTestMixin(object):
                 "edx_video_id": "non-ascii",
                 "client_video_id": u"nón-ascii-näme.mp4",
                 "duration": 256.0,
-                "status": "file_delivered",
+                "status": "transcode_active",
                 "encoded_videos": [
                     {
                         "profile": "profile1",
@@ -169,8 +169,9 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
                 set(["edx_video_id", "client_video_id", "created", "duration", "status"])
             )
             dateutil.parser.parse(response_video["created"])
-            for field in ["edx_video_id", "client_video_id", "duration", "status"]:
+            for field in ["edx_video_id", "client_video_id", "duration"]:
                 self.assertEqual(response_video[field], original_video[field])
+            self.assertEqual(response_video["status"], status_display_string(original_video["status"]))
 
     def test_get_html(self):
         response = self.client.get(self.url)
@@ -312,9 +313,12 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
 
     def setUp(self):
         super(VideoUrlsCsvTestCase, self).setUp()
-        VideoEncodingDownloadConfig(
+        VideoUploadConfig(
             profile_whitelist="profile1",
-            status_whitelist="file_delivered,file_complete"
+            status_whitelist=(
+                status_display_string("file_complete") + "," +
+                status_display_string("transcode_active")
+            )
         ).save()
 
     def _check_csv_response(self, expected_video_ids, expected_profiles):
@@ -333,7 +337,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(
             reader.fieldnames,
             (
-                ["Name", "Duration", "Date Added", "Video ID"] +
+                ["Name", "Duration", "Date Added", "Video ID", "Status"] +
                 ["{} URL".format(profile) for profile in expected_profiles]
             )
         )
@@ -366,9 +370,13 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
         self._check_csv_response(["test2", "non-ascii"], ["profile1"])
 
     def test_config(self):
-        VideoEncodingDownloadConfig(
+        VideoUploadConfig(
             profile_whitelist="profile1,profile2",
-            status_whitelist="file_delivered,file_complete,transcode_active"
+            status_whitelist=(
+                status_display_string("file_complete") + "," +
+                status_display_string("transcode_active") + "," +
+                status_display_string("upload")
+            )
         ).save()
         self._check_csv_response(["test1", "test2", "non-ascii"], ["profile1", "profile2"])
 

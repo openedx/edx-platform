@@ -3,38 +3,6 @@ define(
     function(gettext, DateUtils, BaseView) {
         "use strict";
 
-        var statusDisplayStrings = {
-            // Translators: This is the status of an active video upload
-            UPLOADING: gettext("Uploading"),
-            // Translators: This is the status for a video that the servers
-            // are currently processing
-            IN_PROGRESS: gettext("In Progress"),
-            // Translators: This is the status for a video that the servers
-            // have successfully processed
-            COMPLETE: gettext("Complete"),
-            // Translators: This is the status for a video that the servers
-            // have failed to process
-            FAILED: gettext("Failed"),
-            // Translators: This is the status for a video for which an invalid
-            // processing token was provided in the course settings
-            INVALID_TOKEN: gettext("Invalid Token"),
-            // Translators: This is the status for a video that is in an unknown
-            // state
-            UNKNOWN: gettext("Unknown")
-        };
-
-        var statusMap = {
-            "upload": statusDisplayStrings.UPLOADING,
-            "ingest": statusDisplayStrings.IN_PROGRESS,
-            "transcode_queue": statusDisplayStrings.IN_PROGRESS,
-            "transcode_active": statusDisplayStrings.IN_PROGRESS,
-            "file_delivered": statusDisplayStrings.COMPLETE,
-            "file_complete": statusDisplayStrings.COMPLETE,
-            "file_corrupt": statusDisplayStrings.FAILED,
-            "pipeline_error": statusDisplayStrings.FAILED,
-            "invalid_token": statusDisplayStrings.INVALID_TOKEN
-        };
-
         var PreviousVideoUploadView = BaseView.extend({
             tagName: "tr",
 
@@ -57,7 +25,7 @@ define(
                     // the servers where its duration is determined.
                     duration: duration > 0 ? this.renderDuration(duration) : gettext("Pending"),
                     created: DateUtils.renderDate(this.model.get("created")),
-                    status: statusMap[this.model.get("status")] || statusDisplayStrings.UNKNOWN
+                    status: this.model.get("status")
                 };
                 this.$el.html(
                     this.template(_.extend({}, this.model.attributes, renderedAttributes))
