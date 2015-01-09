@@ -12,14 +12,14 @@ var edx = edx || {};
         accessDeniedCount: 0,
         searchTerm: '',
         page: 0,
-        url: '/search',
+        url: '/search/',
         fetchXhr: null,
 
         initialize: function (models, options) {
             // call super constructor
             Backbone.Collection.prototype.initialize.apply(this, arguments);
             if (options && options.course_id) {
-                this.url += '/' + options.course_id;
+                this.url += options.course_id;
             }
         },
 
@@ -65,7 +65,7 @@ var edx = edx || {};
         },
 
         cancelSearch: function () {
-            this.fetchXhr &&  this.fetchXhr.abort();
+            this.fetchXhr && this.fetchXhr.abort();
             this.page = 0;
             this.totalCount = 0;
             this.accessDeniedCount = 0;

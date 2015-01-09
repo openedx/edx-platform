@@ -534,6 +534,14 @@
             'js/search/views/list': {
                 exports: 'edx.search.List',
                 deps: ['jquery', 'underscore', 'backbone', 'gettext']
+            },
+            'js/search/router': {
+                exports: 'edx.search.Router',
+                deps: ['backbone']
+            },
+            'js/search/app': {
+                exports: 'edx.search.App',
+                deps: ['backbone', 'underscore']
             }
         }
     });

@@ -36,6 +36,8 @@ var edx = edx || {};
         },
 
         renderNext: function () {
+            // total count may have changed
+            this.$el.find('.search-count-total').text(this.collection.totalCount);
             this.renderItems();
             if (! this.collection.hasNextPage()) {
                 this.$el.find('.search-load-next').remove();
