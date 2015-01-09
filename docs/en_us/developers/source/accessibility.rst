@@ -2,19 +2,19 @@
 edX Accessibility Guide
 #######################
 
-EdX measures and evaluates accessibility using the World Wide Web Consortium's `Web Content Accessibility Guidelines (WCAG) 2.0 <http://www.w3.org/TR/WCAG/>`_ (Dec. 11, 2008).  All features merged into edX are expected to `conform <http://www.w3.org/TR/WCAG20/#conformance>`_ to `Level AA <http://www.w3.org/TR/WCAG20/#cc1>`_ of this specification.  This guide is intended to extend the guidance available in WCAG 2.0, with a focus on features frequently found in the edX platform as well as  Learning and Content Management Systems in general.
+EdX measures and evaluates accessibility using the World Wide Web Consortium's `Web Content Accessibility Guidelines (WCAG) 2.0 <http://www.w3.org/TR/WCAG/>`_ (Dec. 11, 2008).  All features merged into edX are expected to `conform <http://www.w3.org/TR/WCAG20/#conformance>`_ to `Level AA <http://www.w3.org/TR/WCAG20/#cc1>`_ of this specification.  This guide is intended to extend the guidance available in WCAG 2.0, with a focus on features frequently found in Open edX platform as well as Learning and Content Management Systems in general.
 
 Introduction
 ************
 
-The core mission of edX is to expand access to education for everyone.  When developing any user interfaces, its essential that those interfaces can be used by everyone, regardless of any physical limitation they may have.  The edX platform is used everyday by people who may not be able to see, hear or have the dexterity to use traditional modes of computer interaction (like the mouse).  Understanding a few core concepts about how people with disabilities use the web and web applications should make the guidance in this document a little easier to understand.
+The core mission of edX is to expand access to education for everyone.  We expect that any user interfaces that are developed for the Open edX platform can be used by everyone, regardless of any physical limitation they may have.  The Open edX platform is used everyday by people who may not be able to see, hear or have the dexterity to use traditional modes of computer interaction (like the mouse).  Understanding a few core concepts about how people with disabilities use the web and web applications should make the guidance in this document a little easier to understand.
 
-* Someone who cannot see cannot use a mouse (nor can those with neurological conditions that prevent the kind of precise hand eye coordination required to use a mouse.)
+* Someone who cannot see cannot use a mouse (nor can those with neurological conditions that prevent the kind of precise hand eye coordination required to use a mouse).
 * Many people with disabilities use "`Assistive Technology <http://www.w3.org/TR/WCAG20/#atdef>`_" (like a screen reader) to interact with their computer, web browser, and web applications.
 * Anything conveyed visually (like an element's role, state or other properties) must also be conveyed programmatically so Assistive Technologies know the element's role, what state it's currently in and how users can interact with it.  *Protip:* This information often comes for free when you use native HTML5 elements.
-* Many people with mobility impairments use custom keyboards, or keyboard emulators.
+* Many people with mobility impairments use custom keyboards or keyboard emulators.
 * Some people rely on speech to interact with web applications and need to be able to address interactive elements.
-* Someone who cannot hear or hear well requires visible text captions for any audible content, or an equivalent visual cue.
+* Someone who cannot hear or hear well requires visible text captions for any audible content or an equivalent visual cue.
 * Users may customize their operating system, browser or web page display properties to make web applications easier for them to use (like reversing contrast, increasing font size, or removing images). 
 
 These are just a few core concepts developers need to keep in mind when developing user interfaces that work for everyone.  More information is available from the W3C's Web Accessibility Initiative's `How People with Disabilities Use the Web: Overview <http://www.w3.org/WAI/intro/people-use-web/Overview.html>`_.
