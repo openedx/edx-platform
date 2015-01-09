@@ -102,6 +102,7 @@ var edx = edx || {};
             this.removeNotification();
             if (this.editor) {
                 this.editor.setCohort(cohort);
+                $('.cohort-management-group .group-header-title').focus();
             } else {
                 this.editor = new CohortEditorView({
                     el: this.$('.cohort-management-group'),
@@ -111,6 +112,7 @@ var edx = edx || {};
                     context: this.context
                 });
                 this.editor.render();
+                $('.cohort-management-group .group-header-title').focus();
             }
         },
 
@@ -120,11 +122,13 @@ var edx = edx || {};
             this.notification = new NotificationView({
                 model: model
             });
-            this.notification.render();
+
             if (!beforeElement) {
                 beforeElement = this.$('.cohort-management-group');
             }
             beforeElement.before(this.notification.$el);
+
+            this.notification.render();
         },
 
         removeNotification: function() {
@@ -149,6 +153,7 @@ var edx = edx || {};
             });
             this.cohortFormView.render();
             this.$('.cohort-management-add-form').append(this.cohortFormView.$el);
+            this.cohortFormView.$('.cohort-name').focus();
             this.setCohortEditorVisibility(false);
         },
 
@@ -228,6 +233,7 @@ var edx = edx || {};
                         });
                     }
                 }).render();
+                this.$('#file-upload-form-file').focus();
             }
         },
 
