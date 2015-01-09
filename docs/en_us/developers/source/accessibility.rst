@@ -20,7 +20,7 @@ The core mission of edX is to expand access to education for everyone. We expect
 These are just a few core concepts developers need to keep in mind when developing user interfaces that work for everyone. More information is available from the W3C's Web Accessibility Initiative's `How People with Disabilities Use the Web: Overview <http://www.w3.org/WAI/intro/people-use-web/Overview.html>`_.
 
 Make Your Images Accessible
-************************
+***************************
 
 All images require a `text alternative <http://www.w3.org/TR/WCAG20/#text-altdef>`_ with the exception of any image that is purely decorative or has a text alternative adjacent to it. Regardless of whether or not an image element requires a text alternative, *all* ``<img>`` elements require an ``alt`` attribute, even if the value of that attribute is ``""`` (NULL). Because an author error should not prevent a screen reader user from using a web site, screen readers will expose the path/to/the/image as a last resort, in an effort to provide some useful information to the user regarding the purpose of the image. If your image is purely decorative, or has a text equivalent immediately adjacent to it, use a NULL alt attribute i.e. ``alt=""``.
 
@@ -50,7 +50,7 @@ Sighted users have the benefit of visual context. It's often quite obvious what 
 *Protip:* Screen reader users often enter "forms processing mode" when they encounter a form. This temporarily disables all of the keyboard shortcuts available to them so key presses are actually passed through to the control, with the exception of ``TAB`` which will move focus from one form field to the next. This means that context sensitive help provided for form fields (like help text adjacent to the form field) is not likely to be encountered by these users. Add an `aria-describedby <http://www.w3.org/TR/wai-aria/states_and_properties#aria-describedby>`_ attribute to the input referencing this text. This programmatically links the text to the form control so the user can access it while in forms processing mode.
 
 Use semantic markup
-*******************************
+*******************
 
 The role, state and associated properties of an element are exposed to users of Assistive Technology either directly through the DOM or through the Accessibility API. Using elements for purposes other than the ones they are intended for have the consequence of falsely reporting the role, state and associated properties of the element to these users. This breaks features designed to make web apps easier to use and can often result in confusion when expected behaviors are not available.
 
@@ -61,7 +61,7 @@ If the semantics and behavior you need already exist in a native HTML5 element, 
 * Are you really marking up a list of items, or are you using an ``<ul>`` as a styling hook?
 
 Use WAI-ARIA to create accessible widgets or enhance native elements
-*******************
+********************************************************************
 
 There will be times when native HTML5 elements just don't give you the behavior or style options you need or desire. When developing custom HTML/JS widgets make sure you add all the necessary role, state and property information so that your widget can be used by users of assistive technology:
 
@@ -92,9 +92,9 @@ ARIA attributes can also be used to enhance native elements by adding helpful in
 	...
 	</div>
 
---------------
+------------------
 Use with *CAUTION*
---------------
+------------------
 
 * ``role="presentation"`` strips away all of the semantics from a native element.
 * ``role="application"`` on an element will pass all keystrokes to the browser for handling by scripts. This disables all of the keyboard shortcuts provided by the screen reader and is only designed to be used by authors who plan on providing support for all of the application's functions via the keyboard as well as the roles, states and properties for all of its child elements.
@@ -105,17 +105,17 @@ Use with *CAUTION*
 *Protip:* There are legitimate use cases for ``aria-hidden`` i.e. when using an icon font that has accessible text immediately adjacent to it. Icon fonts can be focused on by certain screen readers and will remain silent upon focus. This can lead screen reader users to suspect they are missing important content. Some screen readers display what is being spoken on the screen, which helps users with certain cognitive disabilities. Icon fonts will often be rendered as a nondescript glyph in these cases. It is useful to remove them with ``aria-hidden``. It can also be used to prevent exposing a screen reader user to redundant information when an information is available in an accessible format as well as a less than accessible format.
 
 Don't forget to manage focus on pop-ups
-************
+***************************************
 
 Whenever a control inserts interactive content into the DOM or reveals previously hidden content (pop-up menus or modal dialog boxes), you must move focus to the container. While within the menu or dialog box, keyboard focus should remain trapped within its bounds. Hitting the ESC key or activating the "Save" or "Cancel" buttons in the dialog should close and exit the region and return focus to the element that triggered it. ``<div>``s and other container elements are not natively focusable. If you want to be able to move focus to the container it must have a ``tabindex="-1"`` attribute. It should also have an ``aria-label`` or ``aria-labelledby`` attribute defined that identifies the purpose of the dialog.
 
 Inform users when content changes dynamically
-************************************
+*********************************************
 
 If a user action or script updates the content of a page dynamically adding the ``aria-live="polite"`` attribute to the parent element of the region that changes will cause the contents of the element to be read to a screen reader user even though the element does not currently have focus. This is not intended to be used when the region contains interactive elements. 
 
 Techniques for hiding and exposing content to targeted audiences
-******************************************
+****************************************************************
 
 Content that enhances the experience for one audience may be confusing or encumber a different audience. For instance, a close button that looks like ``X`` will be read by a screen reader as the letter X, unless you hide it from the Accessibility API. To visibly hide content that should be read by screen readers, edX makes a CSS ``class="sr"`` available to expose content only to screen reader users: 
 ::
@@ -132,17 +132,17 @@ Do not add content using CSS
 CSS generated content can cause many accessibility problems. Since many screen readers interact with the DOM, they are not exposed to content generated by CSS, which does not live in the DOM. There is currently no mechanism for adding alternative content for images added using CSS (either background images or pseudo elements). Many developers think that providing screen reader only text can be used to solve this. However, images added using this technique will not be rendered to users who have high contrast mode enabled on their operating systems. These users are likely not using screen readers, so they cannot access the visible icon, or the screen reader text.
 
 Include a descriptive ``title`` attribute for all ``<iframe>`` elements
-*******************************
+***********************************************************************
 
 Use the ``title`` attribute to provide a description of the embedded content to help users decide if they would like to interact with this content or not. ``<iframe>`` titles may be presented out of context (like in a list within a dialog box), so choose text that will make sense when exposed out of context.
 
 Make sure all links and interactive controls have labels that make sense out of context
-*************************
+***************************************************************************************
 
 Screen reader users have the option of listing and navigating links and form controls out of the context of the page. When a page contains vague and non-unique text like "Click here" or "More" the purpose of these links is not clear without the text that is adjacent to them.
 
 Choose colors that meet WCAG 2.0's minimum contrast ratios
-***************************
+**********************************************************
 
 A minimum contrast between foreground and background colors is critical for users with impaired vision. You can `check color contrast ratios <https://duckduckgo.com/l/?kh=-1&uddg=https%3A%2F%2Fleaverou.github.io%2Fcontrast-ratio%2F>`_ using any number of tools available for free online.
 
