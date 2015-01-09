@@ -241,6 +241,10 @@ def _has_access_course_desc(user, action, course):
                 return True
             return _has_staff_access_to_descriptor(user, course, course.id)
 
+        print 'course.id = {}'.format(course.id)
+        print 'can_enroll = {}'.format(can_enroll())
+        print 'can_load = {}'.format(can_load())
+
         return can_enroll() or can_load()
 
     def can_see_in_catalog():
@@ -324,12 +328,21 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
 
+        print '_has_staff_access_to_descriptor(user, descriptor, course_key) = {}'.format(_has_staff_access_to_descriptor(user, descriptor, course_key))
+        print 'not user.is_anonymous {}'.format(not user.is_anonymous())
+        print 'get_pre_requisite_courses_not_completed = {}'.format(get_pre_requisite_courses_not_completed(user, [(descriptor, None)]))
+        print 'checks = {}'.format(hasattr(descriptor, 'pre_requisite_courses') and descriptor.pre_requisite_courses)
         # if course has pre-requisite course not passed by user
-        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
-                and not _has_staff_access_to_descriptor(user, descriptor, course_key) \
-                and hasattr(descriptor, 'pre_requisite_courses') and descriptor.pre_requisite_courses \
-                and not user.is_anonymous() \
-                and get_pre_requisite_courses_not_completed(user, [(descriptor, None)]):
+        if (
+            settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] and
+            not _has_staff_access_to_descriptor(user, descriptor, course_key) and
+            hasattr(descriptor, 'pre_requisite_courses') and descriptor.pre_requisite_courses and
+            not user.is_anonymous()
+            # NOTE to Zia, this is returning False in the failing unit test
+            # it's right to return false, but one should be able to see the about page
+            # even if they haven't completed the milestones
+            and get_pre_requisite_courses_not_completed(user, [(descriptor, None)])
+        ):
             return False
 
         # If start dates are off, can always load
