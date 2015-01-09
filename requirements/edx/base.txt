@@ -129,7 +129,7 @@ nose-exclude
 nose-ignore-docstring
 nosexcover==1.0.7
 pep8==1.5.7
-pylint==0.28
+pylint==1.4.0
 python-subunit==0.0.16
 rednose==0.3
 selenium==2.42.1
