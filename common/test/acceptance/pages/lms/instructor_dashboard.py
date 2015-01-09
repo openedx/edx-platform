@@ -133,6 +133,10 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Returns the name of the selected cohort.
         """
+        EmptyPromise(
+            lambda: len(self._get_cohort_options().results) > 0,
+            "Waiting for cohort selector to populate"
+        ).fulfill()
         return self._cohort_name(
             self._get_cohort_options().filter(lambda el: el.is_selected()).first.text[0]
         )
@@ -163,7 +167,10 @@ class MembershipPageCohortManagementSection(PageObject):
         Adds a new manual cohort with the specified name.
         If a content group should also be associated, the name of the content group should be specified.
         """
-        self.q(css=self._bounded_selector("div.cohort-management-nav .action-create")).first.click()
+        create_buttons = self.q(css=self._bounded_selector(".action-create"))
+        # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
+        # (in which case the first is not visible). Click on the last present create button.
+        create_buttons.results[len(create_buttons.results) - 1].click()
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
         if content_group:
