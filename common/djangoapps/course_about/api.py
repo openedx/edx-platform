@@ -11,8 +11,15 @@ import logging
 from django.conf import settings
 from django.utils import importlib
 from course_about import errors
+from util.memcache import safe_key
+from django.core.cache import cache
+from django.conf import settings
+from opaque_keys.edx.keys import CourseKey
+from course_about.serializers import serialize_content
 
 DEFAULT_DATA_API = 'course_about.data'
+
+COURSE_INFO_API_CACHE_PREFIX = 'course_info_api_'
 
 log = logging.getLogger(__name__)
 
@@ -59,7 +66,12 @@ def get_course_about_details(course_id):
             }
         }
     """
-    return _data_api().get_course_about_details(course_id)
+    cache_key = safe_key(course_id, COURSE_INFO_API_CACHE_PREFIX, '')
+    cache_course_info = cache.get(cache_key)
+
+    if cache_course_info:
+        return cache_course_info
+    return _data_api().get_course_about_details(course_id, cache_key)
 
 
 def _data_api():
