@@ -663,25 +663,30 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertTrue(self._has_changes(parent.location))
         self.assertTrue(self._has_changes(child.location))
 
-    @ddt.data('draft', 'split')
-    def test_has_changes_missing_child(self, default_ms):
+    @ddt.data(*itertools.product(
+        ('draft', 'split'),
+        (ModuleStoreEnum.Branch.draft_preferred, ModuleStoreEnum.Branch.published_only)
+    ))
+    @ddt.unpack
+    def test_has_changes_missing_child(self, default_ms, default_branch):
         """
         Tests that has_changes() does not throw an exception when a child doesn't exist.
         """
         self.initdb(default_ms)
 
-        # Create the parent and point it to a fake child
-        parent = self.store.create_item(
-            self.user_id,
-            self.course.id,
-            'vertical',
-            block_id='parent',
-        )
-        parent.children += [self.course.id.make_usage_key('vertical', 'does_not_exist')]
-        parent = self.store.update_item(parent, self.user_id)
+        with self.store.branch_setting(default_branch, self.course.id):
+            # Create the parent and point it to a fake child
+            parent = self.store.create_item(
+                self.user_id,
+                self.course.id,
+                'vertical',
+                block_id='parent',
+            )
+            parent.children += [self.course.id.make_usage_key('vertical', 'does_not_exist')]
+            parent = self.store.update_item(parent, self.user_id)
 
-        # Check the parent for changes should return True and not throw an exception
-        self.assertTrue(self.store.has_changes(parent))
+            # Check the parent for changes should return True and not throw an exception
+            self.assertTrue(self.store.has_changes(parent))
 
     # Draft
     #   Find: find parents (definition.children query), get parent, get course (fill in run?),
