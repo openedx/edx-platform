@@ -763,8 +763,9 @@ def _allow_donation(course_modes, course_id, enrollment):
     has_payment_option = CourseMode.has_payment_options(course_id)
     return_val = False
     if donations_enabled:
-        if not (is_verified_mode and has_payment_option):
-            return_val = True
+        if not is_verified_mode:
+            if not has_payment_option:
+                return_val = True
         else:
             if enrollment.mode in ['audit', 'honor']:
                 return_val = True
