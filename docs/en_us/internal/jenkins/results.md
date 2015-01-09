@@ -2,15 +2,13 @@
 _build log_ will refer to something from the following urls:
 
 ```
-https://jenkins.testeng.edx.org/job/edx-all-tests-auto-pr/[NUMBER]/
-https://jenkins.testeng.edx.org/job/edx-all-tests-manual-pr/[NUMBER]/
-https://jenkins.testeng.edx.org/job/edx-all-tests-manual-commit/[NUMBER]/ 
+https://build.testeng.edx.org/job/edx-platform-all-tests/[NUMBER]/
 ```
 
 _build report_ will refer to something with the following urls:
 
 ```
-https://jenkins.testeng.edx.org/job/edx-platform-report/[NUMBER]/
+https://build.testeng.edx.org/job/edx-platform-report/[NUMBER]/
 ```
 
 Note that navigating to a build via github (clicking 'details') while it is in a pending or failed state
