@@ -624,6 +624,9 @@ class DraftModuleStore(MongoModuleStore):
             return True
         # if this block doesn't have changes, then check its children
         elif xblock.has_children:
+            # fix a bug where dangling pointers should imply a change
+            if len(xblock.children) > len(xblock.get_children()):
+                return True
             return any([self.has_changes(child) for child in xblock.get_children()])
         # otherwise there are no changes
         else:
