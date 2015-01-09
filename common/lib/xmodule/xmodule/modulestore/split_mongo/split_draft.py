@@ -268,8 +268,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
         def has_changes_subtree(block_key):
             draft_block = get_block(draft_course, block_key)
+            if draft_block is None:  # temporary fix for bad pointers TNL-1141
+                return True
             published_block = get_block(published_course, block_key)
-            if not published_block:
+            if published_block is None:
                 return True
 
             # check if the draft has changed since the published was created
