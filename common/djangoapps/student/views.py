@@ -763,10 +763,17 @@ def _allow_donation(course_modes, course_id, enrollment):
     donations_enabled = DonationConfiguration.current().enabled
     is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
     has_payment_option = CourseMode.has_payment_options(course_id)
-    return_val = donations_enabled and (not is_verified_mode or (is_verified_mode and enrollment.mode in ['audit', 'honor'])) and not has_payment_option
-    return_val
-    #TODO Hard coded for the time being
-    return True
+    return_val = False
+    if donations_enabled:
+        if not is_verified_mode:
+            if not has_payment_option:
+                return_val = True
+        else:
+            if enrollment.mode in ['audit', 'honor']:
+                return_val = True
+    # return_val = donations_enabled and ((not is_verified_mode and not has_payment_option) or (is_verified_mode and enrollment.mode in ['audit', 'honor']))
+    # return_val = donations_enabled and not is_verified_mode and not has_payment_option
+    return return_val
 
 
 def try_change_enrollment(request):
