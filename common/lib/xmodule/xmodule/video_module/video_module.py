@@ -213,10 +213,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # 'CN' is China ISO 3166-1 country code.
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('CN')
 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get(self.system.user_location)
+            cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get('CN')
             branding_info = get_branding_info(cdn_info.get('BRANDING'))
             branding_url = branding_info['logo_src']
 
