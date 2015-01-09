@@ -127,38 +127,38 @@ class TestRecentEnrollments(ModuleStoreTestCase):
         self.assertContains(response, "Thank you for enrolling in")
 
     @ddt.data(
-        # (['audit', 'honor'], 'honor', False),
+        (['audit', 'honor'], 'honor', True),
         (['professional'], 'honor', True),
         (['verified'], 'honor', True),
         (['professional', 'verified'], 'honor', True),
         (['audit', 'honor', 'professional'], 'honor', True),
         (['audit', 'honor', 'verified'], 'honor', True),
         (['audit', 'honor', 'verified', 'professional'], 'honor', True),
-        # (['audit'], 'honor', False),
-        # (['honor'], 'honor', False),
-        # ([], 'honor', False),
-        #
-        # (['audit', 'honor'], 'audit', False),
-        # (['professional'], 'audit', True),
-        # (['verified'], 'audit', True),
-        # (['professional', 'verified'], 'audit', True),
-        # (['audit', 'honor', 'professional'], 'audit', True),
-        # (['audit', 'honor', 'verified'], 'audit', True),
-        # (['audit', 'honor', 'verified', 'professional'], 'audit', True),
-        # (['audit'], 'audit', True),
-        # (['honor'], 'audit', True),
-        # ([], 'audit', True),
+        (['audit'], 'honor', True),
+        (['honor'], 'honor', True),
+        ([], 'honor', True),
 
-        # (['audit', 'honor'], 'verified', False),
+        (['audit', 'honor'], 'audit', True),
+        (['professional'], 'audit', True),
+        (['verified'], 'audit', True),
+        (['professional', 'verified'], 'audit', True),
+        (['audit', 'honor', 'professional'], 'audit', True),
+        (['audit', 'honor', 'verified'], 'audit', True),
+        (['audit', 'honor', 'verified', 'professional'], 'audit', True),
+        (['audit'], 'audit', True),
+        (['honor'], 'audit', True),
+        ([], 'audit', True),
+
+        (['audit', 'honor'], 'verified', False),
         (['professional'], 'verified', False),
         (['verified'], 'verified', False),
         (['professional', 'verified'], 'verified', False),
         (['audit', 'honor', 'professional'], 'verified', False),
         (['audit', 'honor', 'verified'], 'verified', False),
         (['audit', 'honor', 'verified', 'professional'], 'verified', False),
-        # (['audit'], 'verified', False),
-        # (['honor'], 'verified', False),
-        # ([], 'verified', False)
+        (['audit'], 'verified', False),
+        (['honor'], 'verified', False),
+        ([], 'verified', False)
     )
     @ddt.unpack
     def test_donate_button(self, course_modes, enrollment_mode, show_donate):
