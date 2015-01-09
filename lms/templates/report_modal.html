@@ -2,6 +2,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%! from django.conf import settings %>
 <%! from microsite_configuration import microsite %>
+<%! from student.models import UserProfile %>
 <%! platform_name = microsite.get_value("platform_name", settings.PLATFORM_NAME) %>
 
 <div class="report-tab">
@@ -24,7 +25,7 @@
       <p>${_("If you've found a problem on this page (e.g. an error), please let us know! For other questions, please check out the 'Help' tab.")}</p>
       <hr>
       <div id="report-error" class="modal-form-error" tabindex="-1"></div>
-% if not user.is_authenticated():
+% if not UserProfile.has_registered(user):
       <label data-field="name" for="report-form-name">${_('Name')}*</label>
       <input name="name" type="text" id="report-form-name" aria-required="true">
       <label data-field="email" for="report-form-email">${_('E-mail')}*</label>
@@ -34,7 +35,7 @@
       <input name="subject" type="text" id="report-form-subject" aria-required="true">
       <label data-field="details" for="report-form-details">${_('Details of the problem you are encountering')}*</label>
       <textarea name="details" id="report-form-details" aria-required="true" placeholder="Include error messages, steps which lead to the issue, etc."></textarea>
-      <input name="issue_type" type="hidden" value="problem">
+      <input name="issue_type" type="hidden" value="problem_report_modal">
       <input name="course_id" type="hidden" value="${course.id.to_deprecated_string() | h}">
       <div class="submit">
         <input name="submit" type="submit" value="${_('Submit Problem Report')}" id="report-submit">
@@ -70,7 +71,7 @@
             $("#report-modal .close-modal").off("click");
             $("#lean_overlay").off("click");
             $("#report-modal").attr("aria-hidden", "true");
-            $('area,input,select,textarea,button').removeAttr('tabindex');
+            $("#report-form-wrapper").find("area,input,select,textarea,button").removeAttr('tabindex');
             $(".report-tab a").focus();
         },
         cycle_modal_tab = function(from_element_name, to_element_name) {
@@ -89,6 +90,7 @@
         $("#report-form input[type='submit']").removeAttr("disabled");
         $("#report-error").css("display", "none");
         $("#report-success-wrapper").css("display", "none");
+        $("#report-form-wrapper").css("display", "block");
         $("#report-modal").attr("aria-hidden", "false");
         $("#report-modal .close-modal").click(onModalClose);
         $("#lean_overlay").click(onModalClose);
@@ -105,7 +107,7 @@
     });
     $("#report-form").submit(function() {
         $("input[type='submit']", this).attr("disabled", "disabled");
-        $('area,input,select,textarea,button').attr('tabindex', -1);
+        $("#report-form-wrapper").find("area,input,select,textarea,button").attr('tabindex', -1);
         $("#report-form-wrapper .close-modal").focus();
     });
     $("#report-form").on("ajax:complete", function() {
@@ -114,7 +116,7 @@
     $("#report-form").on("ajax:success", function(event, data, status, xhr) {
         $("#report-form-wrapper").css("display", "none");
         $("#report-success-wrapper").css("display", "block");
-        $("#report-success-wrapper").focus();
+        $("#report-success-wrapper .close-modal").focus();
     });
     $("#report-form").on("ajax:error", function(event, xhr, status, error) {
         $(".field-error").removeClass("field-error").removeAttr("aria-invalid");
