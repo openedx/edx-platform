@@ -154,7 +154,8 @@ function($, Sinon, Backbone, TemplateHelpers) {
         it('sends a request and parses the json result', function () {
             this.collection.performSearch('search string');
             var response = {
-                total: 1,
+                total: 2,
+                access_denied_count: 1,
                 results: [{
                     data: {
                         location: ['section', 'subsection', 'unit'],
@@ -205,7 +206,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
         });
 
         it('has next page', function () {
-            var response = { total: 35, results: [] };
+            var response = { total: 35, access_denied_count: 5, results: [] };
             this.collection.performSearch('search string');
             this.server.respond('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             expect(this.collection.hasNextPage()).toEqual(true);
