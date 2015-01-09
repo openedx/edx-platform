@@ -1,8 +1,11 @@
 <div id="error" class="wrapper-msg wrapper-msg-activate">
   <div class=" msg msg-activate">
-    <i class="msg-icon icon fa fa-exclamation-triangle"></i>
+    <i class="msg-icon icon fa fa-exclamation-triangle" aria-hidden="true"></i>
     <div class="msg-content">
-      <h3 class="title"><%- errorTitle %></h3>
+      <h3 class="title">
+        <span class="sr"><%- gettext( "Error:" ) %></span>
+        <%- errorTitle %>
+      </h3>
       <div class="copy">
         <p><%= errorMsg %></p>
       </div>
