@@ -8,8 +8,8 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'VideoEncodingDownloadConfig'
-        db.create_table('contentstore_videoencodingdownloadconfig', (
+        # Adding model 'VideoUploadConfig'
+        db.create_table('contentstore_videouploadconfig', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
@@ -17,13 +17,17 @@ class Migration(SchemaMigration):
             ('profile_whitelist', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('status_whitelist', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
-        db.send_create_signal('contentstore', ['VideoEncodingDownloadConfig'])
+        db.send_create_signal('contentstore', ['VideoUploadConfig'])
 
+        if not db.dry_run:
+            orm.VideoUploadConfig.objects.create(
+                profile_whitelist="desktop_mp4,desktop_webm,mobile_low,youtube",
+                status_whitelist="Uploading,In Progress,Complete,Failed,Invalid Token,Unknown"
+            )
 
     def backwards(self, orm):
-        # Deleting model 'VideoEncodingDownloadConfig'
-        db.delete_table('contentstore_videoencodingdownloadconfig')
-
+        # Deleting model 'VideoUploadConfig'
+        db.delete_table('contentstore_videouploadconfig')
 
     models = {
         'auth.group': {
@@ -55,8 +59,8 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
-        'contentstore.videoencodingdownloadconfig': {
-            'Meta': {'object_name': 'VideoEncodingDownloadConfig'},
+        'contentstore.videouploadconfig': {
+            'Meta': {'object_name': 'VideoUploadConfig'},
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
