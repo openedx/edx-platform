@@ -41,29 +41,16 @@ def get_course_about_details(course_id):
         {
             "advertised_start": "FALL",
             "announcement": "YYYY-MM-DD",
-            "copy": {
-                (To be implemented with Marketing Descriptors)
-            }
-            "course_id": "EXAMPLE/COURSE101",
-            "course_number": "COURSE101",
+            "course_id": "edx/DemoCourse",
+            "course_number": "DEMO101",
             "start": "YYYY-MM-DD",
             "end": "YYYY-MM-DD",
             "effort": "HH:MM",
             "display_name": "Demo Course",
-            "is_mobile_enabled": true,
             "is_new": true,
             "media": {
-                (To be implemented with Marketing Descriptors)
+                "course_image": "/some/image/location.png"
             },
-            "organizations": {
-                (To be implemented with new Organization Models)
-            },
-            "subjects": {
-                (To be implemented with new Subjects Models)
-            },
-            "xseries": {
-                (To be implemented with new XSeries Models)
-            }
         }
     """
     cache_key = "{}_{}".format(course_id, COURSE_INFO_API_CACHE_PREFIX)
