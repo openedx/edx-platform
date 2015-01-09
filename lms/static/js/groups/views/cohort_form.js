@@ -7,9 +7,7 @@ var edx = edx || {};
 
     edx.groups.CohortFormView = Backbone.View.extend({
         events : {
-            'change .cohort-management-details-association-course input': 'onRadioButtonChange',
-            'click .tab-content-settings .action-save': 'saveSettings',
-            'submit .cohort-management-group-add-form': 'addStudents'
+            'change .cohort-management-details-association-course input': 'onRadioButtonChange'
         },
 
         initialize: function(options) {
@@ -24,8 +22,8 @@ var edx = edx || {};
             this.notification = new NotificationView({
                 model: model
             });
-            this.notification.render();
             beforeElement.before(this.notification.$el);
+            this.notification.render();
         },
 
         removeNotification: function() {
