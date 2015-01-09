@@ -1,12 +1,12 @@
-<%! from django.utils.translation import ugettext as _ %>
-<%!
-  from django.core.urlresolvers import reverse
-  from courseware.courses import course_image_url, get_course_about_section
-  from django.conf import settings
-  from edxmako.shortcuts import marketing_link
-%>
 <%namespace name='static' file='../static_content.html'/>
-<%! from microsite_configuration import microsite %>
+<%!
+from microsite_configuration import microsite
+from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
+from courseware.courses import course_image_url, get_course_about_section
+from django.conf import settings
+from edxmako.shortcuts import marketing_link
+%>
 
 <%inherit file="../main.html" />
 <%block name="headextra">
@@ -44,7 +44,7 @@
         }
         if (jqXHR.status == 400) {
           $("#register_error")
-            .html(jqXHR.responseText ? jqXHR.responseText : "${_('An error occurred. Please try again later.')}")
+            .html(jqXHR.responseText ? jqXHR.responseText : "${_("An error occurred. Please try again later.")}")
             .css("display", "block");
         }
         else if (jqXHR.status == 403) {
@@ -100,7 +100,7 @@
           location.href = "${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll";
       } else {
         $('#register_error').html(
-            (xhr.responseText ? xhr.responseText : 'An error occurred. Please try again later.')
+            (xhr.responseText ? xhr.responseText : "${_("An error occurred. Please try again later.")}")
         ).css("display", "block");
       }
     });
@@ -232,10 +232,10 @@
             ##       want here (and on this whole page, really).
             % if self.stanford_theme_enabled():
               <a href="http://twitter.com/intent/tweet?text=I+just+registered+for+${course.number}+${get_course_about_section(course, 'title')}!+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
               </a>
               <a href="mailto:?subject=Take%20a%20course%20at%20Stanford%20online!&body=I%20just%20registered%20for%20${course.number}%20${get_course_about_section(course, 'title')}+(http://class.stanford.edu)" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
             % else:
               <%
@@ -271,13 +271,13 @@
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon fa fa-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
+                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
             % endif
           </div>
