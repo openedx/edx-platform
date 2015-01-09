@@ -646,7 +646,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         cohortsView.$('.tab-settings a').click();
                         expect(cohortsView.$('option.option-unavailable').text().trim()).toBe('Deleted Content Group');
                         expect(cohortsView.$('.copy-error').text().trim()).toBe(
-                            'The previously selected content group was deleted. Select another content group.'
+                            'Warning: The previously selected content group was deleted. Select another content group.'
                         );
                     });
 
@@ -687,13 +687,14 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     });
 
                     it("shows an error message when no content groups are specified", function () {
+                        var message;
                         createCohortsView(this, {selectCohort: 1, contentGroups: []});
                         cohortsView.$('.tab-settings a').click();
                         expect(cohortsView.$('.radio-yes').prop('disabled')).toBeTruthy();
-                        expect(cohortsView.$('.msg-inline').text().trim()).toBe(
-                            'No content groups exist. Create a content group to associate with cohort groups. ' +
-                            'Create a content group'
-                        );
+                        message = cohortsView.$('.msg-inline').text().trim();
+                        expect(message).toContain('Warning: No content groups exist.');
+                        expect(message).toContain('Create a content group to associate with cohort groups.');
+                        expect(message).toContain('Create a content group');
                         expect(
                             cohortsView.$('.msg-inline a').attr('href'),
                             MOCK_STUDIO_GROUP_CONFIGURATIONS_URL
