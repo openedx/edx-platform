@@ -1,1 +1,1 @@
-There was an error, try searching again.
+<%= gettext("There was an error, try searching again.") %>
