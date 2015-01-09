@@ -4,12 +4,10 @@ Basic unit tests for LibraryContentModule
 
 Higher-level tests are in `cms/djangoapps/contentstore/tests/test_libraries.py`.
 """
-import ddt
-from mock import patch
-from unittest import TestCase
 from bson.objectid import ObjectId
-
+from mock import patch
 from opaque_keys.edx.locator import LibraryLocator
+from unittest import TestCase
 
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime as VanillaRuntime
@@ -27,12 +25,12 @@ from xmodule.validation import StudioValidationMessage
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
-class BaseTestLibraryContainer(MixedSplitTestCase):
+class LibraryContentTest(MixedSplitTestCase):
     """
-    Base class for TestLibraryContainer and TestLibraryContainerRender
+    Base class for tests of LibraryContentModule (library_content_module.py)
     """
     def setUp(self):
-        super(BaseTestLibraryContainer, self).setUp()
+        super(LibraryContentTest, self).setUp()
 
         self.library = LibraryFactory.create(modulestore=self.store)
         self.lib_blocks = [
@@ -123,10 +121,9 @@ class BaseTestLibraryContainer(MixedSplitTestCase):
             )
 
 
-@ddt.ddt
-class TestLibraryContainer(BaseTestLibraryContainer):
+class TestLibraryContentModule(LibraryContentTest):
     """
-    Basic unit tests for LibraryContentModule (library_content_module.py)
+    Basic unit tests for LibraryContentModule
     """
     def test_lib_content_block(self):
         """
@@ -275,9 +272,9 @@ class TestLibraryContainer(BaseTestLibraryContainer):
 @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
 @patch('xmodule.html_module.HtmlModule.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
-class TestLibraryContentRender(BaseTestLibraryContainer):
+class TestLibraryContentRender(LibraryContentTest):
     """
-    Rendering unit tests for LibraryContentModule (library_content_module.py)
+    Rendering unit tests for LibraryContentModule
     """
     def test_preivew_view(self):
         """ Test preview view rendering """
