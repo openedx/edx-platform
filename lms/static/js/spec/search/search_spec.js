@@ -169,10 +169,13 @@ function($, Sinon, Backbone, TemplateHelpers) {
             };
             this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             this.server.respond();
-            expect(this.onSearch).toHaveBeenCalled();
-            expect(this.collection.totalCount).toEqual(1);
-            expect(this.collection.page).toEqual(0);
-            expect(this.collection.first().attributes).toEqual(response.results[0].data);
+            setTimeout(function () {
+                expect(this.onSearch).toHaveBeenCalled();
+                expect(this.collection.totalCount).toEqual(1);
+                expect(this.collection.accessDeniedCount).toEqual(1);
+                expect(this.collection.page).toEqual(0);
+                expect(this.collection.first().attributes).toEqual(response.results[0].data);
+            }, 0);
         });
 
         it('handles errors', function () {
