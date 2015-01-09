@@ -755,6 +755,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
 
     try:
         descriptor = modulestore().get_item(usage_key)
+        descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
             "Invalid location for course id {course_id}: {usage_key}".format(
@@ -768,8 +769,13 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     tracking_context = {
         'module': {
             'display_name': descriptor.display_name_with_default,
+            'usage_key': unicode(descriptor.location),
         }
     }
+    # For blocks that are inherited from a content library, we add some additional metadata:
+    if descriptor_orig_usage_key is not None:
+        tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
 
     field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
         course_id,
