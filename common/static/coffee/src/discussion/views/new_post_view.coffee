@@ -6,6 +6,7 @@ if Backbone?
           if @mode not in ["tab", "inline"]
               throw new Error("invalid mode: " + @mode)
           @course_settings = options.course_settings
+          @is_commentable_cohorted = options.is_commentable_cohorted
           @topicId = options.topicId
 
       render: () ->
@@ -13,15 +14,18 @@ if Backbone?
           _.extend(context, {
               cohort_options: @getCohortOptions(),
               mode: @mode,
+              is_commentable_cohorted: @is_commentable_cohorted,
               form_id: @mode + (if @topicId then "-" + @topicId else "")
           })
           @$el.html(_.template($("#new-post-template").html(), context))
           threadTypeTemplate = _.template($("#thread-type-template").html());
+          if $('.js-group-select').is(':disabled')
+              $('.group-selector-wrapper').hide()
           @addField(threadTypeTemplate({form_id: _.uniqueId("form-")}));
           if @isTabMode()
               @topicView = new DiscussionTopicMenuView {
                   topicId:  @topicId
-                  course_settings: @course_settings
+                  course_settings: @course_settings,
               }
               @topicView.on('thread:topic_change', @toggleGroupDropdown)
               @addField(@topicView.render())

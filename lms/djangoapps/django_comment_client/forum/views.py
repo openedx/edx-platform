@@ -13,7 +13,8 @@ import newrelic.agent
 from edxmako.shortcuts import render_to_response
 from courseware.courses import get_course_with_access
 from course_groups.cohorts import (is_course_cohorted, get_cohort_id, get_cohorted_threads_privacy,
-                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id)
+                                   get_cohorted_commentables, get_course_cohorts, get_cohort_by_id,
+                                   is_commentable_cohorted)
 from courseware.access import has_access
 
 from django_comment_client.permissions import cached_has_permission
@@ -163,6 +164,7 @@ def inline_discussion(request, course_id, discussion_id):
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, request.user, user_info)
     is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
     return utils.JsonResponse({
+        'is_commentable_cohorted': is_commentable_cohorted(course_id, discussion_id),
         'discussion_data': [utils.safe_content(thread, course_id, is_staff) for thread in threads],
         'user_info': user_info,
         'annotated_content_info': annotated_content_info,
