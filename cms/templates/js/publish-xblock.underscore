@@ -79,7 +79,7 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
         <% } %>
             <% if (hasContentGroupComponents) { %>
                 <p class="note-visibility">
-                    <i class="icon icon-eye-open"></i>
+                    <i class="icon fa fa-eye" aria-hidden="true"></i>
                     <span class="note-copy"><%= gettext("Some content in this unit is only visible to particular groups") %></span>
                 </p>
             <% } %>
@@ -87,9 +87,9 @@ var visibleToStaffOnly = visibilityState === 'staff_only';
             <li class="action-inline">
                 <a href="" class="action-staff-lock" role="button" aria-pressed="<%= hasExplicitStaffLock %>">
                 <% if (hasExplicitStaffLock) { %>
-                    <i class="icon fa fa-check-square-o"></i>
+                    <i class="icon fa fa-check-square-o" aria-hidden="true"></i>
                 <% } else { %>
-                    <i class="icon fa fa-square-o"></i>
+                    <i class="icon fa fa-square-o" aria-hidden="true"></i>
                 <% } %>
                 <%= gettext('Hide from students') %>
             </a>

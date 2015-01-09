@@ -27,8 +27,17 @@ is_staff_locked = ancestor_has_staff_lock(xblock)
         </div>
     % elif is_staff_locked:
         <div class="summary-message summary-message-warning visibility-summary-message">
-            <i class="icon icon-warning-sign"></i>
-            <p class="copy">${_('The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this.')}</p>
+            <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <p class="copy">
+                ## Translators: Any text between {screen_reader_start} and {screen_reader_end} is only read by screen readers and never shown in the browser.
+                ${_(
+                    "{screen_reader_start}Warning:{screen_reader_end} The Unit this component is contained in is hidden from students. Visibility settings here will be trumped by this."
+                    ).format(
+                        screen_reader_start='<span class="sr">',
+                        screen_reader_end='</span>',
+                    )
+                }
+            </p>
         </div>
     % endif
 </div>

@@ -1,10 +1,10 @@
-define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce', 'js/common_helpers/template_helpers'],
-    function (Backbone, $, ExpiryCouponView, TemplateHelpers) {
+define(['backbone', 'jquery', 'js/instructor_dashboard/ecommerce'],
+    function (Backbone, $, ExpiryCouponView) {
         'use strict';
-        var expiryCouponView, createExpiryCoupon;
+        var expiryCouponView;
         describe("edx.instructor_dashboard.ecommerce.ExpiryCouponView", function() {
             beforeEach(function() {
-                setFixtures('<li class="field full-width" id="add-coupon-modal-field-expiry"><input id="expiry-check" type="checkbox"/><label for="expiry-check"></label><input type="text" id="coupon_expiration_date" class="field" name="expiration_date" aria-required="true"/></li>')
+                setFixtures('<li class="field full-width" id="add-coupon-modal-field-expiry"><input id="expiry-check" type="checkbox"/><label for="expiry-check"></label><input type="text" id="coupon_expiration_date" class="field" name="expiration_date" aria-required="true"/></li>');
                 expiryCouponView = new ExpiryCouponView();
             });
 
