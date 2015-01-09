@@ -197,9 +197,7 @@ function() {
             var action = isMuted ? 'addClass' : 'removeClass';
 
             this.el[action]('is-muted').find('a i')
-                .removeClass('icon-volume-up')
-                .removeClass('icon-volume-off')
-                .removeClass('icon-volume-undefined')
+                .removeClass('icon-volume-up icon-volume-off icon-volume-undefined')
                 .addClass('icon-volume-' + volumeIcon);
         },
 

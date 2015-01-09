@@ -779,22 +779,21 @@ function (Sjson, AsyncProcess) {
                 type = 'hide_transcript';
                 state.captionsHidden = true;
                 state.el.addClass('closed');
-                text = gettext('Turn on captions');
+                // text = gettext('Turn on captions');
             } else {
                 type = 'show_transcript';
                 state.captionsHidden = false;
                 state.el.removeClass('closed');
                 this.scrollCaption();
-                text = gettext('Turn off captions');
+                // text = gettext('Turn off captions');
             }
 
             hideSubtitlesEl
-                .attr('title', gettext(text))
-                .removeClass('show_transcript')
-                .removeClass('hide_transcript')
+                .attr('title', text)
+                .removeClass('show_transcript hide_transcript')
                 .addClass(type)
-                .find('span')
-                .text(gettext(text));
+                .find('span');
+                // .text(text);
 
             if (state.videoPlayer) {
                 state.videoPlayer.log(type, {

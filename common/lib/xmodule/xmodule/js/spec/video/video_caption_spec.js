@@ -1066,7 +1066,7 @@
                     expect($('a.hide-subtitles'))
                         .toHaveAttr('title', 'Turn on captions');
                         .toHaveClass('hide_transcript');
-                        .toContain('i.icon.icon-quote-left');
+                        .toContain('icon-quote-left');
                 });
             });
 
@@ -1094,7 +1094,7 @@
                     expect($('a.hide-subtitles'))
                         .toHaveAttr('title', 'Turn off captions');
                         .toHaveClass('show_transcript');
-                        .toContain('i.icon.icon-quote-left');
+                        .toContain('icon-quote-left');
                 });
 
                 // Test turned off due to flakiness (11/25/13)
