@@ -186,7 +186,8 @@ FEATURES = {
 
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
-    # Is this an edX-owned domain? (used on instructor dashboard)
+
+    # Is this an edX-owned domain? (used for edX specific messaging and images)
     'IS_EDX_DOMAIN': False,
 
     # Toggle to enable certificates of courses on dashboard
