@@ -432,13 +432,13 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url("facebook", "account_login"),
                 "registerUrl": self._third_party_login_url("facebook", "account_register")
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url("google-oauth2", "account_login"),
                 "registerUrl": self._third_party_login_url("google-oauth2", "account_register")
             }
@@ -465,7 +465,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
                     "facebook", "account_login",
                     course_id=unicode(course.id),
@@ -479,7 +479,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
                     "google-oauth2", "account_login",
                     course_id=unicode(course.id),
@@ -513,7 +513,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
                     "facebook", "account_login",
                     course_id=unicode(course.id),
@@ -527,7 +527,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
                     "google-oauth2", "account_login",
                     course_id=unicode(course.id),

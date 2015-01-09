@@ -66,7 +66,7 @@
                     title: gettext('You currently have no cohort groups configured'),
                     actionText: gettext('Add Cohort Group'),
                     actionClass: 'action-create',
-                    actionIconClass: 'icon-plus'
+                    actionIconClass: 'fa-plus'
                 });
             }
         },

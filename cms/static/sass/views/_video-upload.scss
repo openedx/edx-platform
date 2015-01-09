@@ -1,5 +1,5 @@
 .view-video-uploads {
-  
+
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
   }
@@ -14,7 +14,7 @@
 
   .nav-actions {
 
-    .icon-cloud-upload {
+    .fa-cloud-upload {
       @extend %t-copy;
       vertical-align: bottom;
       margin-right: ($baseline/5);
