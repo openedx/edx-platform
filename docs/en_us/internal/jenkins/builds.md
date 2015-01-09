@@ -1,7 +1,7 @@
 ## Starting and checking the status of builds
 There are three ways that builds start in our jenkins testing infastructure for edx-platform.  
 
-##### 1) Automatic builds for Pull Requests
+##### 1) Automatically started builds for Pull Requests
 * Permissions Required: You must be a _public_ member of the [edx organization on github](https://github.com/orgs/edx/people).
   If you are not, someone will start a build for you during the pull request review process. You will still be able to
   view the build results as described below.
@@ -28,41 +28,18 @@ There are three ways that builds start in our jenkins testing infastructure for 
   >  ![Failed Tests](jenkins_images/failed_tests.png)  
   >* You can click on 'details' to take you to the jenkins build report.
     
-##### 2) Manually started builds for pull requests
 
-* Permissions Required: You must be a _public_ member of the [edx organization on github](https://github.com/orgs/edx/people).
-
-* How it gets started  
-
-  >1. Go to [edx-all-tests-manual-pr](https://jenkins.testeng.edx.org/job/edx-all-tests-manual-pr/)
-  >2. Make sure you are __logged in__. If you are already logged in, your username and a 'log out' link will be in the
-  >   upper right corner of the page. Else, the 'log in' link will be there.
-  >3. Click 'Build with Parameters' in the left navigation column.
-  >
-  >  ![Build with Params](jenkins_images/build_w_params.png)
-  >
-  >4. Enter the PR number from edx-platform that you want to test.
-  >5. Click on 'Build'.
-  
-* How it is reported  
-
-  >* This will be reported the same as Automatic builds for Pull Requests are. (See point 1 of this
-  >  section.)
-  >* When you start the build, it will redirect you to the log page.  You can watch this page for
-  >  results as well. 
-  
-##### 3) Manually started builds for commits
+##### 2) Manually started builds for commits or pull requests
 
 * Permissions Required: You must be a _public_ member of the [edx organization on github](https://github.com/orgs/edx/people).
 
 * How it gets started
   
-  >1. Go to [edx-all-tests-manual-commit](https://jenkins.testeng.edx.org/job/edx-all-tests-manual-commit/)
+  >1. Go to [https://build.testeng.edx.org/job/edx-platform-all-tests/build](https://build.testeng.edx.org/job/edx-platform-all-tests/build)
   >2. Make sure you are __logged in__. If you are already logged in, your username and a 'log out' link will be in the
   >   upper right corner of the page. Else, the 'log in' link will be there.
-  >3. Click 'Build with Parameters' in the left navigation column.
-  >4. Enter the commit hash that you want to test.
-  >5. Click on 'Build'.
+  >4. Enter either the commit hash or the pull request refspec that you want to test. Examples of valid refspecs are below the input field.
+  >5. Click 'Build'.
   
 * How it is reported
   
@@ -70,3 +47,8 @@ There are three ways that builds start in our jenkins testing infastructure for 
   >  results. 
   >* The results will also be reported to github, and will show up next to your commit on a PR or
   >  other places that the commit is listed (search results, etc.). 
+  >* If you started the build using a pull request refspec or the most recent commit hash on an open pull request, then it will be reported the same as automatic builds for pull requests. (See point 1 of this page.)
+
+##### 3) Automatically started builds for new commits to the 'master' branch
+* A build is started whenever there is a new commit on the 'master' branch.
+* To see recent builds of 'master' look at the [edx-platform-all-tests-master](https://build.testeng.edx.org/job/edx-platform-all-tests-master/) job
