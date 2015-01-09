@@ -44,9 +44,11 @@ var edx = edx || {};
                 tabName = tabElement.data('tab');
             event.preventDefault();
             this.$('.wrapper-tabs .tab').removeClass('is-selected');
+            this.$('.wrapper-tabs .tab').find('span.sr').remove();
             tabElement.addClass('is-selected');
+            tabElement.find('a').prepend('<span class="sr">' + gettext('Selected tab') + ' </span>');
             this.$('.tab-content').addClass('is-hidden');
-            this.$('.tab-content-' + tabName).removeClass('is-hidden');
+            this.$('.tab-content-' + tabName).removeClass('is-hidden').focus();
         },
 
         saveSettings: function(event) {

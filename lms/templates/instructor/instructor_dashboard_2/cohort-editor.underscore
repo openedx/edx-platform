@@ -1,6 +1,6 @@
 <section class="cohort-management-settings has-tabs">
     <header class="cohort-management-group-header">
-        <h3 class="group-header-title">
+        <h3 class="group-header-title" tabindex="-1">
             <span class="title-value"><%- cohort.get('name') %></span>
             <span class="group-count"><%-
                 interpolate(
@@ -29,11 +29,11 @@
     </header>
 
     <ul class="wrapper-tabs">
-        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><a href="#"><%- gettext("Manage Students") %></a></li>
+        <li class="tab tab-manage_students is-selected" data-tab="manage_students"><a href="#"><span class="sr"><%- gettext('Selected tab') %> </span><%- gettext("Manage Students") %></a></li>
         <li class="tab tab-settings" data-tab="settings"><a href="#"><%- gettext("Settings") %></a></li>
     </ul>
 
-    <div class="cohort-management-group-add tab-content tab-content-manage_students">
+    <div class="cohort-management-group-add tab-content tab-content-manage_students" tabindex="-1">
         <form action="" method="post" id="cohort-management-group-add-form" class="cohort-management-group-add-form">
 
             <h4 class="form-title"><%- gettext('Add students to this cohort') %></h4>
@@ -42,8 +42,8 @@
                 <p><%- gettext('Note: Students can be in only one cohort. Adding students to this group overrides any previous group assignment.') %></p>
             </div>
 
-            <div class="cohort-confirmations"></div>
-            <div class="cohort-errors"></div>
+            <div class="cohort-confirmations" aria-live="polite" tabindex="-1"></div>
+            <div class="cohort-errors" aria-live="polite" tabindex="-1"></div>
 
             <div class="form-fields">
                 <div class="field field-textarea is-required">
@@ -53,9 +53,10 @@
                     </label>
                     <textarea name="cohort-management-group-add-students" id="cohort-management-group-add-students"
                               class="input cohort-management-group-add-students"
-                              placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"></textarea>
+                              placeholder="<%- gettext('e.g. johndoe@example.com, JaneDoe, joeydoe@example.com') %>"
+                              aria-describedby="email-notification-tip"></textarea>
 
-                    <span class="tip"><%- gettext('You will not receive notification for emails that bounce, so double-check your spelling.') %></span>
+                    <span class="tip" id="email-notification-tip"><%- gettext('You will not receive notification for emails that bounce, so double-check your spelling.') %></span>
                 </div>
             </div>
 
@@ -67,6 +68,6 @@
         </form>
     </div>
 
-    <div class="cohort-management-details tab-content tab-content-settings is-hidden">
+    <div class="cohort-management-details tab-content tab-content-settings is-hidden" tabindex="-1">
     </div>
 </section>

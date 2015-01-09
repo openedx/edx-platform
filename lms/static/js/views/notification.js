@@ -18,6 +18,7 @@
                 actionClass: this.model.get("actionClass"),
                 actionIconClass: this.model.get("actionIconClass")
             }));
+            this.$('.message').focus();
             return this;
         },
 
