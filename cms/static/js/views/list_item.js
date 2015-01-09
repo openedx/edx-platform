@@ -2,7 +2,7 @@
  * A generic view to represent an editable item in a list.  The item
  * has a edit view and a details view.
  *
- * Children Must implement:
+ * Subclasses must implement:
  * - itemDisplayName (string): Display name for the list item.
  * - createEditView (function): Render and append the edit view to the
  *   DOM.
@@ -16,7 +16,7 @@ define([
 ) {
     'use strict';
 
-    var ListItem = BaseView.extend({
+    var ListItemView     = BaseView.extend({
         canDelete: false,
 
         initialize: function() {
@@ -54,7 +54,7 @@ define([
                 gettext('Delete'),
                 function() {
                     return ViewUtils.runOperationShowingMessage(
-                        gettext('Deleting') + '&hellip;',
+                        gettext('Deleting'),
                         function () {
                             return model.destroy({wait: true});
                         }
@@ -82,5 +82,5 @@ define([
         }
     });
 
-    return ListItem;
+    return ListItemView;
 });

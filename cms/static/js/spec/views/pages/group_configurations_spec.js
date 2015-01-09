@@ -35,9 +35,9 @@ define([
         beforeEach(function () {
             setFixtures(mockGroupConfigurationsPage);
             TemplateHelpers.installTemplates([
-                'no-group-configurations', 'group-configuration-edit',
+                'no-group-configurations', 'group-configuration-editor',
                 'group-configuration-details', 'add-list-item',
-                'no-content-groups', 'content-group-details', 'content-group-edit',
+                'no-content-groups', 'content-group-details', 'content-group-editor',
                 'group-edit'
             ]);
 

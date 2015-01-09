@@ -4,7 +4,7 @@ define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_
         initialize: function() {
             this.emptyTemplate = this.loadTemplate('no-textbooks');
             this.listenTo(this.collection, 'all', this.render);
-            this.listenTo(this.collection, 'destroy', this.handleDestroy);
+            this.listenTo(this.collection, 'destroy', this.onRemoveItem);
         },
         tagName: "div",
         className: "textbooks-list",
@@ -28,13 +28,13 @@ define(["js/views/baseview", "jquery", "js/views/edit_textbook", "js/views/show_
             return this;
         },
         events: {
-            "click .new-button": "addOne"
+            "click .new-button": "onAddItem"
         },
-        addOne: function(e) {
+        onAddItem: function(e) {
             if(e && e.preventDefault) { e.preventDefault(); }
             this.collection.add([{editing: true}]);
         },
-        handleDestroy: function(model, collection, options) {
+        onRemoveItem: function(model, collection, options) {
             collection.remove(model);
         }
     });

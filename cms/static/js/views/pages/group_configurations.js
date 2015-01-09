@@ -2,7 +2,7 @@ define([
     'jquery', 'underscore', 'gettext', 'js/views/pages/base_page',
     'js/views/group_configurations_list', 'js/views/content_group_list'
 ],
-function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
+function ($, _, gettext, BasePage, GroupConfigurationsListView, ContentGroupListView) {
     'use strict';
     var GroupConfigurationsPage = BasePage.extend({
         initialize: function(options) {
@@ -10,12 +10,12 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
             this.experimentsEnabled = options.experimentsEnabled;
             if (this.experimentsEnabled) {
                 this.experimentGroupConfigurations = options.experimentGroupConfigurations;
-                this.experimentGroupsListView = new GroupConfigurationsList({
+                this.experimentGroupsListView = new GroupConfigurationsListView({
                     collection: this.experimentGroupConfigurations
                 });
             }
             this.contentGroupConfiguration = options.contentGroupConfiguration;
-            this.cohortGroupsListView = new GroupList({
+            this.cohortGroupsListView = new ContentGroupListView({
                 collection: this.contentGroupConfiguration.get('groups')
             });
         },

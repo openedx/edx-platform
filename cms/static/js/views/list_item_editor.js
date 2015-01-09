@@ -1,7 +1,7 @@
 /**
  * A generic view to represent a list item in its editing state.
  *
- * Children must implement:
+ * Subclasses must implement:
  * - getTemplateOptions (function): Return an object to pass to the
  *   template.
  * - setValues (function): Set values on the model according to the
@@ -12,9 +12,9 @@
 define([
     'js/views/baseview', 'js/views/utils/view_utils', 'underscore', 'gettext'
 ], function(BaseView, ViewUtils, _, gettext) {
-	'use strict';
+    'use strict';
 
-    var ListItemEdit = BaseView.extend({
+    var ListItemEditor = BaseView.extend({
         initialize: function() {
             this.listenTo(this.model, 'invalid', this.render);
         },
@@ -34,7 +34,7 @@ define([
             }
 
             ViewUtils.runOperationShowingMessage(
-                gettext('Saving') + '&hellip;',
+                gettext('Saving'),
                 function () {
                     var dfd = $.Deferred();
                     var actionableModel = this.getSaveableModel();
@@ -72,5 +72,5 @@ define([
         }
     });
 
-	return ListItemEdit;
+    return ListItemEditor;
 });

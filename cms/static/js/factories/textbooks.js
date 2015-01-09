@@ -8,7 +8,7 @@ define([
 
         $('.content-primary').append(tbView.render().el);
         $('.nav-actions .new-button').click(function(event) {
-            tbView.addOne(event);
+            tbView.onAddItem(event);
         });
         $(window).on('beforeunload', function() {
             var dirty = textbooks.find(function(textbook) { return textbook.isDirty(); });

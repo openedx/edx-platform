@@ -16,16 +16,16 @@ define([
     'js/views/baseview'
 ], function(BaseView) {
     'use strict';
-    var List = BaseView.extend({
+    var ListView = BaseView.extend({
         events: {
-            'click .action-add': 'addOne',
-            'click .new-button': 'addOne'
+            'click .action-add': 'onAddItem',
+            'click .new-button': 'onAddItem'
         },
 
         initialize: function() {
             this.emptyTemplate = this.loadTemplate(this.emptyTemplateName);
             this.listenTo(this.collection, 'add', this.addNewItemView);
-            this.listenTo(this.collection, 'remove', this.handleDestory);
+            this.listenTo(this.collection, 'remove', this.onRemoveItem);
             this.template = this.loadTemplate('add-list-item');
 
             // Don't render the add button when editing a form
@@ -90,17 +90,17 @@ define([
             view.$el.focus();
         },
 
-        addOne: function(event) {
+        onAddItem: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.collection.add({editing: true}, this.newModelOptions);
         },
 
-        handleDestory: function () {
+        onRemoveItem: function () {
             if (this.collection.length === 0) {
                 this.$el.html(this.emptyTemplate());
             }
         }
     });
 
-    return List;
+    return ListView;
 });

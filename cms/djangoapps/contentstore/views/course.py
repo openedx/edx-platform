@@ -15,6 +15,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
+from util.db import generate_int_id, MYSQL_MAX_INT
 from edxmako.shortcuts import render_to_response
 
 from xmodule.course_module import DEFAULT_START_DATE
@@ -70,6 +71,11 @@ from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 from xmodule.split_test_module import get_split_user_partitions
 
+MINIMUM_GROUP_ID = 100
+
+CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can be mapped to cohort groups in the LMS.'
+
+CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
 
 __all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
            'course_rerun_handler',
@@ -1187,26 +1193,6 @@ class GroupConfiguration(object):
         if len(self.configuration.get('groups', [])) < 1:
             raise GroupConfigurationsValidationError(_("must have at least one group"))
 
-    @staticmethod
-    def generate_id(used_ids):
-        """
-        Generate unique id for the group configuration.
-        If this id is already used, we generate new one.
-        """
-        def random_sql_int():
-            """
-            Generate a random number that can fit in a MySQL INT
-            field, since group and group configuration IDs are stored
-            in the `CourseUserGroupPartitionGroup` table.
-            """
-            return random.randrange(100, 2 ** 31)
-        cid = random_sql_int()
-
-        while cid in used_ids:
-            cid = random_sql_int()
-
-        return cid
-
     def assign_id(self, configuration_id=None):
         """
         Assign id for the json representation of group configuration.
@@ -1214,7 +1200,9 @@ class GroupConfiguration(object):
         if configuration_id:
             self.configuration['id'] = int(configuration_id)
         else:
-            self.configuration['id'] = GroupConfiguration.generate_id(GroupConfiguration.get_used_ids(self.course))
+            self.configuration['id'] = generate_int_id(
+                MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(self.course)
+            )
 
     def assign_group_ids(self):
         """
@@ -1224,7 +1212,7 @@ class GroupConfiguration(object):
         # Assign ids to every group in configuration.
         for group in self.configuration.get('groups', []):
             if group.get('id') is None:
-                group["id"] = GroupConfiguration.generate_id(used_ids)
+                group["id"] = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, used_ids)
                 used_ids.append(group["id"])
 
     @staticmethod
@@ -1251,8 +1239,6 @@ class GroupConfiguration(object):
     @staticmethod
     def get_split_test_partitions_with_usage(course, store):
         """
-        Add usage information to group configurations jsons that can be used by split_test.
-
         Returns json split_test group configurations updated with usage information.
         """
         usage_info = GroupConfiguration.get_usage_info(course, store)
@@ -1343,9 +1329,9 @@ class GroupConfiguration(object):
         content_group_configuration = get_cohorted_user_partition(course.id)
         if content_group_configuration is None:
             content_group_configuration = UserPartition(
-                id=GroupConfiguration.generate_id(GroupConfiguration.get_used_ids(course)),
-                name='Content Group Configuration',
-                description='The groups in this configuration can be mapped to cohort groups in the LMS.',
+                id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
+                name=CONTENT_GROUP_CONFIGURATION_NAME,
+                description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
                 groups=[],
                 scheme_id='cohort'
             )
@@ -1372,7 +1358,7 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            should_show_experiment_groups = should_show_experiment_group_configurations(course)
+            should_show_experiment_groups = has_course_enabled_content_experiments(course)
             experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
             content_group_configuration = GroupConfiguration.get_or_create_content_group_configuration(
                 course
@@ -1462,7 +1448,7 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             return JsonResponse(status=204)
 
 
-def should_show_experiment_group_configurations(course):
+def has_course_enabled_content_experiments(course):
     """
     Returns True if Studio should show the "Experiment Group
     Configurations" section on the "Group Configurations" page for the

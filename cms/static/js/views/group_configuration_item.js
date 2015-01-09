@@ -1,11 +1,17 @@
+/**
+ * This class defines an controller view for content experiment group configurations.
+ * It renders an editor view or a details view depending on the state
+ * of the underlying model.
+ * It is expected to be backed by a Group model.
+ */
 define([
-    'js/views/list_item', 'js/views/group_configuration_details', 'js/views/group_configuration_edit'
+    'js/views/list_item', 'js/views/group_configuration_details', 'js/views/group_configuration_editor'
 ], function(
-    ListItem, GroupConfigurationDetails, GroupConfigurationEdit
+    ListItemView, GroupConfigurationDetailsView, GroupConfigurationEditorView
 ) {
     'use strict';
 
-    var GroupConfigurationsItem = ListItem.extend({
+    var GroupConfigurationItemView = ListItemView.extend({
         events: {
             'click .delete': 'deleteItem'
         },
@@ -24,13 +30,13 @@ define([
         canDelete: true,
 
         createEditView: function() {
-            return new GroupConfigurationEdit({model: this.model});
+            return new GroupConfigurationEditorView({model: this.model});
         },
 
         createDetailsView: function() {
-            return new GroupConfigurationDetails({model: this.model});
+            return new GroupConfigurationDetailsView({model: this.model});
         }
     });
 
-    return GroupConfigurationsItem;
+    return GroupConfigurationItemView;
 });

@@ -1,19 +1,25 @@
+/**
+ * This class defines an controller view for content groups.
+ * It renders an editor view or a details view depending on the state
+ * of the underlying model.
+ * It is expected to be backed by a Group model.
+ */
 define([
-    'js/views/list_item', 'js/views/content_group_edit', 'js/views/content_group_details'
-], function(ListItem, GroupItemEdit, GroupDetails) {
+    'js/views/list_item', 'js/views/content_group_editor', 'js/views/content_group_details'
+], function(ListItemView, ContentGroupEditorView, ContentGroupDetailsView) {
     'use strict';
 
-    var ContentGroupItem = ListItem.extend({
-        tagName: 'section', // TODO: confirm class and tag
+    var ContentGroupItemView = ListItemView.extend({
+        tagName: 'section',
 
         createEditView: function() {
-            return new GroupItemEdit({model: this.model});
+            return new ContentGroupEditorView({model: this.model});
         },
 
         createDetailsView: function() {
-            return new GroupDetails({model: this.model});
+            return new ContentGroupDetailsView({model: this.model});
         }
     });
 
-    return ContentGroupItem;
+    return ContentGroupItemView;
 });

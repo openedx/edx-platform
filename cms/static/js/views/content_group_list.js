@@ -1,9 +1,13 @@
+/**
+ * This class defines a list view for content groups.
+ * It is expected to be backed by a Group collection.
+ */
 define([
     'js/views/list', 'js/views/content_group_item', 'gettext'
-], function(ListView, GroupItemView, gettext) {
+], function(ListView, ContentGroupItemView, gettext) {
     'use strict';
 
-    var ContentGroupList = ListView.extend({
+    var ContentGroupListView = ListView.extend({
         tagName: 'div',
 
         className: 'group-configurations-list',
@@ -14,9 +18,9 @@ define([
         itemCategoryDisplayName: gettext('content group'),
 
         createItemView: function(options) {
-            return new GroupItemView(options);
+            return new ContentGroupItemView(options);
         }
     });
 
-    return ContentGroupList;
+    return ContentGroupListView;
 });

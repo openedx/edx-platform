@@ -1,9 +1,13 @@
+/**
+ * This class defines a list view for content experiment group configurations.
+ * It is expected to be backed by a GroupConfiguration collection.
+ */
 define([
     'js/views/list', 'js/views/group_configuration_item', 'gettext'
 ], function(ListView, GroupConfigurationItemView, gettext) {
     'use strict';
 
-    var GroupConfigurationsList = ListView.extend({
+    var GroupConfigurationsListView = ListView.extend({
         tagName: 'div',
 
         className: 'group-configurations-list',
@@ -20,5 +24,5 @@ define([
         }
     });
 
-    return GroupConfigurationsList;
+    return GroupConfigurationsListView;
 });

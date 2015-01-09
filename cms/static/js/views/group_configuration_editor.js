@@ -1,10 +1,14 @@
+/**
+ * This class defines an editing view for content experiment group configurations.
+ * It is expected to be backed by a GroupConfiguration model.
+ */
 define([
-    'js/views/list_item_edit', 'underscore', 'jquery', 'gettext',
-    'js/views/group_edit', 'js/views/utils/view_utils'
+    'js/views/list_item_editor', 'underscore', 'jquery', 'gettext',
+    'js/views/group_edit'
 ],
-function(ListItemEdit, _, $, gettext, GroupEdit, ViewUtils) {
+function(ListItemEditor, _, $, gettext, GroupEditView) {
     'use strict';
-    var GroupConfigurationEdit = ListItemEdit.extend({
+    var GroupConfigurationEditorView = ListItemEditor.extend({
         tagName: 'div',
         events: {
             'change .group-configuration-name-input': 'setName',
@@ -28,16 +32,16 @@ function(ListItemEdit, _, $, gettext, GroupEdit, ViewUtils) {
         initialize: function() {
             var groups = this.model.get('groups');
 
-            ListItemEdit.prototype.initialize.call(this);
+            ListItemEditor.prototype.initialize.call(this);
 
-            this.template = this.loadTemplate('group-configuration-edit');
-            this.listenTo(groups, 'add', this.addOne);
+            this.template = this.loadTemplate('group-configuration-editor');
+            this.listenTo(groups, 'add', this.onAddItem);
             this.listenTo(groups, 'reset', this.addAll);
             this.listenTo(groups, 'all', this.render);
         },
 
         render: function() {
-            ListItemEdit.prototype.render.call(this);
+            ListItemEditor.prototype.render.call(this);
             this.addAll();
             return this;
         },
@@ -57,15 +61,15 @@ function(ListItemEdit, _, $, gettext, GroupEdit, ViewUtils) {
             return this.model;
         },
 
-        addOne: function(group) {
-            var view = new GroupEdit({ model: group });
+        onAddItem: function(group) {
+            var view = new GroupEditView({ model: group });
             this.$('ol.groups').append(view.render().el);
 
             return this;
         },
 
         addAll: function() {
-            this.model.get('groups').each(this.addOne, this);
+            this.model.get('groups').each(this.onAddItem, this);
         },
 
         createGroup: function(event) {
@@ -112,5 +116,5 @@ function(ListItemEdit, _, $, gettext, GroupEdit, ViewUtils) {
         }
     });
 
-    return GroupConfigurationEdit;
+    return GroupConfigurationEditorView;
 });

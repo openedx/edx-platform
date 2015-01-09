@@ -5,7 +5,7 @@ define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "j
             this.template = this.loadTemplate('edit-textbook');
             this.listenTo(this.model, "invalid", this.render);
             var chapters = this.model.get('chapters');
-            this.listenTo(chapters, "add", this.addOne);
+            this.listenTo(chapters, "add", this.onAddItem);
             this.listenTo(chapters, "reset", this.addAll);
             this.listenTo(chapters, "all", this.render);
         },
@@ -25,13 +25,13 @@ define(["js/views/baseview", "underscore", "jquery", "js/views/edit_chapter", "j
             "click .action-cancel": "cancel",
             "click .action-add-chapter": "createChapter"
         },
-        addOne: function(chapter) {
+        onAddItem: function(chapter) {
             var view = new EditChapterView({model: chapter});
             this.$("ol.chapters").append(view.render().el);
             return this;
         },
         addAll: function() {
-            this.model.get('chapters').each(this.addOne, this);
+            this.model.get('chapters').each(this.onAddItem, this);
         },
         createChapter: function(e) {
             if(e && e.preventDefault) { e.preventDefault(); }
