@@ -803,6 +803,7 @@ def _get_module_by_usage_id(request, course_id, usage_id):
 
     try:
         descriptor = modulestore().get_item(usage_key)
+        descriptor_orig_usage_key, descriptor_orig_version = modulestore().get_block_original_usage(usage_key)
     except ItemNotFoundError:
         log.warn(
             "Invalid location for course id {course_id}: {usage_key}".format(
@@ -824,7 +825,7 @@ def _get_module_by_usage_id(request, course_id, usage_id):
         log.debug("No module %s for user %s -- access denied?", usage_key, user)
         raise Http404
 
-    return instance
+    return instance, descriptor_orig_usage_key, descriptor_orig_version
 
 
 def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
@@ -846,7 +847,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     if error_msg:
         return HttpResponse(json.dumps({'success': error_msg}))
 
-    instance = _get_module_by_usage_id(request, course_id, usage_id)
+    instance, descriptor_orig_usage_key, descriptor_orig_version = _get_module_by_usage_id(request, course_id, usage_id)
 
     tracking_context_name = 'module_callback_handler'
     tracking_context = {
@@ -854,6 +855,10 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
             'display_name': instance.display_name_with_default,
         }
     }
+    # For blocks that are inherited from a content library, we add some additional metadata:
+    if descriptor_orig_usage_key is not None:
+        tracking_context['module']['original_usage_key'] = unicode(descriptor_orig_usage_key)
+        tracking_context['module']['original_usage_version'] = unicode(descriptor_orig_version)
 
     req = django_to_webob_request(request)
     try:
@@ -905,7 +910,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    instance = _get_module_by_usage_id(request, course_id, usage_id)
+    instance, _, __ = _get_module_by_usage_id(request, course_id, usage_id)
 
     try:
         fragment = instance.render(view_name, context=request.GET)
