@@ -19,6 +19,17 @@ The core mission of edX is to expand access to education for everyone. We expect
 
 These are just a few core concepts developers need to keep in mind when developing user interfaces that work for everyone. More information is available from the W3C's Web Accessibility Initiative's `How People with Disabilities Use the Web: Overview <http://www.w3.org/WAI/intro/people-use-web/Overview.html>`_.
 
+Use semantic markup
+*******************
+
+The role, state and associated properties of an element are exposed to users of Assistive Technology either directly through the DOM or through the Accessibility API. Using elements for purposes other than the ones they are intended for have the consequence of falsely reporting the role, state and associated properties of the element to these users. This breaks features designed to make web apps easier to use and can often result in confusion when expected behaviors are not available.
+
+If the semantics and behavior you need already exist in a native HTML5 element, you should use that element:  
+
+* If you want a button, use the ``<button>`` element and not a ``<div>`` that looks and behaves like a button. 
+* If you want a checkbox, you should use an ``<input type=checkbox>`` and not try to recreate the states and properties you get with the native element for free. Chances are, you will not fully replicate all of them, i.e. making it focusable, toggling its checked state upon ``space`` or ``enter`` keypresses, exposing its label and  "`checkedness <http://www.w3.org/TR/html5/forms.html#concept-fe-checked>`_" to the Accessibility API (did you know a checkbox can be in an intermediate state?)
+* Are you really marking up a list of items, or are you using an ``<ul>`` as a styling hook?
+
 Make Your Images Accessible
 ***************************
 
@@ -48,17 +59,6 @@ All form elements must have labels, either using the `label element <http://www.
 Sighted users have the benefit of visual context. It's often quite obvious what text identifies the purpose of a given form field based on physical proximity or other visual cues. However, to a user with a vision impairment, who does not have the benefit of visual context, these relationships are not obvious. Users who rely on speech to interact with their computers also need a label for addressing form elements. Correctly using the ``<label>`` element programmatically associates text with a given form element, which can be spoken to the user upon focus, or used to address the form element.
 
 *Protip:* Screen reader users often enter "forms processing mode" when they encounter a form. This temporarily disables all of the keyboard shortcuts available to them so key presses are actually passed through to the control, with the exception of ``TAB`` which will move focus from one form field to the next. This means that context sensitive help provided for form fields (like help text adjacent to the form field) is not likely to be encountered by these users. Add an `aria-describedby <http://www.w3.org/TR/wai-aria/states_and_properties#aria-describedby>`_ attribute to the input referencing this text. This programmatically links the text to the form control so the user can access it while in forms processing mode.
-
-Use semantic markup
-*******************
-
-The role, state and associated properties of an element are exposed to users of Assistive Technology either directly through the DOM or through the Accessibility API. Using elements for purposes other than the ones they are intended for have the consequence of falsely reporting the role, state and associated properties of the element to these users. This breaks features designed to make web apps easier to use and can often result in confusion when expected behaviors are not available.
-
-If the semantics and behavior you need already exist in a native HTML5 element, you should use that element:  
-
-* If you want a button, use the ``<button>`` element and not a ``<div>`` that looks and behaves like a button. 
-* If you want a checkbox, you should use an ``<input type=checkbox>`` and not try to recreate the states and properties you get with the native element for free. Chances are, you will not fully replicate all of them, i.e. making it focusable, toggling its checked state upon ``space`` or ``enter`` keypresses, exposing its label and  "`checkedness <http://www.w3.org/TR/html5/forms.html#concept-fe-checked>`_" to the Accessibility API (did you know a checkbox can be in an intermediate state?)
-* Are you really marking up a list of items, or are you using an ``<ul>`` as a styling hook?
 
 Use WAI-ARIA to create accessible widgets or enhance native elements
 ********************************************************************
