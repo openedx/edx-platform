@@ -9,14 +9,14 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
             BasePage.prototype.initialize.call(this);
             this.experimentsEnabled = options.experimentsEnabled;
             if (this.experimentsEnabled) {
-                this.experimentGroupsCollection = options.experimentGroupsCollection;
+                this.experimentGroupConfigurations = options.experimentGroupConfigurations;
                 this.experimentGroupsListView = new GroupConfigurationsList({
-                    collection: this.experimentGroupsCollection
+                    collection: this.experimentGroupConfigurations
                 });
             }
-            this.cohortGroupConfiguration = options.cohortGroupConfiguration;
+            this.contentGroupConfiguration = options.contentGroupConfiguration;
             this.cohortGroupsListView = new GroupList({
-                collection: this.cohortGroupConfiguration.get('groups')
+                collection: this.contentGroupConfiguration.get('groups')
             });
         },
 
@@ -39,8 +39,8 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
         },
 
         onBeforeUnload: function () {
-            var dirty = this.cohortGroupConfiguration.isDirty() ||
-                (this.experimentsEnabled && this.experimentGroupsCollection.find(function(configuration) {
+            var dirty = this.contentGroupConfiguration.isDirty() ||
+                (this.experimentsEnabled && this.experimentGroupConfigurations.find(function(configuration) {
                     return configuration.isDirty();
                 }));
 
@@ -62,7 +62,7 @@ function ($, _, gettext, BasePage, GroupConfigurationsList, GroupList) {
          * @param {String|Number} Id of the group configuration.
          */
         expandConfiguration: function (id) {
-            var groupConfig = this.experimentsEnabled && this.experimentGroupsCollection.findWhere({
+            var groupConfig = this.experimentsEnabled && this.experimentGroupConfigurations.findWhere({
                 id: parseInt(id)
             });
 

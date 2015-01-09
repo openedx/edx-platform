@@ -2,18 +2,21 @@ define([
     'js/collections/group_configuration', 'js/models/group_configuration', 'js/views/pages/group_configurations'
 ], function(GroupConfigurationCollection, GroupConfigurationModel, GroupConfigurationsPage) {
     'use strict';
-    return function (experimentsEnabled, experimentConfigurations, cohortConfiguration, groupConfigurationUrl, courseOutlineUrl) {
-        var experimentGroupsCollection = new GroupConfigurationCollection(experimentConfigurations, {parse: true}),
-            cohortGroupConfiguration = new GroupConfigurationModel(cohortConfiguration, {parse: true});
+    return function (experimentsEnabled, experimentGroupConfigurationsJson, contentGroupConfigurationJson,
+                     groupConfigurationUrl, courseOutlineUrl) {
+        var experimentGroupConfigurations = new GroupConfigurationCollection(
+                experimentGroupConfigurationsJson, {parse: true}
+            ),
+            contentGroupConfiguration = new GroupConfigurationModel(contentGroupConfigurationJson, {parse: true});
 
-        experimentGroupsCollection.url = groupConfigurationUrl;
-        cohortGroupConfiguration.urlRoot = groupConfigurationUrl;
-        experimentGroupsCollection.outlineUrl = courseOutlineUrl;
+        experimentGroupConfigurations.url = groupConfigurationUrl;
+        experimentGroupConfigurations.outlineUrl = courseOutlineUrl;
+        contentGroupConfiguration.urlRoot = groupConfigurationUrl;
         new GroupConfigurationsPage({
             el: $('#content'),
             experimentsEnabled: experimentsEnabled,
-            experimentGroupsCollection: experimentGroupsCollection,
-            cohortGroupConfiguration: cohortGroupConfiguration
+            experimentGroupConfigurations: experimentGroupConfigurations,
+            contentGroupConfiguration: contentGroupConfiguration
         }).render();
     };
 });
