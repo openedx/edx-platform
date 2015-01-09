@@ -10,17 +10,17 @@ from django.core.urlresolvers import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.conf import settings
+from datetime import datetime
+from mock import patch
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase, mixed_store_config
 )
 from xmodule.modulestore.tests.factories import CourseFactory, CourseAboutFactory
 from student.tests.factories import UserFactory
-from util.parsing_utils import course_image_url
+from course_about.serializers import course_image_url
 from course_about import api
 from course_about.errors import CourseNotFoundError, CourseAboutError
-from mock import patch
 from xmodule.modulestore.django import modulestore
-from datetime import datetime
 
 # Since we don't need any XML course fixtures, use a modulestore configuration
 # that disables the XML modulestore.

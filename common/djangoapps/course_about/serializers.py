@@ -16,7 +16,6 @@ def serialize_content(course_descriptor, about_descriptor):
     """
     data = {
         'media': {},
-        "course_id": unicode(course_descriptor.id),
         'display_name': getattr(course_descriptor, 'display_name', None),
         'course_number': course_descriptor.location.course,
         'course_id': None,
@@ -28,8 +27,11 @@ def serialize_content(course_descriptor, about_descriptor):
         'effort': about_descriptor.get("effort", None)
 
     }
+
+    content_id = unicode(course_descriptor.id)
+    data["course_id"] = unicode(content_id)
     if getattr(course_descriptor, 'course_image', False):
-        data['media']['image'] = _course_image_url(course_descriptor)
+        data['media']['course_image'] = course_image_url(course_descriptor)
 
     start = getattr(course_descriptor, 'start', None)
     end = getattr(course_descriptor, 'end', None)
@@ -42,7 +44,7 @@ def serialize_content(course_descriptor, about_descriptor):
     return data
 
 
-def _course_image_url(course):
+def course_image_url(course):
     """
     Return url of course image.
     Args:
