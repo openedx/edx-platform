@@ -86,7 +86,7 @@
           <li class="req req-0 req-activate">
             <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-envelope-o"></i>
+              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
             </div>
 
             <div class="copy">
@@ -104,8 +104,8 @@
           <li class="req req-1 req-id">
             <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
             <div class="placeholder-art fa-lg">
-              <i class="icon fa fa-list-alt fa-stack-2x"></i>
-              <i class="icon fa fa-user id-photo fa-stack-1x"></i>
+              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
+              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
             </div>
 
             <div class="copy">
@@ -120,7 +120,7 @@
           <li class="req req-2 req-webcam">
             <h4 class="title"><%- gettext( "Webcam" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-video-camera"></i>
+              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
             </div>
 
             <div class="copy"></div>
@@ -131,6 +131,11 @@
     </div>
 
     <nav class="nav-wizard is-ready">
+
+      <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity." ), { platformName: platformName } ) %>">
+        <%- gettext( "Want to confirm your identity later?" ) %>
+      </a>
+
       <a id="verify_now_button"
          class="next action-primary right"
          href="<%- _.sprintf( '/verify_student/verify-now/%(courseKey)s', { courseKey: courseKey } ) %>"
@@ -139,10 +144,6 @@
           gettext( "Next: %(nextStepTitle)s" ),
           { nextStepTitle: nextStepTitle }
         ) %>
-      </a>
-
-      <a id="verify_later_button" class="next action-secondary verify-later nav-link" href="/dashboard" data-tooltip="<%- _.sprintf( gettext( "If you don't verify your identity now, you can still explore your course from your dashboard. You will receive periodic reminders from %(platformName)s to verify your identity." ), { platformName: platformName } ) %>">
-        <%- gettext( "Want to confirm your identity later?" ) %>
       </a>
     </nav>
     <% } %>

@@ -26,7 +26,7 @@
           <li class="req req-0 req-activate">
             <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-envelope-o"></i>
+              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
             </div>
 
             <div class="copy">
@@ -40,8 +40,8 @@
           <li class="req req-1 req-id">
             <h4 class="title"><%- gettext( "Photo ID" ) %></h4>
             <div class="placeholder-art fa-lg">
-              <i class="icon fa fa-list-alt fa-stack-2x"></i>
-              <i class="icon fa fa-user id-photo fa-stack-1x"></i>
+              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
+              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
             </div>
 
             <div class="copy">
@@ -56,7 +56,7 @@
           <li class="req req-2 req-webcam">
             <h4 class="title"><%- gettext( "Webcam" ) %></h4>
             <div class="placeholder-art">
-              <i class="icon fa fa-video-camera"></i>
+              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
             </div>
 
             <div class="copy"></div>
