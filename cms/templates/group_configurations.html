@@ -20,7 +20,7 @@
 
 <%block name="requirejs">
   require(["js/factories/group_configurations"], function(GroupConfigurationsFactory) {
-      GroupConfigurationsFactory(${json.dumps(should_show_experiment_groups)}, ${json.dumps(experiment_configurations)}, ${json.dumps(cohort_configuration)}, "${group_configuration_url}", "${course_outline_url}");
+      GroupConfigurationsFactory(${json.dumps(should_show_experiment_groups)}, ${json.dumps(experiment_group_configurations)}, ${json.dumps(content_group_configuration)}, "${group_configuration_url}", "${course_outline_url}");
   });
 </%block>
 
@@ -47,7 +47,7 @@
       % if should_show_experiment_groups:
         <div class="wrapper-groups experiment-groups">
           <h3 class="title">${_("Experiment Group Configurations")}</h3>
-          % if experiment_configurations is None:
+          % if experiment_group_configurations is None:
             <div class="notice notice-incontext notice-moduledisabled">
                 <p class="copy">
                     ${_("This module is disabled at the moment.")}

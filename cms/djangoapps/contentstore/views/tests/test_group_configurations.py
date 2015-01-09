@@ -207,7 +207,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'First name')
         self.assertContains(response, 'Group C')
-        self.assertContains(response, 'Cohort Group Configuration')
+        self.assertContains(response, 'Content Group Configuration')
 
     def test_unsupported_http_accept_header(self):
         """
@@ -235,7 +235,7 @@ class GroupConfigurationsListHandlerTestCase(CourseTestCase, GroupConfigurations
         }
         response = self.client.ajax_post(
             self._url(),
-            data=json.dumps(GROUP_CONFIGURATION_JSON)
+            data=GROUP_CONFIGURATION_JSON
         )
         self.assertEqual(response.status_code, 201)
         self.assertIn("Location", response)

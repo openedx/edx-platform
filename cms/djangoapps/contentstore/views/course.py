@@ -1332,7 +1332,7 @@ class GroupConfiguration(object):
         return configuration_json
 
     @staticmethod
-    def get_or_create_cohorted_user_partition(course, store, user_id):
+    def get_or_create_content_group_configuration(course):
         """
         Returns the first user partition from the course which uses the
         CohortPartitionScheme, or generates one if no such partition is
@@ -1340,16 +1340,16 @@ class GroupConfiguration(object):
         the client explicitly creates a group within the partition and
         POSTs back.
         """
-        cohorted_partition = get_cohorted_user_partition(course.id)
-        if cohorted_partition is None:
-            cohorted_partition = UserPartition(
+        content_group_configuration = get_cohorted_user_partition(course.id)
+        if content_group_configuration is None:
+            content_group_configuration = UserPartition(
                 id=GroupConfiguration.generate_id(GroupConfiguration.get_used_ids(course)),
-                name='Cohort Group Configuration',  # TODO: confirm w/ doc/prod -- translate? (below as well)?
+                name='Content Group Configuration',
                 description='The groups in this configuration can be mapped to cohort groups in the LMS.',
                 groups=[],
                 scheme_id='cohort'
             )
-        return cohorted_partition
+        return content_group_configuration
 
 
 @require_http_methods(("GET", "POST"))
@@ -1372,18 +1372,18 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            should_show_experiment_groups = should_show_content_experiment_groups(course)
-            random_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
-            cohort_configuration = GroupConfiguration.get_or_create_cohorted_user_partition(
-                course, store, request.user.id
+            should_show_experiment_groups = should_show_experiment_group_configurations(course)
+            experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
+            content_group_configuration = GroupConfiguration.get_or_create_content_group_configuration(
+                course
             ).to_json()
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'experiment_configurations': random_configurations if should_show_experiment_groups else None,
+                'experiment_group_configurations': experiment_group_configurations if should_show_experiment_groups else None,
                 'should_show_experiment_groups': should_show_experiment_groups,
-                'cohort_configuration': cohort_configuration
+                'content_group_configuration': content_group_configuration
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
@@ -1462,9 +1462,11 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             return JsonResponse(status=204)
 
 
-def should_show_content_experiment_groups(course):
+def should_show_experiment_group_configurations(course):
     """
-    Returns true if Studio should show the "Group Configurations" page for the specified course.
+    Returns True if Studio should show the "Experiment Group
+    Configurations" section on the "Group Configurations" page for the
+    specified course.
     """
     return (
         SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and
