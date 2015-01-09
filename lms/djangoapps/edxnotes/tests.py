@@ -445,8 +445,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
         self.assertItemsEqual(
             [{
-                u"quote": u"test &lt;script&gt;alert(&#39;test&#39;)&lt;/script&gt;",
-                u"text": u"text &#34;&lt;&gt;&amp;&#39;",
+                u"quote": u"test &lt;script&gt;alert('test')&lt;/script&gt;",
+                u"text": u'text "&lt;&gt;&amp;\'',
                 u"chapter": {
                     u"display_name": self.chapter.display_name_with_default,
                     u"index": 0,
@@ -679,6 +679,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 "user": "anonymous_id",
                 "course_id": unicode(self.course.id),
                 "text": "text",
+                "highlight": True,
+                "highlight_tag": "span",
+                "highlight_class": "note-highlight",
             }
         )
 

@@ -2,7 +2,7 @@
 'use strict';
 define([
     'gettext', 'js/edxnotes/views/tab_panel', 'js/edxnotes/views/tab_view',
-    'js/edxnotes/views/search_box', 'jquery.highlight'
+    'js/edxnotes/views/search_box'
 ], function (gettext, TabPanelView, TabView, SearchBoxView) {
     var SearchResultsView = TabView.extend({
         PanelConstructor: TabPanelView.extend({
@@ -12,19 +12,10 @@ define([
                 return [
                     TabPanelView.prototype.className,
                     'note-group'
-                ].join(' ')
+                ].join(' ');
             },
-            highlightMatchedText: true,
             renderContent: function () {
                 this.$el.append(this.getNotes(this.collection.toArray()));
-                if (this.highlightMatchedText) {
-                    this.$('.note-comment-p').highlight(this.options.searchQuery, {
-                        element: 'span',
-                        className: 'note-highlight',
-                        caseSensitive: false,
-                        wordsOnly: false
-                    });
-                }
                 return this;
             }
         }),
@@ -36,12 +27,12 @@ define([
                 return [
                     TabPanelView.prototype.className,
                     'note-group'
-                ].join(' ')
+                ].join(' ');
             },
             renderContent: function () {
                 var message = gettext('No results found for "%(query_string)s". Please try searching again.');
 
-                this.$el.append($('<p></p>', {
+                this.$el.append($('<p />', {
                     text: interpolate(message, {
                         query_string: this.options.searchQuery
                     }, true)
