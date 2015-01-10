@@ -26,10 +26,10 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
 from mobile_api import errors
-from mobile_api.utils import mobile_access_when_enrolled, mobile_view, MobileView, mobile_course_access
+from mobile_api.utils import mobile_access_when_enrolled, mobile_view, mobile_course_access
 
 
-@MobileView(is_user=True)
+@mobile_view(is_user=True)
 class UserDetail(generics.RetrieveAPIView):
     """
     **Use Case**
@@ -67,7 +67,7 @@ class UserDetail(generics.RetrieveAPIView):
     lookup_field = 'username'
 
 
-@MobileView(is_user=True)
+@mobile_view(is_user=True)
 class UserCourseStatus(views.APIView):
     """
     Endpoints for getting and setting meta data
@@ -202,7 +202,7 @@ class UserCourseStatus(views.APIView):
             return self._get_course_info(request, course)
 
 
-@MobileView(is_user=True)
+@mobile_view(is_user=True)
 class UserCourseEnrollmentsList(generics.ListAPIView):
     """
     **Use Case**

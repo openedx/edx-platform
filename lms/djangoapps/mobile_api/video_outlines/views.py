@@ -17,11 +17,11 @@ from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule.exceptions import NotFoundError
 from xmodule.modulestore.django import modulestore
 
-from ..utils import MobileView, mobile_course_access
+from ..utils import mobile_view, mobile_course_access
 from .serializers import BlockOutline, video_summary
 
 
-@MobileView()
+@mobile_view()
 class VideoSummaryList(generics.ListAPIView):
     """
     **Use Case**
@@ -89,7 +89,7 @@ class VideoSummaryList(generics.ListAPIView):
         return Response(video_outline)
 
 
-@MobileView()
+@mobile_view()
 class VideoTranscripts(generics.RetrieveAPIView):
     """
     **Use Case**

@@ -55,7 +55,7 @@ def mobile_access_when_enrolled(course, user):
 
 def mobile_view(is_user=False):
     """
-    Function decorator that abstracts the authentication and permission checks for mobile api views.
+    Function and class decorator that abstracts the authentication and permission checks for mobile api views.
     """
     class IsUser(permissions.BasePermission):
         """
@@ -64,28 +64,14 @@ def mobile_view(is_user=False):
         def has_permission(self, request, view):
             return request.user.username == request.parser_context.get('kwargs', {}).get('username', None)
 
-    def _decorator(func):
+    def _decorator(func_or_class):
         """
         Requires either OAuth2 or Session-based authentication.
         If is_user is True, also requires username in URL matches the request user.
         """
-        func.authentication_classes = (OAuth2Authentication, SessionAuthentication)
-        func.permission_classes = (permissions.IsAuthenticated,)
+        func_or_class.authentication_classes = (OAuth2Authentication, SessionAuthentication)
+        func_or_class.permission_classes = (permissions.IsAuthenticated,)
         if is_user:
-            func.permission_classes += (IsUser,)
-        return func
+            func_or_class.permission_classes += (IsUser,)
+        return func_or_class
     return _decorator
-
-
-class MobileView(object):
-    """
-    Class decorator that abstracts the authentication and permission checks for mobile api views.
-    """
-    def __init__(self, is_user=False):
-        self.is_user = is_user
-
-    def __call__(self, cls):
-        class _Decorator(cls):
-            """Inner decorator class to wrap the given class."""
-            mobile_view(self.is_user)(cls)
-        return _Decorator

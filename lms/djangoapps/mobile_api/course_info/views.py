@@ -9,10 +9,10 @@ from courseware.courses import get_course_about_section, get_course_info_section
 from static_replace import make_static_urls_absolute, replace_static_urls
 from xmodule_modifiers import get_course_update_items
 
-from ..utils import MobileView, mobile_course_access
+from ..utils import mobile_view, mobile_course_access
 
 
-@MobileView()
+@mobile_view()
 class CourseUpdatesList(generics.ListAPIView):
     """
     **Use Case**
@@ -57,7 +57,7 @@ class CourseUpdatesList(generics.ListAPIView):
         return Response(updates_to_show)
 
 
-@MobileView()
+@mobile_view()
 class CourseHandoutsList(generics.ListAPIView):
     """
     **Use Case**
@@ -89,7 +89,7 @@ class CourseHandoutsList(generics.ListAPIView):
             raise Http404(u"No handouts for {}".format(unicode(course.id)))
 
 
-@MobileView()
+@mobile_view()
 class CourseAboutDetail(generics.RetrieveAPIView):
     """
     **Use Case**
