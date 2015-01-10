@@ -27,10 +27,6 @@ COURSE_INFO_API_CACHE_PREFIX = 'course_info_api_'
 def get_course_about_details(course_id):  # pylint: disable=unused-argument
     """
     Return course information for a given course id.
-    First its checks the default cache for given course id if its exists then returns
-    the course otherwise it get the course from module store and set the cache.
-    By default cache expiry set to 5 minutes.
-
     Args:
         course_id(str) : The course id to retrieve course information for.
 
@@ -54,9 +50,9 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
     }
 
     course_info = serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
-    cache_key = "{}_{}".format(course_id, COURSE_INFO_API_CACHE_PREFIX)
-    time_out = getattr(settings, 'COURSE_INFO_API_CACHE_TIME_OUT', 300)
-    cache.set(cache_key, course_info, time_out)
+    # cache_key = "{}_{}".format(course_id, COURSE_INFO_API_CACHE_PREFIX)
+    # time_out = getattr(settings, 'COURSE_INFO_API_CACHE_TIME_OUT', 300)
+    # cache.set(cache_key, course_info, time_out)
     return course_info
 
 

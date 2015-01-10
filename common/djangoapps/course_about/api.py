@@ -28,6 +28,9 @@ def get_course_about_details(course_id):
     """Get course about details for the given course ID.
 
     Given a Course ID, retrieve all the metadata necessary to fully describe the Course.
+    First its checks the default cache for given course id if its exists then returns
+    the course otherwise it get the course from module store and set the cache.
+    By default cache expiry set to 5 minutes.
 
     Args:
         course_id (str): The String representation of a Course ID. Used to look up the requested
@@ -58,7 +61,12 @@ def get_course_about_details(course_id):
 
     if cache_course_info:
         return cache_course_info
-    return _data_api().get_course_about_details(course_id)
+
+    course_info = _data_api().get_course_about_details(course_id)
+    time_out = getattr(settings, 'COURSE_INFO_API_CACHE_TIME_OUT', 300)
+    cache.set(cache_key, course_info, time_out)
+
+    return course_info
 
 
 def _data_api():
