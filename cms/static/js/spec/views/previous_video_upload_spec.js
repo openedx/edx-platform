@@ -67,16 +67,12 @@ define(
 
             _.each(
                 [
-                    {status: "upload", expected: "Uploading"},
-                    {status: "ingest", expected: "In Progress"},
-                    {status: "transcode_queue", expected: "In Progress"},
-                    {status: "transcode_active", expected: "In Progress"},
-                    {status: "file_delivered", expected: "Complete"},
-                    {status: "file_complete", expected: "Complete"},
-                    {status: "file_corrupt", expected: "Failed"},
-                    {status: "pipeline_error", expected: "Failed"},
-                    {status: "invalid_token", expected: "Invalid Token"},
-                    {status: "unexpected_status_string", expected: "Unknown"}
+                    {status: "Uploading", expected: "Uploading"},
+                    {status: "In Progress", expected: "In Progress"},
+                    {status: "Complete", expected: "Complete"},
+                    {status: "Failed", expected: "Failed"},
+                    {status: "Invalid Token", expected: "Invalid Token"},
+                    {status: "Unknown", expected: "Unknown"}
                 ],
                 function(caseInfo) {
                     it("should render " + caseInfo.status + " status correctly", function() {
