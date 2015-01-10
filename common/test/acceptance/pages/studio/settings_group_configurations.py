@@ -49,7 +49,7 @@ class GroupConfigurationsPage(CoursePage):
         """
         Return list of the group-configurations-list-item's of specified type for the course.
         """
-        css = prefix + ' .group-configurations-list-item'
+        css = prefix + ' .wrapper-collection'
         return [GroupConfiguration(self, prefix, index) for index in xrange(len(self.q(css=css)))]
 
     def create_experiment_group_configuration(self):
@@ -90,7 +90,7 @@ class GroupConfigurationsPage(CoursePage):
         """
         Returns the message about "no content" for the specified type.
         """
-        return self.q(css='.wrapper-content ' + prefix + ' .no-group-configurations-content')
+        return self.q(css='.wrapper-content ' + prefix + ' .no-content')
 
     @property
     def experiment_group_sections_present(self):
@@ -107,7 +107,7 @@ class GroupConfiguration(object):
 
     def __init__(self, page, prefix, index):
         self.page = page
-        self.SELECTOR = prefix + ' .group-configurations-list-item-{}'.format(index)
+        self.SELECTOR = prefix + ' .wrapper-collection-{}'.format(index)
         self.index = index
 
     def get_selector(self, css=''):
@@ -195,9 +195,9 @@ class GroupConfiguration(object):
         """
         Return group configuration mode.
         """
-        if self.find_css('.group-configuration-edit').present:
+        if self.find_css('.collection-edit').present:
             return 'edit'
-        elif self.find_css('.group-configuration-details').present:
+        elif self.find_css('.collection').present:
             return 'details'
 
     @property
@@ -227,14 +227,14 @@ class GroupConfiguration(object):
         """
         Return group configuration name.
         """
-        return self.get_text('.group-configuration-title')
+        return self.get_text('.title')
 
     @name.setter
     def name(self, value):
         """
         Set group configuration name.
         """
-        self.find_css('.group-configuration-name-input').first.fill(value)
+        self.find_css('.collection-name-input').first.fill(value)
 
     @property
     def description(self):
