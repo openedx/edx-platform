@@ -29,6 +29,7 @@
       .title {
         @extend %t-title4;
         @extend %t-strong;
+        margin-bottom: ($baseline/2);
       }
 
       .copy {
@@ -520,5 +521,9 @@
 
   .content-supplementary {
     width: flex-grid(3, 12);
+
+    .content-groups-doc {
+      margin-bottom: $baseline;
+    }
   }
 }
