@@ -5,8 +5,8 @@ Test utilities for mobile API tests:
      No tests are implemented in this base class.
 
   Test Mixins to be included by concrete test classes and provide implementation of common test methods:
-     MobileAuthTestMixin - tests for APIs with MobileView/mobile_view and is_user=False.
-     MobileAuthUserTestMixin - tests for APIs with MobileView/mobile_view and is_user=True.
+     MobileAuthTestMixin - tests for APIs with mobile_view and is_user=False.
+     MobileAuthUserTestMixin - tests for APIs with mobile_view and is_user=True.
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=False.
      MobileEnrolledCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=True.
 """
@@ -101,7 +101,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
 
 class MobileAuthTestMixin(object):
     """
-    Test Mixin for testing APIs decorated with MobileView or mobile_view.
+    Test Mixin for testing APIs decorated with mobile_view.
     """
     def test_no_auth(self):
         self.logout()
@@ -110,7 +110,7 @@ class MobileAuthTestMixin(object):
 
 class MobileAuthUserTestMixin(MobileAuthTestMixin):
     """
-    Test Mixin for testing APIs related to users: mobile_view or MobileView with is_user=True.
+    Test Mixin for testing APIs related to users: mobile_view with is_user=True.
     """
     def test_invalid_user(self):
         self.login_and_enroll()

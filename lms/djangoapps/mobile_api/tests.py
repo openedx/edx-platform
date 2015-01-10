@@ -4,17 +4,18 @@ Tests for mobile API utilities.
 
 import ddt
 from mock import patch
+from django.test import TestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from .utils import mobile_access_when_enrolled
+from .utils import mobile_access_when_enrolled, mobile_course_access, mobile_view
 from .testutils import MobileAPITestCase, ROLE_CASES
 
 
 @ddt.ddt
-class TestMobileApiUtils(MobileAPITestCase):
+class TestMobileAccessWhenEnrolled(MobileAPITestCase):
     """
-    Tests for mobile API utilities
+    Tests for mobile_access_when_enrolled utility function.
     """
     @ddt.data(*ROLE_CASES)
     @ddt.unpack
@@ -45,3 +46,22 @@ class TestMobileApiUtils(MobileAPITestCase):
         Verifies that we handle the case where a course hasn't started
         """
         self.assertFalse(mobile_access_when_enrolled(self.course, self.user))
+
+
+@ddt.ddt
+class TestMobileAPIDecorators(TestCase):
+    """
+    Basic tests for mobile api decorators to ensure they retain the docstrings.
+    """
+    @ddt.data(mobile_view, mobile_course_access)
+    def test_function_decorator(self, decorator):
+        @decorator()
+        def decorated_func():
+            """
+            Test docstring of decorated function.
+            """
+            pass
+
+        self.assertIn("Test docstring of decorated function.", decorated_func.__doc__)
+        self.assertEquals(decorated_func.__name__, "decorated_func")
+        self.assertTrue(decorated_func.__module__.endswith("tests"))
