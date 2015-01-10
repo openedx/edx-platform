@@ -1968,3 +1968,12 @@ ANALYTICS_API_KEY = ''
 
 # Metrics tab data source setting
 MAX_ENROLLEES_FOR_METRICS_USING_DB = 100
+
+# MONGO Connection parameters for the forum servers.  Bypassing cs_comment_client
+FORUM_MONGO_PARAMS = {
+    'host': 'localhost',
+    'port': 27017,
+    'password': '',
+    'user': '',
+    'database': 'forum',
+}
