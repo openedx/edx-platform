@@ -1,14 +1,14 @@
-<form class="group-configuration-edit-form">
-    <div class="wrapper-form">
+<form class="collection-edit-form">
     <% if (error && error.message) { %>
-        <div class="group-configuration-edit-error message message-status message-status error is-shown" name="group-configuration-edit-error">
+        <div class="content-group-edit-error message message-status message-status error is-shown">
           <%= gettext(error.message) %>
         </div>
     <% } %>
-        <fieldset class="groups-fields">
-            <div class="input-wrap field text required add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+    <div class="wrapper-form">
+        <fieldset class="collection-fields">
+            <div class="input-wrap field text required add-collection-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
                 <label for="group-cohort-name-<%= uniqueId %>"><%= gettext("Content Group Name") %></label>
-                <input name="group-cohort-name" id="group-cohort-name-<%= uniqueId %>" class="group-configuration-name-input input-text" value="<%- name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
+                <input name="group-cohort-name" id="group-cohort-name-<%= uniqueId %>" class="collection-name-input input-text" value="<%- name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
             </div>
         </fieldset>
     </div>

@@ -12,6 +12,8 @@ define([
     var ContentGroupItemView = ListItemView.extend({
         tagName: 'section',
 
+        baseClassName: 'content-group',
+
         createEditView: function() {
             return new ContentGroupEditorView({model: this.model});
         },

@@ -24,7 +24,7 @@ define([
         groupsAllocation: '.group-allocation',
         errorMessage: '.group-configuration-edit-error',
         inputGroupName: '.group-name',
-        inputName: '.group-configuration-name-input',
+        inputName: '.collection-name-input',
         inputDescription: '.group-configuration-description-input',
         usageCount: '.group-configuration-usage-count',
         usage: '.group-configuration-usage',
@@ -635,15 +635,15 @@ define([
     describe('Content groups list view', function() {
         var newGroupCss = '.new-button',
             addGroupCss = '.action-add',
-            inputCss = '.group-configuration-name-input',
+            inputCss = '.collection-name-input',
             saveButtonCss = '.action-primary',
             cancelButtonCss = '.action-cancel',
-            validationErrorCss = '.group-configuration-edit-error',
+            validationErrorCss = '.content-group-edit-error',
             scopedGroupSelector, createGroups, renderView, saveOrCancel, editNewGroup, editExistingGroup,
             verifyEditingGroup, respondToSave, expectGroupsVisible, correctValidationError;
 
         scopedGroupSelector = function(groupIndex, additionalSelectors) {
-            var groupSelector = '.group-configurations-list-item-' + groupIndex;
+            var groupSelector = '.content-groups-list-item-' + groupIndex;
             if (additionalSelectors) {
                 return groupSelector + ' ' + additionalSelectors;
             } else {
@@ -704,11 +704,11 @@ define([
             // editing a group.
             index = index || 0;
             if (expectEditing) {
-                expect(view.$(scopedGroupSelector(index, '.group-configuration-edit'))).toExist();
+                expect(view.$(scopedGroupSelector(index, '.content-group-edit'))).toExist();
                 expect(view.$(newGroupCss)).not.toExist();
                 expect(view.$(addGroupCss)).toHaveClass('is-hidden');
             } else {
-                expect(view.$('.group-configuration-edit')).not.toExist();
+                expect(view.$('.content-group-edit')).not.toExist();
                 if (view.collection.length === 0) {
                     expect(view.$(newGroupCss)).toExist();
                     expect(view.$(addGroupCss)).not.toExist();
@@ -742,7 +742,7 @@ define([
 
         expectGroupsVisible = function(view, groupNames) {
             _.each(groupNames, function(groupName) {
-                expect(view.$('.group-configurations-list-item')).toContainText(groupName);
+                expect(view.$('.content-groups-list-item')).toContainText(groupName);
             });
         };
 
@@ -753,13 +753,13 @@ define([
         });
 
         it('shows a message when no groups are present', function() {
-            expect(renderView().$('.no-group-configurations-content'))
+            expect(renderView().$('.no-content'))
                 .toContainText('You have not created any content groups yet.');
         });
 
         it('can render groups', function() {
             var groupNames = ['Group 1', 'Group 2', 'Group 3'];
-            renderView(groupNames).$('.group-configuration-details').each(function(index) {
+            renderView(groupNames).$('.content-group-details').each(function(index) {
                 expect($(this)).toContainText(groupNames[index]);
             });
         });

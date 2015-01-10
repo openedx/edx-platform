@@ -1,13 +1,13 @@
-<form class="group-configuration-edit-form">
-    <div class="wrapper-form">
+<form class="collection-edit-form group-configuration-edit-form">
     <% if (error && error.message) { %>
         <div class="group-configuration-edit-error message message-status message-status error is-shown" name="group-configuration-edit-error">
           <%= gettext(error.message) %>
         </div>
     <% } %>
-        <fieldset class="group-configuration-fields">
+    <div class="wrapper-form">
+        <fieldset class="collection-fields group-configuration-fields">
             <legend class="sr"><%= gettext("Group Configuration information") %></legend>
-            <div class="input-wrap field text required add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+            <div class="input-wrap field text required add-collection-name add-group-configuration-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
                 <label for="group-configuration-name-<%= uniqueId %>"><%= gettext("Group Configuration Name") %></label><%
                 if (!_.isUndefined(id)) {
                     %><span class="group-configuration-id">
@@ -16,7 +16,7 @@
                     </span><%
                 }
                 %>
-                <input id="group-configuration-name-<%= uniqueId %>" class="group-configuration-name-input input-text" name="group-configuration-name" type="text" placeholder="<%= gettext("This is the Name of the Group Configuration") %>" value="<%= name %>">
+                <input id="group-configuration-name-<%= uniqueId %>" class="collection-name-input input-text" name="group-configuration-name" type="text" placeholder="<%= gettext("This is the Name of the Group Configuration") %>" value="<%= name %>">
                 <span class="tip tip-stacked"><%= gettext("Name or short description of the configuration") %></span>
             </div>
             <div class="input-wrap field text add-group-configuration-description">
@@ -30,10 +30,10 @@
             <label class="groups-fields-label required"><%= gettext("Groups") %></label>
             <span class="tip tip-stacked"><%= gettext("Name of the groups that students will be assigned to, for example, Control, Video, Problems. You must have two or more groups.") %></span>
             <ol class="groups list-input enum"></ol>
-            <button class="action action-add-group"><i class="icon fa fa-plus"></i> <%= gettext("Add another group") %></button>
+            <button class="action action-add-group action-add-item"><i class="icon fa fa-plus"></i> <%= gettext("Add another group") %></button>
         </fieldset>
         <% if (!_.isEmpty(usage)) { %>
-            <div class="wrapper-group-configuration-validation">
+            <div class="wrapper-group-configuration-validation usage-validation">
                 <i class="icon fa fa-warning"></i>
                 <p class="group-configuration-validation-text">
                     <%= gettext('This configuration is currently used in content experiments. If you make changes to the groups, you may need to edit those experiments.') %>
