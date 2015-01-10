@@ -18,17 +18,19 @@ define([
 
         tagName: 'section',
 
+        baseClassName: 'group-configuration',
+
+        canDelete: true,
+
+        // Translators: this refers to a collection of groups.
+        itemDisplayName: gettext('group configuration'),
+
         attributes: function () {
             return {
                 'id': this.model.get('id'),
                 'tabindex': -1
             };
         },
-
-        // Translators: this refers to a collection of groups.
-        itemDisplayName: gettext('group configuration'),
-
-        canDelete: true,
 
         createEditView: function() {
             return new GroupConfigurationEditorView({model: this.model});

@@ -1,14 +1,14 @@
-<div class="wrapper-group-configuration">
-    <header class="group-configuration-header">
-        <h3 class="group-configuration-title">
-            <a href="#" class="group-toggle <% if(showGroups){ print('hide'); } else { print('show'); } %>-groups">
+<div class="collection-details wrapper-group-configuration">
+    <header class="collection-header group-configuration-header">
+        <h3 class="title group-configuration-title">
+            <a href="#" class="toggle group-toggle <% if(showGroups){ print('hide'); } else { print('show'); } %>-groups">
                 <i class="ui-toggle-expansion icon fa fa-caret-<% if(showGroups){ print('down'); } else { print('right'); } %>"></i>
                 <%= name %>
             </a>
         </h3>
     </header>
 
-    <ol class="group-configuration-info group-configuration-info-<% if(showGroups){ print('block'); } else { print('inline'); } %>">
+    <ol class="collection-info group-configuration-info group-configuration-info-<% if(showGroups){ print('block'); } else { print('inline'); } %>">
       <% if (!_.isUndefined(id)) { %>
         <li class="group-configuration-id"
             ><span class="group-configuration-label"><%= gettext('ID') %>: </span
@@ -16,7 +16,7 @@
         ></li>
       <% } %>
       <% if (showGroups) { %>
-        <li class="group-configuration-description">
+        <li class="collection-description group-configuration-description">
             <%= description %>
         </li>
       <% } else { %>
@@ -31,11 +31,11 @@
 
     <% if(showGroups) { %>
       <% allocation = Math.floor(100 / groups.length) %>
-      <ol class="groups groups-<%= index %>">
+      <ol class="collection-items groups groups-<%= index %>">
         <% groups.each(function(group, groupIndex) { %>
-          <li class="group group-<%= groupIndex %>">
-            <span class="group-name"><%= group.get('name') %></span>
-            <span class="group-allocation"><%= allocation %>%</span>
+          <li class="item group group-<%= groupIndex %>">
+            <span class="name group-name"><%= group.get('name') %></span>
+            <span class="meta group-allocation"><%= allocation %>%</span>
           </li>
         <% }) %>
       </ol>
@@ -56,12 +56,12 @@
     </ul>
 </div>
 <% if(showGroups) { %>
-  <div class="wrapper-group-configuration-usages">
+  <div class="collection-references wrapper-group-configuration-usages">
     <% if (!_.isEmpty(usage)) { %>
-      <h4 class="group-configuration-usage-text"><%= gettext('This Group Configuration is used in:') %></h4>
-      <ol class="group-configuration-usage">
+      <h4 class="intro group-configuration-usage-text"><%= gettext('This Group Configuration is used in:') %></h4>
+      <ol class="usage group-configuration-usage">
         <% _.each(usage, function(unit) { %>
-          <li class="group-configuration-usage-unit">
+          <li class="usage-unit group-configuration-usage-unit">
             <p><a href=<%= unit.url %> ><%= unit.label %></a></p>
             <% if (unit.validation) { %>
               <p>
@@ -70,7 +70,7 @@
                 <% } else if (unit.validation.type === 'error') { %>
                   <i class="icon fa fa-exclamation-circle"></i>
                 <% } %>
-                <span class="group-configuration-validation-message">
+                <span class="usage-validation-message group-configuration-validation-message">
                   <%= unit.validation.text %>
                 </span>
               </p>
