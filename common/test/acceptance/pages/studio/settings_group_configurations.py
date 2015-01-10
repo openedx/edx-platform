@@ -32,7 +32,7 @@ class GroupConfigurationsPage(CoursePage):
         return True
 
     @property
-    def experiment_groups(self):
+    def experiment_group_configurations(self):
         """
         Return list of the experiment group configurations for the course.
         """
@@ -97,7 +97,7 @@ class GroupConfigurationsPage(CoursePage):
         """
         Returns whether or not anything related to content experiments is present.
         """
-        return self.q(css=self.experiment_groups_css).present
+        return self.q(css=self.experiment_groups_css).present or self.q(css=".experiment-groups-doc").present
 
 
 class GroupConfiguration(object):

@@ -46,8 +46,8 @@ class ContentGroupConfigurationTest(StudioCourseTest):
     def test_no_content_groups_by_default(self):
         """
         Scenario: Ensure that message telling me to create a new content group is
-        shown when no content groups exist.
-        Given I have a course without
+            shown when no content groups exist.
+        Given I have a course without content groups
         When I go to the Group Configuration page in Studio
         Then I see "You have not created any content groups yet." message
         """
