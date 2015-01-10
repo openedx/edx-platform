@@ -2,6 +2,7 @@ import logging
 import datetime
 import decimal
 import pytz
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.http import (
@@ -258,7 +259,12 @@ def use_code(request):
     Registration Code Redemption page.
     """
     code = request.POST["code"]
-    coupons = Coupon.objects.filter(code=code, is_active=True)
+    coupons = Coupon.objects.filter(
+        Q(code=code),
+        Q(is_active=True),
+        Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
+        Q(expiration_date__isnull=True)
+    )
     if not coupons:
         # If no coupons then we check that code against course registration code
         try:
@@ -423,9 +429,8 @@ def use_coupon_code(coupons, user):
             return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
 
     if not is_redemption_applied:
-        log.warning("Course item does not exist for coupon '{code}'".format(code=coupons[0].code))
-        return HttpResponseNotFound(
-            _("Coupon '{code}' is not valid for any course in the shopping cart.".format(code=coupons[0].code)))
+        log.warning("Discount does not exist against code '{code}'.".format(code=coupons[0].code))
+        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.".format(code=coupons[0].code)))
 
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': True}),
