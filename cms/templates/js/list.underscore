@@ -1,9 +1,12 @@
 <% if (length === 0) { %>
-    <div class="no-group-configurations-content">
-        <p><%- interpolate(gettext("You have not created any %(item_type)ss yet."), {item_type: itemCategoryDisplayName}, true) %><a href="#" class="button new-button"><i class="icon fa fa-plus"></i> <%= gettext("Add your first content group") %></a></p>
+    <div class="no-content">
+        <p>
+            <%- emptyMessage %>
+            <a href="#" class="button new-button"><i class="icon fa fa-plus"></i> <%= interpolate(gettext("Add your first %(item_type)s"), {item_type: itemCategoryDisplayName}, true) %></a>
+        </p>
     </div>
 <% } else { %>
-    <div class="content-groups"></div>
+    <div class="list-items"></div>
     <% if (!isEditing) { %>
         <button class="action action-add">
             <i class="icon fa fa-plus"></i><%- interpolate(gettext('New %(item_type)s'), {item_type: itemCategoryDisplayName}, true) %>

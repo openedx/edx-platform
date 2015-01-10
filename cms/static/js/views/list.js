@@ -10,6 +10,7 @@
  * - itemCategoryDisplayName (string): Display name for the category
  *   of items this list contains.  For example, 'Group Configuration'.
  *   Note that it must be translated.
+ * - emptyMessage (string): Text to render when the list is empty.
  */
 define([
     'js/views/baseview'
@@ -20,6 +21,8 @@ define([
             'click .action-add': 'onAddItem',
             'click .new-button': 'onAddItem'
         },
+
+        listContainerCss: '.list-items',
 
         initialize: function() {
             this.listenTo(this.collection, 'add', this.addNewItemView);
@@ -35,12 +38,13 @@ define([
         render: function(model) {
             this.$el.html(this.template({
                 itemCategoryDisplayName: this.itemCategoryDisplayName,
+                emptyMessage: this.emptyMessage,
                 length: this.collection.length,
                 isEditing: model && model.get('editing')
             }));
 
             this.collection.each(function(model) {
-                this.$('.content-groups').append(this.createItemView({model: model}).render().el);
+                this.$(this.listContainerCss).append(this.createItemView({model: model}).render().el);
             }, this);
 
             return this;
@@ -71,7 +75,7 @@ define([
             // If items already exist, just append one new.
             // Otherwise re-render the empty list HTML.
             if (this.collection.length > 1) {
-                this.$('.content-groups').append(view.render().el);
+                this.$(this.listContainerCss).append(view.render().el);
             } else {
                 this.render();
             }

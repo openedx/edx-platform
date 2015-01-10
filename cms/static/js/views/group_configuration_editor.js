@@ -11,7 +11,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
     var GroupConfigurationEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {
-            'change .group-configuration-name-input': 'setName',
+            'change .collection-name-input': 'setName',
             'change .group-configuration-description-input': 'setDescription',
             'click .action-add-group': 'createGroup',
             'focus .input-text': 'onFocus',
@@ -24,6 +24,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
             var index = this.model.collection.indexOf(this.model);
 
             return [
+                'collection-edit',
                 'group-configuration-edit',
                 'group-configuration-edit-' + index
             ].join(' ');
@@ -84,7 +85,7 @@ function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
         setName: function(event) {
             if (event && event.preventDefault) { event.preventDefault(); }
             this.model.set(
-                'name', this.$('.group-configuration-name-input').val(),
+                'name', this.$('.collection-name-input').val(),
                 { silent: true }
             );
         },
