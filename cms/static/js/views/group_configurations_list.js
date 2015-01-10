@@ -17,6 +17,8 @@ define([
         // Translators: this refers to a collection of groups.
         itemCategoryDisplayName: gettext('group configuration'),
 
+        emptyMessage: gettext('You have not created any group configurations yet.'),
+
         createItemView: function(options) {
             return new GroupConfigurationItemView(options);
         }

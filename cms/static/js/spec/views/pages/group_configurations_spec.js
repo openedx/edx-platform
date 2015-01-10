@@ -52,7 +52,7 @@ define([
                 expect(view.$('.ui-loading')).toBeVisible();
                 view.render();
                 expect(view.$(groupConfigItemClassName)).toExist();
-                expect(view.$('.content-groups .no-group-configurations-content')).toExist();
+                expect(view.$('.content-groups .no-content')).toExist();
                 expect(view.$('.ui-loading')).toHaveClass('is-hidden');
             });
         });
