@@ -111,24 +111,26 @@ textarea {
                 <td><a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">${cil.course_id | h}</a></td>
                 <td>${cil.git_log}</td>
               </tr>
-          %endfor
-          ## Show the full log if viewing information about a specific course
-          %if course_id is not None:
-              <tr>
-                <td colspan="3">
-                  <pre>
-                    %if cil is not None:
+
+              ## Show the full log of the latest import if viewing logs for a specific course
+              %if course_id is not None:
+                  <tr>
+                    <td colspan="3">
+                      <pre>
                         ${cil.import_log | h}
-                    %else:
-                        ## Translators: git is a version-control system; see http://git-scm.com/about
-                        ${_('No git import logs have been recorded for this course.')}
-                    %endif
-                  </pre>
-                </td>
-              </tr>
-          %endif
+                      </pre>
+                    </td>
+                  </tr>
+              %endif
+          %endfor
         </tbody>
       </table>
+
+      ## If viewing a single course and there are no logs available, let the user know
+      %if course_id is not None and cil is None:
+        ## Translators: git is a version-control system; see http://git-scm.com/about
+        ${_('No git import logs have been recorded for this course.')}
+      %endif
     </section>
   </div>
 </section>
