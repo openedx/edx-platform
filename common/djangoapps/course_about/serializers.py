@@ -21,8 +21,8 @@ def serialize_content(course_descriptor, about_descriptor):
         'course_id': None,
         'advertised_start': getattr(course_descriptor, 'advertised_start', None),
         'is_new': getattr(course_descriptor, 'is_new', None),
-        'start': None,
-        'end': None,
+        'start': _formatted_datetime(course_descriptor, 'start'),
+        'end': _formatted_datetime(course_descriptor, 'end'),
         'announcement': None,
         'effort': about_descriptor.get("effort", None)
 
@@ -33,12 +33,7 @@ def serialize_content(course_descriptor, about_descriptor):
     if getattr(course_descriptor, 'course_image', False):
         data['media']['course_image'] = course_image_url(course_descriptor)
 
-    start = getattr(course_descriptor, 'start', None)
-    end = getattr(course_descriptor, 'end', None)
     announcement = getattr(course_descriptor, 'announcement', None)
-
-    data['start'] = start.strftime('%Y-%m-%d') if start else None
-    data['end'] = end.strftime('%Y-%m-%d') if end else None
     data["announcement"] = announcement.strftime('%Y-%m-%d') if announcement else None
 
     return data
@@ -55,3 +50,16 @@ def course_image_url(course):
     loc = StaticContent.compute_location(course.id, course.course_image)
     url = StaticContent.serialize_asset_key_with_slash(loc)
     return url
+
+
+def _formatted_datetime(course_descriptor, date_type):
+    """
+    Return formatted date.
+    Args:
+        course_descriptor(CourseDescriptor) : The CourseDescriptor Object.
+        date_type (str) : Either start or end.
+    Returns:
+        formatted date or None .
+    """
+    course_date_ = getattr(course_descriptor, date_type, None)
+    return course_date_.strftime('%Y-%m-%d') if course_date_ else None

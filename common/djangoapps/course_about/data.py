@@ -50,9 +50,6 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
     }
 
     course_info = serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
-    # cache_key = "{}_{}".format(course_id, COURSE_INFO_API_CACHE_PREFIX)
-    # time_out = getattr(settings, 'COURSE_INFO_API_CACHE_TIME_OUT', 300)
-    # cache.set(cache_key, course_info, time_out)
     return course_info
 
 
