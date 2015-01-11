@@ -136,7 +136,6 @@ define([
 
                 setFixtures( '<div id="current-step-container"></div>' );
                 TemplateHelpers.installTemplate( 'templates/verify_student/make_payment_step' );
-                TemplateHelpers.installTemplate( 'templates/verify_student/requirements' );
             });
 
             it( 'allows users to choose a suggested price', function() {

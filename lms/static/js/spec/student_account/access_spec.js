@@ -157,6 +157,9 @@ define([
             it('toggles between the login and registration forms', function() {
                 ajaxSpyAndInitialize(this, 'login');
 
+                // Prevent URL from updating
+                spyOn(history, 'pushState').andCallFake( function() {} );
+
                 // Simulate selection of the registration form
                 selectForm('register');
                 assertForms('#register-form', '#login-form');
