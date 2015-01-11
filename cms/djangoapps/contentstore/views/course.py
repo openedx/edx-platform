@@ -1359,7 +1359,10 @@ def group_configurations_list_handler(request, course_key_string):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
             should_show_experiment_groups = has_course_enabled_content_experiments(course)
-            experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
+            if should_show_experiment_groups:
+                experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
+            else:
+                experiment_group_configurations = None
             content_group_configuration = GroupConfiguration.get_or_create_content_group_configuration(
                 course
             ).to_json()
@@ -1367,7 +1370,7 @@ def group_configurations_list_handler(request, course_key_string):
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'experiment_group_configurations': experiment_group_configurations if should_show_experiment_groups else None,
+                'experiment_group_configurations': experiment_group_configurations,
                 'should_show_experiment_groups': should_show_experiment_groups,
                 'content_group_configuration': content_group_configuration
             })

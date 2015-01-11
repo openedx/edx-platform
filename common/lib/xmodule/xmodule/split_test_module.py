@@ -582,7 +582,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                     split_validation.add(
                         StudioValidationMessage(
                             StudioValidationMessage.ERROR,
-                            _(u"The experiment uses a group configuration that is not supported for experiments. Select a valid group configuration or delete this experiment.")
+                            _(u"The experiment uses a group configuration that is not supported for experiments. "
+                              u"Select a valid group configuration or delete this experiment.")
                         )
                     )
                 else:
@@ -600,7 +601,8 @@ class SplitTestDescriptor(SplitTestFields, SequenceDescriptor, StudioEditableDes
                         split_validation.add(
                             StudioValidationMessage(
                                 StudioValidationMessage.WARNING,
-                                _(u"The experiment has an inactive group. Move content into active groups, then delete the inactive group.")
+                                _(u"The experiment has an inactive group. "
+                                  u"Move content into active groups, then delete the inactive group.")
                             )
                         )
         return split_validation
