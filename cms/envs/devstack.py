@@ -30,6 +30,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LMS_BASE = "localhost:8000"
 FEATURES['PREVIEW_LMS_BASE'] = "preview." + LMS_BASE
 
+########################### PIPELINE #################################
+
+# Skip RequireJS optimizer in development
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
 ############################# ADVANCED COMPONENTS #############################
 
 # Make it easier to test advanced components in local dev
