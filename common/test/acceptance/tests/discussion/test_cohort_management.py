@@ -112,7 +112,8 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_management_page.select_cohort(self.manual_cohort_name)
         self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
         self.assertEqual(
-            "No content groups exist. Create a content group to associate with cohort groups. Create a content group",
+            "Warning:\nNo content groups exist. "
+            "Create a content group to associate with cohort groups. Create a content group",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         self.assertFalse(self.cohort_management_page.select_content_group_radio_button())
@@ -616,7 +617,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
             self.cohort_management_page.get_all_content_groups()
         )
         self.assertEqual(
-            "The previously selected content group was deleted. Select another content group.",
+            "Warning:\nThe previously selected content group was deleted. Select another content group.",
             self.cohort_management_page.get_cohort_related_content_group_message()
         )
         self.cohort_management_page.set_cohort_associated_content_group("Pears")
