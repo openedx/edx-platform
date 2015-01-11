@@ -737,83 +737,81 @@ def course_about(request, course_id):
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
-    permission_name = microsite.get_value(
-        'COURSE_ABOUT_VISIBILITY_PERMISSION',
-        settings.COURSE_ABOUT_VISIBILITY_PERMISSION
-    )
-    course = get_course_with_access(request.user, permission_name, course_key)
+    with modulestore().bulk_operations(course_key):
+        permission_name = microsite.get_value(
+            'COURSE_ABOUT_VISIBILITY_PERMISSION',
+            settings.COURSE_ABOUT_VISIBILITY_PERMISSION
+        )
+        course = get_course_with_access(request.user, permission_name, course_key)
 
-    if microsite.get_value(
-        'ENABLE_MKTG_SITE',
-        settings.FEATURES.get('ENABLE_MKTG_SITE', False)
-    ):
-        return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
+        if microsite.get_value('ENABLE_MKTG_SITE', settings.FEATURES.get('ENABLE_MKTG_SITE', False)):
+            return redirect(reverse('info', args=[course.id.to_deprecated_string()]))
 
-    registered = registered_for_course(course, request.user)
+        registered = registered_for_course(course, request.user)
 
-    staff_access = has_access(request.user, 'staff', course)
-    studio_url = get_studio_url(course, 'settings/details')
+        staff_access = has_access(request.user, 'staff', course)
+        studio_url = get_studio_url(course, 'settings/details')
 
-    if has_access(request.user, 'load', course):
-        course_target = reverse('info', args=[course.id.to_deprecated_string()])
-    else:
-        course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
+        if has_access(request.user, 'load', course):
+            course_target = reverse('info', args=[course.id.to_deprecated_string()])
+        else:
+            course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-    show_courseware_link = (has_access(request.user, 'load', course) or
-                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
+        show_courseware_link = (has_access(request.user, 'load', course) or
+                                settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
-    # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
-    registration_price = 0
-    in_cart = False
-    reg_then_add_to_cart_link = ""
+        # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
+        registration_price = 0
+        in_cart = False
+        reg_then_add_to_cart_link = ""
 
-    _is_shopping_cart_enabled = is_shopping_cart_enabled()
-    if (_is_shopping_cart_enabled):
-        registration_price = CourseMode.min_course_price_for_currency(course_key,
-                                                                      settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
-        if request.user.is_authenticated():
-            cart = shoppingcart.models.Order.get_cart_for_user(request.user)
-            in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
-                shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
+        _is_shopping_cart_enabled = is_shopping_cart_enabled()
+        if _is_shopping_cart_enabled:
+            registration_price = CourseMode.min_course_price_for_currency(course_key,
+                                                                          settings.PAID_COURSE_REGISTRATION_CURRENCY[0])
+            if request.user.is_authenticated():
+                cart = shoppingcart.models.Order.get_cart_for_user(request.user)
+                in_cart = shoppingcart.models.PaidCourseRegistration.contained_in_order(cart, course_key) or \
+                    shoppingcart.models.CourseRegCodeItem.contained_in_order(cart, course_key)
 
-        reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
-            reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
+            reg_then_add_to_cart_link = "{reg_url}?course_id={course_id}&enrollment_action=add_to_cart".format(
+                reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
 
-    # Used to provide context to message to student if enrollment not allowed
-    can_enroll = has_access(request.user, 'enroll', course)
-    invitation_only = course.invitation_only
-    is_course_full = CourseEnrollment.is_course_full(course)
+        # Used to provide context to message to student if enrollment not allowed
+        can_enroll = has_access(request.user, 'enroll', course)
+        invitation_only = course.invitation_only
+        is_course_full = CourseEnrollment.is_course_full(course)
 
-    # Register button should be disabled if one of the following is true:
-    # - Student is already registered for course
-    # - Course is already full
-    # - Student cannot enroll in course
-    active_reg_button = not(registered or is_course_full or not can_enroll)
+        # Register button should be disabled if one of the following is true:
+        # - Student is already registered for course
+        # - Course is already full
+        # - Student cannot enroll in course
+        active_reg_button = not(registered or is_course_full or not can_enroll)
 
-    is_shib_course = uses_shib(course)
+        is_shib_course = uses_shib(course)
 
-    return render_to_response('courseware/course_about.html', {
-        'course': course,
-        'staff_access': staff_access,
-        'studio_url': studio_url,
-        'registered': registered,
-        'course_target': course_target,
-        'registration_price': registration_price,
-        'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-        'in_cart': in_cart,
-        'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
-        'show_courseware_link': show_courseware_link,
-        'is_course_full': is_course_full,
-        'can_enroll': can_enroll,
-        'invitation_only': invitation_only,
-        'active_reg_button': active_reg_button,
-        'is_shib_course': is_shib_course,
-        # We do not want to display the internal courseware header, which is used when the course is found in the
-        # context. This value is therefor explicitly set to render the appropriate header.
-        'disable_courseware_header': True,
-        'is_shopping_cart_enabled': _is_shopping_cart_enabled,
-        'cart_link': reverse('shoppingcart.views.show_cart'),
-    })
+        return render_to_response('courseware/course_about.html', {
+            'course': course,
+            'staff_access': staff_access,
+            'studio_url': studio_url,
+            'registered': registered,
+            'course_target': course_target,
+            'registration_price': registration_price,
+            'currency_symbol': settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
+            'in_cart': in_cart,
+            'reg_then_add_to_cart_link': reg_then_add_to_cart_link,
+            'show_courseware_link': show_courseware_link,
+            'is_course_full': is_course_full,
+            'can_enroll': can_enroll,
+            'invitation_only': invitation_only,
+            'active_reg_button': active_reg_button,
+            'is_shib_course': is_shib_course,
+            # We do not want to display the internal courseware header, which is used when the course is found in the
+            # context. This value is therefor explicitly set to render the appropriate header.
+            'disable_courseware_header': True,
+            'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+            'cart_link': reverse('shoppingcart.views.show_cart'),
+        })
 
 
 @ensure_csrf_cookie
