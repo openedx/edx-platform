@@ -22,7 +22,7 @@
         <div class="message-actions">
             <button class="action-primary <%- actionClass %>">
                 <% if (actionIconClass) { %>
-                    <i class="icon <%- actionIconClass %>"></i>
+                    <i class="icon fa <%- actionIconClass %>"></i>
                 <% } %>
                 <%- actionText %>
             </button>
