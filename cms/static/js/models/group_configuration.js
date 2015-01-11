@@ -14,12 +14,10 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
                 version: 2,
                 groups: new GroupCollection([
                     {
-                        name: gettext('Group A'),
-                        order: 0
+                        name: gettext('Group A')
                     },
                     {
-                        name: gettext('Group B'),
-                        order: 1
+                        name: gettext('Group B')
                     }
                 ]),
                 showGroups: false,
@@ -56,16 +54,6 @@ function(Backbone, _, str, gettext, GroupModel, GroupCollection) {
 
         isEmpty: function() {
             return !this.get('name') && this.get('groups').isEmpty();
-        },
-
-        parse: function(response) {
-            var attrs = $.extend(true, {}, response);
-
-            _.each(attrs.groups, function(group, index) {
-                group.order = group.order || index;
-            });
-
-            return attrs;
         },
 
         toJSON: function() {

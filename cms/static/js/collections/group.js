@@ -5,17 +5,20 @@ function (_, str, Backbone, gettext, GroupModel) {
     'use strict';
     var GroupCollection = Backbone.Collection.extend({
         model: GroupModel,
-        comparator: 'order',
-        /*
-         * Return next index for the model.
-         * @return {Number}
-         */
-        nextOrder: function() {
-            if(!this.length) {
-                return 0;
-            }
 
-            return this.last().get('order') + 1;
+        /*
+         * Sort groups by name, alphabetically.
+         */
+        comparator: function(first, second) {
+            var firstName = first.get('name').toLowerCase(),
+                secondName = second.get('name').toLowerCase();
+            if (firstName < secondName) {
+                return -1;
+            } else if (firstName === secondName) {
+                return 0;
+            } else {
+                return 1;
+            }
         },
         /**
          * Indicates if the collection is empty when all the models are empty
@@ -34,7 +37,7 @@ function (_, str, Backbone, gettext, GroupModel) {
          * Group A, Group B, Group AA, Group ZZZ etc.
          */
         getNextDefaultGroupName: function () {
-            var index = this.nextOrder(),
+            var index = this.length,
                 usedNames = _.pluck(this.toJSON(), 'name'),
                 name = '';
 

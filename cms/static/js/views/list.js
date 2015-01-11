@@ -26,7 +26,11 @@ define([
             this.emptyTemplate = this.loadTemplate(this.emptyTemplateName);
             this.listenTo(this.collection, 'add', this.addNewItemView);
             this.listenTo(this.collection, 'remove', this.onRemoveItem);
-            this.template = this.loadTemplate('add-list-item');
+            this.template = _.template([
+                '<button class="action action-add">',
+                '<i class="icon icon-plus"></i><%= interpolate(gettext(\'New %(item_type)s\'), {item_type: itemCategoryDisplayName}, true) %>',
+                '</button>'
+            ].join('\n'));
 
             // Don't render the add button when editing a form
             this.listenTo(this.collection, 'change:editing', this.toggleAddButton);

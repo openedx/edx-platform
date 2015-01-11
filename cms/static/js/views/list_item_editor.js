@@ -21,7 +21,7 @@ define([
 
         render: function() {
             this.$el.html(this.template(_.extend({
-        	error: this.model.validationError
+                error: this.model.validationError
             }, this.getTemplateOptions())));
         },
 

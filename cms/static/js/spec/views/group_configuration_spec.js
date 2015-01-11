@@ -492,7 +492,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['add-list-item', 'no-group-configurations', 'group-configuration-editor', 'group-edit']
+                ['no-group-configurations', 'group-configuration-editor', 'group-edit']
             );
 
             this.model = new GroupConfigurationModel({ id: 0 });
@@ -709,7 +709,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['add-list-item', 'no-content-groups', 'content-group-editor', 'content-group-details']
+                ['no-content-groups', 'content-group-editor', 'content-group-details']
             );
         });
 
