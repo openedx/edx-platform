@@ -12,8 +12,6 @@ define(['jquery', 'js/common_helpers/template_helpers', 'js/verify_student/views
                 'intro_step',
                 'make_payment_step',
                 'payment_confirmation_step',
-                'progress',
-                'requirements',
                 'review_photos_step',
                 'webcam_photo'
             ];
