@@ -19,7 +19,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 PagingView.prototype.initialize.call(this);
                 var collection = this.collection;
                 this.template = this.loadTemplate("asset-library");
-                this.listenTo(collection, 'destroy', this.onRemoveItem);
+                this.listenTo(collection, 'destroy', this.handleDestroy);
                 this.registerSortableColumn('js-asset-name-col', gettext('Name'), 'display_name', 'asc');
                 this.registerSortableColumn('js-asset-date-col', gettext('Date Added'), 'date_added', 'desc');
                 this.setInitialSortColumn('js-asset-date-col');
@@ -94,7 +94,7 @@ define(["jquery", "underscore", "gettext", "js/models/asset", "js/views/paging",
                 ViewUtils.hideLoadingIndicator();
             },
 
-            onRemoveItem: function(model) {
+            handleDestroy: function(model) {
                 this.collection.fetch({reset: true}); // reload the collection to get a fresh page full of items
                 analytics.track('Deleted Asset', {
                     'course': course_location_analytics,
