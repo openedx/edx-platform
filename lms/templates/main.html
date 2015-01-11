@@ -14,9 +14,12 @@
     % if responsive:
     <meta name="viewport" content="width=device-width, initial-scale=1">
     % endif
-<%! from django.utils.translation import ugettext as _ %>
-<%! from microsite_configuration import microsite %>
-<%! from microsite_configuration import page_title_breadcrumbs %>
+<%!
+from django.utils.translation import ugettext as _
+from pipeline_mako import render_require_js_path_overrides
+from microsite_configuration import microsite
+from microsite_configuration import page_title_breadcrumbs
+%>
 
 <%namespace name='static' file='static_content.html'/>
 <%! from django.utils.http import urlquote_plus %>
@@ -58,7 +61,13 @@
     })(this);
   </script>
 
-  <script type="text/javascript" src="/jsi18n/"></script>
+  ## RequireJS-enabled pages should include the "i18n" module as a requirement.
+  ## If RequireJS is not enabled, then we will need to load i18n explicitly
+  ## so that JavaScript on the page can use internationalization functions.
+  % if not enable_require_js:
+  <script type="text/javascript" src="/i18n.js"></script>
+  % endif
+
 
   <link rel="icon" type="image/x-icon" href="${static.url(microsite.get_value('favicon_path', settings.FAVICON_PATH))}" />
 
@@ -67,28 +76,16 @@
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  % if disable_courseware_js:
-    <%static:js group='base_vendor'/>
+  % if enable_require_js:
+    <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
   % else:
-    <%static:js group='main_vendor'/>
-  % endif
-
-  <script>
-    window.baseUrl = "${settings.STATIC_URL}";
-    (function (require) {
-    % if settings.DEBUG is True:
-        ## Using what amounts to a random number in the Development environment for cache-busting
-        var urlArgs = "bust=" + (new Date()).getTime();
+    % if disable_courseware_js:
+      <%static:js group='base_vendor'/>
     % else:
-        var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
+      <%static:js group='main_vendor'/>
     % endif
-      require.config({
-          baseUrl: baseUrl,
-          urlArgs: urlArgs
-      });
-    }).call(this, require || RequireJS.require);
-  </script>
-  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  % endif
 
   <%block name="headextra"/>
 
@@ -149,7 +146,7 @@
     </div>
 
     <%block name="footer">
-      ## Can be overridden by child templates wanting to hide the footer. 
+      ## Can be overridden by child templates wanting to hide the footer.
       <%
         if theme_enabled() and not is_microsite():
           footer_file = 'theme-footer.html'
@@ -163,7 +160,8 @@
 
   </div>
 
-  % if not disable_courseware_js:
+  <script>window.baseUrl = "${settings.STATIC_URL}";</script>
+  % if not enable_require_js and not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
   % endif
