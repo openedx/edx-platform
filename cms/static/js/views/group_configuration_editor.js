@@ -76,7 +76,8 @@ function(ListItemEditor, _, $, gettext, GroupEditView) {
             if (event && event.preventDefault) { event.preventDefault(); }
             var collection = this.model.get('groups');
             collection.add([{
-                name: collection.getNextDefaultGroupName()
+                name: collection.getNextDefaultGroupName(),
+                order: collection.nextOrder()
             }]);
         },
 
