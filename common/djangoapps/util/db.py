@@ -44,7 +44,7 @@ def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
     return wrapper
 
 
-def generate_int_id(minimum, maximum, used_ids=None):
+def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
     """
     Return a unique integer in the range [minimum, maximum], inclusive.
     """
