@@ -120,7 +120,11 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * True if this xblock contains an entrance exam module.
+             */
+            'is_entrance_exam': null
         },
 
         initialize: function () {
@@ -155,6 +159,10 @@ function(Backbone, _, str, ModuleUtils) {
 
         isPublishable: function(){
             return !this.get('published') || this.get('has_changes');
+        },
+
+        isEntranceExam: function(){
+            return this.get('is_entrance_exam') ;
         },
 
         /**
