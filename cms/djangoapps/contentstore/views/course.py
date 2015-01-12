@@ -70,6 +70,7 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
+from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
@@ -796,7 +797,8 @@ def settings_handler(request, course_key_string):
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
-                'upload_asset_url': upload_asset_url
+                'upload_asset_url': upload_asset_url,
+                'course_handler_url': reverse_course_url('course_handler', course_key),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -805,7 +807,34 @@ def settings_handler(request, course_key_string):
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
-            else:  # post or put, doesn't matter.
+            # For every other possible method type submitted by the caller...
+            else:
+
+                # If the entrance exams feature has been enabled, we'll need to check for some
+                # feature-specific settings and handle them accordingly
+                # We have to be careful that we're only executing the following logic if we actually
+                # need to create or delete an entrance exam from the specified course
+                if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+                    course_entrance_exam_present = course_module.entrance_exam_enabled
+                    entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
+                    ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
+
+                    # If the entrance exam box on the settings screen has been checked,
+                    # and the course does not already have an entrance exam attached...
+                    if entrance_exam_enabled and not course_entrance_exam_present:
+                        # Load the default minimum score threshold from settings, then try to override it
+                        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+                        if ee_min_score_pct and ee_min_score_pct != '':
+                            entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+                        # Create the entrance exam
+                        create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+
+                    # If the entrance exam box on the settings screen has been unchecked,
+                    # and the course has an entrance exam attached...
+                    elif not entrance_exam_enabled and course_entrance_exam_present:
+                        delete_entrance_exam(request, course_key)
+
+                # Perform the normal update workflow for the CourseDetails model
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder

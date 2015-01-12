@@ -1912,7 +1912,11 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+
+    # milestones
+    'milestones',
+
 )
 
 for app_name in OPTIONAL_APPS:

@@ -120,7 +120,11 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * Indicate the type of xblock
+             */
+            'override_type': null
         },
 
         initialize: function () {
@@ -155,6 +159,19 @@ function(Backbone, _, str, ModuleUtils) {
 
         isPublishable: function(){
             return !this.get('published') || this.get('has_changes');
+        },
+
+        canBeDeleted: function(){
+            //get the type of xblock
+            if(this.get('override_type') != null) {
+                var type = this.get('override_type');
+
+                //hide/remove the delete trash icon if type is entrance exam.
+                if (_.has(type, 'is_entrance_exam') && type['is_entrance_exam']) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         /**

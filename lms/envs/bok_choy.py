@@ -86,6 +86,10 @@ for log_name, log_level in LOG_OVERRIDES:
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 
+########################### Entrance Exams #################################
+FEATURES['MILESTONES_APP'] = True
+FEATURES['ENTRANCE_EXAMS'] = True
+
 # Point the URL used to test YouTube availability to our stub YouTube server
 YOUTUBE_PORT = 9080
 YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)

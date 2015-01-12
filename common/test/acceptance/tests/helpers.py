@@ -170,6 +170,19 @@ def enable_css_animations(page):
     """)
 
 
+def element_has_text(page, css_selector, text):
+    """
+    Return true if the given text is present in the list.
+    """
+    text_present = False
+    text_list = page.q(css=css_selector).text
+
+    if len(text_list) > 0 and (text in text_list):
+        text_present = True
+
+    return text_present
+
+
 class UniqueCourseTest(WebAppTest):
     """
     Test that provides a unique course ID.
