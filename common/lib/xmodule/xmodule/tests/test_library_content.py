@@ -351,6 +351,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
             "location": unicode(self.lc_block.location),
             "added": [block_info],
             "result": [block_info],
+            "previous_count": 0,
+            "max_count": 1,
         })
         self.publisher.reset_mock()
 
@@ -364,6 +366,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         event_data = self._assert_event_was_published("assigned")
         self.assertEqual(event_data["added"][0]["usage_key"], unicode(new_child.location))
         self.assertEqual(len(event_data["result"]), 2)
+        self.assertEqual(event_data["previous_count"], 1)
+        self.assertEqual(event_data["max_count"], 2)
 
     def test_assigned_descendants(self):
         """
