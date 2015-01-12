@@ -29,10 +29,13 @@
             <a href="${get_online_help_info(online_help_token)['pdf_url']}" target="_blank" rel="external" class="action action-primary">${_("Building and Running an {platform_name} Course PDF").format(platform_name=settings.PLATFORM_NAME)}</a>
           </li>
 
-        <li class="action-item">
-          <a href="http://help.edge.edx.org/" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
-          <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
-        </li>
+        % if settings.TENDER_DOMAIN:
+          <li class="action-item">
+            <a href="//${settings.TENDER_DOMAIN}" rel="external" class="action action-primary">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</a>
+            <span class="tip">${_("{studio_name} Author Support").format(studio_name=settings.STUDIO_NAME)}</span>
+          </li>
+        % endif
+
         <li class="action-item">
           <a href="https://edge.edx.org/courses/edX/edX101/How_to_Create_an_edX_Course/about" rel="external" class="action action-primary">${_("Enroll in edX101")}</a>
           <span class="tip">${_("How to use {studio_name} to build your course").format(studio_name=settings.STUDIO_NAME)}</span>
@@ -40,6 +43,7 @@
       </ul>
       </div>
 
+    % if settings.TENDER_DOMAIN:
       <div class="feedback">
         <h3 class="title">${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}</h3>
 
@@ -50,10 +54,11 @@
         <ul class="list-actions">
           <li class="action-item">
 
-            <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon fa fa-comments"></i>${_("Contact Us")}</a>
+            <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary show-tender" title="${_("Use our feedback tool, Tender, to share your feedback")}"><i class="icon fa fa-comments"></i>${_("Contact Us")}</a>
           </li>
         </ul>
       </div>
+    % endif
     </section>
   </div>
 </div>

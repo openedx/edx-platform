@@ -1,6 +1,9 @@
 ## -*- coding: utf-8 -*-
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+import json
+%>
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
@@ -46,7 +49,8 @@
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = "${settings.STATIC_URL}";
+      window.baseUrl = ${json.dumps(settings.STATIC_URL)};
+      window.TENDER_DOMAIN = ${json.dumps(settings.TENDER_DOMAIN)};
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
