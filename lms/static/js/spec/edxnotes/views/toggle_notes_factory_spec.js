@@ -31,7 +31,7 @@ define([
             );
             this.toggleNotes = ToggleNotesFactory(true, '/test_url');
             this.button = $('.action-toggle-notes');
-            this.icon = this.button.find('.checkbox-icon');
+            this.label = this.button.find('.utility-control-label');
         });
 
         afterEach(function () {
@@ -44,14 +44,14 @@ define([
             var requests = AjaxHelpers.requests(this);
 
             expect(this.button).not.toHaveClass('is-disabled');
-            expect(this.icon).toHaveClass('icon-check');
-            expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
+            expect(this.button).toHaveAttr('aria-pressed', 'true');
 
             this.button.click();
-            expect(this.icon).toHaveClass('icon-check-empty');
-            expect(this.icon).not.toHaveClass('icon-check');
+            expect(this.label).toContainText('Show notes');
             expect(this.button).not.toHaveClass('is-active');
+            expect(this.button).toHaveAttr('aria-pressed', 'false');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -60,9 +60,9 @@ define([
             AjaxHelpers.respondWithJson(requests, {});
 
             this.button.click();
-            expect(this.icon).toHaveClass('icon-check');
-            expect(this.icon).not.toHaveClass('icon-check-empty');
+            expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
+            expect(this.button).toHaveAttr('aria-pressed', 'true');
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
