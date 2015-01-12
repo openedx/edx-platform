@@ -26,7 +26,9 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 
 from .component import get_component_templates, CONTAINER_TEMPATES
-from student.auth import STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
+from student.auth import (
+    STUDIO_VIEW_USERS, STUDIO_EDIT_ROLES, get_user_permissions, has_studio_read_access, has_studio_write_access
+)
 from student.roles import CourseCreatorRole, CourseInstructorRole, CourseStaffRole, LibraryUserRole
 from student import auth
 from util.json_request import expect_json, JsonResponse, JsonResponseBadRequest
@@ -71,7 +73,10 @@ def _display_library(library_key_string, request):
         log.exception("Non-library key passed to content libraries API.")  # Should never happen due to url regex
         raise Http404  # This is not a library
     if not has_studio_read_access(request.user, library_key):
-        log.exception(u"User %s tried to access library %s without permission", request.user.username, unicode(library_key))
+        log.exception(
+            u"User %s tried to access library %s without permission",
+            request.user.username, unicode(library_key)
+        )
         raise PermissionDenied()
 
     library = modulestore().get_library(library_key)
@@ -80,7 +85,10 @@ def _display_library(library_key_string, request):
         raise Http404
 
     response_format = 'html'
-    if request.REQUEST.get('format', 'html') == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'text/html'):
+    if (
+            request.REQUEST.get('format', 'html') == 'json' or
+            'application/json' in request.META.get('HTTP_ACCEPT', 'text/html')
+    ):
         response_format = 'json'
 
     return library_blocks_view(library, request.user, response_format)
@@ -134,8 +142,8 @@ def _create_library(request):
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=error.message)}
-        )
+            "ErrMsg": _("Unable to create library '{name}'.\n\n{err}").format(name=display_name, err=error.message)
+        })
     except DuplicateCourseError:
         log.exception("Unable to create library - one already exists with the same key.")
         return JsonResponseBadRequest({
@@ -203,7 +211,7 @@ def manage_library_users(request, library_key_string):
     if not isinstance(library_key, LibraryLocator):
         raise Http404  # This is not a library
     user_perms = get_user_permissions(request.user, library_key)
-    if not (user_perms & STUDIO_VIEW_USERS):
+    if not user_perms & STUDIO_VIEW_USERS:
         raise PermissionDenied()
     library = modulestore().get_library(library_key)
     if library is None:

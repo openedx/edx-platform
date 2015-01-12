@@ -67,7 +67,7 @@ def _manage_users(request, course_key):
     """
     # check that logged in user has permissions to this item
     user_perms = get_user_permissions(request.user, course_key)
-    if not (user_perms & STUDIO_VIEW_USERS):
+    if not user_perms & STUDIO_VIEW_USERS:
         raise PermissionDenied()
 
     course_module = modulestore().get_course(course_key)
@@ -156,7 +156,8 @@ def _course_team_user(request, course_key, email):
         role = role_type(course_key)
         if role_type.ROLE == new_role:
             if (requester_perms & STUDIO_EDIT_ROLES) or (user.id == request.user.id and old_roles):
-                # User has STUDIO_EDIT_ROLES permission or is currently a member of a higher role, and is thus demoting themself
+                # User has STUDIO_EDIT_ROLES permission or
+                # is currently a member of a higher role, and is thus demoting themself
                 auth.add_users(request.user, role, user)
                 role_added = True
             else:

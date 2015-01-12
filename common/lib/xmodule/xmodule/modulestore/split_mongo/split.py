@@ -673,7 +673,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
-                    copy.deepcopy(system.course_entry.structure['blocks']),  # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
+                    # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
+                    copy.deepcopy(system.course_entry.structure['blocks']),
                     block_id,
                     depth,
                     new_module_data
@@ -2125,8 +2126,11 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Set of all descendent block IDs of dest_usage that are to be replaced:
             block_key = BlockKey(dest_usage.block_type, dest_usage.block_id)
             orig_descendants = set(self.descendants(dest_structure['blocks'], block_key, depth=None, descendent_map={}))
-            orig_descendants.remove(block_key)  # The descendants() method used above adds the block itself, which we don't consider a descendant.
-            new_descendants = self._copy_from_template(source_structures, source_keys, dest_structure, block_key, user_id)
+            # The descendants() method used above adds the block itself, which we don't consider a descendant.
+            orig_descendants.remove(block_key)
+            new_descendants = self._copy_from_template(
+                source_structures, source_keys, dest_structure, block_key, user_id
+            )
 
             # Update the edit info:
             dest_info = dest_structure['blocks'][block_key]
@@ -2144,7 +2148,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.update_structure(destination_course, dest_structure)
             self._update_head(destination_course, index_entry, destination_course.branch, dest_structure['_id'])
         # Return usage locators for all the new children:
-        return [destination_course.make_usage_key(*k) for k in dest_structure['blocks'][block_key]['fields']['children']]
+        return [
+            destination_course.make_usage_key(*k)
+            for k in dest_structure['blocks'][block_key]['fields']['children']
+        ]
 
     def _copy_from_template(self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id):
         """
@@ -2184,10 +2191,13 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_block_info['defaults'] = new_block_info['fields']
 
             # <workaround>
-            # CAPA modules store their 'markdown' value (an alternate representation of their content) in Scope.settings rather than Scope.content :-/
+            # CAPA modules store their 'markdown' value (an alternate representation of their content)
+            # in Scope.settings rather than Scope.content :-/
             # markdown is a field that really should not be overridable - it fundamentally changes the content.
-            # capa modules also use a custom editor that always saves their markdown field to the metadata, even if it hasn't changed, which breaks our override system.
-            # So until capa modules are fixed, we special-case them and remove their markdown fields, forcing the inherited version to use XML only.
+            # capa modules also use a custom editor that always saves their markdown field to the metadata,
+            # even if it hasn't changed, which breaks our override system.
+            # So until capa modules are fixed, we special-case them and remove their markdown fields,
+            # forcing the inherited version to use XML only.
             if usage_key.block_type == 'problem' and 'markdown' in new_block_info['defaults']:
                 del new_block_info['defaults']['markdown']
             # </workaround>
@@ -2199,7 +2209,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_block_info['edit_info'] = existing_block_info.get('edit_info', {})
             new_block_info['edit_info']['previous_version'] = new_block_info['edit_info'].get('update_version', None)
             new_block_info['edit_info']['update_version'] = dest_structure['_id']
-            # Note we do not set 'source_version' - it's only used for copying identical blocks from draft to published as part of publishing workflow.
+            # Note we do not set 'source_version' - it's only used for copying identical blocks
+            # from draft to published as part of publishing workflow.
             # Setting it to the source_block_info structure version here breaks split_draft's has_changes() method.
             new_block_info['edit_info']['edited_by'] = user_id
             new_block_info['edit_info']['edited_on'] = datetime.datetime.now(UTC)
@@ -2208,7 +2219,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             children = source_block_info['fields'].get('children')
             if children:
                 children = [src_course_key.make_usage_key(child.type, child.id) for child in children]
-                new_blocks |= self._copy_from_template(source_structures, children, dest_structure, new_block_key, user_id)
+                new_blocks |= self._copy_from_template(
+                    source_structures, children, dest_structure, new_block_key, user_id
+                )
 
             new_blocks.add(new_block_key)
             # And add new_block_key to the list of new_parent_block_key's new children:

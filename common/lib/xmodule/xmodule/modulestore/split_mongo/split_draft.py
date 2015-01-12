@@ -110,7 +110,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                     if usage_key.category in DIRECT_ONLY_CATEGORIES:
                         self.publish(usage_key.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
                         children = getattr(self.get_item(usage_key, **kwargs), "children", [])
-                        keys_to_check.extend(children)  # e.g. if usage_key is a chapter, it may have an auto-publish sequential child
+                        # e.g. if usage_key is a chapter, it may have an auto-publish sequential child
+                        keys_to_check.extend(children)
         return new_keys
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
@@ -431,6 +432,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         pass
 
     def _get_head(self, xblock, branch):
+        """ Gets block at the head of specified branch """
         try:
             course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
         except ItemNotFoundError:

@@ -365,6 +365,7 @@ class XBlockWrapper(PageObject):
         return self._validation_paragraph('error').present
 
     @property
+    # pylint: disable=invalid-name
     def has_validation_not_configured_warning(self):
         """ Is a validation "not configured" message shown? """
         return self._validation_paragraph('not-configured').present
@@ -380,6 +381,7 @@ class XBlockWrapper(PageObject):
         return self._validation_paragraph('error').text[0]
 
     @property
+    # pylint: disable=invalid-name
     def validation_not_configured_warning_text(self):
         """ Get the text of the validation "not configured" message. """
         return self._validation_paragraph('not-configured').text[0]

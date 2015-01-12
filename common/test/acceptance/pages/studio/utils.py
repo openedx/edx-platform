@@ -118,7 +118,10 @@ def add_component(page, item_type, specific_type):
     if multiple_templates:
         sub_template_menu_div_selector = '.new-component-{}'.format(item_type)
         page.wait_for_element_visibility(sub_template_menu_div_selector, 'Wait for the templates sub-menu to appear')
-        page.wait_for_element_invisibility('.add-xblock-component .new-component', 'Wait for the add component menu to disappear')
+        page.wait_for_element_invisibility(
+            '.add-xblock-component .new-component',
+            'Wait for the add component menu to disappear'
+        )
 
         all_options = page.q(css='.new-component-{} ul.new-component-template li a span'.format(item_type))
         chosen_option = all_options.filter(lambda el: el.text == specific_type).first

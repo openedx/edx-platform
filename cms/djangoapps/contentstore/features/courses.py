@@ -1,5 +1,6 @@
 # pylint: disable=missing-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=unused-argument
 
 from lettuce import world, step
 from common import *
@@ -33,7 +34,7 @@ def i_create_a_course(step):
     create_a_course()
 
 
-# pylint disable=unused-argument, invalid-name
+# pylint: disable=invalid-name
 @step('I click the course link in Studio Home$')
 def i_click_the_course_link_in_studio_home(step):
     course_css = 'a.course-link'
@@ -42,7 +43,11 @@ def i_click_the_course_link_in_studio_home(step):
 
 @step('I see an error about the length of the org/course/run tuple')
 def i_see_error_about_length(step):
-    assert world.css_has_text('#course_creation_error', 'The combined length of the organization, course number, and course run fields cannot be more than 65 characters.')
+    assert world.css_has_text(
+        '#course_creation_error',
+        'The combined length of the organization, course number, '
+        'and course run fields cannot be more than 65 characters.'
+    )
 
 ############ ASSERTIONS ###################
 
@@ -54,7 +59,6 @@ def courseware_page_has_loaded_in_studio(step):
 
 
 @step('I see the course listed in Studio Home$')
-# pylint disable=unused-argument
 def i_see_the_course_in_studio_home(step):
     course_css = 'h3.class-title'
     assert world.css_has_text(course_css, world.scenario_dict['COURSE'].display_name)
