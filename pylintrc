@@ -56,7 +56,8 @@ disable=
     too-many-return-statements,
     too-many-branches,
     too-many-arguments,
-    too-many-locals
+    too-many-locals,
+    duplicate-code
 
 
 [REPORTS]
