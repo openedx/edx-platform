@@ -21,13 +21,7 @@ from xmodule.modulestore.mongo.base import (
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
-from search.search_engine_base import SearchEngine
-
 log = logging.getLogger(__name__)
-
-# Use default index and document names for now
-INDEX_NAME = "courseware_index"
-DOCUMENT_TYPE = "courseware_content"
 
 
 def wrap_draft(item):
@@ -643,76 +637,12 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
-    def do_index(self, location, delete=False):
+    def do_course_reindex(self, course_key, depth=0, **kwargs):
         """
-        Main routine to index (for purposes of searching) from given location and other stuff on down
+        Get the course with the given courseid (org/course/run)
         """
-        # TODO - inline for now, need to move this out to a celery task
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
-        if not searcher:
-            return
-
-        location_info = {
-            "course": unicode(location.course_key),
-        }
-
-        def _fetch_item(item_location):
-            """ Fetch the item from the modulestore location, log if not found, but continue """
-            try:
-                item = self.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            except ItemNotFoundError:
-                log.warning('Cannot find: %s', item_location)
-                return None
-
-            return item
-
-        def index_item_location(item_location, current_start_date):
-            """ add this item to the search index """
-            item = _fetch_item(item_location)
-            if item:
-                if item.start and (not current_start_date or item.start > current_start_date):
-                    current_start_date = item.start
-
-                if item.has_children:
-                    for child_loc in item.children:
-                        index_item_location(child_loc, current_start_date)
-
-                item_index = {}
-                item_index.update(location_info)
-                item_index.update(item.index_dictionary())
-                item_index.update({
-                    'id': unicode(item.scope_ids.usage_id),
-                })
-
-                if current_start_date:
-                    item_index.update({
-                        "start_date": current_start_date
-                    })
-
-                searcher.index(DOCUMENT_TYPE, item_index)
-
-        def remove_index_item_location(item_location):
-            """ remove this item from the search index """
-            item = _fetch_item(item_location)
-            if item:
-                if item.has_children:
-                    for child_loc in item.children:
-                        remove_index_item_location(child_loc)
-
-                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
-
-        try:
-            if delete:
-                remove_index_item_location(location)
-            else:
-                index_item_location(location, None)
-        except Exception as err:  # pylint: disable=broad-except
-            # broad exception so that index operation does not prevent the rest of the application from working
-            log.exception(
-                "Indexing error encountered, courseware index may be out of date %s - %s",
-                location.course_key,
-                str(err)
-            )
+        location = course_key.make_usage_key('course', course_key.run)
+        return self.do_index(location, delete=False)
 
     def publish(self, location, user_id, **kwargs):
         """

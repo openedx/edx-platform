@@ -322,6 +322,21 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             return None
 
     @strip_key
+    def do_index(self, course_key, depth=0, **kwargs):
+        """
+        restarts index on a course with the course_id. If no such course exists,
+        it returns None
+
+        :param course_key: must be a CourseKey
+        """
+        assert(isinstance(course_key, CourseKey))
+        store = self._get_modulestore_for_courseid(course_key)
+        try:
+            return store.do_course_reindex(course_key, depth=depth, **kwargs)
+        except ItemNotFoundError:
+            return None
+
+    @strip_key
     @contract(library_key='LibraryLocator')
     def get_library(self, library_key, depth=0, **kwargs):
         """

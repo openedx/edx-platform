@@ -29,6 +29,8 @@ class CoursewareSearchTest(UniqueCourseTest):
             That's where you'll find me.
         """
     SEARCH_STRING = "chimney"
+    EDITED_CHAPTER_NAME = "Section 2 - edited"
+    EDITED_SEARCH_STRING = "edited"
 
     def setUp(self):
         """
@@ -52,8 +54,12 @@ class CoursewareSearchTest(UniqueCourseTest):
         )
 
         course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Section').add_children(
-                XBlockFixtureDesc('sequential', 'Subsection')
+            XBlockFixtureDesc('chapter', 'Section 1').add_children(
+                XBlockFixtureDesc('sequential', 'Subsection 1')
+            )
+        ).add_children(
+            XBlockFixtureDesc('chapter', 'Section 2').add_children(
+                XBlockFixtureDesc('sequential', 'Subsection 2')
             )
         ).install()
 
@@ -72,18 +78,32 @@ class CoursewareSearchTest(UniqueCourseTest):
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self.courseware_search_page.visit()
 
-    def _studio_publish_content(self):
+    def _studio_publish_content(self, section_index):
+        """
+        Publish content on studio course page under specified section
+        """
         self.course_outline.visit()
-        subsection = self.course_outline.section_at(0).subsection_at(0)
+        subsection = self.course_outline.section_at(section_index).subsection_at(0)
         subsection.toggle_expand()
         unit = subsection.unit_at(0)
         unit.publish()
 
-    def _studio_add_content(self):
+    def _studio_edit_chapter_name(self, section_index):
+        """
+        Edit chapter name on studio course page under specified section
+        """
+        self.course_outline.visit()
+        section = self.course_outline.section_at(section_index)
+        section.change_name(self.EDITED_CHAPTER_NAME)
+
+    def _studio_add_content(self, section_index):
+        """
+        Add content on studio course page under specified section
+        """
 
         # create a unit in course outline
         self.course_outline.visit()
-        subsection = self.course_outline.section_at(0).subsection_at(0)
+        subsection = self.course_outline.section_at(section_index).subsection_at(0)
         subsection.toggle_expand()
         subsection.add_unit()
 
@@ -97,6 +117,16 @@ class CoursewareSearchTest(UniqueCourseTest):
         type_in_codemirror(unit_page, 0, self.HTML_CONTENT)
         click_css(unit_page, '.action-save', 0)
 
+    def _studio_reindex(self):
+        """
+        Reindex course content on studio course page
+        """
+
+        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self.course_outline.visit()
+        self.course_outline.start_reindex()
+        self.course_outline.wait_for_ajax()
+
     def test_search(self):
         """
         Make sure that you can search for something.
@@ -104,20 +134,48 @@ class CoursewareSearchTest(UniqueCourseTest):
 
         # Create content in studio without publishing.
         self._auto_auth('STAFF_USER', 'staff101@example.com', True)
-        self._studio_add_content()
+        self._studio_add_content(0)
 
         # Do a search, there should be no results shown.
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit().search_for_term(self.SEARCH_STRING)
-        self.browser.save_screenshot('search1.png')
+        self.courseware_search_page.visit()
+        self.courseware_search_page.search_for_term(self.SEARCH_STRING)
         assert self.SEARCH_STRING not in self.courseware_search_page.search_results.html[0]
 
         # Publish in studio to trigger indexing.
         self._auto_auth('STAFF_USER', 'staff101@example.com', True)
-        self._studio_publish_content()
+        self._studio_publish_content(0)
 
         # Do the search again, this time we expect results.
         self._auto_auth(self.USERNAME, self.EMAIL, False)
-        self.courseware_search_page.visit().search_for_term(self.SEARCH_STRING)
-        self.browser.save_screenshot('search2.png')
+        self.courseware_search_page.visit()
+        self.courseware_search_page.search_for_term(self.SEARCH_STRING)
         assert self.SEARCH_STRING in self.courseware_search_page.search_results.html[0]
+
+    def test_reindex(self):
+        """
+        Make sure new content gets reindexed on button press.
+        """
+
+        # Create content in studio without publishing.
+        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self._studio_add_content(1)
+
+        # Publish in studio to trigger indexing, and edit chapter name afterwards.
+        self._studio_publish_content(1)
+        self._studio_edit_chapter_name(1)
+
+        # Do a search, there should be no results shown.
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_search_page.visit()
+        self.courseware_search_page.search_for_term(self.EDITED_SEARCH_STRING)
+        assert self.EDITED_SEARCH_STRING not in self.courseware_search_page.search_results.html[0]
+
+        # Do a ReIndex from studio, to add edited chapter name
+        self._studio_reindex()
+
+        # Do the search again, this time we expect results.
+        self._auto_auth(self.USERNAME, self.EMAIL, False)
+        self.courseware_search_page.visit()
+        self.courseware_search_page.search_for_term(self.EDITED_SEARCH_STRING)
+        assert self.EDITED_SEARCH_STRING in self.courseware_search_page.search_results.html[0]

@@ -80,6 +80,7 @@ urlpatterns += patterns(
         'course_info_update_handler'
     ),
     url(r'^home/$', 'course_listing', name='home'),
+    url(r'^course_index/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_index_handler', name='course_index_handler'),
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
     url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_notifications_handler'),
     url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_rerun_handler', name='course_rerun_handler'),
