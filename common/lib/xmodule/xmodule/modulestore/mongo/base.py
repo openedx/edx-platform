@@ -1225,7 +1225,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # attach to parent if given
         if 'detached' not in xblock._class_tags:
             parent = self.get_item(parent_usage_key)
-            parent.children.append(xblock.location)
+
+            # Originally added to support entrance exams (settings.FEATURES.get('ENTRANCE_EXAMS'))
+            if kwargs.get('position') is None:
+                parent.children.append(xblock.location)
+            else:
+                parent.children.insert(kwargs.get('position'), xblock.location)
+
             self.update_item(parent, user_id)
 
         return xblock

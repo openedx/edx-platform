@@ -1920,7 +1920,9 @@ OPTIONAL_APPS = (
 
     # edxval
     'edxval',
-    'milestones'
+
+    # milestones
+    'milestones',
 )
 
 for app_name in OPTIONAL_APPS:

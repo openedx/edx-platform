@@ -1,3 +1,6 @@
+"""
+Django module container for classes and operations related to the "Course Module" content type
+"""
 import logging
 from cStringIO import StringIO
 from math import exp
@@ -8,12 +11,13 @@ from datetime import datetime
 import dateutil.parser
 from lazy import lazy
 
+
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
 import json
 
-from xblock.fields import Scope, List, String, Dict, Boolean, Integer
+from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
 
@@ -655,6 +659,31 @@ class CourseFields(object):
             {"display_name": _("Both"), "value": CATALOG_VISIBILITY_CATALOG_AND_ABOUT},
             {"display_name": _("About"), "value": CATALOG_VISIBILITY_ABOUT},
             {"display_name": _("None"), "value": CATALOG_VISIBILITY_NONE}]
+    )
+
+    entrance_exam_enabled = Boolean(
+        display_name=_("Entrance Exam Enabled"),
+        help=_(
+            "Specify whether students must complete an entrance exam before they can view your course content." +
+            "Note, you must enable Entrance Exams for this course setting to take effect."),
+        default=False,
+        scope=Scope.settings,
+    )
+
+    entrance_exam_minimum_score_pct = Float(
+        display_name=_("Entrance Exam Minimum Score (%)"),
+        help=_(
+            "Specify a minimum percentage score for an entrance exam before students can view your course content." +
+            "Note, you must enable Entrance Exams for this course setting to take effect."),
+        default=65,
+        scope=Scope.settings,
+    )
+
+    entrance_exam_id = String(
+        display_name=_("Entrance Exam ID"),
+        help=_("Content module identifier (location) of entrance exam."),
+        default=None,
+        scope=Scope.settings,
     )
 
 

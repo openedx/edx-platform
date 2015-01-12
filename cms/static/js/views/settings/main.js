@@ -64,9 +64,20 @@ var DetailsView = ValidatingView.extend({
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
+
         var pre_requisite_courses = this.model.get('pre_requisite_courses');
         pre_requisite_courses = pre_requisite_courses.length > 0 ? pre_requisite_courses : '';
         this.$el.find('#' + this.fieldToSelectorMap['pre_requisite_courses']).val(pre_requisite_courses);
+
+        if (this.model.get('entrance_exam_enabled') == 'true') {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
+            this.$('.div-grade-requirements').show();
+        }
+        else {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
+            this.$('.div-grade-requirements').hide();
+        }
+        this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
         return this;
     },
@@ -80,7 +91,9 @@ var DetailsView = ValidatingView.extend({
         'intro_video' : 'course-introduction-video',
         'effort' : "course-effort",
         'course_image_asset_path': 'course-image-url',
-        'pre_requisite_courses': 'pre-requisite-course'
+        'pre_requisite_courses': 'pre-requisite-course',
+        'entrance_exam_enabled': 'entrance-exam-enabled',
+        'entrance_exam_minimum_score_pct': 'entrance-exam-minimum-score-pct'
     },
 
     updateTime : function(e) {
@@ -155,6 +168,23 @@ var DetailsView = ValidatingView.extend({
             break;
         case 'course-effort':
             this.setField(event);
+            break;
+        case 'entrance-exam-enabled':
+            if($(event.currentTarget).is(":checked")){
+                this.$('.div-grade-requirements').show();
+            }else{
+                this.$('.div-grade-requirements').hide();
+            }
+            this.setField(event);
+            break;
+        case 'entrance-exam-minimum-score-pct':
+            // If the val is an empty string then update model with default value.
+            if ($(event.currentTarget).val() === '') {
+                this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
+            }
+            else {
+                this.setField(event);
+            }
             break;
         case 'course-short-description':
             this.setField(event);

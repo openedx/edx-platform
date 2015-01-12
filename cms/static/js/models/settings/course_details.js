@@ -1,4 +1,5 @@
-define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
+    function(Backbone, _, gettext, ValidationHelpers) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -16,7 +17,9 @@ var CourseDetails = Backbone.Model.extend({
         effort: null,	// an int or null,
         course_image_name: '', // the filename
         course_image_asset_path: '', // the full URL (/c4x/org/course/num/asset/filename)
-        pre_requisite_courses: []
+        pre_requisite_courses: [],
+        entrance_exam_enabled : '',
+        entrance_exam_minimum_score_pct: '50'
     },
 
     validate: function(newattrs) {
@@ -43,6 +46,16 @@ var CourseDetails = Backbone.Model.extend({
                 errors.intro_video = gettext("Key should only contain letters, numbers, _, or -");
             }
             // TODO check if key points to a real video using google's youtube api
+        }
+        if(_.has(newattrs, 'entrance_exam_minimum_score_pct')){
+            var range = {
+                min: 1,
+                max: 100
+            };
+            if(!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)){
+                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between "
+                    + range.min +" and "+ range.max +".");
+            }
         }
         if (!_.isEmpty(errors)) return errors;
         // NOTE don't return empty errors as that will be interpreted as an error state

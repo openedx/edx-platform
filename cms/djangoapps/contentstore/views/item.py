@@ -13,6 +13,7 @@ from functools import partial
 from static_replace import replace_static_urls
 from xmodule_modifiers import wrap_xblock, request_token
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, HttpResponse, Http404
@@ -85,6 +86,17 @@ def usage_key_with_run(usage_key_string):
     usage_key = UsageKey.from_string(usage_key_string)
     usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
     return usage_key
+
+
+def _filter_entrance_exam_grader(graders):
+    """
+    If the entrance exams feature is enabled we need to hide away the grader from
+    views/controls like the 'Grade as' dropdown that allows a course author to select
+    the grader type for a given section of a course
+    """
+    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+        graders = [grader for grader in graders if grader.get('type') != u'Entrance Exam']
+    return graders
 
 
 # pylint: disable=unused-argument
@@ -513,6 +525,15 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
 
 @login_required
 @expect_json
+def create_item(request):
+    """
+    Exposes internal helper method without breaking existing bindings/dependencies
+    """
+    return _create_item(request)
+
+
+@login_required
+@expect_json
 def _create_item(request):
     """View for create items."""
     usage_key = usage_key_with_run(request.json['parent_locator'])
@@ -549,6 +570,15 @@ def _create_item(request):
         if display_name is not None:
             metadata['display_name'] = display_name
 
+        # Entrance Exams: Chapter module positioning
+        child_position = None
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            is_entrance_exam = request.json.get('is_entrance_exam', False)
+            if category == 'chapter' and is_entrance_exam:
+                metadata['is_entrance_exam'] = is_entrance_exam
+                metadata['in_entrance_exam'] = True  # Inherited metadata, all children will have it
+                child_position = 0
+
         # TODO need to fix components that are sending definition_data as strings, instead of as dicts
         # For now, migrate them into dicts here.
         if isinstance(data, basestring):
@@ -562,7 +592,31 @@ def _create_item(request):
             definition_data=data,
             metadata=metadata,
             runtime=parent.runtime,
+            position=child_position
         )
+
+        # Entrance Exams: Grader assignment
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            course = store.get_course(usage_key.course_key)
+            if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:
+                if category == 'sequential' and request.json.get('parent_locator') == course.entrance_exam_id:
+                    grader = {
+                        "type": "Entrance Exam",
+                        "min_count": 0,
+                        "drop_count": 0,
+                        "short_label": "Entrance",
+                        "weight": 0
+                    }
+                    grading_model = CourseGradingModel.update_grader_from_json(
+                        course.id,
+                        grader,
+                        request.user
+                    )
+                    CourseGradingModel.update_section_grader_type(
+                        created_block,
+                        grading_model['type'],
+                        request.user
+                    )
 
         # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
         # if we add one then we need to also add it to the policy information (i.e. metadata)
@@ -641,6 +695,15 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
             store.update_item(parent, user.id)
 
         return dest_module.location
+
+
+@login_required
+@expect_json
+def delete_item(request, usage_key):
+    """
+    Exposes internal helper method without breaking existing bindings/dependencies
+    """
+    _delete_item(usage_key, request.user)
 
 
 def _delete_item(usage_key, user):
@@ -781,6 +844,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         else:
             graders = []
 
+    # Filter the graders data as needed
+    graders = _filter_entrance_exam_grader(graders)
+
     # Compute the child info first so it can be included in aggregate information for the parent
     should_visit_children = include_child_info and (course_outline and not is_xblock_unit or not course_outline)
     if should_visit_children and xblock.has_children:
@@ -798,6 +864,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     else:
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
+
+    #instead of adding a new feature directly into xblock-info, we should add them into override_type.
+    override_type = {}
+    if getattr(xblock, "is_entrance_exam", None):
+        override_type['is_entrance_exam'] = xblock.is_entrance_exam
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -818,6 +889,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
+        "override_type": override_type,
     }
     if data is not None:
         xblock_info["data"] = data

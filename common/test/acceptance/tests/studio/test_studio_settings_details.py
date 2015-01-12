@@ -1,15 +1,19 @@
 """
 Acceptance tests for Studio's Settings Details pages
 """
+from unittest import skip
+
 from acceptance.tests.studio.base_studio_test import StudioCourseTest
 from ...fixtures.course import CourseFixture
+from ...pages.studio.settings import SettingsPage
+from ...pages.studio.overview import CourseOutlinePage
+from ...tests.studio.base_studio_test import StudioCourseTest
 from ..helpers import (
     generate_course_key,
     select_option_by_value,
-    is_option_value_selected
+    is_option_value_selected,
+    element_has_text,
 )
-
-from ...pages.studio.settings import SettingsPage
 
 
 class SettingsMilestonesTest(StudioCourseTest):
@@ -82,3 +86,43 @@ class SettingsMilestonesTest(StudioCourseTest):
         self.settings_detail.save_changes()
         self.assertTrue('Your changes have been saved.' in self.settings_detail.browser.page_source)
         self.assertTrue(is_option_value_selected(browser_query=self.settings_detail.pre_requisite_course, value=''))
+
+    def test_page_has_enable_entrance_exam_field(self):
+        """
+        Test to make sure page has 'enable entrance exam' field.
+        """
+        self.assertTrue(self.settings_detail.entrance_exam_field)
+
+    @skip('Passes in devstack, passes individually in Jenkins, fails in suite in Jenkins.')
+    def test_enable_entrance_exam_for_course(self):
+        """
+        Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
+        And also that the entrance exam is destroyed after deselecting the checkbox.
+        """
+        self.settings_detail.require_entrance_exam(required=True)
+        self.settings_detail.save_changes()
+
+        # getting the course outline page.
+        course_outline_page = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
+        course_outline_page.visit()
+
+        # title with text 'Entrance Exam' should be present on page.
+        self.assertTrue(element_has_text(
+            page=course_outline_page,
+            css_selector='span.section-title',
+            text='Entrance Exam'
+        ))
+
+        # Delete the currently created entrance exam.
+        self.settings_detail.visit()
+        self.settings_detail.require_entrance_exam(required=False)
+        self.settings_detail.save_changes()
+
+        course_outline_page.visit()
+        self.assertFalse(element_has_text(
+            page=course_outline_page,
+            css_selector='span.section-title',
+            text='Entrance Exam'
+        ))

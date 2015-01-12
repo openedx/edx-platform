@@ -21,9 +21,11 @@ from capa.xqueue_interface import XQueueInterface
 from courseware.access import has_access, get_user_role
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache, DjangoKeyValueStore
+from courseware.models import StudentModule
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import LmsModuleSystem, unquote_slashes, quote_slashes
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
+from .module_utils import yield_dynamic_descriptor_descendents
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
@@ -35,6 +37,7 @@ from xblock.exceptions import NoSuchHandlerError
 from xblock.django.request import django_to_webob_request, webob_to_django_response
 from xmodule.error_module import ErrorDescriptor, NonStaffErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore, ModuleI18nService
@@ -53,7 +56,10 @@ from xmodule.x_module import XModuleDescriptor
 
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-
+if settings.FEATURES.get('MILESTONES_APP', False):
+    from milestones import api as milestones_api
+    from milestones.exceptions import InvalidMilestoneRelationshipTypeException
+    from util.milestones_helpers import serialize_user
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +99,31 @@ def make_track_function(request):
     return function
 
 
+def _get_required_content(course, user):
+    """
+    Queries milestones subsystem to see if the specified course is gated on one or more milestones,
+    and if those milestones can be fulfilled via completion of a particular course content module
+    """
+    required_content = []
+    if settings.FEATURES.get('MILESTONES_APP', False):
+        # Get all of the outstanding milestones for this course, for this user
+        try:
+            milestone_paths = milestones_api.get_course_milestones_fulfillment_paths(
+                unicode(course.id),
+                serialize_user(user)
+            )
+        except InvalidMilestoneRelationshipTypeException:
+            return required_content
+
+        # For each outstanding milestone, see if this content is one of its fulfillment paths
+        for path_key in milestone_paths:
+            milestone_path = milestone_paths[path_key]
+            if milestone_path.get('content') and len(milestone_path['content']):
+                for content in milestone_path['content']:
+                    required_content.append(content)
+    return required_content
+
+
 def toc_for_course(request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
@@ -122,9 +153,20 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         if course_module is None:
             return None
 
+        # Check to see if the course is gated on required content (such as an Entrance Exam)
+        required_content = _get_required_content(course, request.user)
+
         chapters = list()
         for chapter in course_module.get_display_items():
-            if chapter.hide_from_toc:
+            # Only show required content, if there is required content
+            # chapter.hide_from_toc is read-only (boo)
+            local_hide_from_toc = False
+            if len(required_content):
+                if unicode(chapter.location) not in required_content:
+                    local_hide_from_toc = True
+
+            # Skip the current chapter if a hide flag is tripped
+            if chapter.hide_from_toc or local_hide_from_toc:
                 continue
 
             sections = list()
@@ -141,7 +183,6 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                                      'active': active,
                                      'graded': section.graded,
                                      })
-
             chapters.append({'display_name': chapter.display_name_with_default,
                              'url_name': chapter.url_name,
                              'sections': sections,
@@ -341,7 +382,58 @@ def get_module_system_for_user(user, field_data_cache,
             request_token=request_token,
         )
 
-    def handle_grade_event(block, event_type, event):
+    def _fulfill_content_milestones(course_key, content_key, user_id):  # pylint: disable=unused-argument
+        """
+        Internal helper to handle milestone fulfillments for the specified content module
+        """
+        # Fulfillment Use Case: Entrance Exam
+        # If this module is part of an entrance exam, we'll need to see if the student
+        # has reached the point at which they can collect the associated milestone
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            course = modulestore().get_course(course_key)
+            content = modulestore().get_item(content_key)
+            entrance_exam_enabled = getattr(course, 'entrance_exam_enabled', False)
+            in_entrance_exam = getattr(content, 'in_entrance_exam', False)
+            if entrance_exam_enabled and in_entrance_exam:
+                exam_key = UsageKey.from_string(course.entrance_exam_id)
+                exam_descriptor = modulestore().get_item(exam_key)
+                exam_modules = yield_dynamic_descriptor_descendents(
+                    exam_descriptor,
+                    inner_get_module
+                )
+                ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
+                module_pcts = []
+                exam_pct = 0
+                for module in exam_modules:
+                    if module.graded and module.category not in ignore_categories:
+                        module_pct = 0
+                        try:
+                            student_module = StudentModule.objects.get(
+                                module_state_key=module.scope_ids.usage_id,
+                                student_id=user_id
+                            )
+                            if student_module.max_grade:
+                                module_pct = student_module.grade / student_module.max_grade
+                        except StudentModule.DoesNotExist:
+                            pass
+                        module_pcts.append(module_pct)
+                exam_pct = sum(module_pcts) / float(len(module_pcts))
+                if exam_pct >= course.entrance_exam_minimum_score_pct:
+                    relationship_types = milestones_api.get_milestone_relationship_types()
+                    content_milestones = milestones_api.get_course_content_milestones(
+                        course_key,
+                        exam_key,
+                        relationship=relationship_types['FULFILLS']
+                    )
+                    # Add each milestone to the user's set...
+                    user = {'id': user_id}
+                    for milestone in content_milestones:
+                        milestones_api.add_user_milestone(user, milestone)
+
+    def handle_grade_event(block, event_type, event):  # pylint: disable=unused-argument
+        """
+        Manages the workflow for recording and updating of student module grade state
+        """
         user_id = event.get('user_id', user.id)
 
         # Construct the key for the module
@@ -372,6 +464,16 @@ def get_module_system_for_user(user, field_data_cache,
             tags.append('type:%s' % grade_bucket_type)
 
         dog_stats_api.increment("lms.courseware.question_answered", tags=tags)
+
+        # If we're using the awesome edx-milestones app, we need to cycle
+        # through the fulfillment scenarios to see if any are now applicable
+        # thanks to the updated grading information that was just submitted
+        if settings.FEATURES.get('MILESTONES_APP', False):
+            _fulfill_content_milestones(
+                course_id,
+                descriptor.location,
+                user_id
+            )
 
     def publish(block, event_type, event):
         """A function that allows XModules to publish events."""
