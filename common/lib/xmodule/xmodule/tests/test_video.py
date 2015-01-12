@@ -14,6 +14,8 @@ the course, section, subsection, unit, etc.
 """
 import unittest
 import datetime
+from uuid import uuid4
+import copy
 from mock import Mock, patch
 
 from . import LogicTest
@@ -26,7 +28,12 @@ from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
 from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
+
 from django.conf import settings
+from django.test.utils import override_settings
+
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 SRT_FILEDATA = '''
 0
@@ -535,7 +542,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
-        expected = etree.fromstring('''\
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
@@ -544,7 +552,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
            <transcript language="ge" src="german_translation.srt" />
            <transcript language="ua" src="ukrainian_translation.srt" />
          </video>
-        ''')
+        '''
+        expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_end_time(self):
@@ -564,14 +573,15 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.download_video = True
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
-        expected = etree.fromstring('''\
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
          </video>
-        ''')
-
+        '''
+        expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_parameters(self):
@@ -615,6 +625,7 @@ class VideoCdnTest(unittest.TestCase):
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
 
 
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
 
     """
