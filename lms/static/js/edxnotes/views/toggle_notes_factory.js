@@ -14,7 +14,7 @@ define([
         initialize: function (options) {
             this.visibility = options.visibility;
             this.visibilityUrl = options.visibilityUrl;
-            this.checkboxIcon = this.$('.checkbox-icon');
+            this.label = this.$('.utility-control-label');
             this.actionLink = this.$('.action-toggle-notes');
             this.actionLink.removeClass('is-disabled');
             this.notification = new Annotator.Notification();
@@ -30,12 +30,12 @@ define([
         toggleNotes: function () {
             if (this.visibility) {
                 _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
-                this.checkboxIcon.removeClass('icon-check-empty').addClass('icon-check');
-                this.actionLink.addClass('is-active');
+                this.actionLink.addClass('is-active').attr('aria-pressed', true);
+                this.label.text(gettext('Hide notes'));
             } else {
                 EdxnotesVisibilityDecorator.disableNotes();
-                this.checkboxIcon.removeClass('icon-check').addClass('icon-check-empty');
-                this.actionLink.removeClass('is-active');
+                this.actionLink.removeClass('is-active').attr('aria-pressed', false);
+                this.label.text(gettext('Show notes'));
             }
         },
 
