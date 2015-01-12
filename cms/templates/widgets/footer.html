@@ -15,9 +15,9 @@
         <li class="nav-item nav-peripheral-pp">
           <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
         </li>
-        % if user.is_authenticated():
+        % if settings.TENDER_DOMAIN and user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a href="http://help.edge.edx.org/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
+          <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
         </li>
         % endif
       </ol>

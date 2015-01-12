@@ -74,6 +74,8 @@ STATICFILES_STORAGE = 'pipeline.storage.NonPackagingPipelineStorage'
 STATIC_URL = "/static/"
 PIPELINE_ENABLED = False
 
+TENDER_DOMAIN = "help.edge.edx.org"
+
 # Update module store settings per defaults for tests
 update_module_store_settings(
     MODULESTORE,

@@ -26,9 +26,13 @@
       </div>
 
       <ul class="list-actions">
+        % if settings.TENDER_DOMAIN:
         <li class="action-item">
-          <a href="http://help.edge.edx.org/discussion/new" class="action action-primary show-tender">${_('Contact edX Support')}</a>
+          <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary show-tender">
+            ${_('Contact {platform_name} Support').format(platform_name=settings.PLATFORM_NAME)}
+          </a>
         </li>
+        % endif
       </ul>
     </div>
   </section>
