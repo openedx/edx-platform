@@ -168,6 +168,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
 
             addButtonActions: function(element) {
                 XBlockOutlineView.prototype.addButtonActions.apply(this, arguments);
+                element.find('.button.re-index').click(_.bind(this.handleReIndexEvent, this));
                 element.find('.configure-button').click(function(event) {
                     event.preventDefault();
                     this.editXBlock();
@@ -209,6 +210,30 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                         ensureChildrenRendered: this.ensureChildrenRendered.bind(this)
                     });
                 }
+            },
+
+            handleReIndexEvent: function(event) {
+                var self = this;
+                event.preventDefault();
+                var target = $(event.currentTarget);
+                target.css('cursor', 'wait');
+                this.startReIndex().done(function(data) {
+                    if(data.status !== 'success') {
+                        self.onIndexError(data.status);
+                    }
+                }).always(function() {target.css('cursor', 'pointer');});
+            },
+
+            startReIndex: function() {
+                var locator =  window.course.id;
+                return $.ajax({
+                    url: '/course_index/' + locator,
+                    method: 'GET'
+                    });
+            },
+
+            onIndexError: function(errors) {
+                alert(errors.join('\n'));
             }
         });
 
