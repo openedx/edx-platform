@@ -30,15 +30,6 @@ from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from opaque_keys.edx.keys import CourseKey, UsageKey
 DEBUG_ACCESS = False
 
-from functools import wraps
-# We may not always have the request_cache module available
-try:
-    from request_cache.middleware import RequestCache
-    HAS_REQUEST_CACHE = True
-except ImportError:
-    HAS_REQUEST_CACHE = False
-
-
 log = logging.getLogger(__name__)
 
 
@@ -48,31 +39,6 @@ def debug(*args, **kwargs):
         log.debug(*args, **kwargs)
 
 
-def cache_per_request(access_func):
-    """
-    It is assumed that a user's access to a given item will not change during
-    the lifecycle of a single request.  Therefore, the results of checking
-    access are memoized to reduce work for the server.  Right now it's set up
-    solely to work with the has_access function.
-    """
-    @wraps(access_func)
-    def access_wrapper(user, action, obj, course_key=None):
-        args = (user, action, obj, course_key)
-        if HAS_REQUEST_CACHE:
-            cache = RequestCache.get_request_cache().data
-            cache_key = (access_func.__name__,) + args
-            if cache_key not in cache:
-                result = access_func(*args)
-                cache[cache_key] = result
-            return cache[cache_key]
-        else:
-            return access_func(*args)
-    return access_wrapper
-
-
-#from profilestats import profile
-#@profile
-@cache_per_request
 def has_access(user, action, obj, course_key=None):
     """
     Check whether a user has the access to do action on obj.  Handles any magic
