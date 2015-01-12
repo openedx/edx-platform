@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name
 """
-Helper methods for milestones api calls.
+Utility library for working with the edx-milestones app
 """
 
 from django.conf import settings
@@ -19,6 +19,10 @@ from milestones.api import (
     get_user_milestones,
 )
 from milestones.models import MilestoneRelationshipType
+
+NAMESPACE_CHOICES = {
+    'ENTRANCE_EXAM': 'entrance_exams'
+}
 
 
 def add_prerequisite_course(course_key, prerequisite_course_key):
@@ -165,3 +169,21 @@ def seed_milestone_relationship_types():
     if settings.FEATURES.get('MILESTONES_APP', False):
         MilestoneRelationshipType.objects.create(name='requires')
         MilestoneRelationshipType.objects.create(name='fulfills')
+
+
+def generate_milestone_namespace(namespace, course_key=None):
+    """
+    Returns a specifically-formatted namespace string for the specified type
+    """
+    if namespace in NAMESPACE_CHOICES.values():
+        if namespace == 'entrance_exams':
+            return '{}.{}'.format(unicode(course_key), NAMESPACE_CHOICES['ENTRANCE_EXAM'])
+
+
+def serialize_user(user):
+    """
+    Returns a milestones-friendly representation of a user object
+    """
+    return {
+        'id': user.id,
+    }

@@ -4,6 +4,8 @@ import datetime
 import json
 from json.encoder import JSONEncoder
 
+from django.conf import settings
+
 from opaque_keys.edx.locations import Location
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from contentstore.utils import course_image_url
@@ -19,6 +21,9 @@ ABOUT_ATTRIBUTES = [
     'short_description',
     'overview',
     'effort',
+    'entrance_exam_enabled',
+    'entrance_exam_id',
+    'entrance_exam_minimum_score_pct',
 ]
 
 
@@ -40,6 +45,12 @@ class CourseDetails(object):
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
         self.pre_requisite_courses = []  # pre-requisite courses
+        self.entrance_exam_enabled = ""  # is entrance exam enabled
+        self.entrance_exam_id = ""  # the content location for the entrance exam
+        self.entrance_exam_minimum_score_pct = settings.FEATURES.get(
+            'ENTRANCE_EXAM_MIN_SCORE_PCT',
+            '50'
+        )  # minimum passing score for entrance exam content module/tree
 
     @classmethod
     def _fetch_about_attribute(cls, course_key, attribute):
@@ -168,7 +179,8 @@ class CourseDetails(object):
         # NOTE: below auto writes to the db w/o verifying that any of the fields actually changed
         # to make faster, could compare against db or could have client send over a list of which fields changed.
         for attribute in ABOUT_ATTRIBUTES:
-            cls.update_about_item(course_key, attribute, jsondict[attribute], descriptor, user)
+            if attribute in jsondict:
+                cls.update_about_item(course_key, attribute, jsondict[attribute], descriptor, user)
 
         recomposed_video_tag = CourseDetails.recompose_video_tag(jsondict['intro_video'])
         cls.update_about_item(course_key, 'video', recomposed_video_tag, descriptor, user)

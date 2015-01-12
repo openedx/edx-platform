@@ -450,6 +450,12 @@ FEATURES['ENABLE_EDXNOTES'] = True
 # Add milestones to Installed apps for testing
 INSTALLED_APPS += ('milestones', )
 
+# MILESTONES
+FEATURES['MILESTONES_APP'] = True
+
+# ENTRANCE EXAMS
+FEATURES['ENTRANCE_EXAMS'] = True
+
 ########################## SECURITY #######################
 
 FEATURES['ENFORCE_PASSWORD_POLICY'] = False

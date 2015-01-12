@@ -676,6 +676,35 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         finally:
             shutil.rmtree(root_dir)
 
+    def test_draft_modulestore_create_child_with_position(self):
+        """
+        This test is designed to hit a specific set of use cases having to do with
+        the child positioning logic found in mongo/base.py:create_child()
+        """
+        # Set up the draft module store
+        course = self.draft_store.create_course("TestX", "ChildTest", "1234_A1", 1)
+        first_child = self.draft_store.create_child(
+            self.dummy_user,
+            course.location,
+            "chapter",
+            block_id=course.location.block_id
+        )
+        second_child = self.draft_store.create_child(
+            self.dummy_user,
+            course.location,
+            "chapter",
+            block_id=course.location.block_id,
+            position=0
+        )
+
+        # First child should have been moved to second position, and better child takes the lead
+        course = self.draft_store.get_course(course.id)
+        self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
+        self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
+
+        # Clean up the data so we don't break other tests which apparently expect a particular state
+        self.draft_store.delete_course(course.id, self.dummy_user)
+
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''

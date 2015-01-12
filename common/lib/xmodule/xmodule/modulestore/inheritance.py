@@ -177,6 +177,14 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.user_info
     )
 
+    in_entrance_exam = Boolean(
+        display_name=_("Tag this module as part of an Entrance Exam section"),
+        help=_("Enter true or false. If true, answer submissions for problem modules will be "
+               "considered in the Entrance Exam scoring/gating algorithm."),
+        scope=Scope.settings,
+        default=False
+    )
+
 
 def compute_inherited_metadata(descriptor):
     """Given a descriptor, traverse all of its descendants and do metadata

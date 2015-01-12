@@ -100,8 +100,12 @@
       @include transition(color $tmg-f2 ease-in-out 0s);
       display: block;
       margin-top: ($baseline/4);
-      color: $gray-l3;
+      color: $gray-d1;
     }
+    .tip-inline{
+    display: inline;
+    margin-left: 5px;
+  }
 
     .message-error {
       @extend %t-copy-sub1;
@@ -126,6 +130,30 @@
     .list-input {
       @extend %cont-no-list;
 
+      .show-data{
+        .heading{
+          border: 1px solid #E0E0E0;
+          padding: 5px 15px;
+          margin-top: 5px;
+        }
+         .div-grade-requirements{
+            border: 1px solid #E0E0E0;
+            border-top: none;
+            padding: 10px 15px;
+           label{font-weight: 600;}
+           input#entrance-exam-minimum-score-pct{
+              height: 40px;
+              font-size: 18px;
+           }
+         }
+      }
+      #heading-entrance-exam{
+        font-weight: 600;
+      }
+
+      label[for="entrance-exam-enabled"] {
+        font-size: 14px;
+      }
       .field {
         margin: 0 0 ($baseline*2) 0;
 

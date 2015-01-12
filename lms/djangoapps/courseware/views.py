@@ -68,6 +68,7 @@ import survey.utils
 import survey.views
 
 from util.views import ensure_valid_course_key
+
 log = logging.getLogger("edx.courseware")
 
 template_imports = {'urllib': urllib}

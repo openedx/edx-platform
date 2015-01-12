@@ -78,12 +78,14 @@ if (xblockInfo.get('graded')) {
                         </a>
                     </li>
                 <% } %>
-                <li class="action-item action-delete">
-                    <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
-                        <i class="icon fa fa-trash-o"></i>
-                        <span class="sr action-button-text"><%= gettext('Delete') %></span>
-                    </a>
-                </li>
+                <% if (xblockInfo.canBeDeleted()) { %>
+                    <li class="action-item action-delete">
+                        <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
+                            <i class="icon fa fa-trash-o" aria-hidden="true"></i>
+                            <span class="sr action-button-text"><%= gettext('Delete') %></span>
+                        </a>
+                    </li>
+                <% } %>
                 <li class="action-item action-drag">
                     <span data-tooltip="<%= gettext('Drag to reorder') %>"
                           class="drag-handle <%= xblockType %>-drag-handle action">

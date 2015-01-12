@@ -135,12 +135,19 @@ FEATURES = {
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
+    # Toggle course milestones app/feature
+    'MILESTONES_APP': False,
+
+    # Toggle course entrance exams feature
+    'ENTRANCE_EXAMS': False,
+
     # edx-notifications subsystem
     'ENABLE_NOTIFICATIONS': False,
 
     # Whether edx-notifications should use Celery for bulk operations
     'ENABLE_NOTIFICATIONS_CELERY': False,
 }
+
 ENABLE_JASMINE = False
 
 
@@ -761,7 +768,9 @@ OPTIONAL_APPS = (
 
     # edxval
     'edxval',
-    'milestones'
+
+    # milestones
+    'milestones',
 )
 
 
@@ -795,6 +804,9 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
 # FAQ url to direct users to if they upload
 # a file that exceeds the above size
 MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
+
+### Default value for entrance exam minimum score
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 
