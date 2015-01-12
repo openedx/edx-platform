@@ -4,7 +4,7 @@ import copy
 import mock
 from mock import patch
 import shutil
-import lxml
+import lxml.html
 
 from datetime import timedelta
 from fs.osfs import OSFS
@@ -26,7 +26,7 @@ from contentstore.views.component import ADVANCED_COMPONENT_TYPES
 
 from xmodule.contentstore.django import contentstore
 from xmodule.contentstore.utils import restore_asset_from_trashcan, empty_asset_trashcan
-from xmodule.exceptions import NotFoundError, InvalidVersionError
+from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
@@ -1745,6 +1745,35 @@ class EntryPageTestCase(TestCase):
     def test_logout(self):
         # Logout redirects.
         self._test_page("/logout", 302)
+
+
+class SigninPageTestCase(TestCase):
+    """
+    Tests that the CSRF token is directly included in the signin form. This is
+    important to make sure that the script is functional independently of any
+    other script.
+    """
+
+    def test_csrf_token_is_present_in_form(self):
+        # Expected html:
+        # <form>
+        #   ...
+        #   <fieldset>
+        #       ...
+        #       <input name="csrfmiddlewaretoken" value="...">
+        #       ...
+        #       </fieldset>
+        #       ...
+        #</form>
+        response = self.client.get("/signin")
+        csrf_token = response.cookies.get("csrftoken")
+        form = lxml.html.fromstring(response.content).get_element_by_id("login_form")
+        csrf_input_field = form.find(".//input[@name='csrfmiddlewaretoken']")
+
+        self.assertIsNotNone(csrf_token)
+        self.assertIsNotNone(csrf_token.value)
+        self.assertIsNotNone(csrf_input_field)
+        self.assertEqual(csrf_token.value, csrf_input_field.attrib["value"])
 
 
 def _create_course(test, course_key, course_data):
