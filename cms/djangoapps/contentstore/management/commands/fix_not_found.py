@@ -20,6 +20,7 @@ class Command(BaseCommand):
 
         course_key = CourseKey.from_string(args[0])
         # for now only support on split mongo
+        # pylint: disable=protected-access
         owning_store = modulestore()._get_modulestore_for_courseid(course_key)
         if hasattr(owning_store, 'fix_not_found'):
             owning_store.fix_not_found(course_key, ModuleStoreEnum.UserID.mgmt_command)
