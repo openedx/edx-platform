@@ -559,7 +559,11 @@
     }
 
     .form-actions {
-      @include padding($baseline 0 $baseline 0);
+      padding: $baseline 0;
+
+      &.new-cohort-form {
+        padding: $baseline;
+      }
     }
   }
 
@@ -1097,6 +1101,14 @@
   .tab-content {
     @include padding($baseline $baseline 0 $baseline);
     border: 1px solid $gray-l5;
+
+    &.new-cohort-form {
+      padding: 0 $baseline;
+
+      .form-label {
+        margin-top: $baseline;
+      }
+    }
   }
 }
 
