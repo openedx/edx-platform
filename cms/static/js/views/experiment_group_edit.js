@@ -8,7 +8,7 @@ define([
 function(BaseView, _, str, gettext) {
     'use strict';
     _.str = str; // used in template
-    var GroupEditView = BaseView.extend({
+    var ExperimentGroupEditView = BaseView.extend({
         tagName: 'li',
         events: {
             'click .action-close': 'removeGroup',
@@ -69,5 +69,5 @@ function(BaseView, _, str, gettext) {
         }
     });
 
-    return GroupEditView;
+    return ExperimentGroupEditView;
 });

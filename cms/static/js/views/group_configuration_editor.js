@@ -4,11 +4,11 @@
  */
 define([
     'js/views/list_item_editor', 'underscore', 'jquery', 'gettext',
-    'js/views/group_edit'
+    'js/views/experiment_group_edit'
 ],
-function(ListItemEditor, _, $, gettext, GroupEditView) {
+function(ListItemEditorView, _, $, gettext, ExperimentGroupEditView) {
     'use strict';
-    var GroupConfigurationEditorView = ListItemEditor.extend({
+    var GroupConfigurationEditorView = ListItemEditorView.extend({
         tagName: 'div',
         events: {
             'change .group-configuration-name-input': 'setName',
@@ -32,7 +32,7 @@ function(ListItemEditor, _, $, gettext, GroupEditView) {
         initialize: function() {
             var groups = this.model.get('groups');
 
-            ListItemEditor.prototype.initialize.call(this);
+            ListItemEditorView.prototype.initialize.call(this);
 
             this.template = this.loadTemplate('group-configuration-editor');
             this.listenTo(groups, 'add', this.onAddItem);
@@ -41,7 +41,7 @@ function(ListItemEditor, _, $, gettext, GroupEditView) {
         },
 
         render: function() {
-            ListItemEditor.prototype.render.call(this);
+            ListItemEditorView.prototype.render.call(this);
             this.addAll();
             return this;
         },
@@ -62,7 +62,7 @@ function(ListItemEditor, _, $, gettext, GroupEditView) {
         },
 
         onAddItem: function(group) {
-            var view = new GroupEditView({ model: group });
+            var view = new ExperimentGroupEditView({ model: group });
             this.$('ol.groups').append(view.render().el);
 
             return this;

@@ -4,6 +4,7 @@
  *
  * Subclasses must implement:
  * - itemDisplayName (string): Display name for the list item.
+ *   Must be translated.
  * - createEditView (function): Render and append the edit view to the
  *   DOM.
  * - createDetailsView (function): Render and append the details view

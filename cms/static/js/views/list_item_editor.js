@@ -14,7 +14,7 @@ define([
 ], function(BaseView, ViewUtils, _, gettext) {
     'use strict';
 
-    var ListItemEditor = BaseView.extend({
+    var ListItemEditorView = BaseView.extend({
         initialize: function() {
             this.listenTo(this.model, 'invalid', this.render);
         },
@@ -72,5 +72,5 @@ define([
         }
     });
 
-    return ListItemEditor;
+    return ListItemEditorView;
 });

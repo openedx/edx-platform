@@ -2,13 +2,14 @@ define([
     'underscore', 'js/models/course', 'js/models/group_configuration', 'js/models/group',
     'js/collections/group_configuration', 'js/collections/group',
     'js/views/group_configuration_details', 'js/views/group_configurations_list', 'js/views/group_configuration_editor',
-    'js/views/group_configuration_item', 'js/views/group_edit', 'js/views/content_group_list',
+    'js/views/group_configuration_item', 'js/views/experiment_group_edit', 'js/views/content_group_list',
     'js/views/feedback_notification', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
     'js/spec_helpers/view_helpers', 'jasmine-stealth'
 ], function(
     _, Course, GroupConfigurationModel, GroupModel, GroupConfigurationCollection, GroupCollection,
-    GroupConfigurationDetailsView, GroupConfigurationsListView, GroupConfigurationEditorView, GroupConfigurationItemView, GroupEditView,
-    GroupList, Notification, AjaxHelpers, TemplateHelpers, ViewHelpers
+    GroupConfigurationDetailsView, GroupConfigurationsListView, GroupConfigurationEditorView,
+    GroupConfigurationItemView, ExperimentGroupEditView, GroupList, Notification, AjaxHelpers, TemplateHelpers,
+    ViewHelpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -87,7 +88,7 @@ define([
         delete window.course;
     });
 
-    describe('GroupConfigurationDetailsView', function() {
+    describe('GroupConfigurationDetailsView, the details view for experiment group configurations', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('group-configuration-details', true);
 
@@ -256,7 +257,7 @@ define([
         });
     });
 
-    describe('GroupConfigurationEditorView', function() {
+    describe('GroupConfigurationEditorView, the editor view for experiment group configurations', function() {
 
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
@@ -487,7 +488,7 @@ define([
         });
     });
 
-    describe('GroupConfigurationsListView', function() {
+    describe('GroupConfigurationsListView, the list view for experiment group configurations', function() {
         var emptyMessage = 'You have not created any group configurations yet.';
 
         beforeEach(function() {
@@ -533,7 +534,7 @@ define([
         });
     });
 
-    describe('GroupConfigurationItemView', function() {
+    describe('GroupConfigurationItemView, the controller view for experiment group configurations', function() {
         var clickDeleteItem;
 
         beforeEach(function() {
@@ -602,7 +603,7 @@ define([
         });
     });
 
-    describe('GroupEditView', function() {
+    describe('ExperimentGroupEditView, the editor view for groups within experiment group configurations', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('group-edit', true);
 
@@ -612,7 +613,7 @@ define([
 
             this.collection = new GroupCollection([this.model]);
 
-            this.view = new GroupEditView({
+            this.view = new ExperimentGroupEditView({
                 model: this.model
             });
         });
@@ -631,7 +632,7 @@ define([
         });
     });
 
-    describe('ContentGroupListView', function() {
+    describe('ContentGroupListView, the list view for content groups', function() {
         var newGroupCss = '.new-button',
             addGroupCss = '.action-add',
             inputCss = '.group-configuration-name-input',
@@ -656,7 +657,7 @@ define([
                 })),
                 groupConfiguration = new GroupConfigurationModel({
                     id: 0,
-                    name: 'Group Configuration',
+                    name: 'Content Group Configuration',
                     groups: groups
                 });
             groupConfiguration.urlRoot = '/mock_url';
@@ -723,7 +724,7 @@ define([
             expect(requests[0].method).toBe('POST');
             expect(requests[0].url).toBe('/mock_url/0');
             AjaxHelpers.respondWithJson(requests, {
-                name: 'Group Configuration',
+                name: 'Content Group Configuration',
                 groups: view.collection.map(function(groupModel, index) {
                     return _.extend(groupModel.toJSON(), {id: index});
                 })
@@ -752,7 +753,8 @@ define([
         });
 
         it('shows a message when no groups are present', function() {
-            expect(renderView().$('.no-group-configurations-content')).toExist();
+            expect(renderView().$('.no-group-configurations-content'))
+                .toContainText('You have not created any content groups yet.');
         });
 
         it('can render groups', function() {

@@ -57,37 +57,14 @@ define([
             });
         });
 
-        describe('on page close/change', function() {
-            it('I see notification message if the model is changed',
-            function() {
-                var view = initializePage(true),
-                    message;
-
-                view.render();
-                message = view.onBeforeUnload();
-                expect(message).toBeUndefined();
-            });
-
-            it('I do not see notification message if the model is not changed',
-            function() {
-                var expectedMessage ='You have unsaved changes. Do you really want to leave this page?',
-                    view = renderPage(),
-                    message;
-
-                view.experimentGroupConfigurations.at(0).set('name', 'Configuration 2');
-                message = view.onBeforeUnload();
-                expect(message).toBe(expectedMessage);
-            });
-        });
-
-        describe('Check that Group Configuration will focus and expand depending on content of url hash', function() {
+        describe('Experiment group configurations', function() {
             beforeEach(function () {
                 spyOn($.fn, 'focus');
                 TemplateHelpers.installTemplate('group-configuration-details');
                 this.view = initializePage(true);
             });
 
-            it('should focus and expand group configuration if its id is part of url hash', function() {
+            it('should focus and expand if its id is part of url hash', function() {
                 spyOn(this.view, 'getLocationHash').andReturn('#0');
                 this.view.render();
                 // We cannot use .toBeFocused due to flakiness.
@@ -95,18 +72,45 @@ define([
                 expect(this.view.$(groupConfigItemClassName)).toBeExpanded();
             });
 
-            it('should not focus on any group configuration if url hash is empty', function() {
+            it('should not focus on any experiment configuration if url hash is empty', function() {
                 spyOn(this.view, 'getLocationHash').andReturn('');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
                 expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
             });
 
-            it('should not focus on any group configuration if url hash contains wrong id', function() {
+            it('should not focus on any experiment configuration if url hash contains wrong id', function() {
                 spyOn(this.view, 'getLocationHash').andReturn('#1');
                 this.view.render();
                 expect($.fn.focus).not.toHaveBeenCalled();
                 expect(this.view.$(groupConfigItemClassName)).not.toBeExpanded();
+            });
+
+            it('should not show a notification message if an experiment configuration is not changed', function () {
+                this.view.render();
+                expect(this.view.onBeforeUnload()).toBeUndefined();
+            });
+
+            it('should show a notification message if an experiment configuration is changed', function () {
+                this.view.experimentGroupConfigurations.at(0).set('name', 'Configuration 2');
+                expect(this.view.onBeforeUnload())
+                    .toBe('You have unsaved changes. Do you really want to leave this page?');
+            });
+        });
+
+        describe('Content groups', function() {
+            beforeEach(function() {
+                this.view = renderPage();
+            });
+
+            it('should not show a notification message if a content group is not changed', function () {
+                expect(this.view.onBeforeUnload()).toBeUndefined();
+            });
+
+            it('should show a notification message if a content group is changed', function () {
+                this.view.contentGroupConfiguration.get('groups').add({name: 'Content Group'});
+                expect(this.view.onBeforeUnload())
+                    .toBe('You have unsaved changes. Do you really want to leave this page?');
             });
         });
     });

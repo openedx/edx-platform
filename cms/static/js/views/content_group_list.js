@@ -19,14 +19,7 @@ define([
 
         createItemView: function(options) {
             return new ContentGroupItemView(options);
-        },
-
-        /* The Group collection is sorted alphabetically, but newly
-         * created content groups are appended to the bottom of the
-         * list.  Disable sorting when adding new models to keep the
-         * list item's index in sync with its position on screen.
-         */
-        newModelOptions: {sort: false}
+        }
     });
 
     return ContentGroupListView;

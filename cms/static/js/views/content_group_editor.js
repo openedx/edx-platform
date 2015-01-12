@@ -5,10 +5,10 @@
 define([
     'js/views/list_item_editor', 'underscore'
 ],
-function(ListItemEditor, _) {
+function(ListItemEditorView, _) {
     'use strict';
 
-    var ContentGroupEditorView = ListItemEditor.extend({
+    var ContentGroupEditorView = ListItemEditorView.extend({
         tagName: 'div',
         className: 'group-configuration-edit',
         events: {
@@ -17,7 +17,7 @@ function(ListItemEditor, _) {
         },
 
         initialize: function() {
-            ListItemEditor.prototype.initialize.call(this);
+            ListItemEditorView.prototype.initialize.call(this);
             this.template = this.loadTemplate('content-group-editor');
         },
 

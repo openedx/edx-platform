@@ -73,6 +73,8 @@ from xmodule.split_test_module import get_split_user_partitions
 
 MINIMUM_GROUP_ID = 100
 
+# Note: the following content group configuration strings are not
+# translated since they are not visible to users.
 CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can be mapped to cohort groups in the LMS.'
 
 CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
