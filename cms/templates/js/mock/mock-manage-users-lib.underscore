@@ -9,7 +9,7 @@
       <h3 class="sr">Page Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button create-user-button"><i class="icon-plus"></i> Add Instructor</a>
+          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> Add Instructor</a>
         </li>
       </ul>
     </nav>
@@ -72,7 +72,7 @@
                 <a href="#" class="make-user admin-role remove-admin-role">Remove Staff Access</span></a>
               </li>
             <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon-trash"></i><span class="sr">Delete the user, honor</span></a>
+                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, honor</span></a>
             </li>
           </ul>
 
@@ -103,7 +103,7 @@
                   <a href="#" class="make-staff admin-role remove-admin-role">Remove Admin Access</span></a>
                 </li>
             <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon-trash"></i><span class="sr">Delete the user, audit</span></a>
+                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, audit</span></a>
             </li>
           </ul>
 
@@ -134,7 +134,7 @@
                 <a href="#" class="make-staff admin-role add-admin-role">Add Staff Access</span></a>
               </li>
             <li class="action action-delete ">
-                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon-trash"></i><span class="sr">Delete the user, staff</span></a>
+                <a href="#" class="delete remove-user action-icon" data-tooltip="Remove this user"><i class="icon fa fa-trash-o"></i><span class="sr">Delete the user, staff</span></a>
             </li>
           </ul>
 

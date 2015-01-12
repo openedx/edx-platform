@@ -20,8 +20,8 @@
 		    </div>
 		    <nav class="pagination pagination-compact top">
 		        <ol>
-		            <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon-angle-left"></i> <span class="nav-label"><%= gettext("Previous") %></span></a></li>
-		            <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%= gettext("Next") %></span> <i class="icon-angle-right"></i></a></li>
+		            <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon fa fa-angle-left"></i> <span class="nav-label"><%= gettext("Previous") %></span></a></li>
+		            <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%= gettext("Next") %></span> <i class="icon fa fa-angle-right"></i></a></li>
 		        </ol>
 		    </nav>
 		</div>
@@ -30,7 +30,7 @@
 		<script type="text/template" id="paging-footer-tpl">
 		    <nav class="pagination pagination-full bottom">
                 <ol>
-                    <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon-angle-left"></i> <span class="nav-label"><%= gettext("Previous") %></span></a></li>
+                    <li class="nav-item previous"><a class="nav-link previous-page-link" href="#"><i class="icon fa fa-angle-left"></i> <span class="nav-label"><%= gettext("Previous") %></span></a></li>
                     <li class="nav-item page">
                         <div class="pagination-form">
                             <label class="page-number-label" for="page-number"><%= gettext("Page number") %></label>
@@ -41,7 +41,7 @@
                         <span class="page-divider">/</span>
                         <span class="total-pages"><%= total_pages %></span>
                     </li>
-                    <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%= gettext("Next") %></span> <i class="icon-angle-right"></i></a></li>
+                    <li class="nav-item next"><a class="nav-link next-page-link" href="#"><span class="nav-label"><%= gettext("Next") %></span> <i class="icon fa fa-angle-right"></i></a></li>
                 </ol>
 		    </nav>
 		</script>
@@ -54,7 +54,7 @@
                     <div class="xblock-header-primary">
                         <div class="header-details">
                             <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse expand">
-                                <i class="icon-caret-down ui-toggle-expansion"></i>
+                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
                                 <span class="sr">Expand or Collapse</span>
                             </a>
                             <span class="xblock-display-name">Group A</span>
@@ -156,7 +156,7 @@
                     <div class="xblock-header-primary">
                         <div class="header-details">
                             <a href="#" data-tooltip="Expand or Collapse" class="action expand-collapse expand">
-                                <i class="icon-caret-down ui-toggle-expansion"></i>
+                                <i class="icon fa fa-caret-down ui-toggle-expansion"></i>
                                 <span class="sr">Expand or Collapse</span>
                             </a>
                             <span class="xblock-display-name">Group B</span>
