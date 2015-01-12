@@ -11,6 +11,7 @@ from course_about.errors import CourseNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
+
 log = logging.getLogger(__name__)
 
 ABOUT_ATTRIBUTES = [
@@ -23,8 +24,10 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
     Return course information for a given course id.
     Args:
         course_id(str) : The course id to retrieve course information for.
+
     Returns:
         Serializable dictionary of the Course About Information.
+
     Raises:
         CourseNotFoundError
     """
@@ -35,10 +38,14 @@ def get_course_about_details(course_id):  # pylint: disable=unused-argument
             raise CourseNotFoundError("course not found")
     except InvalidKeyError as err:
         raise CourseNotFoundError(err.message)
-    about_descriptor = {}
-    for attribute in ABOUT_ATTRIBUTES:
-        about_descriptor[attribute] = _fetch_course_detail(course_key, attribute)
-    return serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
+
+    about_descriptor = {
+        attribute: _fetch_course_detail(course_key, attribute)
+        for attribute in ABOUT_ATTRIBUTES
+    }
+
+    course_info = serialize_content(course_descriptor=course_descriptor, about_descriptor=about_descriptor)
+    return course_info
 
 
 def _fetch_course_detail(course_key, attribute):

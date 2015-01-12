@@ -35,7 +35,6 @@ class XModuleFactory(Factory):
     @lazy_attribute
     def modulestore(self):
         from xmodule.modulestore.django import modulestore
-
         return modulestore()
 
 
