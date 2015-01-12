@@ -49,7 +49,7 @@ requirejs.config({
 
         "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
         "youtube": "//www.youtube.com/player_api?noext",
-        "tender": "//edxedge.tenderapp.com/tender_widget",
+        "tender": "//api.tenderapp.com/tender_widget",
 
         "coffee/src/ajax_prefix": "xmodule_js/common_static/coffee/src/ajax_prefix",
         "js/spec/test_utils": "js/spec/test_utils",

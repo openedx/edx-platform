@@ -502,6 +502,11 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
+# If you want to enable Tender integration (http://tenderapp.com/),
+# put in the domain where Tender hosts tender_widget.js. For example,
+# TENDER_DOMAIN = "example.tenderapp.com"
+TENDER_DOMAIN = None
+
 ################################# CELERY ######################################
 
 # Message configuration
