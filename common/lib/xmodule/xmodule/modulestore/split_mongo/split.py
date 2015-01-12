@@ -2418,22 +2418,26 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 # update the index entry if appropriate
                 self._update_head(dest_course_key, index_entry, dest_course_key.branch, new_structure['_id'])
 
-    def internal_clean_children(self, course_locator):
+    def fix_not_found(self, course_locator, user_id):
         """
         Only intended for rather low level methods to use. Goes through the children attrs of
-        each block removing any whose block_id is not a member of the course. Does not generate
-        a new version of the course but overwrites the existing one.
+        each block removing any whose block_id is not a member of the course.
 
         :param course_locator: the course to clean
         """
         original_structure = self._lookup_course(course_locator).structure
-        for block in original_structure['blocks'].itervalues():
+        index_entry = self._get_index_if_valid(course_locator)
+        new_structure = self.version_structure(course_locator, original_structure, user_id)
+        for block in new_structure['blocks'].itervalues():
             if 'fields' in block and 'children' in block['fields']:
                 block['fields']["children"] = [
                     block_id for block_id in block['fields']["children"]
-                    if block_id in original_structure['blocks']
+                    if block_id in new_structure['blocks']
                 ]
-        self.update_structure(course_locator, original_structure)
+        self.update_structure(course_locator, new_structure)
+        if index_entry is not None:
+            # update the index entry if appropriate
+            self._update_head(course_locator, index_entry, course_locator.branch, new_structure['_id'])
 
     def convert_references_to_keys(self, course_key, xblock_class, jsonfields, blocks):
         """

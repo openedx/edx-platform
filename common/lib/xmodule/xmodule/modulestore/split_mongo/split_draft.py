@@ -251,6 +251,16 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         course_key = self._map_revision_to_branch(course_key)
         return super(DraftVersioningModuleStore, self).get_orphans(course_key, **kwargs)
 
+    def fix_not_found(self, course_key, user_id):
+        """
+        Fix any children which point to non-existent blocks in the course's published and draft branches
+        """
+        for branch in [ModuleStoreEnum.RevisionOption.published_only, ModuleStoreEnum.RevisionOption.draft_only]:
+            super(DraftVersioningModuleStore, self).fix_not_found(
+                self._map_revision_to_branch(course_key, branch),
+                user_id
+            )
+
     def has_changes(self, xblock):
         """
         Checks if the given block has unpublished changes
