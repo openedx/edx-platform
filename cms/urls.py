@@ -6,7 +6,9 @@ from ratelimitbackend import admin
 admin.autodiscover()
 
 # Pattern to match a course key or a library key
-COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?')
+COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
+    r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?'
+)
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 

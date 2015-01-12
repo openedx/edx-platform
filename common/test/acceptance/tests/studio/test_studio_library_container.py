@@ -26,10 +26,15 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         """
         super(StudioLibraryContainerTest, self).setUp()
         # Also create a course:
-        self.course_fixture = CourseFixture(self.course_info['org'], self.course_info['number'], self.course_info['run'], self.course_info['display_name'])
+        self.course_fixture = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
         self.populate_course_fixture(self.course_fixture)
         self.course_fixture.install()
-        self.outline = CourseOutlinePage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        self.outline = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
 
         self.outline.visit()
         subsection = self.outline.section(SECTION_NAME).subsection(SUBSECTION_NAME)
@@ -156,7 +161,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
         self.assertFalse(library_block.has_validation_warning)
-        #self.assertIn("3 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
+        # Removed this assert until a summary message is added back to the author view (SOL-192)
+        #self.assertIn("3 matching components", library_block.author_content)
 
         self.library_fixture.create_xblock(self.library_fixture.library_location, XBlockFixtureDesc("html", "Html4"))
 
@@ -171,7 +177,8 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
         library_block = self._get_library_xblock_wrapper(self.unit_page.xblocks[0])
 
         self.assertFalse(library_block.has_validation_message)
-        #self.assertIn("4 matching components", library_block.author_content)  # Removed this assert until a summary message is added back to the author view (SOL-192)
+        # Removed this assert until a summary message is added back to the author view (SOL-192)
+        #self.assertIn("4 matching components", library_block.author_content)
 
     def test_no_content_message(self):
         """

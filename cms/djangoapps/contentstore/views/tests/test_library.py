@@ -215,7 +215,10 @@ class UnitTestLibraries(ModuleStoreTestCase):
         self.assertNotIn(extra_user.username, response.content)
 
         # Now add extra_user to the library:
-        user_details_url = reverse_course_url('course_team_handler', library.location.library_key, kwargs={'email': extra_user.email})
+        user_details_url = reverse_course_url(
+            'course_team_handler',
+            library.location.library_key, kwargs={'email': extra_user.email}
+        )
         edit_response = self.client.ajax_post(user_details_url, {"role": LibraryUserRole.ROLE})
         self.assertIn(edit_response.status_code, (200, 204))
 

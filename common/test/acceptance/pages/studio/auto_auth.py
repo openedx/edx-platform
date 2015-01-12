@@ -15,7 +15,8 @@ class AutoAuthPage(PageObject):
     this url will create a user and log them in.
     """
 
-    def __init__(self, browser, username=None, email=None, password=None, staff=None, course_id=None, roles=None, no_login=None):
+    def __init__(self, browser, username=None, email=None, password=None,
+                 staff=None, course_id=None, roles=None, no_login=None):
         """
         Auto-auth is an end-point for HTTP GET requests.
         By default, it will create accounts with random user credentials,

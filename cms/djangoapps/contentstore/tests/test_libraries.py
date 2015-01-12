@@ -67,6 +67,13 @@ class LibraryTestCase(ModuleStoreTestCase):
             **(other_settings or {})
         )
 
+    def _add_simple_content_block(self):
+        """ Adds simple HTML block to library """
+        return ItemFactory.create(
+            category="html", parent_location=self.library.location,
+            user_id=self.user.id, publish_item=False
+        )
+
     def _refresh_children(self, lib_content_block, status_code_expected=200):
         """
         Helper method: Uses the REST API to call the 'refresh_children' handler
@@ -74,7 +81,11 @@ class LibraryTestCase(ModuleStoreTestCase):
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
             lib_content_block.runtime._services['user'] = Mock(user_id=self.user.id)  # pylint: disable=protected-access
-        handler_url = reverse_usage_url('component_handler', lib_content_block.location, kwargs={'handler': 'refresh_children'})
+        handler_url = reverse_usage_url(
+            'component_handler',
+            lib_content_block.location,
+            kwargs={'handler': 'refresh_children'}
+        )
         response = self.client.ajax_post(handler_url)
         self.assertEqual(response.status_code, status_code_expected)
         return modulestore().get_item(lib_content_block.location)
@@ -128,7 +139,7 @@ class TestLibraries(LibraryTestCase):
         Test the 'max_count' property of LibraryContent blocks.
         """
         for _ in range(0, num_to_create):
-            ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+            self._add_simple_content_block()
 
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -203,9 +214,9 @@ class TestLibraries(LibraryTestCase):
         """
         Test that the same block definition is used for the library and course[s]
         """
-        block1 = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        block1 = self._add_simple_content_block()
         def_id1 = block1.definition_locator.definition_id
-        block2 = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        block2 = self._add_simple_content_block()
         def_id2 = block2.definition_locator.definition_id
         self.assertNotEqual(def_id1, def_id2)
 
@@ -461,7 +472,10 @@ class TestLibraryAccess(LibraryTestCase):
     def _assert_cannot_create_library(self, org="org", library="libfail", expected_code=403):
         """ Ensure the current user is not able to create a library. """
         self.assertTrue(expected_code >= 300)
-        response = self.client.ajax_post(LIBRARY_REST_URL, {'org': org, 'library': library, 'display_name': "Irrelevant"})
+        response = self.client.ajax_post(
+            LIBRARY_REST_URL,
+            {'org': org, 'library': library, 'display_name': "Irrelevant"}
+        )
         self.assertEqual(response.status_code, expected_code)
         key = LibraryLocator(org=org, library=library)
         self.assertEqual(modulestore().get_library(key), None)
@@ -574,7 +588,7 @@ class TestLibraryAccess(LibraryTestCase):
         Test the read-only role (LibraryUserRole and its org-level equivalent)
         """
         # As staff user, add a block to self.library:
-        block = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        block = self._add_simple_content_block()
 
         # Login as a non_staff_user:
         self._login_as_non_staff_user()
@@ -650,7 +664,7 @@ class TestLibraryAccess(LibraryTestCase):
         from a library with (write, read, or no) access to a course with (write or no) access.
         """
         # As staff user, add a block to self.library:
-        block = ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        block = self._add_simple_content_block()
         # And create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -687,7 +701,7 @@ class TestLibraryAccess(LibraryTestCase):
         access to a course with (write or no) access.
         """
         # As staff user, add a block to self.library:
-        ItemFactory.create(category="html", parent_location=self.library.location, user_id=self.user.id, publish_item=False)
+        self._add_simple_content_block()
         # And create a course:
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             course = CourseFactory.create()
@@ -702,7 +716,8 @@ class TestLibraryAccess(LibraryTestCase):
 
         # Try updating our library content block:
         lc_block = self._add_library_content_block(course, self.lib_key)
-        self._bind_module(lc_block, user=self.non_staff_user)  # We must use the CMS's module system in order to get permissions checks.
+        # We must use the CMS's module system in order to get permissions checks.
+        self._bind_module(lc_block, user=self.non_staff_user)
         lc_block = self._refresh_children(lc_block, status_code_expected=200 if expected_result else 403)
         self.assertEqual(len(lc_block.children), 1 if expected_result else 0)
 
@@ -822,7 +837,7 @@ class TestOverrides(LibraryTestCase):
         # Change the settings in the library version:
         self.problem.display_name = "X"
         self.problem.weight = 99
-        new_data_value = "<problem><p>We change the data as well to check that non-overriden fields do get updated.</p></problem>"
+        new_data_value = "<problem><p>Changed data to check that non-overriden fields *do* get updated.</p></problem>"
         self.problem.data = new_data_value
         modulestore().update_item(self.problem, self.user.id)
 

@@ -195,7 +195,8 @@ class TestLibraryContentModule(LibraryContentTest):
         """
         # Set max_count to higher value than exists in library
         self.lc_block.max_count = 50
-        self.lc_block.refresh_children()  # In the normal studio editing process, editor_saved() calls refresh_children at this point
+        # In the normal studio editing process, editor_saved() calls refresh_children at this point
+        self.lc_block.refresh_children()
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
@@ -269,7 +270,9 @@ class TestLibraryContentModule(LibraryContentTest):
         self.assertNotIn(LibraryContentDescriptor.display_name, non_editable_metadata_fields)
 
 
-@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
+@patch(
+    'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
+)
 @patch('xmodule.html_module.HtmlModule.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryContentRender(LibraryContentTest):
