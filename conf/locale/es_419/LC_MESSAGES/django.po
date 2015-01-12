@@ -10613,7 +10613,7 @@ msgstr "Gracias por su paciencia mientras se procesa su solicitud."
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your verification status is good until {date}."
-msgstr "Su estado de verificación es bueno hasta {fecha}"
+msgstr "Su estado de verificación es bueno hasta {date}"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
