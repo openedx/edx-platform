@@ -2,7 +2,7 @@
 
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "home" %></%def>
-<%block name="title">${_("Studio Home")}</%block>
+<%block name="title">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</%block>
 <%block name="bodyclass">is-signedin index view-dashboard</%block>
 
 <%block name="requirejs">
@@ -14,7 +14,7 @@
 <%block name="content">
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
-    <h1 class="page-header">${_("Studio Home")}</h1>
+    <h1 class="page-header">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</h1>
 
     % if user.is_active:
     <nav class="nav-actions">
