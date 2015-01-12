@@ -10,9 +10,12 @@ This API is exposed via the RESTful layer (views.py) but may be used directly in
 import logging
 from django.conf import settings
 from django.utils import importlib
+from django.core.cache import cache
 from course_about import errors
 
 DEFAULT_DATA_API = 'course_about.data'
+
+COURSE_ABOUT_API_CACHE_PREFIX = 'course_about_api_'
 
 log = logging.getLogger(__name__)
 
@@ -21,6 +24,9 @@ def get_course_about_details(course_id):
     """Get course about details for the given course ID.
 
     Given a Course ID, retrieve all the metadata necessary to fully describe the Course.
+    First its checks the default cache for given course id if its exists then returns
+    the course otherwise it get the course from module store and set the cache.
+    By default cache expiry set to 5 minutes.
 
     Args:
         course_id (str): The String representation of a Course ID. Used to look up the requested
@@ -46,7 +52,17 @@ def get_course_about_details(course_id):
             },
         }
     """
-    return _data_api().get_course_about_details(course_id)
+    cache_key = "{}_{}".format(course_id, COURSE_ABOUT_API_CACHE_PREFIX)
+    cache_course_info = cache.get(cache_key)
+
+    if cache_course_info:
+        return cache_course_info
+
+    course_info = _data_api().get_course_about_details(course_id)
+    time_out = getattr(settings, 'COURSE_INFO_API_CACHE_TIME_OUT', 300)
+    cache.set(cache_key, course_info, time_out)
+
+    return course_info
 
 
 def _data_api():
