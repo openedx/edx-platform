@@ -129,42 +129,24 @@ class TestRecentEnrollments(ModuleStoreTestCase):
     @ddt.data(
         #Register as an honor in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'honor', True),
-        ([('audit', 0)], 'honor', True),
         ([('honor', 0)], 'honor', True),
         ([], 'honor', True),
         #Register as an honor in any course modes which has payment option
-        ([('audit', 0), ('honor', 10)], 'honor', False),
-        ([('audit', 10), ('honor', 0)], 'honor', False),
-        ([('professional', 20)], 'honor', True),
-        ([('verified', 20)], 'honor', True),
-        ([('professional', 20), ('verified', 20)], 'honor', True),
-        ([('audit', 0), ('honor', 5), ('professional', 20)], 'honor', True),
-        ([('audit', 0), ('honor', 10), ('verified', 20)], 'honor', True),
-        ([('audit', 10), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
-        ([('audit', 10)], 'honor', False),
-        ([('honor', 10)], 'honor', False),
+        ([('honor', 10)], 'honor', False),  # This is a paid course
+        ([('audit', 0), ('honor', 0), ('professional', 20)], 'honor', True),
+        ([('audit', 0), ('honor', 0), ('verified', 20)], 'honor', True),
+        ([('audit', 0), ('honor', 0), ('verified', 20), ('professional', 20)], 'honor', True),
         ([], 'honor', True),
         #Register as an audit in any course modes with no payment option
         ([('audit', 0), ('honor', 0)], 'audit', True),
         ([('audit', 0)], 'audit', True),
-        ([('honor', 0)], 'audit', True),
-        ([], 'audit', True),
-        #Register as an audit in any course modes which has payment option
-        ([('audit', 0), ('honor', 10)], 'audit', False),
-        ([('audit', 10), ('honor', 0)], 'audit', False),
-        ([('audit', 10)], 'audit', False),
-        ([('honor', 10)], 'audit', False),
-        ([], 'audit', True),
+        #Register as an audit in any course modes which has no payment option
+        ([('audit', 0), ('honor', 0), ('verified', 10)], 'audit', True),
         #Register as a verified in any course modes which has payment option
-        ([('audit', 0), ('honor', 10)], 'verified', False),
-        ([('professional', 20)], 'verified', False),
+        ([('professional', 20)], 'professional', False),
         ([('verified', 20)], 'verified', False),
         ([('professional', 20), ('verified', 20)], 'verified', False),
-        ([('audit', 0), ('honor', 5), ('professional', 20)], 'verified', False),
-        ([('audit', 0), ('honor', 10), ('verified', 20)], 'verified', False),
-        ([('audit', 0), ('honor', 10), ('verified', 20), ('professional', 20)], 'verified', False),
-        ([('audit', 10)], 'verified', False),
-        ([('honor', 10)], 'verified', False),
+        ([('audit', 0), ('honor', 0), ('verified', 20)], 'verified', False)
     )
     @ddt.unpack
     def test_donate_button(self, course_modes, enrollment_mode, show_donate):
