@@ -115,13 +115,14 @@ class PartitionTestCase(TestCase):
 
     def setUp(self):
         # Set up two user partition schemes: mock and random
+        self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
+        self.random_scheme = MockUserPartitionScheme("random")
         extensions = [
             Extension(
-                self.TEST_SCHEME_NAME, USER_PARTITION_SCHEME_NAMESPACE,
-                MockUserPartitionScheme(self.TEST_SCHEME_NAME), None
+                self.non_random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.non_random_scheme, None
             ),
             Extension(
-                "random", USER_PARTITION_SCHEME_NAMESPACE, MockUserPartitionScheme("random"), None
+                self.random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.random_scheme, None
             ),
         ]
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
@@ -136,6 +137,10 @@ class PartitionTestCase(TestCase):
             self.TEST_GROUPS,
             extensions[0].plugin
         )
+
+        # Make sure the names are set on the schemes (which happens normally in code, but may not happen in tests).
+        self.user_partition.get_scheme(self.non_random_scheme.name)
+        self.user_partition.get_scheme(self.random_scheme.name)
 
 
 class TestUserPartition(PartitionTestCase):
