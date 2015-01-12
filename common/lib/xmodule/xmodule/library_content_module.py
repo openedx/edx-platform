@@ -222,7 +222,7 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
             return self._selected_set  # pylint: disable=access-member-before-definition
 
         lib_tools = self.runtime.service(self, 'library_tools')
-        format_block_keys = lambda block_keys: lib_tools.create_block_analytics_summary(self.location.course_key, block_keys)
+        format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
 
         # Determine which of our children we will show:
         selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples
