@@ -14,7 +14,6 @@ from django.core.cache import get_cache, InvalidCacheBackendError
 import django.utils
 
 import re
-import threading
 
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
@@ -53,13 +52,13 @@ def load_function(path):
 
 
 def create_modulestore_instance(
-    engine,
-    content_store,
-    doc_store_config,
-    options,
-    i18n_service=None,
-    fs_service=None,
-    user_service=None,
+        engine,
+        content_store,
+        doc_store_config,
+        options,
+        i18n_service=None,
+        fs_service=None,
+        user_service=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options

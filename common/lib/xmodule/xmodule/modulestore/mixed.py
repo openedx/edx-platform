@@ -100,15 +100,15 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     ModuleStore knows how to route requests to the right persistence ms
     """
     def __init__(
-        self,
-        contentstore,
-        mappings,
-        stores,
-        i18n_service=None,
-        fs_service=None,
-        user_service=None,
-        create_modulestore_instance=None,
-        **kwargs
+            self,
+            contentstore,
+            mappings,
+            stores,
+            i18n_service=None,
+            fs_service=None,
+            user_service=None,
+            create_modulestore_instance=None,
+            **kwargs
     ):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
@@ -314,7 +314,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         :param course_key: must be a CourseKey
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courseid(course_key)
         try:
             return store.get_course(course_key, depth=depth, **kwargs)
@@ -351,7 +351,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         * ignore_case (bool): If True, do a case insensitive search. If
             False, do a case sensitive search
         """
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         store = self._get_modulestore_for_courseid(course_id)
         return store.has_course(course_id, ignore_case, **kwargs)
 
@@ -359,7 +359,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
 
