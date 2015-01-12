@@ -13,6 +13,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
+from xmodule.split_test_module import get_split_user_partitions
 
 from xblock.core import XBlock
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
@@ -307,8 +308,10 @@ def _has_group_access(descriptor, user, course_key):
     This function returns a boolean indicating whether or not `user` has
     sufficient group memberships to "load" a block (the `descriptor`)
     """
-    if len(descriptor.user_partitions) == 0:
-        # short circuit the process, since there are no defined user partitions
+    if len(descriptor.user_partitions) == len(get_split_user_partitions(descriptor.user_partitions)):
+        # Short-circuit the process, since there are no defined user partitions that are not
+        # user_partitions used by the split_test module. The split_test module handles its own access
+        # via updating the children of the split_test module.
         return True
 
     # use merged_group_access which takes group access on the block's
