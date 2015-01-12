@@ -4,7 +4,7 @@ define([
 ], function($, CourseDetailsModel, MainView, AjaxHelpers) {
     'use strict';
     describe('Settings/Main', function () {
-        var urlRoot = '/course-details',
+        var urlRoot = '/course/settings/org/DemoX/Demo_Course',
             modelData = {
                 start_date: "2014-10-05T00:00:00Z",
                 end_date: "2014-11-05T20:00:00Z",
@@ -19,7 +19,9 @@ define([
                 intro_video : null,
                 effort : null,
                 course_image_name : '',
-                course_image_asset_path : ''
+                course_image_asset_path : '',
+                entrance_exam_enabled : '',
+                entrance_exam_minimum_score_pct: '50'
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 
@@ -56,8 +58,34 @@ define([
             // It sends `POST` request, because the model doesn't have `id`. In
             // this case, it is considered to be new according to Backbone documentation.
             AjaxHelpers.expectJsonRequest(
-                requests, 'POST', '/course-details', expectedJson
+                requests, 'POST', urlRoot, expectedJson
             );
+        });
+
+        it('Creating an entrance exam with minimum_score_pct. It should save the ' +
+            '"entrance_exam_minimum_score_pct" and "entrance_exam_enabled" as part of course details', function () {
+            var entrance_exam_minimum_score_pct = '60';
+            var entrance_exam_enabled = 'true';
+
+            var requests = AjaxHelpers.requests(this),
+                expectedJson = $.extend(true, {}, modelData, {
+                    entrance_exam_enabled: entrance_exam_enabled,
+                    entrance_exam_minimum_score_pct: entrance_exam_minimum_score_pct
+                });
+
+            this.view.$el.find('#entrance-exam-enabled')
+                .attr('checked', entrance_exam_enabled)
+                .trigger('change');
+
+            this.view.$el.find('#entrance-exam-minimum-score-pct')
+                .val(entrance_exam_minimum_score_pct)
+                .trigger('input');
+
+            this.view.saveView();
+            AjaxHelpers.expectJsonRequest(
+                requests, 'POST', urlRoot, expectedJson
+            );
+            AjaxHelpers.respondWithJson(requests, expectedJson);
         });
     });
 });

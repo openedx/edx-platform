@@ -30,7 +30,7 @@ from courseware.tests.factories import StudentModuleFactory, UserFactory, Global
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE,
-    TEST_DATA_XML_MODULESTORE
+    TEST_DATA_XML_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes

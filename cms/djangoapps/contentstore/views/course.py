@@ -70,6 +70,7 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
+from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam
 
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
@@ -796,7 +797,8 @@ def settings_handler(request, course_key_string):
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
-                'upload_asset_url': upload_asset_url
+                'upload_asset_url': upload_asset_url,
+                'course_handler_url': reverse_course_url('course_handler', course_key),
             })
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
             if request.method == 'GET':
@@ -805,7 +807,22 @@ def settings_handler(request, course_key_string):
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
-            else:  # post or put, doesn't matter.
+            else:
+                # post or put, doesn't matter.
+                if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+                    # is entrance exam enabled or not for course.
+                    entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
+                    if entrance_exam_enabled:
+                        # setting to default value from cms configurations.
+                        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+                        ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
+                        if ee_min_score_pct and ee_min_score_pct != '':
+                            entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+
+                        create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+                    else:
+                        delete_entrance_exam(request, course_key)
+
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder

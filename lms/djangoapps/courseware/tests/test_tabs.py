@@ -1,6 +1,8 @@
 """
 Test cases for tabs.
+Note: Tests covering workflows in the actual tabs.py file begin after line 100
 """
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.utils import override_settings
@@ -17,6 +19,11 @@ from student.tests.factories import UserFactory
 from xmodule.tabs import CourseTabList
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+
+if settings.FEATURES.get('MILESTONES_APP', False):
+    from courseware.tabs import get_course_tab_list
+    from milestones import api as milestones_api
+    from milestones.models import MilestoneRelationshipType
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
@@ -97,3 +104,69 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertIn(self.xml_data, resp.content)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
+class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Validate tab behavior when dealing with Entrance Exams
+    """
+    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+
+        def setUp(self):
+            """
+            Test case scaffolding
+            """
+            self.course = CourseFactory.create()
+            self.instructor_tab = ItemFactory.create(
+                category="instructor", parent_location=self.course.location,
+                data="Instructor Tab", display_name="Instructor"
+            )
+            self.extra_tab_2 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 2"
+            )
+            self.extra_tab_3 = ItemFactory.create(
+                category="static_tab", parent_location=self.course.location,
+                data="Extra Tab", display_name="Extra Tab 3"
+            )
+            self.setup_user()
+            self.enroll(self.course)
+            self.user.is_staff = True
+            self.relationship_types = milestones_api.get_milestone_relationship_types()
+            MilestoneRelationshipType.objects.create(name='requires')
+            MilestoneRelationshipType.objects.create(name='fulfills')
+
+        def test_get_course_tabs_list_entrance_exam_enabled(self):
+            """
+            Unit Test: test_get_course_tabs_list_entrance_exam_enabled
+            """
+            entrance_exam = ItemFactory.create(
+                category="chapter", parent_location=self.course.location,
+                data="Exam Data", display_name="Entrance Exam"
+            )
+            entrance_exam.is_entrance_exam = True
+            milestone = {
+                'name': 'Test Milestone',
+                'namespace': '{}.entrance_exams'.format(unicode(self.course.id)),
+                'description': 'Testing Courseware Tabs'
+            }
+            self.course.entrance_exam_enabled = True
+            self.course.entrance_exam_id = unicode(entrance_exam.location)
+            milestone = milestones_api.add_milestone(milestone)
+            milestones_api.add_course_milestone(
+                unicode(self.course.id),
+                self.relationship_types['REQUIRES'],
+                milestone
+            )
+            milestones_api.add_course_content_milestone(
+                unicode(self.course.id),
+                unicode(entrance_exam.location),
+                self.relationship_types['FULFILLS'],
+                milestone
+            )
+            course_tab_list = get_course_tab_list(self.course, self.user)
+            self.assertEqual(len(course_tab_list), 2)
+            self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
+            self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
+            self.assertEqual(course_tab_list[1]['tab_id'], 'instructor')

@@ -112,11 +112,19 @@ FEATURES = {
     # Turn off Video Upload Pipeline through Studio, by default
     'ENABLE_VIDEO_UPLOAD_PIPELINE': False,
 
+
     # Is this an edX-owned domain? (edx.org)
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'IS_EDX_DOMAIN': False,
+
+    # Toggle course milestones app/feature
+    'MILESTONES_APP': False,
+
+    # Toggle course entrance exams feature
+    'ENTRANCE_EXAMS': False,
 }
+
 ENABLE_JASMINE = False
 
 
@@ -721,7 +729,10 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+
+    # milestones
+    'milestones',
 )
 
 
@@ -755,6 +766,9 @@ MAX_ASSET_UPLOAD_FILE_SIZE_IN_MB = 10
 # FAQ url to direct users to if they upload
 # a file that exceeds the above size
 MAX_ASSET_UPLOAD_FILE_SIZE_URL = ""
+
+### Default value for entrance exam minimum score
+ENTRANCE_EXAM_MIN_SCORE_PCT = 50
 
 ################ ADVANCED_COMPONENT_TYPES ###############
 

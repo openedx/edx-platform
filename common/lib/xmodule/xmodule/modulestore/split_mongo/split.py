@@ -1510,7 +1510,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 raise ItemNotFoundError(parent_usage_key)
 
             parent = new_structure['blocks'][block_id]
-            parent['fields'].setdefault('children', []).append(BlockKey.from_usage_key(xblock.location))
+
+            # Originally added to support entrance exams (settings.FEATURES.get('ENTRANCE_EXAMS'))
+            if kwargs.get('position') is None:
+                parent['fields'].setdefault('children', []).append(BlockKey.from_usage_key(xblock.location))
+            else:
+                parent['fields'].setdefault('children', []).insert(
+                    kwargs.get('position'),
+                    BlockKey.from_usage_key(xblock.location)
+                )
+
             if parent['edit_info']['update_version'] != new_structure['_id']:
                 # if the parent hadn't been previously changed in this bulk transaction, indicate that it's
                 # part of the bulk transaction
