@@ -58,29 +58,29 @@
         </div>
 
         % else:
-        <section class="is-empty">
+        <section class="placeholder is-empty">
           <article>
-            <h2>${_('You have not made any notes in this course yet.')}</h2>
+            <h2 class="placeholder-title">${_('You have not made any notes in this course yet. Other students in this course are using notes to:')}</h2>
 
-            <p>${_('Other students in this course are using notes to:')}</p>
-            <ul>
-                <li>${_("Mark a passage or concept so that it's easy to find later.")}</li>
-                <li>${_('Record thoughts about a specific passage or concept.')}</li>
-                <li>${_('Highlight important information to review later in the course or in future courses.')}</li>
-            </ul>
+            <div class="placeholder-copy">
+              <ul>
+                  <li>${_("Mark a passage or concept so that it's easy to find later.")}</li>
+                  <li>${_('Record thoughts about a specific passage or concept.')}</li>
+                  <li>${_('Highlight important information to review later in the course or in future courses.')}</li>
+              </ul>
 
-            % if position is not None:
-            <div class="student-notes-cta">
-              <h3 class="sr">${_('Start creating notes')}</h3>
+              % if position is not None:
+              <div class="placeholder-cta student-notes-cta">
+                <p class="placeholder-cta-copy">${_('Get started by making a note in something you just read, like {section_link}.').format(
+                  section_link='<a href="{url}">{section_name}</a>'.format(
+                    url=position['url'],
+                    section_name=position['display_name'],
+                    )
+                  )}</p>
+              </div>
+              % endif
 
-              <p>${_('Get started by making a note in something you just read, like {section_link}.').format(
-                section_link='<a href="{url}">{section_name}</a>'.format(
-                  url=position['url'],
-                  section_name=position['display_name'],
-                  )
-                )}</p>
             </div>
-            % endif
           </article>
         </section>
         % endif
