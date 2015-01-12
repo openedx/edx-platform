@@ -11,6 +11,7 @@
 // +tabbed views
 // +search - no results
 // +search - error
+// +case - no notes made
 
 // +notes:
 // --------------------
@@ -350,5 +351,46 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
   // --------------------
   .wrapper-msg {
     margin-bottom: $baseline;
+  }
+
+  // +case - no notes made
+  // --------------------
+  .placeholder {
+    background: $gray-l5;
+    border-top: ($baseline/4) solid $active-color;
+    padding: ($baseline*1.5);
+  }
+
+  .placeholder-title {
+    @extend %hd-lv3;
+    margin-bottom: $baseline;
+    text-transform: none; // reset needed for poor h2 element styling
+    letter-spacing: 0; // reset needed for poor h2 element styling
+  }
+
+  .placeholder-copy {
+    @extend %t-copy-sub1;
+
+    ul {
+      @extend %ui-no-list;
+
+      li {
+        @extend %wipe-last-child;
+        display: block;
+        margin-bottom: ($baseline/2);
+      }
+    }
+
+    p, ul {
+      margin-bottom: $baseline;
+    }
+  }
+
+  .placeholder-cta-copy {
+    @extend %t-strong;
+
+    a {
+      @extend %t-strong;
+    }
   }
 }
