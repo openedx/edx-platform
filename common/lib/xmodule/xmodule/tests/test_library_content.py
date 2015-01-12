@@ -356,7 +356,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
 
         # Now increase max_count so that one more child will be added:
         self.lc_block.max_count = 2
-        del self.lc_block._xmodule._selected_set  # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
         children = self.lc_block.get_child_descriptors()
         self.assertEqual(len(children), 2)
         child, new_child = children if children[0].location == child.location else reversed(children)
@@ -394,24 +395,25 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         event_data = self._assert_event_was_published("assigned")
 
         for block_list in (event_data["added"], event_data["result"]):
-            self.assertEqual(len(block_list), 1)  # The main_vertical is the only root block added, and is the only result.
+            self.assertEqual(len(block_list), 1)  # main_vertical is the only root block added, and is the only result.
             self.assertEqual(block_list[0]["usage_key"], unicode(course_usage_main_vertical))
 
             # Check that "descendants" is a flat, unordered list of all of main_vertical's descendants:
-            descendants_expected = {}
-            for lib_key, course_usage_key in (
+            descendants_expected = (
                 (inner_vertical.location, course_usage_inner_vertical),
                 (html_block.location, course_usage_html),
                 (problem_block.location, course_usage_problem),
-            ):
-                descendants_expected[unicode(course_usage_key)] = {
+            )
+            descendant_data_expected = {}
+            for lib_key, course_usage_key in descendants_expected:
+                descendant_data_expected[unicode(course_usage_key)] = {
                     "usage_key": unicode(course_usage_key),
                     "original_usage_key": unicode(lib_key),
                     "original_usage_version": unicode(self.store.get_block_original_usage(course_usage_key)[1]),
                 }
-            self.assertEqual(len(block_list[0]["descendants"]), len(descendants_expected))
+            self.assertEqual(len(block_list[0]["descendants"]), len(descendant_data_expected))
             for descendant in block_list[0]["descendants"]:
-                self.assertEqual(descendant, descendants_expected.get(descendant["usage_key"]))
+                self.assertEqual(descendant, descendant_data_expected.get(descendant["usage_key"]))
 
     def test_removed_overlimit(self):
         """
@@ -419,10 +421,11 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         We go from one blocks assigned to none because max_count has been decreased.
         """
         # Decrease max_count to 1, causing the block to be overlimit:
-        self.lc_block.get_child_descriptors()  # We must call an XModule method before we can change max_count - otherwise the change has no effect
+        self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
         self.lc_block.max_count = 0
-        del self.lc_block._xmodule._selected_set  # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving no blocks left:
         children = self.lc_block.get_child_descriptors()
@@ -438,21 +441,24 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         We go from two blocks assigned, to one because the others have been deleted from the library.
         """
         # Start by assigning two blocks to the student:
-        self.lc_block.get_child_descriptors()  # We must call an XModule method before we can change max_count - otherwise the change has no effect
+        self.lc_block.get_child_descriptors()  # This line is needed in the test environment or the change has no effect
         self.lc_block.max_count = 2
-        del self.lc_block._xmodule._selected_set  # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
         initial_blocks_assigned = self.lc_block.get_child_descriptors()
         self.assertEqual(len(initial_blocks_assigned), 2)
         self.publisher.reset_mock()  # Clear the "assigned" event that was just published.
         # Now make sure that one of the assigned blocks will have to be un-assigned.
-        # To cause an "invalid" event, we delete all blocks from the content library except for one of the two already assigned to the student:
+        # To cause an "invalid" event, we delete all blocks from the content library
+        # except for one of the two already assigned to the student:
         keep_block_key = initial_blocks_assigned[0].location
         keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
         deleted_block_key = initial_blocks_assigned[1].location
         self.library.children = [keep_block_lib_usage_key]
         self.store.update_item(self.library, self.user_id)
         self.lc_block.refresh_children()
-        del self.lc_block._xmodule._selected_set  # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        # Clear the cache (only needed because we skip saving/re-loading the block) pylint: disable=protected-access
+        del self.lc_block._xmodule._selected_set
 
         # Check that the event says that one block was removed, leaving one block left:
         children = self.lc_block.get_child_descriptors()
@@ -460,7 +466,8 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         event_data = self._assert_event_was_published("removed")
         self.assertEqual(event_data["removed"], [{
             "usage_key": unicode(deleted_block_key),
-            "original_usage_key": None,  # Note: original_usage_key info is sadly unavailable because the block has been deleted so that info can no longer be retrieved
+            "original_usage_key": None,  # Note: original_usage_key info is sadly unavailable because the block has been
+                                         # deleted so that info can no longer be retrieved
             "original_usage_version": None,
             "descendants": [],
         }])

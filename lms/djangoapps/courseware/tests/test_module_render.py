@@ -1004,10 +1004,10 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
     def test_context_contains_display_name(self, mock_tracker):
         mock_tracker.reset_mock()
         problem_display_name = u'Option Response Problem'
-        module_info = self.handle_callback_and_get_module_info_from_event(mock_tracker, problem_display_name)
+        module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
         self.assertEquals(problem_display_name, module_info['display_name'])
 
-    def handle_callback_and_get_module_info_from_event(self, mock_tracker, problem_display_name=None):
+    def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
         Creates a fake module, invokes the callback and extracts the 'module'
         metadata from the emitted problem_check event.
@@ -1038,7 +1038,7 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
             self.fail('Event type "problem_check" not found in call list.')
 
     def test_missing_display_name(self, mock_tracker):
-        actual_display_name = self.handle_callback_and_get_module_info_from_event(mock_tracker)['display_name']
+        actual_display_name = self.handle_callback_and_get_module_info(mock_tracker)['display_name']
         self.assertTrue(actual_display_name.startswith('problem'))
 
     def test_library_source_information(self, mock_tracker):
@@ -1049,8 +1049,9 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
         """
         original_usage_key = UsageKey.from_string(u'block-v1:A+B+C+type@problem+block@abcd1234')
         original_usage_version = ObjectId()
-        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', lambda _, key: (original_usage_key, original_usage_version)):
-            module_info = self.handle_callback_and_get_module_info_from_event(mock_tracker)
+        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
+            module_info = self.handle_callback_and_get_module_info(mock_tracker)
             self.assertIn('original_usage_key', module_info)
             self.assertEqual(module_info['original_usage_key'], unicode(original_usage_key))
             self.assertIn('original_usage_version', module_info)
