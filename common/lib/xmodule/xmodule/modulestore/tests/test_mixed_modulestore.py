@@ -1962,6 +1962,46 @@ class TestMixedModuleStore(CourseComparisonTest):
                 with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
                     self.assertTrue(self.store.has_item(vertical_loc))
 
+    @ddt.data(ModuleStoreEnum.Type.split)  # Need to fix and add ModuleStoreEnum.Type.mongo,
+    def test_delete_dag(self, default):
+        """
+        Test that deleting an element with more than one parent fully removes it from the course.
+        """
+        # set the default modulestore
+        with MongoContentstoreBuilder().build() as contentstore:
+            self.store = MixedModuleStore(
+                contentstore=contentstore,
+                create_modulestore_instance=create_modulestore_instance,
+                mappings={},
+                **self.OPTIONS
+            )
+            self.addCleanup(self.store.close_all_connections)
+            with self.store.default_store(default):
+                dest_course_key = self.store.make_course_key('a', 'course', 'course')
+                courses = import_from_xml(
+                    self.store, self.user_id, DATA_DIR, ['xml_dag'], load_error_modules=False,
+                    static_content_store=contentstore,
+                    target_course_id=dest_course_key,
+                    create_course_if_not_present=True,
+                )
+                course_id = courses[0].id
+                # ensure both parents point to the dag item
+                dag_item = course_id.make_usage_key('html', 'toyhtml')
+                one_parent = course_id.make_usage_key('vertical', 'vertical_test')
+                other_parent = course_id.make_usage_key('vertical', 'zeta')
+                with self.store.bulk_operations(course_id):
+                    # actually should test get_parent but it's not alphabetized yet
+                    self.assertEqual(self.store.get_parent_location(dag_item), one_parent)
+                    for parent_loc in [one_parent, other_parent]:
+                        parent = self.store.get_item(parent_loc)
+                        self.assertIn(dag_item, parent.children)
+                    # just testing draft branch assuming it doesn't matter which branch
+                    with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
+                        self.store.delete_item(dag_item, self.user_id)
+                        for parent_loc in [one_parent, other_parent]:
+                            parent = self.store.get_item(parent_loc)
+                            self.assertNotIn(dag_item, parent.children)
+
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_import_edit_import(self, default):
         """
