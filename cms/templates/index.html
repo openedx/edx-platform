@@ -25,7 +25,7 @@
           <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Course")}</a>
             % if libraries_enabled:
-              <a href="#" class="button new-button new-library-button"><i class="icon-plus icon-inline"></i>
+              <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
               ${_("New Library")}</a>
             % endif
           % elif course_creator_status=='disallowed_for_this_site' and settings.FEATURES.get('STUDIO_REQUEST_EMAIL',''):
