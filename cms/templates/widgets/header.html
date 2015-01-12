@@ -183,7 +183,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-account-dashboard">
-                    <a href="/">${_("Studio Home")}</a>
+                    <a href="/">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
                   </li>
                   <li class="nav-item nav-account-signout">
                     <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>
