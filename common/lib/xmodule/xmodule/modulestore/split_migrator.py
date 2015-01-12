@@ -119,7 +119,7 @@ class SplitMigrator(object):
 
         # clean up orphans in published version: in old mongo, parents pointed to the union of their published and draft
         # children which meant some pointers were to non-existent locations in 'direct'
-        self.split_modulestore.internal_clean_children(course_version_locator)
+        self.split_modulestore.fix_not_found(course_version_locator, user_id)
 
     def _add_draft_modules_to_course(self, published_course_usage_key, source_course_key, user_id, **kwargs):
         """
