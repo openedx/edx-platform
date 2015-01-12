@@ -21,7 +21,45 @@ class EnrollmentUserThrottle(UserRateThrottle):
 
 
 class EnrollmentView(APIView):
-    """ Enrollment API View for creating, updating, and viewing course enrollments. """
+    """
+        **Use Cases**
+
+            Get the user's enrollment status for a course.
+
+        **Example Requests**:
+
+            GET /api/enrollment/v1/enrollment/{user_id},{course_id}
+
+        **Response Values**
+
+            * created: The date the user account was created.
+
+            * mode: The enrollment mode of the user in this course.
+
+            * is_active: Whether the enrollment is currently active.
+
+            * course_details: A collection that includes:
+
+                * course_id: The unique identifier for the course.
+
+                * enrollment_end: The date and time after which users cannot enroll for the course.
+
+                * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
+
+                    * slug: The short name for the enrollment mode.
+                    * name: The full name of the enrollment mode.
+                    * min_price: The minimum price for which a user can enroll in this mode.
+                    * suggested_prices: A list of suggested prices for this enrollment mode.
+                    * currency: The currency of the listed prices.
+                    * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
+                    * description: A description of this mode.
+
+                * enrollment_start: The date and time that users can begin enrolling in the course.
+
+                * invite_only: Whether students must be invited to enroll in the course; true or false.
+
+            * user: The ID of the user.
+    """
 
     authentication_classes = OAuth2Authentication, SessionAuthenticationAllowInactiveUser
     permission_classes = permissions.IsAuthenticated,
@@ -63,7 +101,40 @@ class EnrollmentView(APIView):
 
 
 class EnrollmentCourseDetailView(APIView):
-    """ Enrollment API View for viewing course enrollment details. """
+    """
+        **Use Cases**
+
+            Get enrollment details for a course.
+
+            **Note:** Getting enrollment details for a course does not require authentication.
+
+        **Example Requests**:
+
+            GET /api/enrollment/v1/course/{course_id}
+
+
+        **Response Values**
+
+            A collection of course enrollments for the user, or for the newly created enrollment. Each course enrollment contains:
+
+                * course_id: The unique identifier of the course.
+
+                * enrollment_end: The date and time after which users cannot enroll for the course.
+
+                * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
+
+                        * slug: The short name for the enrollment mode.
+                        * name: The full name of the enrollment mode.
+                        * min_price: The minimum price for which a user can enroll in this mode.
+                        * suggested_prices: A list of suggested prices for this enrollment mode.
+                        * currency: The currency of the listed prices.
+                        * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
+                        * description: A description of this mode.
+
+                * enrollment_start: The date and time that users can begin enrolling in the course.
+
+                * invite_only: Whether students must be invited to enroll in the course; true or false.
+    """
 
     authentication_classes = []
     permission_classes = []
@@ -98,24 +169,71 @@ class EnrollmentCourseDetailView(APIView):
 
 
 class EnrollmentListView(APIView):
-    """ Enrollment API List View for viewing all course enrollments for a user. """
+    """
+        **Use Cases**
+
+            1. Get a list of all course enrollments for the currently logged in user.
+
+            2. Enroll the currently logged in user in a course.
+
+               Currently you can use this command only to enroll the user in "honor" mode.
+
+               If honor mode is not supported for the course, the request fails and returns the available modes.
+
+        **Example Requests**:
+
+            GET /api/enrollment/v1/enrollment
+
+            POST /api/enrollment/v1/enrollment{"course_details":{"course_id": "edX/DemoX/Demo_Course"}}
+
+        **Post Parameters**
+
+            * user:  The user ID of the currently logged in user. Optional. You cannot use the command to enroll a different user.
+
+            * course details: A collection that contains:
+
+                * course_id: The unique identifier for the course.
+
+        **Response Values**
+
+            A collection of course enrollments for the user, or for the newly created enrollment. Each course enrollment contains:
+
+                * created: The date the user account was created.
+
+                * mode: The enrollment mode of the user in this course.
+
+                * is_active: Whether the enrollment is currently active.
+
+                * course_details: A collection that includes:
+
+                    * course_id:  The unique identifier for the course.
+
+                    * enrollment_end: The date and time after which users cannot enroll for the course.
+
+                    * course_modes: An array of data about the enrollment modes supported for the course. Each enrollment mode collection includes:
+
+                        * slug: The short name for the enrollment mode.
+                        * name: The full name of the enrollment mode.
+                        * min_price: The minimum price for which a user can enroll in this mode.
+                        * suggested_prices: A list of suggested prices for this enrollment mode.
+                        * currency: The currency of the listed prices.
+                        * expiration_datetime: The date and time after which users cannot enroll in the course in this mode.
+                        * description: A description of this mode.
+
+                    * enrollment_start: The date and time that users can begin enrolling in the course.
+
+                    * invite_only: Whether students must be invited to enroll in the course; true or false.
+
+                * user: The ID of the user.
+    """
 
     authentication_classes = OAuth2Authentication, SessionAuthenticationAllowInactiveUser
     permission_classes = permissions.IsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
     def get(self, request):
-        """List out all the enrollments for the current user
-
-        Returns a JSON response with all the course enrollments for the current user.
-
-        Args:
-            request (Request): The GET request for course enrollment listings.
-            user (str): Get all enrollments for the specified user's username.
-
-        Returns:
-            A JSON serialized representation of the user's course enrollments.
-
+        """
+            Gets a list of all course enrollments for the currently logged in user.
         """
         user = request.GET.get('user', request.user.username)
         if request.user.username != user:
@@ -135,25 +253,8 @@ class EnrollmentListView(APIView):
             )
 
     def post(self, request):
-        """Create a new enrollment
-
-        Creates a new enrollment based on the data posted. Currently all that can be specified is
-        the course id.  All other attributes will be determined by the server, and cannot be updated
-        through this endpoint.
-
-        By default, this will attempt to create the enrollment with course mode 'honor'. If the course
-        does not have an 'honor' course mode, it will fail as a bad request and list the available
-        course modes.
-
-        Args:
-            request (Request): The POST request to create a new enrollment. POST DATA should contain
-                'course_details' with an attribute 'course_id' to identify which course to enroll in.
-                'user' may be specified as well, but must match the username of the authenticated user.
-                Ex. {'user': 'Bob', 'course_details': { 'course_id': 'edx/demo/T2014' } }
-
-        Returns:
-            A JSON serialized representation of the user's new course enrollment.
-
+        """
+            Enrolls the currently logged in user in a course.
         """
         user = request.DATA.get('user', request.user.username)
         if not user:
