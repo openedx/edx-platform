@@ -47,16 +47,16 @@ div.video {
     .video-download-button{
       display: inline-block;
       vertical-align: top;
-      margin: ($baseline*.75) ($baseline/2) 0 0;
+      margin: ($baseline*0.75) ($baseline/2) 0 0;
 
       > a {
-        @include transition(all 0.25s ease-in-out 0s);
+        @include transition(all $tmg-f2 ease-in-out 0s);
         @include font-size(14);
         line-height : 14px;
         float: left;
         border-radius: 3px;
         background-color: $very-light-text;
-        padding: ($baseline*.75);
+        padding: ($baseline*0.75);
         color: $lighter-base-font-color;
 
         &:hover, &:focus {
@@ -77,15 +77,23 @@ div.video {
     }
 
     .branding {
+      @include float(right);
       display: inline-block;
-      float: right;
-      margin: 15px 0 0 10px;
+      margin: ($baseline - 5) 0 0 ($baseline/2);
       vertical-align: top;
 
       .host-tag {
-        // The @extend %cont-text-hide wasn't working for some reason...
+        // @extend %text-sr; In the _mixins file, but not seeing it.
+        // Adding overrides for now
+        border: 0;
+        clip: rect(1px 1px 1px 1px);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
         position: absolute;
-        left: -9999em;
+        width: 1px;
+
         display: inline-block;
         vertical-align: middle;
         font-size: 70%;
@@ -95,7 +103,7 @@ div.video {
       .brand-logo {
         display: inline-block;
         max-width: 100%;
-        max-height: ($baseline*1.5);
+        max-height: ($baseline*2);
         padding: ($baseline/4) 0;
         vertical-align: middle;
       }
@@ -121,7 +129,7 @@ div.video {
       left: 50%;
       z-index: 1;
       padding: 30px;
-      background: rgba(0, 0, 0, 0.7);
+      background: $shadow-d2;
       border-radius: 25%;
 
       &:after{
@@ -144,7 +152,7 @@ div.video {
       top: 50%;
       left: 50%;
       padding: 30px;
-      background: rgba(0, 0, 0, 0.7);
+      background: $shadow-d2;
       border-radius: 25%;
 
       &:after{
@@ -155,7 +163,7 @@ div.video {
         height: 0px;
         border-style: solid;
         border-width: 30px 0 30px 50px;
-        border-color: transparent transparent transparent #ffffff;
+        border-color: transparent transparent transparent $white;
       }
     }
 
@@ -199,29 +207,29 @@ div.video {
 
       %video-button {
         @include transition(none);
+        @extend %t-strong;
         display: block;
         overflow: hidden;
         margin: 0;
         padding: 0 0 0 15px;
-        color: #fff;
-        font-weight: 800;
+        color: $white;
         line-height: 46px;
         border-width: 0 1px;
         border-style: solid;
-        border-color: #000;
+        border-color: $black;
         cursor: pointer;
         -webkit-font-smoothing: antialiased;
 
         &:hover, &:focus {
-          background-color: #444;
-          color: #fff;
+          background-color: $gray-d2;
+          color: $white;
           text-decoration: none;
         }
 
         &:active,
         &:focus {
-          color: #fff;
-          background-color: #444;
+          color: $white;
+          background-color: $gray-d2;
           text-decoration: none;
         }
       }
@@ -292,8 +300,8 @@ div.video {
 
       .video-playback-controls {
         @include clearfix();
-        background: #181818;
-        color: #f2f2f2;
+        background: $gray-d4;
+        color: $gray-l5;
 
         .video-controls-options {
           display: block;
@@ -301,7 +309,7 @@ div.video {
           margin: 0;
           padding: 0;
           list-style: none;
-          border-right: 1px solid #666;
+          border-right: 1px solid $gray-d1;
 
           .video-control {
             display: block;
@@ -317,8 +325,8 @@ div.video {
               text-align: center;
 
               &:focus {
+                @extend %ui-depth4;
                 position: relative;
-                z-index: 10000;
                 outline: $white dotted thin;
                 outline-offset: -2px;
               }
@@ -329,8 +337,8 @@ div.video {
             }
 
             .vidtime {
+              @extend %t-strong;
               padding: 0 lh(.75);
-              font-weight: bold;
               -webkit-font-smoothing: antialiased;
 
               @media (max-width: 1120px) {
@@ -340,12 +348,12 @@ div.video {
           }
 
           .video-control:first-child {
-            border-right: 1px solid #666;
+            border-right: 1px solid $gray-d1;
           }
 
           @media (max-width: 1120px) {
+            @include font-size(14);
             margin-right: lh(.5);
-            font-size: em(14);
           }
         }
       }
@@ -358,7 +366,7 @@ div.video {
           display: block;
           position: relative;
           float: left;
-          border-right: 1px solid #666;
+          border-right: 1px solid $gray-d1;
 
           .speed-button {
             @extend %video-button;
@@ -378,13 +386,13 @@ div.video {
             }
 
             .label {
+              @include font-size(14);
               float: left;
               padding: 0 lh(.25) 0 lh(.5);
-              font-size: em(14);
               font-weight: normal;
               letter-spacing: 1px;
               text-transform: uppercase;
-              color: #999;
+              color: $gray-l1;
 
               @media (max-width: 1120px) {
                 display: none;
@@ -392,11 +400,11 @@ div.video {
             }
 
             .value {
+              @extend %t-strong;
               float: left;
               margin-bottom: 0;
               padding: 0 lh(.5) 0 0;
-              font-weight: bold;
-              color: #fff;
+              color: $white;
 
               @media (max-width: 1120px) {
                 padding: 0 lh(.5) 0 lh(.5);
@@ -412,10 +420,10 @@ div.video {
             width: 127px;
             bottom: 46px;
             opacity: 0;
-            background-color: #444;
+            background-color: $gray-d2;
 
             li {
-              color: #fff;
+              color: $white;
               cursor: pointer;
 
               a {
@@ -425,11 +433,11 @@ div.video {
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 border: 0;
-                color: #fff;
+                color: $white;
 
                 &:hover,
                 &:focus {
-                  background-color: #666;
+                  background-color: $gray-d1;
                   color: #aaa;
                   outline-offset: -4px;
                 }
@@ -473,8 +481,8 @@ div.video {
         a.hide-subtitles {
 
           &:focus {
+            @extend %ui-depth4;
             position: relative;
-            z-index: 10000;
             overflow: auto;
             outline: $white dotted thin;
             outline-offset: -2px;
@@ -485,7 +493,7 @@ div.video {
           position: relative;
           display: block;
           float: left;
-          border-right: 1px solid #666;
+          border-right: 1px solid $gray-d1;
 
           &.is-opened {
 
@@ -513,14 +521,14 @@ div.video {
             width: 45px;
             height: 125px;
             opacity: 0;
-            background-color: #444;
+            background-color: $gray-d2;
 
             .volume-slider {
               height: 100px;
               width: 5px;
               margin: 14px auto;
               border: 0;
-              background: #666;
+              background: $gray-d1;
 
               a.ui-slider-handle {
                 @include transition(height 2.0s ease-in-out 0s, width 2.0s ease-in-out 0s);
@@ -548,7 +556,7 @@ div.video {
           margin: 0;
           padding: 0;
           list-style: none;
-          border-right: 1px solid #666;
+          border-right: 1px solid $gray-d1;
 
           .size-control {
             margin: 0;
@@ -578,8 +586,7 @@ div.video {
               border: none;
 
               &.active {
-                background-color: #F44;
-                color: #0ff;
+                background-color: $gray-d1;
                 text-decoration: none;
               }
 
@@ -594,7 +601,7 @@ div.video {
           display: block;
           float: left;
           height: 46px;
-          border-right: 1px solid #666;
+          border-right: 1px solid $gray-d1;
 
           .subtitles-control {
             @extend %video-button;
@@ -679,7 +686,7 @@ div.video {
       }
 
       &.focused {
-        outline: #000 dotted thin;
+        outline: $black dotted thin;
         outline-offset: -1px;
       }
 
@@ -751,7 +758,7 @@ div.video {
     margin: 0;
     padding: 0;
     vertical-align: middle;
-    background: rgba(#000, .95);
+    background: rgba($black, .95);
     border: 0;
     border-radius: 0;
 
@@ -813,7 +820,7 @@ div.video {
     .subtitles {
       @include box-sizing(border-box);
       @include transition(none);
-      background: #000;
+      background: $black;
       height: 100%;
       width: 25%;
       padding: lh();
