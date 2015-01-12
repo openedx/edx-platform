@@ -72,6 +72,21 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
 # pylint: disable=protected-access
 
 
+# yeah, this shouldn't be here, but get_parent calls get_block which calls load_item which
+# returns items with revision = draft but the app code can't handle that. Anyway, we need
+# to get rid of draft.py and move it all here.
+def wrap_draft(item):
+    """
+    Cleans the item's location and sets the `is_draft` attribute if needed.
+
+    Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
+    Sets the item's location to the non-draft location in either case.
+    """
+    setattr(item, 'is_draft', item.location.revision == MongoRevisionKey.draft)
+    item.location = item.location.replace(revision=MongoRevisionKey.published)
+    return item
+
+
 class MongoRevisionKey(object):
     """
     Key Revision constants to use for Location and Usage Keys in the Mongo modulestore
@@ -192,11 +207,16 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.course_id = course_key
         self.cached_metadata = cached_metadata
 
+    def get_block(self, usage_id):
+        block = super(CachingDescriptorSystem, self).get_block(usage_id)
+        return wrap_draft(block)
+
     def load_item(self, location):
         """
         Return an XModule instance for the specified location
         """
         assert isinstance(location, UsageKey)
+        location = self.modulestore.fill_in_run(location)
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
