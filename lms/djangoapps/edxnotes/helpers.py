@@ -112,6 +112,9 @@ def get_parent_unit(xblock):
     Find vertical that is a unit, not just some container.
     """
     while xblock:
+        xblock = xblock.get_parent()
+        if xblock is None:
+            return None
         parent = xblock.get_parent()
         if parent is None:
             return None
