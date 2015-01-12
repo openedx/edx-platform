@@ -712,9 +712,9 @@ def _create_recent_enrollment_message(course_enrollment_pairs, course_modes):
             {
                 "course_id": course.id,
                 "course_name": course.display_name,
-                "allow_donation": _allow_donation(course_modes, course.id)
+                "allow_donation": _allow_donation(course_modes, course.id, enrollment)
             }
-            for course in recently_enrolled_courses
+            for course, enrollment in recently_enrolled_courses
         ]
 
         return render_to_string(
@@ -738,14 +738,14 @@ def _get_recently_enrolled_courses(course_enrollment_pairs):
     seconds = DashboardConfiguration.current().recent_enrollment_time_delta
     time_delta = (datetime.datetime.now(UTC) - datetime.timedelta(seconds=seconds))
     return [
-        course for course, enrollment in course_enrollment_pairs
+        (course, enrollment) for course, enrollment in course_enrollment_pairs
         # If the enrollment has no created date, we are explicitly excluding the course
         # from the list of recent enrollments.
         if enrollment.is_active and enrollment.created > time_delta
     ]
 
 
-def _allow_donation(course_modes, course_id):
+def _allow_donation(course_modes, course_id, enrollment):
     """Determines if the dashboard will request donations for the given course.
 
     Check if donations are configured for the platform, and if the current course is accepting donations.
@@ -753,15 +753,14 @@ def _allow_donation(course_modes, course_id):
     Args:
         course_modes (dict): Mapping of course ID's to course mode dictionaries.
         course_id (str): The unique identifier for the course.
+        enrollment(CourseEnrollment): The enrollment object in which the user is enrolled
 
     Returns:
         True if the course is allowing donations.
 
     """
     donations_enabled = DonationConfiguration.current().enabled
-    is_verified_mode = CourseMode.has_verified_mode(course_modes[course_id])
-    has_payment_option = CourseMode.has_payment_options(course_id)
-    return donations_enabled and not is_verified_mode and not has_payment_option
+    return donations_enabled and enrollment.mode in course_modes[course_id] and course_modes[course_id][enrollment.mode].min_price == 0
 
 
 def try_change_enrollment(request):
