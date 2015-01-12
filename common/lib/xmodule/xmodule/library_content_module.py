@@ -220,25 +220,56 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
         if hasattr(self, "_selected_set"):
             # Already done:
             return self._selected_set  # pylint: disable=access-member-before-definition
+
+        selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples assigned to this student
+        previous_count = len(selected)
+
+        lib_tools = self.runtime.service(self, 'library_tools')
+        format_block_keys = lambda keys: lib_tools.create_block_analytics_summary(self.location.course_key, keys)
+
+        def publish_event(event_name, **kwargs):
+            """ Publish an event for analytics purposes """
+            event_data = {
+                "location": unicode(self.location),
+                "result": format_block_keys(selected),
+                "previous_count": previous_count,
+                "max_count": self.max_count,
+            }
+            event_data.update(kwargs)
+            self.runtime.publish(self, "edx.librarycontentblock.content.{}".format(event_name), event_data)
+
         # Determine which of our children we will show:
-        selected = set(tuple(k) for k in self.selected)  # set of (block_type, block_id) tuples
         valid_block_keys = set([(c.block_type, c.block_id) for c in self.children])  # pylint: disable=no-member
         # Remove any selected blocks that are no longer valid:
-        selected -= (selected - valid_block_keys)
+        invalid_block_keys = (selected - valid_block_keys)
+        if invalid_block_keys:
+            selected -= invalid_block_keys
+            # Publish an event for analytics purposes:
+            # reason "invalid" means deleted from library or a different library is now being used.
+            publish_event("removed", removed=format_block_keys(invalid_block_keys), reason="invalid")
         # If max_count has been decreased, we may have to drop some previously selected blocks:
+        overlimit_block_keys = set()
         while len(selected) > self.max_count:
-            selected.pop()
+            overlimit_block_keys.add(selected.pop())
+        if overlimit_block_keys:
+            # Publish an event for analytics purposes:
+            publish_event("removed", removed=format_block_keys(overlimit_block_keys), reason="overlimit")
         # Do we have enough blocks now?
         num_to_add = self.max_count - len(selected)
         if num_to_add > 0:
+            added_block_keys = None
             # We need to select [more] blocks to display to this user:
+            pool = valid_block_keys - selected
             if self.mode == "random":
-                pool = valid_block_keys - selected
                 num_to_add = min(len(pool), num_to_add)
-                selected |= set(random.sample(pool, num_to_add))
+                added_block_keys = set(random.sample(pool, num_to_add))
                 # We now have the correct n random children to show for this user.
             else:
                 raise NotImplementedError("Unsupported mode.")
+            selected |= added_block_keys
+            if added_block_keys:
+                # Publish an event for analytics purposes:
+                publish_event("assigned", added=format_block_keys(added_block_keys))
         # Save our selections to the user state, to ensure consistency:
         self.selected = list(selected)  # TODO: this doesn't save from the LMS "Progress" page.
         # Cache the results

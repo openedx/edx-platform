@@ -34,9 +34,8 @@ def i_create_a_course(step):
     create_a_course()
 
 
-# pylint: disable=invalid-name
 @step('I click the course link in Studio Home$')
-def i_click_the_course_link_in_studio_home(step):
+def i_click_the_course_link_in_studio_home(step):  # pylint: disable=invalid-name
     course_css = 'a.course-link'
     world.css_click(course_css)
 

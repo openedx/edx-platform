@@ -454,12 +454,17 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if block_info['edit_info'].get('update_version') == update_version:
             return
 
+        original_usage = block_info['edit_info'].get('original_usage')
+        original_usage_version = block_info['edit_info'].get('original_usage_version')
         block_info['edit_info'] = {
             'edited_on': datetime.datetime.now(UTC),
             'edited_by': user_id,
             'previous_version': block_info['edit_info']['update_version'],
             'update_version': update_version,
         }
+        if original_usage:
+            block_info['edit_info']['original_usage'] = original_usage
+            block_info['edit_info']['original_usage_version'] = original_usage_version
 
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
@@ -1253,6 +1258,21 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         '''
         # TODO implement
         pass
+
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator and version from
+        which the copy was inherited.
+
+        Returns usage_key, version if the data is available, otherwise returns (None, None)
+        """
+        blocks = self._lookup_course(usage_key.course_key).structure['blocks']
+        block = blocks.get(BlockKey.from_usage_key(usage_key))
+        if block and 'original_usage' in block['edit_info']:
+            usage_key = BlockUsageLocator.from_string(block['edit_info']['original_usage'])
+            return usage_key, block['edit_info'].get('original_usage_version')
+        return None, None
 
     def create_definition_from_data(self, course_key, new_def_data, category, user_id):
         """
@@ -2214,6 +2234,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             # Setting it to the source_block_info structure version here breaks split_draft's has_changes() method.
             new_block_info['edit_info']['edited_by'] = user_id
             new_block_info['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+            new_block_info['edit_info']['original_usage'] = unicode(usage_key.replace(branch=None, version_guid=None))
+            new_block_info['edit_info']['original_usage_version'] = source_block_info['edit_info'].get('update_version')
             dest_structure['blocks'][new_block_key] = new_block_info
 
             children = source_block_info['fields'].get('children')
