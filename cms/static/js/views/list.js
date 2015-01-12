@@ -28,7 +28,7 @@ define([
             this.listenTo(this.collection, 'remove', this.onRemoveItem);
             this.template = _.template([
                 '<button class="action action-add">',
-                '<i class="icon icon-plus"></i><%= interpolate(gettext(\'New %(item_type)s\'), {item_type: itemCategoryDisplayName}, true) %>',
+                '<i class="icon fa fa-plus"></i><%= interpolate(gettext(\'New %(item_type)s\'), {item_type: itemCategoryDisplayName}, true) %>',
                 '</button>'
             ].join('\n'));
 

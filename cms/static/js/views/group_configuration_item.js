@@ -25,7 +25,8 @@ define([
             };
         },
 
-        itemDisplayName: gettext('Group Configuration'),
+        // Translators: this refers to a collection of groups.
+        itemDisplayName: gettext('group configuration'),
 
         canDelete: true,
 
