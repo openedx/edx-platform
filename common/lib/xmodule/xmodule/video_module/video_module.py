@@ -2,14 +2,12 @@
 # pylint: disable=abstract-method
 """Video is ungraded Xmodule for support video content.
 It's new improved video module, which support additional feature:
-
 - Can play non-YouTube video sources via in-browser HTML5 video player.
 - YouTube defaults to HTML5 mode from the start.
 - Speed changes in both YouTube and non-YouTube videos happen via
 in-browser HTML5 video method (when in HTML5 mode).
 - Navigational subtitles can be disabled altogether via an attribute
 in XML.
-
 Examples of html5 videos for manual testing:
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.mp4
     https://s3.amazonaws.com/edx-course-videos/edx-intro/edX-FA12-cware-1_100.webm
@@ -36,7 +34,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
 from .transcripts_utils import VideoTranscriptsMixin
-from .video_utils import create_youtube_string, get_video_from_cdn
+from .video_utils import create_youtube_string, get_video_from_cdn, get_branding_info
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -80,7 +78,6 @@ _ = lambda text: text
 class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, XModule):
     """
     XML source example:
-
         <video show_captions="true"
             youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
             url_name="lecture_21_3" display_name="S19V3: Vacancies"
@@ -129,12 +126,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
     def get_transcripts_for_student(self):
         """Return transcript information necessary for rendering the XModule student view.
-
         This is more or less a direct extraction from `get_html`.
-
         Returns:
             Tuple of (track_url, transcript_language, sorted_languages)
-
             track_url -> subtitle download url
             transcript_language -> default transcript language
             sorted_languages -> dictionary of available transcript languages
@@ -175,6 +169,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sources = filter(None, self.html5_sources)
 
         download_video_link = None
+        branding_info = None
         youtube_streams = ""
 
         # If we have an edx_video_id, we prefer its values over what we store
@@ -215,6 +210,9 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get(self.system.user_location)
+            branding_info = get_branding_info(cdn_info.get('BRANDING'))
+
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
                 if new_url:
@@ -235,6 +233,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # This won't work when we move to data that
             # isn't on the filesystem
+            "branding_info": branding_info,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
             'end': self.end_time.total_seconds(),
@@ -286,7 +285,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     def __init__(self, *args, **kwargs):
         """
         Mostly handles backward compatibility issues.
-
         `source` is deprecated field.
         a) If `source` exists and `source` is not `html5_sources`: show `source`
             field on front-end as not-editable but clearable. Dropdown is a new
@@ -331,21 +329,16 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     def editor_saved(self, user, old_metadata, old_content):
         """
         Used to update video values during `self`:save method from CMS.
-
         old_metadata: dict, values of fields of `self` with scope=settings which were explicitly set by user.
         old_content, same as `old_metadata` but for scope=content.
-
         Due to nature of code flow in item.py::_save_item, before current function is called,
         fields of `self` instance have been already updated, but not yet saved.
-
         To obtain values, which were changed by user input,
         one should compare own_metadata(self) and old_medatada.
-
         Video player has two tabs, and due to nature of sync between tabs,
         metadata from Basic tab is always sent when video player is edited and saved first time, for example:
         {'youtube_id_1_0': u'OEoXaMPEzfM', 'display_name': u'Video', 'sub': u'OEoXaMPEzfM', 'html5_sources': []},
         that's why these fields will always present in old_metadata after first save. This should be fixed.
-
         At consequent save requests html5_sources are always sent too, disregard of their change by user.
         That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
         This should be fixed too.
@@ -390,7 +383,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         """
         Creates an instance of this descriptor from the supplied xml_data.
         This may be overridden by subclasses
-
         xml_data: A string of xml that will be translated into data and children for
             this module
         system: A DescriptorSystem for interacting with external resources
