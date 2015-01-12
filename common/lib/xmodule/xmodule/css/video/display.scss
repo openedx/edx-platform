@@ -72,6 +72,31 @@ div.video {
         border-radius: 3px;
       }
     }
+
+    .branding {
+      display: inline-block;
+      float: right;
+      margin: 15px 0 0 10px;
+      vertical-align: top;
+
+      .host-tag {
+        @include margin-right($baseline/2);
+        position: absolute;
+        left: -9999em;
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 70%;
+        color: #777;
+      }
+
+      .brand-logo {
+        display: inline-block;
+        max-width: 100%;
+        max-height: ($baseline*2);
+        padding: ($baseline/4) 0;
+        vertical-align: middle;
+      }
+    }
   }
 
   article.video-wrapper {
@@ -741,7 +766,7 @@ div.video {
         bottom: 0;
         left: 0;
         position: absolute;
-        width: 100%; 
+        width: 100%;
       }
     }
 

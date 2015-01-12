@@ -112,7 +112,7 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         # Response should be instance of HttpResponseRedirect.
         self.assertIsInstance(response, HttpResponseRedirect)
         # Location should be "/login".
-        self.assertEqual(response._headers.get("location")[1], "/login")
+        self.assertEqual(response._headers.get("location")[1], "/login")  # pylint: disable=protected-access
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
@@ -198,7 +198,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     def test_course_cards_sorted_by_default_sorting(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args
+        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'index.html')
 
         # Now the courses will be stored in their announcement dates.
@@ -209,7 +209,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # check the /courses view
         response = self.client.get(reverse('branding.views.courses'))
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args
+        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
 
         # Now the courses will be stored in their announcement dates.
@@ -223,7 +223,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
     def test_course_cards_sorted_by_start_date_show_earliest_first(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args
+        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'index.html')
 
         # now the courses will be sorted by their creation dates, earliest first.
@@ -234,7 +234,7 @@ class IndexPageCourseCardsSortingTests(ModuleStoreTestCase):
         # check the /courses view as well
         response = self.client.get(reverse('branding.views.courses'))
         self.assertEqual(response.status_code, 200)
-        ((template, context), _) = RENDER_MOCK.call_args
+        ((template, context), _) = RENDER_MOCK.call_args  # pylint: disable=unpacking-non-sequence
         self.assertEqual(template, 'courseware/courses.html')
 
         # now the courses will be sorted by their creation dates, earliest first.

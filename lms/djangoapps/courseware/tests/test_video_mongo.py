@@ -39,6 +39,7 @@ class TestVideoYouTube(TestVideo):
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': u'A Name',
             'end': 3610.0,
@@ -102,6 +103,7 @@ class TestVideoNonYouTube(TestVideo):
 
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -204,6 +206,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         sources = json.dumps([u'example.mp4', u'example.webm'])
 
         expected_context = {
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -320,6 +323,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -459,6 +463,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         # Video found for edx_video_id
         initial_context = {
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -576,6 +581,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         # Video found for edx_video_id
         initial_context = {
+            'branding_info': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -628,11 +634,22 @@ class TestGetHtmlMethod(BaseTestXmodule):
             self.item_descriptor.xmodule_runtime.render_template('video.html', expected_context)
         )
 
+    # pylint: disable=invalid-name
+    @patch('xmodule.video_module.video_module.BrandingInfoConfig')
     @patch('xmodule.video_module.video_module.get_video_from_cdn')
-    def test_get_html_cdn_source(self, mocked_get_video):
+    def test_get_html_cdn_source(self, mocked_get_video, mock_BrandingInfoConfig):
         """
         Test if sources got from CDN.
         """
+
+        mock_BrandingInfoConfig.get_config.return_value = {
+            "CN": {
+                'url': 'http://www.xuetangx.com',
+                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+                'logo_tag': 'Video hosted by XuetangX.com'
+            }
+        }
+
         def side_effect(*args, **kwargs):
             cdn = {
                 'http://example.com/example.mp4': 'http://cdn_example.com/example.mp4',
@@ -679,6 +696,11 @@ class TestGetHtmlMethod(BaseTestXmodule):
         ]
 
         initial_context = {
+            'branding_info': {
+                'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
+                'logo_tag': 'Video hosted by XuetangX.com',
+                'url': 'http://www.xuetangx.com'
+            },
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
