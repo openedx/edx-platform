@@ -26,8 +26,8 @@
                 expect($('.video-controls')).toContain(
                     [
                         '.slider',
-                        'ul.vcr',
-                        'a.play',
+                        'ul.video-controls-options',
+                        'a.video_control',
                         '.vidtime',
                         '.add-fullscreen'
                     ].join(',')
@@ -50,13 +50,15 @@
             });
 
             it('add ARIA attributes to play control', function () {
-                var playControl = $('ul.vcr a');
+                var playControl = $('ul.video-controls-options a.video_control');
 
                 expect(playControl).toHaveAttrs({
                     'role': 'button',
                     'title': 'Play',
                     'aria-disabled': 'false'
                 });
+
+                expect(playControl).toContain('.icon-play');
             });
 
             it('add ARIA attributes to fullscreen control', function () {
@@ -645,6 +647,7 @@
                 expect($('.video_control')).not.toHaveClass('play');
                 expect($('.video_control')).toHaveClass('pause');
                 expect($('.video_control')).toHaveAttr('title', 'Pause');
+                expect($('.video_control')).toContain('.icon-pause');
             });
         });
 
@@ -658,6 +661,7 @@
                 expect($('.video_control')).not.toHaveClass('pause');
                 expect($('.video_control')).toHaveClass('play');
                 expect($('.video_control')).toHaveAttr('title', 'Play');
+                expect($('.video_control')).toContain('.icon-play');
             });
         });
 

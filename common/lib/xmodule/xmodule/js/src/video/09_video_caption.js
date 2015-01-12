@@ -790,7 +790,10 @@ function (Sjson, AsyncProcess) {
 
             hideSubtitlesEl
                 .attr('title', text)
-                .text(gettext(text));
+                .removeClass('show_transcript hide_transcript')
+                .addClass(type)
+                .find('span')
+                .text(text);
 
             if (state.videoPlayer) {
                 state.videoPlayer.log(type, {

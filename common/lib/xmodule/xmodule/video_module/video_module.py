@@ -36,7 +36,7 @@ from xmodule.raw_module import EmptyDataRawDescriptor
 from xmodule.xml_module import is_pointer_tag, name_to_pathname, deserialize_field
 
 from .transcripts_utils import VideoTranscriptsMixin
-from .video_utils import create_youtube_string, get_video_from_cdn
+from .video_utils import create_youtube_string, get_video_from_cdn, get_branding_info
 from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
@@ -175,6 +175,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sources = filter(None, self.html5_sources)
 
         download_video_link = None
+        branding_info = None
         youtube_streams = ""
 
         # If we have an edx_video_id, we prefer its values over what we store
@@ -212,11 +213,15 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # 'CN' is China ISO 3166-1 country code.
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
-        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
+        cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get('CN')
 
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
+            cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get('CN')
+            branding_info = get_branding_info(cdn_info.get('BRANDING'))
+            branding_url = branding_info['logo_src']
+
             for index, source_url in enumerate(sources):
-                new_url = get_video_from_cdn(cdn_url, source_url)
+                new_url = get_video_from_cdn(cdn_url, source_url, branding_url)
                 if new_url:
                     sources[index] = new_url
 
@@ -235,6 +240,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             # This won't work when we move to data that
             # isn't on the filesystem
+            "branding_info": branding_info,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': self.display_name_with_default,
             'end': self.end_time.total_seconds(),
