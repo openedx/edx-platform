@@ -94,8 +94,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-05 14:57+0000\n"
-"PO-Revision-Date: 2014-12-30 16:00+0000\n"
+"POT-Creation-Date: 2015-01-12 15:04+0000\n"
+"PO-Revision-Date: 2015-01-12 15:22+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -133,10 +133,7 @@ msgstr "Cancelar"
 msgid "This link will open in a new browser window/tab"
 msgstr "Este link será aberto em uma nova janela/guia do navegador"
 
-#. Translators: This is the status for a video that is in an unknown
-#. state
 #: cms/static/js/factories/manage_users.js
-#: cms/static/js/views/previous_video_upload.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -691,7 +688,6 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/group-configuration-edit.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr ""
@@ -3047,7 +3043,7 @@ msgid "Saved"
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
-msgid "An unexpected error occurred.  Please try again."
+msgid "An error has occurred. Please try again."
 msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
@@ -3059,7 +3055,7 @@ msgid "Could not retrieve payment information"
 msgstr ""
 
 #: lms/static/js/verify_student/views/review_photos_step_view.js
-msgid "An unexpected error occurred. Please try again later."
+msgid "An error has occurred. Please try again later."
 msgstr ""
 
 #: lms/static/js/verify_student/views/review_photos_step_view.js
@@ -3067,17 +3063,17 @@ msgid "Could not submit photos"
 msgstr ""
 
 #: lms/static/js/verify_student/views/step_view.js
-msgid "An unexpected error occurred.  Please reload the page to try again."
+msgid "An error has occurred. Please try reloading the page."
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "Video capture error"
+msgid "Video Capture Error"
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid ""
-"Please check that your webcam is connected and you have allowed access to "
-"your webcam."
+"Please verify that your webcam is connected and that you have allowed your "
+"browser to access it."
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
@@ -3093,7 +3089,7 @@ msgid "Double-check that your webcam is connected and working to continue."
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "No Flash Detected"
+msgid "Flash Not Detected"
 msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
@@ -3413,9 +3409,7 @@ msgid "Queued"
 msgstr ""
 
 #. Translators: This is the status of an active video upload
-#. Translators: This is the status of an active video upload
 #: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
-#: cms/static/js/views/previous_video_upload.js
 msgid "Uploading"
 msgstr ""
 
@@ -3711,30 +3705,6 @@ msgstr ""
 #. "Showing 0-9 out of 25 total".
 #: cms/static/js/views/paging_header.js
 msgid "%(total_items)s total"
-msgstr ""
-
-#. Translators: This is the status for a video that the servers
-#. are currently processing
-#: cms/static/js/views/previous_video_upload.js
-msgid "In Progress"
-msgstr ""
-
-#. Translators: This is the status for a video that the servers
-#. have successfully processed
-#: cms/static/js/views/previous_video_upload.js
-msgid "Complete"
-msgstr ""
-
-#. Translators: This is the status for a video that the servers
-#. have failed to process
-#: cms/static/js/views/previous_video_upload.js
-msgid "Failed"
-msgstr ""
-
-#. Translators: This is the status for a video for which an invalid
-#. processing token was provided in the course settings
-#: cms/static/js/views/previous_video_upload.js
-msgid "Invalid Token"
 msgstr ""
 
 #. Translators: This is listed as the duration for a video
@@ -4153,26 +4123,9 @@ msgid ""
 msgstr ""
 
 #: lms/templates/student_account/access.underscore
-msgid "Welcome!"
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid "Log in or register to take courses from the world's best universities."
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
 msgid ""
 "Sorry, we're having some technical problems. Wait a few minutes and try "
 "again."
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-#: lms/templates/student_account/access.underscore
-msgid "I am a new user"
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid "I am a returning user"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
@@ -4188,7 +4141,6 @@ msgid "Change My Email Address"
 msgstr ""
 
 #: lms/templates/student_account/account.underscore
-#: lms/templates/student_account/password_reset.underscore
 msgid "Reset Password"
 msgstr ""
 
@@ -4198,27 +4150,41 @@ msgstr ""
 
 #: lms/templates/student_account/login.underscore
 msgid ""
-"You've successfully logged into %(currentProvider)s, but your "
+"You've successfully signed into %(currentProvider)s, but your "
 "%(currentProvider)s account isn't linked with an %(platformName)s account. "
 "To link your accounts, go to your %(platformName)s dashboard."
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-msgid "We couldn't log you in."
+msgid "Password Reset Email Sent"
 msgstr ""
 
 #: lms/templates/student_account/login.underscore
-msgid "Log in"
-msgstr ""
-
-#: lms/templates/student_account/login.underscore
-msgid "Log in using %(name)s"
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
 msgid ""
-"Enter the email address you used to create your account. We'll send you a "
-"link you can use to reset your password."
+"We've sent instructions for resetting your password to the email address you"
+" provided."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "We couldn't sign you in."
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/login.underscore
+#: lms/templates/student_account/register.underscore
+msgid "Sign in"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "or sign in with"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "New to %(platformName)s?"
+msgstr ""
+
+#: lms/templates/student_account/login.underscore
+msgid "Create an account"
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
@@ -4226,21 +4192,25 @@ msgid "An error occurred."
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
-msgid "Reset password"
-msgstr ""
-
-#: lms/templates/student_account/password_reset.underscore
-msgid "Password Reset Email Sent"
+msgid "Password assistance"
 msgstr ""
 
 #: lms/templates/student_account/password_reset.underscore
 msgid ""
-"We've sent instructions for resetting your password to the email address you"
-" provided."
+"Please enter your email address below and we will send you instructions for "
+"setting a new password."
+msgstr ""
+
+#: lms/templates/student_account/password_reset.underscore
+msgid "Reset my password"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "You've successfully logged into %(currentProvider)s."
+msgid "We couldn't create your account."
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "You've successfully signed into %(currentProvider)s."
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -4250,19 +4220,23 @@ msgid ""
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Register using %(name)s"
+msgid "Create an account using"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "We couldn't complete your registration."
+msgid "or create a new one here"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
-msgid "Register"
+msgid "Create your account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "Required field"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Already have an account?"
 msgstr ""
 
 #: lms/templates/student_profile/profile.underscore
@@ -4311,10 +4285,10 @@ msgstr ""
 
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid ""
-"Thank you for submitting your identification photos, we will review them "
-"soon. If there is a problem with any of the items, we will contact you to "
-"resubmit. You can now enroll in any of the verified certificate courses for "
-"one year without having to re-verify."
+"Thank you for submitting your photos. We will review them shortly. You can "
+"now sign up for any %(platformName)s course that offers verified "
+"certificates. Verification is good for one year. After one year, you must "
+"submit photos for verification again."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -4323,8 +4297,8 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 msgid ""
-"Use your webcam to take a picture of your face so we can match it with the "
-"picture on your ID."
+"Use your webcam to take a photo of your face. We will match this photo with "
+"the photo on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -4341,8 +4315,7 @@ msgid "Be sure your entire face is inside the frame"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
-msgid ""
-"Once in position, use the camera button %(icon)s to capture your picture"
+msgid "Once in position, use the camera button %(icon)s to capture your photo"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -4356,7 +4329,7 @@ msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "Common Questions"
+msgid "Frequently Asked Questions"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -4365,22 +4338,25 @@ msgid "Why does %(platformName)s need my photo?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"As part of the verification process, we need your photo to confirm your "
-"identity."
+"As part of the verification process, you take a photo of both your face and "
+"a government-issued photo ID. Our authorization service confirms your "
+"identity by comparing the photo you take with the photo on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
-msgid "What does %(platformName)s do with this picture?"
+msgid "What does %(platformName)s do with this photo?"
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"We encrypt it and send it to our secure authorization service for review. We"
-" use the highest levels of security and do not save the photo or information"
-" anywhere once the match has been completed."
+"We use the highest levels of security available to encrypt your photo and "
+"send it to our authorization service for review. Your photo and information "
+"are not saved or visible anywhere on %(platformName)s after the verification"
+" process is complete."
 msgstr ""
 
 #: lms/templates/verify_student/face_photo_step.underscore
@@ -4396,8 +4372,8 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid ""
-"Use your webcam to take a picture of your ID so we can match it with your "
-"photo and the name on your account."
+"Use your webcam to take a photo of your ID. We will match this photo with "
+"the photo of your face and the name on your account."
 msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
@@ -4418,16 +4394,18 @@ msgstr ""
 msgid "Once in position, use the camera button %(icon)s to capture your ID"
 msgstr ""
 
-#: lms/templates/verify_student/id_photo_step.underscore
-msgid ""
-"We need to match your ID with your photo and name to confirm your identity."
-msgstr ""
-
 #: lms/templates/verify_student/intro_step.underscore
 msgid "Thanks for returning to verify your ID in: %(courseName)s"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You need to activate your account before you can enroll in courses. Check "
+"your inbox for an activation email. After you complete activation you can "
+"return and refresh this page."
+msgstr ""
+
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4436,13 +4414,7 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "Check your email"
-msgstr ""
-
-#: lms/templates/verify_student/intro_step.underscore
-msgid ""
-"You need to activate your account before you can register for courses. Check"
-" your inbox for an activation email."
+msgid "Check Your Email"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -4452,8 +4424,8 @@ msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
 msgid ""
-"A driver's license, passport, or government-issued ID with your name and "
-"picture"
+"A driver's license, passport, or other government-issued ID with your name "
+"and photo"
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -4472,8 +4444,8 @@ msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid ""
-"We've already verified your identity through the photos of you and your ID "
-"you provided earlier. You can now pay and complete registration."
+"We have successfully verified your identity. You can now enter your payment "
+"information and complete your enrollment."
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -4491,7 +4463,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-msgid "Your Course Total"
+msgid "Your Total Contribution"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -4512,14 +4484,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
-#: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid ""
-"You need to activate your account before you can enroll in courses. Check "
-"your inbox for an activation email."
-msgstr ""
-
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Government-issued Photo ID"
+msgid "Government-Issued Photo ID"
 msgstr ""
 
 #: lms/templates/verify_student/make_payment_step.underscore
@@ -4530,12 +4495,8 @@ msgstr ""
 msgid "Continue to payment"
 msgstr ""
 
-#: lms/templates/verify_student/make_payment_step.underscore
-msgid "Activate your account"
-msgstr ""
-
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Thank you! We have received your payment for %(courseName)s"
+msgid "Thank you! We have received your payment for %(courseName)s."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4553,6 +4514,10 @@ msgid "Date"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Amount"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Total"
 msgstr ""
 
@@ -4561,15 +4526,15 @@ msgid "Please Note"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Items with strikethough have been refunded."
+msgid "Crossed out items have been refunded."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Billed To"
+msgid "Billed to"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "No receipt available."
+msgid "No receipt available"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4577,19 +4542,26 @@ msgid "Next Step: Confirm your identity"
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
-msgid "Check your email."
+msgid "Check your email"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"You need to activate your account before you can enroll in courses. Check "
+"your inbox for an activation email."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
 "A driver's license, passport, or government-issued ID with your name and "
-"picture."
+"photo."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid ""
-"If you don't confirm your identity now, you can go to the dashboard to "
-"explore your course and %(platformName)s will remind you later."
+"If you don't verify your identity now, you can still explore your course "
+"from your dashboard. You will receive periodic reminders from "
+"%(platformName)s to verify your identity."
 msgstr ""
 
 #: lms/templates/verify_student/payment_confirmation_step.underscore
@@ -4597,11 +4569,13 @@ msgid "Want to confirm your identity later?"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "Review your photos"
+msgid "Review Your Photos"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "Make sure we can verify your identity from the photos below."
+msgid ""
+"Make sure we can verify your identity with the photos and information you "
+"have provided."
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
@@ -4625,11 +4599,12 @@ msgid "Does the name on your ID match your account name: %(fullName)s?"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "Edit your name"
+msgid "Edit Your Name"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "You should change the name on your account to match your ID."
+msgid ""
+"Make sure that the full name on your account matches the name on your ID."
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
@@ -4637,7 +4612,7 @@ msgid "Photos don't meet the requirements?"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
-msgid "Retake your photos"
+msgid "Retake Your Photos"
 msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
@@ -4655,11 +4630,11 @@ msgid ""
 msgstr ""
 
 #: lms/templates/verify_student/webcam_photo.underscore
-msgid "Retake photo"
+msgid "Retake Photo"
 msgstr ""
 
 #: lms/templates/verify_student/webcam_photo.underscore
-msgid "Take photo"
+msgid "Take Photo"
 msgstr ""
 
 #: cms/templates/js/active-video-upload-list.underscore
@@ -5076,6 +5051,10 @@ msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore
 msgid "Previous Uploads"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Download available encodings (.csv)"
 msgstr ""
 
 #: cms/templates/js/previous-video-upload-list.underscore

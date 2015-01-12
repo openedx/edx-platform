@@ -19,7 +19,7 @@
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # 歐陽毅 <wishnoblog@gmail.com>, 2014
-# Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2014
+# Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2015
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
 # Xaver Y.R. Chen <yrchen@atcity.org>, 2013
 # Zhen-Rong Chen <zhenrcaaron@gmail.com>, 2014
@@ -63,7 +63,7 @@
 # Timothy K. Shih <timothykshih@gmail.com>, 2013
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Timothy K. Shih <timothykshih@gmail.com>, 2013
-# Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2014
+# Xaver Y.R. Chen <yrchen@atcity.org>, 2013-2015
 # Yung Wei <oscarwei1988@gmail.com>, 2014
 # Zhen-Rong Chen <zhenrcaaron@gmail.com>, 2014
 # KUN-MIN SYU <qwer20108@gmail.com>, 2014
@@ -83,7 +83,7 @@
 # Lin Yu-Chun <iftwoplustwoequalsfive@gmail.com>, 2013-2014
 # HSU-CHENG CHIANG <tosti.chiang@gmail.com>, 2013
 # Timothy K. Shih <timothykshih@gmail.com>, 2013
-# Xaver Y.R. Chen <yrchen@atcity.org>, 2014
+# Xaver Y.R. Chen <yrchen@atcity.org>, 2014-2015
 # Zhen-Rong Chen <zhenrcaaron@gmail.com>, 2014
 # Zhen-Rong Chen <zhenrcaaron@gmail.com>, 2014
 # KUN-MIN SYU <qwer20108@gmail.com>, 2014
@@ -111,7 +111,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-05 14:58+0000\n"
+"POT-Creation-Date: 2015-01-12 15:05+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: LIU,SHU-HAO <jeremy55662004@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/edx-platform/language/zh_TW/)\n"
@@ -166,6 +166,33 @@ msgstr ""
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
 msgstr "單元"
+
+#. Translators: This is the status for a video that the servers have
+#. successfully processed
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/instructor/views/instructor_task_helpers.py
+msgid "Complete"
+msgstr "完成"
+
+#: lms/templates/help_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/instructor/instructor_dashboard_2/metrics.html
+#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/billing_details.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "Name"
+msgstr "名稱"
+
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/djangoapps/shoppingcart/reports.py
+#: lms/templates/open_ended_problems/open_ended_problems.html
+#: lms/templates/shoppingcart/receipt.html
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+msgid "Status"
+msgstr "狀態"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -2319,8 +2346,9 @@ msgstr ""
 msgid "Both"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/about.html
+#: lms/templates/static_templates/about.html
 msgid "About"
 msgstr "關於"
 
@@ -3553,27 +3581,12 @@ msgstr "搜尋"
 msgid "Copyright"
 msgstr "版權"
 
-#: lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/instructor/instructor_dashboard_2/metrics.html
-#: lms/templates/open_ended_problems/open_ended_flagged_problems.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/billing_details.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "Name"
-msgstr "名稱"
-
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's public username.
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
-#: openedx/core/djangoapps/user_api/views.py
 msgid "Username"
 msgstr "使用者名稱"
 
@@ -4156,14 +4169,14 @@ msgstr ""
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
-msgstr "您的成績報告正在產生中！您可以在“待處理教師工作”查看工作的狀態。"
+msgstr "您的成績報告正在產生中！您可以在“待處理教師指定工作列表”查看工作的狀態。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid ""
 "A grade report generation task is already in progress. Check the 'Pending "
 "Instructor Tasks' table for the status of the task. When completed, the "
 "report will be available for download in the table below."
-msgstr "成績報告產生任務已在進行中。選取“待處理教師工作”表取得任務的狀態。完成後，可於報告表格下方找到下載的連結。"
+msgstr "成績報告產生任務已在進行中。選取“待處理教師指定工作列表”表取得任務的狀態。完成後，可於報告表格下方找到下載的連結。"
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Successfully changed due date for student {0} for {1} to {2}"
@@ -4210,6 +4223,10 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
 msgid "Please Enter the Coupon Discount Value Less than or Equal to 100"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/coupons.py
+msgid "Please enter the date in this format i-e month/day/year"
 msgstr ""
 
 #: lms/djangoapps/instructor/views/coupons.py
@@ -4302,10 +4319,6 @@ msgid_plural "{num_emails} failed"
 msgstr[0] ""
 
 #: lms/djangoapps/instructor/views/instructor_task_helpers.py
-msgid "Complete"
-msgstr "完成"
-
-#: lms/djangoapps/instructor/views/instructor_task_helpers.py
 msgid "Incomplete"
 msgstr "未完成"
 
@@ -4382,7 +4395,10 @@ msgstr ""
 msgid "Remote gradebook response for {action}"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/legacy.py
+#: openedx/core/djangoapps/user_api/views.py
 msgid "Full name"
 msgstr ""
 
@@ -4394,11 +4410,8 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#. Translators: This label appears above a field on the registration form
-#. meant to hold the user's full name.
 #: lms/djangoapps/instructor/views/legacy.py
 #: lms/djangoapps/instructor/views/tools.py
-#: openedx/core/djangoapps/user_api/views.py
 msgid "Full Name"
 msgstr "全名"
 
@@ -4634,32 +4647,6 @@ msgstr ""
 #: lms/djangoapps/instructor_task/views.py
 msgid " (out of {total})"
 msgstr "(/ {total})"
-
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid ""
-"\n"
-"      Dear %(student_name)s,\n"
-"    "
-msgstr ""
-
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid ""
-" \n"
-"    Congratulations on earning your certificate in %(course_name)s!\n"
-"    Since you have an account on LinkedIn, you can display your hard earned\n"
-"    credential for your colleagues to see.  Click the button below to add the\n"
-"    certificate to your profile.\n"
-"    "
-msgstr ""
-"  \n"
-"恭喜取得%(course_name)s課程的結業證書！\n"
-"既然您有LinkedIn帳戶，您可以顯示您的辛苦得來的 \n"
-"證書給您的同事看。 點擊下面的按鈕來新增 \n"
-"證書到您的個人資料中。"
-
-#: lms/djangoapps/linkedin/templates/linkedin_email.html
-msgid "Add to profile"
-msgstr ""
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "Courseware Chrome"
@@ -4908,13 +4895,6 @@ msgid "Order ID"
 msgstr "訂單ID"
 
 #: lms/djangoapps/shoppingcart/reports.py
-#: lms/templates/open_ended_problems/open_ended_problems.html
-#: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-msgid "Status"
-msgstr "狀態"
-
-#: lms/djangoapps/shoppingcart/reports.py
 msgid "Quantity"
 msgstr "數量"
 
@@ -5043,7 +5023,7 @@ msgstr ""
 msgid "Course added to cart."
 msgstr "增加課程到購物車。"
 
-#: lms/djangoapps/shoppingcart/views.py
+#: lms/djangoapps/shoppingcart/views.py lms/djangoapps/shoppingcart/views.py
 msgid "Discount does not exist against code '{code}'."
 msgstr ""
 
@@ -5066,10 +5046,6 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
 msgid "Only one coupon redemption is allowed against an order"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{code}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -5408,6 +5384,13 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource2.py
 msgid ""
+"We're sorry, but this payment was declined. The items in your shopping cart "
+"have been saved. If you have any questions about this transaction, please "
+"contact us at {email}."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/processors/CyberSource2.py
+msgid ""
 "Sorry! Your payment could not be processed because an unexpected exception "
 "occurred. Please contact us at {email} for assistance."
 msgstr ""
@@ -5727,11 +5710,15 @@ msgstr ""
 #: lms/templates/registration/password_reset_confirm.html
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
-"correctly. <br /> Required fields are noted by <strong "
-"class=\"indicator\">bold text and an asterisk (*)</strong>."
+"correctly."
 msgstr ""
-"請輸入您的新密碼兩次以確保正確。<br /> 需要填寫的欄位已經使用 <strong class=\"indicator\"> 粗體和星號 (*) 標明"
-" </strong>."
+
+#: lms/templates/registration/password_reset_confirm.html
+msgid ""
+"\n"
+"        Required fields are noted by %(bold_start)sbold text and an asterisk (*)%(bold_end)s.\n"
+"        "
+msgstr ""
 
 #: lms/templates/registration/password_reset_confirm.html
 #: lms/templates/forgot_password_modal.html lms/templates/login.html
@@ -5790,8 +5777,8 @@ msgstr ""
 #: lms/templates/registration/password_reset_email.html
 msgid ""
 "You're receiving this e-mail because you requested a password reset for your"
-" user account at edx.org."
-msgstr "由於您向系統請求重置密碼，系統將發一封關於帳戶密碼的電子郵件給您，請檢查您的信箱。"
+" user account at %(site_name)s."
+msgstr ""
 
 #: lms/templates/registration/password_reset_email.html
 msgid "Please go to the following page and choose a new password:"
@@ -5808,7 +5795,7 @@ msgid "Thanks for using our site!"
 msgstr "感謝您使用我們的網站！"
 
 #: lms/templates/registration/password_reset_email.html
-msgid "The edX Team"
+msgid "The %(platform_name)s Team"
 msgstr ""
 
 #: lms/templates/wiki/article.html
@@ -6067,10 +6054,9 @@ msgstr "要創建一篇新的Wiki條目，先為它創建連結。點擊連結�
 msgid "[Article Name](wiki:ArticleName)"
 msgstr "[文章名稱](wiki:ArticleName)"
 
-#. Translators: Do not translate "edX"
 #: lms/templates/wiki/includes/cheatsheet.html
-msgid "edX Additions:"
-msgstr "edX 附加："
+msgid "%(platform_name)s Additions:"
+msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Math Expression"
@@ -6085,8 +6071,8 @@ msgid "Wikipedia"
 msgstr "維基百科"
 
 #: lms/templates/wiki/includes/cheatsheet.html
-msgid "edX Wiki"
-msgstr "edX Wiki"
+msgid "%(platform_name)s Wiki"
+msgstr ""
 
 #: lms/templates/wiki/includes/cheatsheet.html
 msgid "Huge Header"
@@ -6254,10 +6240,6 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: lms/templates/login.html
-msgid "Remember me"
-msgstr "記住我"
-
 #: openedx/core/djangoapps/user_api/views.py
 msgid ""
 "It looks like {email_address} and {username} belong to an existing account. "
@@ -6283,21 +6265,32 @@ msgstr ""
 msgid "The name that will appear on your certificates"
 msgstr ""
 
+#. Translators: This label appears above a field on the registration form
+#. meant to hold the user's public username.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Public username"
+msgstr ""
+
 #: openedx/core/djangoapps/user_api/views.py
 msgid "The name that will identify you in your courses"
 msgstr ""
 
-#: lms/templates/register.html
-msgid "Highest Level of Education Completed"
-msgstr "最高教育程度"
+#. Translators: This label appears above a dropdown menu on the registration
+#. form used to select the user's highest completed level of education.
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Highest level of education completed"
+msgstr ""
 
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
-msgid "Year of Birth"
+#: lms/templates/signup_modal.html
+msgid "Year of birth"
 msgstr "出生年份"
 
+#: lms/templates/signup_modal.html
+msgid "Mailing address"
+msgstr "郵寄地址"
+
 #: openedx/core/djangoapps/user_api/views.py
-msgid "If you'd like, tell us why you're interested in {platform_name}"
+msgid "Tell us why you're interested in {platform_name}"
 msgstr ""
 
 #. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
@@ -6318,6 +6311,10 @@ msgstr ""
 msgid "Country"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/views.py
+msgid "Please select your Country."
+msgstr ""
+
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/static_templates/honor.html
@@ -6325,8 +6322,7 @@ msgstr ""
 msgid "Honor Code"
 msgstr "榮譽守則"
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html
+#: lms/templates/footer-edx-new.html
 msgid "Terms of Service and Honor Code"
 msgstr "服務條款和榮譽守則"
 
@@ -6340,7 +6336,8 @@ msgstr ""
 msgid "You must agree to the {platform_name} {terms_of_service}."
 msgstr ""
 
-#: cms/templates/widgets/footer.html lms/templates/static_templates/tos.html
+#: cms/templates/widgets/footer.html lms/templates/footer.html
+#: lms/templates/static_templates/tos.html
 #: lms/templates/static_templates/tos.html
 msgid "Terms of Service"
 msgstr "服務條款"
@@ -6564,6 +6561,70 @@ msgstr "只有教師可以加入其他教師。"
 msgid "You may not remove the last instructor from a course"
 msgstr "您不可以移除課程的最後一位教師。"
 
+#: cms/templates/import.html
+msgid "Uploading"
+msgstr "上傳中"
+
+#. Translators: This is the status for a video that the servers are currently
+#. processing
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "In Progress"
+msgstr ""
+
+#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: This is the status for a video that the servers have failed to
+#. process
+#: cms/djangoapps/contentstore/views/videos.py
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Failed"
+msgstr ""
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Invalid Token"
+msgstr ""
+
+#. Translators: This is the status for a video that is in an unknown state
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Unknown"
+msgstr ""
+
+#. Translators: This is the header for a CSV file column
+#. containing URLs for video encodings for the named profile
+#. (e.g. desktop, mobile high quality, mobile low quality)
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "{profile_name} URL"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Duration"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Date Added"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "Video ID"
+msgstr ""
+
+#. #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
+#. Translators: This is listed as the duration for a video that has not
+#. yet reached the point in its processing by the servers where its
+#. duration is determined.
+#: cms/djangoapps/contentstore/views/videos.py cms/templates/index.html
+#: lms/templates/dashboard/_dashboard_status_verification.html
+#: lms/templates/verify_student/midcourse_reverify_dash.html
+msgid "Pending"
+msgstr ""
+
+#. Translators: This is the suggested filename when downloading the URL
+#. listing for videos uploaded through Studio
+#: cms/djangoapps/contentstore/views/videos.py
+msgid "{course}_video_urls"
+msgstr ""
+
 #: cms/djangoapps/course_creators/models.py
 msgid "unrequested"
 msgstr "未經請求的"
@@ -6666,12 +6727,6 @@ msgstr ""
 msgid "Course Number:"
 msgstr "課程編號："
 
-#: cms/templates/index.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Pending"
-msgstr ""
-
 #: cms/templates/login.html cms/templates/register.html
 #: lms/templates/help_modal.html lms/templates/login.html
 #: lms/templates/provider_login.html lms/templates/provider_login.html
@@ -6705,11 +6760,6 @@ msgstr ""
 msgid "Staff"
 msgstr ""
 
-#: cms/templates/register.html cms/templates/widgets/header.html
-#: lms/templates/index.html
-msgid "Sign Up"
-msgstr ""
-
 #. Translators: This is the placeholder text for a field that requests the
 #. user's full name.
 #: cms/templates/register.html lms/templates/register.html
@@ -6722,6 +6772,13 @@ msgstr "例：Jane Doe"
 #: lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "公開使用者名稱"
+
+#. Translators: This is the placeholder text for a field that asks the user to
+#. pick a username
+#: cms/templates/register.html lms/templates/register-shib.html
+#: lms/templates/register.html lms/templates/register.html
+msgid "example: JaneDoe"
+msgstr "例：JaneDoe"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -6750,8 +6807,7 @@ msgid "Visit your {link_start}dashboard{link_end} to see your courses."
 msgstr ""
 
 #: cms/templates/widgets/footer.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/privacy.html
+#: lms/templates/footer.html lms/templates/static_templates/privacy.html
 #: lms/templates/static_templates/privacy.html
 msgid "Privacy Policy"
 msgstr "隱私權保護政策"
@@ -6855,95 +6911,13 @@ msgstr "引導的討論"
 msgid "Hide Annotations"
 msgstr "隱藏註解"
 
-#: lms/templates/contact.html lms/templates/static_templates/about.html
-#: lms/templates/static_templates/about.html
-msgid "Vision"
-msgstr "願景"
-
-#: lms/templates/contact.html
-msgid "Faq"
-msgstr "常見問題"
-
-#: lms/templates/contact.html lms/templates/footer-legacy.html
-msgid "Press"
-msgstr "新聞報導"
-
-#: lms/templates/contact.html lms/templates/footer-edx-new.html
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/contact.html
-#: lms/templates/static_templates/contact.html
-msgid "Contact"
-msgstr "聯繫我們"
-
-#: lms/templates/contact.html
-msgid "Class Feedback"
-msgstr "課堂回饋"
-
-#: lms/templates/contact.html
-msgid ""
-"We are always seeking feedback to improve our courses. If you are an "
-"enrolled student and have any questions, feedback, suggestions, or any other"
-" issues specific to a particular class, please post on the discussion forums"
-" of that&nbsp;class."
-msgstr ""
-"我們一直在尋找可以提升我們課程品質的回饋。如果您是一位已註冊學生，有任何提問、回饋、建議或者其他任何關於某一特定分類的問題，請在相應的課堂論壇下發貼。"
-
-#: lms/templates/contact.html
-msgid "General Inquiries and Feedback"
-msgstr "一般諮詢和回饋"
-
-#: lms/templates/contact.html
-msgid ""
-"If you have a general question about {platform_name} please email "
-"{contact_email}. To see if your question has already been answered, visit "
-"our {faq_link_start}FAQ page{faq_link_end}. You can also join the discussion"
-" on our {fb_link_start}facebook page{fb_link_end}. Though we may not have a "
-"chance to respond to every email, we take all feedback into consideration."
-msgstr ""
-
-#: lms/templates/contact.html
-msgid "Technical Inquiries and Feedback"
-msgstr "技術諮詢和回饋"
-
-#: lms/templates/contact.html
-msgid ""
-"If you have suggestions/feedback about the overall {platform_name} platform,"
-" or are facing general technical issues with the platform (e.g., issues with"
-" email addresses and passwords), you can reach us at {tech_email}. For "
-"technical questions, please make sure you are using a current version of "
-"Firefox or Chrome, and include browser and version in your e-mail, as well "
-"as screenshots or other pertinent details. If you find a bug or other "
-"issues, you can reach us at the following: {bugs_email}."
-msgstr ""
-
-#: lms/templates/contact.html
-msgid "Media"
-msgstr "媒體"
-
-#: lms/templates/contact.html
-msgid ""
-"Please visit our {link_start}media/press page{link_end} for more "
-"information. For any media or press inquiries, please email {email}."
-msgstr ""
-"請訪問我們的{link_start}媒體/新聞報導{link_end}以尋求更多的資訊。如果您對媒體或者新聞報導方面有任何疑問，請發送郵件到{email}。"
-
-#: lms/templates/contact.html
-msgid "Universities"
-msgstr "大學"
-
-#: lms/templates/contact.html
-msgid ""
-"If you are a university wishing to collaborate with or if you have questions"
-" about {platform_name}, please email {email}."
-msgstr "如果您的學校希望和我們進行合作，或者對我們的{platform_name}平臺有任何疑問，請發送郵件到{email}。"
-
 #: lms/templates/course.html
 msgid "New"
 msgstr "新的"
 
 #: lms/templates/dashboard.html
 msgid "Dashboard"
-msgstr "控制面板"
+msgstr "儀表板"
 
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -7120,7 +7094,7 @@ msgstr "電子郵件信箱變更成功"
 #: lms/templates/email_change_successful.html
 #: lms/templates/emails_change_successful.html
 msgid "You should see your new email in your {link_start}dashboard{link_end}."
-msgstr "您應該可以在您的{link_start}控制面板{link_end}看到您新的電子郵件信箱"
+msgstr "您應該可以在您的{link_start}儀表板{link_end}看到您新的電子郵件信箱"
 
 #: lms/templates/email_exists.html
 msgid "An account with the new e-mail address already exists."
@@ -7210,9 +7184,11 @@ msgid ""
 "online initiative created by founding partners {Harvard} and {MIT}."
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-msgid "&copy; 2014 edX, some rights reserved."
-msgstr "&copy; 2014 edX, 部分權利保留。"
+#. Translators: '&copy;' is an HTML character code for the copyright symbol.
+#. Please don't remove or change it.
+#: lms/templates/footer-edx-new.html
+msgid "&copy; {copyright_year} edX, some rights reserved."
+msgstr ""
 
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
@@ -7222,8 +7198,14 @@ msgstr ""
 msgid "News"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html lms/templates/footer-legacy.html
-#: lms/templates/footer.html lms/templates/static_templates/faq.html
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/contact.html
+#: lms/templates/static_templates/contact.html
+msgid "Contact"
+msgstr "聯繫我們"
+
+#: lms/templates/footer-edx-new.html lms/templates/footer.html
+#: lms/templates/static_templates/faq.html
 #: lms/templates/static_templates/faq.html
 msgid "FAQ"
 msgstr "常見問題"
@@ -7244,48 +7226,52 @@ msgstr ""
 msgid "Follow Us"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.twitter.com. Please
+#. translate this the way that Twitter advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Twitter"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.facebook.com. Please
+#. translate this the way that Facebook advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Facebook"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.meetup.com. Please
+#. translate this the way that Meetup advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Meetup"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of www.linked.com. Please
+#. translate this the way that LinkedIn advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "LinkedIn"
 msgstr ""
 
-#: lms/templates/footer-edx-new.html
+#. Translators: This is the website name of plus.google.com. Please
+#. translate this the way that Google+ advertises in your language.
+#: lms/templates/footer-edx-new.html lms/templates/footer-edx-new.html
 msgid "Google+"
 msgstr ""
 
-#: lms/templates/footer-legacy.html lms/templates/footer.html
-#: lms/templates/static_templates/jobs.html
+#: lms/templates/footer.html lms/templates/static_templates/jobs.html
 #: lms/templates/static_templates/jobs.html
 msgid "Jobs"
 msgstr "工作"
 
-#: lms/templates/footer-legacy.html
-msgid "edX Logo"
-msgstr ""
-
-#: lms/templates/footer-legacy.html
-msgid ""
-"{EdX} is a non-profit created by founding partners {Harvard} and {MIT} whose"
-" mission is to bring the best of higher education to students of all ages "
-"anywhere in the world, wherever there is Internet access. {EdX}'s free "
-"online MOOCs are interactive and subjects include computer science, public "
-"health, and artificial intelligence."
+#. Translators: '&copy;' is an HTML character code for the copyright symbol.
+#. Please don't remove or change it.
+#: lms/templates/footer.html
+msgid "&copy; {copyright_year} {platform_name}, some rights reserved"
 msgstr ""
 
 #: lms/templates/footer.html
-msgid "&copy; 2014 {platform_name}, some rights reserved"
-msgstr "&copy; 2014 {platform_name}, 部分權利保留。"
+msgid ""
+"{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
+"Code{honor_link_end}"
+msgstr ""
 
 #. Translators: 'Open edX' is a brand, please keep this untranslated. See
 #. http://openedx.org for more information.
@@ -7475,16 +7461,20 @@ msgid "Free courses from <strong>{university_name}</strong>"
 msgstr "來自<strong>{university_name}</strong>的免費課程"
 
 #: lms/templates/index.html
-msgid "The Future of Online Education"
-msgstr "線上教育的未來"
-
-#: lms/templates/index.html
 msgid "For anyone, anywhere, anytime"
 msgstr "任何人，任何地點，任何時間"
 
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
 #: lms/templates/index.html
-msgid "Stay up to date with all {platform_name} has to offer!"
-msgstr "堅持到按期完成所有 {platform_name} 提出的要求！"
+msgid "Welcome to Open edX!"
+msgstr ""
+
+#. Translators: 'Open edX' is a brand, please keep this untranslated. See
+#. http://openedx.org for more information.
+#: lms/templates/index.html
+msgid "It works! This is the default homepage for this Open edX instance."
+msgstr ""
 
 #: lms/templates/invalid_email_key.html
 msgid "Invalid email change key"
@@ -7588,6 +7578,10 @@ msgstr ""
 #: lms/templates/login.html
 msgid "Account Preferences"
 msgstr "帳戶偏好"
+
+#: lms/templates/login.html
+msgid "Remember me"
+msgstr "記住我"
 
 #. Translators: provider_name is the name of an external, third-party user
 #. authentication provider (like Google or LinkedIn).
@@ -7733,15 +7727,15 @@ msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Dashboard for:"
-msgstr "控制面板："
+msgstr "儀表板："
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "More options dropdown"
 msgstr "更多選擇下拉清單"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
-msgid "Log Out"
-msgstr "登出"
+msgid "Sign out"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "Shopping Cart"
@@ -7754,9 +7748,8 @@ msgstr "註冊"
 
 #: lms/templates/navigation-edx.html lms/templates/navigation-edx.html
 #: lms/templates/navigation.html lms/templates/navigation.html
-#: lms/templates/register-sidebar.html
-msgid "Log in"
-msgstr "登入"
+msgid "Sign in"
+msgstr ""
 
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid ""
@@ -7859,11 +7852,6 @@ msgstr "輸入一個公開的使用者名稱："
 
 #: lms/templates/register-shib.html lms/templates/register.html
 #: lms/templates/register.html
-msgid "example: JaneDoe"
-msgstr "例：JaneDoe"
-
-#: lms/templates/register-shib.html lms/templates/register.html
-#: lms/templates/register.html
 msgid "Will be shown in any discussions or forums you participate in"
 msgstr "將會顯示在您參加的任何討論或論壇上"
 
@@ -7892,6 +7880,10 @@ msgstr "註冊協助"
 #: lms/templates/register-sidebar.html
 msgid "Already registered?"
 msgstr "已經註冊過了？"
+
+#: lms/templates/register-sidebar.html
+msgid "Log in"
+msgstr "登入"
 
 #: lms/templates/register-sidebar.html
 msgid "Welcome to {platform_name}"
@@ -7978,7 +7970,8 @@ msgstr ""
 
 #: lms/templates/register.html
 msgid ""
-"We just need a little more information before you start learning with edX."
+"We just need a little more information before you start learning with "
+"{platform_name}."
 msgstr ""
 
 #: lms/templates/register.html
@@ -8012,6 +8005,15 @@ msgstr ""
 #: lms/templates/register.html
 msgid "example: New York"
 msgstr ""
+
+#: lms/templates/register.html
+msgid "Highest Level of Education Completed"
+msgstr "最高教育程度"
+
+#: lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/instructor_analytics.html
+msgid "Year of Birth"
+msgstr "出生年份"
 
 #: lms/templates/register.html
 msgid "Please share with us your reasons for registering with {platform_name}"
@@ -8074,14 +8076,6 @@ msgstr "全名 *"
 #: lms/templates/signup_modal.html
 msgid "Ed. Completed"
 msgstr "編輯已完成"
-
-#: lms/templates/signup_modal.html
-msgid "Year of birth"
-msgstr "出生年份"
-
-#: lms/templates/signup_modal.html
-msgid "Mailing address"
-msgstr "郵寄地址"
 
 #: lms/templates/signup_modal.html
 msgid "Goals in signing up for {platform_name}"
@@ -8209,7 +8203,7 @@ msgstr "下一頁"
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Sysadmin Dashboard"
-msgstr "系統管理員主頁"
+msgstr "系統管理員儀表板"
 
 #: lms/templates/sysadmin_dashboard.html
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -8256,7 +8250,7 @@ msgstr "檢查並修復外部認證對應"
 msgid ""
 "Go to each individual course's Instructor dashboard to manage course "
 "enrollment."
-msgstr "進入每個單獨的課程教師主頁來管理課程報名"
+msgstr "進入每門課程獨立的 \"課程教師儀表板\" 來管理課程註冊情況"
 
 #: lms/templates/sysadmin_dashboard.html
 msgid "Manage course staff and instructors"
@@ -8774,12 +8768,16 @@ msgid ""
 msgstr ""
 
 #: lms/templates/courseware/courses.html
-msgid "Explore free courses from leading universities."
-msgstr "瀏覽頂尖大學中的免費課程。"
-
-#: lms/templates/courseware/courses.html
 msgid "Explore free courses from {university_name}."
 msgstr "瀏覽{university_name}的免費課程。"
+
+#: lms/templates/courseware/courses.html
+msgid "Explore courses from {platform_name}."
+msgstr ""
+
+#: lms/templates/courseware/courses.html
+msgid "{platform_name} Logo"
+msgstr ""
 
 #: lms/templates/courseware/courseware-error.html
 msgid ""
@@ -8939,7 +8937,7 @@ msgstr "課程講義"
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
-msgstr ""
+msgstr "傳統教師儀表板"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -8948,7 +8946,7 @@ msgstr "在Studio中檢視課程"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Back To Instructor Dashboard"
-msgstr ""
+msgstr "返回教師儀表板"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid ""
@@ -9176,7 +9174,7 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/send_email.html
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Pending Instructor Tasks"
-msgstr "待處理教師工作"
+msgstr "待處理教師指定工作列表"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Task Type"
@@ -9933,7 +9931,7 @@ msgid "DISCUSSION HOME:"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
-msgid "HOW TO USE EDX DISCUSSIONS"
+msgid "How to use {platform_name} discussions"
 msgstr ""
 
 #: lms/templates/discussion/_underscore_templates.html
@@ -10517,7 +10515,7 @@ msgstr ""
 msgid ""
 "You have been enrolled in {course_name} at {site_name} by a member of the "
 "course staff. The course should now appear on your {site_name} dashboard."
-msgstr ""
+msgstr "您已被課程教員加入到了{site_name}上的 \"{course_name}\" 中，該課程應會立即出現在您的{site_name}儀表板中。"
 
 #: lms/templates/emails/enroll_email_enrolledmessage.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -10699,14 +10697,14 @@ msgstr ""
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
 "name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the tech support at"
+"e-mail the tech support at {email}"
 msgstr ""
 
 #: lms/templates/emails/reject_name_change.txt
 msgid ""
 "We are sorry. Our course staff did not approve your request to change your "
 "name from {old_name} to {new_name}. If you need further assistance, please "
-"e-mail the course staff at ta@edx.org."
+"e-mail the course staff at {email}."
 msgstr ""
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
@@ -10715,6 +10713,8 @@ msgid ""
 " member of the course staff. The course will remain on your dashboard, but "
 "you will no longer be part of the beta testing group."
 msgstr ""
+"您在{site_name}上的 \"{course_name}\" "
+"課程的Beta測試員身份已被課程教員取消。該課程將仍然顯示在您的儀表板中，但您將不再是Beta測試組的一員。"
 
 #: lms/templates/emails/remove_beta_tester_email_message.txt
 #: lms/templates/emails/unenroll_email_enrolledmessage.txt
@@ -10844,6 +10844,10 @@ msgstr ""
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Percentage Discount"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+msgid "Add expiration date"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
@@ -11117,6 +11121,10 @@ msgid "Coupons Information"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Expiry Date"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Discount (%)"
 msgstr ""
 
@@ -11125,7 +11133,23 @@ msgid "Redeem Count"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{code}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{description}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "{discount}"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Invoice number should not be empty."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Never Expires"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11167,6 +11191,10 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "example: A123DS"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Expiration Date"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/extensions.html
@@ -11380,11 +11408,11 @@ msgstr "性別分佈"
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Instructor Dashboard"
-msgstr "教師控制面板"
+msgstr "教師儀表板"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
-msgstr ""
+msgstr "回歸傳統界面儀表板"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
@@ -11847,7 +11875,7 @@ msgid ""
 "Rescoring runs in the background, and status for active tasks will appear in"
 " the 'Pending Instructor Tasks' table. To see status for all tasks submitted"
 " for this problem and student, click on this button:"
-msgstr "後台正在重新評分工作，進行中的工作狀態會出現在'待處理教師工作'表格中。如果您要查看關於這個問題所有提交的狀態，點擊這個按鈕："
+msgstr "後台正在重新評分工作，進行中的工作狀態會出現在'待處理教師指定工作列表'表格中。如果您要查看關於這個問題所有提交的狀態，請點擊這個按鈕："
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Show Background Task History for Student"
@@ -12272,7 +12300,7 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "View Dashboard"
-msgstr ""
+msgstr "查看儀表板"
 
 #: lms/templates/shoppingcart/receipt.html
 msgid ""
@@ -12415,6 +12443,10 @@ msgid "{site_name} -  Confirm Enrollment"
 msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "{course_number} {course_title} Cover Image"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm your enrollment for:"
 msgstr ""
 
@@ -12423,22 +12455,10 @@ msgid "course dates"
 msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{course_name}"
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{start_date}"
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_redemption.html
-msgid "{end_date}"
-msgstr ""
-
-#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You've clicked a link for an enrollment code that has already been used. "
-"Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
-"enrolled in the course, or contact your company's administrator."
+"Check your {link_start}course dashboard{link_end} to see if you're enrolled "
+"in the course, or contact your company's administrator."
 msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -12449,8 +12469,8 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
-"You're already registered for this course. Visit your <a "
-"href={dashboard_url}>dashboard</a> to see the course."
+"You're already registered for this course. Visit your "
+"{link_start}dashboard{link_end} to see the course."
 msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -12462,6 +12482,10 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "View Dashboard &nbsp; &nbsp; &#x25b8;"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "Activate Course Enrollment"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -12625,7 +12649,7 @@ msgstr "進入課程"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Go to your Dashboard"
-msgstr "進入您的訊息視窗"
+msgstr "進入您的儀表板"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Verified Status"
@@ -12706,11 +12730,12 @@ msgstr ""
 
 #: lms/templates/static_templates/embargo.html
 msgid ""
-"Our system indicates that you are trying to access an edX course from a "
-"country currently subject to U.S. economic and trade sanctions. "
-"Unfortunately, at this time edX must comply with export controls, and we "
-"cannot allow you to access this particular course. Feel free to browse our "
-"catalogue to find other courses you may be interested in taking."
+"Our system indicates that you are trying to access this {platform_name} "
+"course from a country currently subject to U.S. economic and trade "
+"sanctions. Unfortunately, at this time {platform_name} must comply with "
+"export controls, and we cannot allow you to access this particular course. "
+"Feel free to browse our catalogue to find other courses you may be "
+"interested in taking."
 msgstr ""
 
 #: lms/templates/static_templates/media-kit.html
@@ -12784,7 +12809,7 @@ msgid "Student Account"
 msgstr ""
 
 #: lms/templates/student_account/login_and_register.html
-msgid "Log in or Register"
+msgid "Sign in or Register"
 msgstr ""
 
 #: lms/templates/student_profile/index.html
@@ -12811,7 +12836,7 @@ msgstr ""
 
 #: lms/templates/survey/survey.html
 msgid "Cancel and Return to Dashboard"
-msgstr ""
+msgstr "取消並且回到儀表板"
 
 #: lms/templates/survey/survey.html
 msgid "Why do I need to complete this information?"
@@ -13120,9 +13145,9 @@ msgstr "檢查您的姓名"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 msgid ""
-"Make sure your full name on your edX account ({full_name}) matches the ID "
-"you originally submitted. We will also use this as the name on your "
-"certificate."
+"Make sure your full name on your {platform_name} account ({full_name}) "
+"matches the ID you originally submitted. We will also use this as the name "
+"on your certificate."
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -13164,7 +13189,7 @@ msgid ""
 "We have received your re-verification details and submitted them for review."
 " Your dashboard will show the notification status once the review is "
 "complete."
-msgstr "我們已收到您重新驗證的細節並且提交以供審查。審查完成後您的主頁面會顯示通知狀態。"
+msgstr "我們已收到您重新驗證的細節並且提交以供審查。審查完成後您的儀表板會顯示通知狀態。"
 
 #: lms/templates/verify_student/midcourse_reverification_confirmation.html
 msgid ""
@@ -13217,10 +13242,6 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
 msgid "The status of your submitted re-verifications:"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_reverify_dash.html
-msgid "Failed"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_reverify_dash.html
@@ -13472,9 +13493,9 @@ msgstr "重新拍攝您的照片"
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid ""
-"Make sure your full name on your edX account ({full_name}) matches your ID. "
-"We will also use this as the name on your certificate."
-msgstr "請確保您在edX帳戶的全名({full_name})匹配您的ID。我們也會使用這個姓名在證書上。"
+"Make sure your full name on your {platform_name} account ({full_name}) "
+"matches your ID. We will also use this as the name on your certificate."
+msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
 msgid ""
@@ -13593,7 +13614,7 @@ msgstr "我們收到了您重新提交的資訊，並將稍後進行審查以核
 #: lms/templates/verify_student/reverification_confirmation.html
 #: lms/templates/verify_student/reverification_window_expired.html
 msgid "Return to Your Dashboard"
-msgstr ""
+msgstr "回到您的儀表板"
 
 #: lms/templates/verify_student/reverification_window_expired.html
 #: lms/templates/verify_student/reverification_window_expired.html
@@ -13619,8 +13640,8 @@ msgid "Register for {}"
 msgstr "註冊 for {}"
 
 #: lms/templates/verify_student/show_requirements.html
-msgid "You need to activate your edX account before proceeding"
-msgstr "在繼續之前，您需要啟動您的edX帳號"
+msgid "You need to activate your {platform_name} account before proceeding"
+msgstr ""
 
 #: lms/templates/verify_student/show_requirements.html
 msgid ""
@@ -14443,7 +14464,7 @@ msgstr ""
 
 #: cms/templates/error.html
 msgid "Back to dashboard"
-msgstr "回到控制面板"
+msgstr "回到儀表板"
 
 #: cms/templates/export.html cms/templates/export.html
 msgid "Course Export"
@@ -14956,10 +14977,6 @@ msgid "Course Import Status"
 msgstr "課程匯入狀態"
 
 #: cms/templates/import.html
-msgid "Uploading"
-msgstr "上傳中"
-
-#: cms/templates/import.html
 msgid "Transferring your file to our servers"
 msgstr "將您的檔案傳送到我們的伺服器上"
 
@@ -15440,6 +15457,10 @@ msgid ""
 "ownership of the course, click Add admin access to make another user the "
 "Admin, then ask that user to remove you from the Course Team list."
 msgstr "每門課程必須有一名管理員。如果您是管理員並希望轉讓您的課程擁有者身分，您可以賦予其他用戶管理員許可權，並請求他們將您從課程團隊列表中移除。"
+
+#: cms/templates/register.html cms/templates/widgets/header.html
+msgid "Sign Up"
+msgstr ""
 
 #: cms/templates/register.html
 msgid "Sign Up for {studio_name}"
