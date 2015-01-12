@@ -82,9 +82,9 @@ class LibraryFixture(XBlockContainerFixture):
                 err_msg = response.json().get('ErrMsg')
             except ValueError:
                 err_msg = "Unknown Error"
-            raise FixtureError(
-                "Could not create library {}. Status was {}, error was: {}".format(self.library_info, response.status_code, err_msg)
-            )
+            raise FixtureError("Could not create library {}. Status was {}, error was: {}".format(
+                self.library_info, response.status_code, err_msg
+            ))
 
     def create_xblock(self, parent_loc, xblock_desc):
         # Disable publishing for library XBlocks:

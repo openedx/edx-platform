@@ -28,12 +28,18 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         # Add a vertical with a capa child to the source library/course:
         vertical_block = self.make_block("vertical", source_container)
         problem_library_display_name = "Problem Library Display Name"
-        problem_block = self.make_block("problem", vertical_block, display_name=problem_library_display_name, markdown="Problem markdown here")
+        problem_block = self.make_block(
+            "problem", vertical_block, display_name=problem_library_display_name, markdown="Problem markdown here"
+        )
 
         if source_type == LibraryFactory:
-            source_container = self.store.get_library(source_container.location.library_key, remove_version=False, remove_branch=False)
+            source_container = self.store.get_library(
+                source_container.location.library_key, remove_version=False, remove_branch=False
+            )
         else:
-            source_container = self.store.get_course(source_container.location.course_key, remove_version=False, remove_branch=False)
+            source_container = self.store.get_course(
+                source_container.location.course_key, remove_version=False, remove_branch=False
+            )
 
         # Inherit the vertical and the problem from the library into the course:
         source_keys = [source_container.children[0]]
@@ -48,7 +54,8 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         problem_block_course = self.store.get_item(vertical_block_course.children[0])
         self.assertEqual(problem_block_course.display_name, problem_library_display_name)
 
-        # Check that when capa modules are copied, their "markdown" fields (Scope.settings) are removed. (See note in split.py:copy_from_template())
+        # Check that when capa modules are copied, their "markdown" fields (Scope.settings) are removed.
+        # (See note in split.py:copy_from_template())
         self.assertIsNotNone(problem_block.markdown)
         self.assertIsNone(problem_block_course.markdown)
 
@@ -59,7 +66,8 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         problem_block_course.weight = new_weight
         self.store.update_item(problem_block_course, self.user_id)
 
-        # Test that "Any previously existing children of `dest_usage` that haven't been replaced/updated by this copy_from_template operation will be deleted."
+        # Test that "Any previously existing children of `dest_usage`
+        # that haven't been replaced/updated by this copy_from_template operation will be deleted."
         extra_block = self.make_block("html", vertical_block_course)
 
         # Repeat the copy_from_template():
@@ -86,19 +94,26 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         display_name_expected = "CUSTOM Library Display Name"
         self.make_block("problem", source_library, display_name=display_name_expected)
         # Reload source_library since we need its branch and version to use copy_from_template:
-        source_library = self.store.get_library(source_library.location.library_key, remove_version=False, remove_branch=False)
+        source_library = self.store.get_library(
+            source_library.location.library_key, remove_version=False, remove_branch=False
+        )
         # And a course with a vertical:
         course = CourseFactory.create(modulestore=self.store)
         self.make_block("vertical", course)
 
-        problem_key_in_course = self.store.copy_from_template(source_library.children, dest_key=course.location, user_id=self.user_id)[0]
+        problem_key_in_course = self.store.copy_from_template(
+            source_library.children, dest_key=course.location, user_id=self.user_id
+        )[0]
 
-        # We do the following twice because different methods get used inside split modulestore on first vs. subsequent publish
+        # We do the following twice because different methods get used inside
+        # split modulestore on first vs. subsequent publish
         for __ in range(0, 2):
             # Publish:
             self.store.publish(problem_key_in_course, self.user_id)
             # Test that the defaults values are there.
-            problem_published = self.store.get_item(problem_key_in_course.for_branch(ModuleStoreEnum.BranchName.published))
+            problem_published = self.store.get_item(
+                problem_key_in_course.for_branch(ModuleStoreEnum.BranchName.published)
+            )
             self.assertEqual(problem_published.display_name, display_name_expected)
 
     def test_copy_from_template_auto_publish(self):
@@ -119,7 +134,9 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
         html = self.make_block("html", source_course)
 
         # Reload source_course since we need its branch and version to use copy_from_template:
-        source_course = self.store.get_course(source_course.location.course_key, remove_version=False, remove_branch=False)
+        source_course = self.store.get_course(
+            source_course.location.course_key, remove_version=False, remove_branch=False
+        )
 
         # Inherit the vertical and the problem from the library into the course:
         source_keys = [block.location for block in [about, chapter, html]]
@@ -146,10 +163,13 @@ class TestSplitCopyTemplate(MixedSplitTestCase):
 
         # Check that the auto-publish blocks have been published:
         self.assertFalse(self.store.has_changes(new_blocks["about"]))
-        self.assertTrue(published_version_exists(new_blocks["chapter"]))  # We can't use has_changes because it includes descendants
+        # We can't use has_changes because it includes descendants
+        self.assertTrue(published_version_exists(new_blocks["chapter"]))
         self.assertTrue(published_version_exists(new_blocks["sequential"]))  # Ditto
         # Check that non-auto-publish blocks and blocks with non-auto-publish descendants show changes:
         self.assertTrue(self.store.has_changes(new_blocks["html"]))
         self.assertTrue(self.store.has_changes(new_blocks["problem"]))
-        self.assertTrue(self.store.has_changes(new_blocks["chapter"]))  # Will have changes since a child block has changes.
-        self.assertFalse(published_version_exists(new_blocks["vertical"]))  # Verify that our published_version_exists works
+        # Will have changes since a child block has changes.
+        self.assertTrue(self.store.has_changes(new_blocks["chapter"]))
+        # Verify that our published_version_exists works
+        self.assertFalse(published_version_exists(new_blocks["vertical"]))

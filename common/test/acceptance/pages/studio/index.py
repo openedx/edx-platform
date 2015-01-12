@@ -88,7 +88,8 @@ class DashboardPage(PageObject):
         """
         List all the libraries found on the page's list of libraries.
         """
-        self.q(css='#course-index-tabs .libraries-tab a').click()  # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
+        # Workaround Selenium/Firefox bug: `.text` property is broken on invisible elements
+        self.q(css='#course-index-tabs .libraries-tab a').click()
         div2info = lambda element: {
             'name': element.find_element_by_css_selector('.course-title').text,
             'org': element.find_element_by_css_selector('.course-org .value').text,

@@ -93,4 +93,5 @@ class LibraryToolsService(object):
             dest_block.source_libraries = new_libraries
             self.store.update_item(dest_block, user_id)
             dest_block.children = self.store.copy_from_template(source_blocks, dest_block.location, user_id)
-            # ^-- copy_from_template updates the children in the DB but we must also set .children here to avoid overwriting the DB again
+            # ^-- copy_from_template updates the children in the DB
+            # but we must also set .children here to avoid overwriting the DB again

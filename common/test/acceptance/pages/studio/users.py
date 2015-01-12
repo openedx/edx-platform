@@ -47,7 +47,9 @@ class UsersPage(PageObject):
         """
         Return a list of users listed on this page.
         """
-        return self.q(css='.user-list .user-item').map(lambda el: UserWrapper(self.browser, el.get_attribute('data-email'))).results
+        return self.q(css='.user-list .user-item').map(
+            lambda el: UserWrapper(self.browser, el.get_attribute('data-email'))
+        ).results
 
     @property
     def has_add_button(self):

@@ -20,7 +20,7 @@ from xmodule.validation import StudioValidationMessage, StudioValidation
 from xmodule.x_module import XModule, STUDENT_VIEW
 from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
 from .xml_module import XmlDescriptor
-from pkg_resources import resource_string
+from pkg_resources import resource_string  # pylint: disable=no-name-in-module
 
 
 # Make '_' a no-op so we can scrape strings
@@ -187,7 +187,8 @@ class LibraryContentFields(object):
         scope=Scope.settings,
     )
     selected = List(
-        # This is a list of (block_type, block_id) tuples used to record which random/first set of matching blocks was selected per user
+        # This is a list of (block_type, block_id) tuples used to record
+        # which random/first set of matching blocks was selected per user
         default=[],
         scope=Scope.user_state,
     )
@@ -296,7 +297,8 @@ class LibraryContentModule(LibraryContentFields, XModule, StudioEditableModule):
                     'display_name': self.display_name or self.url_name,
                 }))
                 self.render_children(context, fragment, can_reorder=False, can_add=False)
-        # else: When shown on a unit page, don't show any sort of preview - just the status of this block in the validation area.
+        # else: When shown on a unit page, don't show any sort of preview -
+        # just the status of this block in the validation area.
 
         # The following JS is used to make the "Update now" button work on the unit page and the container view:
         fragment.add_javascript_url(self.runtime.local_resource_url(self, 'public/js/library_content_edit.js'))
@@ -412,7 +414,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             if not self._validate_library_version(validation, lib_tools, version, library_key):
                 break
 
-        # Note: we assume refresh_children() has been called since the last time fields like source_libraries or capa_types were changed.
+        # Note: we assume refresh_children() has been called
+        # since the last time fields like source_libraries or capa_types were changed.
         matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
             self._set_validation_error_if_empty(

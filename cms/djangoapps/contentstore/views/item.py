@@ -169,7 +169,10 @@ def xblock_handler(request, usage_key_string):
 
             source_course = duplicate_source_usage_key.course_key
             dest_course = parent_usage_key.course_key
-            if not has_studio_write_access(request.user, dest_course) or not has_studio_read_access(request.user, source_course):
+            if (
+                    not has_studio_write_access(request.user, dest_course) or
+                    not has_studio_read_access(request.user, source_course)
+            ):
                 raise PermissionDenied()
 
             dest_usage_key = _duplicate_item(
@@ -252,6 +255,7 @@ def xblock_view_handler(request, usage_key_string, view_name):
                         'page_size': int(request.REQUEST.get('page_size', 0)),
                     }
             except ValueError:
+                # pylint: disable=too-many-format-args
                 return HttpResponse(
                     content="Couldn't parse paging parameters: enable_paging: "
                             "%s, page_number: %s, page_size: %s".format(
@@ -435,7 +439,9 @@ def _save_xblock(user, xblock, data=None, children_strings=None, metadata=None, 
                         try:
                             value = field.from_json(value)
                         except ValueError as verr:
-                            reason = _("Invalid data ({details})").format(details=verr.message) if verr.message else _("Invalid data")
+                            reason = _("Invalid data")
+                            if verr.message:
+                                reason = _("Invalid data ({details})").format(details=verr.message)
                             return JsonResponse({"error": reason}, 400)
                         field.write_to(xblock, value)
 
@@ -544,7 +550,9 @@ def _create_item(request):
             )
             store.update_item(course, request.user.id)
 
-        return JsonResponse({"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)})
+        return JsonResponse(
+            {"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)}
+        )
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
@@ -559,9 +567,11 @@ def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_
         category = dest_usage_key.block_type
 
         # Update the display name to indicate this is a duplicate (unless display name provided).
-        duplicate_metadata = {}  # Can't use own_metadata(), b/c it converts data for JSON serialization - not suitable for setting metadata of the new block
+        # Can't use own_metadata(), b/c it converts data for JSON serialization -
+        # not suitable for setting metadata of the new block
+        duplicate_metadata = {}
         for field in source_item.fields.values():
-            if (field.scope == Scope.settings and field.is_set_on(source_item)):
+            if field.scope == Scope.settings and field.is_set_on(source_item):
                 duplicate_metadata[field.name] = field.read_from(source_item)
         if display_name is not None:
             duplicate_metadata['display_name'] = display_name
@@ -746,7 +756,9 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     is_library_block = isinstance(xblock.location, LibraryUsageLocator)
     is_xblock_unit = is_unit(xblock, parent_xblock)
     # this should not be calculated for Sections and Subsections on Unit page or for library blocks
-    has_changes = modulestore().has_changes(xblock) if (is_xblock_unit or course_outline) and not is_library_block else None
+    has_changes = None
+    if (is_xblock_unit or course_outline) and not is_library_block:
+        has_changes = modulestore().has_changes(xblock)
 
     if graders is None:
         if not is_library_block:

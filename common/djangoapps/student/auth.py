@@ -17,7 +17,7 @@ STUDIO_EDIT_ROLES = 8
 STUDIO_VIEW_USERS = 4
 STUDIO_EDIT_CONTENT = 2
 STUDIO_VIEW_CONTENT = 1
-# In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself.
+# In addition to the above, one is always allowed to "demote" oneself to a lower role within a course, or remove oneself
 
 
 def has_access(user, role):
@@ -70,7 +70,7 @@ def get_user_permissions(user, course_key, org=None):
     if OrgStaffRole(org=org).has_user(user) or (course_key and has_access(user, CourseStaffRole(course_key))):
         return STUDIO_VIEW_USERS | STUDIO_EDIT_CONTENT | STUDIO_VIEW_CONTENT
     # Otherwise, for libraries, users can view only:
-    if (course_key and isinstance(course_key, LibraryLocator)):
+    if course_key and isinstance(course_key, LibraryLocator):
         if OrgLibraryUserRole(org=org).has_user(user) or has_access(user, LibraryUserRole(course_key)):
             return STUDIO_VIEW_USERS | STUDIO_VIEW_CONTENT
     return 0

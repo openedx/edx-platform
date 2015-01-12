@@ -1508,7 +1508,8 @@ class TestLibraryXBlockInfo(ModuleStoreTestCase):
             parent_location=self.library.location, category='vertical', user_id=user_id, publish_item=False
         )
         self.child_html = ItemFactory.create(
-            parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block', user_id=user_id, publish_item=False
+            parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block',
+            user_id=user_id, publish_item=False
         )
 
     def test_lib_xblock_info(self):

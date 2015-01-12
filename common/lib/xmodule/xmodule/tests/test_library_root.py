@@ -14,7 +14,9 @@ from xmodule.modulestore.tests.utils import MixedSplitTestCase
 dummy_render = lambda block, _: Fragment(block.data)  # pylint: disable=invalid-name
 
 
-@patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
+@patch(
+    'xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render
+)
 @patch('xmodule.html_module.HtmlDescriptor.author_view', dummy_render, create=True)
 @patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: [])
 class TestLibraryRoot(MixedSplitTestCase):
