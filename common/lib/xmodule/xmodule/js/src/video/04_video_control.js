@@ -287,7 +287,6 @@ function () {
         this.videoControl.fullScreenEl
             .attr('title', text)
             .find('.sr').text(text);
-            // .text(text);
 
         this.el.trigger('fullscreen', [this.isFullScreen]);
     }
