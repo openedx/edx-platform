@@ -206,6 +206,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         # define an attribute here as well, even though it's None
         self.course_id = course_key
         self.cached_metadata = cached_metadata
+        self.cached_modules = {}
 
     def get_block(self, usage_id):
         block = super(CachingDescriptorSystem, self).get_block(usage_id)
@@ -217,12 +218,15 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         assert isinstance(location, UsageKey)
         location = self.modulestore.fill_in_run(location)
+        if location in self.cached_modules:
+            return self.cached_modules[location]
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
                 self.module_data.update(module.runtime.module_data)
+            self.cached_modules[location] = module
             return module
         else:
             # load the module and apply the inherited metadata
@@ -300,6 +304,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
                 # decache any computed pending field settings
                 module.save()
+                self.cached_modules[location] = module
                 return module
             except:
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
