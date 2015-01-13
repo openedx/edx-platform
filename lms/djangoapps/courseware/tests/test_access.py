@@ -268,15 +268,15 @@ class AccessTestCase(LoginEnrollmentTestCase):
 
         #user should not be able to load course even if enrolled
         CourseEnrollmentFactory(user=user, course_id=course.id)
-        self.assertFalse(access._has_access_course_desc(user, 'load_with_prerequisites', course))
+        self.assertFalse(access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course))
 
         # Staff can always access course
         staff = StaffFactory.create(course_key=course.id)
-        self.assertTrue(access._has_access_course_desc(staff, 'load_with_prerequisites', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'view_courseware_with_prerequisites', course))
 
         # User should be able access after completing required course
         fulfill_course_milestone(pre_requisite_course.id, user)
-        self.assertTrue(access._has_access_course_desc(user, 'load_with_prerequisites', course))
+        self.assertTrue(access._has_access_course_desc(user, 'view_courseware_with_prerequisites', course))
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
     def test_courseware_page_unfulfilled_prereqs(self):

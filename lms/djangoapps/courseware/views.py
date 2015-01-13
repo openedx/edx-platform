@@ -350,9 +350,16 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
-    if not has_access(user, 'load_with_prerequisites', course):
-        log.debug(u'User %s tried to view course %s without fulfilling prerequisites', user, unicode(course.id))
-        return redirect(reverse('about_course', args=[unicode(course.id)]))
+    # see if all pre-requisites (as per the milestones app feature) have been fulfilled
+    # Note that if the pre-requisite feature flag has been turned off (default) then this check will
+    # always pass
+    if not has_access(user, 'view_courseware_with_prerequisites', course):
+        # prequities have not been fulfilled therefore redirect to the Dashboard
+        log.info((
+            u'User {user_id} tried to view course {course_id} '
+            u'without fulfilling prerequisites'
+        ).format(user_id=user.id, course_id=unicode(course.id)))
+        return redirect(reverse('dashboard'))
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.

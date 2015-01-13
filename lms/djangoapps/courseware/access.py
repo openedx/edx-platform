@@ -266,7 +266,7 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
-    def can_load_course_with_prerequisites():  # pylint: disable=invalid-name
+    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
         """
         Checks if prerequisite courses feature is enabled and course has prerequisites
         and user is neither staff nor anonymous then it returns False if user has not
@@ -283,7 +283,7 @@ def _has_access_course_desc(user, action, course):
 
     checkers = {
         'load': can_load,
-        'load_with_prerequisites': can_load_course_with_prerequisites,
+        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
         'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
         'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
