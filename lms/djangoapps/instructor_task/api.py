@@ -20,7 +20,7 @@ from instructor_task.tasks import (
     send_bulk_course_email,
     calculate_grades_csv,
     calculate_students_features_csv,
-    get_student_submissions,
+    get_student_responses,
     get_ora2_responses,
 )
 from instructor_task.api_helper import (
@@ -227,12 +227,12 @@ def submit_calculate_grades_csv(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_get_student_submissions(request, course_key):
+def submit_get_student_responses(request, course_key):
     """
-    AlreadyRunningError is raised if the student submissions report is already being generated.
+    AlreadyRunningError is raised if the student responses report is already being generated.
     """
-    task_type = 'student_submissions'
-    task_class = get_student_submissions
+    task_type = 'student_responses'
+    task_class = get_student_responses
     task_input = {}
     task_key = ""
 

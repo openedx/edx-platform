@@ -27,7 +27,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from instructor_task.tasks_helper import (
     upload_grades_csv,
     upload_students_csv,
-    push_student_submissions_to_s3,
+    push_student_responses_to_s3,
     push_ora2_responses_to_s3,
     UPDATE_STATUS_FAILED,
     UPDATE_STATUS_SUCCEEDED,
@@ -130,9 +130,9 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestSubmissionsReport(TestReportMixin, ModuleStoreTestCase):
+class TestReponsesReport(TestReportMixin, ModuleStoreTestCase):
     """
-    Tests that CSV student submissions report generation works.
+    Tests that CSV student responses report generation works.
     """
     def test_unicode(self):
         course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
@@ -150,7 +150,7 @@ class TestSubmissionsReport(TestReportMixin, ModuleStoreTestCase):
             state=u'{"student_answers":{"fake-problem":"caf\xe9"}}',
         )
 
-        result = push_student_submissions_to_s3(None, None, self.course.id, None, 'generated')
+        result = push_student_responses_to_s3(None, None, self.course.id, None, 'generated')
         self.assertEqual(result, "succeeded")
 
 

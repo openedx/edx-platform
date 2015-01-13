@@ -391,9 +391,9 @@ def iterate_problem_components(course):
                         yield component, parent_metadata
 
 
-def student_submissions(course):
+def student_responses(course):
     """
-    Yields student submissions for all problems in course for writing out to a CSV file.
+    Yields student responses for all problems in course for writing out to a CSV file.
     """
     order = 1
     for problem_component, parent_metadata in iterate_problem_components(course):
@@ -410,7 +410,7 @@ def student_submissions(course):
                     state_dict = json.loads(module.state) if module.state else {}
                     raw_answers = state_dict.get("student_answers", {})
                 except ValueError:
-                    log.error("Student submissions: Could not parse module state for " +
+                    log.error("Student responses: Could not parse module state for " +
                               "StudentModule id={module_id}, course={course_id}".format(module_id=module.id, course_id=course.id))
                     continue
                 pretty_answers = u', '.join(u"{problem}={answer}".format(problem=problem, answer=answer) for (problem, answer) in raw_answers.items())
@@ -421,8 +421,8 @@ def student_submissions(course):
                 order += 1
 
 
-def student_submission_rows(course):
-    """ Wrapper to return all (header and data) rows for student submissions reports for a course """
+def student_response_rows(course):
+    """ Wrapper to return all (header and data) rows for student responses reports for a course """
     header = ["Section", "Subsection", "Unit", "Problem", "Order In Course", "Location", "Student", "Response"]
-    rows = chain([header], student_submissions(course))
+    rows = chain([header], student_responses(course))
     return rows

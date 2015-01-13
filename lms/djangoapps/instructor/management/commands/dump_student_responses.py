@@ -6,7 +6,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 
-from instructor_analytics.basic import student_submission_rows
+from instructor_analytics.basic import student_response_rows
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         if course is None:
             raise CommandError("Invalid course_id")
 
-        rows = student_submission_rows(course)
+        rows = student_response_rows(course)
 
         def _utf8_encoded_rows(rows):
             for row in rows:
