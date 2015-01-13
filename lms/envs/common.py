@@ -372,6 +372,9 @@ FEATURES = {
     # lives in the Extended table, saving the frontend from
     # making multiple queries.
     'ENABLE_READING_FROM_MULTIPLE_HISTORY_TABLES': True,
+
+    # Enable django-sudo
+    'ENABLE_DJANGO_SUDO': True,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -480,6 +483,7 @@ TEMPLATES = [
             COMMON_ROOT / 'lib' / 'capa' / 'capa' / 'templates',
             COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
             COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+            COMMON_ROOT / 'djangoapps' / 'django_sudo_helpers' / 'templates',
         ],
         # Options specific to this backend.
         'OPTIONS': {
@@ -1146,9 +1150,12 @@ MIDDLEWARE_CLASSES = (
     # catches any uncaught RateLimitExceptions and returns a 403 instead of a 500
     'ratelimitbackend.middleware.RateLimitMiddleware',
 
+<<<<<<< HEAD
     # django current site middleware with default site
     'django_sites_extensions.middleware.CurrentSiteWithDefaultMiddleware',
 
+=======
+>>>>>>> Added DjangoSudo functionality for instructor dashboard and course team page
     # needs to run after locale middleware (or anything that modifies the request context)
     'edxmako.middleware.MakoMiddleware',
 
@@ -2860,6 +2867,7 @@ CREDENTIALS_GENERATION_ROUTING_KEY = HIGH_PRIORITY_QUEUE
 
 WIKI_REQUEST_CACHE_MIDDLEWARE_CLASS = "request_cache.middleware.RequestCache"
 
+<<<<<<< HEAD
 # Dafault site id to use in case there is no site that matches with the request headers.
 DEFAULT_SITE_ID = 1
 
@@ -2870,3 +2878,19 @@ THEME_CACHE_TIMEOUT = 30 * 60
 # API access management
 API_ACCESS_MANAGER_EMAIL = 'api-access@example.com'
 API_ACCESS_FROM_EMAIL = 'api-requests@example.com'
+=======
+########## django-dodo ##########
+def apply_django_sudo_settings(django_settings):
+    """Set provider-independent settings."""
+    # force re-authentication before activating administrative functions
+    django_settings.MIDDLEWARE_CLASSES += (
+        'sudo.middleware.SudoMiddleware',
+        'django_sudo_helpers.middleware.DjangoSudoMiddleware',
+    )
+
+    # Allows sudo-mode
+    django_settings.INSTALLED_APPS += (
+        'sudo',
+        'django_sudo_helpers'
+    )
+>>>>>>> Added DjangoSudo functionality for instructor dashboard and course team page

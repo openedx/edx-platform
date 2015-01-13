@@ -4,10 +4,13 @@ Acceptance tests for course in studio
 from nose.plugins.attrib import attr
 
 from .base_studio_test import StudioCourseTest
+from ..helpers import get_sudo_access, _link_dummy_account
+from ...pages.lms.account_settings import AccountSettingsPage
 from ...pages.studio.auto_auth import AutoAuthPage
-
+from ...pages.common.logout import LogoutPage
 from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.index import DashboardPage
+from ...pages.common.sudo_page import SudoPage
 
 
 @attr('shard_2')
@@ -37,6 +40,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self.page = CourseTeamPage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
+        get_sudo_access(self.browser, self.page, self.user.get('password'))
         self._go_to_course_team_page()
 
     def _go_to_course_team_page(self):
@@ -130,6 +134,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self.page.add_user_to_course(self.other_user.get('email'))
         self._assert_user_present(self.other_user, present=True)
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._assert_current_course(visible=True)
 
     def test_added_users_cannot_add_or_delete_other_users(self):
@@ -147,6 +152,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self._assert_user_present(self.other_user, present=True)
 
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._assert_current_course(visible=True)
         self._go_to_course_team_page()
 
@@ -208,6 +214,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self._assert_is_admin(other)
 
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._go_to_course_team_page()
         other = self.page.get_user(self.other_user.get('email'))
         self.assertTrue(other.is_current_user)
@@ -239,12 +246,14 @@ class CourseTeamPageTest(StudioCourseTest):
 
         # precondition check - frank is an admin and can add/delete/promote/demote users
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._go_to_course_team_page()
         other = self.page.get_user(self.other_user.get('email'))
         self.assertTrue(other.is_current_user)
         self._assert_can_manage_users()
 
         self.log_in(self.user)
+        get_sudo_access(self.browser, self.page, self.user.get('password'))
         self._go_to_course_team_page()
         other = self.page.get_user(self.other_user.get('email'))
         other.click_demote()
@@ -253,6 +262,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self._assert_is_staff(other)
 
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._go_to_course_team_page()
         other = self.page.get_user(self.other_user.get('email'))
         self.assertTrue(other.is_current_user)
@@ -289,7 +299,9 @@ class CourseTeamPageTest(StudioCourseTest):
         current = self.page.get_user(self.user.get('email'))
         self.assertTrue(current.can_demote)
         self.assertTrue(current.can_delete)
-        current.click_delete()
+        # Don't wait for ajax to complete on deleting logged in user from course
+        # team because response will be 403.
+        current.click_delete(wait_for_ajax=False)
 
         self.log_in(self.user)
         self._assert_current_course(visible=False)
@@ -338,6 +350,7 @@ class CourseTeamPageTest(StudioCourseTest):
         self.assertFalse(current.can_promote)
 
         self.log_in(self.other_user)
+        get_sudo_access(self.browser, self.page, self.other_user.get('password'))
         self._go_to_course_team_page()
 
         current = self.page.get_user(self.user.get('email'))
@@ -347,3 +360,39 @@ class CourseTeamPageTest(StudioCourseTest):
 
         self.log_in(self.user)
         self._assert_current_course(visible=False)
+
+    def test_third_party_auth_on_sudo_page_with_unlinked_account(self):
+        """
+        Test that dummy auth button is invisible on sudo page when no account is linked.
+        """
+        # Logout and log back in to remove sudo access.
+        LogoutPage(self.browser).visit()
+        self.log_in(user=self.user)
+
+        sudo_password_page = SudoPage(self.browser, self.page)
+        sudo_password_page.visit()
+        self.assertFalse(sudo_password_page.is_dummy_auth_button_visible)
+
+    def test_third_party_auth_on_sudo_page_with_linked_account(self):
+        """
+        Test that user can authenticate on sudo page with dummy third party auth.
+        """
+        dummy_user = self._make_user(username='dummy_user')
+
+        # Add user to course team.
+        self.page.visit()
+        self.page.add_user_to_course(dummy_user['email'])
+        self.assertIn(dummy_user.get('username'), self.page.usernames)
+
+        # Logout and log back in with new user.
+        LogoutPage(self.browser).visit()
+        self.log_in(user=dummy_user)
+
+        account_settings = AccountSettingsPage(self.browser)
+        _link_dummy_account(account_settings)
+
+        # Visit sudo page and click on dummy auth button to get sudo access.
+        sudo_password_page = SudoPage(self.browser, self.page)
+        sudo_password_page.visit()
+        sudo_password_page.click_third_party_dummy_provider_button()
+        self.assertTrue(self.page.is_browser_on_page())

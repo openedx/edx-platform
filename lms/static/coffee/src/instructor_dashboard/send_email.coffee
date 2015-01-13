@@ -79,9 +79,9 @@ class SendEmail
             data: send_data
             success: (data) =>
               @display_response success_message
-
-            error: std_ajax_err =>
+            error: std_ajax_err((=>
               @fail_with_error gettext('Error sending email.')
+            ), true)
 
         else
           @$task_response.empty()
@@ -99,38 +99,41 @@ class SendEmail
           else
             @$history_request_response_error.text gettext("There is no email history for this course.")
             # Enable the msg-warning css display
-            @$history_request_response_error.css({"display":"block"})
-        error: std_ajax_err =>
+            @$history_request_response_error.css({"display": "block"})
+        error: std_ajax_err((=>
           @$history_request_response_error.text gettext("There was an error obtaining email task history for this course.")
+        ), true)
 
     # List content history for emails sent
     @$btn_task_history_email_content.click =>
       url = @$btn_task_history_email_content.data 'endpoint'
       $.ajax
         dataType: 'json'
-        url : url
+        url: url
         success: (data) =>
           if data.emails.length
             create_email_content_table @$table_email_content_history, @$email_content_table_inner, data.emails
             create_email_message_views @$email_messages_wrapper, data.emails
           else
             @$content_request_response_error.text gettext("There is no email history for this course.")
-            @$content_request_response_error.css({"display":"block"})
-        error: std_ajax_err =>
+            @$content_request_response_error.css({"display": "block"})
+        error: std_ajax_err((=>
           @$content_request_response_error.text gettext("There was an error obtaining email content history for this course.")
+        ), true)
+
 
   fail_with_error: (msg) ->
     console.warn msg
     @$task_response.empty()
     @$request_response_error.empty()
     @$request_response_error.text msg
-    $(".msg-confirm").css({"display":"none"})
+    $(".msg-confirm").css({"display": "none"})
 
   display_response: (data_from_server) ->
     @$task_response.empty()
     @$request_response_error.empty()
     @$task_response.text(data_from_server)
-    $(".msg-confirm").css({"display":"block"})
+    $(".msg-confirm").css({"display": "block"})
 
 
 # Email Section

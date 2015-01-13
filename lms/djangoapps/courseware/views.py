@@ -73,6 +73,7 @@ from openedx.core.djangoapps.credit.api import (
     is_credit_course
 )
 from openedx.core.djangoapps.theming import helpers as theming_helpers
+from sudo.utils import revoke_sudo_privileges
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from openedx.core.djangoapps.self_paced.models import SelfPacedConfiguration
@@ -342,6 +343,10 @@ def index(request, course_id, chapter=None, section=None,
 
      - HTTPresponse
     """
+
+    # Revoke sudo privileges from a request explicitly
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False) and request.is_sudo(region=course_id):
+        revoke_sudo_privileges(request, region=course_id)
 
     course_key = CourseKey.from_string(course_id)
 

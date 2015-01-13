@@ -5,7 +5,7 @@ django admin page for the course creators table
 from course_creators.models import CourseCreator, update_creator_state, send_user_notification, send_admin_notification
 from course_creators.views import update_course_creator_group
 
-from ratelimitbackend import admin
+from django.contrib import admin
 from django.conf import settings
 from django.dispatch import receiver
 from edxmako.shortcuts import render_to_string

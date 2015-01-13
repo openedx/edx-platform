@@ -86,7 +86,8 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
         url = reverse('instructor_dashboard', kwargs={'course_id': unicode(self.course.id)})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
-        response = self.client.get(url)
+        self.grant_sudo_access(unicode(self.course.id), 'test')
+        response = self.client.get(self.url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False
         self.assertIn(email_section, response.content)
@@ -100,6 +101,7 @@ class EmailSendFromDashboardTestCase(SharedModuleStoreTestCase):
             default_store=ModuleStoreEnum.Type.split
         )
 
+    @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
     def setUp(self):
         super(EmailSendFromDashboardTestCase, self).setUp()
         self.create_staff_and_instructor()

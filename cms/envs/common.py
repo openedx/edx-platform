@@ -199,6 +199,9 @@ FEATURES = {
 
     # Show Language selector
     'SHOW_LANGUAGE_SELECTOR': False,
+
+    # Enable django-sudo
+    'ENABLE_DJANGO_SUDO': True,
 }
 
 ENABLE_JASMINE = False
@@ -238,6 +241,7 @@ MAKO_TEMPLATES['main'] = [
     COMMON_ROOT / 'djangoapps' / 'pipeline_mako' / 'templates',
     COMMON_ROOT / 'djangoapps' / 'pipeline_js' / 'templates',
     COMMON_ROOT / 'static',  # required to statically include common Underscore templates
+    COMMON_ROOT / 'djangoapps' / 'django_sudo_helpers' / 'templates',
 ]
 
 for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
@@ -254,6 +258,9 @@ TEMPLATES = [
         # Options specific to this backend.
         'OPTIONS': {
             'loaders': (
+                'edxmako.makoloader.MakoFilesystemLoader',
+                'edxmako.makoloader.MakoAppDirectoriesLoader',
+
                 'django.template.loaders.filesystem.Loader',
                 'django.template.loaders.app_directories.Loader',
             ),
@@ -314,7 +321,6 @@ XQUEUE_INTERFACE = {
 simplefilter('ignore')
 
 ################################# Middleware ###################################
-
 MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'header_control.middleware.HeaderControlMiddleware',
@@ -900,8 +906,11 @@ INSTALLED_APPS = (
 
     # Management commands used for configuration automation
     'edx_management_commands.management_commands',
-)
 
+    'third_party_auth',
+
+    'social.apps.django_app.default',
+)
 
 ################# EDX MARKETING SITE ##################################
 
@@ -1178,3 +1187,18 @@ USERNAME_PATTERN = r'(?P<username>[\w.@+-]+)'
 
 # Partner support link for CMS footer
 PARTNER_SUPPORT_EMAIL = ''
+
+########## django-sudo ##########
+def apply_django_sudo_settings(django_settings):
+    """Set provider-independent settings."""
+    # force re-authentication before activating administrative functions
+    django_settings.MIDDLEWARE_CLASSES += (
+        'sudo.middleware.SudoMiddleware',
+        'django_sudo_helpers.middleware.DjangoSudoMiddleware',
+    )
+
+    # Allows sudo-mode
+    django_settings.INSTALLED_APPS += (
+        'sudo',
+        'django_sudo_helpers'
+    )

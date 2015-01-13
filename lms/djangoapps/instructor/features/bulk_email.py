@@ -96,6 +96,13 @@ def log_into_the_course(step, role):  # pylint: disable=unused-argument
     world.expected_addresses['myself'] = [my_email]
 
 
+@step("I go to instructor tab")
+def i_got_to_instructor_tab(step):      # pylint: disable=unused-argument
+    url = '/courses/{}'.format(world.bulk_email_course_key)
+    world.visit(url)
+    world.css_click('a[href="{}/instructor"]'.format(url))
+
+
 @step(u'I send email to "([^"]*)"')
 def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
 
@@ -115,9 +122,6 @@ def when_i_send_an_email(step, recipient):  # pylint: disable=unused-argument
     call_command('loaddata', 'course_email_template.json')
 
     # Go to the email section of the instructor dash
-    url = '/courses/{}'.format(world.bulk_email_course_key)
-    world.visit(url)
-    world.css_click('a[href="{}/instructor"]'.format(url))
     world.css_click('a[data-section="send_email"]')
 
     # Select the recipient

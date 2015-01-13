@@ -47,6 +47,10 @@ def run():
     # before the django.setup().
     microsite.enable_microsites_pre_startup(log)
 
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO'):
+        from lms.envs.common import apply_django_sudo_settings
+        apply_django_sudo_settings(settings)
+
     django.setup()
 
     autostartup()

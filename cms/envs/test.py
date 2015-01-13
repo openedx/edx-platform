@@ -36,6 +36,10 @@ from lms.envs.test import (
     DEFAULT_FILE_STORAGE,
     MEDIA_ROOT,
     MEDIA_URL,
+    # This is practically unused but needed by the oauth2_provider package, which
+    # some tests in common/ rely on.
+    OAUTH_OIDC_ISSUER,
+    SERVICE_VARIANT,
 )
 
 # mongo connection settings
@@ -327,3 +331,5 @@ FEATURES['CUSTOM_COURSES_EDX'] = True
 
 # API access management -- needed for simple-history to run.
 INSTALLED_APPS += ('openedx.core.djangoapps.api_admin',)
+######### Django-sudo ##########
+FEATURES['ENABLE_DJANGO_SUDO'] = True
