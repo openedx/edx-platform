@@ -6,6 +6,7 @@
 // +notes
 // +skip navigation
 // +utility navigation
+// +case - calculator spacing
 
 // +notes:
 // --------------------
@@ -27,7 +28,7 @@
 .nav-utilities {
   @extend %ui-depth3;
   position: fixed;
-  @include right($baseline*2.25);
+  right: 0;
   bottom: 0;
 
   .wrapper-utility {
@@ -72,5 +73,11 @@
       border: none;
       box-shadow: none;
     }
+  }
+
+  // +case - calculator spacing (needed for overriding calculator positioning)
+  // --------------------
+  &.has-utility-calculator {
+    @include right($baseline*2.25);
   }
 }
