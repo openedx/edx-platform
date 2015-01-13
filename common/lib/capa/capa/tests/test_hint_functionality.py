@@ -14,6 +14,11 @@ from . import new_loncapa_problem, load_fixture
 class HintTest(unittest.TestCase):
     """Base class for tests of extended hinting functionality."""
 
+    def correctness(self, problem_id, choice):
+        student_answers = {problem_id: choice}
+        cmap = self.problem.grade_answers(answers=student_answers)    # pylint: disable=no-member
+        return cmap[problem_id]['correctness']
+
     def _grade_problem(self, problem_id, choice):
         """
         Given a set of student choices for our problem, return the hint message to be shown (if any)
@@ -48,10 +53,11 @@ class HintTest(unittest.TestCase):
                 '\nDoes not match the expected HTML:\n                           ' + expected_string)
 
 
+# It is a little surprising how much more complicated TextInput is than all the other cases.
 @ddt
 class TextInputHintsTest(HintTest):
     """
-    This class consists of a suite of test cases to be run on the text input problem represented by the XML below.
+    This c
     """
     xml = load_fixture('extended_hints_text_input.xml')
     problem = new_loncapa_problem(xml)          # this problem is properly constructed
@@ -84,43 +90,98 @@ class TextInputHintsTest(HintTest):
 
 
 @ddt
-class TextInputHintsManyCombinations(HintTest):
-    """
-    Test text input combinations with additional answers.
-    """
+class TextInputExtendedHintsCaseInsensitive(HintTest):
+    """Sometimes the semantics can be encoded in the class name."""
     xml = load_fixture('extended_hints_text_input.xml')
     problem = new_loncapa_problem(xml)
 
     @data(
-        {'problem_id': u'1_5_1', 'choice': 'A', 'expected_string': '<div class="feedback_hint_correct">Woo Hoo: hint1</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'a', 'expected_string': ''},
-        {'problem_id': u'1_5_1', 'choice': 'B', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'b', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'C', 'expected_string': '<div class="feedback_hint_correct">Correct: hint3</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'c', 'expected_string': ''},
-        {'problem_id': u'1_5_1', 'choice': 'D', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'd', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'E', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint5</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'e', 'expected_string': ''},
-
-        {'problem_id': u'1_5_1', 'choice': 'FGG', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'fgG', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
-
-        {'problem_id': u'1_5_1', 'choice': 'HIII', 'expected_string': '<div class="feedback_hint_incorrect">Incorrect: hint7</div>'},
-        {'problem_id': u'1_5_1', 'choice': 'hiIi', 'expected_string': ''},
-
-        {'problem_id': u'1_5_1', 'choice': 'abc', 'expected_string': ''},
-
-        # verify the implicit ^ .. $ of regex matching, so none of these match
-        {'problem_id': u'1_5_1', 'choice': 'xHIII', 'expected_string': ''},
-        {'problem_id': u'1_5_1', 'choice': 'HIIIx', 'expected_string': ''},
-        {'problem_id': u'1_5_1', 'choice': 'xHIIIx', 'expected_string': ''},
+        {'problem_id': u'1_5_1', 'choice': 'abc', 'expected_string': ''},  # wrong answer yielding no hint
+        {'problem_id': u'1_5_1', 'choice': 'A', 'expected_string': u'<div class="feedback_hint_correct">Woo Hooå: hint1Ω</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'a', 'expected_string': u'<div class="feedback_hint_correct">Woo Hooå: hint1Ω</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'B', 'expected_string': u'<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'b', 'expected_string': u'<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'C', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'c', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
+        # regexp cases
+        {'problem_id': u'1_5_1', 'choice': 'FGG', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
+        {'problem_id': u'1_5_1', 'choice': 'fgG', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
     )
     @unpack
     def test_text_input_hints(self, problem_id, choice, expected_string):
         message_text = self._grade_problem(problem_id, choice)
         self.assertEqual(message_text, expected_string)
 
+@ddt
+class TextInputExtendedHintsCaseSensitive(HintTest):
+    """Sometimes the semantics can be encoded in the class name."""
+    xml = load_fixture('extended_hints_text_input.xml')
+    problem = new_loncapa_problem(xml)
+
+    @data(
+        {'problem_id': u'1_6_1', 'choice': 'abc', 'expected_string': ''},
+        {'problem_id': u'1_6_1', 'choice': 'A', 'expected_string': u'<div class="feedback_hint_correct">Correct: hint1</div>'},
+        {'problem_id': u'1_6_1', 'choice': 'a', 'expected_string': u''},
+        {'problem_id': u'1_6_1', 'choice': 'B', 'expected_string': u'<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_6_1', 'choice': 'b', 'expected_string': u''},
+        {'problem_id': u'1_6_1', 'choice': 'C', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
+        {'problem_id': u'1_6_1', 'choice': 'c', 'expected_string': u''},
+        # regexp cases
+        {'problem_id': u'1_6_1', 'choice': 'FGG', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
+        {'problem_id': u'1_6_1', 'choice': 'fgG', 'expected_string': u''},
+    )
+    @unpack
+    def test_text_input_hints(self, problem_id, choice, expected_string):
+        message_text = self._grade_problem(problem_id, choice)
+        self.assertEqual(message_text, expected_string)
+
+
+@ddt
+class TextInputExtendedHintsCompatible(HintTest):
+    """
+    Compatibility test with mixed old and new style additional_answer tags.
+    """
+    xml = load_fixture('extended_hints_text_input.xml')
+    problem = new_loncapa_problem(xml)
+    @data(
+        {'problem_id': u'1_7_1', 'choice': 'A', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint1</div>'},
+        {'problem_id': u'1_7_1', 'choice': 'B', 'correct':'correct', 'expected_string': ''},
+        {'problem_id': u'1_7_1', 'choice': 'C', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_7_1', 'choice': 'D', 'correct':'incorrect', 'expected_string': ''},
+        # check going through conversion with difficult chars
+        {'problem_id': u'1_7_1', 'choice': """<&"'>""", 'correct':'correct', 'expected_string': ''},
+    )
+    @unpack
+    def test_text_input_hints(self, problem_id, choice, correct, expected_string):
+        message_text = self._grade_problem(problem_id, choice)
+        self.assertEqual(message_text, expected_string)
+        self.assertEqual(self.correctness(problem_id, choice), correct)
+
+
+@ddt
+class TextInputExtendedHintsRegex(HintTest):
+    """
+    Extended hints where the answer is regex mode.
+    """
+    xml = load_fixture('extended_hints_text_input.xml')
+    problem = new_loncapa_problem(xml)
+    @data(
+        {'problem_id': u'1_8_1', 'choice': 'ABwrong', 'correct':'incorrect', 'expected_string': ''},
+        {'problem_id': u'1_8_1', 'choice': 'ABC', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint1</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'ABBBBC', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint1</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'aBc', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint1</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'BBBB', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'bbb', 'correct':'correct', 'expected_string': '<div class="feedback_hint_correct">Correct: hint2</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'C', 'correct':'incorrect', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'c', 'correct':'incorrect', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint4</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'D', 'correct':'incorrect', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
+        {'problem_id': u'1_8_1', 'choice': 'd', 'correct':'incorrect', 'expected_string': u'<div class="feedback_hint_incorrect">Incorrect: hint6</div>'},
+    )
+    @unpack
+    def test_text_input_hints(self, problem_id, choice, correct, expected_string):
+        message_text = self._grade_problem(problem_id, choice)
+        self.assertEqual(message_text, expected_string)
+        self.assertEqual(self.correctness(problem_id, choice), correct)
 
 @ddt
 class NumericInputHintsTest(HintTest):

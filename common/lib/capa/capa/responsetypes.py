@@ -150,6 +150,9 @@ class LoncapaResponse(object):
           - system      : LoncapaSystem instance which provides OS, rendering, and user context
 
         """
+        ##from nose.tools import set_trace
+        ##set_trace()
+
         self.xml = xml
         self.inputfields = inputfields
         self.context = context
@@ -267,7 +270,7 @@ class LoncapaResponse(object):
         # Establish the hint text
         # This can lead to early-exit if the hint is blank.
         if not hint_text:
-            if hint_node is None:
+            if hint_node is None or hint_node.text is None:  # .text can be None, maybe just in testing
                 return ''
             hint_text = hint_node.text.strip()
             if not hint_text:
@@ -279,9 +282,9 @@ class LoncapaResponse(object):
             label = hint_node.get('label', '')
         if not label:
             if correct:
-                label = _('Correct')
+                label = _(u'Correct')
             else:
-                label = _('Incorrect')
+                label = _(u'Incorrect')
         if label:
             label += ': '
 
@@ -292,7 +295,7 @@ class LoncapaResponse(object):
             style = QUESTION_HINT_INCORRECT_STYLE
 
         # Ready to go
-        return '<div class="{0}">{1}{2}</div>'.format(style, label, hint_text)
+        return u'<div class="{0}">{1}{2}</div>'.format(style, label, hint_text)
 
     def get_extended_hints(self, student_answers, new_cmap):
         """
@@ -1528,7 +1531,9 @@ class StringResponse(LoncapaResponse):
             return
         # end of backward compatibility
 
-        correct_answers = [self.xml.get('answer')] + [element.text for element in self.xml.findall('additional_answer')]
+        # XML compatibility note: 2015 additional_answer switched to having a 'answer' attribute.
+        # See make_compatible in capa_problem which translates the old format.
+        correct_answers = [self.xml.get('answer')] + [element.get('answer') for element in self.xml.findall('additional_answer')]
         self.correct_answer = [contextualize_text(answer, self.context).strip() for answer in correct_answers]
 
         # TODO nparlante - explain how tag removal works
@@ -1617,42 +1622,37 @@ class StringResponse(LoncapaResponse):
                         new_cmap[self.answer_id]['msg'] += self.make_hint_div(hint_node, True)
                     return
 
-                # Then look for additional answer
+                # Then look for additional answer with an answer= attribute
                 for node in response.findall('./additional_answer'):
-                    if self.match_hint_node(node, student_answer, False):
+                    if self.match_hint_node(node, student_answer, self.regexp, self.case_insensitive):
                         # Treat the additional_answer as a hint-containing node
                         new_cmap[self.answer_id]['msg'] += self.make_hint_div(node, True)
                         return
 
                 # stringequalhint and regexphint represent wrong answers
                 for node in response.findall('./stringequalhint'):
-                    if self.match_hint_node(node, student_answer, False):
+                    if self.match_hint_node(node, student_answer, False, self.case_insensitive):
                         new_cmap[self.answer_id]['msg'] += self.make_hint_div(node, False)
                         return
 
                 for node in response.findall('./regexphint'):
-                    if self.match_hint_node(node, student_answer, True):
+                    if self.match_hint_node(node, student_answer, True, self.case_insensitive):
                         new_cmap[self.answer_id]['msg'] += self.make_hint_div(node, False)
                         return
 
-    def match_additional_node(self, node, given, regex_mode):
+    def match_hint_node(self, node, given, regex_mode, ci_mode):
         """
-        <additional_answer>^thre+</additional_answer>
         Return the boolean match of a given student answer vs. additional_answer and regexphint nodes
-        which contain an answer="xxx" attribute, and possibly type="ci".
+        which contain an answer="xxx" attribute. The ci_mode is passed in.
         A regular expression with an error will not match anything.
         """
         answer = node.get('answer', '').strip()
         if not answer:
             return False
 
-        ci = False
-        if node.get('type') == 'ci':
-            ci = True
-
         if regex_mode:
             flags = 0
-            if ci:
+            if ci_mode:
                 flags = re.IGNORECASE
             try:
                 # We follow the check_string convention, adding ^ and $
@@ -1661,37 +1661,7 @@ class StringResponse(LoncapaResponse):
             except Exception:
                 return False
 
-        if ci:
-            return answer.lower() == given.lower()
-        else:
-            return answer == given
-            
-    def match_hint_node(self, node, given, regex_mode):
-        """
-        Return the boolean match of a given student answer vs. additional_answer and regexphint nodes
-        which contain an answer="xxx" attribute, and possibly type="ci".
-        A regular expression with an error will not match anything.
-        """
-        answer = node.get('answer', '').strip()
-        if not answer:
-            return False
-
-        ci = False
-        if node.get('type') == 'ci':
-            ci = True
-
-        if regex_mode:
-            flags = 0
-            if ci:
-                flags = re.IGNORECASE
-            try:
-                # We follow the check_string convention, adding ^ and $
-                regex = re.compile('^' + answer + '$', flags=flags | re.UNICODE)
-                return re.search(regex, given)
-            except Exception:
-                return False
-
-        if ci:
+        if ci_mode:
             return answer.lower() == given.lower()
         else:
             return answer == given
