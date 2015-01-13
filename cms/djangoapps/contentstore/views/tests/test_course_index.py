@@ -114,6 +114,7 @@ class TestCourseIndex(CourseTestCase):
         """
         course_staff_client, course_staff = self.create_non_staff_authed_user_client()
         for course in [self.course, self.odd_course]:
+            self.grant_sudo_access(unicode(course.id), 'foo')
             permission_url = reverse_course_url('course_team_handler', course.id, kwargs={'email': course_staff.email})
 
             self.client.post(

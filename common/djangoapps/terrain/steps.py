@@ -241,3 +241,23 @@ def view_course_team_settings(_step, whom):
     world.click_course_settings()
     link_css = 'li.nav-course-settings-team a'
     world.css_click(link_css)
+
+
+@step('I get sudo access with password "([^"]*)"$')
+def i_get_sudo_access(_step, password):
+    """
+    Get sudo access for instructor or staff user.
+    Set the password value of the element to the specified password.
+    Note that wait_for empty is due to password field
+    It will return password like this **** not text.
+    """
+
+    sudo_form = world.css_find('form.sudo-form')
+    # check if sudo form is available then submit password to get sudo access
+    # otherwise return True because sudo access already given.
+    if len(sudo_form) > 0:
+        css_selector = 'input[id=id_password]'
+        world.retry_on_exception(lambda: world.css_find(css_selector)[0].fill(password))
+        world.wait_for(lambda _: not world.css_has_value(css_selector, '', index=0))
+        world.css_click('input[type=submit]')
+    return True

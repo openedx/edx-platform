@@ -380,6 +380,7 @@ class AdminCourseModePageTest(ModuleStoreTestCase):
         }
 
         self.client.login(username=user.username, password='test')
+        self.grant_sudo_access('django_admin', 'test')
 
         # creating new course mode from django admin page
         response = self.client.post(reverse('admin:course_modes_coursemode_add'), data=data)

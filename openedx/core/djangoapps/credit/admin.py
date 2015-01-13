@@ -1,10 +1,12 @@
 """
 Django admin page for credit eligibility
 """
+
 from ratelimitbackend import admin
 from openedx.core.djangoapps.credit.models import (
     CreditCourse, CreditProvider, CreditEligibility, CreditRequest
 )
+from django.contrib import admin
 
 
 class CreditCourseAdmin(admin.ModelAdmin):

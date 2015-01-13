@@ -9,7 +9,7 @@ from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from nose.plugins.attrib import attr
 from .helpers import CohortTestMixin
-from ..helpers import UniqueCourseTest, EventsTestMixin, create_user_partition_json
+from ..helpers import UniqueCourseTest, EventsTestMixin, create_user_partition_json, get_sudo_access
 from xmodule.partitions.partitions import Group
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -53,14 +53,16 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         ).visit().get_user_id()
 
         # login as an instructor
+        instructor_password = 'test'
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
             self.browser, username=self.instructor_name, email="instructor_user@example.com",
-            course_id=self.course_id, staff=True
+            course_id=self.course_id, staff=True, password=instructor_password
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        get_sudo_access(self.browser, self.instructor_dashboard_page, instructor_password)
         self.instructor_dashboard_page.visit()
         self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
@@ -648,14 +650,16 @@ class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
         self.cohort_id = self.add_manual_cohort(self.course_fixture, self.cohort_name)
 
         # login as an instructor
+        self.instructor_password = 'test'
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
             self.browser, username=self.instructor_name, email="instructor_user@example.com",
-            course_id=self.course_id, staff=True
+            course_id=self.course_id, staff=True, password=self.instructor_password
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        get_sudo_access(self.browser, self.instructor_dashboard_page, self.instructor_password)
         self.instructor_dashboard_page.visit()
         self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
         self.cohort_management_page.wait_for_page()
@@ -940,14 +944,16 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         })
 
         # login as an instructor
+        instructor_password = 'test'
         self.instructor_name = "instructor_user"
         self.instructor_id = AutoAuthPage(
             self.browser, username=self.instructor_name, email="instructor_user@example.com",
-            course_id=self.course_id, staff=True
+            course_id=self.course_id, staff=True, password=instructor_password
         ).visit().get_user_id()
 
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        get_sudo_access(self.browser, self.instructor_dashboard_page, instructor_password)
         self.instructor_dashboard_page.visit()
         self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 

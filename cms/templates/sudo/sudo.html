@@ -1,0 +1,42 @@
+{% block body %}
+    {% load i18n %}
+    {% load compressed %}
+    {% compressed_css 'style-main' %}
+
+<a href="#sudo-modal" id="sudo-modal-trig" style="display: none;"></a>
+<section aria-hidden="true" class="modal sudo-modal" id="sudo-modal" style="overflow:auto; display: none;" >
+  <div class="inner-wrapper" style="color:black">
+    <header>
+      <h2>{% trans "Confirm Your Password to Access the Course Team Settings" %}</h2>
+    </header>
+    <hr />
+    <div>
+        <form class="sudo-form" method="post" action="">{% csrf_token %}
+            {{ form.as_p }}
+            <p>
+                <input type="submit" id="sudo-button" class="sudo-button" value="{% trans 'Submit' %}">
+            </p>
+        </form>
+    </div>
+  </div>
+</section>
+<script type="text/javascript">
+      window.baseUrl = "{{STATIC_URL}}";
+      var require = {baseUrl: window.baseUrl};
+</script>
+<script type="text/javascript" src="{{STATIC_URL}}js/vendor/require.js"></script>
+<script type="text/javascript" src="{{STATIC_URL}}require-config.js"></script>
+<script type = "text/javascript">
+    require(['domReady', "jquery"], function (domReady, $) {
+        domReady(function () {
+            require(["jquery.leanModal"], function () {
+                var sudoModalTrig = $("#sudo-modal-trig");
+                sudoModalTrig.leanModal();
+                sudoModalTrig.click();
+                $("#lean_overlay").remove();
+            });
+        });
+    });
+</script>
+<div id="sudo_overlay"></div>
+{% endblock %}

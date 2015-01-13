@@ -29,6 +29,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         # Create instructor account
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), "test")
 
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
