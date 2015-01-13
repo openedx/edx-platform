@@ -361,6 +361,16 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.listView.$el.find('a.search-load-next')[0]).not.toExist();
         });
 
+        it('triggers an event for next page', function () {
+            var onNext = jasmine.createSpy('onNext');
+            this.listView.on('next', onNext);
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.listView.render();
+            this.listView.$el.find('a.search-load-next').click();
+            expect(onNext).toHaveBeenCalled();
+        });
+
         it('shows a spinner when loading more results', function () {
             this.collection.totalCount = 123;
             this.collection.hasNextPage = function () { return true; };
