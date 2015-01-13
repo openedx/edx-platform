@@ -86,8 +86,9 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
 
     .search-notes-input {
       @extend %t-demi-strong;
+      position: relative;
+      @include right(-6px); // manually positioning input right next to submit
       width: 55%;
-      @include margin-right($baseline/4);
       padding: ($baseline/2) ($baseline*0.75);
       color: $gray-d3;
     }
@@ -95,6 +96,7 @@ $divider-visual-tertiary: ($baseline/20) solid $gray-l4;
     .search-notes-submit {
       @extend %btn-inherited-primary;
       @extend %t-action2;
+      padding: 8px $baseline 9px $baseline; // manually syncing up height with search input
     }
   }
 
