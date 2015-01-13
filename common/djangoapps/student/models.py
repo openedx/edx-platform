@@ -1267,9 +1267,6 @@ class CourseAccessRole(models.Model):
         return "[CourseAccessRole] user: {}   role: {}   org: {}   course: {}".format(self.user.username, self.role, self.org, self.course_id)
 
 
-class CourseAccessRoleAdmin(admin.ModelAdmin):
-    raw_id_fields = ("user",)
-
 #### Helper methods for use from python manage.py shell and other classes.
 
 
