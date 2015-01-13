@@ -82,6 +82,8 @@ def wrap_draft(item):
     Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
     Sets the item's location to the non-draft location in either case.
     """
+    if hasattr(item, 'is_draft'):
+        return item
     setattr(item, 'is_draft', item.location.revision == MongoRevisionKey.draft)
     item.location = item.location.replace(revision=MongoRevisionKey.published)
     return item
@@ -223,7 +225,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             except ItemNotFoundError:
                 pass  # do the below
         block = super(CachingDescriptorSystem, self).get_block(usage_id)
-        return wrap_draft(block)
+        return block
 
     def load_item(self, location):
         """
@@ -234,7 +236,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if location in self.cached_modules:
             return self.cached_modules[location]
         json_data = self.module_data.get(location)
-        if json_data is None and location not in self.module_data:
+        if json_data is None:
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
