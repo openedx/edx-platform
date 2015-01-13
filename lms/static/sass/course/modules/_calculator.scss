@@ -15,20 +15,19 @@ div.calc-main {
 
   .calc {
     @include transition(background-color $tmg-f2 ease-in-out 0s);
-    background: url("../images/calc-icon.png") $black-t3 no-repeat center;
+    background: url("../images/calc-icon.png") $black-t1 no-repeat center;
     border-bottom: 0;
-    border-radius: ($baseline/10);
     color: $white;
     float: right;
     height: $baseline;
-    margin-right: ($baseline/2);
+    margin-right: ($baseline*0.75);
     padding: $baseline;
     position: relative;
     top: -42px;
     width: ($baseline*0.75);
 
     &:hover, &:focus {
-      background-color: $black;
+      background-color: $gray-d1;
     }
 
     &.closed {
