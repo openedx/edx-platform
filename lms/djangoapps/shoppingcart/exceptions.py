@@ -37,6 +37,11 @@ class MultipleCouponsNotAllowedException(InvalidCartItem):
     pass
 
 
+class RedemptionCodeError(Exception):
+    """An error occurs while processing redemption codes. """
+    pass
+
+
 class ReportException(Exception):
     pass
 

@@ -6,7 +6,8 @@ import json
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from mock import patch
-from student.tests.factories import UserFactory
+from student.roles import CourseSalesAdminRole
+from student.tests.factories import UserFactory, CourseModeFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
@@ -149,7 +150,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice
+                created_by=self.instructor, invoice=sale_invoice, mode_slug='honor'
             )
             course_code.save()
 
@@ -259,6 +260,13 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
+
+        # Create a paid course mode.
+        mode = CourseModeFactory.create()
+        mode.course_id = self.course.id
+        mode.min_price = 1
+        mode.save()
 
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})

@@ -280,8 +280,9 @@ class DashboardTest(ModuleStoreTestCase):
             recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
             course_id=self.course.id, is_valid=False
         )
-        course_reg_code = shoppingcart.models.CourseRegistrationCode(code="abcde", course_id=self.course.id,
-                                                                     created_by=self.user, invoice=sale_invoice_1)
+        course_reg_code = shoppingcart.models.CourseRegistrationCode(
+            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, mode_slug='honor'
+        )
         course_reg_code.save()
 
         cart = shoppingcart.models.Order.get_cart_for_user(self.user)

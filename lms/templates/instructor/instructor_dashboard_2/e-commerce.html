@@ -12,9 +12,11 @@
       <div class="wrap">
          <h2>${_('Registration Codes')}</h2>
          <div>
+            %if section_data['sales_admin']:
             <span class="code_tip">${_('Click to generate Registration Codes')}
             <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
             </span>
+            %endif
             <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
@@ -43,6 +45,7 @@
          </div>
       </div>
       <!-- end wrap -->
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Course Price")}</h2>
          <div>
@@ -53,8 +56,9 @@
             </span>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
-      %if section_data['access']['finance_admin'] is True:
+      %if section_data['access']['finance_admin']:
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
@@ -79,6 +83,7 @@
          </div>
       </div><!-- end wrap -->
       %endif
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
@@ -132,6 +137,7 @@
             </div>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
    </div>
 </div>

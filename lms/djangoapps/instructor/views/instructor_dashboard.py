@@ -4,6 +4,8 @@ Instructor Dashboard Views
 
 import logging
 import datetime
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 import uuid
 import pytz
 
@@ -15,7 +17,7 @@ from django.views.decorators.cache import cache_control
 from edxmako.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.utils.html import escape
-from django.http import Http404
+from django.http import Http404, HttpResponseServerError
 from django.conf import settings
 from util.json_request import JsonResponse
 from mock import patch
@@ -33,7 +35,7 @@ from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
-from student.roles import CourseFinanceAdminRole
+from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
@@ -47,13 +49,19 @@ log = logging.getLogger(__name__)
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    course = get_course_by_id(course_key, depth=None)
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        log.error(u"Unable to find course with course key %s while loading the Instructor Dashboard.", course_id)
+        return HttpResponseServerError()
+
+    course = get_course_by_id(course_key, depth=0)
 
     access = {
         'admin': request.user.is_staff,
         'instructor': has_access(request.user, 'instructor', course),
         'finance_admin': CourseFinanceAdminRole(course_key).has_user(request.user),
+        'sales_admin': CourseSalesAdminRole(course_key).has_user(request.user),
         'staff': has_access(request.user, 'staff', course),
         'forum_admin': has_forum_access(
             request.user, course_key, FORUM_ROLE_ADMINISTRATOR
@@ -72,10 +80,18 @@ def instructor_dashboard_2(request, course_id):
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
-    course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
     course_mode_has_price = False
-    if course_honor_mode and course_honor_mode.min_price > 0:
+    paid_modes = CourseMode.paid_modes_for_course(course_key)
+    if len(paid_modes) == 1:
         course_mode_has_price = True
+    elif len(paid_modes) > 1:
+        log.error(
+            u"Course %s has %s course modes with payment options. Course must only have "
+            u"one paid course mode to enable eCommerce options.",
+            unicode(course_key), len(paid_modes)
+        )
+
+    is_white_label = CourseMode.is_white_label(course_key)
 
     if (settings.FEATURES.get('INDIVIDUAL_DUE_DATES') and access['instructor']):
         sections.insert(3, _section_extensions(course))
@@ -89,8 +105,8 @@ def instructor_dashboard_2(request, course_id):
         sections.append(_section_metrics(course, access))
 
     # Gate access to Ecommerce tab
-    if course_mode_has_price:
-        sections.append(_section_e_commerce(course, access))
+    if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
+        sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label))
 
     disable_buttons = not _is_small_course(course_key)
 
@@ -126,15 +142,13 @@ def instructor_dashboard_2(request, course_id):
 ## section_display_name will be used to generate link titles in the nav bar.
 
 
-def _section_e_commerce(course, access):
+def _section_e_commerce(course, access, paid_mode, coupons_enabled):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     coupons = Coupon.objects.filter(course_id=course_key).order_by('-is_active')
-    course_price = None
+    course_price = paid_mode.min_price
+
     total_amount = None
-    course_honor_mode = CourseMode.mode_for_course(course_key, 'honor')
-    if course_honor_mode and course_honor_mode.min_price > 0:
-        course_price = course_honor_mode.min_price
     if access['finance_admin']:
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(course_key)
 
@@ -160,6 +174,8 @@ def _section_e_commerce(course, access):
         'set_course_mode_url': reverse('set_course_mode_price', kwargs={'course_id': unicode(course_key)}),
         'download_coupon_codes_url': reverse('get_coupon_codes', kwargs={'course_id': unicode(course_key)}),
         'coupons': coupons,
+        'sales_admin': access['sales_admin'],
+        'coupons_enabled': coupons_enabled,
         'course_price': course_price,
         'total_amount': total_amount
     }
