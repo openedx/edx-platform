@@ -135,9 +135,9 @@ class GetItemTest(ItemTest):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
 
     @ddt.data(
-        (1, 26),
-        (2, 28),
-        (3, 30),
+        (1, 24),
+        (2, 24),
+        (3, 24),
     )
     @ddt.unpack
     def test_container_get_query_count(self, branching_factor, unit_queries,):
