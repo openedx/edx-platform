@@ -1596,6 +1596,13 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+################# Mobile URLS ##########################
+
+# These are URLs to the app store for mobile.
+MOBILE_STORE_URLS = {
+    'apple': '#',
+    'google': '#'
+}
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
