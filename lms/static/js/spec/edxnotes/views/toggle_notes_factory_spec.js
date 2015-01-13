@@ -32,6 +32,7 @@ define([
             this.toggleNotes = ToggleNotesFactory(true, '/test_url');
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
+            this.toggleMessage = $('.action-toggle-message');
         });
 
         afterEach(function () {
@@ -47,11 +48,15 @@ define([
             expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
             expect(this.button).toHaveAttr('aria-pressed', 'true');
+            expect(this.toggleMessage).not.toHaveClass('is-fleeting');
+            expect(this.toggleMessage).toContainText('Hiding notes');
 
             this.button.click();
             expect(this.label).toContainText('Show notes');
             expect(this.button).not.toHaveClass('is-active');
             expect(this.button).toHaveAttr('aria-pressed', 'false');
+            expect(this.toggleMessage).toHaveClass('is-fleeting');
+            expect(this.toggleMessage).toContainText('Hiding notes');
             expect(Annotator._instances).toHaveLength(0);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
@@ -63,6 +68,8 @@ define([
             expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
             expect(this.button).toHaveAttr('aria-pressed', 'true');
+            expect(this.toggleMessage).toHaveClass('is-fleeting');
+            expect(this.toggleMessage).toContainText('Showing notes');
             expect(Annotator._instances).toHaveLength(2);
 
             AjaxHelpers.expectJsonRequest(requests, 'PUT', '/test_url', {
