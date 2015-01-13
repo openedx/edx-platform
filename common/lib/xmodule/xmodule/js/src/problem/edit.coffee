@@ -1,3 +1,73 @@
+# TODO nparlante: rewrite this
+# The function of this file is a bit confusing because:
+#
+#    - it is a ‘coffee’ file designed to produce javascript source files when
+#      run through the coffee processor, and
+#
+#    - one of the primary functions performed by the code here is contained
+#      in the function ‘markdownToXml’ at the very end of the file—which
+#      Is just one large verbatim javascript function (notice the back tick
+#      just before the ‘function (markdown) {‘)
+#
+# So, most of the code resulting from processing of this file will be javascript
+# But the function is *already* essentially javascript which is simply passed
+# through.
+#
+# The function ‘markdownToXml’ is responsible for the parsing and
+# interpretation of a block of markdown text constructed by a course author
+# in the simple editor. The function transforms the input string from ‘markdown’
+# format to a hybrid XML/HTML format. The transformation is carried out in a
+# series of steps with regex replacements doing most of the work.
+#
+# There is an important subtlety here: each replacement pattern is applied
+# repeatedly to any substring of text which matches the search expression.
+# For example, suppose the input string includes three questions: a multiple
+# choice question, a text input question, another multiple choice question,
+# and a drop down question:
+#
+# 	Multiple Choice Question (markdown)
+# 	Text Input Question (markdown)
+# 	Multiple Choice Question (markdown)
+# 	Drop Down Question (markdown)
+#
+# The first regex replacement step looks for multiple choice questions in
+# the string and in this example two will be found. Both those substrings
+# will be transformed into XML/HTML resulting in a new string held in
+# variable ‘xml’ which will be passed on to the next stage of the
+# transformation process:
+#
+# 	Multiple Choice Question (XML/HTML)
+# 	Text Input Question (markdown)
+# 	Multiple Choice Question (XML/HTML)
+# 	Drop Down Question (markdown)
+#
+# Next, a search pattern designed to find checkbox questions is applied but,
+# in our example, nothing matches the pattern so no change is made to
+# the ‘xml’ string.
+#
+# Now the process repeated with a numeric input question pattern, but
+# none is found.
+#
+# A text input question pattern is applied and this time one question is
+# found and transformed to XML/HTML:
+#
+# 	Multiple Choice Question (XML/HTML)
+# 	Text Input Question (XML/HTML)
+# 	Multiple Choice Question (XML/HTML)
+# 	Drop Down Question (markdown)
+#
+# A drop down question pattern is applied and one question is found
+# and transformed:
+#
+# 	Multiple Choice Question (XML/HTML)
+# 	Text Input Question (XML/HTML)
+# 	Multiple Choice Question (XML/HTML)
+# 	Drop Down Question (XML/HTML)
+#
+# Finally, some miscellaneous cleanup is done, including wrapping
+# the entire transformed string in a root element <problem>..</problem> pair of tags.
+#
+
 class @MarkdownEditingDescriptor extends XModule.Descriptor
   # TODO really, these templates should come from or also feed the cheatsheet
   @multipleChoiceTemplate : "( ) incorrect\n( ) incorrect\n(x) correct\n"
@@ -7,6 +77,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
   @selectTemplate: "[[incorrect, (correct), incorrect]]\n"
   @headerTemplate: "Header\n=====\n"
   @explanationTemplate: "[explanation]\nShort explanation\n[explanation]\n"
+  @customLabel: ""
 
   constructor: (element) ->
     @element = element
@@ -166,7 +237,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       return revisedLines
     else
       return template
-
+ 
   @insertStringInput: (selectedText) ->
     return MarkdownEditingDescriptor.insertGenericInput(selectedText, '= ', '', MarkdownEditingDescriptor.stringInputTemplate)
 
@@ -189,31 +260,132 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
     else
       return template
 
-# We may wish to add insertHeader. Here is Tom's code.
-# function makeHeader() {
-#  var selection = simpleEditor.getSelection();
-#  var revisedSelection = selection + '\n';
-#  for(var i = 0; i < selection.length; i++) {
-#revisedSelection += '=';
-#  }
-#  simpleEditor.replaceSelection(revisedSelection);
-#}
-#
+
   @markdownToXml: (markdown)->
     toXml = `function (markdown) {
       var xml = markdown,
           i, splits, scriptFlag;
 
+      // fix DOS \r\n line endings to look like \n
+      xml = xml.replace(/\r\n/g, '\n');
+
       // replace headers
       xml = xml.replace(/(^.*?$)(?=\n\=\=+$)/gm, '<h1>$1</h1>');
       xml = xml.replace(/\n^\=\=+$/gm, '');
 
-      // group multiple choice answers
+
+      // Pull out demand hints,  || a hint ||
+      var demandhints = '';
+      xml = xml.replace(/(^\s*\|\|.*?\|\|\s*$\n?)+/gm, function(match) {  // $\n
+          var options = match.split('\n');
+          for (i = 0; i < options.length; i += 1) {
+              if(options[i].length > 0) {
+                  var inner = /\s*\|\|(.*?)\|\|/.exec(options[i]);
+                  demandhints += '  <hint>' + inner[1].trim() + '</hint>\n';
+               }
+           }
+           return '';
+      });
+      
+      // encode \n within {{ .. }}
+      // This is the one instance of {{ ... }} matching that permits \n
+      xml = xml.replace(/{{(.|\n)*?}}/gm, function(match) {
+          // TODO nparlante describe
+          return match.replace(/\r?\n( |\t)*/g, ' ');
+      });
+      
+
+      extractHint = function(text, detectParens) {
+          var curly = /\s*{{(.*?)}}/.exec(text);
+          var hint = '';
+          var label = '';
+          var parens = false;
+          var labelassign = '';
+          if (curly) {
+              text = text.replace(curly[0], '');
+              hint = curly[1].trim();
+              var labelmatch = /^(.*?)::/.exec(hint);
+              if (labelmatch) {
+                  hint = hint.replace(labelmatch[0], '').trim();
+                  label = labelmatch[1].trim();
+                  labelassign = ' label="' + label + '"';
+              }
+           }
+           if (detectParens) {
+             if (text.length >= 2 && text[0] == '(' && text[text.length-1] == ')') {
+                 text = text.substring(1, text.length-1)
+                 parens = true;
+              }
+           }
+           // undo the &lf; encoding of newlines which is just inside hints
+           //hint = hint.replace(/\&lf;/g', ' ').trim();  // TODO nparlante: could do this upstream
+           return {'nothint': text, 'hint': hint, 'label': label, 'parens': parens, 'labelassign': labelassign};
+      }
+
+
+      // replace selects
+      // [[ a, b, (c) ]]
+      // [[
+      //     a
+      //     b
+      //     c
+      //  ]]
+      // <optionresponse>
+      //  <optioninput>
+      //     <option  correct="True">AAA<optionhint  label="Good Job">Yes, multiple choice is the right answer.</optionhint> 
+      // Note: part of the option-response syntax looks like multiple-choice, so it must be processed first.   
+      xml = xml.replace(/\[\[((.|\n)+?)\]\]/g, function(match, group1) {
+          // decide if this is old style or new style
+          if (match.indexOf('\n') == -1) {  // OLD style
+              var options = group1.split(/\,\s*/g);
+              var optiontag = '  <optioninput options="(';
+              for (i = 0; i < options.length; i += 1) {
+                  optiontag += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
+              }
+              optiontag += ')" correct="';
+              var correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(group1);
+              if (correct) {
+                  optiontag += correct[1];
+              }
+              optiontag += '">';
+
+              return '\n<optionresponse>\n' + optiontag + '</optioninput>\n</optionresponse>\n\n';
+          }
+          
+          // new style          
+          var lines = group1.split('\n');
+          var optionlines = ''
+          for (i = 0; i < lines.length; i++) {
+              var line = lines[i].trim();
+              if (line.length > 0) {
+                  var textHint = extractHint(line, true);
+                  var correctstr = ' correct="' + (textHint.parens?'True':'False') + '"';
+                  var hintstr = '';
+                  if (textHint.hint) {
+                      var label = textHint.label;
+                      if (label) {
+                          label = ' label="' + label + '"';
+                      }
+                      
+                      hintstr = ' <optionhint' + label + '>' + textHint.hint + '</optionhint>';
+                  }
+                  optionlines += '    <option' + correctstr + '>' + textHint.nothint + hintstr + '</option>\n'
+               }
+           }
+          
+          return '\n<optionresponse>\n  <optioninput>\n' + optionlines + '  </optioninput>\n</optionresponse>\n\n';
+      });
+
+      //_____________________________________________________________________
+      //
+      // multiple choice questions
+      //
       xml = xml.replace(/(^\s*\(.{0,3}\).*?$\n*)+/gm, function(match, p) {
         var choices = '';
         var shuffle = false;
         var options = match.split('\n');
         for(var i = 0; i < options.length; i++) {
+          options[i] = options[i].trim();                   // trim off leading/trailing whitespace
           if(options[i].length > 0) {
             var value = options[i].split(/^\s*\(.{0,3}\)\s*/)[1];
             var inparens = /^\s*\((.{0,3})\)\s*/.exec(options[i])[1];
@@ -224,6 +396,12 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
             }
             if(/!/.test(inparens)) {
               shuffle = true;
+            }
+
+            var hint = extractHint(value);
+            if (hint.hint) {
+              value = hint.nothint;
+              value = value + ' <choicehint' + hint.labelassign + '>' + hint.hint + '</choicehint>';
             }
             choices += '    <choice correct="' + correct + '"' + fixed + '>' + value + '</choice>\n';
           }
@@ -241,26 +419,66 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
       });
 
       // group check answers
-      xml = xml.replace(/(^\s*\[.?\].*?$\n*)+/gm, function(match) {
+      // [.] with {{...}} lines mixed in
+      xml = xml.replace(/(^\s*((\[.?\])|({{.*?}})).*?$\n*)+/gm, function(match) {
           var groupString = '<choiceresponse>\n',
               options, value, correct;
 
           groupString += '  <checkboxgroup direction="vertical">\n';
           options = match.split('\n');
+          
+          endHints = '';  // save these up to emit at the end
 
           for (i = 0; i < options.length; i += 1) {
               if(options[i].length > 0) {
+                  // detect the {{ ((A*B)) ...}} case first
+                  // emits: <booleanhint value="A*B">AB hint</booleanhint>
+                                    
+                  var abhint = /^\s*{{\s*\(\((.*?)\)\)(.*?)}}/.exec(options[i]);
+                  if (abhint) {
+                  		// lone case of hint text processing outside of extractHint, since syntax here is unique
+											var hintbody = abhint[2];
+											hintbody = hintbody.replace('&lf;', '\n').trim()                      
+                      endHints += '    <booleanhint value="' + abhint[1].trim() +'">' + hintbody + '</booleanhint>\n';
+                      continue;  // bail
+                   }
+              
+              
                   value = options[i].split(/^\s*\[.?\]\s*/)[1];
                   correct = /^\s*\[x\]/i.test(options[i]);
-                  groupString += '    <choice correct="' + correct + '">' + value + '</choice>\n';
+                  hints = '';
+                  //  {{ selected: You’re right that apple is a fruit. }, {unselected: Remember that apple is also a fruit.}}
+                  var hint = extractHint(value);
+                  if (hint.hint) {
+                      var inner = '{' + hint.hint + '}';  // parsing is easier if we put outer { } back
+                      var select = /{\s*(s|selected):((.|\n)*?)}/i.exec(inner);  // include \n since we are downstream of extractHint()
+                      // checkbox choicehints get their own line, since there can be two of them
+                      // <choicehint selected="true">You’re right that apple is a fruit.</choicehint>
+                      if (select) {
+                          hints += '\n      <choicehint selected="true">' + select[2].trim() + '</choicehint>';
+                      }
+                      var select = /{\s*(u|unselected):((.|\n)*?)}/i.exec(inner);
+                      if (select) {
+                          hints += '\n      <choicehint selected="false">' + select[2].trim() + '</choicehint>';
+                      }
+                      
+                      // Blank out the original text only if the specific "selected" syntax is found
+                      // That way, if the user types it wrong, at least they can see it's not processed.
+                      if (hints) {
+                          value = hint.nothint;  
+                      }                   
+                  }
+                  groupString += '    <choice correct="' + correct + '">' + value + hints +'</choice>\n';
               }
           }
 
+          groupString += endHints;
           groupString += '  </checkboxgroup>\n';
           groupString += '</choiceresponse>\n\n';
 
           return groupString;
       });
+
 
       // replace string and numerical
       xml = xml.replace(/(^\=\s*(.*?$)(\n*or\=\s*(.*?$))*)+/gm, function(match, p) {
@@ -270,11 +488,19 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
               processNumericalResponse = function (value) {
                   var params, answer, string;
 
+                  var textHint = extractHint(value);
+                  var hintLine = '';
+                  if (textHint.hint) {
+                    value = textHint.nothint;
+                    hintLine = '  <correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>\n'
+                  }
+                  
                   if (_.contains([ '[', '(' ], value[0]) && _.contains([ ']', ')' ], value[value.length-1]) ) {
                     // [5, 7) or (5, 7), or (1.2345 * (2+3), 7*4 ]  - range tolerance case
                     // = (5*2)*3 should not be used as range tolerance
                     string = '<numericalresponse answer="' + value +  '">\n';
                     string += '  <formulaequationinput />\n';
+                    string += hintLine;
                     string += '</numericalresponse>\n\n';
                     return string;
                   }
@@ -296,6 +522,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
                   }
 
                   string += '  <formulaequationinput />\n';
+                  string += hintLine;
                   string += '</numericalresponse>\n\n';
 
                   return string;
@@ -303,15 +530,24 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
 
               processStringResponse = function (values) {
                   var firstAnswer = values.shift(), string;
-
-                  if (firstAnswer[0] === '|') { // this is regexp case
-                      string = '<stringresponse answer="' + firstAnswer.slice(1).trim() +  '" type="ci regexp" >\n';
-                  } else {
-                      string = '<stringresponse answer="' + firstAnswer +  '" type="ci" >\n';
+                  var typ = ' type="ci"';
+                  if (firstAnswer[0] == '|') { // this is regexp case
+                      typ = ' type="ci regexp"';
+                      firstAnswer = firstAnswer.slice(1).trim();
+                  }
+                  var textHint = extractHint(firstAnswer);
+                  string = '<stringresponse answer="' + textHint.nothint + '"' + typ +' >\n';
+                  if (textHint.hint) {
+                    string += '  <correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>\n';
                   }
 
                   for (i = 0; i < values.length; i += 1) {
-                      string += '  <additional_answer>' + values[i] + '</additional_answer>\n';
+                      var textHint = extractHint(values[i]);
+                      string += '  <additional_answer>' + textHint.nothint;
+                      if (textHint.hint) {
+                        string += '<correcthint' + textHint.labelassign + '>' + textHint.hint + '</correcthint>';
+                      }
+                      string += '</additional_answer>\n';
                   }
 
                   string +=  '  <textline size="20"/>\n</stringresponse>\n\n';
@@ -322,31 +558,7 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           return processNumericalResponse(answersList[0]) || processStringResponse(answersList);
       });
 
-      // replace selects
-      xml = xml.replace(/\[\[(.+?)\]\]/g, function(match, p) {
-          var selectString = '\n<optionresponse>\n',
-              correct, options;
-
-          selectString += '  <optioninput options="(';
-          options = p.split(/\,\s*/g);
-
-          for (i = 0; i < options.length; i += 1) {
-              selectString += "'" + options[i].replace(/(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g, '$1') + "'" + (i < options.length -1 ? ',' : '');
-          }
-
-          selectString += ')" correct="';
-          correct = /(?:^|,)\s*\((.*?)\)\s*(?:$|,)/g.exec(p);
-
-          if (correct) {
-              selectString += correct[1];
-          }
-
-          selectString += '"></optioninput>\n';
-          selectString += '</optionresponse>\n\n';
-
-          return selectString;
-      });
-
+      
       // replace explanations
       xml = xml.replace(/\[explanation\]\n?([^\]]*)\[\/?explanation\]/gmi, function(match, p1) {
           var selectString = '<solution>\n<div class="detailed-solution">\nExplanation\n\n' + p1 + '\n</div>\n</solution>';
@@ -407,13 +619,21 @@ class @MarkdownEditingDescriptor extends XModule.Descriptor
           }
       }
 
+      // TODO nparlante - this line is new
+      xml = xml.replace(/(<p>\s*<\/p>)/gm, '');      // remove empty paragraph tags
+
       xml = splits.join('');
 
       // rid white space
       xml = xml.replace(/\n\n\n/g, '\n');
 
-      // surround w/ problem tag
-      xml = '<problem>\n' + xml + '\n</problem>';
+      // if we've come across demand hints, wrap in <demandhint>
+      if (demandhints) {
+          demandhints = '\n<demandhint>\n' + demandhints + '</demandhint>';
+      }
+      
+      // make all elements descendants of a single problem element
+      xml = '<problem>\n' + xml + demandhints + '\n</problem>';
 
       return xml;
     }`

@@ -31,6 +31,8 @@ class @Problem
     @checkButtonCheckText = @checkButton.val()
     @checkButtonCheckingText = @checkButton.data('checking')
     @checkButton.click @check_fd
+
+    @$('div.action input.hint_button').click @hint_button
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
@@ -138,6 +140,7 @@ class @Problem
 
 
   render: (content) ->
+    debugger   # njp
     if content
       @el.attr({'aria-busy': 'true', 'aria-live': 'off', 'aria-atomic': 'false'})
       @el.html(content)
@@ -149,6 +152,7 @@ class @Problem
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
         @el.html(response.html)
+        ##debugger  # njp  - check seems to not hit this one
         JavascriptLoader.executeModuleScripts @el, () =>
           @setupInputTypes()
           @bind()
@@ -305,6 +309,7 @@ class @Problem
       switch response.success
         when 'incorrect', 'correct'
           window.SR.readElts($(response.contents).find('.status'))
+          ##debugger  # njp
           @render(response.contents)
           @updateProgress response
           if @el.hasClass 'showed'
@@ -696,3 +701,20 @@ class @Problem
       if @has_response
         @enableCheckButton true
     window.setTimeout(enableCheckButton, 750)
+
+  hint_button: =>
+    next_hint_index = -1
+    problemId = this.element_id
+    for problemElement in document.getElementsByClassName('problems-wrapper')
+      for pAttribute in problemElement.attributes
+        if pAttribute.name == 'id'
+          if pAttribute.value == problemId
+            hintButtonElements = problemElement.getElementsByClassName("hint_button")
+            for hbAttribute in hintButtonElements[0].attributes
+              if hbAttribute.name == 'next_hint_index'
+                next_hint_index = hbAttribute.value
+                break
+            break
+
+    $.postWithPrefix "#{@url}/hint_button", next_hint_index: next_hint_index, input_id: @id,(response) =>
+        @render(response.contents)

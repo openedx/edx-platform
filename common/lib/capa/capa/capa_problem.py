@@ -162,6 +162,8 @@ class LoncapaProblem(object):
         # parse problem XML file into an element tree
         self.tree = etree.XML(problem_text)
 
+        self.make_compatible(self.tree)
+
         # handle any <include file="foo"> tags
         self._process_includes()
 
@@ -190,6 +192,24 @@ class LoncapaProblem(object):
                 response.late_transforms(self)
 
         self.extracted_tree = self._extract_html(self.tree)
+
+    def make_compatible(self, tree):
+        """
+        adjust the xml at load-time with in-place editing <more here>
+        """
+        # #1 additional_answer compatibility move
+        # old:    <additional_answer>ANSWER</additional_answer>
+        # convert to
+        # new:    <additional_answer answer="ANSWER">OPTIONAL-HINT</addional_answer>
+        # the new format is canonical from here on out, but by this conversion we support
+        # the old format
+        additionals = tree.xpath('//stringresponse/additional_answer')
+        for additional in additionals:
+            answer = additional.get('answer')
+            text = additional.text
+            if not answer and text:  # trigger of old->new conversion
+                additional.set('answer', text)
+                additional.text = ''
 
     def do_reset(self):
         """

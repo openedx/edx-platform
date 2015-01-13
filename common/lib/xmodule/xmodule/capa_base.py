@@ -9,6 +9,7 @@ import os
 import traceback
 import struct
 import sys
+import re
 
 # We don't want to force a dependency on datadog, so make the import conditional
 try:
@@ -207,7 +208,7 @@ class CapaFields(object):
              "This key is granted for exclusive use by this course for the specified duration. "
              "Please do not share the API key with other courses and notify MathWorks immediately "
              "if you believe the key is exposed or compromised. To obtain a key for your course, "
-             "or to report and issue, please contact moocsupport@mathworks.com",
+             "or to report an issue, please contact moocsupport@mathworks.com",
         scope=Scope.settings
     )
 
@@ -216,7 +217,6 @@ class CapaMixin(CapaFields):
     """
         Core logic for Capa Problem, which can be used by XModules or XBlocks.
     """
-
     def __init__(self, *args, **kwargs):
         super(CapaMixin, self).__init__(*args, **kwargs)
 
@@ -600,13 +600,24 @@ class CapaMixin(CapaFields):
 
         return html
 
-    def get_problem_html(self, encapsulate=True):
+    def insert_hint_div(self, hint_text, html):
+        """
+        Insert the given hint_text into the html, wrapped in a div.
+        Looks for a special hidden marker which is replaced with the hint div.
+        """
+        # this marker is in problem.html template
+        marker = '<div hidden class="problem_hint"></div>'
+        hint_div = '<div class="problem_hint">' + hint_text + '</div>'
+        return html.replace(marker_pattern, hint_div, 1)
+
+    def get_problem_html(self, encapsulate=True, hint_index=None):
         """
         Return html for the problem.
-
-        Adds check, reset, save buttons as necessary based on the problem config and state.
+        Displays check, reset, save, and hint buttons as necessary.
+        encapsulate:         True -- embed the html in a problem <div>
+        hint_index: if not None, this is the index of the next demand hint
+        to show.
         """
-
         try:
             html = self.lcp.get_html()
 
@@ -614,6 +625,7 @@ class CapaMixin(CapaFields):
         # then generate an error message instead.
         except Exception as err:  # pylint: disable=broad-except
             html = self.handle_problem_html_error(err)
+
 
         # The convention is to pass the name of the check button if we want
         # to show a check button, and False otherwise This works because
@@ -632,6 +644,17 @@ class CapaMixin(CapaFields):
             'weight': self.weight,
         }
 
+        # Handle demand hints
+        demand_hints = self.lcp.tree.xpath("//problem/demandhint/hint")
+        show_hint_button = len(demand_hints) > 0
+        hint_text = ''
+        if hint_index == None:
+            hint_index = 0  # bootstrap case, the client will start at 0
+        else:
+            hint_element = demand_hints[hint_index]
+            hint_text = hint_element.text.strip()
+            hint_index = (hint_index + 1) % len(demand_hints)
+
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
@@ -642,9 +665,16 @@ class CapaMixin(CapaFields):
             'answer_available': self.answer_available(),
             'attempts_used': self.attempts,
             'attempts_allowed': self.max_attempts,
+            'show_hint_button': show_hint_button,
+            'next_hint_index': hint_index,
         }
 
         html = self.runtime.render_template('problem.html', context)
+        
+        html = self.remove_extra_tags(html)
+
+        if hint_text:
+            html = self.insert_hint_div(hint_text, html)
 
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
@@ -661,6 +691,52 @@ class CapaMixin(CapaFields):
             html = self.runtime.replace_jump_to_id_urls(html)
 
         return html
+
+    def _strip_element(self, element_name, html):
+        """
+        Using a bit of regex magic, strip out of an html string an entire XML element. How this
+        works is a bit obscure but it does work. Suppose our html has this element in it somewhere:
+                    <foo/>
+                    <demandhint>
+                        <hint> blah blah </hint>
+                    </demandhint>
+                    <bar/>
+        will be reduced to this:
+                    <foo/>
+                    <bar/>
+        when this funtion is called with element_name = 'demandhint'
+        :param element_name: the name of the element to excise
+        :param html:         the string representation of the XML to operate on
+        :return:             a potentially modified string representation of the XML
+        """
+        html = re.sub(r'</' + element_name + '>', '~', html)
+        html = re.sub(r'<' + element_name + '[^~]+~', '', html)
+        return html
+
+    def remove_extra_tags(self, html):
+        """
+        The capa xml includes many tags such as <additional_answer> or <demandhint> which are not
+        meant to be part of the client html. We strip them all and return the resulting html.
+        """
+        tags = ['demandhint', 'choicehint', 'optionhint', 'stringhint', 'numerichint', 'optionhint',
+                'correcthint', 'regexphint', 'additional_answer', 'stringequalhint', 'compoundhint',
+                'stringequalhint']
+        for tag in tags:
+            html = re.sub(r'<%s>.*?</%s>' % (tag, tag), '', html)
+        # Note: could probably speed this up by calling sub() once with a big regex
+        # vs. simply calling sub() many times as we have here.
+        return html
+
+    def hint_button(self, data):
+        """
+        Hint button handler, returns new html using the next_hint_index from the client.
+        """
+        hint_index = int(data['next_hint_index'])
+        html = self.get_problem_html(encapsulate=False, hint_index=hint_index)
+        return {
+            'success': True,
+            'contents': html,
+        }
 
     def is_past_due(self):
         """
@@ -1003,6 +1079,8 @@ class CapaMixin(CapaFields):
                 }
 
         try:
+            #from nose.tools import set_trace
+            #set_trace()
             correct_map = self.lcp.grade_answers(answers)
             self.attempts = self.attempts + 1
             self.lcp.done = True
