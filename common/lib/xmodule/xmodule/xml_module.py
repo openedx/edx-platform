@@ -129,7 +129,8 @@ class XmlDescriptor(XModuleDescriptor):
                          # VS[compat] -- remove the below attrs once everything is in the CMS
                          'course', 'org', 'url_name', 'filename',
                          # Used for storing xml attributes between import and export, for roundtrips
-                         'xml_attributes')
+                         'xml_attributes',
+                         )
 
     metadata_to_export_to_policy = ('discussion_topics', 'checklists')
 
