@@ -98,8 +98,7 @@ define([
                 errorHolder = view.$('.wrapper-msg');
             view.showErrorMessage('<p>error message is here</p>');
             expect(errorHolder).not.toHaveClass('is-hidden');
-            expect(errorHolder.find('.msg')).toBeFocused();
-            expect(errorHolder.find('.copy')).toContainText('<p>error message is here</p>');
+            expect(errorHolder.find('.copy')).toContainHtml('<p>error message is here</p>');
 
             view.hideErrorMessage();
             expect(errorHolder).toHaveClass('is-hidden');

@@ -154,7 +154,7 @@ define([
             expect(requests).toHaveLength(0);
             assertBoxIsEnabled(this.searchBox);
             expect(this.searchBox.options.error).toHaveBeenCalledWith(
-                'Please enter a term in the search field.',
+                'Please enter a term in the <a href="#search-notes-input"> search field</a>.',
                 '   '
             );
         });
