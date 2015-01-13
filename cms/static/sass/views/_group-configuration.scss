@@ -507,6 +507,10 @@
       margin-top: ($baseline*0.75);
       padding: ($baseline/2) $baseline;
 
+      &.is-hidden {
+        display: none;
+      }
+
       .icon {
         display: inline-block;
         vertical-align: middle;

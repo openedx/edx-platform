@@ -1360,7 +1360,7 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            should_show_experiment_groups = has_course_enabled_content_experiments(course)
+            should_show_experiment_groups = are_content_experiments_enabled(course)
             if should_show_experiment_groups:
                 experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
             else:
@@ -1453,11 +1453,9 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             return JsonResponse(status=204)
 
 
-def has_course_enabled_content_experiments(course):
+def are_content_experiments_enabled(course):
     """
-    Returns True if Studio should show the "Experiment Group
-    Configurations" section on the "Group Configurations" page for the
-    specified course.
+    Returns True if content experiments have been enabled for the course.
     """
     return (
         SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and

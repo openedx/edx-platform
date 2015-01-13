@@ -2,7 +2,6 @@
  * A generic list view class.
  *
  * Expects the following properties to be overriden:
- * - emptyTemplateName (string): Name of an underscore template to
  *   render when the collection is empty.
  * - createItemView (function): Create and return an item view for a
  *   model in the collection.
@@ -23,72 +22,58 @@ define([
         },
 
         initialize: function() {
-            this.emptyTemplate = this.loadTemplate(this.emptyTemplateName);
             this.listenTo(this.collection, 'add', this.addNewItemView);
             this.listenTo(this.collection, 'remove', this.onRemoveItem);
-            this.template = _.template([
-                '<button class="action action-add">',
-                '<i class="icon fa fa-plus"></i><%= interpolate(gettext(\'New %(item_type)s\'), {item_type: itemCategoryDisplayName}, true) %>',
-                '</button>'
-            ].join('\n'));
+            this.template = this.loadTemplate('list');
 
             // Don't render the add button when editing a form
             this.listenTo(this.collection, 'change:editing', this.toggleAddButton);
             this.listenTo(this.collection, 'add', this.toggleAddButton);
-            this.listenTo(this.collection, 'remove', this.renderAddButton);
+            this.listenTo(this.collection, 'remove', this.toggleAddButton);
         },
 
-        render: function() {
-            if (this.collection.length === 0) {
-                this.$el.html(this.emptyTemplate());
-            } else {
-                var frag = document.createDocumentFragment();
+        render: function(model) {
+            this.$el.html(this.template({
+                itemCategoryDisplayName: this.itemCategoryDisplayName,
+                length: this.collection.length,
+                isEditing: model && model.get('editing')
+            }));
 
-                this.collection.each(function(model) {
-                    frag.appendChild(this.createItemView({model: model}).render().el);
-                }, this);
-
-                this.$el.html([frag]);
-                this.renderAddButton();
-            }
+            this.collection.each(function(model) {
+                this.$('.content-groups').append(this.createItemView({model: model}).render().el);
+            }, this);
 
             return this;
         },
 
-        removeAddButton: function() {
-            var addItemElement = this.$('.action-add');
-            if (addItemElement.length) {
-                addItemElement.remove();
-            }
-        },
-
-        renderAddButton: function() {
-            this.removeAddButton();
+        hideOrShowAddButton: function(shouldShow) {
+            var addButtonCss = '.action-add';
             if (this.collection.length) {
-                this.$el.append(this.template({
-                    itemCategory: this.itemCategory,
-                    itemCategoryDisplayName: this.itemCategoryDisplayName
-                }));
+                if (shouldShow) {
+                    this.$(addButtonCss).removeClass('is-hidden');
+                } else {
+                    this.$(addButtonCss).addClass('is-hidden');
+                }
             }
         },
 
         toggleAddButton: function(model) {
-            if (model.get('editing')) {
-                this.removeAddButton();
+            if (model.get('editing') && this.collection.contains(model)) {
+                this.hideOrShowAddButton(false);
             } else {
-                this.renderAddButton();
+                this.hideOrShowAddButton(true);
             }
         },
 
         addNewItemView: function (model) {
             var view = this.createItemView({model: model});
 
-            // If items already exist, just append one new. Otherwise, overwrite
-            // no-content message.
+            // If items already exist, just append one new.
+            // Otherwise re-render the empty list HTML.
             if (this.collection.length > 1) {
-                this.$el.append(view.render().el);
+                this.$('.content-groups').append(view.render().el);
             } else {
-                this.$el.html(view.render().el);
+                this.render();
             }
 
             view.$el.focus();
@@ -101,7 +86,7 @@ define([
 
         onRemoveItem: function () {
             if (this.collection.length === 0) {
-                this.$el.html(this.emptyTemplate());
+                this.render();
             }
         }
     });

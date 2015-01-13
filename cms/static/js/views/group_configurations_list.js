@@ -14,8 +14,6 @@ define([
 
         newModelOptions: {addDefaultGroups: true},
 
-        emptyTemplateName: 'no-group-configurations',
-
         // Translators: this refers to a collection of groups.
         itemCategoryDisplayName: gettext('group configuration'),
 

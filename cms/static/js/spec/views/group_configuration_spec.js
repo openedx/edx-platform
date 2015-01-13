@@ -88,7 +88,7 @@ define([
         delete window.course;
     });
 
-    describe('GroupConfigurationDetailsView, the details view for experiment group configurations', function() {
+    describe('Experiment group configurations details view', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('group-configuration-details', true);
 
@@ -257,7 +257,7 @@ define([
         });
     });
 
-    describe('GroupConfigurationEditorView, the editor view for experiment group configurations', function() {
+    describe('Experiment group configurations editor view', function() {
 
         var setValuesToInputs = function (view, values) {
             _.each(values, function (value, selector) {
@@ -488,12 +488,12 @@ define([
         });
     });
 
-    describe('GroupConfigurationsListView, the list view for experiment group configurations', function() {
+    describe('Experiment group configurations list view', function() {
         var emptyMessage = 'You have not created any group configurations yet.';
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['no-group-configurations', 'group-configuration-editor', 'group-edit']
+                ['group-configuration-editor', 'group-edit', 'list']
             );
 
             this.model = new GroupConfigurationModel({ id: 0 });
@@ -534,7 +534,7 @@ define([
         });
     });
 
-    describe('GroupConfigurationItemView, the controller view for experiment group configurations', function() {
+    describe('Experiment group configurations controller view', function() {
         var clickDeleteItem;
 
         beforeEach(function() {
@@ -552,7 +552,7 @@ define([
 
         clickDeleteItem = function (view, promptSpy) {
             view.$('.delete').click();
-            ViewHelpers.verifyPromptShowing(promptSpy, /Delete this Group Configuration/);
+            ViewHelpers.verifyPromptShowing(promptSpy, /Delete this group configuration/);
             ViewHelpers.confirmPrompt(promptSpy);
             ViewHelpers.verifyPromptHidden(promptSpy);
         };
@@ -603,7 +603,7 @@ define([
         });
     });
 
-    describe('ExperimentGroupEditView, the editor view for groups within experiment group configurations', function() {
+    describe('Experiment group configurations group editor view', function() {
         beforeEach(function() {
             TemplateHelpers.installTemplate('group-edit', true);
 
@@ -632,7 +632,7 @@ define([
         });
     });
 
-    describe('ContentGroupListView, the list view for content groups', function() {
+    describe('Content groups list view', function() {
         var newGroupCss = '.new-button',
             addGroupCss = '.action-add',
             inputCss = '.group-configuration-name-input',
@@ -706,7 +706,7 @@ define([
             if (expectEditing) {
                 expect(view.$(scopedGroupSelector(index, '.group-configuration-edit'))).toExist();
                 expect(view.$(newGroupCss)).not.toExist();
-                expect(view.$(addGroupCss)).not.toExist();
+                expect(view.$(addGroupCss)).toHaveClass('is-hidden');
             } else {
                 expect(view.$('.group-configuration-edit')).not.toExist();
                 if (view.collection.length === 0) {
@@ -714,7 +714,7 @@ define([
                     expect(view.$(addGroupCss)).not.toExist();
                 } else {
                     expect(view.$(newGroupCss)).not.toExist();
-                    expect(view.$(addGroupCss)).toExist();
+                    expect(view.$(addGroupCss)).not.toHaveClass('is-hidden');
                 }
             }
         };
@@ -748,7 +748,7 @@ define([
 
         beforeEach(function() {
             TemplateHelpers.installTemplates(
-                ['no-content-groups', 'content-group-editor', 'content-group-details']
+                ['content-group-editor', 'content-group-details', 'list']
             );
         });
 

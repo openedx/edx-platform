@@ -12,8 +12,6 @@ define([
 
         className: 'group-configurations-list',
 
-        emptyTemplateName: 'no-content-groups',
-
         // Translators: This refers to a content group that can be linked to a student cohort.
         itemCategoryDisplayName: gettext('content group'),
 
