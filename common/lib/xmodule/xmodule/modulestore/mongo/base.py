@@ -215,7 +215,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         if (
             self.modulestore.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred
-            and usage_id.category in DIRECT_ONLY_CATEGORIES
+            and usage_id.category not in DIRECT_ONLY_CATEGORIES
         ):
             try:
                 block = super(CachingDescriptorSystem, self).get_block(as_draft(usage_id))

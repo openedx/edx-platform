@@ -660,8 +660,9 @@ def _import_course_draft(
 
                         # remove these after pulling them out as they reference the source
                         # course and cause other confusion
-                        for attr in ['parent_url', 'index_in_children_list']:
-                            del xml.attrib[attr]
+#                         if hasattr(xml, 'attrib'):
+#                             for attr in ['parent_url', 'index_in_children_list']:
+#                                 del xml.attrib[attr]
                         draft = draft_node_constructor(
                             module=descriptor, url=draft_url, parent_url=parent_url, index=index
                         )
