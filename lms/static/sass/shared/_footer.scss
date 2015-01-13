@@ -429,4 +429,32 @@ $edx-footer-bg-color: rgb(252,252,252);
       }
     }
   }
+
+  // App links
+  // --------------------
+  .footer-mobile-apps {
+    padding-top: 20px;
+
+    .mobile-app-wrapper {
+      margin: 0 0 10px 0;
+    }
+
+    a {
+      display: inline-block;
+
+      &:hover {
+        border: none;
+      }
+    }
+
+    .app-store {
+      height: auto;
+      width: 129px;
+    }
+
+    .google-play {
+      height: auto;
+      width: 129px;
+    }
+  }
 }

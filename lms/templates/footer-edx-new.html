@@ -94,6 +94,22 @@
           <span class="copy">${_("Google+")}</span>
         </a>
       </div>
+
+      % if settings.FEATURES.get('ENABLE_FOOTER_MOBILE_APP_LINKS'):
+      <div class="footer-mobile-apps">
+        <h2 class="footer-nav-title">${_("Mobile Apps")}</h2>
+        <div class="mobile-app-wrapper">
+          <a href="${settings.MOBILE_STORE_URLS.get('apple', '#')}">
+            <img class="app-store" alt="${_("Apple app on Apple Store")}" src="${static.url('images/app/app_store_badge_135x40.svg')}">
+          </a>
+        </div>
+        <div class="mobile-app-wrapper">
+          <a href="${settings.MOBILE_STORE_URLS.get('google', '#')}">
+            <img class="google-play" alt="${_("Android app on Google Play")}" src="${static.url('images/app/google_play_badge_45.png')}">
+          </a>
+        </div>
+      </div>
+      % endif
     </div>
   </footer>
 </div>
