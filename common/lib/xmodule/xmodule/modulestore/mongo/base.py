@@ -209,6 +209,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.cached_modules = {}
 
     def get_block(self, usage_id):
+        """
+        Overrides the base impl to figure out if you want draft or published and then
+        to strip the revision if it got a draft
+        """
+        if (
+            self.modulestore.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred
+            and usage_id.category in DIRECT_ONLY_CATEGORIES
+        ):
+            try:
+                block = super(CachingDescriptorSystem, self).get_block(as_draft(usage_id))
+                return wrap_draft(block)
+            except ItemNotFoundError:
+                pass  # do the below
         block = super(CachingDescriptorSystem, self).get_block(usage_id)
         return wrap_draft(block)
 
@@ -221,7 +234,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if location in self.cached_modules:
             return self.cached_modules[location]
         json_data = self.module_data.get(location)
-        if json_data is None:
+        if json_data is None and location not in self.module_data:
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
