@@ -12,9 +12,11 @@
 
 <div class="container-paging-header"></div>
 
+<div>
 % for item in items:
     ${item['content']}
 % endfor
+</div>
 
 % if can_add:
     <div class="add-xblock-component new-component-item adding"></div>
