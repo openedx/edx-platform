@@ -310,8 +310,7 @@ class AccessTestCase(LoginEnrollmentTestCase):
         self.assertRedirects(
             response,
             reverse(
-                'about_course',
-                args=[unicode(course.id)]
+                'dashboard'
             )
         )
         self.assertEqual(response.status_code, 302)

@@ -772,7 +772,7 @@ def course_about(request, course_id):
         course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
     show_courseware_link = ((has_access(request.user, 'load', course) and
-                            has_access(request.user, 'load_with_prerequisites', course))
+                            has_access(request.user, 'view_courseware_with_prerequisites', course))
                             or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 

@@ -544,7 +544,7 @@ def dashboard(request):
 
     show_courseware_links_for = frozenset(
         course.id for course, _enrollment in course_enrollment_pairs
-        if has_access(request.user, 'load', course) and has_access(request.user, 'load_with_prerequisites', course)
+        if has_access(request.user, 'load', course) and has_access(request.user, 'view_courseware_with_prerequisites', course)
     )
 
     # Construct a dictionary of course mode information
