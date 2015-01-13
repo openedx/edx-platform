@@ -564,6 +564,13 @@ class TestSwitchActivePoc(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         PocMembershipFactory(poc=self.poc, student=self.user, active=active)
 
+    def revoke_poc_registration(self):
+        from ..models import PocMembership
+        membership = PocMembership.objects.filter(
+            poc=self.poc, student=self.user
+        )
+        membership.delete()
+
     def verify_active_poc(self, request, id=None):
         if id:
             id = str(id)
@@ -687,6 +694,22 @@ class TestSwitchActivePoc(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
         # we tried to select the poc it doesn't exist anymore, so we are
         # switched back to the mooc view
+        self.verify_active_poc(self.client)
+
+    def test_revoking_poc_membership_revokes_active_poc(self):
+        self.register_user_in_poc(active=True)
+        self.client.login(username=self.user.username, password="test")
+        # ensure poc is active in the request session
+        switch_url = reverse(
+            'switch_active_poc',
+            args=[self.course.id.to_deprecated_string(), self.poc.id]
+        )
+        self.client.get(switch_url)
+        self.verify_active_poc(self.client, self.poc.id)
+        # unenroll the user from the poc
+        self.revoke_poc_registration()
+        # request the course root and verify that the poc is not active
+        self.client.get(self.target_url)
         self.verify_active_poc(self.client)
 
 

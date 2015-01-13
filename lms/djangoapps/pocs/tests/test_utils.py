@@ -544,5 +544,5 @@ class TestUserPocList(ModuleStoreTestCase):
         # all parts of the poc url are present
         for part in url_parts:
             self.assertTrue(part in this_membership['poc_url'])
-        actual_name = self.get_course_title()
-        self.assertTrue(actual_name in this_membership['poc_name'])
+        actual_name = self.poc.display_name
+        self.assertEqual(actual_name, this_membership['poc_name'])
