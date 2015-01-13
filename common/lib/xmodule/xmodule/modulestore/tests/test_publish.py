@@ -32,7 +32,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             with check_mongo_calls(3, 2):
                 self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', 'runid', split=False)
 
-            with check_mongo_calls(4, 2):
+            with check_mongo_calls(3, 2):
                 self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', 'runid', split=False)
             # For each vertical (2) created:
             #   - load draft
@@ -41,7 +41,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             #   - load parent
             #   - get ancestors
             #   - load inheritable data
-            with check_mongo_calls(15, 6):
+            with check_mongo_calls(14, 6):
                 self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', split=False)
                 self._create_item('vertical', 'Vert2', {}, {'display_name': 'Vertical 2'}, 'chapter', 'Chapter1', split=False)
             # For each (4) item created
@@ -50,7 +50,7 @@ class TestPublish(SplitWMongoCourseBoostrapper):
             #   - compute what is parent
             #   - load draft parent again & compute its parent chain up to course
             # count for updates increased to 16 b/c of edit_info updating
-            with check_mongo_calls(36, 16):
+            with check_mongo_calls(34, 16):
                 self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', split=False)
                 self._create_item(
                     'discussion', 'Discussion1',
