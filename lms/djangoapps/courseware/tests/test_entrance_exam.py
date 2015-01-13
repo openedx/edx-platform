@@ -423,6 +423,7 @@ class EntranceExamTestCases(LoginEnrollmentTestCase, ModuleStoreTestCase):
         # hit skip entrance exam api in instructor app
         instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=instructor.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
         response = self.client.post(url, {
             'unique_student_identifier': self.request.user.email,

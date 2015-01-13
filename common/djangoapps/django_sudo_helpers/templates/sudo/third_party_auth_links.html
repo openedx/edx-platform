@@ -1,0 +1,27 @@
+{% load i18n third_party_auth_links %}
+<script type="text/javascript">
+    function thirdPartySignin(event, url) {
+      event.preventDefault();
+      window.location.href = url;
+    }
+</script>
+{% if has_enabled_account %}
+    <span class="deco-divider">
+        {# Translators: this is the last choice of a number of choices of how to log in to the site. #}
+        <span class="copy">{% trans "or" %}</span>
+    </span>
+{% endif %}
+
+<div class="form-actions form-third-party-auth">
+
+{% for enabled in providers %}
+    {% if enabled.has_account %}
+        <button type="submit" class="button button-primary button-{{enabled.provider_id}} login-{{enabled.provider_id}}" onclick="thirdPartySignin(event, '{{pipeline_url|get_pipeline_url:enabled.provider_id}}');" ><span aria-hidden="true" class="icon fa {{enabled.icon_class}}"></span>
+            {# Translators: provider_name is the name of an external, third-party user authentication provider (like Google, Facebook or LinkedIn). #}
+            {% blocktrans with enabled.name as provider_name %}
+            Sign in with {{provider_name}}
+            {% endblocktrans %}
+        </button>
+    {% endif %}
+{% endfor %}
+</div>

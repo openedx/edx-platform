@@ -31,6 +31,10 @@ def run():
     if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
         enable_third_party_auth()
 
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO'):
+        from lms.envs.common import apply_django_sudo_settings
+        apply_django_sudo_settings(settings)
+
     django.setup()
 
     autostartup()

@@ -47,9 +47,10 @@ class TestEmailErrors(ModuleStoreTestCase):
     def setUp(self):
         super(TestEmailErrors, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        self.course = CourseFactory.create(display_name=course_title)
+        self.course = CourseFactory.create(display_name=course_title, run="1T2015")
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
 
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")

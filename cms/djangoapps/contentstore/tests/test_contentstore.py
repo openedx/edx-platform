@@ -1504,6 +1504,7 @@ class ContentStoreTest(ContentStoreTestCase, XssTestMixin):
         resp = self._show_course_overview(course_key)
         self.assertEqual(resp.status_code, 200)
         self.assertContains(resp, 'Chapter 2')
+        self.grant_sudo_access(unicode(course_key), self.user_password)
 
         # go to various pages
         test_get_html('import_handler')

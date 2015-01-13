@@ -11,6 +11,7 @@ from ..pages.studio.settings_group_configurations import GroupConfigurationsPage
 from ..pages.studio.auto_auth import AutoAuthPage as StudioAutoAuthPage
 from ..fixtures.course import XBlockFixtureDesc
 from ..fixtures import LMS_BASE_URL
+from .helpers import get_sudo_access
 from ..pages.studio.component_editor import ComponentVisibilityEditorView
 from ..pages.lms.instructor_dashboard import InstructorDashboardPage
 from ..pages.lms.courseware import CoursewarePage
@@ -54,8 +55,12 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         ).visit()
 
         # Start logged in as the staff user.
+        self.instructor_password = 'test'
         StudioAutoAuthPage(
-            self.browser, username=self.staff_user["username"], email=self.staff_user["email"]
+            self.browser,
+            username=self.staff_user["username"],
+            email=self.staff_user["email"],
+            password=self.instructor_password
         ).visit()
 
     def populate_course_fixture(self, course_fixture):
@@ -138,6 +143,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         Each cohort is assigned one student.
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        get_sudo_access(self.browser, instructor_dashboard_page, self.instructor_password)
         instructor_dashboard_page.visit()
         cohort_management_page = instructor_dashboard_page.select_cohort_management()
 

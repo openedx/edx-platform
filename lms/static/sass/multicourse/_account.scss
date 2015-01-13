@@ -158,7 +158,7 @@
 }
 
 // shared
-.login, .register, .passwordreset, #forgot-password-modal #password-reset {
+.login, .register, .passwordreset, .sudo, #forgot-password-modal #password-reset {
 
   // reset - horrible, but necessary
   p, ol, ul, h1, h2, h3, h4, h5, h6, label, input, textarea {
@@ -753,5 +753,30 @@
     border: none;
     border-bottom: 3px solid shade($red, 10%);
     background: tint($red,95%);
+  }
+}
+
+.sudo {
+  margin: 0 auto;
+  max-width: 480px;
+  padding: 50px;
+
+  .deco-divider {
+    border-top: ($baseline/5) solid $white;
+
+    .copy {
+      background: $light-gray1;
+    }
+  }
+
+  h2 {
+    text-align: center;
+  }
+
+  .errorlist {
+    border-left: 3px solid $error-color;
+    padding: 10px 15px;
+    background-color: $gray-l4;
+    list-style-type: none;
   }
 }

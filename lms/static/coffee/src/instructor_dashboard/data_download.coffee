@@ -85,13 +85,13 @@ class DataDownload
     @$problem_grade_report_csv_btn = @$section.find("input[name='problem-grade-report']'")
 
     # response areas
-    @$download                        = @$section.find '.data-download-container'
-    @$download_display_text           = @$download.find '.data-display-text'
+    @$download = @$section.find '.data-download-container'
+    @$download_display_text = @$download.find '.data-display-text'
     @$download_request_response_error = @$download.find '.request-response-error'
-    @$reports                         = @$section.find '.reports-download-container'
-    @$download_display_table          = @$reports.find '.profile-data-display-table'
-    @$reports_request_response        = @$reports.find '.request-response'
-    @$reports_request_response_error  = @$reports.find '.request-response-error'
+    @$reports = @$section.find '.reports-download-container'
+    @$download_display_table = @$reports.find '.profile-data-display-table'
+    @$reports_request_response = @$reports.find '.request-response'
+    @$reports_request_response_error = @$reports.find '.request-response-error'
 
     @report_downloads = new (ReportDownloads()) @$section
     @instructor_tasks = new (PendingInstructorTasks()) @$section
@@ -154,12 +154,14 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: (std_ajax_err) =>
+        error: std_ajax_err((=>
           @$reports_request_response_error.text gettext("Error generating student profile information. Please try again.")
-          $(".msg-error").css({"display":"block"})
+          $(".msg-error").css({"display": "block"})
+        ), true)
+
         success: (data) =>
           @$reports_request_response.text data['status']
-          $(".msg-confirm").css({"display":"block"})
+          $(".msg-confirm").css({"display": "block"})
 
     @$list_studs_btn.click (e) =>
       url = @$list_studs_btn.data 'endpoint'
@@ -172,9 +174,11 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: (std_ajax_err) =>
+        error: std_ajax_err((=>
           @clear_display()
           @$download_request_response_error.text gettext("Error getting student list.")
+        ), true)
+
         success: (data) =>
           @clear_display()
 
@@ -191,7 +195,7 @@ class DataDownload
           $table_placeholder = $ '<div/>', class: 'slickgrid'
           @$download_display_table.append $table_placeholder
           grid = new Slick.Grid($table_placeholder, grid_data, columns, options)
-          # grid.autosizeColumns()
+    # grid.autosizeColumns()
 
     @$list_problem_responses_csv_btn.click (e) =>
       @clear_display()
@@ -216,12 +220,14 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: (std_ajax_err) =>
+        error: std_ajax_err((=>
           @$reports_request_response_error.text gettext("Error generating list of students who may enroll. Please try again.")
-          $(".msg-error").css({"display":"block"})
+          $(".msg-error").css({"display": "block"})
+        ), true)
+
         success: (data) =>
           @$reports_request_response.text data['status']
-          $(".msg-confirm").css({"display":"block"})
+          $(".msg-confirm").css({"display": "block"})
 
     @$grade_config_btn.click (e) =>
       url = @$grade_config_btn.data 'endpoint'
@@ -229,9 +235,10 @@ class DataDownload
       $.ajax
         dataType: 'json'
         url: url
-        error: (std_ajax_err) =>
+        error: std_ajax_err((=>
           @clear_display()
           @$download_request_response_error.text gettext("Error retrieving grading configuration.")
+        ), true)
         success: (data) =>
           @clear_display()
           @$download_display_text.html data['grading_config_summary']
@@ -243,20 +250,22 @@ class DataDownload
       @onClickGradeDownload @$problem_grade_report_csv_btn, gettext("Error generating problem grade report. Please try again.")
 
   onClickGradeDownload: (button, errorMessage) ->
-      # Clear any CSS styling from the request-response areas
-      #$(".msg-confirm").css({"display":"none"})
-      #$(".msg-error").css({"display":"none"})
-      @clear_display()
-      url = button.data 'endpoint'
-      $.ajax
-        dataType: 'json'
-        url: url
-        error: (std_ajax_err) =>
-          @$reports_request_response_error.text errorMessage
-          $(".msg-error").css({"display":"block"})
-        success: (data) =>
-          @$reports_request_response.text data['status']
-          $(".msg-confirm").css({"display":"block"})
+    # Clear any CSS styling from the request-response areas
+    #$(".msg-confirm").css({"display":"none"})
+    #$(".msg-error").css({"display":"none"})
+    @clear_display()
+    url = button.data 'endpoint'
+    $.ajax
+      dataType: 'json'
+      url: url
+      error: std_ajax_err((=>
+          @.$reports_request_response_error.text gettext('Error generating student profile information. Please try again.')
+          $('.msg-error').css 'display': 'block'
+        ), true
+      )
+      success: (data) =>
+        @$reports_request_response.text data['status']
+        $(".msg-confirm").css({"display": "block"})
 
   # handler for when the section title is clicked.
   onClickTitle: ->
@@ -278,8 +287,8 @@ class DataDownload
     @$reports_request_response.empty()
     @$reports_request_response_error.empty()
     # Clear any CSS styling from the request-response areas
-    $(".msg-confirm").css({"display":"none"})
-    $(".msg-error").css({"display":"none"})
+    $(".msg-confirm").css({"display": "none"})
+    $(".msg-error").css({"display": "none"})
 
 # export for use
 # create parent namespaces if they do not already exist.

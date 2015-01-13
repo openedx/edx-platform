@@ -35,6 +35,7 @@ from courseware.field_overrides import disable_overrides
 from courseware.grades import iterate_grades_for
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
+from django_sudo_helpers.decorators import sudo_required
 from edxmako.shortcuts import render_to_response
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.djangoapps.content.course_overviews.models import CourseOverview
@@ -111,6 +112,7 @@ def coach_dashboard(view):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def dashboard(request, course, ccx=None):
     """
     Display the CCX Coach Dashboard.
@@ -156,6 +158,7 @@ def dashboard(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def create_ccx(request, course, ccx=None):
     """
     Create a new CCX
@@ -214,6 +217,7 @@ def create_ccx(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def save_ccx(request, course, ccx=None):
     """
     Save changes to CCX.
@@ -304,6 +308,7 @@ def save_ccx(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def set_grading_policy(request, course, ccx=None):
     """
     Set grading policy for the CCX.
@@ -419,6 +424,7 @@ def get_ccx_schedule(course, ccx):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def ccx_schedule(request, course, ccx=None):  # pylint: disable=unused-argument
     """
     get json representation of ccx schedule
@@ -518,6 +524,7 @@ def _ccx_students_enrrolling_center(action, identifiers, email_students, course_
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def ccx_invite(request, course, ccx=None):
     """
     Invite users to new ccx
@@ -541,6 +548,7 @@ def ccx_invite(request, course, ccx=None):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def ccx_student_management(request, course, ccx=None):
     """
     Manage the enrollment of individual students in a CCX
@@ -588,6 +596,7 @@ def prep_course_for_grading(course, request):
 @transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def ccx_gradebook(request, course, ccx=None):
     """
     Show the gradebook for this CCX.
@@ -616,6 +625,7 @@ def ccx_gradebook(request, course, ccx=None):
 @transaction.non_atomic_requests
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+@sudo_required
 def ccx_grades_csv(request, course, ccx=None):
     """
     Download grades as CSV.

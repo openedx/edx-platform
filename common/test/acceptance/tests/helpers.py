@@ -27,7 +27,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
 
-
+from ..pages.common.sudo_page import SudoPage
 from ..pages.common import BASE_URL
 
 
@@ -749,3 +749,36 @@ class TestWithSearchIndexMixin(object):
     def _cleanup_index_file(self):
         """ Removes search index backing file """
         remove_file(self.TEST_INDEX_FILENAME)
+
+
+def get_sudo_access(browser, redirect_page, password):
+    """
+    Get sudo access for instructor or staff user.
+    """
+    sudo_password_page = SudoPage(browser, redirect_page)
+    sudo_password_page.visit()
+    sudo_password_page.submit_sudo_password_and_get_access(password)
+
+
+def _link_dummy_account(account_page):
+    """
+    Go to Account Settings page and link the user's account to the Dummy provider.
+    """
+    account_page.visit()
+    field_id = "auth-oa2-dummy"
+    account_page.wait_for_field(field_id)
+    assert "Link" == account_page.link_title_for_link_field(field_id)
+    account_page.click_on_link_in_link_field(field_id)
+    account_page.wait_for_link_title_for_link_field(field_id, "Unlink")
+
+
+def _unlink_dummy_account(account_page):
+    """
+    Verify that the 'Dummy' third party auth provider is linked, then unlink it.
+    """
+    account_page.visit()
+    field_id = "auth-oa2-dummy"
+    account_page.wait_for_field(field_id)
+    assert "Unlink" == account_page.link_title_for_link_field(field_id)
+    account_page.click_on_link_in_link_field(field_id)
+    account_page.wait_for_message(field_id, "Successfully unlinked")

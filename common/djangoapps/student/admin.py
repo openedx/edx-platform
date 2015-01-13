@@ -1,7 +1,7 @@
 """ Django admin pages for student app """
 from django import forms
 from django.contrib.auth.models import User
-from ratelimitbackend import admin
+from django.contrib import admin
 from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey

@@ -1,3 +1,6 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.template.defaultfilters import escapejs %>
+
 <%namespace name='static' file='/static_content.html'/>
 <%!
 from django.utils.translation import ugettext as _
@@ -67,15 +70,7 @@ ${block_content}
         <input type="text" id="sd_fu_${location.name | h}" placeholder="${user.username}"/>
       </div>
       <div data-location="${location | h}" data-location-name="${location.name | h}">
-        [
-        <a href="#" class="staff-debug-reset">${_('Reset Student Attempts')}</a>
-        % if has_instructor_access:
-        |
-        <a href="#" class="staff-debug-sdelete">${_('Delete Student State')}</a>
-        |
-        <a href="#" class="staff-debug-rescore">${_('Rescore Student Submission')}</a>
-        % endif
-        ]
+        [<a href="#" class="staff-debug-grade-adjustments">${_("Modify Student's State for Problem")}</a>]
       </div>
       <div id="result_${location.name | h}"/>
     </div>

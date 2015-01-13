@@ -14,7 +14,7 @@ emailStudents = false
 class MemberListWidget
   # create a MemberListWidget `$container` is a jquery object to embody.
   # `params` holds template parameters. `params` should look like the defaults below.
-  constructor: (@$container, params={}) ->
+  constructor: (@$container, params = {}) ->
     params = _.defaults params,
       title: "Member List"
       info: """
@@ -120,11 +120,11 @@ class AuthListWidget extends MemberListWidget
         $revoke_btn = $ _.template('<div class="revoke"><i class="icon fa fa-times-circle" aria-hidden="true"></i> <%= label %></div>', {label: label_trans}),
           class: 'revoke'
         $revoke_btn.click =>
-            @modify_member_access member.email, 'revoke', (error) =>
-              # abort on error
-              return @show_errors error unless error is null
-              @clear_errors()
-              @reload_list()
+          @modify_member_access member.email, 'revoke', (error) =>
+            # abort on error
+            return @show_errors error unless error is null
+            @clear_errors()
+            @reload_list()
         @add_row [member.username, member.email, $revoke_btn]
 
   # clear error display
@@ -139,11 +139,13 @@ class AuthListWidget extends MemberListWidget
     $.ajax
       dataType: 'json'
       url: @list_endpoint
-      data: rolename: @rolename
+      data:
+        rolename: @rolename
       success: (data) => cb? null, data[@rolename]
-      error: std_ajax_err =>
-        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+      error: std_ajax_err((=>
+        # Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".
         cb? gettext("Error fetching list for role") + " '#{@rolename}'"
+      ), true)
 
   # send ajax request to modify access
   # (add or remove them from the list)
@@ -158,7 +160,9 @@ class AuthListWidget extends MemberListWidget
         rolename: @rolename
         action: action
       success: (data) => @member_response data
-      error: std_ajax_err => cb? gettext "Error changing user's permissions."
+      error: std_ajax_err((=>
+        cb? gettext "Error changing user's permissions."
+      ), true)
 
   member_response: (data) ->
     @clear_errors()
@@ -204,15 +208,15 @@ class @AutoEnrollmentViaCsv
         event.preventDefault()
         data = new FormData(event.currentTarget)
         $.ajax
-            dataType: 'json'
-            type: 'POST'
-            url: event.currentTarget.action
-            data: data
-            processData: false
-            contentType: false
-            success: (data) =>
-              @processing = false
-              @display_response data
+          dataType: 'json'
+          type: 'POST'
+          url: event.currentTarget.action
+          data: data
+          processData: false
+          contentType: false
+          success: (data) =>
+            @processing = false
+            @display_response data
 
         return false
 
@@ -246,7 +250,7 @@ class @AutoEnrollmentViaCsv
         if student_result.is_general_error
           details.push student_result.response
         else
-          response_message = student_result.username + '  ('+ student_result.email + '):  ' + '   (' + student_result.response + ')'
+          response_message = student_result.username + '  (' + student_result.email + '):  ' + '   (' + student_result.response + ')'
           details.push response_message
 
       @$results.append @render_notification_view type, title, message, details
@@ -261,23 +265,23 @@ class @AutoEnrollmentViaCsv
   render_notification_view: (type, title, message, details) ->
     notification_model = new NotificationModel()
     notification_model.set({
-          'type': type,
-          'title': title,
-          'message': message,
-          'details': details,
+      'type': type,
+      'title': title,
+      'message': message,
+      'details': details,
     });
-    view = new NotificationView(model:notification_model);
+    view = new NotificationView(model: notification_model);
     view.render()
     return view.$el.html()
 
 class BetaTesterBulkAddition
   constructor: (@$container) ->
     # gather elements
-    @$identifier_input       = @$container.find("textarea[name='student-ids-for-beta']")
-    @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
+    @$identifier_input = @$container.find("textarea[name='student-ids-for-beta']")
+    @$btn_beta_testers = @$container.find("input[name='beta-testers']")
+    @$checkbox_autoenroll = @$container.find("input[name='auto-enroll']")
     @$checkbox_emailstudents = @$container.find("input[name='email-students-beta']")
-    @$task_response          = @$container.find(".request-response")
+    @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
     # click handlers
@@ -296,7 +300,10 @@ class BetaTesterBulkAddition
         url: @$btn_beta_testers.data 'endpoint'
         data: send_data
         success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error gettext "Error adding/removing users as beta testers."
+        error: std_ajax_err((=>
+          @fail_with_error gettext "Error adding/removing users as beta testers."
+        ), true)
+
 
   # clear the input text field
   clear_input: ->
@@ -365,13 +372,13 @@ class BetaTesterBulkAddition
 class BatchEnrollment
   constructor: (@$container) ->
     # gather elements
-    @$identifier_input       = @$container.find("textarea[name='student-ids']")
-    @$enrollment_button      = @$container.find(".enrollment-button")
-    @$is_course_white_label  = @$container.find("#is_course_white_label").val()
-    @$reason_field           = @$container.find("textarea[name='reason-field']")
-    @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
+    @$identifier_input = @$container.find("textarea[name='student-ids']")
+    @$enrollment_button = @$container.find(".enrollment-button")
+    @$is_course_white_label = @$container.find("#is_course_white_label").val()
+    @$reason_field = @$container.find("textarea[name='reason-field']")
+    @$checkbox_autoenroll = @$container.find("input[name='auto-enroll']")
     @$checkbox_emailstudents = @$container.find("input[name='email-students']")
-    @$task_response          = @$container.find(".request-response")
+    @$task_response = @$container.find(".request-response")
     @$request_response_error = @$container.find(".request-response-error")
 
     # attach click handler for enrollment buttons
@@ -395,8 +402,9 @@ class BatchEnrollment
         url: $(event.target).data 'endpoint'
         data: send_data
         success: (data) => @display_response data
-        error: std_ajax_err => @fail_with_error gettext "Error enrolling/unenrolling users."
-
+        error: std_ajax_err((=>
+          @fail_with_error gettext "Error enrolling/unenrolling users."
+        ), true)
 
   # clear the input text field
   clear_input: ->
@@ -478,7 +486,7 @@ class BatchEnrollment
         else
           allowed.push student_results
 
-      # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
+        # The instructor is trying to unenroll someone who is not enrolled or allowed to enroll; non-sensical action.
       else if data_from_server.action is 'unenroll' and not (student_results.before.enrollment) and not (student_results.before.allowed)
         notunenrolled.push student_results
 
@@ -572,11 +580,11 @@ class AuthList
   # rolename is the name of Role for forums for the forum endpoints
   constructor: (@$container, @rolename) ->
     # gather elements
-    @$display_table          = @$container.find('.auth-list-table')
+    @$display_table = @$container.find('.auth-list-table')
     @$request_response_error = @$container.find('.request-response-error')
-    @$add_section            = @$container.find('.auth-list-add')
-    @$allow_field             = @$add_section.find("input[name='email']")
-    @$allow_button            = @$add_section.find("input[name='allow']")
+    @$add_section = @$container.find('.auth-list-add')
+    @$allow_field = @$add_section.find("input[name='email']")
+    @$allow_button = @$add_section.find("input[name='allow']")
 
     # attach click handler
     @$allow_button.click =>
@@ -597,7 +605,7 @@ class AuthList
       options =
         enableCellNavigation: true
         enableColumnReorder: false
-        # autoHeight: true
+      # autoHeight: true
         forceFitColumns: true
 
       # this is a hack to put a button/link in a slick grid cell
@@ -618,10 +626,10 @@ class AuthList
         field: 'first_name'
         name: 'First Name'
       ,
-      #   id: 'last_name'
-      #   field: 'last_name'
-      #   name: 'Last Name'
-      # ,
+        #   id: 'last_name'
+        #   field: 'last_name'
+        #   name: 'Last Name'
+        # ,
         id: 'revoke'
         field: 'revoke'
         name: 'Revoke'
@@ -646,9 +654,13 @@ class AuthList
     $.ajax
       dataType: 'json'
       url: @$display_table.data 'endpoint'
-      data: rolename: @rolename
+      data:
+        rolename: @rolename
       success: load_auth_list
-      error: std_ajax_err => @$request_response_error.text "Error fetching list for '#{@rolename}'"
+      error: std_ajax_err((=>
+        @$request_response_error.text "Error fetching list for '#{@rolename}'"
+      ), true)
+
 
 
   # slickgrid's layout collapses when rendered
@@ -670,8 +682,9 @@ class AuthList
         rolename: @rolename
         action: action
       success: (data) -> cb?(data)
-      error: std_ajax_err => @$request_response_error.text gettext "Error changing user's permissions."
-
+      error: std_ajax_err((=>
+        @$request_response_error.text gettext "Error changing user's permissions."
+      ), true)
 
 # Membership Section
 class Membership

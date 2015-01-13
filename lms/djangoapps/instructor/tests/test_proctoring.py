@@ -35,6 +35,7 @@ class TestProctoringDashboardViews(SharedModuleStoreTestCase):
         # Create instructor account
         self.instructor = AdminFactory.create()
         self.client.login(username=self.instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
 
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 

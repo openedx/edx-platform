@@ -19,10 +19,12 @@ find_and_assert = ($root, selector) ->
 #
 # wraps a `handler` function so that first
 # it prints basic error information to the console.
-@std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+@std_ajax_err = (handler, sudo_reload=false) -> (jqXHR, textStatus, errorThrown) ->
   console.warn """ajax error
                   textStatus: #{textStatus}
                   errorThrown: #{errorThrown}"""
+  if sudo_reload == true and jqXHR.status == 401
+    window.location.reload()
   handler.apply this, arguments
 
 
@@ -297,7 +299,10 @@ class @PendingInstructorTasks
           @$no_tasks_message.empty()
           @$no_tasks_message.append $('<p>').text gettext("No tasks currently running.")
           @$no_tasks_message.show()
-      error: std_ajax_err => console.error "Error finding pending tasks to display"
+      error: std_ajax_err((=>
+          console.error "Error finding pending tasks to display"
+        ), true)
+          
     ### /Pending Instructor Tasks Section ####
 
 class KeywordValidator
