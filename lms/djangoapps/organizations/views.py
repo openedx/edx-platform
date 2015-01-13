@@ -36,23 +36,24 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
         response_data = {}
         grade_avg = 0
         grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
-        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True,
-                                                          user__courseenrollment__is_active=True)
+        org_user_grades = StudentGradebook.objects.filter(user__organizations=pk, user__is_active=True)
         courses_filter = request.QUERY_PARAMS.get('courses', None)
         courses = []
+        exclude_users = set()
         if courses_filter:
             upper_bound = getattr(settings, 'API_LOOKUP_UPPER_BOUND', 100)
             courses_filter = courses_filter.split(",")[:upper_bound]
             for course_string in courses_filter:
                 courses.append(get_course_key(course_string))
-            org_user_grades = org_user_grades.filter(course_id__in=courses,
-                                                     user__courseenrollment__course_id__in=courses)
+
+            # fill exclude users
+            for course_key in courses:
+                exclude_users.union(get_aggregate_exclusion_user_ids(course_key))
+
+            org_user_grades = org_user_grades.filter(course_id__in=courses).exclude(user_id__in=exclude_users)
 
         users_grade_sum = org_user_grades.aggregate(Sum('grade'))
         if users_grade_sum['grade__sum']:
-            exclude_users = set()
-            for course_key in courses:
-                exclude_users.union(get_aggregate_exclusion_user_ids(course_key))
             users_enrolled_qs = CourseEnrollment.objects.filter(user__is_active=True, is_active=True,
                                                                 user__organizations=pk)\
                 .exclude(user_id__in=exclude_users)
@@ -61,12 +62,20 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
             users_enrolled = users_enrolled_qs.aggregate(Count('user', distinct=True))
             total_users = users_enrolled['user__count']
             if total_users:
-                grade_avg = float('{0:.3f}'.format(float(users_grade_sum['grade__sum']) / total_users))
+                # in order to compute avg across organization we need course of courses org has
+                total_courses_in_org = len(courses)
+                if not courses:
+                    org_courses = users_enrolled_qs.aggregate(Count('course_id', distinct=True))
+                    total_courses_in_org = org_courses['course_id__count']
+                grade_avg = float('{0:.3f}'.format(
+                    float(users_grade_sum['grade__sum']) / total_users / total_courses_in_org
+                ))
         response_data['users_grade_average'] = grade_avg
 
         users_grade_complete_count = org_user_grades\
-            .filter(proforma_grade__lte=F('grade') + grade_complete_match_range, proforma_grade__gt=0).count()
-        response_data['users_grade_complete_count'] = users_grade_complete_count
+            .filter(proforma_grade__lte=F('grade') + grade_complete_match_range, proforma_grade__gt=0)\
+            .aggregate(Count('user', distinct=True))
+        response_data['users_grade_complete_count'] = users_grade_complete_count['user__count'] or 0
 
         return Response(response_data, status=status.HTTP_200_OK)
 
