@@ -116,6 +116,8 @@ class TestUploadtranscripts(Basetranscripts):
         """))
         self.bad_name_srt_file.seek(0)
 
+        self.ufeff_srt_file = tempfile.NamedTemporaryFile(suffix='.srt')
+
     def test_success_video_module_source_subs_uploading(self):
         self.item.data = textwrap.dedent("""
             <video youtube="">
@@ -296,12 +298,52 @@ class TestUploadtranscripts(Basetranscripts):
         self.assertEqual(resp.status_code, 400)
         self.assertEqual(json.loads(resp.content).get('status'), 'Undefined file extension.')
 
+    def test_subs_uploading_with_byte_order_mark(self):
+        """
+        Test uploading subs containing BOM(Byte Order Mark), e.g. U+FEFF
+        """
+        filedate = textwrap.dedent("""
+            1
+            00:00:10,500 --> 00:00:13,000
+            Test ufeff characters
+
+            2
+            00:00:15,000 --> 00:00:18,000
+            At the left we can see...
+        """).encode('utf-8-sig')
+
+        # Verify that ufeff character is in filedata.
+        self.assertIn("ufeff", filedate)
+        self.ufeff_srt_file.write(filedate)
+        self.ufeff_srt_file.seek(0)
+
+        link = reverse('upload_transcripts')
+        filename = os.path.splitext(os.path.basename(self.ufeff_srt_file.name))[0]
+        resp = self.client.post(link, {
+            'locator': self.video_usage_key,
+            'transcript-file': self.ufeff_srt_file,
+            'video_list': json.dumps([{
+                'type': 'html5',
+                'video': filename,
+                'mode': 'mp4',
+            }])
+        })
+        self.assertEqual(resp.status_code, 200)
+
+        content_location = StaticContent.compute_location(
+            self.course.id, 'subs_{0}.srt.sjson'.format(filename))
+        self.assertTrue(contentstore().find(content_location))
+
+        subs_text = json.loads(contentstore().find(content_location).data).get('text')
+        self.assertIn("Test ufeff characters", subs_text)
+
     def tearDown(self):
         super(TestUploadtranscripts, self).tearDown()
 
         self.good_srt_file.close()
         self.bad_data_srt_file.close()
         self.bad_name_srt_file.close()
+        self.ufeff_srt_file.close()
 
 
 class TestDownloadtranscripts(Basetranscripts):
