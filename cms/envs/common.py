@@ -122,6 +122,12 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
+
+    # Enable support for content libraries. Note that content libraries are
+    # only supported in courses using split mongo. Change the setting
+    # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
+    # and libraries created with split.
+    'ENABLE_CONTENT_LIBRARIES': False,
 }
 ENABLE_JASMINE = False
 
