@@ -16,8 +16,7 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
 )
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
-, wrap_draft)
+    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT, wrap_draft)
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
