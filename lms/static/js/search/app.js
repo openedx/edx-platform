@@ -7,27 +7,24 @@ var edx = edx || {};
     edx.search = edx.search || {};
 
     edx.search.App = function (course_id) {
-
         var self = this;
 
-        self.router = new edx.search.Router();
-        self.form = new edx.search.Form();
-        self.collection = new edx.search.Collection([], { course_id: course_id });
-        self.results = new edx.search.List({ collection: self.collection });
+        this.router = new edx.search.Router();
+        this.form = new edx.search.Form();
+        this.collection = new edx.search.Collection([], { course_id: course_id });
+        this.results = new edx.search.List({ collection: this.collection });
 
-        self.form.on('search', self.results.showLoadingMessage, self.results);
-        self.form.on('search', self.collection.performSearch, self.collection);
-        self.form.on('search', function (term) {
+        this.form.on('search', this.results.showLoadingMessage, this.results);
+        this.form.on('search', this.collection.performSearch, this.collection);
+        this.form.on('search', function (term) {
             self.router.navigate('search/' + term, { replace: true });
         });
-        self.form.on('clear', self.collection.cancelSearch, self.collection);
-        self.form.on('clear', self.results.clear, self.results);
-        self.form.on('clear', self.router.navigate, self.router);
+        this.form.on('clear', this.collection.cancelSearch, this.collection);
+        this.form.on('clear', this.results.clear, this.results);
+        this.form.on('clear', this.router.navigate, this.router);
 
-        self.results.on('next', self.collection.loadNextPage, self.collection);
-
-        self.router.on('route:search', self.form.doSearch, self.form);
-
+        this.results.on('next', this.collection.loadNextPage, this.collection);
+        this.router.on('route:search', this.form.doSearch, this.form);
     };
 
     var course_id = $('#search-content').attr('data-course-id');
