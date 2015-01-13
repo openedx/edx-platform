@@ -329,6 +329,9 @@ FEATURES = {
     # Separate the verification flow from the payment flow
     'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
 
+    # Show the mobile app links in the footer
+    'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
+
     # Whether an xBlock publishing a 'grade' event should be considered a 'progress' event as well
     'MARK_PROGRESS_ON_GRADING_EVENT': False,
 
@@ -1637,6 +1640,13 @@ MKTG_URL_LINK_MAP = {
     'WHAT_IS_VERIFIED_CERT': 'verified-certificate',
 }
 
+################# Mobile URLS ##########################
+
+# These are URLs to the app store for mobile.
+MOBILE_STORE_URLS = {
+    'apple': '#',
+    'google': '#'
+}
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
