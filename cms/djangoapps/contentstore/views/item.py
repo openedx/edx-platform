@@ -348,7 +348,7 @@ def xblock_container_handler(request, usage_key_string):
     """
     usage_key = usage_key_with_run(usage_key_string)
 
-    if not has_course_author_access(request.user, usage_key.course_key):
+    if not has_studio_read_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     response_format = request.REQUEST.get('format', 'html')
