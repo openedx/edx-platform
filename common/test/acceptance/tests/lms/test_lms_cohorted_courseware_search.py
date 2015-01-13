@@ -10,6 +10,7 @@ from ...pages.studio.overview import CourseOutlinePage
 from ...pages.lms.courseware_search import CoursewareSearchPage
 from ...pages.lms.staff_view import StaffPage
 from ...fixtures.course import XBlockFixtureDesc
+from ..helpers import get_sudo_access
 
 from nose.plugins.attrib import attr
 
@@ -81,13 +82,13 @@ class CoursewareSearchCohortTest(ContainerBase):
 
         self._studio_reindex()
 
-    def _auto_auth(self, username, email, staff):
+    def _auto_auth(self, username, email, staff, password='test'):
         """
         Logout and login with given credentials.
         """
         LogoutPage(self.browser).visit()
         StudioAutoAuthPage(self.browser, username=username, email=email,
-                           course_id=self.course_id, staff=staff).visit()
+                           course_id=self.course_id, staff=staff, password=password).visit()
 
     def _studio_reindex(self):
         """
@@ -191,7 +192,7 @@ class CoursewareSearchCohortTest(ContainerBase):
         Each cohort is assigned one student.
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
-        instructor_dashboard_page.visit()
+        get_sudo_access(self.browser, instructor_dashboard_page, 'test')
         cohort_management_page = instructor_dashboard_page.select_cohort_management()
 
         def add_cohort_with_student(cohort_name, content_group, student):

@@ -9,7 +9,7 @@ from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, 
 from student.models import (
     CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
 )
-from ratelimitbackend import admin
+from django.contrib import admin
 from student.roles import REGISTERED_ACCESS_ROLES
 
 from xmodule.modulestore.django import modulestore

@@ -36,6 +36,7 @@ class TestInstructorAPIEnrollmentEmailLocalization(SharedModuleStoreTestCase):
         self.instructor = InstructorFactory(course_key=self.course.id)
         set_user_preference(self.instructor, LANGUAGE_KEY, 'zh-cn')
         self.client.login(username=self.instructor.username, password='test')
+        self.grant_sudo_access(unicode(self.course.id), 'test')
 
         self.student = UserFactory.create()
         set_user_preference(self.student, LANGUAGE_KEY, 'fr')

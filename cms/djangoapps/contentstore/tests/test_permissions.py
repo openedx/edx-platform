@@ -22,10 +22,10 @@ class TestCourseAccess(ModuleStoreTestCase):
 
         Create a pool of users w/o granting them any permissions
         """
-        user_password = super(TestCourseAccess, self).setUp()
+        self.user_password = super(TestCourseAccess, self).setUp()
 
         self.client = AjaxEnabledTestClient()
-        self.client.login(username=self.user.username, password=user_password)
+        self.client.login(username=self.user.username, password=self.user_password)
 
         # create a course via the view handler which has a different strategy for permissions than the factory
         self.course_key = self.store.make_course_key('myu', 'mydept.mycourse', 'myrun')
@@ -93,6 +93,7 @@ class TestCourseAccess(ModuleStoreTestCase):
             user_by_role[role].append(user)
             self.assertTrue(auth.has_course_author_access(user, self.course_key), "{} does not have access".format(user))
 
+        self.grant_sudo_access(unicode(self.course_key), self.user_password)
         course_team_url = reverse_course_url('course_team_handler', self.course_key)
         response = self.client.get_html(course_team_url)
         for role in [CourseInstructorRole, CourseStaffRole]:  # Global and org-based roles don't appear on this page

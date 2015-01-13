@@ -34,6 +34,7 @@ from courseware.courses import get_course_by_id, get_studio_url
 from django_comment_client.utils import has_forum_access
 from django_comment_common.models import FORUM_ROLE_ADMINISTRATOR
 from student.models import CourseEnrollment
+from django_sudo_helpers.decorators import sudo_required
 from shoppingcart.models import Coupon, PaidCourseRegistration, CourseRegCodeItem
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
@@ -66,8 +67,33 @@ class InstructorDashboardTab(CourseTab):
         return bool(user and has_access(user, 'staff', course, course.id))
 
 
+def check_staff_or_404():
+    """
+    Decorator with argument that requires an access level of the requesting
+    user. If the requirement is not satisfied, returns an
+    Http404 (404).
+
+    Assumes that request is in args[0].
+    Assumes that course_id is in kwargs['course_id'].
+    """
+
+    def decorator(func):  # pylint: disable=missing-docstring
+        def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
+            request = args[0]
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
+            user_is_staff = has_access(request.user, "staff", course)
+            if user_is_staff:
+                return func(*args, **kwargs)
+            else:
+                raise Http404
+        return wrapped
+    return decorator
+
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@check_staff_or_404()
+@sudo_required
 def instructor_dashboard_2(request, course_id):
     """ Display the instructor dashboard for a course. """
     try:
@@ -87,16 +113,16 @@ def instructor_dashboard_2(request, course_id):
         'forum_admin': has_forum_access(request.user, course_key, FORUM_ROLE_ADMINISTRATOR),
     }
 
-    if not access['staff']:
-        raise Http404()
-
     is_white_label = CourseMode.is_white_label(course_key)
+
+    unique_student_identifier = request.GET.get("unique_student_identifier", "")
+    problem_to_reset = request.GET.get("problem_to_reset", "")
 
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access, is_white_label),
         _section_cohort_management(course, access),
-        _section_student_admin(course, access),
+        _section_student_admin(course, access, unique_student_identifier, problem_to_reset),
         _section_data_download(course, access),
     ]
 
@@ -441,10 +467,20 @@ def _is_small_course(course_key):
     return is_small_course
 
 
-def _section_student_admin(course, access):
+def _section_student_admin(course, access, unique_student_identifier, problem_to_reset):
     """ Provide data for the corresponding dashboard section """
     course_key = course.id
     is_small_course = _is_small_course(course_key)
+
+    problem_url = None
+    if problem_to_reset:
+        problem_url = reverse(
+            'jump_to',
+            kwargs={
+                'course_id': unicode(course_key),
+                'location': problem_to_reset
+            }
+        )
 
     section_data = {
         'section_key': 'student_admin',
@@ -468,6 +504,9 @@ def _section_student_admin(course, access):
         'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
                                                           kwargs={'course_id': unicode(course_key)}),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
+        'unique_student_identifier': unique_student_identifier,
+        'problem_to_reset': problem_to_reset,
+        'problem_url': problem_url,
     }
     return section_data
 

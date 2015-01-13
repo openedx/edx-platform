@@ -29,6 +29,7 @@ from opaque_keys.edx.keys import UsageKey
 
 from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
+from sudo.utils import revoke_sudo_privileges
 from models.settings.course_grading import CourseGradingModel
 
 __all__ = ['OPEN_ENDED_COMPONENT_TYPES',
@@ -163,6 +164,12 @@ def container_handler(request, usage_key_string):
         with modulestore().bulk_operations(usage_key.course_key):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
+
+                # Revoke sudo privileges from a request explicitly
+                region = unicode(course.id)
+                if request.is_sudo(region=region):
+                    revoke_sudo_privileges(request, region=region)
+
             except ItemNotFoundError:
                 return HttpResponseBadRequest()
 

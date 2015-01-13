@@ -39,17 +39,22 @@
 
 <div class="student-grade-container action-type-container">
   <h2>${_("Student-specific grade adjustment")}</h2>
+  %if section_data['problem_url']:
+    <div class="wrap-instructor-info" aria-hidden="true">
+      <a href="${ section_data['problem_url'] }" class="instructor-info-action">${_("Go Back To Problem")}</a>
+    </div>
+  %endif
   <div class="request-response-error"></div>
   <p>
   <label>
   ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
-  <input type="text" name="student-select-grade" placeholder="${_("Student Email or Username")}">
+  <input type="text" name="student-select-grade" value="${ section_data['unique_student_identifier'] }" placeholder="${_("Student Email or Username")}">
   </label>
   </p>
   <br>
 
   <label> ${_("Specify a problem in the course here with its complete location:")}
-  <input type="text" name="problem-select-single" placeholder="${_("Problem location")}">
+  <input type="text" name="problem-select-single" value="${ section_data['problem_to_reset'] }" placeholder="${_("Problem location")}">
   </label>
 
   ## Translators: A location (string of text) follows this sentence.

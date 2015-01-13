@@ -25,6 +25,7 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from unittest import TestCase
+from ..pages.common.sudo_page import SudoPage
 
 
 from ..pages.common import BASE_URL
@@ -683,3 +684,12 @@ class TestWithSearchIndexMixin(object):
     def _cleanup_index_file(self):
         """ Removes search index backing file """
         remove_file(self.TEST_INDEX_FILENAME)
+
+
+def get_sudo_access(browser, redirect_page, password):
+    """
+    Get sudo access for instructor or staff user.
+    """
+    sudo_password_page = SudoPage(browser, redirect_page)
+    sudo_password_page.visit()
+    sudo_password_page.submit_sudo_password_and_get_access(password)

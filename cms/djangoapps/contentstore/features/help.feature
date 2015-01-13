@@ -33,6 +33,7 @@ Feature: CMS.Help
         Then I should see online help for "grading"
 
         And I am viewing the course team settings
+        And I get sudo access with password "test"
         Then I should see online help for "course-team"
 
         And I select the Advanced Settings

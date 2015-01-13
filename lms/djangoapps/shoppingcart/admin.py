@@ -1,5 +1,5 @@
 """Django admin interface for the shopping cart models. """
-from ratelimitbackend import admin
+from django.contrib import admin
 from shoppingcart.models import (
     PaidCourseRegistrationAnnotation,
     Coupon,

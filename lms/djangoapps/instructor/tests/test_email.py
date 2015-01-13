@@ -40,6 +40,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(SharedModuleStoreTestCase):
         # Create instructor account
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), "test")
 
     # In order for bulk email to work, we must have both the ENABLE_INSTRUCTOR_EMAIL_FLAG
     # set to True and for the course to be Mongo-backed.

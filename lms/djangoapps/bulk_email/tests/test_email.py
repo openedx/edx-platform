@@ -53,7 +53,7 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(EmailSendFromDashboardTestCase, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
-        self.course = CourseFactory.create(display_name=course_title)
+        self.course = CourseFactory.create(display_name=course_title, run="1T2015")
 
         self.instructor = InstructorFactory(course_key=self.course.id)
 
@@ -75,6 +75,7 @@ class EmailSendFromDashboardTestCase(ModuleStoreTestCase):
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # Response loads the whole instructor dashboard, so no need to explicitly
         # navigate to a particular email section
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         response = self.client.get(self.url)
         email_section = '<div class="vert-left send-email" id="section-send-email">'
         # If this fails, it is likely because ENABLE_INSTRUCTOR_EMAIL is set to False

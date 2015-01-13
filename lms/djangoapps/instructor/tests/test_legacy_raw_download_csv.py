@@ -44,6 +44,7 @@ class TestRawGradeCSV(TestSubmittingProblems):
         """
         # Answer second problem correctly with 2nd user to expose bug
         self.login(self.instructor, self.password)
+        self.grant_sudo_access(unicode(self.course.id), self.password)
         resp = self.submit_question_answer('p2', {'2_1': 'Correct'})
         self.assertEqual(resp.status_code, 200)
 

@@ -9,6 +9,7 @@ define([
         describe('StaffDebugActions', function () {
             var location = 'i4x://edX/Open_DemoX/edx_demo_course/problem/test_loc';
             var locationName = 'test_loc';
+            var action = {location: location, locationName: locationName};
             var fixture_id = 'sd_fu_' + locationName;
             var fixture = $('<input>', { id: fixture_id, placeholder: "userman" });
             var escapableLocationName = 'test\.\*\+\?\^\:\$\{\}\(\)\|\]\[loc';
@@ -21,7 +22,11 @@ define([
             describe('get_url ', function () {
                 it('defines url to courseware ajax entry point', function () {
                     spyOn(StaffDebug, "get_current_url").andReturn("/courses/edX/Open_DemoX/edx_demo_course/courseware/stuff");
-                    expect(StaffDebug.get_url('rescore_problem')).toBe('/courses/edX/Open_DemoX/edx_demo_course/instructor/api/rescore_problem');
+                    $('body').append(fixture);
+                    var expected_url = '/courses/edX/Open_DemoX/edx_demo_course/instructor?unique_student_identifier=userman&problem_to_reset=' + encodeURIComponent(action.location);
+                    expect(StaffDebug.get_url(action)).toBe(expected_url);
+
+                    $('#' + fixture_id).remove();
                 });
             });
 
@@ -52,89 +57,18 @@ define([
                     $("input[id^='sd_fu_']").remove();
                 });
             });
-            describe('do_idash_action success', function () {
-                it('adds a success message to the results element after using an action', function () {
-                    $('body').append(escapableResultArea);
-                    var requests = AjaxHelpers.requests(this);
-                    var action = {
-                        locationName: esclocationName,
-                        success_msg: 'Successfully reset the attempts for user userman',
-                    };
-                    StaffDebug.do_idash_action(action);
-                    AjaxHelpers.respondWithJson(requests, action);
-                    expect($('#idash_msg').text()).toBe('Successfully reset the attempts for user userman');
-                    $('#result_' + locationName).remove();
-                });
-            });
-            describe('do_idash_action error', function () {
-                it('adds a failure message to the results element after using an action', function () {
-                    $('body').append(escapableResultArea);
-                    var requests = AjaxHelpers.requests(this);
-                    var action = {
-                        locationName: esclocationName,
-                        error_msg: 'Failed to reset attempts.',
-                    };
-                    StaffDebug.do_idash_action(action);
-                    AjaxHelpers.respondWithError(requests);
-                    expect($('#idash_msg').text()).toBe('Failed to reset attempts. ');
-                    $('#result_' + locationName).remove();
-                });
-            });                    
-            describe('reset', function () {
+            describe('student_grade_adjustemnts', function () {
                 it('makes an ajax call with the expected parameters', function () {
                     $('body').append(fixture);
 
-                    spyOn($, 'ajax');
-                    StaffDebug.reset(locationName, location);
+                    spyOn(StaffDebug, 'goto_student_admin');
 
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                        'problem_to_reset': location,
-                        'unique_student_identifier': 'userman',
-                        'delete_module': false
-                    });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                        '/instructor/api/reset_student_attempts'
-                    );
-                    $('#' + fixture_id).remove();
-                });
-            });
-            describe('sdelete', function () {
-                it('makes an ajax call with the expected parameters', function () {
-                    $('body').append(fixture);
+                    StaffDebug.student_grade_adjustemnts(locationName, location);
 
-                    spyOn($, 'ajax');
-                    StaffDebug.sdelete(locationName, location);
+                    var expected_url = get_url(action) + '#view-student_admin';
 
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                        'problem_to_reset': location,
-                        'unique_student_identifier': 'userman',
-                        'delete_module': true
-                    });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                        '/instructor/api/reset_student_attempts'
-                    );
+                    expect(StaffDebug.goto_student_admin).toHaveBeenCalledWith(expected_url);
 
-                    $('#' + fixture_id).remove();
-                });
-            });
-            describe('rescore', function () {
-                it('makes an ajax call with the expected parameters', function () {
-                    $('body').append(fixture);
-
-                    spyOn($, 'ajax');
-                    StaffDebug.rescore(locationName, location);
-
-                    expect($.ajax.mostRecentCall.args[0]['type']).toEqual('GET');
-                    expect($.ajax.mostRecentCall.args[0]['data']).toEqual({
-                        'problem_to_reset': location,
-                        'unique_student_identifier': 'userman',
-                        'delete_module': false
-                    });
-                    expect($.ajax.mostRecentCall.args[0]['url']).toEqual(
-                        '/instructor/api/rescore_problem'
-                    );
                     $('#' + fixture_id).remove();
                 });
             });
