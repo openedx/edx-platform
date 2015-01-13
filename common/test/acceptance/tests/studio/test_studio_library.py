@@ -148,6 +148,27 @@ class LibraryEditPageTest(StudioLibraryTest):
         add_component(self.lib_page, "problem", "Multiple Choice")
         self.assertTrue(self.lib_page.nav_disabled(position))
 
+    def test_delete_deletes_only_desired_block(self):
+        """
+        Scenario: Ensure that when deleting XBlock only desired XBlock is deleted
+        Given that I have a library in Studio with no XBlocks
+        And I create Blank Common Problem XBlock
+        And I create Checkboxes XBlock
+        When I delete Blank Problem XBlock
+        Then Checkboxes XBlock is not deleted
+        And Blank Common Problem XBlock is deleted
+        """
+        self.assertEqual(len(self.lib_page.xblocks), 0)
+        add_component(self.lib_page, "problem", "Blank Common Problem")
+        add_component(self.lib_page, "problem", "Checkboxes")
+        self.assertEqual(len(self.lib_page.xblocks), 2)
+        self.assertIn("Blank Common Problem", self.lib_page.xblocks[0].name)
+        self.assertIn("Checkboxes", self.lib_page.xblocks[1].name)
+        self.lib_page.click_delete_button(self.lib_page.xblocks[0].locator)
+        self.assertEqual(len(self.lib_page.xblocks), 1)
+        problem_block = self.lib_page.xblocks[0]
+        self.assertIn("Checkboxes", problem_block.name)
+
 
 @ddt
 class LibraryNavigationTest(StudioLibraryTest):
