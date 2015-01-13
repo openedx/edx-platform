@@ -81,31 +81,14 @@ class StaffDebugPage(PageObject):
     def is_browser_on_page(self):
         return self.q(css='section.staff-modal').present
 
-    def reset_attempts(self, user=None):
+    def click_student_grade_adjustments(self, user=None):
         """
         This clicks on the reset attempts link with an optionally
         specified user.
         """
         if user:
             self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-reset').click()
-
-    def delete_state(self, user=None):
-        """
-        This delete's a student's state for the problem
-        """
-        if user:
-            self.q(css='input[id^=sd_fu_]').fill(user)
-        self.q(css='section.staff-modal a.staff-debug-sdelete').click()
-
-    def rescore(self, user=None):
-        """
-        This clicks on the reset attempts link with an optionally
-        specified user.
-        """
-        if user:
-            self.q(css='input[id^=sd_fu_]').first.fill(user)
-        self.q(css='section.staff-modal a.staff-debug-rescore').click()
+        self.q(css='section.staff-modal a.staff-debug-grade-adjustments').click()
 
     @property
     def idash_msg(self):

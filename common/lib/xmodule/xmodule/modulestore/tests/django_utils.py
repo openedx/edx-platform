@@ -18,6 +18,7 @@ from request_cache.middleware import RequestCache
 from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from openedx.core.lib.tempdir import mkdtemp_clean
 
+from sudo.utils import region_name
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores, SignalHandler
@@ -216,7 +217,6 @@ TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
     store_order=[StoreConstructors.split, StoreConstructors.draft]
 )
 
-
 def clear_all_caches():
     """Clear all caches so that cache info doesn't leak across test cases."""
     # This will no longer be necessary when Django adds (in Django 1.10?):
@@ -227,7 +227,23 @@ def clear_all_caches():
     RequestCache().clear_request_cache()
 
 
-class SharedModuleStoreTestCase(TestCase):
+class DjangoSudoTestCase(TestCase):
+    """
+    Subclass for any test case that uses a django-sudo.
+    """
+
+    def grant_sudo_access(self, region, password):
+        """
+        Grant sudo access to staff or instructor user.
+        """
+        self.client.post(
+            '/sudo/?region={}'.format(region_name(region)),
+            {'password': password},
+            follow=True
+        )
+
+
+class SharedModuleStoreTestCase(DjangoSudoTestCase):
     """
     Subclass for any test case that uses a ModuleStore that can be shared
     between individual tests. This class ensures that the ModuleStore is cleaned
@@ -391,7 +407,7 @@ class SharedModuleStoreTestCase(TestCase):
         return wrapper
 
 
-class ModuleStoreTestCase(TestCase):
+class ModuleStoreTestCase(DjangoSudoTestCase):
     """
     Subclass for any test case that uses a ModuleStore.
     Ensures that the ModuleStore is cleaned before/after each test.

@@ -167,6 +167,7 @@ class TestAdminAccessCoachDashboard(CcxTestCase, LoginEnrollmentTestCase):
         """
         instructor = self.make_instructor()
         self.client.login(username=instructor.username, password="test")
+        self.grant_sudo_access(unicode(self.course.id), 'test')
         self.make_coach()
         ccx = self.make_ccx()
         url = reverse(
@@ -864,6 +865,7 @@ class TestCCXGrades(SharedModuleStoreTestCase, LoginEnrollmentTestCase):
         self.course = get_course_by_id(self.ccx_key, depth=None)
         setup_students_and_grades(self)
         self.client.login(username=coach.username, password="test")
+        self.grant_sudo_access(unicode(self._course.id), 'test')
         self.addCleanup(RequestCache.clear_request_cache)
 
     @patch('ccx.views.render_to_response', intercept_renderer)

@@ -103,6 +103,7 @@ AUTH_REDIRECT_KEY = 'next'
 AUTH_ENTRY_LOGIN = 'login'
 AUTH_ENTRY_REGISTER = 'register'
 AUTH_ENTRY_ACCOUNT_SETTINGS = 'account_settings'
+AUTH_ENTRY_SUDO = 'grant_sudo'
 
 # Entry modes into the authentication process by a remote API call (as opposed to a browser session).
 AUTH_ENTRY_LOGIN_API = 'login_api'
@@ -144,6 +145,7 @@ _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_ACCOUNT_SETTINGS,
     AUTH_ENTRY_LOGIN_API,
     AUTH_ENTRY_REGISTER_API,
+    AUTH_ENTRY_SUDO
 ] + AUTH_ENTRY_CUSTOM.keys())
 
 _DEFAULT_RANDOM_PASSWORD_LENGTH = 12

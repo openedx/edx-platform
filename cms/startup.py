@@ -32,6 +32,13 @@ def run():
     if settings.COMPREHENSIVE_THEME_DIR:
         enable_comprehensive_theme(settings.COMPREHENSIVE_THEME_DIR)
 
+    if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH', False):
+        enable_third_party_auth()
+
+    if settings.FEATURES.get('ENABLE_DJANGO_SUDO'):
+        from lms.envs.common import apply_django_sudo_settings
+        apply_django_sudo_settings(settings)
+
     django.setup()
 
     autostartup()
@@ -92,3 +99,14 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def enable_third_party_auth():
+    """
+    Enable the use of third_party_auth, which allows users to sign in to edX
+    using other identity providers. For configuration details, see
+    common/djangoapps/third_party_auth/settings.py.
+    """
+
+    from third_party_auth import settings as auth_settings
+    auth_settings.apply_settings(settings)

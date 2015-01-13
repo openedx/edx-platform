@@ -42,6 +42,8 @@ LOG_OVERRIDES = [
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
 
+SERVICE_VARIANT = os.environ.get('SERVICE_VARIANT', 'unittest')
+
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
 MONGO_HOST = os.environ.get('EDXAPP_TEST_MONGO_HOST', 'localhost')
@@ -576,3 +578,7 @@ JWT_AUTH.update({
 # better performant unit tests.
 from openedx.core.lib.block_structure.transformer_registry import TransformerRegistry
 TransformerRegistry.USE_PLUGIN_MANAGER = False
+
+######### Django-sudo ##########
+FEATURES['ENABLE_DJANGO_SUDO'] = True
+

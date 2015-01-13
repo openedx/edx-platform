@@ -1,7 +1,7 @@
 """
 Tests course_creators.admin.py.
 """
-
+from django.conf import settings
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.admin.sites import AdminSite
@@ -11,6 +11,7 @@ import mock
 from course_creators.admin import CourseCreatorAdmin
 from course_creators.models import CourseCreator
 from django.core import mail
+from sudo.utils import region_name
 from student.roles import CourseCreatorRole
 from student import auth
 
@@ -45,6 +46,17 @@ class CourseCreatorAdminTest(TestCase):
             "ENABLE_CREATOR_GROUP": True,
             "STUDIO_REQUEST_EMAIL": self.studio_request_email
         }
+
+    def grant_sudo_access(self, region, password):
+        """
+        Grant sudo access to staff or instructor user.
+        """
+        if settings.FEATURES.get('ENABLE_DJANGO_SUDO', False):
+            self.client.post(
+                '/sudo/?region={}'.format(region_name(region)),
+                {'password': password},
+                follow=True
+            )
 
     @mock.patch('course_creators.admin.render_to_string', mock.Mock(side_effect=mock_render_to_string, autospec=True))
     @mock.patch('django.contrib.auth.models.User.email_user')
@@ -161,6 +173,7 @@ class CourseCreatorAdminTest(TestCase):
         self.assertFalse(self.creator_admin.has_change_permission(self.request))
 
     def test_rate_limit_login(self):
+        self.grant_sudo_access('django_admin', 'foo')
         with mock.patch.dict('django.conf.settings.FEATURES', {'ENABLE_CREATOR_GROUP': True}):
             post_params = {'username': self.user.username, 'password': 'wrong_password'}
             # try logging in 30 times, the default limit in the number of failed
