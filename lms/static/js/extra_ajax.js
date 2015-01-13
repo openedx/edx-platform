@@ -34,7 +34,6 @@ $(function(){
         var name = $("#name");
         if (cedula.length!=10){
             senescyt.val("");
-            name.val("");
             return
         }
         $.ajax({
