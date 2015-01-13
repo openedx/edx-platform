@@ -35,7 +35,7 @@
               <p>
                 <% if ( !upgrade ) { %>
                   <%- _.sprintf(
-                      gettext( "Please confirm your contribution for this course (min. $ %(minPrice)s %(currency)s)" ),
+                      gettext( "Please confirm your contribution for this course (min. %(minPrice)s %(currency)s)" ),
                       { minPrice: minPrice, currency: currency }
                   ) %>
                 <% } %>
