@@ -471,7 +471,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                             self.max_count
                         ) +
                         ngettext(
-                            u'but there are only {actual} matching problem.',
+                            u'but there is only {actual} matching problem.',
                             u'but there are only {actual} matching problems.',
                             matching_children_count
                         )
