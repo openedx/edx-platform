@@ -116,6 +116,9 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'IS_EDX_DOMAIN': False,
+
+    # Enable course reruns using split-mongo for everyone
+    'ALLOW_COURSE_RERUNS': True,
 }
 ENABLE_JASMINE = False
 
