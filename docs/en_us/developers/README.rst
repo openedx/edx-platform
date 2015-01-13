@@ -1,28 +1,25 @@
-###################
-EdX Documentation
-###################
+######################
+EdX Developer's Guide
+######################
 
-The following documentation projects have been moved to the `edx-documentation`_ repository as of November 3, 2014:
-
-* course_authors
-* data
-* developers
-* install_operations
-* mobile
-* OLX
-* ORA-2
-* release_notes
-* students
-
-API documentation that includes docstrings from code files is stored in the
-repository of that module.  All other documentation projects are stored in edx-
-documentation.
+We have moved the edX Developer's Guide to the `edx-documentation`_ repository
+as of January 13, 2015.
 
 By moving documentation to its own repository, we will be better able to
 develop workflows, manage versioning, create translations, and automate
 testing, without complicating ongoing development of the edX Platform.
 
 .. _edx_documentation: https://github.com/edx/edx-documentation
+
+******************************
+EdX Platform Docstrings
+******************************
+
+We are in the process of creating a new project to publish docstrings for the
+edX Platform. Docstrings will be included for CMS, LMS, and Common modules.
+
+This project will remain in the edX Platform repository, in the docs/en-us
+directory.
 
 ******************************
 View Published Documentation
