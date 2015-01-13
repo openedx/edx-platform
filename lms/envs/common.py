@@ -308,6 +308,9 @@ FEATURES = {
 
     # Separate the verification flow from the payment flow
     'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
+
+    # Show the mobile app links in the footer
+    'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 }
 
 # Ignore static asset files on import which match this pattern
