@@ -266,7 +266,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
 
         beforeEach(function () {
             setFixtures(
-                '<section id="search-content" data-course-name="Test Course"></section>' +
+                '<section id="courseware-search-results" data-course-name="Test Course"></section>' +
                 '<section id="course-content"></section>');
 
             TemplateHelpers.installTemplate('templates/courseware_search/search_item');

@@ -1031,17 +1031,17 @@ courseware_js = (
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
 )
 
-# Courseware Search
-# TODO: add conditional
-courseware_js += (
-    'js/search/models/result.js',
-    'js/search/collections/collection.js',
-    'js/search/views/form.js',
-    'js/search/views/list.js',
-    'js/search/views/item.js',
-    'js/search/router.js',
-    'js/search/app.js',
-)
+# Include JS files needed for courseware search
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    courseware_js += (
+        'js/search/models/result.js',
+        'js/search/collections/collection.js',
+        'js/search/views/form.js',
+        'js/search/views/list.js',
+        'js/search/views/item.js',
+        'js/search/router.js',
+        'js/search/app.js',
+    )
 
 
 # Before a student accesses courseware, we do not

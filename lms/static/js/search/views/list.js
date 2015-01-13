@@ -6,7 +6,7 @@ var edx = edx || {};
     edx.search = edx.search || {};
 
     edx.search.List = Backbone.View.extend({
-        el: '#search-content',
+        el: '#courseware-search-results',
         events: {
             'click .search-load-next': 'loadNext'
         },

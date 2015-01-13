@@ -27,7 +27,7 @@ var edx = edx || {};
         this.router.on('route:search', this.form.doSearch, this.form);
     };
 
-    var course_id = $('#search-content').attr('data-course-id');
+    var course_id = $('#courseware-search-results').attr('data-course-id');
     var app = new edx.search.App(course_id);
     Backbone.history.start();
     return  app;
