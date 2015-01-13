@@ -5,12 +5,18 @@ define([
     'use strict';
     describe('EdxNotes Events Plugin', function() {
         var note = {
-            user: 'user-123',
-            id: 'note-123',
-            text: 'text-123',
-            quote: 'quote-123',
-            usage_id: 'usage-123'
-        };
+                user: 'user-123',
+                id: 'note-123',
+                text: 'text-123',
+                quote: 'quote-123',
+                usage_id: 'usage-123'
+            },
+            noteWithoutId = {
+                user: 'user-123',
+                text: 'text-123',
+                quote: 'quote-123',
+                usage_id: 'usage-123'
+            };
 
         beforeEach(function() {
             this.annotator =  NotesFactory.factory(
@@ -28,13 +34,20 @@ define([
         it('should log edx.course.student_notes.viewed event properly', function() {
             this.annotator.publish('annotationViewerShown', [
                 this.annotator.viewer,
-                [note, {user: 'user-456', id: 'note-456'}]]
-            );
+                [note, {user: 'user-456'}, {user: 'user-789', id: 'note-789'}]
+            ]);
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.viewed', {
-                    'notes': [{'note_id': 'note-123'}, {'note_id': 'note-456'}]
+                    'notes': [{'note_id': 'note-123'}, {'note_id': 'note-789'}]
                 }
             );
+        });
+
+        it('should not log edx.course.student_notes.viewed event if all notes are new', function() {
+            this.annotator.publish('annotationViewerShown', [
+                this.annotator.viewer, [{user: 'user-456'}, {user: 'user-789'}]
+            ]);
+            expect(Logger.log).not.toHaveBeenCalled();
         });
 
         it('should log edx.course.student_notes.added event properly', function() {
@@ -61,13 +74,13 @@ define([
         });
 
         it('should log the edx.course.student_notes.edited event properly', function() {
-            var old_note = note,
-                new_note = $.extend({}, note, {text: 'text-456'});
+            var oldNote = note,
+                newNote = $.extend({}, note, {text: 'text-456'});
 
-            this.annotator.publish('annotationEditorShown', [this.annotator.editor, old_note]);
+            this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
             expect(this.annotator.plugins.Events.oldNoteText).toBe('text-123');
-            this.annotator.publish('annotationUpdated', new_note);
-            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, new_note]);
+            this.annotator.publish('annotationUpdated', newNote);
+            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, newNote]);
 
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.edited', {
@@ -81,6 +94,18 @@ define([
                     'component_usage_id': 'usage-123'
                 }
             );
+            expect(this.annotator.plugins.Events.oldNoteText).toBeNull();
+        });
+
+        it('should not log the edx.course.student_notes.edited event if the note is new', function() {
+            var oldNote = noteWithoutId,
+                newNote = $.extend({}, noteWithoutId, {text: 'text-456'});
+
+            this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
+            expect(this.annotator.plugins.Events.oldNoteText).toBe('text-123');
+            this.annotator.publish('annotationUpdated', newNote);
+            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, newNote]);
+            expect(Logger.log).not.toHaveBeenCalled();
             expect(this.annotator.plugins.Events.oldNoteText).toBeNull();
         });
 
@@ -98,17 +123,22 @@ define([
             );
         });
 
+        it('should not log the edx.course.student_notes.deleted event if the note is new', function() {
+            this.annotator.publish('annotationDeleted', noteWithoutId);
+            expect(Logger.log).not.toHaveBeenCalled();
+        });
+
         it('should truncate values of some fields', function() {
-            var old_note = $.extend({}, note, {text: Helpers.LONG_TEXT}),
-                new_note = $.extend({}, note, {
+            var oldNote = $.extend({}, note, {text: Helpers.LONG_TEXT}),
+                newNote = $.extend({}, note, {
                     text: Helpers.LONG_TEXT + '123',
                     quote: Helpers.LONG_TEXT + '123'
                 });
 
-            this.annotator.publish('annotationEditorShown', [this.annotator.editor, old_note]);
+            this.annotator.publish('annotationEditorShown', [this.annotator.editor, oldNote]);
             expect(this.annotator.plugins.Events.oldNoteText).toBe(Helpers.LONG_TEXT);
-            this.annotator.publish('annotationUpdated', new_note);
-            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, new_note]);
+            this.annotator.publish('annotationUpdated', newNote);
+            this.annotator.publish('annotationEditorHidden', [this.annotator.editor, newNote]);
 
             expect(Logger.log).toHaveBeenCalledWith(
                 'edx.course.student_notes.edited', {
