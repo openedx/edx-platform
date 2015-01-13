@@ -18,7 +18,7 @@ define([
 ) {
     'use strict';
 
-    var ListItemView     = BaseView.extend({
+    var ListItemView = BaseView.extend({
         canDelete: false,
 
         initialize: function() {

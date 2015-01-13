@@ -7,7 +7,9 @@ define([
         var experimentGroupConfigurations = new GroupConfigurationCollection(
                 experimentGroupConfigurationsJson, {parse: true}
             ),
-            contentGroupConfiguration = new GroupConfigurationModel(contentGroupConfigurationJson, {parse: true});
+            contentGroupConfiguration = new GroupConfigurationModel(contentGroupConfigurationJson, {
+                parse: true, canBeEmpty: true
+            });
 
         experimentGroupConfigurations.url = groupConfigurationUrl;
         experimentGroupConfigurations.outlineUrl = courseOutlineUrl;
