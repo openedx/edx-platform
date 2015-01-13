@@ -16,6 +16,7 @@ import unittest
 import datetime
 from uuid import uuid4
 import copy
+import os
 from mock import Mock, patch
 
 from . import LogicTest
@@ -31,9 +32,6 @@ from xmodule.video_module.transcripts_utils import download_youtube_subs, save_t
 
 from django.conf import settings
 from django.test.utils import override_settings
-
-TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 SRT_FILEDATA = '''
 0
@@ -55,6 +53,43 @@ Dobar dan!
 Kako ste danas?
 '''
 
+def seed():
+    return os.getppid()
+
+settings.YOUTUBE = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
+
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
+
+settings.CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': 'localhost',
+        'db': 'acceptance_xcontent_%s' % seed(),
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+}
+
+TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
+TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 def instantiate_descriptor(**field_data):
     """
