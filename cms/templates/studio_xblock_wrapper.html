@@ -55,29 +55,37 @@ messages = json.dumps(xblock.validate().to_json())
         <div class="header-actions">
             <ul class="actions-list">
                 % if not is_root:
-                    % if not show_inline:
-                        <li class="action-item action-edit">
+                    % if can_edit:
+                        % if not show_inline:
+                            <li class="action-item action-edit">
+                                <a href="#" class="edit-button action-button">
+                                    <i class="icon fa fa-pencil"></i>
+                                    <span class="action-button-text">${_("Edit")}</span>
+                                </a>
+                            </li>
+                            <li class="action-item action-duplicate">
+                                <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
+                                <i class="icon fa fa-copy"></i>
+                                <span class="sr">${_("Duplicate")}</span>
+                                </a>
+                            </li>
+                        % endif
+                        <li class="action-item action-delete">
+                            <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
+                            <i class="icon fa fa-trash-o"></i>
+                            <span class="sr">${_("Delete")}</span>
+                            </a>
+                        </li>
+                        % if is_reorderable:
+                            <li class="action-item action-drag">
+                                <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
+                            </li>
+                        % endif
+                    % elif not show_inline:
+                        <li class="action-item action-edit action-edit-view-only">
                             <a href="#" class="edit-button action-button">
-                                <i class="icon fa fa-pencil"></i>
-                                <span class="action-button-text">${_("Edit")}</span>
+                                <span class="action-button-text">${_("Details")}</span>
                             </a>
-                        </li>
-                        <li class="action-item action-duplicate">
-                            <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
-                            <i class="icon fa fa-copy"></i>
-                            <span class="sr">${_("Duplicate")}</span>
-                            </a>
-                        </li>
-                    % endif
-                    <li class="action-item action-delete">
-                        <a href="#" data-tooltip="${_("Delete")}" class="delete-button action-button">
-                        <i class="icon fa fa-trash-o"></i>
-                        <span class="sr">${_("Delete")}</span>
-                        </a>
-                    </li>
-                    % if is_reorderable:
-                        <li class="action-item action-drag">
-                            <span data-tooltip="${_('Drag to reorder')}" class="drag-handle action"></span>
                         </li>
                     % endif
                 % endif

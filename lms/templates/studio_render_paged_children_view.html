@@ -1,0 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
+
+<%namespace name='static' file='static_content.html'/>
+
+% for template_name in ["paging-header", "paging-footer"]:
+<script type="text/template" id="${template_name}-tpl">
+    <%static:include path="js/${template_name}.underscore" />
+</script>
+% endfor
+
+<div class="xblock-container-paging-parameters" data-start="${first_displayed}" data-displayed="${displayed_children}" data-total="${total_children}"></div>
+
+<div class="container-paging-header"></div>
+
+<div>
+% for item in items:
+    ${item['content']}
+% endfor
+</div>
+
+% if can_add:
+    <div class="add-xblock-component new-component-item adding"></div>
+% endif
+
+<div class="container-paging-footer"></div>

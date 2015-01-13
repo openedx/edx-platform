@@ -45,7 +45,7 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
@@ -132,6 +132,38 @@
           </li>
         </ol>
       </nav>
+      % elif context_library:
+       <%
+            library_key = context_library.location.course_key
+            index_url = reverse('contentstore.views.library_handler', kwargs={'library_key_string': unicode(library_key)})
+      %>
+      <h2 class="info-course">
+        <span class="sr">${_("Current Library:")}</span>
+        <a class="course-link" href="${index_url}">
+          <span class="course-org">${context_library.display_org_with_default | h}</span><span class="course-number">${context_library.display_number_with_default | h}</span>
+          <span class="course-title" title="${context_library.display_name_with_default}">${context_library.display_name_with_default}</span>
+        </a>
+      </h2>
+
+      <nav class="nav-course nav-dd ui-left">
+        <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_library.display_name_with_default)}</h2>
+        <ol>
+
+          <li class="nav-item nav-library-settings">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Library")} </span>${_("Settings")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-library-settings-team">
+                    <a href="${lib_users_url}">${_("User Access")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </nav>
       % endif
     </div>
 
@@ -151,7 +183,7 @@
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-account-dashboard">
-                    <a href="/">${_("My Courses")}</a>
+                    <a href="/">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
                   </li>
                   <li class="nav-item nav-account-signout">
                     <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>

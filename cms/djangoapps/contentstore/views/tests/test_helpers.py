@@ -4,7 +4,7 @@ Unit tests for helpers.py.
 
 from contentstore.tests.utils import CourseTestCase
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory
 from django.utils import http
 
 
@@ -49,6 +49,11 @@ class HelpersTestCase(CourseTestCase):
         video = ItemFactory.create(parent_location=child_vertical.location, category="video",
                                    display_name="My Video")
         self.assertIsNone(xblock_studio_url(video))
+
+        # Verify library URL
+        library = LibraryFactory.create()
+        expected_url = u'/library/{}'.format(unicode(library.location.library_key))
+        self.assertEqual(xblock_studio_url(library), expected_url)
 
     def test_xblock_type_display_name(self):
 

@@ -33,6 +33,12 @@
                             </a>
                         </li>
                 % endif
+                    <li class="nav-item">
+                        <a href="#" class="button new-button new-component-button">
+                            <i class="icon fa fa-plus icon-inline"></i>
+                            <span class="action-button-text">${_("Add Component")}</span>
+                        </a>
+                   </li>
                 </ul>
             </nav>
         </header>

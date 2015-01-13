@@ -4,6 +4,7 @@
      id="<%= type %>-<%= intent %>"
      aria-hidden="<% if(obj.shown) { %>false<% } else { %>true<% } %>"
      aria-labelledby="<%= type %>-<%= intent %>-title"
+     tabindex="-1"
      <% if (obj.message) { %>aria-describedby="<%= type %>-<%= intent %>-description" <% } %>
      <% if (obj.actions) { %>role="dialog"<% } %>
   >

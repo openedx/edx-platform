@@ -119,7 +119,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
     def test_password_reset_success(self):
         # Create a user account
-        email, password = self._create_unique_user()
+        email, password = self._create_unique_user()  # pylint: disable=unused-variable
 
         # Navigate to the password reset form and try to submit it
         self.login_page.visit().password_reset(email=email)
@@ -141,6 +141,9 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
         )
 
     def _create_unique_user(self):
+        """
+        Create a new user with a unique name and email.
+        """
         username = "test_{uuid}".format(uuid=self.unique_id[0:6])
         email = "{user}@example.com".format(user=username)
         password = "password"

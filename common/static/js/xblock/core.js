@@ -23,10 +23,10 @@
         if (runtime && version && initFnName) {
             return new window[runtime]['v' + version];
         } else {
-            if (!runtime || !version || !initFnName) {
+            if (runtime || version || initFnName) {
                 var elementTag = $('<div>').append($element.clone()).html();
                 console.log('Block ' + elementTag + ' is missing data-runtime, data-runtime-version or data-init, and can\'t be initialized');
-            }
+            } // else this XBlock doesn't have a JS init function.
             return null;
         }
     }

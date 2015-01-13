@@ -27,6 +27,8 @@ Representation:
             **** 'definition': the db id of the record containing the content payload for this xblock
             **** 'fields': the Scope.settings and children field values
                 ***** 'children': This is stored as a list of (block_type, block_id) pairs
+            **** 'defaults': Scope.settings default values copied from a template block (used e.g. when
+                blocks are copied from a library to a course)
             **** 'edit_info': dictionary:
                 ***** 'edited_on': when was this xblock's fields last changed (will be edited_on value of
                 update_version structure)
@@ -53,6 +55,7 @@ Representation:
 import copy
 import threading
 import datetime
+import hashlib
 import logging
 from contracts import contract, new_contract
 from importlib import import_module
@@ -451,12 +454,17 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         if block_info['edit_info'].get('update_version') == update_version:
             return
 
+        original_usage = block_info['edit_info'].get('original_usage')
+        original_usage_version = block_info['edit_info'].get('original_usage_version')
         block_info['edit_info'] = {
             'edited_on': datetime.datetime.now(UTC),
             'edited_by': user_id,
             'previous_version': block_info['edit_info']['update_version'],
             'update_version': update_version,
         }
+        if original_usage:
+            block_info['edit_info']['original_usage'] = original_usage
+            block_info['edit_info']['original_usage_version'] = original_usage_version
 
     def find_matching_course_indexes(self, branch=None, search_targets=None):
         """
@@ -670,7 +678,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
-                    system.course_entry.structure['blocks'],
+                    # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
+                    copy.deepcopy(system.course_entry.structure['blocks']),
                     block_id,
                     depth,
                     new_module_data
@@ -691,12 +700,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
                 for block in new_module_data.itervalues():
                     if block['definition'] in definitions:
-                        converted_fields = self.convert_references_to_keys(
-                            course_key, system.load_block_type(block['block_type']),
-                            definitions[block['definition']].get('fields'),
-                            system.course_entry.structure['blocks'],
-                        )
-                        block['fields'].update(converted_fields)
+                        definition = definitions[block['definition']]
+                        # convert_fields was being done here, but it gets done later in the runtime's xblock_from_json
+                        block['fields'].update(definition.get('fields'))
                         block['definition_loaded'] = True
 
             system.module_data.update(new_module_data)
@@ -1254,6 +1260,21 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         '''
         # TODO implement
         pass
+
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator and version from
+        which the copy was inherited.
+
+        Returns usage_key, version if the data is available, otherwise returns (None, None)
+        """
+        blocks = self._lookup_course(usage_key.course_key).structure['blocks']
+        block = blocks.get(BlockKey.from_usage_key(usage_key))
+        if block and 'original_usage' in block['edit_info']:
+            usage_key = BlockUsageLocator.from_string(block['edit_info']['original_usage'])
+            return usage_key, block['edit_info'].get('original_usage_version')
+        return None, None
 
     def create_definition_from_data(self, course_key, new_def_data, category, user_id):
         """
@@ -2073,6 +2094,168 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             self.update_structure(destination_course, destination_structure)
             self._update_head(destination_course, index_entry, destination_course.branch, destination_structure['_id'])
 
+    @contract(source_keys="list(BlockUsageLocator)", dest_usage=BlockUsageLocator)
+    def copy_from_template(self, source_keys, dest_usage, user_id):
+        """
+        Flexible mechanism for inheriting content from an external course/library/etc.
+
+        Will copy all of the XBlocks whose keys are passed as `source_course` so that they become
+        children of the XBlock whose key is `dest_usage`. Any previously existing children of
+        `dest_usage` that haven't been replaced/updated by this copy_from_template operation will
+        be deleted.
+
+        Unlike `copy()`, this does not care whether the resulting blocks are positioned similarly
+        in their new course/library. However, the resulting blocks will be in the same relative
+        order as `source_keys`.
+
+        If any of the blocks specified already exist as children of the destination block, they
+        will be updated rather than duplicated or replaced. If they have Scope.settings field values
+        overriding inherited default values, those overrides will be preserved.
+
+        IMPORTANT: This method does not preserve block_id - in other words, every block that is
+        copied will be assigned a new block_id. This is because we assume that the same source block
+        may be copied into one course in multiple places. However, it *is* guaranteed that every
+        time this method is called for the same source block and dest_usage, the same resulting
+        block id will be generated.
+
+        :param source_keys: a list of BlockUsageLocators. Order is preserved.
+
+        :param dest_usage: The BlockUsageLocator that will become the parent of an inherited copy
+        of all the xblocks passed in `source_keys`.
+
+        :param user_id: The user who will get credit for making this change.
+        """
+        # Preload the block structures for all source courses/libraries/etc.
+        # so that we can access descendant information quickly
+        source_structures = {}
+        for key in source_keys:
+            course_key = key.course_key.for_version(None)
+            if course_key.branch is None:
+                raise ItemNotFoundError("branch is required for all source keys when using copy_from_template")
+            if course_key not in source_structures:
+                with self.bulk_operations(course_key):
+                    source_structures[course_key] = self._lookup_course(course_key).structure
+
+        destination_course = dest_usage.course_key
+        with self.bulk_operations(destination_course):
+            index_entry = self.get_course_index(destination_course)
+            if index_entry is None:
+                raise ItemNotFoundError(destination_course)
+            dest_structure = self._lookup_course(destination_course).structure
+            old_dest_structure_version = dest_structure['_id']
+            dest_structure = self.version_structure(destination_course, dest_structure, user_id)
+
+            # Set of all descendent block IDs of dest_usage that are to be replaced:
+            block_key = BlockKey(dest_usage.block_type, dest_usage.block_id)
+            orig_descendants = set(self.descendants(dest_structure['blocks'], block_key, depth=None, descendent_map={}))
+            # The descendants() method used above adds the block itself, which we don't consider a descendant.
+            orig_descendants.remove(block_key)
+            new_descendants = self._copy_from_template(
+                source_structures, source_keys, dest_structure, block_key, user_id
+            )
+
+            # Update the edit info:
+            dest_info = dest_structure['blocks'][block_key]
+
+            # Update the edit_info:
+            dest_info['edit_info']['previous_version'] = dest_info['edit_info']['update_version']
+            dest_info['edit_info']['update_version'] = old_dest_structure_version
+            dest_info['edit_info']['edited_by'] = user_id
+            dest_info['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+
+            orphans = orig_descendants - new_descendants
+            for orphan in orphans:
+                del dest_structure['blocks'][orphan]
+
+            self.update_structure(destination_course, dest_structure)
+            self._update_head(destination_course, index_entry, destination_course.branch, dest_structure['_id'])
+        # Return usage locators for all the new children:
+        return [
+            destination_course.make_usage_key(*k)
+            for k in dest_structure['blocks'][block_key]['fields']['children']
+        ]
+
+    def _copy_from_template(self, source_structures, source_keys, dest_structure, new_parent_block_key, user_id):
+        """
+        Internal recursive implementation of copy_from_template()
+
+        Returns the new set of BlockKeys that are the new descendants of the block with key 'block_key'
+        """
+        # pylint: disable=no-member
+        # ^-- Until pylint gets namedtuple support, it will give warnings about BlockKey attributes
+        new_blocks = set()
+
+        new_children = list()  # ordered list of the new children of new_parent_block_key
+
+        for usage_key in source_keys:
+            src_course_key = usage_key.course_key.for_version(None)
+            block_key = BlockKey(usage_key.block_type, usage_key.block_id)
+            source_structure = source_structures.get(src_course_key, [])
+            if block_key not in source_structure['blocks']:
+                raise ItemNotFoundError(usage_key)
+            source_block_info = source_structure['blocks'][block_key]
+
+            # Compute a new block ID. This new block ID must be consistent when this
+            # method is called with the same (source_key, dest_structure) pair
+            unique_data = "{}:{}:{}".format(
+                unicode(src_course_key).encode("utf-8"),
+                block_key.id,
+                new_parent_block_key.id,
+            )
+            new_block_id = hashlib.sha1(unique_data).hexdigest()[:20]
+            new_block_key = BlockKey(block_key.type, new_block_id)
+
+            # Now clone block_key to new_block_key:
+            new_block_info = copy.deepcopy(source_block_info)
+            # Note that new_block_info now points to the same definition ID entry as source_block_info did
+            existing_block_info = dest_structure['blocks'].get(new_block_key, {})
+            # Inherit the Scope.settings values from 'fields' to 'defaults'
+            new_block_info['defaults'] = new_block_info['fields']
+
+            # <workaround>
+            # CAPA modules store their 'markdown' value (an alternate representation of their content)
+            # in Scope.settings rather than Scope.content :-/
+            # markdown is a field that really should not be overridable - it fundamentally changes the content.
+            # capa modules also use a custom editor that always saves their markdown field to the metadata,
+            # even if it hasn't changed, which breaks our override system.
+            # So until capa modules are fixed, we special-case them and remove their markdown fields,
+            # forcing the inherited version to use XML only.
+            if usage_key.block_type == 'problem' and 'markdown' in new_block_info['defaults']:
+                del new_block_info['defaults']['markdown']
+            # </workaround>
+
+            new_block_info['fields'] = existing_block_info.get('fields', {})  # Preserve any existing overrides
+            if 'children' in new_block_info['defaults']:
+                del new_block_info['defaults']['children']  # Will be set later
+            new_block_info['block_id'] = new_block_key.id
+            new_block_info['edit_info'] = existing_block_info.get('edit_info', {})
+            new_block_info['edit_info']['previous_version'] = new_block_info['edit_info'].get('update_version', None)
+            new_block_info['edit_info']['update_version'] = dest_structure['_id']
+            # Note we do not set 'source_version' - it's only used for copying identical blocks
+            # from draft to published as part of publishing workflow.
+            # Setting it to the source_block_info structure version here breaks split_draft's has_changes() method.
+            new_block_info['edit_info']['edited_by'] = user_id
+            new_block_info['edit_info']['edited_on'] = datetime.datetime.now(UTC)
+            new_block_info['edit_info']['original_usage'] = unicode(usage_key.replace(branch=None, version_guid=None))
+            new_block_info['edit_info']['original_usage_version'] = source_block_info['edit_info'].get('update_version')
+            dest_structure['blocks'][new_block_key] = new_block_info
+
+            children = source_block_info['fields'].get('children')
+            if children:
+                children = [src_course_key.make_usage_key(child.type, child.id) for child in children]
+                new_blocks |= self._copy_from_template(
+                    source_structures, children, dest_structure, new_block_key, user_id
+                )
+
+            new_blocks.add(new_block_key)
+            # And add new_block_key to the list of new_parent_block_key's new children:
+            new_children.append(new_block_key)
+
+        # Update the children of new_parent_block_key
+        dest_structure['blocks'][new_parent_block_key]['fields']['children'] = new_children
+
+        return new_blocks
+
     def delete_item(self, usage_locator, user_id, force=False):
         """
         Delete the block or tree rooted at block (if delete_children) and any references w/in the course to the block
@@ -2702,7 +2885,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._filter_blacklist(copy.copy(new_block['fields']), blacklist),
                 new_block['definition'],
                 destination_version,
-                raw=True
+                raw=True,
+                block_defaults=new_block.get('defaults')
             )
 
         # introduce new edit info field for tracing where copied/published blocks came
@@ -2741,7 +2925,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
             del structure['blocks'][orphan]
 
-    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False):
+    def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
         """
         Create the core document structure for a block.
 
@@ -2752,7 +2936,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         if not raw:
             block_fields = self._serialize_fields(category, block_fields)
-        return {
+        document = {
             'block_type': category,
             'definition': definition_id,
             'fields': block_fields,
@@ -2763,6 +2947,9 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 'update_version': new_id
             }
         }
+        if block_defaults:
+            document['defaults'] = block_defaults
+        return document
 
     @contract(block_key=BlockKey)
     def _get_block_from_structure(self, structure, block_key):

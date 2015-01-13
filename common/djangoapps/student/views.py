@@ -1745,6 +1745,7 @@ def auto_auth(request):
     * `staff`: Set to "true" to make the user global staff.
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
+    * `no_login`: Define this to create the user but not login
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1764,6 +1765,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
+    login_when_done = 'no_login' not in request.GET
 
     # Get or create the user object
     post_data = {
@@ -1807,14 +1809,16 @@ def auto_auth(request):
         user.roles.add(role)
 
     # Log in as the user
-    user = authenticate(username=username, password=password)
-    login(request, user)
+    if login_when_done:
+        user = authenticate(username=username, password=password)
+        login(request, user)
 
     create_comments_service_user(user)
 
     # Provide the user with a valid CSRF token
     # then return a 200 response
-    success_msg = u"Logged in user {0} ({1}) with password {2} and user_id {3}".format(
+    success_msg = u"{} user {} ({}) with password {} and user_id {}".format(
+        u"Logged in" if login_when_done else "Created",
         username, email, password, user.id
     )
     response = HttpResponse(success_msg)

@@ -1,7 +1,7 @@
-define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"],
-    function(_, BaseView, AlertView, gettext) {
+define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext", "js/views/paging_mixin"],
+    function(_, BaseView, AlertView, gettext, PagingMixin) {
 
-        var PagingView = BaseView.extend({
+        var PagingView = BaseView.extend(PagingMixin).extend({
             // takes a Backbone Paginator as a model
 
             sortableColumns: {},
@@ -21,41 +21,8 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 this.$('#' + sortColumn).addClass('current-sort');
             },
 
-            setPage: function(page) {
-                var self = this,
-                    collection = self.collection,
-                    oldPage = collection.currentPage;
-                collection.goTo(page, {
-                    reset: true,
-                    success: function() {
-                        window.scrollTo(0, 0);
-                    },
-                    error: function(collection) {
-                        collection.currentPage = oldPage;
-                        self.onError();
-                    }
-                });
-            },
-
             onError: function() {
                 // Do nothing by default
-            },
-
-            nextPage: function() {
-                var collection = this.collection,
-                    currentPage = collection.currentPage,
-                    lastPage = collection.totalPages - 1;
-                if (currentPage < lastPage) {
-                    this.setPage(currentPage + 1);
-                }
-            },
-
-            previousPage: function() {
-                var collection = this.collection,
-                    currentPage = collection.currentPage;
-                if (currentPage > 0) {
-                    this.setPage(currentPage - 1);
-                }
             },
 
             /**
@@ -110,6 +77,5 @@ define(["underscore", "js/views/baseview", "js/views/feedback_alert", "gettext"]
                 this.setPage(0);
             }
         });
-
         return PagingView;
     }); // end define();

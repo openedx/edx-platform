@@ -56,6 +56,15 @@ ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
 ADVANCED_PROBLEM_TYPES = settings.ADVANCED_PROBLEM_TYPES
 
 
+CONTAINER_TEMPATES = [
+    "basic-modal", "modal-button", "edit-xblock-modal",
+    "editor-mode-button", "upload-dialog", "image-modal",
+    "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
+    "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
+    "unit-outline", "container-message"
+]
+
+
 def _advanced_component_types():
     """
     Return advanced component types which can be created.
@@ -202,14 +211,15 @@ def container_handler(request, usage_key_string):
                 'xblock_info': xblock_info,
                 'draft_preview_link': preview_lms_link,
                 'published_preview_link': lms_link,
+                'templates': CONTAINER_TEMPATES
             })
     else:
         return HttpResponseBadRequest("Only supports HTML requests")
 
 
-def get_component_templates(course):
+def get_component_templates(courselike, library=False):
     """
-    Returns the applicable component templates that can be used by the specified course.
+    Returns the applicable component templates that can be used by the specified course or library.
     """
     def create_template_dict(name, cat, boilerplate_name=None, is_common=False):
         """
@@ -240,7 +250,13 @@ def get_component_templates(course):
     categories = set()
     # The component_templates array is in the order of "advanced" (if present), followed
     # by the components in the order listed in COMPONENT_TYPES.
-    for category in COMPONENT_TYPES:
+    component_types = COMPONENT_TYPES[:]
+
+    # Libraries do not support discussions
+    if library:
+        component_types = [component for component in component_types if component != 'discussion']
+
+    for category in component_types:
         templates_for_category = []
         component_class = _load_mixed_class(category)
         # add the default template with localized display name
@@ -254,7 +270,7 @@ def get_component_templates(course):
         if hasattr(component_class, 'templates'):
             for template in component_class.templates():
                 filter_templates = getattr(component_class, 'filter_templates', None)
-                if not filter_templates or filter_templates(template, course):
+                if not filter_templates or filter_templates(template, courselike):
                     templates_for_category.append(
                         create_template_dict(
                             _(template['metadata'].get('display_name')),
@@ -279,11 +295,15 @@ def get_component_templates(course):
             "display_name": component_display_names[category]
         })
 
+    # Libraries do not support advanced components at this time.
+    if library:
+        return component_templates
+
     # Check if there are any advanced modules specified in the course policy.
     # These modules should be specified as a list of strings, where the strings
     # are the names of the modules in ADVANCED_COMPONENT_TYPES that should be
     # enabled for the course.
-    course_advanced_keys = course.advanced_modules
+    course_advanced_keys = courselike.advanced_modules
     advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
     advanced_component_types = _advanced_component_types()
     # Set component types according to course policy file

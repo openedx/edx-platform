@@ -5,6 +5,7 @@ Test for lms courseware app, module render unit
 from functools import partial
 import json
 
+from bson import ObjectId
 import ddt
 from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
@@ -13,6 +14,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
@@ -971,12 +973,13 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
 
     def test_context_contains_display_name(self, mock_tracker):
         problem_display_name = u'Option Response Problem'
-        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker, problem_display_name)
-        self.assertEquals(problem_display_name, actual_display_name)
+        module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
+        self.assertEquals(problem_display_name, module_info['display_name'])
 
-    def handle_callback_and_get_display_name_from_event(self, mock_tracker, problem_display_name=None):
+    def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
-        Creates a fake module, invokes the callback and extracts the display name from the emitted problem_check event.
+        Creates a fake module, invokes the callback and extracts the 'module'
+        metadata from the emitted problem_check event.
         """
         descriptor_kwargs = {
             'category': 'problem',
@@ -1000,11 +1003,27 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
         event = mock_call[1][0]
 
         self.assertEquals(event['event_type'], 'problem_check')
-        return event['context']['module']['display_name']
+        return event['context']['module']
 
     def test_missing_display_name(self, mock_tracker):
-        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
+        actual_display_name = self.handle_callback_and_get_module_info(mock_tracker)['display_name']
         self.assertTrue(actual_display_name.startswith('problem'))
+
+    def test_library_source_information(self, mock_tracker):
+        """
+        Check that XBlocks that are inherited from a library include the
+        information about their library block source in events.
+        We patch the modulestore to avoid having to create a library.
+        """
+        original_usage_key = UsageKey.from_string(u'block-v1:A+B+C+type@problem+block@abcd1234')
+        original_usage_version = ObjectId()
+        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
+            module_info = self.handle_callback_and_get_module_info(mock_tracker)
+            self.assertIn('original_usage_key', module_info)
+            self.assertEqual(module_info['original_usage_key'], unicode(original_usage_key))
+            self.assertIn('original_usage_version', module_info)
+            self.assertEqual(module_info['original_usage_version'], unicode(original_usage_version))
 
 
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):

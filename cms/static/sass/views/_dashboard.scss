@@ -289,10 +289,44 @@
 
   // ====================
 
-  // ELEM: course listings
-  .courses {
-    margin: $baseline 0;
+  // Course/Library tabs
+  #course-index-tabs {
+    margin: 0;
+    font-size: 1.4rem;
 
+    li {
+      display: inline-block;
+      line-height: $baseline*2;
+      margin: 0 10px;
+
+      &.active {
+        border-bottom: 4px solid $blue;
+      }
+
+      &.active, &:hover {
+        a {
+          color: $gray-d2;
+        }
+      }
+
+      a {
+        color: $blue;
+        cursor: pointer;
+        display: inline-block;
+      }
+    }
+  }
+
+  // ELEM: course listings
+  .courses-tab, .libraries-tab {
+    display: none;
+
+    &.active {
+      display: block;
+    }
+  }
+
+  .courses, .libraries {
     .title {
       @extend %t-title6;
       margin-bottom: $baseline;
@@ -311,7 +345,6 @@
 	}
 
   .list-courses {
-    margin-top: $baseline;
     border-radius: 3px;
     border: 1px solid $gray-l2;
     background: $white;
@@ -464,25 +497,20 @@
       .metadata-item {
         display: inline-block;
 
-        &:after {
+        & + .metadata-item:before {
           content: "/";
           margin-left: ($baseline/10);
           margin-right: ($baseline/10);
           color: $gray-l4;
         }
 
-        &:last-child {
-
-          &:after {
-            content: "";
-            margin-left: 0;
-            margin-right: 0;
-          }
-        }
-
         .label {
           @extend %cont-text-sr;
         }
+      }
+
+      .extra-metadata {
+        margin-left: ($baseline/10);
       }
     }
 
@@ -622,7 +650,7 @@
 
   // course listings
 
-  .create-course {
+  .create-course, .create-library {
 
     .row {
       @include clearfix();

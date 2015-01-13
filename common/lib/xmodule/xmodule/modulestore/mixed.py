@@ -509,6 +509,18 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(location.course_key)
         return store.get_parent_location(location, **kwargs)
 
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator from which the
+        copy was inherited.
+        """
+        try:
+            store = self._verify_modulestore_support(usage_key.course_key, 'get_block_original_usage')
+            return store.get_block_original_usage(usage_key)
+        except NotImplementedError:
+            return None, None
+
     def get_modulestore_type(self, course_id):
         """
         Returns a type which identifies which modulestore is servicing the given course_id.
@@ -675,6 +687,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(course_key, 'import_xblock')
         return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime)
+
+    @strip_key
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        """
+        See :py:meth `SplitMongoModuleStore.copy_from_template`
+        """
+        store = self._verify_modulestore_support(dest_key.course_key, 'copy_from_template')
+        return store.copy_from_template(source_keys, dest_key, user_id)
 
     @strip_key
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):

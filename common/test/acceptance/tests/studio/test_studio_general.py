@@ -88,6 +88,15 @@ class CoursePagesTest(StudioCourseTest):
             ]
         ]
 
+    def test_page_redirect(self):
+        """
+        /course/ is the base URL for all courses, but by itself, it should
+        redirect to /home/.
+        """
+        self.dashboard_page = DashboardPage(self.browser)  # pylint: disable=attribute-defined-outside-init
+        self.dashboard_page.visit()
+        self.assertEqual(self.browser.current_url.strip('/').rsplit('/')[-1], 'home')
+
     @skip('Intermittently failing with Page not found error for Assets. TE-418')
     def test_page_existence(self):
         """

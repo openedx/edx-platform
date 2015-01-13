@@ -6,14 +6,11 @@ Higher-level tests are in `cms/djangoapps/contentstore`.
 """
 from bson.objectid import ObjectId
 import ddt
-from mock import patch
 from opaque_keys.edx.locator import LibraryLocator
-from xblock.fragment import Fragment
-from xblock.runtime import Runtime as VanillaRuntime
+
 from xmodule.modulestore.exceptions import DuplicateCourseError
 from xmodule.modulestore.tests.factories import LibraryFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.tests.utils import MixedSplitTestCase
-from xmodule.x_module import AUTHOR_VIEW
 
 
 @ddt.ddt
@@ -179,30 +176,13 @@ class TestLibraries(MixedSplitTestCase):
         version = lib.location.library_key.version_guid
         self.assertIsInstance(version, ObjectId)
 
-    @patch('xmodule.modulestore.split_mongo.caching_descriptor_system.CachingDescriptorSystem.render', VanillaRuntime.render)
-    def test_library_author_view(self):
-        """
-        Test that LibraryRoot.author_view can run and includes content from its
-        children.
-        We have to patch the runtime (module system) in order to be able to
-        render blocks in our test environment.
-        """
+    def test_xblock_in_lib_have_published_version_returns_false(self):
         library = LibraryFactory.create(modulestore=self.store)
-        # Add one HTML block to the library:
-        ItemFactory.create(
+        block = ItemFactory.create(
             category="html",
             parent_location=library.location,
             user_id=self.user_id,
             publish_item=False,
             modulestore=self.store,
         )
-        library = self.store.get_library(library.location.library_key)
-
-        context = {'reorderable_items': set(), }
-        # Patch the HTML block to always render "Hello world"
-        message = u"Hello world"
-        hello_render = lambda _, context: Fragment(message)
-        with patch('xmodule.html_module.HtmlDescriptor.author_view', hello_render, create=True):
-            with patch('xmodule.x_module.DescriptorSystem.applicable_aside_types', lambda self, block: []):
-                result = library.render(AUTHOR_VIEW, context)
-        self.assertIn(message, result.content)
+        self.assertFalse(self.store.has_published_version(block))

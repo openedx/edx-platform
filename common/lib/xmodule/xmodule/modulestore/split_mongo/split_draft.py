@@ -5,7 +5,7 @@ Module for the dual-branch fall-back Draft->Published Versioning ModuleStore
 from xmodule.modulestore.split_mongo.split import SplitMongoModuleStore, EXCLUDE_ALL
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.exceptions import InsufficientSpecificationError
+from xmodule.modulestore.exceptions import InsufficientSpecificationError, ItemNotFoundError
 from xmodule.modulestore.draft_and_published import (
     ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES, UnsupportedRevisionError
 )
@@ -92,6 +92,27 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         if location.branch == ModuleStoreEnum.BranchName.draft and category in DIRECT_ONLY_CATEGORIES:
             # version_agnostic b/c of above assumption in docstring
             self.publish(location.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        """
+        See :py:meth `SplitMongoModuleStore.copy_from_template`
+        """
+        source_keys = [self._map_revision_to_branch(key) for key in source_keys]
+        dest_key = self._map_revision_to_branch(dest_key)
+        new_keys = super(DraftVersioningModuleStore, self).copy_from_template(source_keys, dest_key, user_id)
+        if dest_key.branch == ModuleStoreEnum.BranchName.draft:
+            # Check if any of new_keys or their descendants need to be auto-published.
+            # We don't use _auto_publish_no_children since children may need to be published.
+            with self.bulk_operations(dest_key.course_key):
+                keys_to_check = list(new_keys)
+                while keys_to_check:
+                    usage_key = keys_to_check.pop()
+                    if usage_key.category in DIRECT_ONLY_CATEGORIES:
+                        self.publish(usage_key.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
+                        children = getattr(self.get_item(usage_key, **kwargs), "children", [])
+                        # e.g. if usage_key is a chapter, it may have an auto-publish sequential child
+                        keys_to_check.extend(children)
+        return new_keys
 
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         old_descriptor_locn = descriptor.location
@@ -246,6 +267,15 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             revision = ModuleStoreEnum.RevisionOption.draft_only
         location = self._map_revision_to_branch(location, revision=revision)
         return super(DraftVersioningModuleStore, self).get_parent_location(location, **kwargs)
+
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator from which the
+        copy was inherited.
+        """
+        usage_key = self._map_revision_to_branch(usage_key)
+        return super(DraftVersioningModuleStore, self).get_block_original_usage(usage_key)
 
     def get_orphans(self, course_key, **kwargs):
         course_key = self._map_revision_to_branch(course_key)
@@ -421,7 +451,12 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         pass
 
     def _get_head(self, xblock, branch):
-        course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
+        """ Gets block at the head of specified branch """
+        try:
+            course_structure = self._lookup_course(xblock.location.course_key.for_branch(branch)).structure
+        except ItemNotFoundError:
+            # There is no published version xblock container, e.g. Library
+            return None
         return self._get_block_from_structure(course_structure, BlockKey.from_usage_key(xblock.location))
 
     def _get_version(self, block):
