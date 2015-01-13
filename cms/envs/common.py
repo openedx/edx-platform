@@ -123,6 +123,12 @@ FEATURES = {
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
 
+    # Enable support for content libraries. Note that content libraries are
+    # only supported in courses using split mongo. Change the setting
+    # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
+    # and libraries created with split.
+    'ENABLE_CONTENT_LIBRARIES': False,
+
     # edx-notifications subsystem
     'ENABLE_NOTIFICATIONS': False,
 

@@ -406,6 +406,14 @@ class XBlockWrapper(PageObject):
     def has_group_visibility_set(self):
         return self.q(css=self._bounded_selector('.wrapper-xblock.has-group-visibility-set')).is_present()
 
+    @property
+    def has_edit_visibility_button(self):
+        """
+        Returns true if this xblock has an 'edit visibility' button
+        :return:
+        """
+        return self.q(css=self._bounded_selector('.visibility-button')).is_present()
+
     def go_to_container(self):
         """
         Open the container page linked to by this xblock, and return
