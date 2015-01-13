@@ -10,7 +10,13 @@ define([
         },
 
         errorMessage: gettext('An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page.'),
-        emptyFieldMessage: gettext('Please enter a term in the search field.'),
+        emptyFieldMessage: (function () {
+            var message = gettext('Please enter a term in the %(anchor_start)s search field%(anchor_end)s.');
+            return interpolate(message, {
+                'anchor_start': '<a href="#search-notes-input">',
+                'anchor_end': '</a>'
+            }, true);
+        } ()),
 
         initialize: function (options) {
             _.bindAll(this, 'onSuccess', 'onError', 'onComplete');
