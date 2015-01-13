@@ -64,12 +64,18 @@ define([
         },
 
         annotationViewerShown: function (viewer, annotations) {
-            var data = {
+            // Emits an event only when the annotation already exists on the
+            // server. Otherwise, `annotation.id` is `undefined`.
+            var data;
+            annotations = _.reject(annotations, this.isNew);
+            data = {
                 'notes': _.map(annotations, function (annotation) {
                     return {'note_id': annotation.id};
                 })
             };
-            this.log('edx.course.student_notes.viewed', data);
+            if (data.notes.length) {
+                this.log('edx.course.student_notes.viewed', data);
+            }
         },
 
         annotationFullyCreated: function (annotation) {
@@ -86,16 +92,24 @@ define([
         },
 
         annotationUpdated: function (annotation) {
-            var data = _.extend(
-                this.getDefaultData(annotation),
-                this.getText('old_note_text', this.oldNoteText)
-            );
-            this.log('edx.course.student_notes.edited', data);
+            var data;
+            if (!this.isNew(annotation)) {
+                data = _.extend(
+                    this.getDefaultData(annotation),
+                    this.getText('old_note_text', this.oldNoteText)
+                );
+                this.log('edx.course.student_notes.edited', data);
+            }
         },
 
         annotationDeleted: function (annotation) {
-            var data = this.getDefaultData(annotation);
-            this.log('edx.course.student_notes.deleted', data);
+            var data;
+            // Emits an event only when the annotation already exists on the
+            // server.
+            if (!this.isNew(annotation)) {
+                data = this.getDefaultData(annotation);
+                this.log('edx.course.student_notes.deleted', data);
+            }
         },
 
         getDefaultData: function (annotation) {
@@ -114,7 +128,7 @@ define([
                 truncated = false,
                 limit = this.options.stringLimit;
 
-            if (_.isNumber(limit) && text.length > limit) {
+            if (_.isNumber(limit) && _.isString(text) && text.length > limit) {
                 text = String(text).slice(0, limit);
                 truncated = true;
             }
@@ -123,6 +137,14 @@ define([
             info[fieldName + '_truncated'] = truncated;
 
             return info;
+        },
+
+        /**
+         * If the model does not yet have an id, it is considered to be new.
+         * @return {Boolean}
+         */
+        isNew: function (annotation) {
+            return !_.has(annotation, 'id');
         },
 
         log: function (eventName, data) {
