@@ -338,7 +338,7 @@ class EdxNotesPageTest(EdxNotesTestMixin):
         Then I see only "You do not have any notes within the course." message
         """
         self.notes_page.visit()
-        self.assertIn("YOU HAVE NOT MADE ANY NOTES IN THIS COURSE YET.", self.notes_page.no_content_text)
+        self.assertIn("You have not made any notes in this course yet. Other students in this course are using notes to:", self.notes_page.no_content_text)
 
     def test_recent_activity_view(self):
         """
