@@ -666,13 +666,16 @@ class DraftModuleStore(MongoModuleStore):
 
             return item
 
-        def index_item_location(item_location):
+        def index_item_location(item_location, current_start_date):
             """ add this item to the search index """
             item = _fetch_item(item_location)
             if item:
+                if item.start and (not current_start_date or item.start > current_start_date):
+                    current_start_date = item.start
+
                 if item.has_children:
                     for child_loc in item.children:
-                        index_item_location(child_loc)
+                        index_item_location(child_loc, current_start_date)
 
                 item_index = {}
                 item_index.update(location_info)
@@ -680,6 +683,12 @@ class DraftModuleStore(MongoModuleStore):
                 item_index.update({
                     'id': unicode(item.scope_ids.usage_id),
                 })
+
+                if current_start_date:
+                    item_index.update({
+                        "start_date": current_start_date
+                    })
+
                 searcher.index(DOCUMENT_TYPE, item_index)
 
         def remove_index_item_location(item_location):
@@ -689,12 +698,15 @@ class DraftModuleStore(MongoModuleStore):
                 if item.has_children:
                     for child_loc in item.children:
                         remove_index_item_location(child_loc)
-                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+                try:
+                    searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+                except Exception:
+                    pass
 
         if delete:
             remove_index_item_location(location)
         else:
-            index_item_location(location)
+            index_item_location(location, None)
 
     def publish(self, location, user_id, **kwargs):
         """
