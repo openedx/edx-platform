@@ -542,8 +542,10 @@ def dashboard(request):
         staff_access = True
         errored_courses = modulestore().get_errored_courses()
 
-    show_courseware_links_for = frozenset(course.id for course, _enrollment in course_enrollment_pairs
-                                          if has_access(request.user, 'load', course))
+    show_courseware_links_for = frozenset(
+        course.id for course, _enrollment in course_enrollment_pairs
+        if has_access(request.user, 'load', course) and has_access(request.user, 'load_with_prerequisites', course)
+    )
 
     # Construct a dictionary of course mode information
     # used to render the course list.  We re-use the course modes dict
@@ -655,7 +657,9 @@ def dashboard(request):
     order_history_list = order_history(user, course_org_filter=course_org_filter, org_filter_out_set=org_filter_out_set)
 
     # get list of courses having pre-requisites yet to be completed
-    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, course_enrollment_pairs)
+    courses_having_prerequisites = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                             if course.pre_requisite_courses)
+    courses_requirements_not_met = get_pre_requisite_courses_not_completed(user, courses_having_prerequisites)
 
     context = {
         'enrollment_message': enrollment_message,

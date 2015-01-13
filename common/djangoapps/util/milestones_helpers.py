@@ -21,9 +21,10 @@ from django.conf import settings
 
 def add_prerequisite_course(course_key, prerequisite_course_key):
     """
-    It would create a milestone for given course and set it as
-    requirement milestone for given course and set it a fulfilment
-    milestone for pre-requisite course.
+    It would create a milestone, then it would set newly created
+    milestones as requirement for course referred by `course_key`
+    and it would set newly created milestone as fulfilment
+    milestone for course referred by `prerequisite_course_key`.
     """
     # create a milestone
     milestone = add_milestone({
@@ -40,7 +41,8 @@ def add_prerequisite_course(course_key, prerequisite_course_key):
 
 def remove_prerequisite_course(course_key, milestone):
     """
-    It would remove pre-requisite course milestone for a course
+    It would remove pre-requisite course milestone for course
+    referred by `course_key`.
     """
 
     remove_course_milestone(
@@ -52,7 +54,7 @@ def remove_prerequisite_course(course_key, milestone):
 def set_prerequisite_courses(course_key, prerequisite_course_keys):
     """
     It would remove any existing requirement milestones for the given `course_key`
-    and create new milestones for each pre requisite course in `prerequisite_course_keys`.
+    and create new milestones for each pre-requisite course in `prerequisite_course_keys`.
     To only remove course milestones pass `course_key` and empty list or
     None as `prerequisite_course_keys` .
     """
@@ -73,33 +75,28 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: 
     """
     It would make dict of prerequisite courses not completed by user among courses
     user has enrolled in. It calls the fulfilment api of milestones app and
-    iterates over all fulfillments of user not achieved to make dict of
-    prerequisites yet to be completed.
+    iterates over all fulfilment milestones not achieved to make dict of
+    prerequisite courses yet to be completed.
     """
     pre_requisite_courses = {}
     if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
-        for course, __ in enrolled_courses:
+        for course_key in enrolled_courses:
             required_courses = []
-            # if course has pre-requisites then fetch fulfilment path
-            if course.pre_requisite_courses:
-                fulfilment_paths = get_course_milestones_fulfillment_paths(course.id, {'id': user.id})
-                for milestone_key, milestone_value in fulfilment_paths.items():  # pylint: disable=unused-variable
-                    for key, value in milestone_value.items():
-                        if key == 'courses' and value:
-                            for required_course in value:
-                                required_course_key = CourseKey.from_string(required_course['course_id'])
-                                required_course_descriptor = modulestore().get_course(required_course_key)
-                                required_courses.append({
-                                    'key': required_course_key,
-                                    'display': ' '.join([
-                                        required_course_descriptor.display_org_with_default,
-                                        required_course_descriptor.display_number_with_default
-                                    ])
-                                })
+            fulfilment_paths = get_course_milestones_fulfillment_paths(course_key, {'id': user.id})
+            for milestone_key, milestone_value in fulfilment_paths.items():  # pylint: disable=unused-variable
+                for key, value in milestone_value.items():
+                    if key == 'courses' and value:
+                        for required_course in value:
+                            required_course_key = CourseKey.from_string(required_course['course_id'])
+                            required_course_descriptor = modulestore().get_course(required_course_key)
+                            required_courses.append({
+                                'key': required_course_key,
+                                'display': get_course_display_name(required_course_descriptor)
+                            })
 
-                # if there are required courses add to dict
+            # if there are required courses add to dict
             if required_courses:
-                pre_requisite_courses[course.id] = {'courses': required_courses}
+                pre_requisite_courses[course_key] = {'courses': required_courses}
     return pre_requisite_courses
 
 
@@ -113,16 +110,24 @@ def get_prerequisite_courses_display(course_descriptor):  # pylint: disable=inva
         for course_id in course_descriptor.pre_requisite_courses:
             course_key = CourseKey.from_string(course_id)
             required_course_descriptor = modulestore().get_course(course_key)
-            pre_requisite_courses.append(' '.join([
-                required_course_descriptor.display_org_with_default,
-                required_course_descriptor.display_number_with_default
-            ]))
+            pre_requisite_courses.append(get_course_display_name(required_course_descriptor))
     return pre_requisite_courses
+
+
+def get_course_display_name(descriptor):
+    """
+    It would return display name from given course descriptor
+    """
+    return ' '.join([
+        descriptor.display_org_with_default,
+        descriptor.display_number_with_default
+    ])
 
 
 def fulfill_course_milestone(course_key, user):
     """
-    It would save course milestone collected by user.
+    Marks the course specified by the given course_key as complete for the given user.
+    If any other courses require this course as a prerequisite, their milestones will be appropriately updated.
     """
     course_milestones = get_course_milestones(course_key=course_key, relationship="fulfills")
     for milestone in course_milestones:
@@ -143,9 +148,5 @@ def is_valid_course_key(key):
     try:
         course_key = CourseKey.from_string(key)
     except InvalidKeyError:
-        try:
-            course_key = SlashSeparatedCourseKey.from_deprecated_string(key)
-        except InvalidKeyError:
-            course_key = key
-
+        course_key = key
     return isinstance(course_key, CourseKey)

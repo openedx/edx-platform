@@ -2,12 +2,14 @@ import datetime
 import pytz
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 import courseware.access as access
 from courseware.tests.factories import UserFactory, StaffFactory, InstructorFactory
-from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory
+from courseware.tests.helpers import LoginEnrollmentTestCase
+from student.tests.factories import AnonymousUserFactory, CourseEnrollmentAllowedFactory, CourseEnrollmentFactory
 from xmodule.course_module import (
     CATALOG_VISIBILITY_CATALOG_AND_ABOUT, CATALOG_VISIBILITY_ABOUT,
     CATALOG_VISIBILITY_NONE
@@ -22,7 +24,7 @@ from util.milestones_helpers import (
 # pylint: disable=protected-access
 
 
-class AccessTestCase(TestCase):
+class AccessTestCase(LoginEnrollmentTestCase):
     """
     Tests for the various access controls on the student dashboard
     """
@@ -265,16 +267,58 @@ class AccessTestCase(TestCase):
         set_prerequisite_courses(course.id, pre_requisite_courses)
 
         #user should not be able to load course even if enrolled
-        CourseEnrollmentAllowedFactory(email=user.email, course_id=course.id)
-        self.assertFalse(access._has_access_course_desc(user, 'load', course))
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+        self.assertFalse(access._has_access_course_desc(user, 'load_with_prerequisites', course))
 
         # Staff can always access course
         staff = StaffFactory.create(course_key=course.id)
-        self.assertTrue(access._has_access_course_desc(staff, 'load', course))
+        self.assertTrue(access._has_access_course_desc(staff, 'load_with_prerequisites', course))
 
         # User should be able access after completing required course
         fulfill_course_milestone(pre_requisite_course.id, user)
-        self.assertTrue(access._has_access_course_desc(user, 'load', course))
+        self.assertTrue(access._has_access_course_desc(user, 'load_with_prerequisites', course))
+
+    @patch.dict("django.conf.settings.FEATURES", {'ENABLE_PREREQUISITE_COURSES': True})
+    def test_courseware_page_unfulfilled_prereqs(self):
+        """
+        Test courseware access when a course has pre-requisite course yet to be completed
+        """
+        pre_requisite_course = CourseFactory.create(
+            org='edX',
+            course='900',
+            run='test_run',
+        )
+
+        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+        course = CourseFactory.create(
+            org='edX',
+            course='1000',
+            run='test_run',
+            pre_requisite_courses=pre_requisite_courses,
+        )
+        set_prerequisite_courses(course.id, pre_requisite_courses)
+
+        test_password = 't3stp4ss.!'
+        user = UserFactory.create()
+        user.set_password(test_password)
+        user.save()
+        self.login(user.email, test_password)
+        CourseEnrollmentFactory(user=user, course_id=course.id)
+
+        url = reverse('courseware', args=[unicode(course.id)])
+        response = self.client.get(url)
+        self.assertRedirects(
+            response,
+            reverse(
+                'about_course',
+                args=[unicode(course.id)]
+            )
+        )
+        self.assertEqual(response.status_code, 302)
+
+        fulfill_course_milestone(pre_requisite_course.id, user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
 
 class UserRoleTestCase(TestCase):

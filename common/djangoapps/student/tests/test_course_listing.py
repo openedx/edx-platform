@@ -153,6 +153,11 @@ class TestCourseListing(ModuleStoreTestCase):
 
         set_prerequisite_courses(course_location, pre_requisite_courses)
         # get dashboard
-        courses_list = list(get_course_enrollment_pairs(self.student, None, []))
-        courses_requirements_not_met = get_pre_requisite_courses_not_completed(self.student, courses_list)
+        course_enrollment_pairs = list(get_course_enrollment_pairs(self.student, None, []))
+        courses_having_prerequisites = frozenset(course.id for course, _enrollment in course_enrollment_pairs
+                                                 if course.pre_requisite_courses)
+        courses_requirements_not_met = get_pre_requisite_courses_not_completed(
+            self.student,
+            courses_having_prerequisites
+        )
         self.assertEqual(len(courses_requirements_not_met[course_location]['courses']), len(pre_requisite_courses))

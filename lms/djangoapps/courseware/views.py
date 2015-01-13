@@ -350,6 +350,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
 
+    if not has_access(user, 'load_with_prerequisites', course):
+        log.debug(u'User %s tried to view course %s without fulfilling prerequisites', user, unicode(course.id))
+        return redirect(reverse('about_course', args=[unicode(course.id)]))
+
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
     if survey.utils.must_answer_survey(course, user):
@@ -760,7 +764,9 @@ def course_about(request, course_id):
     else:
         course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-    show_courseware_link = (has_access(request.user, 'load', course) or
+    show_courseware_link = ((has_access(request.user, 'load', course) and
+                            has_access(request.user, 'load_with_prerequisites', course))
+                            or
                             settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
 
     # Note: this is a flow for payment for course registration, not the Verified Certificate flow.

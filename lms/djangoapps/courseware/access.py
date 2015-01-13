@@ -266,8 +266,24 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
+    def can_load_course_with_prerequisites():  # pylint: disable=invalid-name
+        """
+        Checks if prerequisite courses feature is enabled and course has prerequisites
+        and user is neither staff nor anonymous then it returns False if user has not
+        passed prerequisite courses otherwise return True.
+        """
+        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
+                and not _has_staff_access_to_descriptor(user, course, course.id) \
+                and hasattr(course, 'pre_requisite_courses') and course.pre_requisite_courses \
+                and not user.is_anonymous() \
+                and get_pre_requisite_courses_not_completed(user, [course.id]):
+            return False
+        else:
+            return True
+
     checkers = {
         'load': can_load,
+        'load_with_prerequisites': can_load_course_with_prerequisites,
         'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
         'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
@@ -322,14 +338,6 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         don't have to hit the enrollments table on every module load.
         """
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
-            return False
-
-        # if course has pre-requisite course not passed by user
-        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
-                and not _has_staff_access_to_descriptor(user, descriptor, course_key) \
-                and hasattr(descriptor, 'pre_requisite_courses') and descriptor.pre_requisite_courses \
-                and not user.is_anonymous() \
-                and get_pre_requisite_courses_not_completed(user, [(descriptor, None)]):
             return False
 
         # If start dates are off, can always load

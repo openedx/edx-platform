@@ -489,7 +489,8 @@ def get_courses_accessible_to_user(request):
 
 def _remove_in_process_courses(courses, in_process_course_actions):
     """
-    remove any courses in courses that are also in the in_process_course_actions list and formats them for view
+    removes any in-process courses in courses list. in-process actually refers to courses
+    that are in the process of being generated for re-run
     """
     def format_course_for_view(course):
         """
@@ -821,7 +822,7 @@ def settings_handler(request, course_key_string):
                 courses = [course for course in courses if course.id != course_key]
                 if courses:
                     courses = _remove_in_process_courses(courses, in_process_course_actions)
-                settings_context.update({'pre_requisite_courses': courses})
+                settings_context.update({'possible_pre_requisite_courses': courses})
 
             return render_to_response('settings.html', settings_context)
         elif 'application/json' in request.META.get('HTTP_ACCEPT', ''):
@@ -837,7 +838,7 @@ def settings_handler(request, course_key_string):
                 if prerequisite_course_enabled:
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
-                        return JsonResponseBadRequest({_("error"): _("Invalid prerequisite course key")})
+                        return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
                     set_prerequisite_courses(course_key, prerequisite_course_keys)
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
