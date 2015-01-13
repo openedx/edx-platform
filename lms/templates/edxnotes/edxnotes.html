@@ -26,7 +26,7 @@
         <div class="wrapper-notes-search">
           <form role="search" action="${search_endpoint}" method="GET" id="search-notes-form" class="is-hidden">
             <label for="search-notes-input" class="sr">${_('Search notes for:')}</label>
-            <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}">
+            <input type="search" class="search-notes-input" id="search-notes-input" name="note" placeholder="${_('Search notes for...')}" required>
             <button type="submit" class="search-notes-submit">
               <i class="icon fa fa-search"></i>
               <span class="sr">${_('Search')}</span>
@@ -37,9 +37,9 @@
       </div>
 
       <div class="wrapper-msg is-hidden error urgency-high inline-error">
-        <div class="msg msg-error" tabindex="-1">
+        <div class="msg msg-error">
           <div class="msg-content">
-            <p class="copy"></p>
+            <p class="copy" aria-live="polite"></p>
           </div>
         </div>
       </div>
