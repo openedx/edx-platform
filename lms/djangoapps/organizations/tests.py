@@ -457,18 +457,18 @@ class OrganizationsApiTests(ModuleStoreTestCase):
             course1 = CourseFactory.create(display_name="COURSE1", org="CRS1", run="RUN1")
             course2 = CourseFactory.create(display_name="COURSE2", org="CRS2", run="RUN2")
             course3 = CourseFactory.create(display_name="COURSE3", org="CRS3", run="RUN3")
-            if i < 3:
+
+            # first six users are enrolled in course1, course2 and course3
+            if i < 7:
                 CourseEnrollmentFactory.create(user=user, course_id=course1.id)
                 StudentGradebook.objects.create(user=user, grade=0.75, proforma_grade=0.85, course_id=course1.id)
-            elif i < 5:
                 CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.82, proforma_grade=0.82, course_id=course2.id)
-            elif i < 7:
                 CourseEnrollmentFactory.create(user=user, course_id=course3.id)
                 StudentGradebook.objects.create(user=user, grade=0.72, proforma_grade=0.78, course_id=course3.id)
             elif i < 9:
                 CourseEnrollmentFactory.create(user=user, course_id=course1.id)
-                StudentGradebook.objects.create(user=user, grade=0.94, proforma_grade=0.67, course_id=course1.id)
+                StudentGradebook.objects.create(user=user, grade=0.54, proforma_grade=0.67, course_id=course1.id)
             elif i < 11:
                 CourseEnrollmentFactory.create(user=user, course_id=course2.id)
                 StudentGradebook.objects.create(user=user, grade=0.90, proforma_grade=0.91, course_id=course2.id)
@@ -493,30 +493,30 @@ class OrganizationsApiTests(ModuleStoreTestCase):
         metrics_uri = '{}metrics/'.format(test_uri)
         response = self.do_get(metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 6)
-        self.assertEqual(response.data['users_grade_average'], 0.751)
+        self.assertEqual(response.data['users_grade_complete_count'], 8)
+        self.assertEqual(response.data['users_grade_average'], 0.504)
 
 
         courses = {'courses': unicode(course1.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 2)
-        self.assertEqual(response.data['users_grade_average'], 0.845)
+        self.assertEqual(response.data['users_grade_complete_count'], 0)
+        self.assertEqual(response.data['users_grade_average'], 0.698)
 
         courses = {'courses': unicode(course2.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 4)
-        self.assertEqual(response.data['users_grade_average'], 0.688)
+        self.assertEqual(response.data['users_grade_complete_count'], 8)
+        self.assertEqual(response.data['users_grade_average'], 0.747)
 
         courses = {'courses': '{},{}'.format(course1.id, course2.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
         response = self.do_get(filtered_metrics_uri)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['users_grade_complete_count'], 6)
-        self.assertEqual(response.data['users_grade_average'], 0.758)
+        self.assertEqual(response.data['users_grade_complete_count'], 8)
+        self.assertEqual(response.data['users_grade_average'], 0.559)
 
         courses = {'courses': '{}'.format(self.course.id)}
         filtered_metrics_uri = '{}?{}'.format(metrics_uri, urlencode(courses))
