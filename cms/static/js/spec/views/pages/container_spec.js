@@ -594,6 +594,7 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
             });
         }
 
+        // Create a suite for a non-paged container that includes 'edit visibility' buttons
         parameterized_suite("Non paged",
             { },
             {
@@ -603,6 +604,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 has_visibility_editor: true
             }
         );
+
+        // Create a suite for a paged container that does not include 'edit visibility' buttons
         parameterized_suite("Paged",
             { page_size: 42 },
             {
@@ -610,5 +613,6 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                 initial: 'mock/mock-container-paged-xblock.underscore',
                 add_response: 'mock/mock-xblock-paged.underscore',
                 has_visibility_editor: false
-            });
+            }
+        );
     });
