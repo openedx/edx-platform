@@ -220,7 +220,7 @@
         &.has-warnings {
           border-top: 3px solid $orange;
 
-          .fa-warning {
+          .fa-exclamation-triangle {
             margin-right: ($baseline/2);
             color: $orange;
           }
