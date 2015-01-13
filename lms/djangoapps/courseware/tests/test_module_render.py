@@ -198,6 +198,14 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(403, response.status_code)
         self.assertEquals('Unauthenticated', response.content)
 
+    def test_hash_resource(self):
+        """
+        Ensure that the resource hasher works and does not fail on unicode,
+        decoded or otherwise.
+        """
+        resources = ['ASCII text', u'❄ I am a special snowflake.', "❄ So am I, but I didn't tell you."]
+        self.assertEqual(render.hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
+
     def test_missing_position_handler(self):
         """
         Test that sending POST request without or invalid position argument don't raise server error
