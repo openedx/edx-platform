@@ -1061,13 +1061,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             raise ItemNotFoundError(locator)
 
         course = self._lookup_course(locator.course_key)
-        parent_id = self._get_parent_from_structure(BlockKey.from_usage_key(locator), course.structure)
-        if parent_id is None:
+        parent_ids = self._get_parents_from_structure(BlockKey.from_usage_key(locator), course.structure)
+        if len(parent_ids) == 0:
             return None
+        # find alphabetically least
+        parent_ids.sort(key=lambda parent: (parent.type, parent.id))
         return BlockUsageLocator.make_relative(
             locator,
-            block_type=parent_id.type,
-            block_id=parent_id.id,
+            block_type=parent_ids[0].type,
+            block_id=parent_ids[0].id,
         )
 
     def get_orphans(self, course_key, **kwargs):
@@ -2041,8 +2043,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             for subtree_root in subtree_list:
                 if BlockKey.from_usage_key(subtree_root) != source_structure['root']:
                     # find the parents and put root in the right sequence
-                    parent = self._get_parent_from_structure(BlockKey.from_usage_key(subtree_root), source_structure)
-                    if parent is not None:  # may be a detached category xblock
+                    parents = self._get_parents_from_structure(BlockKey.from_usage_key(subtree_root), source_structure)
+                    for parent in parents:
                         if parent not in destination_blocks:
                             raise ItemNotFoundError(parent)
                         orphans.update(
@@ -2101,8 +2103,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_structure = self.version_structure(usage_locator.course_key, original_structure, user_id)
             new_blocks = new_structure['blocks']
             new_id = new_structure['_id']
-            parent_block_key = self._get_parent_from_structure(block_key, original_structure)
-            if parent_block_key:
+            parent_block_keys = self._get_parents_from_structure(block_key, original_structure)
+            for parent_block_key in parent_block_keys:
                 parent_block = new_blocks[parent_block_key]
                 parent_block['fields']['children'].remove(block_key)
                 parent_block['edit_info']['edited_on'] = datetime.datetime.now(UTC)
@@ -2626,15 +2628,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         }
 
     @contract(block_key=BlockKey)
-    def _get_parent_from_structure(self, block_key, structure):
+    def _get_parents_from_structure(self, block_key, structure):
         """
         Given a structure, find block_key's parent in that structure. Note returns
         the encoded format for parent
         """
-        for parent_block_key, value in structure['blocks'].iteritems():
-            if block_key in value['fields'].get('children', []):
-                return parent_block_key
-        return None
+        return [
+            parent_block_key
+            for parent_block_key, value in structure['blocks'].iteritems()
+            if block_key in value['fields'].get('children', [])
+        ]
 
     def _sync_children(self, source_parent, destination_parent, new_child):
         """
@@ -2733,7 +2736,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Delete the orphan and any of its descendants which no longer have parents.
         """
-        if self._get_parent_from_structure(orphan, structure) is None:
+        if len(self._get_parents_from_structure(orphan, structure)) == 0:
             for child in structure['blocks'][orphan]['fields'].get('children', []):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
             del structure['blocks'][orphan]
