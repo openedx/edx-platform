@@ -107,15 +107,46 @@ def send_request(user, course_id, path="", query_string=None):
     return response
 
 
+def get_parent_xblock(xblock):
+    """
+    Returns the xblock that is the parent of the specified xblock, or None if it has no parent.
+    """
+    # TODO: replace with xblock.get_parent() when it lands
+    store = modulestore()
+    if store.request_cache is not None:
+        parent_cache = store.request_cache.data.setdefault('edxnotes-parent-cache', {})
+    else:
+        parent_cache = None
+
+    locator = xblock.location
+    if parent_cache and unicode(locator) in parent_cache:
+        return parent_cache[unicode(locator)]
+
+    parent_location = store.get_parent_location(locator)
+
+    if parent_location is None:
+        return None
+    xblock = store.get_item(parent_location)
+    # .get_parent_location(locator) returns locators w/o branch and version
+    # and for uniformity we remove them from children locators
+    xblock.children = [child.for_branch(None) for child in xblock.children]
+
+    if parent_cache is not None:
+        for child in xblock.children:
+            parent_cache[unicode(child)] = xblock
+
+    return xblock
+
+
 def get_parent_unit(xblock):
     """
     Find vertical that is a unit, not just some container.
     """
     while xblock:
-        xblock = xblock.get_parent()
+        xblock = get_parent_xblock(xblock)
         if xblock is None:
             return None
-        parent = xblock.get_parent()
+        parent = get_parent_xblock(xblock)
         if parent is None:
             return None
         if parent.category == 'sequential':
@@ -169,7 +200,7 @@ def preprocess_collection(user, course, collection):
                 log.debug("Unit not found: %s", usage_key)
                 continue
 
-            section = unit.get_parent()
+            section = get_parent_xblock(unit)
             if not section:
                 log.debug("Section not found: %s", usage_key)
                 continue
@@ -183,7 +214,7 @@ def preprocess_collection(user, course, collection):
                 filtered_collection.append(model)
                 continue
 
-            chapter = section.get_parent()
+            chapter = get_parent_xblock(section)
             if not chapter:
                 log.debug("Chapter not found: %s", usage_key)
                 continue
@@ -218,9 +249,7 @@ def get_module_context(course, item):
         'location': unicode(item.location),
         'display_name': item.display_name_with_default,
     }
-
-    if item.category == 'chapter' and item.get_parent():
-        course = item.get_parent()
+    if item.category == 'chapter':
         ancestor_children = [unicode(child) for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
@@ -228,7 +257,6 @@ def get_module_context(course, item):
             "course_id": unicode(course.id),
             "module_id": item.url_name,
         })
-
     if item.category in ('chapter', 'sequential'):
         item_dict['children'] = [unicode(child) for child in item.children]
 

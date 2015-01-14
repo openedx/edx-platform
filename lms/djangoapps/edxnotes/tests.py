@@ -142,6 +142,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Setup a dummy course content.
         """
         super(EdxNotesHelpersTest, self).setUp()
+        modulestore().request_cache.data = {}
         ClientFactory(name="edx-notes")
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
@@ -567,7 +568,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests the result if the unit does not exist.
         """
         store = MagicMock()
-        store.get_item().get_parent.return_value = None
+        store.get_parent_location.return_value = None
         mock_modulestore.return_value = store
         mock_has_access.return_value = True
         initial_collection = [{
