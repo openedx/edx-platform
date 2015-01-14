@@ -593,10 +593,12 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         Tests `test_get_parent_xblock` method to return parent xblock or None
         """
-        self.assertEqual(helpers.get_parent_xblock(self.html_module_1).location, self.vertical.location)
-        self.assertEqual(helpers.get_parent_xblock(self.sequential).location, self.chapter.location)
-        self.assertEqual(helpers.get_parent_xblock(self.chapter).location, self.course.location)
-        self.assertIsNone(helpers.get_parent_xblock(self.course))
+        for i in range(2):
+            # repeat the test twice to make sure caching does not interfere
+            self.assertEqual(helpers.get_parent_xblock(self.html_module_1).location, self.vertical.location)
+            self.assertEqual(helpers.get_parent_xblock(self.sequential).location, self.chapter.location)
+            self.assertEqual(helpers.get_parent_xblock(self.chapter).location, self.course.location)
+            self.assertIsNone(helpers.get_parent_xblock(self.course))
 
     def test_get_parent_unit(self):
         """
