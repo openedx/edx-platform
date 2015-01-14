@@ -1,7 +1,7 @@
 <div class="search-info">
     <%- gettext("Searching") %> <%= courseName %>
     <div class="search-count">
-        <span class="search-count-total"><%- totalCount %></span>  <%- gettext("results") %>
+        <span class="search-count-total"><%- totalCount %></span>  <%- ngettext("result", "results", totalCount) %>
     </div>
 </div>
 
