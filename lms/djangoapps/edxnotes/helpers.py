@@ -18,8 +18,7 @@ from django.utils.translation import ugettext as _
 from capa.util import sanitize_html
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.search import path_to_location
-from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
 from provider.oauth2.models import AccessToken, Client
