@@ -38,23 +38,23 @@
 
 %endif
 
-%if verification_status == 'must_reverify':
+%if verification_status in ['must_reverify', 'expired']:
 <li class="status status-verification is-denied">
-  <span class="title status-title">${_("ID-Verification Status")}</span>
+<span class="title status-title">${_("{platform_name} Verification Status").format(platform_name=settings.PLATFORM_NAME)}</span>
 
   <div class="status-data">
     <span class="status-data-message">${verification_msg}</span>
 
     <ul class="list-actions">
     <li class="action-item action-item-reverify">
-      <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Re-verify Yourself")}</a>
+      <a href="${reverse('verify_student_reverify')}" class="action action-reverify">${_("Resubmit Verification")}</a>
     </li>
     </ul>
 
     <div class="status-note">
       <span class="deco-arrow"></span>
 
-      <p>${_("If you fail to pass a verification attempt before your course ends, you will not receive a verified certificate.")}</p>
+      <p>${_("To receive a verified certificate, you have to submit a new photo of yourself and your government-issued photo ID before the course ends.")}</p>
     </div>
   </div>
 </li>

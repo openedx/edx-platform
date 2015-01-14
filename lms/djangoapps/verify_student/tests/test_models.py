@@ -382,6 +382,14 @@ class TestPhotoVerification(TestCase):
         reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
         self.assertEquals(reverify_status, ('denied', ''))
 
+        reverify_attempt.status = 'approved'
+        # pylint: disable=protected-access
+        reverify_attempt.created_at = SoftwareSecurePhotoVerification._earliest_allowed_date() + timedelta(days=-1)
+        reverify_attempt.save()
+        reverify_status = SoftwareSecurePhotoVerification.user_status(user=user, window=window)
+        message = 'Your {platform_name} verification has expired.'.format(platform_name=settings.PLATFORM_NAME)
+        self.assertEquals(reverify_status, ('expired', message))
+
     def test_display(self):
         user = UserFactory.create()
         window = MidcourseReverificationWindowFactory()

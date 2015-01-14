@@ -299,7 +299,10 @@ class PhotoVerification(StatusModel):
                     return ('none', error_msg)
 
             if attempt.created_at < cls._earliest_allowed_date():
-                return ('expired', error_msg)
+                return (
+                    'expired',
+                    _("Your {platform_name} verification has expired.").format(platform_name=settings.PLATFORM_NAME)
+                )
 
             # If someone is denied their original verification attempt, they can try to reverify.
             # However, if a midcourse reverification is denied, that denial is permanent.
@@ -742,7 +745,7 @@ class SoftwareSecurePhotoVerification(PhotoVerification):
             ("photoIdReasons", "Text not clear"): _("We couldn't read your name from your photo ID image."),
             ("generalReasons", "Name mismatch"): _("The name associated with your account and the name on your ID do not match."),
             ("userPhotoReasons", "Image not clear"): _("The image of your face was not clear."),
-            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo"),
+            ("userPhotoReasons", "Face out of view"): _("Your face was not visible in your self-photo."),
         }
 
         try:
