@@ -187,9 +187,9 @@ class StudentAdmin
         return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
       send_data =
         unique_student_identifier: unique_student_identifier
-        problem_to_reset: 'entrance_exam'
+        problem_to_reset: 'entrance_exam' # 'entrance_exam' is an system defined constant
         delete_module: false
-      success_message = gettext("Success! Entrance exam attempts reset for student '<%= student_id %>'.")
+      success_message = gettext("Entrance exam attempts is being reset for student '<%= student_id %>'.")
       error_message = gettext("Error resetting entrance exam attempts for student '<%= student_id %>'. Make sure student identifier is correct.")
       full_success_message = _.template(success_message, {student_id: unique_student_identifier})
       full_error_message = _.template(error_message, {student_id: unique_student_identifier})

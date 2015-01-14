@@ -71,7 +71,7 @@ import instructor_analytics.csvs
 import csv
 from openedx.core.djangoapps.user_api.models import UserPreference
 from instructor.views import INVOICE_KEY
-
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
 from bulk_email.models import CourseEmail
@@ -1516,17 +1516,20 @@ def reset_student_attempts(request, course_id):
     response_payload['problem_to_reset'] = problem_to_reset
 
     if student:
-        if problem_to_reset == 'entrance_exam':
-            entrance_exam_modules = get_entrance_exam_modules(request, course, student)
-            if entrance_exam_modules:
-                for module in entrance_exam_modules:
-                    instructor_task.api.submit_reset_problem_attempts_for_student(
-                        module.scope_ids.usage_id,
-                        student
-                    )
-            else:
-                return HttpResponseBadRequest(_("Course does not has entrance exam enabled."))
-
+        if problem_to_reset == 'entrance_exam':  # Constant for determining if problem_to_reset is entrance exam
+            try:
+                entrance_exam_modules = get_entrance_exam_modules(request, course, student)
+                if entrance_exam_modules:
+                    for module in entrance_exam_modules:
+                        instructor_task.api.submit_reset_problem_attempts_for_student(
+                            module.scope_ids.usage_id,
+                            student
+                        )
+                else:
+                    return HttpResponseBadRequest(_("Course does not has entrance exam enabled."))
+            except ItemNotFoundError:
+                return HttpResponseBadRequest()
+        # reset problem attempts.
         else:
             try:
                 enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)

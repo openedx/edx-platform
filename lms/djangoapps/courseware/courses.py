@@ -427,7 +427,9 @@ def get_entrance_exam_modules(request, course, student):
     if settings.FEATURES.get('ENTRANCE_EXAMS', False):
         if getattr(course, 'entrance_exam_enabled', False):
             exam_key = UsageKey.from_string(course.entrance_exam_id)
-            exam_descriptor = modulestore().get_item(exam_key)
+            # it will be a Mongo performance boost, if you pass in a depth=3 argument here
+            # as it will optimize round trips to the database to fetch all children for the current node
+            exam_descriptor = modulestore().get_item(exam_key, depth=3)
 
             def create_module(descriptor):
                 """creates an XModule instance given a descriptor"""
