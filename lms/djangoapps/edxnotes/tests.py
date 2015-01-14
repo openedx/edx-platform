@@ -152,7 +152,8 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
         self.vertical_with_container = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        self.child_container = ItemFactory.create(category='split_test', parent_location=self.vertical_with_container.location)
+        self.child_container = ItemFactory.create(
+            category='split_test', parent_location=self.vertical_with_container.location)
         self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
         self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
@@ -294,7 +295,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"section": {
                         u"display_name": self.sequential.display_name_with_default,
                         u"location": unicode(self.sequential.location),
-                        u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
+                        u"children": [
+                            unicode(self.vertical.location),
+                            unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
                         u"url": self._get_jump_to_url(self.vertical),
@@ -363,7 +366,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"section": {
                             u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
-                            u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
+                            u"children": [
+                                unicode(self.vertical.location),
+                                unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
                             u"url": self._get_jump_to_url(self.vertical),
@@ -385,7 +390,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"section": {
                             u"display_name": self.sequential.display_name_with_default,
                             u"location": unicode(self.sequential.location),
-                            u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
+                            u"children": [
+                                unicode(self.vertical.location),
+                                unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
                             u"url": self._get_jump_to_url(self.vertical),

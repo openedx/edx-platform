@@ -877,14 +877,13 @@ class CourseTabList(List):
 
         # the following tabs should appear only once
         for tab_type in [
-            CoursewareTab.type,
-            CourseInfoTab.type,
-            NotesTab.type,
-            TextbookTabs.type,
-            PDFTextbookTabs.type,
-            HtmlTextbookTabs.type,
-            EdxNotesTab.type,
-        ]:
+                CoursewareTab.type,
+                CourseInfoTab.type,
+                NotesTab.type,
+                TextbookTabs.type,
+                PDFTextbookTabs.type,
+                HtmlTextbookTabs.type,
+                EdxNotesTab.type]:
             cls._validate_num_tabs_of_type(tabs, tab_type, 1)
 
     @staticmethod
