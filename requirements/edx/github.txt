@@ -19,7 +19,7 @@
 -e git+https://github.com/pmitros/django-pyfs.git@d175715e0fe3367ec0f1ee429c242d603f6e8b10#egg=djpyfs
 
 # Our libraries:
--e git+https://github.com/edx-solutions/XBlock.git@4dc416c2af4c4863fc3834fb80c7682cb9e3fd19#egg=XBlock
+-e git+https://github.com/edx-solutions/XBlock.git@b5acb81ad5b6fa02f53a7434c69ee87c4cc15950#egg=XBlock
 -e git+https://github.com/edx/codejail.git@71f5c5616e2a73ae8cecd1ff2362774a773d3665#egg=codejail
 -e git+https://github.com/edx/diff-cover.git@v0.5.0#egg=diff_cover
 -e git+https://github.com/edx/js-test-tool.git@v0.1.5#egg=js_test_tool
