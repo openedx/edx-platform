@@ -13,6 +13,7 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class CoursewareSearchTest(UniqueCourseTest):
+
     """
     Test courseware search.
     """
@@ -28,7 +29,6 @@ class CoursewareSearchTest(UniqueCourseTest):
             That's where you'll find me.
         """
     SEARCH_STRING = "chimney"
-
 
     def setUp(self):
         """
@@ -72,7 +72,6 @@ class CoursewareSearchTest(UniqueCourseTest):
         self._auto_auth(self.USERNAME, self.EMAIL, False)
         self.courseware_search_page.visit()
 
-
     def _studio_publish_content(self):
         self.course_outline.visit()
         subsection = self.course_outline.section_at(0).subsection_at(0)
@@ -97,7 +96,6 @@ class CoursewareSearchTest(UniqueCourseTest):
         unit_page.wait_for_element_visibility('.modal-editor', 'Modal editor is visible')
         type_in_codemirror(unit_page, 0, self.HTML_CONTENT)
         click_css(unit_page, '.action-save', 0)
-
 
     def test_search(self):
         """
