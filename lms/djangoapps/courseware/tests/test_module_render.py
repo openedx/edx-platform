@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test for lms courseware app, module render unit
 """
@@ -14,6 +15,7 @@ from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 
 from capa.tests.response_xml_factory import OptionResponseXMLFactory
+from courseware.module_render import hash_resource
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -160,6 +162,14 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.post(dispatch_url, {'position': 2})
         self.assertEquals(403, response.status_code)
         self.assertEquals('Unauthenticated', response.content)
+
+    def test_hash_resource(self):
+        """
+        Ensure that the resource hasher works and does not fail on unicode,
+        decoded or otherwise.
+        """
+        resources = ['ASCII text', u'❄ I am a special snowflake.', "❄ So am I, but I didn't tell you."]
+        self.assertEqual(hash_resource(resources), 'a76e27c8e80ca3efd7ce743093aa59e0')
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
