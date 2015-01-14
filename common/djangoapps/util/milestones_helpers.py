@@ -4,7 +4,6 @@ Helper methods for milestones api calls.
 
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from milestones.api import (

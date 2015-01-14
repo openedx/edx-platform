@@ -354,11 +354,11 @@ def _index_bulk_op(request, course_key, chapter, section, position):
     # Note that if the pre-requisite feature flag has been turned off (default) then this check will
     # always pass
     if not has_access(user, 'view_courseware_with_prerequisites', course):
-        # prequities have not been fulfilled therefore redirect to the Dashboard
-        log.info((
-            u'User {user_id} tried to view course {course_id} '
-            u'without fulfilling prerequisites'
-        ).format(user_id=user.id, course_id=unicode(course.id)))
+        # prerequisites have not been fulfilled therefore redirect to the Dashboard
+        log.info(
+            u'User %d tried to view course %s '
+            u'without fulfilling prerequisites',
+            user.id, unicode(course.id))
         return redirect(reverse('dashboard'))
 
     # check to see if there is a required survey that must be taken before
@@ -771,10 +771,13 @@ def course_about(request, course_id):
     else:
         course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-    show_courseware_link = ((has_access(request.user, 'load', course) and
-                            has_access(request.user, 'view_courseware_with_prerequisites', course))
-                            or
-                            settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
+    show_courseware_link = (
+        (
+            has_access(request.user, 'load', course)
+            and has_access(request.user, 'view_courseware_with_prerequisites', course)
+        )
+        or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
+    )
 
     # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
     registration_price = 0

@@ -365,7 +365,7 @@ def course_listing(request):
     """
     courses, in_process_course_actions = get_courses_accessible_to_user(request)
     libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
-    
+
     def format_in_process_course_view(uca):
         """
         Return a dict of the data which the view requires for each unsucceeded course
@@ -399,7 +399,6 @@ def course_listing(request):
             'number': library.display_number_with_default,
             'can_edit': has_studio_write_access(request.user, library.location.library_key),
         }
-
 
     courses = _remove_in_process_courses(courses, in_process_course_actions)
     in_process_course_actions = [format_in_process_course_view(uca) for uca in in_process_course_actions]
