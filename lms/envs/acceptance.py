@@ -179,3 +179,7 @@ XQUEUE_INTERFACE = {
 YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+
+if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
+    # Use MockSearchEngine as the search engine for test scenario
+    SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"

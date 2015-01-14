@@ -75,6 +75,10 @@ DEBUG_TOOLBAR_CONFIG = {
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
+################################ SEARCH INDEX ################################
+FEATURES['ENABLE_COURSEWARE_INDEX'] = True
+SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
 ###############################################################################
 # See if the developer has any local overrides.
 try:

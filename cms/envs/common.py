@@ -128,6 +128,10 @@ FEATURES = {
     # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
     # and libraries created with split.
     'ENABLE_CONTENT_LIBRARIES': False,
+
+    # Enable the courseware search functionality
+    'ENABLE_COURSEWARE_INDEX': False,
+
 }
 ENABLE_JASMINE = False
 
@@ -823,6 +827,10 @@ ADVANCED_PROBLEM_TYPES = [
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
-# Use MockSearchEngine as the search engine for test scenario
-from search.tests.mock_search_engine import MockSearchEngine
-SEARCH_ENGINE = MockSearchEngine
+# Default to no Search Engine
+SEARCH_ENGINE = None
+ELASTIC_FIELD_MAPPINGS = {
+    "start_date": {
+        "type": "date"
+    }
+}

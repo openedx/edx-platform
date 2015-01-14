@@ -103,6 +103,11 @@ FEATURES['ADVANCED_SECURITY'] = False
 PASSWORD_MIN_LENGTH = None
 PASSWORD_COMPLEXITY = {}
 
+# Enable courseware search for tests
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+# Use MockSearchEngine as the search engine for test scenario
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:

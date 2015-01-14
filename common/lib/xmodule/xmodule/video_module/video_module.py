@@ -614,8 +614,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         return field_data
 
-    def index_view(self):
-        xblock_body = super(VideoDescriptor, self).index_view()
+    def index_dictionary(self):
+        xblock_body = super(VideoDescriptor, self).index_dictionary()
         video_body = {
             "display_name": self.display_name,
         }

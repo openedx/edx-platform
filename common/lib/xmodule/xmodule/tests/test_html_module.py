@@ -60,14 +60,14 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """
 
-    def test_index_view(self):
+    def test_index_dictionary(self):
         sample_xml = '''
             <html>
                 <p>Hello World!</p>
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " Hello World! ", "display_name": "Text"},
             "content_type": "HTML Content"
         })
@@ -79,7 +79,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_cdata)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " This has CDATA in it. ", "display_name": "Text"},
             "content_type": "HTML Content"
         })
@@ -90,7 +90,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             </html>
         '''
         descriptor = instantiate_descriptor(data=sample_xml_tab_spaces)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " Text has spaces :) ", "display_name": "Text"},
             "content_type": "HTML Content"
         })

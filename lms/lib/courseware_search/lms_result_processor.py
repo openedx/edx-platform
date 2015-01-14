@@ -4,7 +4,7 @@ This file contains implementation override of SearchResultProcessor which will a
     * Confirms user access to object
 """
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from search.views import SearchResultProcessor
+from search.result_processor import SearchResultProcessor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
@@ -12,6 +12,7 @@ from courseware.access import has_access
 
 
 class LmsSearchResultProcessor(SearchResultProcessor):
+
     """ SearchResultProcessor for LMS Search """
     _course_key = None
     _usage_key = None
@@ -75,6 +76,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         return location_description
 
     def should_remove(self, user):
+        """ Test to see if this result should be removed due to access restriction """
         return has_access(
             user,
             'load',

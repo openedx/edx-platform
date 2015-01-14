@@ -254,8 +254,8 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
         non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
         return non_editable_fields
 
-    def index_view(self):
-        xblock_body = super(HtmlDescriptor, self).index_view()
+    def index_dictionary(self):
+        xblock_body = super(HtmlDescriptor, self).index_dictionary()
         html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
         html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
         html_body = {

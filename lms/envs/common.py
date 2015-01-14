@@ -1032,16 +1032,15 @@ courseware_js = (
 )
 
 # Include JS files needed for courseware search
-if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    courseware_js += (
-        'js/search/models/result.js',
-        'js/search/collections/collection.js',
-        'js/search/views/form.js',
-        'js/search/views/list.js',
-        'js/search/views/item.js',
-        'js/search/router.js',
-        'js/search/app.js',
-    )
+courseware_js += (
+    'js/search/models/result.js',
+    'js/search/collections/collection.js',
+    'js/search/views/form.js',
+    'js/search/views/list.js',
+    'js/search/views/item.js',
+    'js/search/router.js',
+    'js/search/app.js',
+)
 
 
 # Before a student accesses courseware, we do not
@@ -2000,8 +1999,7 @@ PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/log
 # Height of the Co-brand Logo in mm
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
-# Use MockSearchEngine as the search engine for test scenario
-from search.tests.mock_search_engine import MockSearchEngine
-SEARCH_ENGINE = MockSearchEngine
+# Use None for the default search engine
+SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"

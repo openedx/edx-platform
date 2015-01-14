@@ -307,11 +307,6 @@ VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIP
 API_DATE_FORMAT = '%Y-%m-%d'
 API_DATE_FORMAT = ENV_TOKENS.get('API_DATE_FORMAT', API_DATE_FORMAT)
 
-# Use ElasticSearch for the search engine
-from search.elastic import ElasticSearchEngine
-SEARCH_ENGINE = ElasticSearchEngine
-ELASTIC_SEARCH_MAPPINGS = {
-    "start_date": {
-        "type": "date"
-    }
-}
+if FEATURES['ENABLE_COURSEWARE_INDEX']:
+    # Use ElasticSearch for the search engine
+    SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"

@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 # pylint: disable=protected-access
 """Test for Video Xmodule functional logic.
@@ -15,8 +16,6 @@ the course, section, subsection, unit, etc.
 import unittest
 import datetime
 from uuid import uuid4
-import copy
-import os
 from mock import Mock, patch
 
 from . import LogicTest
@@ -53,10 +52,8 @@ Dobar dan!
 Kako ste danas?
 '''
 
-def seed():
-    return os.getppid()
 
-settings.YOUTUBE = {
+TEST_YOU_TUBE_SETTINGS = {
     # YouTube JavaScript API
     'API': 'www.youtube.com/iframe_api',
 
@@ -74,11 +71,11 @@ settings.YOUTUBE = {
     },
 }
 
-settings.CONTENTSTORE = {
+TEST_DATA_CONTENTSTORE = {
     'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
     'DOC_STORE_CONFIG': {
         'host': 'localhost',
-        'db': 'acceptance_xcontent_%s' % seed(),
+        'db': 'test_xcontent_%s' % uuid4().hex,
     },
     # allow for additional options that can be keyed on a name, e.g. 'trashcan'
     'ADDITIONAL_OPTIONS': {
@@ -88,8 +85,6 @@ settings.CONTENTSTORE = {
     }
 }
 
-TEST_DATA_CONTENTSTORE = copy.deepcopy(settings.CONTENTSTORE)
-TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().hex
 
 def instantiate_descriptor(**field_data):
     """
@@ -661,13 +656,14 @@ class VideoCdnTest(unittest.TestCase):
 
 
 @override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(YOUTUBE=TEST_YOU_TUBE_SETTINGS)
 class VideoDescriptorIndexingTestCase(unittest.TestCase):
 
     """
     Make sure that VideoDescriptor can format data for indexing as expected.
     """
 
-    def test_index_view(self):
+    def test_index_dictionary(self):
         xml_data = '''
             <video display_name="Test Video"
                    youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
@@ -682,7 +678,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             </video>
         '''
         descriptor = instantiate_descriptor(data=xml_data)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {"display_name": "Test Video"},
             "content_type": "Video"
         })
@@ -704,10 +700,32 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
 
         descriptor = instantiate_descriptor(data=xml_data_sub)
         download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {
                 "display_name": "Test Video",
-                "transcript_en": "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these courses. As you know, our courses are entirely online. So before we start learning about the subjects that brought you here, let's learn about the tools that you will use to navigate through the course material. Let's start with what is on your screen right now. You are watching a video of me talking. You have several tools associated with these videos. Some of them are standard video buttons, like the play Pause Button on the bottom left. Like most video players, you can see how far you are into this particular video segment and how long the entire video segment is. Something that you might not be used to is the speed option. While you are going through the videos, you can speed up or slow down the video player with these buttons. Go ahead and try that now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can adjust it this way. Another great feature is the transcript on the side. This will follow along with everything that I am saying as I am saying it, so you can read along if you like. You can also click on any of the words, and you will notice that the video jumps to that word. The video slider at the bottom of the video will let you navigate through the video quickly. If you ever find the transcript distracting, you can toggle the captioning button in order to make it go away or reappear. Now that you know about the video player, I want to point out the sequence navigator. Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You can see how far you are in a particular sequence by observing which tab you're on. You can navigate directly to any video or exercise by clicking on the appropriate tab. You can also progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try that now. The tutorial will continue in the next video."
+                "transcript_en": (
+                    "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these"
+                    "courses. As you know, our courses are entirely online. So before we start learning about the"
+                    "subjects that brought you here, let's learn about the tools that you will use to navigate through"
+                    "the course material. Let's start with what is on your screen right now. You are watching a video"
+                    "of me talking. You have several tools associated with these videos. Some of them are standard"
+                    "video buttons, like the play Pause Button on the bottom left. Like most video players, you can see"
+                    "how far you are into this particular video segment and how long the entire video segment is."
+                    "Something that you might not be used to is the speed option. While you are going through the"
+                    "videos, you can speed up or slow down the video player with these buttons. Go ahead and try that"
+                    "now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can"
+                    "adjust it this way. Another great feature is the transcript on the side. This will follow along"
+                    "with everything that I am saying as I am saying it, so you can read along if you like. You can"
+                    "also click on any of the words, and you will notice that the video jumps to that word. The video"
+                    "slider at the bottom of the video will let you navigate through the video quickly. If you ever"
+                    "find the transcript distracting, you can toggle the captioning button in order to make it go away"
+                    "or reappear. Now that you know about the video player, I want to point out the sequence navigator."
+                    "Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You"
+                    "can see how far you are in a particular sequence by observing which tab you're on. You can"
+                    "navigate directly to any video or exercise by clicking on the appropriate tab. You can also"
+                    "progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try"
+                    "that now. The tutorial will continue in the next video."
+                )
             },
             "content_type": "Video"
         })
@@ -730,10 +748,32 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
 
         descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {
                 "display_name": "Test Video",
-                "transcript_en": "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these courses. As you know, our courses are entirely online. So before we start learning about the subjects that brought you here, let's learn about the tools that you will use to navigate through the course material. Let's start with what is on your screen right now. You are watching a video of me talking. You have several tools associated with these videos. Some of them are standard video buttons, like the play Pause Button on the bottom left. Like most video players, you can see how far you are into this particular video segment and how long the entire video segment is. Something that you might not be used to is the speed option. While you are going through the videos, you can speed up or slow down the video player with these buttons. Go ahead and try that now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can adjust it this way. Another great feature is the transcript on the side. This will follow along with everything that I am saying as I am saying it, so you can read along if you like. You can also click on any of the words, and you will notice that the video jumps to that word. The video slider at the bottom of the video will let you navigate through the video quickly. If you ever find the transcript distracting, you can toggle the captioning button in order to make it go away or reappear. Now that you know about the video player, I want to point out the sequence navigator. Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You can see how far you are in a particular sequence by observing which tab you're on. You can navigate directly to any video or exercise by clicking on the appropriate tab. You can also progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try that now. The tutorial will continue in the next video.",
+                "transcript_en": (
+                    "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these"
+                    "courses. As you know, our courses are entirely online. So before we start learning about the"
+                    "subjects that brought you here, let's learn about the tools that you will use to navigate through"
+                    "the course material. Let's start with what is on your screen right now. You are watching a video"
+                    "of me talking. You have several tools associated with these videos. Some of them are standard"
+                    "video buttons, like the play Pause Button on the bottom left. Like most video players, you can see"
+                    "how far you are into this particular video segment and how long the entire video segment is."
+                    "Something that you might not be used to is the speed option. While you are going through the"
+                    "videos, you can speed up or slow down the video player with these buttons. Go ahead and try that"
+                    "now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can"
+                    "adjust it this way. Another great feature is the transcript on the side. This will follow along"
+                    "with everything that I am saying as I am saying it, so you can read along if you like. You can"
+                    "also click on any of the words, and you will notice that the video jumps to that word. The video"
+                    "slider at the bottom of the video will let you navigate through the video quickly. If you ever"
+                    "find the transcript distracting, you can toggle the captioning button in order to make it go away"
+                    "or reappear. Now that you know about the video player, I want to point out the sequence navigator."
+                    "Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You"
+                    "can see how far you are in a particular sequence by observing which tab you're on. You can"
+                    "navigate directly to any video or exercise by clicking on the appropriate tab. You can also"
+                    "progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try"
+                    "that now. The tutorial will continue in the next video."
+                ),
                 "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch"
             },
             "content_type": "Video"
@@ -758,7 +798,7 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=xml_data_transcripts)
         save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
         save_to_store(CRO_SRT_FILEDATA, "subs_croatian1.srt", 'text/srt', descriptor.location)
-        self.assertEqual(descriptor.index_view(), {
+        self.assertEqual(descriptor.index_dictionary(), {
             "content": {
                 "display_name": "Test Video",
                 "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch",

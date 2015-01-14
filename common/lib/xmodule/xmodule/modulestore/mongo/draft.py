@@ -21,7 +21,7 @@ from xmodule.modulestore.mongo.base import (
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
-from search.manager import SearchEngine
+from search.search_engine_base import SearchEngine
 
 log = logging.getLogger(__name__)
 
@@ -679,7 +679,7 @@ class DraftModuleStore(MongoModuleStore):
 
                 item_index = {}
                 item_index.update(location_info)
-                item_index.update(item.index_view())
+                item_index.update(item.index_dictionary())
                 item_index.update({
                     'id': unicode(item.scope_ids.usage_id),
                 })
@@ -698,15 +698,21 @@ class DraftModuleStore(MongoModuleStore):
                 if item.has_children:
                     for child_loc in item.children:
                         remove_index_item_location(child_loc)
-                try:
-                    searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
-                except Exception:
-                    pass
 
-        if delete:
-            remove_index_item_location(location)
-        else:
-            index_item_location(location, None)
+                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
+
+        try:
+            if delete:
+                remove_index_item_location(location)
+            else:
+                index_item_location(location, None)
+        except Exception as err:  # pylint: disable=broad-except
+            # broad exception so that index operation does not prevent the rest of the application from working
+            log.exception(
+                "Indexing error encountered, courseware index may be out of date %s - %s",
+                location.course_key,
+                str(err)
+            )
 
     def publish(self, location, user_id, **kwargs):
         """

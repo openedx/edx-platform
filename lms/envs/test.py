@@ -440,6 +440,7 @@ MONGODB_LOG = {
 # Enable EdxNotes for tests.
 FEATURES['ENABLE_EDXNOTES'] = True
 
+# Enable courseware search for tests
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
-from search.tests.mock_search_engine import MockSearchEngine
-SEARCH_ENGINE = MockSearchEngine
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
