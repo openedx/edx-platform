@@ -1,61 +1,32 @@
 <%! from django.utils.translation import ugettext as _ %>
 
-<script id="poc-schedule-template" type="text/x-handlerbars-template">
-  <table class="poc-schedule">
-    <thead>
-      <tr>
-        <th>${_('Unit')}</th>
-        <th>${_('Start Date')}</th>
-        <th>${_('Due Date')}</th>
-        <th><a href="#" id="remove-all">
-          <i class="icon-remove-sign icon"></i> ${_('remove all')}
-        </a></th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each chapters}}
-        <tr class="chapter collapsed" data-location="{{location}}" data-depth="1">
-          <td class="unit">
-            <a href="#"><i class="icon-caret-right icon toggle-collapse"></i></a> 
-            {{display_name}}
-          </td>
-          <td class="date start-date"><a>{{start}}</a></td>
-          <td class="date due-date"><a>{{due}}</a></td>
-          <td><a href="#" class="remove-unit">
-            <i class="icon-remove-sign icon"></i> ${_('remove')}
-          </a></td>
-        </tr>
-        {{#each children}}
-          <tr class="sequential collapsed" data-depth="2" 
-              data-location="{{../location}} {{location}}">
-            <td class="unit">
-              <a href="#"><i class="icon-caret-right icon toggle-collapse"></i></a> 
-              {{display_name}}
-            </td>
-            <td class="date start-date"><a>{{start}}</a></td>
-            <td class="date due-date"><a>{{due}}</a></td>
-            <td><a href="#" class="remove-unit">
-              <i class="icon-remove-sign icon"></i> ${_('remove')}
-            </a></td>
-          </tr>
-          {{#each children}}
-            <tr class="vertical" data-dapth="3"
-                data-location="{{../../location}} {{../location}} {{location}}">
-              <td class="unit">&nbsp;{{display_name}}</td>
-              <td class="date start-date"><a>{{start}}</a></td>
-              <td class="date due-date"><a>{{due}}</a></td>
-              <td><a href="#" class="remove-unit">
-                <i class="icon-remove-sign icon"></i> ${_('remove')}
-              </a></td>
-          {{/each}}
-        {{/each}}
-      {{/each}}
-    </tbody>
-  </table>
-</script>
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="jsextra">
+  <script>  
+    var save_url = '${save_url}';
+    var schedule = ${schedule};
+  </script>
+    <script src="${static.url('js/vendor/backbone-min.js')}"></script>
+  <script src="${static.url('js/vendor/timepicker/jquery.timepicker.js')}"></script>
+  <link rel="stylesheet" type="text/css" href="${static.url('js/vendor/timepicker/jquery.timepicker.css')}" />
+  <style>
+    .ui-timepicker-list { z-index: 100000; }
+    .ui-datepicker { z-index: 100000 !important; }
+    input.date, input.time { width: auto !important; display: inline !important; }
+  </style>
+  <%static:js group='pocs'/>
+</%block>
+
+%for template_name in ["schedule"]:
+  <script type="text/template" id="poc-${template_name}-template">
+    <%static:include path="pocs/${template_name}.underscore" />
+  </script>
+%endfor
 
 <div class="poc-schedule-container">
   <div id="poc-schedule"></div>
+  <div id="new-poc-schedule"></div>
 </div>
 
 <section id="enter-date-modal" class="modal" aria-hidden="true">
@@ -70,7 +41,7 @@
       <h2></h2>
     </header>
     <form role="form">
-      <div class="field" id="datepair">
+      <div class="field datepair">
         <label></label>
         <input placeholder="Date" class="date" type="text" name="date"/ size="11">
         <input placeholder="Time" class="time" type="text" name="time"/ size="6">
@@ -101,26 +72,26 @@
     <h2>${_('Schedule a Unit')}</h2>
     <form role="form" id="add-unit" name="add-unit" class="poc-form">
       <div class="field">
-        <b>${_('Chapter')}</b><br/>
+        <b>${_('Section')}</b><br/>
         <select name="chapter"></select>
       </div>
       <div class="field">
-        <b>${_('Sequential')}</b><br/>
+        <b>${_('Subsection')}</b><br/>
         <select name="sequential"></select>
       </div>
       <div class="field">
-        <b>${_('Vertical')}</b><br/>
+        <b>${_('Unit')}</b><br/>
         <select name="vertical"></select>
       </div>
-      <div class="field">
+      <div class="field datepair">
         <b>${_('Start Date')}</b><br/>
-        <input type="date" name="start_date"/>
-        <input type="time" name="start_time"/>
+        <input placeholder="Date" type="date" class="date" name="start_date"/>
+        <input placeholder="time" type="time" class="time" name="start_time"/>
       </div>
-      <div class="field">
+      <div class="field datepair">
         <b>${_('Due Date')}</b> ${_('(Optional)')}<br/>
-        <input type="date" name="due_date"/>
-        <input type="time" name="due_time"/>
+        <input placeholder="Date" type="date" class="date" name="due_date"/>
+        <input placeholder="time" type="time" class="time" name="due_time"/>
       </div>
       <div class="field">
         <br/>
@@ -138,390 +109,20 @@
 </div>
 
 <script>
-$('#datepair .time').timepicker({
-    'showDuration': true,
-    'timeFormat': 'G:i'
+$(function() {
+    schedule_template = _.template($('#poc-schedule-template').html());
+    var view = new edx.pocs.schedule.ScheduleView({
+        el: $('#new-poc-schedule')
+    });
+    view.render();
+    //poc_schedule.render();
+    $('.datepair .time').timepicker({
+        'showDuration': true,
+        'timeFormat': 'G:i'
+    });
+    $('.datepair .date').datepicker({
+        'dateFormat': 'yy-mm-dd',
+        'autoclose': true
+    });
 });
-$('#datepair .date').datepicker({
-    'dateFormat': 'yy-mm-dd',
-    'autoclose': true
-});
-
-var poc_schedule = (function () {
-  var save_url = '${save_url}';
-  var schedule = ${schedule};
-  var template = Handlebars.compile($('#poc-schedule-template').html());
-  var chapter_select = $('form#add-unit select[name="chapter"]'),
-      sequential_select = $('form#add-unit select[name="sequential"]'),
-      vertical_select = $('form#add-unit select[name="vertical"]');
-
-  var self = {
-    schedule: schedule,
-    dirty: false
-  };
-
-  function hide(unit) {
-    unit.hidden = true;
-  }
-
-  function show(unit) {
-    unit.hidden = false;
-  }
-
-  function get_datetime(which) {
-    var date = $('form#add-unit input[name=' + which + '_date]').val();
-    var time = $('form#add-unit input[name=' + which + '_time]').val();
-    if (date && time)
-      return date + ' ' + time;
-    return null;
-  }
-
-  function set_datetime(which, value) {
-    var parts = value ? value.split(' ') : ['', ''],
-        date = parts[0],
-        time = parts[1];
-    $('form#add-unit input[name=' + which + '_date]').val(date);
-    $('form#add-unit input[name=' + which + '_time]').val(time);
-  }
-
-  /**
-   * Render the course tree view.
-   */
-  self.render = function() {
-    this.hidden = pruned(this.schedule, function(node) {
-      return node.hidden || node.category !== 'vertical'});
-    this.showing = pruned(this.schedule, function(node) {
-      return !node.hidden});
-
-    // Render template
-    $('#poc-schedule').html(template({chapters: this.showing}));
-
-    // Start collapsed
-    $('table.poc-schedule .sequential,.vertical').hide();
-
-    // Click handlers for collapsible tree
-    $('table.poc-schedule .toggle-collapse').on('click', toggle_collapse);
-
-    // Hidden hover fields for empty date fields
-    $('table.poc-schedule .date a').each(function() {
-      if (! $(this).text()) {
-        $(this).text('Set date').addClass('empty');
-      }
-    });
-    
-    // Handle date edit clicks
-    $('table.poc-schedule .date a').attr('href', '#enter-date-modal')
-      .leanModal({closeButton: '.close-modal'});
-    $('table.poc-schedule .due-date a').on('click', enterNewDate('due'));
-    $('table.poc-schedule .start-date a').on('click', enterNewDate('start'));
-
-    // Click handler for remove all
-    $('table.poc-schedule a#remove-all').on('click', function(event) {
-      event.preventDefault();
-      schedule_apply(self.schedule, hide);
-      self.dirty = true;
-      self.render();
-    });
-
-    // Show or hide form
-    if (this.hidden.length) {
-      // Populate chapters select, depopulate others
-      chapter_select.html('')
-        .append('<option value="none">${_("Select a chapter")}...</option>')
-        .append(schedule_options(this.hidden));
-      sequential_select.html('').prop('disabled', true);
-      vertical_select.html('').prop('disabled', true);
-      $('form#add-unit').show();
-      $('#all-units-added').hide();
-      $('#add-unit-button').prop('disabled', true);
-    }
-    else {
-      $('form#add-unit').hide();
-      $('#all-units-added').show();
-    }
-
-    // Add unit handlers
-    chapter_select.on('change', function(event) {
-      var chapter_location = chapter_select.val();
-      vertical_select.html('').prop('disabled', true);
-      if (chapter_location !== 'none') {
-        chapter = find_unit(self.hidden, chapter_location);
-        sequential_select.html('')
-          .append('<option value="all">${_("All sequentials")}</option>')
-          .append(schedule_options(chapter.children));
-        sequential_select.prop('disabled', false);
-        $('#add-unit-button').prop('disabled', false);
-        set_datetime('start', chapter.start);
-        set_datetime('due', chapter.due);
-      }
-      else {
-        sequential_select.html('').prop('disabled', true);
-      }
-    });
-
-    sequential_select.on('change', function(event) {
-      var sequential_location = sequential_select.val();
-      if (sequential_location !== 'all') {
-        var chapter = chapter_select.val();
-        sequential = find_unit(self.hidden, chapter, sequential_location);
-        vertical_select.html('')
-          .append('<option value="all">${_("All verticals")}</option>')
-          .append(schedule_options(sequential.children));
-        vertical_select.prop('disabled', false);
-        set_datetime('start', sequential.start);
-        set_datetime('due', sequential.due);
-      }
-      else {
-        vertical_select.html('').prop('disabled', true);
-      } 
-    });
-    
-    vertical_select.on('change', function(event) {
-      var vertical_location = vertical_select.val();
-      if (vertical_location !== 'all') {
-        var chapter = chapter_select.val(),
-            sequential = sequential_select.val();
-        vertical = find_unit(
-          self.hidden, chapter, sequential, vertical_location);
-        set_datetime('start', vertical.start);
-        set_datetime('due', vertical.due);
-      }
-    });
-
-    // Add unit handler
-    $('#add-unit-button').on('click', function(event) {
-      event.preventDefault();
-      var chapter = chapter_select.val(),
-          sequential = sequential_select.val(),
-          vertical = vertical_select.val(),
-          units = find_lineage(self.schedule,
-            chapter,
-            sequential == 'all' ? null : sequential,
-            vertical == 'all' ? null: vertical),
-          start = get_datetime('start'),
-          due = get_datetime('due');
-      units.map(show);
-      unit = units[units.length - 1]
-      schedule_apply([unit], show);      
-      if (start) unit.start = start;
-      if (due) unit.due = due;
-      self.dirty = true;
-      self.render();
-    });
-
-    // Remove unit handler
-    $('table.poc-schedule a.remove-unit').on('click', function(event) {
-      var row = $(this).closest('tr'),
-          path = row.data('location').split(' '),
-          unit = find_unit(self.schedule, path[0], path[1], path[2]);
-      schedule_apply([unit], hide);
-      self.dirty = true;
-      self.render(); 
-    });
-
-    // Show or hide save button
-    if (this.dirty) $('#dirty-schedule').show()
-    else $('#dirty-schedule').hide();
-
-    // Handle save button
-    $('#dirty-schedule #save-changes').on('click', function(event) {
-        event.preventDefault();
-        self.save();
-    });
-
-    $('#ajax-error').hide();
-  }
-
-  /**
-   * Handle date entry.
-   */
-  function enterNewDate(what) {
-    return function(event) {
-      var row = $(this).closest('tr');
-      var modal = $('#enter-date-modal')
-        .data('what', what)
-        .data('location', row.data('location'));
-      modal.find('h2').text(
-          what == 'due' ? '${_("Enter Due Date")}' : 
-              '${_("Enter Start Date")}');
-      modal.find('label').text(row.find('td:first').text());
-
-      var path = row.data('location').split(' '),
-          unit = find_unit(self.schedule, path[0], path[1], path[2]),
-          parts = unit[what] ? unit[what].split(' ') : ['', ''],
-          date = parts[0],
-          time = parts[1];
-
-      modal.find('input[name=date]').val(date);
-      modal.find('input[name=time]').val(time);
-
-      modal.find('form').off('submit').on('submit', function(event) {
-        event.preventDefault();
-        var date = $(this).find('input[name=date]').val(),
-            time = $(this).find('input[name=time]').val();
-        var valid_date = new Date(date);
-        if (isNaN(valid_date.valueOf())) {
-          alert('Please enter a valid date');
-          return;
-        }
-        var valid_time = /^\d{1,2}:\d{2}?$/;
-        if (!time.match(valid_time)) {
-          alert('Please enter a valid time');
-          return;
-        }
-        unit[what] = date + ' ' + time;
-        modal.find('.close-modal').click();
-        self.dirty = true;
-        self.render();
-      });
-    }
-  }
-
-  /**
-   * Returns a sequence of <option> DOM elements for a particular sequence
-   * of schedule nodes.
-   */
-  function schedule_options(nodes) {
-    return nodes.map(function(node) {
-      return $('<option>')
-        .attr('value', node.location)
-        .text(node.display_name)[0];
-    });
-  }
-
-  /**
-   * Return a schedule pruned by the given filter function.
-   */
-  function pruned(tree, filter) {
-    return tree.filter(filter)
-      .map(function(node) {
-        var copy = {};
-        $.extend(copy, node);
-        if (node.children) copy.children = pruned(node.children, filter);
-        return copy;
-      })
-      .filter(function(node) {
-        return node.children === undefined || node.children.length;
-      });
-  }
-
-  /**
-   * Get table rows that represent the children of given row in the schedule
-   * tree.
-   */
-  function get_children(row) {
-    var depth = $(row).data('depth');
-    return $(row).nextUntil(
-      $(row).siblings().filter(function() {
-        return $(this).data('depth') <= depth;
-      })
-    );
-  }
-
-  /**
-   * Handle click event for expanding/collapsing nodes in the schedule tree.
-   */
-  function toggle_collapse(event) {
-    event.preventDefault();
-    var row = $(this).closest('tr');
-    var children = get_children(row);
-
-    if (row.is('.expanded')) {
-      $(this).removeClass('icon-caret-down').addClass('icon-caret-right');
-      row.removeClass('expanded').addClass('collapsed');
-      children.hide(); 
-    }
-
-    else {
-      $(this).removeClass('icon-caret-right').addClass('icon-caret-down');
-      row.removeClass('collapsed').addClass('expanded');
-      children.filter('.collapsed').each(function() {
-        children = children.not(get_children(this));
-      });
-      children.show(); 
-    }
-  }
-
-  /**
-   * Save changes.
-   */
-  self.save = function() {
-    var button = $('#dirty-schedule #save-changes');
-    button.prop('disabled', true).text('${_("Saving")}...');
-    
-    $.ajax({
-        url: save_url,
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(this.schedule),
-        success: function(data, textStatus, jqXHR) {
-          self.schedule = data.schedule;
-          self.dirty = false;
-          self.render();
-          button.prop('disabled', false).text('${_("Save changes")}');
-          
-          // Update textarea with grading policy JSON, since grading policy
-          // may have changed.  
-          $('#grading-policy').text(data.grading_policy);
-        },
-        error: function(jqXHR, textStatus, error) {
-          console.log(jqXHR.responseText);
-          $('#ajax-error').show();
-          $('#dirty-schedule').hide();
-          $('form#add-unit select,input,button').prop('disabled', true);
-        }
-      });
-  }
-
-  /**
-   * Add all nodes.
-   */
-  $('#add-all').on('click', function(event) {
-      event.preventDefault();
-      schedule_apply(self.schedule, show);
-      self.dirty = true;
-      self.render();
-  });
-
-  /**
-   * Visit every tree node, applying function.
-   */
-  function schedule_apply(nodes, f) {
-    nodes.map(function(node) {
-      f(node);
-      if (node.children !== undefined) schedule_apply(node.children, f);
-    });
-  }
-
-  /**
-   * Find a unit in the tree.
-   */
-  function find_unit(tree, chapter, sequential, vertical) {
-    var units = find_lineage(tree, chapter, sequential, vertical);
-    return units[units.length -1];
-  }
-
-  function find_lineage(tree, chapter, sequential, vertical) {
-    function find_in(seq, location) {
-      for (var i = 0; i < seq.length; i++)
-        if (seq[i].location === location)
-          return seq[i];
-    }
-
-    var units = [],
-        unit = find_in(tree, chapter);
-    units[units.length] = unit;
-    if (sequential) {
-      units[units.length] = unit = find_in(unit.children, sequential);
-      if (vertical) 
-        units[units.length] = unit = find_in(unit.children, vertical);
-    }
-
-    return units;
-  }
-
-  return self;
-})();
-
-$(function() { poc_schedule.render(); });
 </script>

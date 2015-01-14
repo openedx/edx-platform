@@ -317,6 +317,16 @@ def get_poc_schedule(course, poc):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
+def poc_schedule(request, course):
+    poc = get_poc_for_coach(course, request.user)
+    schedule = get_poc_schedule(course, poc)
+    json_schedule = json.dumps(schedule, indent=4)
+    return HttpResponse(json_schedule, mimetype='application/json')
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@coach_dashboard
 def poc_invite(request, course):
     """
     Invite users to new poc
