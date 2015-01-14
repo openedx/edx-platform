@@ -1408,9 +1408,6 @@ class TestItemCrud(SplitModuleTest):
         with store.bulk_operations(course_key):
             new_course = store.create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
             new_course_locator = new_course.id
-            index_history_info = store.get_course_history_info(new_course.location.course_key)
-            course_block_prev_version = new_course.previous_version
-            course_block_update_version = new_course.update_version
             versionless_course_locator = new_course_locator.version_agnostic()
             first_child = store.create_child(
                 self.user_id,
