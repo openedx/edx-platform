@@ -662,7 +662,8 @@ def _import_course_draft(
                         # course and cause other confusion
                         if hasattr(xml, 'attrib'):
                             for attr in ['parent_url', 'index_in_children_list']:
-                                del xml.attrib[attr]
+                                if attr in xml.attrib:
+                                    del xml.attrib[attr]
 
                         draft = draft_node_constructor(
                             module=descriptor, url=draft_url, parent_url=parent_url, index=index
@@ -670,6 +671,8 @@ def _import_course_draft(
 
                         drafts.append(draft)
 
+                # FIXME: diaper pattern!
+                # maintainers: take note before going crazy debugging subtle problems with xml -> mongo import et al.
                 except Exception:  # pylint: disable=broad-except
                     logging.exception('Error while parsing course xml.')
 
