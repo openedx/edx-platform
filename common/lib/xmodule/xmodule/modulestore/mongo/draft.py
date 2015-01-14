@@ -16,11 +16,23 @@ from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
 )
 from xmodule.modulestore.mongo.base import (
-    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT, wrap_draft)
+    MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT)
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 
 log = logging.getLogger(__name__)
+
+
+def wrap_draft(item):
+    """
+    Cleans the item's location and sets the `is_draft` attribute if needed.
+
+    Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
+    Sets the item's location to the non-draft location in either case.
+    """
+    setattr(item, 'is_draft', item.location.revision == MongoRevisionKey.draft)
+    item.location = item.location.replace(revision=MongoRevisionKey.published)
+    return item
 
 
 class DraftModuleStore(MongoModuleStore):
