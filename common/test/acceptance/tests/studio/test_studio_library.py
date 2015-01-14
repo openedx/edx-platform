@@ -69,6 +69,18 @@ class LibraryEditPageTest(StudioLibraryTest):
         self.assertEqual(len(self.lib_page.xblocks), 1)
         self.assertEqual(self.lib_page.xblocks[0].locator, second_block_id)
 
+    def test_no_edit_visibility_button(self):
+        """
+        Scenario: Ensure that library xblocks do not have 'edit visibility' buttons.
+        Given I have a library in Studio with no XBlocks
+        And I navigate to Library Page in Studio
+        When I add Text XBlock
+        Then one XBlock is displayed
+        And no 'edit visibility' button is shown
+        """
+        add_component(self.lib_page, "html", "Text")
+        self.assertFalse(self.lib_page.xblocks[0].has_edit_visibility_button)
+
     def test_add_edit_xblock(self):
         """
         Scenario: Ensure that we can add an XBlock, edit it, then see the resulting changes.
