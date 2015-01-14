@@ -114,7 +114,7 @@ def get_parent_xblock(xblock):
     # TODO: replace with xblock.get_parent() when it lands
     store = modulestore()
     if store.request_cache is not None:
-        parent_cache = store.request_cache.data.setdefault("edxnotes-parent-cache", {})
+        parent_cache = store.request_cache.data.setdefault('edxnotes-parent-cache', {})
     else:
         parent_cache = None
 
@@ -149,7 +149,7 @@ def get_parent_unit(xblock):
         parent = get_parent_xblock(xblock)
         if parent is None:
             return None
-        if parent.category == "sequential":
+        if parent.category == 'sequential':
             return xblock
 
 
@@ -247,14 +247,14 @@ def get_module_context(course, item):
     Returns context for the module (chapter, section).
     """
     item_dict = {
-        "location": unicode(item.location),
-        "display_name": item.display_name_with_default,
+        'location': unicode(item.location),
+        'display_name': item.display_name_with_default,
     }
-    if item.category == "chapter":
-        item_dict["index"] = get_index(item_dict["location"], course.children)
+    if item.category == 'chapter':
+        item_dict['index'] = get_index(item_dict['location'], course.children)
 
-    if item.category in ("chapter", "sequential"):
-        item_dict["children"] = [unicode(child) for child in item.children]
+    if item.category in ('chapter', 'sequential'):
+        item_dict['children'] = [unicode(child) for child in item.children]
 
     return item_dict
 
@@ -266,13 +266,14 @@ def get_unit_context(course, chapter, section, unit):
     # Position starts from 1, that's why we add 1.
     position = get_index(unicode(unit.location), section.children) + 1
     return {
-        "location": unicode(unit.location),
-        "display_name": unit.display_name_with_default,
-        "url": reverse("courseware_position", kwargs={
-            "course_id": unicode(course.id),
-            "chapter": chapter.url_name,
-            "section": section.url_name,
-            "position": position,
+        'location': unicode(unit.location),
+        'display_name': unit.display_name_with_default,
+        'url_name': unit.url_name,
+        'url': reverse('courseware_position', kwargs={
+            'course_id': unicode(course.id),
+            'chapter': chapter.url_name,
+            'section': section.url_name,
+            'position': position,
         })
     }
 
@@ -325,7 +326,7 @@ def get_endpoint(path=""):
     Returns edx-notes-api endpoint.
     """
     try:
-        url = settings.EDXNOTES_INTERFACE["url"]
+        url = settings.EDXNOTES_INTERFACE['url']
         if not url.endswith("/"):
             url += "/"
 
@@ -350,17 +351,17 @@ def get_course_position(course_module):
     If there is no current position in the course or chapter, then selects
     the first child.
     """
-    urlargs = {"course_id": unicode(course_module.id)}
+    urlargs = {'course_id': unicode(course_module.id)}
     chapter = get_current_child(course_module, min_depth=1)
     if chapter is None:
         log.debug("No chapter found when loading current position in course")
         return None
 
-    urlargs["chapter"] = chapter.url_name
+    urlargs['chapter'] = chapter.url_name
     if course_module.position is not None:
         return {
-            "display_name": chapter.display_name_with_default,
-            "url": reverse("courseware_chapter", kwargs=urlargs),
+            'display_name': chapter.display_name_with_default,
+            'url': reverse('courseware_chapter', kwargs=urlargs),
         }
 
     # Relying on default of returning first child
@@ -369,10 +370,10 @@ def get_course_position(course_module):
         log.debug("No section found when loading current position in course")
         return None
 
-    urlargs["section"] = section.url_name
+    urlargs['section'] = section.url_name
     return {
-        "display_name": section.display_name_with_default,
-        "url": reverse("courseware_section", kwargs=urlargs),
+        'display_name': section.display_name_with_default,
+        'url': reverse('courseware_section', kwargs=urlargs),
     }
 
 
@@ -406,5 +407,5 @@ def is_harvard_notes_enabled(course):
     Checks for 'textannotation', 'imageannotation', 'videoannotation' in the list
     of advanced modules of the course.
     """
-    modules = set(["textannotation", "imageannotation", "videoannotation"])
+    modules = set(['textannotation', 'imageannotation', 'videoannotation'])
     return bool(modules.intersection(course.advanced_modules))
