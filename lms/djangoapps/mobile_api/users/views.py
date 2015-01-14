@@ -26,7 +26,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
 from mobile_api import errors
-from mobile_api.utils import mobile_access_when_enrolled, mobile_view, mobile_course_access
+from mobile_api.utils import mobile_course_listing_access, mobile_view, mobile_course_access
 
 
 @mobile_view(is_user=True)
@@ -45,6 +45,7 @@ class UserDetail(generics.RetrieveAPIView):
     **Example request**:
 
         GET /api/mobile/v0.5/users/{username}
+
 
     **Response Values**
 
@@ -244,7 +245,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         enrollments = self.queryset.filter(user__username=self.kwargs['username'], is_active=True).order_by('created')
         return [
             enrollment for enrollment in enrollments
-            if mobile_access_when_enrolled(enrollment.course, self.request.user)
+            if mobile_course_listing_access(enrollment.course, self.request.user)
         ]
 
 
