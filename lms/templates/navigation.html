@@ -58,6 +58,11 @@ site_status_msg = get_site_status_msg(course_id)
             <a href="${marketing_link('COURSES')}">${_('Find Courses')}</a>
           </li>
         % endif
+        %if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD','') and user.is_staff:
+          <li>
+            <a href="${reverse('sysadmin')}">Sysadmin</a>
+          </li>
+        %endif
       </%block>
     </ol>
     <ol class="user">
