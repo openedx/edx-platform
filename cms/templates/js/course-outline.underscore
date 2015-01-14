@@ -81,7 +81,7 @@ if (xblockInfo.get('graded')) {
                 <% if (!(xblockInfo.isEntranceExam())) { %>
                     <li class="action-item action-delete">
                         <a href="#" data-tooltip="<%= gettext('Delete') %>" class="delete-button action-button">
-                            <i class="icon fa fa-trash-o"></i>
+                            <i class="icon fa fa-trash-o" aria-hidden="true"></i>
                             <span class="sr action-button-text"><%= gettext('Delete') %></span>
                         </a>
                     </li>

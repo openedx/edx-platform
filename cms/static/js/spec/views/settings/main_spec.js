@@ -62,8 +62,7 @@ define([
             );
         });
 
-        it('Creating an entrance exam with minimum_score_pct. It should save the ' +
-            '"entrance_exam_minimum_score_pct" and "entrance_exam_enabled" as part of course details', function () {
+        it('should save entrance exam course details information correctly', function () {
             var entrance_exam_minimum_score_pct = '60';
             var entrance_exam_enabled = 'true';
 
