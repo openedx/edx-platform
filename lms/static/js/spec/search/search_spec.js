@@ -169,13 +169,12 @@ function($, Sinon, Backbone, TemplateHelpers) {
             };
             this.server.respondWith('POST', this.collection.url, [200, {}, JSON.stringify(response)]);
             this.server.respond();
-            setTimeout(function () {
-                expect(this.onSearch).toHaveBeenCalled();
-                expect(this.collection.totalCount).toEqual(1);
-                expect(this.collection.accessDeniedCount).toEqual(1);
-                expect(this.collection.page).toEqual(0);
-                expect(this.collection.first().attributes).toEqual(response.results[0].data);
-            }, 0);
+
+            expect(this.onSearch).toHaveBeenCalled();
+            expect(this.collection.totalCount).toEqual(1);
+            expect(this.collection.accessDeniedCount).toEqual(1);
+            expect(this.collection.page).toEqual(0);
+            expect(this.collection.first().attributes).toEqual(response.results[0].data);
         });
 
         it('handles errors', function () {
@@ -279,6 +278,12 @@ function($, Sinon, Backbone, TemplateHelpers) {
                 hasNextPage: function (){}
             });
             this.collection = new MockCollection();
+
+            // spy on these methods before they are bound to events
+            spyOn(edx.search.List.prototype, 'render').andCallThrough();
+            spyOn(edx.search.List.prototype, 'renderNext').andCallThrough();
+            spyOn(edx.search.List.prototype, 'showErrorMessage').andCallThrough();
+
             this.listView = new edx.search.List({ collection: this.collection });
         });
 
@@ -304,19 +309,13 @@ function($, Sinon, Backbone, TemplateHelpers) {
         });
 
         it('handles events', function () {
-            spyOn(this.listView, 'render');
-            spyOn(this.listView, 'renderNext');
-            spyOn(this.listView, 'showErrorMessage');
-
             this.collection.trigger('search');
             this.collection.trigger('next');
             this.collection.trigger('error');
 
-            setTimeout(function () {
-                expect(this.listView.render).toHaveBeenCalled();
-                expect(this.listView.renderNext).toHaveBeenCalled();
-                expect(this.listView.showErrorMessage).toHaveBeenCalled();
-            }, 0);
+            expect(this.listView.render).toHaveBeenCalled();
+            expect(this.listView.renderNext).toHaveBeenCalled();
+            expect(this.listView.showErrorMessage).toHaveBeenCalled();
         });
 
         it('renders a message when there are no results', function () {
@@ -361,6 +360,16 @@ function($, Sinon, Backbone, TemplateHelpers) {
             expect(this.listView.$el.find('a.search-load-next')[0]).not.toExist();
         });
 
+        it('triggers an event for next page', function () {
+            var onNext = jasmine.createSpy('onNext');
+            this.listView.on('next', onNext);
+            this.collection.totalCount = 123;
+            this.collection.hasNextPage = function () { return true; };
+            this.listView.render();
+            this.listView.$el.find('a.search-load-next').click();
+            expect(onNext).toHaveBeenCalled();
+        });
+
         it('shows a spinner when loading more results', function () {
             this.collection.totalCount = 123;
             this.collection.hasNextPage = function () { return true; };
@@ -394,7 +403,18 @@ function($, Sinon, Backbone, TemplateHelpers) {
             TemplateHelpers.installTemplate('templates/courseware_search/search_list');
             TemplateHelpers.installTemplate('templates/courseware_search/search_loading');
             TemplateHelpers.installTemplate('templates/courseware_search/search_error');
+
+            // spy on these methods before they are bound to events
+            spyOn(edx.search.Router.prototype, 'navigate').andCallThrough();
+            spyOn(edx.search.Form.prototype, 'doSearch').andCallThrough();
+            spyOn(edx.search.Collection.prototype, 'performSearch').andCallThrough();
+            spyOn(edx.search.Collection.prototype, 'cancelSearch').andCallThrough();
+            spyOn(edx.search.Collection.prototype, 'loadNextPage').andCallThrough();
+            spyOn(edx.search.List.prototype, 'showLoadingMessage').andCallThrough();
+            spyOn(edx.search.List.prototype, 'clear').andCallThrough();
+
             this.app = new edx.search.App('a/b/c');
+
         });
 
         it ('has all necessary components', function () {
@@ -406,67 +426,43 @@ function($, Sinon, Backbone, TemplateHelpers) {
         });
 
         it ('shows loading message on search', function () {
-            spyOn(this.app.results, 'showErrorMessage');
             this.app.form.trigger('search');
-            setTimeout(function() {
-                expect(this.app.results.showErrorMessage).toHaveBeenCalled();
-            }, 0);
+            expect(this.app.results.showLoadingMessage).toHaveBeenCalled();
         });
 
         it ('performs search', function () {
-            spyOn(this.app.collection, 'performSearch');
             this.app.form.trigger('search');
-            setTimeout(function() {
-                expect(this.app.collection.performSearch).toHaveBeenCalled();
-            }, 0);
+            expect(this.app.collection.performSearch).toHaveBeenCalled();
         });
 
         it ('updates navigation history on search', function () {
-            spyOn(this.app.router, 'navigate');
-            this.app.form.trigger('search');
-            setTimeout(function() {
-                expect(this.app.router.navigate).toHaveBeenCalledWith('search/');
-            }, 0);
+            this.app.form.trigger('search', 'search_string');
+            expect(this.app.router.navigate).toHaveBeenCalledWith('search/search_string', { replace: true });
         });
 
         it ('cancels search', function () {
-            spyOn(this.app.collection, 'cancelSearch');
             this.app.form.trigger('clear');
-            setTimeout(function() {
-                expect(this.app.collection.cancelSearch).toHaveBeenCalled();
-            }, 0);
+            expect(this.app.collection.cancelSearch).toHaveBeenCalled();
         });
 
         it ('clears results', function () {
-            spyOn(this.app.results, 'clear');
             this.app.form.trigger('clear');
-            setTimeout(function() {
-                expect(this.app.results.clear).toHaveBeenCalled();
-            }, 0);
+            expect(this.app.results.clear).toHaveBeenCalled();
         });
 
         it ('updates navigation history on clear', function () {
-            spyOn(this.app.router, 'navigate');
             this.app.form.trigger('clear');
-            setTimeout(function() {
-                expect(this.app.router.navigate).toHaveBeenCalledWith('');
-            }, 0);
+            expect(this.app.router.navigate).toHaveBeenCalledWith(/* nothing */);
         });
 
         it ('loads next page', function () {
-            spyOn(this.app.collection, 'loadNextPage');
-            this.app.form.trigger('next');
-            setTimeout(function() {
-                expect(this.app.collection.loadNextPage).toHaveBeenCalledWith('');
-            }, 0);
+            this.app.results.trigger('next');
+            expect(this.app.collection.loadNextPage).toHaveBeenCalled();
         });
 
         it ('navigates to search', function () {
-            spyOn(this.app.form, 'doSearch');
-            this.app.router.navigate('search/query', { trigger: true });
-            setTimeout(function() {
-                expect(this.app.form.doSearch).toHaveBeenCalledWith('query');
-            }, 0);
+            Backbone.history.loadUrl('search/query');
+            expect(this.app.form.doSearch).toHaveBeenCalledWith('query');
         });
 
     });
