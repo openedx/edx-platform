@@ -3,34 +3,31 @@ This module provides an abstraction for working with XModuleDescriptors
 that are stored in a database an accessible using their Location as an identifier
 """
 
+import collections
+import datetime
+import functools
+import json
 import logging
 import re
-import json
-import datetime
-from uuid import uuid4
-
-from pytz import UTC
-from collections import namedtuple, defaultdict
-import collections
-from contextlib import contextmanager
-import functools
 import threading
-from operator import itemgetter
-from sortedcontainers import SortedListWithKey
 
 from abc import ABCMeta, abstractmethod
+from collections import defaultdict
+from contextlib import contextmanager
 from contracts import contract, new_contract
-from xblock.plugin import default_select
+from operator import itemgetter
+from pytz import UTC
+from sortedcontainers import SortedListWithKey
 
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
-from xmodule.errortracker import make_error_tracker
-from xmodule.assetstore import AssetMetadata
-from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
+from opaque_keys.edx.keys import AssetKey, CourseKey, UsageKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
-from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xblock.runtime import Mixologist
 from xblock.core import XBlock
+from xblock.plugin import default_select
+from xblock.runtime import Mixologist
+from xmodule.assetstore import AssetMetadata
+from xmodule.errortracker import make_error_tracker
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger('edx.modulestore')
 
@@ -348,7 +345,11 @@ class ModuleStoreAssetBase(object):
             - AssetMetadata[] for all assets of the given asset_key's type
             - the index of asset in list (None if asset does not exist)
         """
-        course_assets = self._find_course_assets(asset_key.course_key)
+        try:
+            course_assets = self._find_course_assets(asset_key.course_key)  # pylint: disable=no-member
+        except ItemNotFoundError:
+            return None, None
+
         all_assets = SortedAssetList(iterable=[])
         # Assets should be pre-sorted, so add them efficiently without sorting.
         # extend() will raise a ValueError if the passed-in list is not sorted.
@@ -396,9 +397,12 @@ class ModuleStoreAssetBase(object):
                 sort_order - one of SortOrder.ascending or SortOrder.descending
 
         Returns:
-            List of AssetMetadata objects.
+            List of AssetMetadata objects, or None if not found.
         """
-        course_assets = self._find_course_assets(course_key)
+        try:
+            course_assets = self._find_course_assets(course_key)    # pylint: disable=no-member
+        except ItemNotFoundError:
+            return None
 
         # Determine the proper sort - with defaults of ('displayname', SortOrder.ascending).
         key_func = None

@@ -230,10 +230,8 @@ class TestMongoAssetMetadataStorage(unittest.TestCase):
                 ))
                 new_asset_loc = fake_course_id.make_asset_key('asset', 'burnside.jpg')
                 # Find asset metadata from non-existent course.
-                with self.assertRaises(ItemNotFoundError):
-                    store.find_asset_metadata(new_asset_loc)
-                with self.assertRaises(ItemNotFoundError):
-                    store.get_all_asset_metadata(fake_course_id, 'asset')
+                self.assertIsNone(store.find_asset_metadata(new_asset_loc))
+                self.assertIsNone(store.get_all_asset_metadata(fake_course_id, 'asset'))
 
     @ddt.data(*MODULESTORE_SETUPS)
     def test_add_same_asset_twice(self, storebuilder):
