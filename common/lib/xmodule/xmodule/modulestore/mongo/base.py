@@ -136,6 +136,8 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     def set(self, key, value):
         if key.scope == Scope.children:
             self._children = value
+        elif key.scope == Scope.parent:
+            self._parent = value
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
@@ -1354,8 +1356,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 # Remove all old pointers to me, then add my current children back
                 parent_cache = self._get_parent_cache(self.get_branch_setting())
                 parent_cache.delete_by_value(xblock.location)
-                for child in xblock.children:
-                    parent_cache.set(unicode(child), xblock.location)
+                for child_location in xblock.children:
+                    parent_cache.set(unicode(child_location), xblock.location)
+                    try:
+                        self.get_item(child_location).parent = xblock.location
+                    except ItemNotFoundError:
+                        # it may never have been persisted before so the update would fail.
+                        pass
 
             self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
 
