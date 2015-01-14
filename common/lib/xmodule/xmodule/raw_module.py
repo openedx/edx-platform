@@ -17,6 +17,11 @@ class RawDescriptor(XmlDescriptor, XMLEditingDescriptor):
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
+        # because we repeatedly copy and convert the xml, this is the only sure
+        # place to remove these attrs if they exist
+        for attr in ['parent_url', 'parent_sequential_url', 'index_in_children_list']:
+            if attr in xml_object.attrib:
+                del xml_object.attrib[attr]
         return {'data': etree.tostring(xml_object, pretty_print=True, encoding='unicode')}, []
 
     def definition_to_xml(self, resource_fs):

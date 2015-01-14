@@ -72,6 +72,23 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
 # pylint: disable=protected-access
 
 
+# yeah, this shouldn't be here, but get_parent calls get_block which calls load_item which
+# returns items with revision = draft but the app code can't handle that. Anyway, we need
+# to get rid of draft.py and move it all here.
+def wrap_draft(item):
+    """
+    Cleans the item's location and sets the `is_draft` attribute if needed.
+
+    Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
+    Sets the item's location to the non-draft location in either case.
+    """
+    if hasattr(item, 'is_draft'):
+        return item
+    setattr(item, 'is_draft', item.location.revision == MongoRevisionKey.draft)
+    item.location = item.location.replace(revision=MongoRevisionKey.published)
+    return item
+
+
 class MongoRevisionKey(object):
     """
     Key Revision constants to use for Location and Usage Keys in the Mongo modulestore
@@ -119,6 +136,8 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
     def set(self, key, value):
         if key.scope == Scope.children:
             self._children = value
+        elif key.scope == Scope.parent:
+            self._parent = value
         elif key.scope == Scope.settings:
             self._metadata[key.field_name] = value
         elif key.scope == Scope.content:
@@ -191,18 +210,40 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         # define an attribute here as well, even though it's None
         self.course_id = course_key
         self.cached_metadata = cached_metadata
+        self.cached_modules = {}
+
+    #def get_block(self, usage_id):
+    #    """
+    #    Overrides the base impl to figure out if you want draft or published and then
+    #    to strip the revision if it got a draft
+    #    """
+    #    if (
+    #        self.modulestore.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred
+    #        and usage_id.category not in DIRECT_ONLY_CATEGORIES
+    #    ):
+    #        try:
+    #            block = super(CachingDescriptorSystem, self).get_block(as_draft(usage_id))
+    #            return wrap_draft(block)
+    #        except ItemNotFoundError:
+    #            pass  # do the below
+    #    block = super(CachingDescriptorSystem, self).get_block(usage_id)
+    #    return block
 
     def load_item(self, location):
         """
         Return an XModule instance for the specified location
         """
         assert isinstance(location, UsageKey)
+        location = self.modulestore.fill_in_run(location)
+        if location in self.cached_modules:
+            return self.cached_modules[location]
         json_data = self.module_data.get(location)
         if json_data is None:
             module = self.modulestore.get_item(location)
             if module is not None:
                 # update our own cache after going to the DB to get cache miss
                 self.module_data.update(module.runtime.module_data)
+            self.cached_modules[location] = module
             return module
         else:
             # load the module and apply the inherited metadata
@@ -280,6 +321,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
 
                 # decache any computed pending field settings
                 module.save()
+                self.cached_modules[location] = module
                 return module
             except:
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
@@ -428,6 +470,16 @@ class MongoBulkOpsRecord(BulkOpsRecord):
     def __init__(self):
         super(MongoBulkOpsRecord, self).__init__()
         self.dirty = False
+        self.resources_fs = None
+        self.runtime = None
+
+    def update_data_dir(self, fs_root, data_dir):
+        if self.resources_fs is None:
+            root = fs_root / data_dir
+
+            root.makedirs_p()  # create directory if it doesn't exist
+
+            self.runtime.resources_fs = OSFS(root)
 
 
 class MongoBulkOpsMixin(BulkOperationsMixin):
@@ -442,6 +494,27 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
         """
         # ensure it starts clean
         bulk_ops_record.dirty = False
+        # note, this only will work with MongoModuleStore or == which defines the properties we're using
+        services = {}
+        if self.i18n_service:
+            services["i18n"] = self.i18n_service
+
+        if self.fs_service:
+            services["fs"] = self.fs_service
+
+        bulk_ops_record.runtime = CachingDescriptorSystem(
+            modulestore=self,
+            module_data={},
+            course_key=course_key,
+            default_class=self.default_class,
+            resources_fs=None,  # filled in later
+            error_tracker=self.error_tracker,
+            render_template=self.render_template,
+            cached_metadata={},
+            mixins=self.xblock_mixins,
+            select=self.xblock_select,
+            services=services,
+        )
 
     def _end_outermost_bulk_operation(self, bulk_ops_record, course_id):
         """
@@ -831,39 +904,19 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         Load an XModuleDescriptor from item, using the children stored in data_cache
         """
         course_key = self.fill_in_run(course_key)
-        location = Location._from_deprecated_son(item['location'], course_key.run)
-        data_dir = getattr(item, 'data_dir', location.course)
-        root = self.fs_root / data_dir
+        # create a runtime if one doesn't exist
+        with self.bulk_operations(course_key):
+            location = Location._from_deprecated_son(item['location'], course_key.run)
 
-        root.makedirs_p()  # create directory if it doesn't exist
+            bulk_rec = self._get_bulk_ops_record(course_key)
+            data_dir = getattr(item, 'data_dir', location.course)
+            bulk_rec.update_data_dir(self.fs_root, data_dir)
 
-        resource_fs = OSFS(root)
+            if apply_cached_metadata:
+                bulk_rec.runtime.cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
 
-        cached_metadata = {}
-        if apply_cached_metadata:
-            cached_metadata = self._get_cached_metadata_inheritance_tree(course_key)
-
-        services = {}
-        if self.i18n_service:
-            services["i18n"] = self.i18n_service
-
-        if self.fs_service:
-            services["fs"] = self.fs_service
-
-        system = CachingDescriptorSystem(
-            modulestore=self,
-            course_key=course_key,
-            module_data=data_cache,
-            default_class=self.default_class,
-            resources_fs=resource_fs,
-            error_tracker=self.error_tracker,
-            render_template=self.render_template,
-            cached_metadata=cached_metadata,
-            mixins=self.xblock_mixins,
-            select=self.xblock_select,
-            services=services,
-        )
-        return system.load_item(location)
+            bulk_rec.runtime.module_data.update(data_cache)
+            return bulk_rec.runtime.load_item(location)
 
     def _load_items(self, course_key, items, depth=0):
         """
@@ -1142,27 +1195,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 block_id = u'{}_{}'.format(block_type, uuid4().hex[:5])
 
+        # should only get the runtime from the bulk ops record and nest all the use of the runtim
+        # in the bulk_op, but to minimize change I'm impl'g this odd pattern here
         if runtime is None:
-            services = {}
-            if self.i18n_service:
-                services["i18n"] = self.i18n_service
+            with self.bulk_operations(course_key):
+                bulk_rec = self._get_bulk_ops_record(course_key)
+                runtime = bulk_rec.runtime
 
-            if self.fs_service:
-                services["fs"] = self.fs_service
-
-            runtime = CachingDescriptorSystem(
-                modulestore=self,
-                module_data={},
-                course_key=course_key,
-                default_class=self.default_class,
-                resources_fs=None,
-                error_tracker=self.error_tracker,
-                render_template=self.render_template,
-                cached_metadata={},
-                mixins=self.xblock_mixins,
-                select=self.xblock_select,
-                services=services,
-            )
         xblock_class = runtime.load_block_type(block_type)
         location = course_key.make_usage_key(block_type, block_id)
         dbmodel = self._create_new_field_data(block_type, location, definition_data, metadata)
@@ -1317,8 +1356,13 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                 # Remove all old pointers to me, then add my current children back
                 parent_cache = self._get_parent_cache(self.get_branch_setting())
                 parent_cache.delete_by_value(xblock.location)
-                for child in xblock.children:
-                    parent_cache.set(unicode(child), xblock.location)
+                for child_location in xblock.children:
+                    parent_cache.set(unicode(child_location), xblock.location)
+                    try:
+                        self.get_item(child_location).parent = xblock.location
+                    except ItemNotFoundError:
+                        # it may never have been persisted before so the update would fail.
+                        pass
 
             self._update_single_item(xblock.scope_ids.usage_id, payload, allow_not_found=allow_not_found)
 
