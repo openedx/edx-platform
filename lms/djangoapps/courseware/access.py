@@ -274,7 +274,7 @@ def _has_access_course_desc(user, action, course):
         """
         if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
                 and not _has_staff_access_to_descriptor(user, course, course.id) \
-                and hasattr(course, 'pre_requisite_courses') and course.pre_requisite_courses \
+                and course.pre_requisite_courses \
                 and not user.is_anonymous() \
                 and get_pre_requisite_courses_not_completed(user, [course.id]):
             return False
