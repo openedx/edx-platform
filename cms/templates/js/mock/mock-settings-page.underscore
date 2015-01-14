@@ -69,7 +69,7 @@
                     <input type="checkbox" id="entrance-exam-enabled" />
                     <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
                 </div>
-                <div id="div-grade-requirements">
+                <div class="div-grade-requirements">
                     <p><span class="tip tip-inline">${_("To create your course entrance exam, go to the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a>${_(". An Entrance Exam section will be created automatically.")}</span></p>
                     <p><label for="entrance-exam-minimum-score-pct">${_("Minimum Passing Score")}</label></p>
                     <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format min-score-tip"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>

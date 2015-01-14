@@ -1,4 +1,5 @@
-define(["backbone", "underscore", "gettext"], function(Backbone, _, gettext) {
+define(["backbone", "underscore", "gettext", "js/models/validation_helpers"],
+    function(Backbone, _, gettext, ValidationHelpers) {
 
 var CourseDetails = Backbone.Model.extend({
     defaults: {
@@ -46,9 +47,13 @@ var CourseDetails = Backbone.Model.extend({
             // TODO check if key points to a real video using google's youtube api
         }
         if(_.has(newattrs, 'entrance_exam_minimum_score_pct')){
-            var intEntranceExamMinScore = Math.round(newattrs.entrance_exam_minimum_score_pct); // see if this ensures value saved is int
-            if (!isFinite(intEntranceExamMinScore) || /\D+/.test(newattrs.entrance_exam_minimum_score_pct) || intEntranceExamMinScore < 0 || intEntranceExamMinScore > 100) {
-                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between 0 and 100.");
+            var range = {
+                min: 1,
+                max: 100
+            };
+            if(!ValidationHelpers.validateIntegerRange(newattrs.entrance_exam_minimum_score_pct, range)){
+                errors.entrance_exam_minimum_score_pct = gettext("Please enter an integer between "
+                    + range.min +" and "+ range.max +".");
             }
         }
         if (!_.isEmpty(errors)) return errors;

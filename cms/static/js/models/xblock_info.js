@@ -122,9 +122,9 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'staff_only_message': null,
             /**
-             * True if this xblock contains an entrance exam module.
+             * Indicate the type of xblock
              */
-            'is_entrance_exam': null
+            'override_type': null
         },
 
         initialize: function () {
@@ -161,8 +161,17 @@ function(Backbone, _, str, ModuleUtils) {
             return !this.get('published') || this.get('has_changes');
         },
 
-        isEntranceExam: function(){
-            return this.get('is_entrance_exam') ;
+        canBeDeleted: function(){
+            //get the type of xblock
+            if(this.get('override_type') != null) {
+                var type = this.get('override_type');
+
+                //hide/remove the delete trash icon if type is entrance exam.
+                if (_.has(type, 'is_entrance_exam') && type['is_entrance_exam']) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         /**

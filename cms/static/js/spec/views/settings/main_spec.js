@@ -66,19 +66,34 @@ define([
             var entrance_exam_minimum_score_pct = '60';
             var entrance_exam_enabled = 'true';
 
+            var entrance_exam_min_score = this.view.$('#entrance-exam-minimum-score-pct');
+            var entrance_exam_enabled_field = this.view.$('#entrance-exam-enabled');
+
             var requests = AjaxHelpers.requests(this),
                 expectedJson = $.extend(true, {}, modelData, {
                     entrance_exam_enabled: entrance_exam_enabled,
                     entrance_exam_minimum_score_pct: entrance_exam_minimum_score_pct
                 });
 
-            this.view.$el.find('#entrance-exam-enabled')
+            expect(this.view.$('.div-grade-requirements div')).toBeHidden();
+
+            // select the entrance-exam-enabled checkbox. grade requirement section should be visible
+            entrance_exam_enabled_field
                 .attr('checked', entrance_exam_enabled)
                 .trigger('change');
+            expect(this.view.$('.div-grade-requirements div')).toBeVisible();
 
-            this.view.$el.find('#entrance-exam-minimum-score-pct')
-                .val(entrance_exam_minimum_score_pct)
-                .trigger('input');
+            //input some invalid values.
+            expect(entrance_exam_min_score.val('101').trigger('input')).toHaveClass("error");
+            expect(entrance_exam_min_score.val('invalidVal').trigger('input')).toHaveClass("error");
+
+            //if input an empty value, model should be populated with the default value.
+            entrance_exam_min_score.val('').trigger('input');
+            expect(this.model.get('entrance_exam_minimum_score_pct'))
+                .toEqual(this.model.defaults.entrance_exam_minimum_score_pct);
+
+            // input a valid value for entrance exam minimum score.
+            entrance_exam_min_score.val(entrance_exam_minimum_score_pct).trigger('input');
 
             this.view.saveView();
             AjaxHelpers.expectJsonRequest(

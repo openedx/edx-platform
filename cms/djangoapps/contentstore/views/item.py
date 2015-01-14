@@ -852,6 +852,11 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
 
+    #instead of adding a new feature directly into xblock-info, we should add them into override_type.
+    override_type = {}
+    if getattr(xblock, "is_entrance_exam", None):
+        override_type['is_entrance_exam'] = xblock.is_entrance_exam
+
     xblock_info = {
         "id": unicode(xblock.location),
         "display_name": xblock.display_name_with_default,
@@ -871,7 +876,7 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
-        "is_entrance_exam": xblock.is_entrance_exam if getattr(xblock, "is_entrance_exam", None) else None
+        "override_type": override_type,
     }
     if data is not None:
         xblock_info["data"] = data
