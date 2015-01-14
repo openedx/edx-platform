@@ -883,7 +883,7 @@ class CourseTabList(List):
             TextbookTabs.type,
             PDFTextbookTabs.type,
             HtmlTextbookTabs.type,
-            EdxNotesTab.type,
+            EdxNotesTab.type
         ]:
             cls._validate_num_tabs_of_type(tabs, tab_type, 1)
 
