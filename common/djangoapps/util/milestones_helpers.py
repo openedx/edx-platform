@@ -15,6 +15,7 @@ from milestones.api import (
     add_user_milestone,
     get_user_milestones,
 )
+from milestones.models import MilestoneRelationshipType
 from django.conf import settings
 
 
@@ -86,7 +87,7 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):  # pylint: 
                 for key, value in milestone_value.items():
                     if key == 'courses' and value:
                         for required_course in value:
-                            required_course_key = CourseKey.from_string(required_course['course_id'])
+                            required_course_key = CourseKey.from_string(required_course)
                             required_course_descriptor = modulestore().get_course(required_course_key)
                             required_courses.append({
                                 'key': required_course_key,
@@ -133,11 +134,11 @@ def fulfill_course_milestone(course_key, user):
         add_user_milestone({'id': user.id}, milestone)
 
 
-def milestones_achieved_by_user(user):
+def milestones_achieved_by_user(user, namespace):
     """
     It would fetch list of milestones completed by user
     """
-    return get_user_milestones({'id': user.id})
+    return get_user_milestones({'id': user.id}, namespace)
 
 
 def is_valid_course_key(key):
@@ -149,3 +150,8 @@ def is_valid_course_key(key):
     except InvalidKeyError:
         course_key = key
     return isinstance(course_key, CourseKey)
+
+
+def seed_milestone_relationship_types():
+    MilestoneRelationshipType.objects.create(name='requires')
+    MilestoneRelationshipType.objects.create(name='fulfills')

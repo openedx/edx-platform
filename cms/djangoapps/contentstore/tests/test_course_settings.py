@@ -25,6 +25,8 @@ from contentstore.views.component import ADVANCED_COMPONENT_POLICY_KEY
 import ddt
 from xmodule.modulestore import ModuleStoreEnum
 
+from util.milestones_helpers import seed_milestone_relationship_types
+
 
 def get_url(course_id, handler_name='settings_handler'):
     return reverse_course_url(handler_name, course_id)
@@ -171,6 +173,10 @@ class CourseDetailsViewTest(CourseTestCase):
     """
     Tests for modifying content on the first course settings page (course dates, overview, etc.).
     """
+    def setUp(self):
+        super(CourseDetailsViewTest, self).setUp()
+        seed_milestone_relationship_types()
+
     def alter_field(self, url, details, field, val):
         """
         Change the one field to the given value and then invoke the update post to see if it worked.

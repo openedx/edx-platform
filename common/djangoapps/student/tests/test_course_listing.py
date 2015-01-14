@@ -20,6 +20,7 @@ from opaque_keys.edx.keys import CourseKey
 from util.milestones_helpers import (
     get_pre_requisite_courses_not_completed,
     set_prerequisite_courses,
+    seed_milestone_relationship_types
 )
 import unittest
 from django.conf import settings
@@ -40,6 +41,8 @@ class TestCourseListing(ModuleStoreTestCase):
         GlobalStaff().add_users(self.teacher)
         self.client = Client()
         self.client.login(username=self.teacher.username, password='test')
+
+        seed_milestone_relationship_types()
 
     def _create_course_with_access_groups(self, course_location, metadata=None):
         """

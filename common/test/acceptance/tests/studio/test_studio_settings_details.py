@@ -16,8 +16,8 @@ class SettingsMilestonesTest(StudioCourseTest):
     """
     Tests for milestones feature in Studio's settings tab
     """
-    def setUp(self):
-        super(SettingsMilestonesTest, self).setUp(is_staff=True)
+    def setUp(self, is_staff=True):
+        super(SettingsMilestonesTest, self).setUp(is_staff=is_staff)
         self.settings_detail = SettingsPage(
             self.browser,
             self.course_info['org'],

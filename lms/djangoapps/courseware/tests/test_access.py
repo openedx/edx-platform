@@ -15,9 +15,11 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+
 from util.milestones_helpers import (
     set_prerequisite_courses,
     fulfill_course_milestone,
+    seed_milestone_relationship_types,
 )
 
 # pylint: disable=missing-docstring
@@ -37,6 +39,8 @@ class AccessTestCase(LoginEnrollmentTestCase):
         self.global_staff = UserFactory(is_staff=True)
         self.course_staff = StaffFactory(course_key=self.course.course_key)
         self.course_instructor = InstructorFactory(course_key=self.course.course_key)
+
+        seed_milestone_relationship_types()
 
     def test_has_access_to_course(self):
         self.assertFalse(access._has_access_to_course(

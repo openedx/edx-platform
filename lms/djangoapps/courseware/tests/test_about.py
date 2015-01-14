@@ -22,6 +22,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import (
     set_prerequisite_courses,
+    seed_milestone_relationship_types,
 )
 
 from .helpers import LoginEnrollmentTestCase
@@ -60,6 +61,8 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
                                       mode_display_name="honor cert",
                                       min_price=10)
         self.course_mode.save()
+
+        seed_milestone_relationship_types()
 
     def test_anonymous_user(self):
         """
