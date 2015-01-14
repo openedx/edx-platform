@@ -405,24 +405,26 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="topic-template">
-    <div class="field-label">
-        <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
-            <a href="#" class="post-topic-button">
-                <span class="sr">Discussion topics; current selection is: </span>
-                <span class="js-selected-topic"></span>
-                <span class="drop-arrow" aria-hidden="true">▾</span>
-            </a>
-            <div class="topic-menu-wrapper">
-                <label class="topic-filter-label">
-                    <span class="sr">Filter topics</span>
-                    <input type="text" class="topic-filter-input" placeholder="Filter topics">
-                </label>
-                <ul class="topic-menu" role="menu"><%= topics_html %></ul>
-           </div>
-       </div>
-    </div><span class="field-help">
-        Add your post to a relevant topic to help others find it.
-    </span>
+    <div class="topic-wrapper">
+      <div class="field-label">
+          <span class="field-label-text">Topic Area:</span><div class="field-input post-topic">
+              <a href="#" class="post-topic-button">
+                  <span class="sr">Discussion topics; current selection is: </span>
+                  <span class="js-selected-topic"></span>
+                  <span class="drop-arrow" aria-hidden="true">▾</span>
+              </a>
+              <div class="topic-menu-wrapper">
+                  <label class="topic-filter-label">
+                      <span class="sr">Filter topics</span>
+                      <input type="text" class="topic-filter-input" placeholder="Filter topics">
+                  </label>
+                  <ul class="topic-menu" role="menu"><%= topics_html %></ul>
+             </div>
+         </div>
+      </div><span class="field-help">
+          Add your post to a relevant topic to help others find it.
+      </span>
+    </div>
 </script>
 
 
