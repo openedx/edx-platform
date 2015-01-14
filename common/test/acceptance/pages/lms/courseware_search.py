@@ -11,17 +11,21 @@ class CoursewareSearchPage(CoursePage):
     """
 
     url_path = "courseware/"
-    search_selector = '#courseware-search'
+    search_bar_selector = '#courseware-search-bar'
+
+    @property
+    def search_results(self):
+        return self.q(css='#courseware-search-results')
 
     def is_browser_on_page(self):
-        return self.q(css=self.search_selector).present
+        return self.q(css=self.search_bar_selector).present
 
     def enter_search_term(self, text):
-        self.q(css=self.search_selector + ' input[type="text"]').fill(text)
+        self.q(css=self.search_bar_selector + ' input[type="text"]').fill(text)
 
     def search(self):
-        self.q(css=self.search_selector + ' [type="submit"]').click()
-        self.wait_for_element_visibility('#search-content', 'Search results are shown')
+        self.q(css=self.search_bar_selector + ' [type="submit"]').click()
+        self.wait_for_element_visibility('.search-info', 'Search results are shown')
 
     def search_for_term(self, text):
         """
@@ -29,4 +33,3 @@ class CoursewareSearchPage(CoursePage):
         """
         self.enter_search_term(text)
         self.search()
-        return self.q(css='.search-results li').html
