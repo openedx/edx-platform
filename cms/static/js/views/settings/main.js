@@ -63,14 +63,15 @@ var DetailsView = ValidatingView.extend({
         var imageURL = this.model.get('course_image_asset_path');
         this.$el.find('#course-image-url').val(imageURL);
         this.$el.find('#course-image').attr('src', imageURL);
-        if(this.model.get('entrance_exam_enabled') == 'true'){
-            this.$el.find('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
-            this.$el.find('#div-grade-requirements').show();
-        }else{
-            this.$el.find('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
-            this.$el.find('#div-grade-requirements').hide();
+        if (this.model.get('entrance_exam_enabled') == 'true') {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).attr('checked', this.model.get('entrance_exam_enabled'));
+            this.$('.div-grade-requirements').show();
         }
-        this.$el.find('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
+        else {
+            this.$('#' + this.fieldToSelectorMap['entrance_exam_enabled']).removeAttr('checked');
+            this.$('.div-grade-requirements').hide();
+        }
+        this.$('#' + this.fieldToSelectorMap['entrance_exam_minimum_score_pct']).val(this.model.get('entrance_exam_minimum_score_pct'));
 
 
         return this;
@@ -164,17 +165,18 @@ var DetailsView = ValidatingView.extend({
             break;
         case 'entrance-exam-enabled':
             if($(event.currentTarget).is(":checked")){
-                this.$el.find('#div-grade-requirements').show();
+                this.$('.div-grade-requirements').show();
             }else{
-                this.$el.find('#div-grade-requirements').hide();
+                this.$('.div-grade-requirements').hide();
             }
             this.setField(event);
             break;
         case 'entrance-exam-minimum-score-pct':
             // If the val is an empty string then update model with default value.
-            if($(event.currentTarget).val() == ''){
+            if ($(event.currentTarget).val() === '') {
                 this.model.set('entrance_exam_minimum_score_pct', this.model.defaults.entrance_exam_minimum_score_pct);
-            }else{
+            }
+            else {
                 this.setField(event);
             }
             break;
