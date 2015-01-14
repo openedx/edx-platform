@@ -20,6 +20,7 @@ from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from student.tests.factories import UserFactory
@@ -172,14 +173,23 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
-    def _get_jump_to_url(self, vertical):
+    def _get_unit_url(self, course, chapter, section, position=None):
         """
         Returns `jump_to_id` url for the `vertical`.
         """
-        return reverse("jump_to_id", kwargs={
-            "course_id": unicode(self.course.id),
-            "module_id": vertical.url_name,
-        })
+        if position is None:
+            return reverse('courseware_section', kwargs={
+                'course_id': course.id,
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+            })
+        else:
+            return reverse('courseware_position', kwargs={
+                'course_id': course.id,
+                'chapter': chapter.url_name,
+                'section': section.url_name,
+                'position': position,
+            })
 
     def test_edxnotes_not_enabled(self):
         """
@@ -276,7 +286,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
-                        u"url": self._get_jump_to_url(self.vertical),
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                         u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
@@ -300,7 +310,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
-                        u"url": self._get_jump_to_url(self.vertical),
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                         u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
@@ -371,7 +381,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                                 unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
-                            u"url": self._get_jump_to_url(self.vertical),
+                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                             u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
@@ -395,7 +405,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                                 unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
-                            u"url": self._get_jump_to_url(self.vertical),
+                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                             u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
@@ -467,7 +477,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_jump_to_url(self.vertical),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -512,7 +522,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_jump_to_url(self.vertical),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -558,7 +568,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_jump_to_url(self.vertical),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -610,7 +620,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         """
         self.assertDictEqual(
             {
-                u"url": self._get_jump_to_url(self.vertical),
+                u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
                 u"display_name": self.vertical.display_name_with_default,
                 u"location": unicode(self.vertical.location),
             },
@@ -774,6 +784,44 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             'display_name': 'Test Section Display Name',
             'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
         })
+
+    @patch("edxnotes.helpers.path_to_location")
+    def test_unit_url(self, mock_path_to_location):
+        """
+        Tests `test_unit_url` method returns unit url.
+        """
+        mock_path_to_location.return_value = (self.course.id, 'chapter_url_name', 'section_url_name', 1)
+        self.assertEqual(
+            '/courses/{}/courseware/chapter_url_name/section_url_name/1'.format(self.course.id),
+            helpers.unit_url(self.vertical.location)
+        )
+
+    @patch("edxnotes.helpers.path_to_location")
+    def test_unit_url_no_position(self, mock_path_to_location):
+        """
+        Tests `test_unit_url` method returns section url when `position` is `None`.
+        """
+        mock_path_to_location.return_value = (self.course.id, 'chapter_url_name', 'section_url_name', None)
+        self.assertEqual(
+            '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
+            helpers.unit_url(self.vertical.location)
+        )
+
+    @patch("edxnotes.helpers.path_to_location")
+    def test_unit_url_item_not_found(self, mock_path_to_location):
+        """
+        Tests `test_unit_url` method returns section url when `position` is `None`.
+        """
+        mock_path_to_location.side_effect = ItemNotFoundError
+        self.assertIsNone(helpers.unit_url(self.vertical.location))
+
+    @patch("edxnotes.helpers.path_to_location")
+    def test_unit_url_no_tath_to_item(self, mock_path_to_location):
+        """
+        Tests `test_unit_url` method returns section url when `position` is `None`.
+        """
+        mock_path_to_location.side_effect = NoPathToItem
+        self.assertIsNone(helpers.unit_url(self.vertical.location))
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")

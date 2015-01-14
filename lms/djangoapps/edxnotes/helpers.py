@@ -18,7 +18,8 @@ from django.utils.translation import ugettext as _
 from capa.util import sanitize_html
 from student.models import anonymous_id_for_user
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.search import path_to_location
+from xmodule.modulestore.exceptions import ItemNotFoundError, NoPathToItem
 from util.date_utils import get_default_time_display
 from dateutil.parser import parse as dateutil_parse
 from provider.oauth2.models import AccessToken, Client
@@ -253,14 +254,40 @@ def get_module_context(course, item):
         ancestor_children = [unicode(child) for child in course.children]
         item_dict['index'] = ancestor_children.index(item_dict['location'])
     elif item.category == 'vertical':
-        item_dict['url'] = reverse("jump_to_id", kwargs={
-            "course_id": unicode(course.id),
-            "module_id": item.url_name,
-        })
+        item_dict['url'] = unit_url(item.location)
+
     if item.category in ('chapter', 'sequential'):
         item_dict['children'] = [unicode(child) for child in item.children]
 
     return item_dict
+
+
+def unit_url(usage_key):
+    """
+    Returns unit url for the `usage_key`.
+    """
+    try:
+        (course_key, chapter, section, position) = path_to_location(modulestore(), usage_key)
+    except ItemNotFoundError:
+        log.debug(u"No data at this location: %s", usage_key)
+        return None
+    except NoPathToItem:
+        log.debug(u"This location is not in any class: %s", usage_key)
+        return None
+
+    if position is None:
+        return reverse('courseware_section', kwargs={
+            'course_id': unicode(course_key),
+            'chapter': chapter,
+            'section': section,
+        })
+    else:
+        return reverse('courseware_position', kwargs={
+            'course_id': unicode(course_key),
+            'chapter': chapter,
+            'section': section,
+            'position': position,
+        })
 
 
 def search(user, course, query_string):
@@ -350,7 +377,7 @@ def get_course_position(course_module):
     urlargs['section'] = section.url_name
     return {
         'display_name': section.display_name_with_default,
-        'url': reverse('courseware_section', kwargs=urlargs)
+        'url': reverse('courseware_section', kwargs=urlargs),
     }
 
 
