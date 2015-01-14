@@ -173,23 +173,16 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
 
-    def _get_unit_url(self, course, chapter, section, position=None):
+    def _get_unit_url(self, course, chapter, section, position=1):
         """
         Returns `jump_to_id` url for the `vertical`.
         """
-        if position is None:
-            return reverse('courseware_section', kwargs={
-                'course_id': course.id,
-                'chapter': chapter.url_name,
-                'section': section.url_name,
-            })
-        else:
-            return reverse('courseware_position', kwargs={
-                'course_id': course.id,
-                'chapter': chapter.url_name,
-                'section': section.url_name,
-                'position': position,
-            })
+        return reverse('courseware_position', kwargs={
+            'course_id': course.id,
+            'chapter': chapter.url_name,
+            'section': section.url_name,
+            'position': position,
+        })
 
     def test_edxnotes_not_enabled(self):
         """
@@ -286,7 +279,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                         u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
-                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                         u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
@@ -310,7 +303,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                             unicode(self.vertical_with_container.location)]
                     },
                     u"unit": {
-                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                        u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                         u"display_name": self.vertical.display_name_with_default,
                         u"location": unicode(self.vertical.location),
                     },
@@ -381,7 +374,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                                 unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
-                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                             u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
@@ -405,7 +398,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                                 unicode(self.vertical_with_container.location)]
                         },
                         u"unit": {
-                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                            u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                             u"display_name": self.vertical.display_name_with_default,
                             u"location": unicode(self.vertical.location),
                         },
@@ -477,7 +470,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -522,7 +515,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -568,7 +561,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                     u"children": [unicode(self.vertical.location), unicode(self.vertical_with_container.location)]
                 },
                 u"unit": {
-                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
+                    u"url": self._get_unit_url(self.course, self.chapter, self.sequential),
                     u"display_name": self.vertical.display_name_with_default,
                     u"location": unicode(self.vertical.location),
                 },
@@ -601,7 +594,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     def test_get_parent_unit(self):
         """
-        Tests `test_get_parent_unit` method for the successful result.
+        Tests `get_parent_unit` method for the successful result.
         """
         parent = helpers.get_parent_unit(self.html_module_1)
         self.assertEqual(parent.location, self.vertical.location)
@@ -614,22 +607,9 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.assertIsNone(helpers.get_parent_unit(self.chapter))
         self.assertIsNone(helpers.get_parent_unit(self.sequential))
 
-    def test_get_module_context_vertical(self):
-        """
-        Tests `test_get_module_context` method for the vertical.
-        """
-        self.assertDictEqual(
-            {
-                u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 1),
-                u"display_name": self.vertical.display_name_with_default,
-                u"location": unicode(self.vertical.location),
-            },
-            helpers.get_module_context(self.course, self.vertical)
-        )
-
     def test_get_module_context_sequential(self):
         """
-        Tests `test_get_module_context` method for the sequential.
+        Tests `get_module_context` method for the sequential.
         """
         self.assertDictEqual(
             {
@@ -642,7 +622,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     def test_get_module_context_html_component(self):
         """
-        Tests `test_get_module_context` method for the sequential.
+        Tests `get_module_context` method for the components.
         """
         self.assertDictEqual(
             {
@@ -654,7 +634,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
     def test_get_module_context_chapter(self):
         """
-        Tests `test_get_module_context` method for the chapters.
+        Tests `get_module_context` method for the chapters.
         """
         self.assertDictEqual(
             {
@@ -673,6 +653,19 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
                 u"children": [],
             },
             helpers.get_module_context(self.course, self.chapter_2)
+        )
+
+    def test_get_unit_context(self):
+        """
+        Tests `get_unit_context` method returns correct context.
+        """
+        self.assertDictEqual(
+            {
+                u"url": self._get_unit_url(self.course, self.chapter, self.sequential, 2),
+                u"display_name": self.vertical_with_container.display_name_with_default,
+                u"location": unicode(self.vertical_with_container.location),
+            },
+            helpers.get_unit_context(self.course, self.chapter, self.sequential, self.vertical_with_container)
         )
 
     @patch.dict("django.conf.settings.EDXNOTES_INTERFACE", {"url": "http://example.com"})
@@ -785,43 +778,13 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
             'url': '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
         })
 
-    @patch("edxnotes.helpers.path_to_location")
-    def test_unit_url(self, mock_path_to_location):
+    def test_get_index(self):
         """
-        Tests `test_unit_url` method returns unit url.
+        Tests `get_index` method returns unit url.
         """
-        mock_path_to_location.return_value = (self.course.id, 'chapter_url_name', 'section_url_name', 1)
-        self.assertEqual(
-            '/courses/{}/courseware/chapter_url_name/section_url_name/1'.format(self.course.id),
-            helpers.unit_url(self.vertical.location)
-        )
-
-    @patch("edxnotes.helpers.path_to_location")
-    def test_unit_url_no_position(self, mock_path_to_location):
-        """
-        Tests `test_unit_url` method returns section url when `position` is `None`.
-        """
-        mock_path_to_location.return_value = (self.course.id, 'chapter_url_name', 'section_url_name', None)
-        self.assertEqual(
-            '/courses/{}/courseware/chapter_url_name/section_url_name/'.format(self.course.id),
-            helpers.unit_url(self.vertical.location)
-        )
-
-    @patch("edxnotes.helpers.path_to_location")
-    def test_unit_url_item_not_found(self, mock_path_to_location):
-        """
-        Tests `test_unit_url` method returns section url when `position` is `None`.
-        """
-        mock_path_to_location.side_effect = ItemNotFoundError
-        self.assertIsNone(helpers.unit_url(self.vertical.location))
-
-    @patch("edxnotes.helpers.path_to_location")
-    def test_unit_url_no_tath_to_item(self, mock_path_to_location):
-        """
-        Tests `test_unit_url` method returns section url when `position` is `None`.
-        """
-        mock_path_to_location.side_effect = NoPathToItem
-        self.assertIsNone(helpers.unit_url(self.vertical.location))
+        children = self.sequential.children
+        self.assertEqual(0, helpers.get_index(unicode(self.vertical.location), children))
+        self.assertEqual(1, helpers.get_index(unicode(self.vertical_with_container.location), children))
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
