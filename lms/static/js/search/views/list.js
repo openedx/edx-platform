@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function ($, _, Backbone, gettext) {
+(function ($, _, Backbone, gettext, interpolate) {
    'use strict';
 
     edx.search = edx.search || {};
@@ -78,4 +78,4 @@ var edx = edx || {};
 
     });
 
-})(jQuery, _, Backbone, gettext);
+})(jQuery, _, Backbone, gettext, interpolate);
