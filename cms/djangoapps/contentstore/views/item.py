@@ -336,7 +336,6 @@ def xblock_outline_handler(request, usage_key_string):
         return Http404
 
 
-# pylint: disable=unused-argument
 @require_http_methods(("GET"))
 @login_required
 @expect_json
