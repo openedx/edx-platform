@@ -1,6 +1,6 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+    "js/views/uploads", "js/utils/change_on_enter", "js/views/utils/view_utils", "jquery.timepicker", "date"],
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter, ViewUtils) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -359,6 +359,7 @@ var DetailsView = ValidatingView.extend({
         var email_type = event.target.id;
         var subject = "";
         var message = "";
+        var validation;
         if (email_type === "test_email_pre") {
             subject = this.pre_enrollment_email_subject_elem.val();
             message = this.pre_enrollment_email_elem.val();
@@ -367,12 +368,18 @@ var DetailsView = ValidatingView.extend({
             message = this.post_enrollment_email_elem.val();
         }
 
-        $.post("/settings/send_test_enrollment_email",
+        validation = ViewUtils.keywordValidator.validateString(message);
+        if (!validation.isValid) {
+            message = gettext('There are invalid keywords in your email. Please check the following keywords and try again:');
+            message += "\n" + validation.keywordsInvalid.join('\n');
+            window.alert(message);
+            return;
+        }
+
+        $.post($(event.target).data('endpoint'),
                {
                  subject: subject,
-                 message:message,org:this.model.get('org'),
-                 number: this.model.get('course_id'),
-                 run: this.model.get('run'),
+                 message:message
                },
                function (data) {
                    alert(gettext("Test email sent! Please check your inbox. Don't forget to save!"));

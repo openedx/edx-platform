@@ -5,7 +5,7 @@ Contains utility functions to help substitute keywords in a text body with
 the appropriate user / course data.
 
 Supported:
-    LMS:
+    LMS and CMS (email on enrollment):
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
@@ -16,8 +16,8 @@ Usage:
     above other modules in the dependency tree and acts like a global var.
     Then we can call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-        - LMS: Announcements + Bulk emails
-        - CMS: Not called
+        - LMS: Bulk emails and emails on enrollment
+        - CMS: Sending test email on enrollment
 """
 
 from django.contrib.auth.models import User
