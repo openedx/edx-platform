@@ -26,7 +26,11 @@
 <footer class="reference" role="complementary" aria-label="<%- gettext('References') %>">
     <div class="wrapper-reference-content">
         <h3 class="reference-title"><%- gettext("Noted in:") %></h3>
-        <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
+        <% if (unit.url) { %>
+          <a class="reference-meta reference-unit-link" href="<%= unit.url %>#<%= id %>"><%- unit.display_name %></a>
+        <% } else { %>
+          <span class="reference-meta"><%- unit.display_name %></span>
+        <% } %>
 
         <h3 class="reference-title"><%- gettext("Last Edited:") %></h3>
         <span class="reference-meta reference-updated-date"><%- updated %></span>

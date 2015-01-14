@@ -206,8 +206,9 @@ def preprocess_collection(user, course, collection):
                 continue
             if section in cache:
                 usage_context = cache[section]
+                chapter = get_parent_xblock(section)
                 usage_context.update({
-                    "unit": get_module_context(course, unit),
+                    "unit": get_unit_context(course, chapter, section, unit),
                 })
                 model.update(usage_context)
                 cache[usage_id] = cache[unit] = usage_context
@@ -221,7 +222,7 @@ def preprocess_collection(user, course, collection):
             if chapter in cache:
                 usage_context = cache[chapter]
                 usage_context.update({
-                    "unit": get_module_context(course, unit),
+                    "unit": get_unit_context(course, chapter, section, unit),
                     "section": get_module_context(course, section),
                 })
                 model.update(usage_context)
@@ -230,7 +231,7 @@ def preprocess_collection(user, course, collection):
                 continue
 
             usage_context = {
-                "unit": get_module_context(course, unit),
+                "unit": get_unit_context(course, chapter, section, unit),
                 "section": get_module_context(course, section),
                 "chapter": get_module_context(course, chapter),
             }
@@ -243,24 +244,46 @@ def preprocess_collection(user, course, collection):
 
 def get_module_context(course, item):
     """
-    Returns dispay_name and url for the parent module.
+    Returns context for the module (chapter, section).
     """
     item_dict = {
         'location': unicode(item.location),
         'display_name': item.display_name_with_default,
     }
     if item.category == 'chapter':
-        ancestor_children = [unicode(child) for child in course.children]
-        item_dict['index'] = ancestor_children.index(item_dict['location'])
-    elif item.category == 'vertical':
-        item_dict['url'] = reverse("jump_to_id", kwargs={
-            "course_id": unicode(course.id),
-            "module_id": item.url_name,
-        })
+        item_dict['index'] = get_index(item_dict['location'], course.children)
+
     if item.category in ('chapter', 'sequential'):
         item_dict['children'] = [unicode(child) for child in item.children]
 
     return item_dict
+
+
+def get_unit_context(course, chapter, section, unit):
+    """
+    Returns context for the unit.
+    """
+    # Position starts from 1, that's why we add 1.
+    position = get_index(unicode(unit.location), section.children) + 1
+    return {
+        'location': unicode(unit.location),
+        'display_name': unit.display_name_with_default,
+        'url_name': unit.url_name,
+        'url': reverse('courseware_position', kwargs={
+            'course_id': unicode(course.id),
+            'chapter': chapter.url_name,
+            'section': section.url_name,
+            'position': position,
+        })
+    }
+
+
+def get_index(usage_key, children):
+    """
+    Returns an index of the child with `usage_key`.
+    """
+    children = [unicode(child) for child in children]
+    return children.index(usage_key)
 
 
 def search(user, course, query_string):
@@ -350,7 +373,7 @@ def get_course_position(course_module):
     urlargs['section'] = section.url_name
     return {
         'display_name': section.display_name_with_default,
-        'url': reverse('courseware_section', kwargs=urlargs)
+        'url': reverse('courseware_section', kwargs=urlargs),
     }
 
 
