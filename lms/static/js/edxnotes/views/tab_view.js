@@ -116,9 +116,7 @@ define([
         showErrorMessage: function (message) {
             this.$('.wrapper-msg')
                 .removeClass('is-hidden')
-                .find('.msg-content .copy').text(message)
-                .closest('.msg')
-                .focus();
+                .find('.msg-content .copy').html(message);
 
             return this;
         },
@@ -129,7 +127,7 @@ define([
         hideErrorMessage: function () {
             this.$('.wrapper-msg')
                 .addClass('is-hidden')
-                .find('.msg-content .copy').text('');
+                .find('.msg-content .copy').html('');
 
             return this;
         }
