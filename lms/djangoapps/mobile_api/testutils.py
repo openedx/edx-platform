@@ -10,7 +10,7 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=False.
      MobileEnrolledCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=True.
 """
-# pylint: disable=no-member
+# pylint: disable=no-member, invalid-name
 import ddt
 from mock import patch
 from rest_framework.test import APITestCase
@@ -140,6 +140,8 @@ class MobileCourseAccessTestMixin(object):
     Subclasses are expected to inherit from MobileAPITestCase.
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
+    ALLOW_ACCESS_TO_UNRELEASED_COURSE = False
+
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
         self.assertEqual(response.status_code, 200)
@@ -170,7 +172,10 @@ class MobileCourseAccessTestMixin(object):
         self.init_course_access()
 
         response = self.api_response(expected_response_code=None)
-        self.verify_failure(response)  # allow subclasses to override verification
+        if self.ALLOW_ACCESS_TO_UNRELEASED_COURSE:
+            self.verify_success(response)
+        else:
+            self.verify_failure(response)
 
     @ddt.data(*ROLE_CASES)
     @ddt.unpack

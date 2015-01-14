@@ -4,12 +4,38 @@ Common utility methods and decorators for Mobile APIs.
 
 
 import functools
+from contextlib import contextmanager
 from django.http import Http404
+from django.conf import settings
 
 from opaque_keys.edx.keys import CourseKey
 from courseware.courses import get_course_with_access
 from rest_framework import permissions
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+
+
+# TODO This contextmanager should be moved to a common utility library.
+@contextmanager
+def dict_value(dictionary, key, value):
+    """
+    A context manager that assigns 'value' to the 'key' in the 'dictionary' when entering the context,
+    and then resets the key upon exiting the context.
+    """
+
+    # cache previous values
+    has_previous_value = key in dictionary
+    previous_value = dictionary[key] if has_previous_value else None
+
+    try:
+        # temporarily set to new value
+        dictionary[key] = value
+        yield
+    finally:
+        # reset to previous values
+        if has_previous_value:
+            dictionary[key] = previous_value
+        else:
+            dictionary.pop(key, None)
 
 
 def mobile_course_access(depth=0, verify_enrolled=True):
@@ -37,18 +63,22 @@ def mobile_course_access(depth=0, verify_enrolled=True):
     return _decorator
 
 
-def mobile_access_when_enrolled(course, user):
+def mobile_course_listing_access(course, user):
     """
-    Determines whether a user has access to a course in a mobile context.
-    Checks the mobile_available flag and the start_date.
-    Note: Does not check if the user is actually enrolled in the course.
+    Determines whether a user has access to a course' listing in a mobile context.
+        Checks the mobile_available flag.
+        Checks roles including Beta Tester and staff roles.
+    Note:
+        Does not check if the user is actually enrolled in the course.
+        Does not check the start_date.
     """
     # The course doesn't always really exist -- we can have bad data in the enrollments
     # pointing to non-existent (or removed) courses, in which case `course` is None.
     if not course:
         return False
     try:
-        return get_course_with_access(user, 'load_mobile_no_enrollment_check', course.id) is not None
+        with dict_value(settings.FEATURES, 'DISABLE_START_DATES', True):
+            return get_course_with_access(user, 'load_mobile_no_enrollment_check', course.id) is not None
     except Http404:
         return False
 
