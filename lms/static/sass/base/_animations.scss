@@ -261,3 +261,21 @@
 @-webkit-keyframes fade-in-animation{ @include fade-in-keyframes; }
    @-moz-keyframes fade-in-animation{ @include fade-in-keyframes; }
         @keyframes fade-in-animation{ @include fade-in-keyframes; }
+
+
+// +utility animations
+// --------------------
+// pulse - double + fade out
+@include keyframes(pulse-out) {
+  0%, 100% {
+    opacity: 0;
+  }
+
+  25%, 75% {
+    opacity: 1.0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

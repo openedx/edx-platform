@@ -98,6 +98,7 @@ def update_module_store_settings(
         module_store_options=None,
         xml_store_options=None,
         default_store=None,
+        mappings=None,
 ):
     """
     Updates the settings for each store defined in the given module_store_setting settings
@@ -122,6 +123,9 @@ def update_module_store_settings(
                 mixed_stores.insert(0, store)
                 return
         raise Exception("Could not find setting for requested default store: {}".format(default_store))
+
+    if mappings and 'mappings' in module_store_setting['default']['OPTIONS']:
+        module_store_setting['default']['OPTIONS']['mappings'] = mappings
 
 
 def get_mixed_stores(mixed_setting):
