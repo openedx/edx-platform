@@ -702,6 +702,9 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         self.assertEqual(unicode(course.children[1]), unicode(first_child.location))
         self.assertEqual(unicode(course.children[0]), unicode(second_child.location))
 
+        # Clean up the data so we don't break other tests which apparently expect a particular state
+        self.draft_store.delete_course(course.id, self.dummy_user)
+
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
     '''

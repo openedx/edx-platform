@@ -1428,6 +1428,9 @@ class TestItemCrud(SplitModuleTest):
             self.assertEqual(unicode(children[1].location), unicode(first_child.location))
             self.assertEqual(unicode(children[0].location), unicode(second_child.location))
 
+            # Clean up the data so we don't break other tests which apparently expect a particular state
+            store.delete_course(refetch_course.id, user)
+
 
 class TestCourseCreation(SplitModuleTest):
     """
