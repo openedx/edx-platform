@@ -30,7 +30,7 @@ prepend_path: lms/static
 lib_paths:
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/coffee/src/ajax_prefix.js
-    - xmodule_js/common_static/coffee/src/logger.js
+    - xmodule_js/common_static/js/src/logger.js
     - xmodule_js/common_static/js/vendor/jasmine-jquery.js
     - xmodule_js/common_static/js/vendor/jasmine-imagediff.js
     - xmodule_js/common_static/js/vendor/require.js
@@ -55,6 +55,9 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/underscore-min.js
     - xmodule_js/common_static/js/vendor/underscore.string.min.js
     - xmodule_js/common_static/js/vendor/backbone-min.js
+    - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
+    - xmodule_js/common_static/js/test/i18n.js
+    - xmodule_js/common_static/js/vendor/date.js
 
 # Paths to source JavaScript files
 src_paths:
@@ -77,10 +80,12 @@ spec_paths:
 fixture_paths:
     - templates/instructor/instructor_dashboard_2
     - templates/dashboard
+    - templates/edxnotes
     - templates/student_account
     - templates/student_profile
     - templates/verify_student
     - templates/file-upload.underscore
+    - js/fixtures/edxnotes
 
 requirejs:
   paths:

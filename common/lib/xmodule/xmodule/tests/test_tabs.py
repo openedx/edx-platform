@@ -412,6 +412,40 @@ class InstructorTestCase(TabTestCase):
         self.check_can_display_results(tab, for_staff_only=True)
 
 
+class EdxNotesTestCase(TabTestCase):
+    """
+    Test cases for Notes Tab.
+    """
+
+    def check_edxnotes_tab(self):
+        """
+        Helper function for verifying the edxnotes tab.
+        """
+        return self.check_tab(
+            tab_class=tabs.EdxNotesTab,
+            dict_tab={'type': tabs.EdxNotesTab.type, 'name': 'same'},
+            expected_link=self.reverse('edxnotes', args=[self.course.id.to_deprecated_string()]),
+            expected_tab_id=tabs.EdxNotesTab.type,
+            invalid_dict_tab=self.fake_dict_tab,
+        )
+
+    def test_edxnotes_tabs_enabled(self):
+        """
+        Tests that edxnotes tab is shown when feature is enabled.
+        """
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = True
+        tab = self.check_edxnotes_tab()
+        self.check_can_display_results(tab, for_authenticated_users_only=True)
+
+    def test_edxnotes_tabs_disabled(self):
+        """
+        Tests that edxnotes tab is not shown when feature is disabled.
+        """
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = False
+        tab = self.check_edxnotes_tab()
+        self.check_can_display_results(tab, expected_value=False)
+
+
 class KeyCheckerTestCase(unittest.TestCase):
     """Test cases for KeyChecker class"""
 
@@ -473,6 +507,7 @@ class TabListTestCase(TabTestCase):
             tabs.TextbookTabs.type,
             tabs.PDFTextbookTabs.type,
             tabs.HtmlTextbookTabs.type,
+            tabs.EdxNotesTab.type,
         ]
 
         for unique_tab_type in unique_tab_types:
@@ -505,6 +540,7 @@ class TabListTestCase(TabTestCase):
                 {'type': tabs.OpenEndedGradingTab.type},
                 {'type': tabs.NotesTab.type, 'name': 'fake_name'},
                 {'type': tabs.SyllabusTab.type},
+                {'type': tabs.EdxNotesTab.type, 'name': 'fake_name'},
             ],
             # with external discussion
             [
@@ -565,6 +601,7 @@ class CourseTabListTestCase(TabListTestCase):
         self.settings.FEATURES['ENABLE_TEXTBOOK'] = True
         self.settings.FEATURES['ENABLE_DISCUSSION_SERVICE'] = True
         self.settings.FEATURES['ENABLE_STUDENT_NOTES'] = True
+        self.settings.FEATURES['ENABLE_EDXNOTES'] = True
         self.course.hide_progress_tab = False
 
         # create 1 book per textbook type

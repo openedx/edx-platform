@@ -196,11 +196,11 @@
 
 // typography weights
 %t-weight1 {
-  font-weight: 300;
+  font-weight: $font-light;
 }
 
 %t-weight2 {
-  font-weight: 400;
+  font-weight: $font-regular;
 }
 
 %t-weight3 {
@@ -208,11 +208,11 @@
 }
 
 %t-weight4 {
-  font-weight: 600;
+  font-weight: $font-semibold;
 }
 
 %t-weight5 {
-  font-weight: 700;
+  font-weight: $font-bold;
 }
 
 // ====================

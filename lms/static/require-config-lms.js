@@ -1,8 +1,29 @@
-;(function (require, define, _) {
+;(function (require, define) {
     var paths = {}, config;
 
-    // URI, tinymce, or jquery.tinymce may already have been loaded before the OVA templates and we do not want to load
-    // them a second time. Check if it is the case and use the global var in requireJS config.
+    // jquery, underscore, gettext, URI, tinymce, or jquery.tinymce may already
+    // have been loaded and we do not want to load them a second time. Check if
+    // it is the case and use the global var instead.
+    if (window.jQuery) {
+        define("jquery", [], function() {return window.jQuery;});
+    } else {
+        paths.jquery = "js/vendor/jquery.min";
+    }
+    if (window._) {
+        define("underscore", [], function() {return window._;});
+    } else {
+        paths.jquery = "js/vendor/underscore-min";
+    }
+    if (window.gettext) {
+        define("gettext", [], function() {return window.gettext;});
+    } else {
+        paths.gettext = "/i18n";
+    }
+    if (window.Logger) {
+        define("logger", [], function() {return window.Logger;});
+    } else {
+        paths.logger = "js/src/logger";
+    }
     if (window.URI) {
         define("URI", [], function() {return window.URI;});
     } else {
@@ -20,10 +41,14 @@
     }
 
     config = {
-        // NOTE: baseUrl has been previously set in lms/templates/main.html
+        // NOTE: baseUrl has been previously set in lms/static/templates/main.html
         waitSeconds: 60,
         paths: {
-            // Files only needed for OVA
+            "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
+            "date": "js/vendor/date",
+            "backbone": "js/vendor/backbone-min",
+            "underscore.string": "js/vendor/underscore.string.min",
+            // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
             "video.dev": "js/vendor/ova/video.dev",
@@ -42,10 +67,30 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
-            // end of files only needed for OVA
+            // end of files needed by OVA
         },
         shim: {
-            // The following are all needed for OVA
+            "annotator_1.2.9": {
+                deps: ["jquery"],
+                exports: "Annotator"
+            },
+            "date": {
+                exports: "Date"
+            },
+            "jquery": {
+                exports: "$"
+            },
+            "underscore": {
+                exports: "_"
+            },
+            "backbone": {
+                deps: ["underscore", "jquery"],
+                exports: "Backbone"
+            },
+            "logger": {
+                exports: "Logger"
+            },
+            // Needed by OVA
             "video.dev": {
                 exports:"videojs"
             },
@@ -74,7 +119,7 @@
                 deps: ["annotator"]
             },
             "diacritic-annotator": {
-                deps: ["annotator"]
+              deps: ["annotator"]
             },
             "flagging-annotator": {
                 deps: ["annotator"]
@@ -99,9 +144,19 @@
                     "URI"
                 ]
             },
-            // End of OVA
+            // End of needed by OVA
+        },
+        map: {
+          "js/edxnotes/*": {
+              "annotator": "annotator_1.2.9"
+          }
         }
     };
-    _.extend(config.paths, paths);
+
+    for (var key in paths) {
+        if ({}.hasOwnProperty.call(paths, key)) {
+            config.paths[key] = paths[key];
+        }
+    }
     require.config(config);
-}).call(this, require || RequireJS.require, define || RequireJS.define, _);
+}).call(this, require || RequireJS.require, define || RequireJS.define);
