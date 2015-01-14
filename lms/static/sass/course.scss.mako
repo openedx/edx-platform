@@ -39,11 +39,15 @@
 // courseware
 @import 'course/courseware/courseware';
 @import 'course/courseware/sidebar';
-@import 'course/courseware/search_results';
 @import 'course/courseware/amplifier';
 @import 'course/layout/calculator';
 @import 'course/layout/timer';
 @import 'course/layout/chat';
+
+## Import styles for courseware search
+% if env["FEATURES"].get("ENABLE_COURSEWARE_SEARCH"):
+    @import 'course/courseware/courseware_search';
+% endif
 
 // course-specific courseware (all styles in these files should be gated by a
 // course-specific class). This should be replaced with a better way of
