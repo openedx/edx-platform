@@ -1579,6 +1579,9 @@ INSTALLED_APPS = (
     # Different Course Modes
     'course_modes',
 
+    # Enrollment API
+    'enrollment',
+
     # Student Identity Verification
     'verify_student',
 
