@@ -705,8 +705,8 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
 
     def test_no_asset_invalid_key(self):
         course_key = CourseLocator(org="edx3", course="test_course", run=None, deprecated=True)
-        # Confirm that invalid course key raises ItemNotFoundError
-        self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
+        # Confirm that invalid course key returns None
+        self.assertIsNone(self.draft_store.get_all_asset_metadata(course_key, 'asset'))
 
 
 class TestMongoKeyValueStore(object):

@@ -840,8 +840,15 @@ class MiscCourseTests(ContentStoreTestCase):
             self.store.unpublish(self.chapter_loc, self.user.id)
 
     def test_bad_contentstore_request(self):
-        resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        """
+        Test that user get proper responses for urls with invalid url or
+        asset/course key
+        """
+        resp = self.client.get_html('/c4x/CDX/123123/asset/&invalid.png')
         self.assertEqual(resp.status_code, 400)
+
+        resp = self.client.get_html('/c4x/CDX/123123/asset/invalid.png')
+        self.assertEqual(resp.status_code, 404)
 
     def test_delete_course(self):
         """
