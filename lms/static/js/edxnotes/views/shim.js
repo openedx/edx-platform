@@ -147,6 +147,42 @@ define([
 
     Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
 
+     * Modifies Annotator.Editor.html template to reverse order of Save and
+     * Cancel buttons.
+     **/
+    Annotator.Editor.prototype.html = [
+        '<div class="annotator-outer annotator-editor">',
+            '<form class="annotator-widget">',
+                '<ul class="annotator-listing"></ul>',
+                '<div class="annotator-controls">',
+                    '<a href="#" title="', _t('Save'), '" class="annotator-save">',
+                        _t('Save'),
+                    '</a>',
+                    '<a href="#" title="', _t('Cancel'), '" class="annotator-cancel">',
+                        _t('Cancel'),
+                    '</a>',
+                '</div>',
+            '</form>',
+        '</div>'
+    ].join('');
+
+    /**
+     * Modifies Annotator.Editor.show to remove focus on Save button.
+     **/
+    Annotator.Editor.prototype.show = _.compose(
+        function () {
+            this.element.find('.annotator-save').removeClass(this.classes.focus);
+        },
+        Annotator.Editor.prototype.show
+    );
+
+    /**
+     * Removes the textarea keydown event handler as it triggers 'processKeypress'
+     * which hides the viewer on ESC and saves on ENTER. We will define different
+     * behaviors for these in /plugins/accessibility.js
+     **/
+    delete Annotator.Editor.prototype.events["textarea keydown"];
+
     /**
      * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
      * editor is opened.

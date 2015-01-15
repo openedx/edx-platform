@@ -266,6 +266,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
     // controls
     .annotator-controls {
+      opacity: 1;
       // RTL support
       @include right(0);
       top: 0;
