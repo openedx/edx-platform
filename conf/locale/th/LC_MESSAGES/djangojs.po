@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # J.14 <jithinchman@gmail.com>, 2014
@@ -19,7 +19,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # J.14 <jithinchman@gmail.com>, 2014
@@ -31,7 +31,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
@@ -41,7 +41,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Jirayu Chamamahattana <mman2x@gmail.com>, 2015
 # Noppachai Eiamwasant <noporo@hotmail.com>, 2015
@@ -1763,15 +1763,15 @@ msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s วินาที "
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "คำอธิบายจะปรากฏเมื่อ"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "เปิดคำอธิบายภาพ"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "ปิดคำอธิบายภาพ"
 

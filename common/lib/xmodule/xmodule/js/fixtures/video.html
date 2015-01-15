@@ -5,68 +5,100 @@
         id="video_id"
         class="video closed"
         data-streams="0.5:7tqY6eQzVhE,1.0:cogebirgzzM,1.5:abcdefghijkl"
-        data-show-captions="true"
+        data-sources='["xmodule/include/fixtures/test.mp4","xmodule/include/fixtures/test.webm","xmodule/include/fixtures/test.ogv"]'
         data-save-state-url="/save_user_state"
+        data-caption-data-dir=""
+        data-show-captions="true"
+        data-general-speed="1.5"
         data-speed="1.5"
+        data-saved-video-position="0"
         data-start=""
         data-end=""
-        data-saved-video-position="0"
         data-transcript-language="en"
         data-transcript-languages='{"en": "English", "de": "Deutsch", "zh": "普通话"}'
         data-transcript-translation-url="/transcript/translation"
-        data-transcript-available-translations-url="/transcript/available_translations"
         data-autoplay="False"
         data-yt-test-timeout="1500"
         data-yt-api-url="www.youtube.com/iframe_api"
         data-yt-test-url="gdata.youtube.com/feeds/api/videos/"
+        data-transcript-available-translations-url="/transcript/available_translations"
         data-autohide-html5="True"
+        data-sub="Z5KLxerq05Y"
+        tabindex="-1"
       >
         <div class="focus_grabber first"></div>
 
         <div class="tc-wrapper">
-          <article class="video-wrapper">
-            <span tabindex="0" class="spinner" aria-hidden="false" aria-label="${_('Loading video player')}"></span>
-            <span tabindex="-1" class="btn-play is-hidden" aria-hidden="true" aria-label="${_('Play video')}"></span>
+          <a href="#before-transcript_id" class="nav-skip sr">Skip to a navigable version of this video's transcript.</a>
+
+          <article class="video-wrapper" id="video-wrapper">
+            <span class="spinner" aria-hidden="false" aria-label="Loading video player" tabindex="0"></span>
+            <span class="btn-play is-hidden" aria-hidden="true" aria-label="Play video" tabindex="-1"></span>
             <div class="video-player-pre"></div>
+
             <section class="video-player">
               <iframe id="id"></iframe>
+              <div class="video-overlay-captions"></div>
+              <h3 class="hidden">No playable video sources were found.</h3>
             </section>
+
             <div class="video-player-post"></div>
+
             <section class="video-controls is-hidden">
-              <div class="slider"></div>
+              <div class="wrapper-slider">
+                <div class="slider" title="Video position"></div>
               <div>
-                <ul class="vcr">
-                  <li><a class="video_control" href="#" title="Play" role="button" aria-disabled="false"></a></li>
-                  <li><div class="vidtime">0:00 / 0:00</div></li>
-                </ul>
-                <div class="secondary-controls">
-                  <div class="speeds">
-                    <a class="speed-button" href="#" title="Speeds" role="button" aria-disabled="false">
-                      <span class="label">Speed</span>
-                      <span class="value"></span>
-                    </a>
-                    <ol class="video-speeds"></ol>
-                  </div>
-                  <div class="volume">
-                    <a href="#" title="Volume" role="button" aria-disabled="false"></a>
-                    <div class="volume-slider-container">
-                      <div class="volume-slider"></div>
-                    </div>
-                  </div>
-                  <a href="#" class="add-fullscreen" title="Fill browser" role="button" aria-disabled="false">Fill Browser</a>
-                  <a href="#" class="quality-control is-hidden" title="HD off" role="button" aria-disabled="false">HD off</a>
-                  <div class="lang menu-container">
-                    <a href="#" class="hide-subtitles" title="Turn off captions" role="button" aria-disabled="false">Captions</a>
+              <div class="controls">
+                <button class="play-pause video_control" title="Play"><i class="icon fa fa-play" aria-hidden="true"></i> <span class="sr">Play</span></button>
+                <div class="time vidtime">0:00 / 0:00</div>
+                <div class="speeds menu-container">
+                  <button class="speed speed-button" title="Speed"><i class="icon fa fa-caret-right" aria-hidden="true" aria-haspopup="true" aria-controls="speed_menu"></i> Speed: <span class="value">1.0x</span></button>
+                  <ul id="speed_menu" class="video-speeds menu" role="menu"></ul>
+                </div>
+                <div class="volume menu-container">
+                  <button class="volume volume-button" title="Volume"><i class="icon fa fa-volume-up" aria-hidden="true" aria-haspopup="true" aria-controls="volume_menu"></i> <span class="sr">Volume</span></button>
+                  <div id="volume_menu" class="volume-slider-container menu" role="presentation">
+                    <div class="volume-slider"></div>
                   </div>
                 </div>
+                <button class="quality quality-control" title="Toggle quality" aria-pressed="false" disabled>HD<span class="sr">Toggle quality</span></button>
+                <button class="captions show-captions" title="Turn on captions" aria-pressed="false"><i class="icon fa fa-cc" aria-hidden="true"></i><span class="sr">Turn on captions</span></button>
+                <button class="transcript hide-subtitles is-active" title="Turn off the transcript" aria-pressed="true"><i class="icon fa fa-align-left" aria-hidden="true"></i><span class="sr">Turn off the transcript</span></button>
+                <button class="size add-fullscreen" title="Toggle fullscreen" aria-pressed="false"><i class="icon fa fa-expand" aria-hidden="true"></i><span class="sr">Toggle fullscreen</span></button>
               </div>
             </section>
+            <a class="nav-skip sr" id="before-transcript_id" href="#after-transcript_id">Skip to end of transcript.</a>
           </article>
 
           <ol class="subtitles"><li></li></ol>
         </div>
 
+        <a class="nav-skip sr" id="after-transcript_id" href="#before-transcript_id">Go back to start of transcript.</a>
+
         <div class="focus_grabber last"></div>
+
+        <ul class="wrapper-downloads">
+          <li class="video-sources video-download-button">
+            <a href="">Download video</a>
+          </li>
+          <li class="video-tracks video-download-button">
+            <div class="a11y-menu-container">
+                <a class="a11y-menu-button" href="#" title=".srt">.srt</a>
+                <ol class="a11y-menu-list">
+                  <li class="a11y-menu-item">
+                    <a class="a11y-menu-item-link" href="#txt" title="Text (.txt) file" data-value="txt">Text (.txt) file</a>
+                  </li>
+                  <li class="a11y-menu-item active">
+                    <a class="a11y-menu-item-link" href="#srt" title="SubRip (.srt) file" data-value="srt">SubRip (.srt) file</a>
+                  </li>
+                </ol>
+            </div>
+          </li>
+          <li id="branding" class="branding">
+            <span class="host-tag"></span>
+            <a href=""></a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
