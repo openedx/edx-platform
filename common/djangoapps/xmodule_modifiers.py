@@ -297,6 +297,7 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
             'answer_dist_url': reverse('get_analytics_answer_dist'),
             'responses_data': responses_data,
             'has_instructor_access': has_instructor_access,
+            'course_id': block.course_id.to_deprecated_string(),
         }
         return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
 

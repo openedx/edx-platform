@@ -1,29 +1,37 @@
 """Inline Analytics integration tests"""
 
-import unittest
 import json
-from mock import patch
+from mock import patch, MagicMock
 
-from rest_framework.test import APIRequestFactory
+from django.test import RequestFactory
 from django.test.utils import override_settings
 
 from courseware.views import get_analytics_answer_dist, process_analytics_answer_dist
-from courseware.tests.factories import UserFactory
-from student.tests.factories import AdminFactory
+from courseware.tests.factories import UserFactory, InstructorFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
-class InlineAnalyticsTest(unittest.TestCase):
+class InlineAnalyticsTest(ModuleStoreTestCase):
     """ unittest class """
 
     def setUp(self):
         self.user = UserFactory.create()
-        self.instructor = AdminFactory.create()
-        self.factory = APIRequestFactory()
+        self.factory = RequestFactory()
+        self.course = CourseFactory.create(
+            org="A",
+            number="B",
+            run="C",
+        )
+        course_key = SlashSeparatedCourseKey.from_deprecated_string("A/B/C")
+        self.instructor = InstructorFactory(course_key=course_key)
 
         analytics_data = {
             "module_id": "123",
             "question_types_by_part": "radio",
             "num_options_by_part": 6,
+            "course_id": "A/B/C",
         }
         json_analytics_data = json.dumps(analytics_data)
         self.data = {"data": json_analytics_data}
@@ -47,18 +55,19 @@ class InlineAnalyticsTest(unittest.TestCase):
 
     @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
     @patch('urllib2.urlopen')
-    @patch('json.loads')
     @patch('courseware.views.process_analytics_answer_dist')
-    def test_instructor_and_url(self, mock_process_analytics, mock_json_loads, mock_requests):
+    def test_instructor_and_url(self, mock_process_analytics, mock_requests):
 
-        instructor = AdminFactory.create()
+        mock_resp = MagicMock()
+        mock_read = MagicMock(return_value="{}")
+        mock_resp.read = mock_read
+        mock_requests.return_value = mock_resp
 
-        factory = APIRequestFactory()
+        factory = self.factory
         request = factory.post('', self.data)
-        request.user = instructor
+        request.user = self.instructor
 
         mock_process_analytics.return_value = [{'dummy': 'dummy'}]
-
         response = get_analytics_answer_dist(request)
         self.assertEquals(response, [{'dummy': 'dummy'}])
 
