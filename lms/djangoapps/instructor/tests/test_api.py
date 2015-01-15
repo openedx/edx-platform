@@ -41,6 +41,7 @@ from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
+from shoppingcart.pdf import PDFInvoice
 from student.models import (
     CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError
 )
@@ -3295,6 +3296,25 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
+
+    def test_pdf_file_throws_exception(self):
+        """
+        test to mock the pdf file generation throws an exception
+        when generating registration codes.
+        """
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
+        }
+        with patch.object(PDFInvoice, 'generate_pdf', side_effect=Exception):
+            response = self.client.post(generate_code_url, data)
+            self.assertEqual(response.status_code, 200, response.content)
 
     def test_get_codes_with_sale_invoice(self):
         """

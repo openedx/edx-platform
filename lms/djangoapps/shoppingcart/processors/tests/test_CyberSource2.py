@@ -119,10 +119,26 @@ class CyberSource2Test(TestCase):
         self.assertEqual(params['signature'], self._signature(params))
 
     # We patch the purchased callback because
+    # we're using the OrderItem base class, which throws an exception
+    # when item doest not have a course id associated
+    @patch.object(OrderItem, 'purchased_callback')
+    def test_process_payment_raises_exception(self, purchased_callback):  # pylint: disable=unused-argument
+        self.order.clear()
+        OrderItem.objects.create(
+            order=self.order,
+            user=self.user,
+            unit_cost=self.COST,
+            line_cost=self.COST,
+        )
+        params = self._signed_callback_params(self.order.id, self.COST, self.COST)
+        process_postpay_callback(params)
+
+    # We patch the purchased callback because
     # (a) we're using the OrderItem base class, which doesn't implement this method, and
     # (b) we want to verify that the method gets called on success.
     @patch.object(OrderItem, 'purchased_callback')
-    def test_process_payment_success(self, purchased_callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_process_payment_success(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         # Simulate a callback from CyberSource indicating that payment was successful
         params = self._signed_callback_params(self.order.id, self.COST, self.COST)
         result = process_postpay_callback(params)
@@ -201,7 +217,8 @@ class CyberSource2Test(TestCase):
         self.assertIn(u"you have cancelled this transaction", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
-    def test_process_no_credit_card_digits(self, callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_process_no_credit_card_digits(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         # Use a credit card number with no digits provided
         params = self._signed_callback_params(
             self.order.id, self.COST, self.COST,
@@ -238,7 +255,8 @@ class CyberSource2Test(TestCase):
         self.assertIn(u"did not return a required parameter", result['error_html'])
 
     @patch.object(OrderItem, 'purchased_callback')
-    def test_sign_then_verify_unicode(self, purchased_callback):
+    @patch.object(OrderItem, 'pdf_receipt_display_name')
+    def test_sign_then_verify_unicode(self, pdf_receipt_display_name, purchased_callback):  # pylint: disable=unused-argument
         params = self._signed_callback_params(
             self.order.id, self.COST, self.COST,
             first_name=u'\u2699'
