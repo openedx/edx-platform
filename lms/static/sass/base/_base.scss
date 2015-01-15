@@ -111,7 +111,8 @@ a:focus {
   width: flex-grid(12);
   margin: 0 auto;
   background: $content-wrapper-bg;
-  padding-bottom: ($baseline*2);
+  box-sizing: border-box;
+  padding: 0 $baseline ($baseline*2) $baseline;
 }
 
 .container {

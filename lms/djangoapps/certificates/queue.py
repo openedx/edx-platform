@@ -125,7 +125,7 @@ class XQueueCertInterface(object):
 
         raise NotImplementedError
 
-    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, title='None'):
+    def add_cert(self, student, course_id, course=None, forced_grade=None, template_file=None, title='None', keep_current=False):
         """
         Request a new certificate for a student.
 
@@ -135,6 +135,8 @@ class XQueueCertInterface(object):
           forced_grade - a string indicating a grade parameter to pass with
                          the certificate request. If this is given, grading
                          will be skipped.
+          keep_current - whether students who no longer meet grade standards
+                         should keep any pre-existing certs.
 
         Will change the certificate status to 'generating'.
 
@@ -158,6 +160,9 @@ class XQueueCertInterface(object):
                           status.deleted,
                           status.error,
                           status.notpassing]
+
+        if keep_current:
+            VALID_STATUSES.append(status.downloadable)
 
         cert_status = certificate_status_for_student(student, course_id)['status']
 
@@ -197,7 +202,7 @@ class XQueueCertInterface(object):
             if forced_grade:
                 grade['grade'] = forced_grade
 
-            cert, __ = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
+            cert, dummy0 = GeneratedCertificate.objects.get_or_create(user=student, course_id=course_id)
 
             cert.mode = cert_mode
             cert.user = student
@@ -243,9 +248,10 @@ class XQueueCertInterface(object):
                     cert.save()
                     self._send_to_xqueue(contents, key)
             else:
-                cert_status = status.notpassing
-                cert.status = cert_status
-                cert.save()
+                if not keep_current:
+                    cert_status = status.notpassing
+                    cert.status = cert_status
+                    cert.save()
 
         return new_status
 

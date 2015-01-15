@@ -15,11 +15,19 @@ from mock import Mock, patch
 from django.test.testcases import TestCase
 from pytz import UTC
 
+from courseware.courses import get_course
+from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.modulestore_config import TEST_DATA_MIXED_MODULESTORE
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from instructor_task.tasks_helper import (
     upload_grades_csv,
     upload_students_csv,
+    push_student_submissions_to_s3,
     push_ora2_responses_to_s3,
     UPDATE_STATUS_FAILED,
     UPDATE_STATUS_SUCCEEDED,
@@ -31,6 +39,8 @@ TEST_COURSE_NUMBER = '1.23x'
 from instructor_task.models import ReportStore
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
 from django.conf import settings
+from django.test.utils import override_settings
+
 
 @ddt.ddt
 class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
@@ -117,6 +127,31 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
         #This assertion simply confirms that the generation completed with no errors
         num_students = len(students)
         self.assertDictContainsSubset({'attempted': num_students, 'succeeded': num_students, 'failed': 0}, result)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
+class TestSubmissionsReport(TestReportMixin, ModuleStoreTestCase):
+    """
+    Tests that CSV student submissions report generation works.
+    """
+    def test_unicode(self):
+        course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
+        self.course = get_course(course_key)
+        self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
+
+        self.student = UserFactory(username=u'student\xec')
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"fake-problem":"caf\xe9"}}',
+        )
+
+        result = push_student_submissions_to_s3(None, None, self.course.id, None, 'generated')
+        self.assertEqual(result, "succeeded")
 
 
 class TestInstructorOra2Report(TestReportMixin, InstructorTaskCourseTestCase):
