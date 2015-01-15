@@ -25,6 +25,7 @@ from instructor_task.tasks import (
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
+                                        encode_entrance_exam_and_student_input,
                                         submit_task)
 from bulk_email.models import CourseEmail
 
@@ -146,16 +147,20 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
-def submit_reset_problem_attempts_for_student(request, usage_key, student):  # pylint: disable=invalid-name
+def submit_reset_problem_attempts_in_entrance_exam(request, usage_key, student):  # pylint: disable=invalid-name
     """
-    Request to have attempts reset for a problem as a background task.
+    Request to have attempts reset for a entrance exam as a background task.
 
-    The problem's attempts will be reset for specified students only.
+    Problem attempts for all problems in entrance exam will be reset
+    for specified student. If student is None problem attempts will be
+    reset for all students.
+
     Parameters are `usage_key`, which must be a :class:`Location`
-    and the `student` as a User object.
+    representing entrance exam section and the `student` as a User object.
 
-    ItemNotFoundException is raised if the problem doesn't exist, or AlreadyRunningError
-    if the problem is already being reset.
+    ItemNotFoundError is raised if entrance exam does not exists for given
+    usage_key, AlreadyRunningError is raised if the entrance exam
+    is already being reset.
 
     This method makes sure the InstructorTask entry is committed.
     When called from any view that is wrapped by TransactionMiddleware,
@@ -164,14 +169,12 @@ def submit_reset_problem_attempts_for_student(request, usage_key, student):  # p
     save here.  Any future database operations will take place in a
     separate transaction.
     """
-    # check arguments:  make sure that the usage_key is defined
-    # (since that's currently typed in).  If the corresponding module descriptor doesn't exist,
-    # an exception will be raised.  Let it pass up to the caller.
+    # check arguments:  make sure entrance exam(section) exists for given usage_key
     modulestore().get_item(usage_key)
 
     task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts
-    task_input, task_key = encode_problem_and_student_input(usage_key, student)
+    task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 

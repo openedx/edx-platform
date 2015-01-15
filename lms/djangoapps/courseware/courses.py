@@ -418,32 +418,22 @@ def get_studio_url(course, page):
     return studio_link
 
 
-def get_entrance_exam_modules(request, course, student):
+def get_problems_in_section(section):
     """
-    This returns all problems in an entrance exam
+    This returns list of problems in a section.
     """
 
-    exam_modules = []
-    if settings.FEATURES.get('ENTRANCE_EXAMS', False):
-        if getattr(course, 'entrance_exam_enabled', False):
-            exam_key = UsageKey.from_string(course.entrance_exam_id)
-            # it will be a Mongo performance boost, if you pass in a depth=3 argument here
-            # as it will optimize round trips to the database to fetch all children for the current node
-            exam_descriptor = modulestore().get_item(exam_key, depth=3)
+    problem_descriptors = []
+    exam_key = UsageKey.from_string(section)
+    # it will be a Mongo performance boost, if you pass in a depth=3 argument here
+    # as it will optimize round trips to the database to fetch all children for the current node
+    section = modulestore().get_item(exam_key, depth=3)
 
-            def create_module(descriptor):
-                """creates an XModule instance given a descriptor"""
-                field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                    course.id, student, descriptor
-                )
-                return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
+    # iterate over section, sub-section,  unit
+    for subsection in section.get_children():
+        for vertical in subsection.get_children():
+            for unit in vertical.get_children():
+                if unit.location.category == 'problem':
+                    problem_descriptors.append(unit)
 
-            exam_modules = yield_dynamic_descriptor_descendents(
-                exam_descriptor,
-                create_module
-            )
-            ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
-            # filter not graded modules and anything which is not a problem
-            exam_modules = [module for module in exam_modules
-                            if module.graded and module.category not in ignore_categories]
-    return exam_modules
+    return problem_descriptors

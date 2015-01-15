@@ -1506,39 +1506,23 @@ def reset_student_attempts(request, course_id):
         if not has_access(request.user, 'instructor', course):
             return HttpResponseForbidden("Requires instructor access.")
 
-    if problem_to_reset != 'entrance_exam':
-        try:
-            module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
-        except InvalidKeyError:
-            return HttpResponseBadRequest()
+    try:
+        module_state_key = course_id.make_usage_key_from_deprecated_string(problem_to_reset)
+    except InvalidKeyError:
+        return HttpResponseBadRequest()
 
     response_payload = {}
     response_payload['problem_to_reset'] = problem_to_reset
 
     if student:
-        if problem_to_reset == 'entrance_exam':  # Constant for determining if problem_to_reset is entrance exam
-            try:
-                entrance_exam_modules = get_entrance_exam_modules(request, course, student)
-                if entrance_exam_modules:
-                    for module in entrance_exam_modules:
-                        instructor_task.api.submit_reset_problem_attempts_for_student(
-                            module.scope_ids.usage_id,
-                            student
-                        )
-                else:
-                    return HttpResponseBadRequest(_("Course does not has entrance exam enabled."))
-            except ItemNotFoundError:
-                return HttpResponseBadRequest()
-        # reset problem attempts.
-        else:
-            try:
-                enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
-            except StudentModule.DoesNotExist:
-                return HttpResponseBadRequest(_("Module does not exist."))
-            except sub_api.SubmissionError:
-                # Trust the submissions API to log the error
-                error_msg = _("An error occurred while deleting the score.")
-                return HttpResponse(error_msg, status=500)
+        try:
+            enrollment.reset_student_attempts(course_id, student, module_state_key, delete_module=delete_module)
+        except StudentModule.DoesNotExist:
+            return HttpResponseBadRequest(_("Module does not exist."))
+        except sub_api.SubmissionError:
+            # Trust the submissions API to log the error
+            error_msg = _("An error occurred while deleting the score.")
+            return HttpResponse(error_msg, status=500)
         response_payload['student'] = student_identifier
     elif all_students:
         instructor_task.api.submit_reset_problem_attempts_for_all_students(request, module_state_key)
@@ -1549,6 +1533,66 @@ def reset_student_attempts(request, course_id):
 
     return JsonResponse(response_payload)
 
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@common_exceptions_400
+def reset_student_attempts_for_entrance_exam(request, course_id):
+    """
+
+    Resets a students attempts counter or starts a task to reset all students
+    attempts counters for entrance exam. Optionally deletes student state for
+    entrance exam. Limited to staff access. Some sub-methods limited to instructor access.
+
+    Following are possible query parameters
+        - unique_student_identifier is an email or username
+        - all_students is a boolean
+            requires instructor access
+            mutually exclusive with delete_module
+        - delete_module is a boolean
+            requires instructor access
+            mutually exclusive with all_students
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course = get_course_with_access(
+        request.user, 'staff', course_id, depth=None
+    )
+
+    if not course.entrance_exam_id:
+        return HttpResponseBadRequest(
+            "Course has no entrance exam section."
+        )
+
+    student_identifier = request.GET.get('unique_student_identifier', None)
+    student = None
+    if student_identifier is not None:
+        student = get_student_from_identifier(student_identifier)
+    all_students = request.GET.get('all_students', False) in ['true', 'True', True]
+    delete_module = request.GET.get('delete_module', False) in ['true', 'True', True]
+
+    # parameter combinations
+    if all_students and student:
+        return HttpResponseBadRequest(
+            "all_students and unique_student_identifier are mutually exclusive."
+        )
+    if all_students and delete_module:
+        return HttpResponseBadRequest(
+            "all_students and delete_module are mutually exclusive."
+        )
+
+    # instructor authorization
+    if all_students or delete_module:
+        if not has_access(request.user, 'instructor', course):
+            return HttpResponseForbidden("Requires instructor access.")
+
+    try:
+        instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(request, course.entrance_exam_id, student)
+    except ItemNotFoundError:
+        return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
+
+    response_payload = {'student': student_identifier or 'All Students', 'task': 'created'}
+    return JsonResponse(response_payload)
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)

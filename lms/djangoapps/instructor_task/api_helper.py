@@ -276,6 +276,28 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
     return task_input, task_key
 
 
+def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
+    """
+    Encode usage_key and optional student into task_key and task_input values.
+
+    Args:
+        usage_key (Location): The usage_key identifying the entrance exam.
+        student (User): the student affected
+    """
+    assert isinstance(usage_key, UsageKey)
+    if student is not None:
+        task_input = {'entrance_exam_url': unicode(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{entranceexam}".format(student=student.id, problem=unicode(usage_key))
+    else:
+        task_input = {'entrance_exam_url': unicode(usage_key)}
+        task_key_stub = "_{entranceexam}".format(problem=unicode(usage_key))
+
+    # create the key value by using MD5 hash:
+    task_key = hashlib.md5(task_key_stub).hexdigest()
+
+    return task_input, task_key
+
+
 def submit_task(request, task_type, task_class, course_key, task_input, task_key):
     """
     Helper method to submit a task.
