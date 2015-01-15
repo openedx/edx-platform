@@ -1,3 +1,4 @@
+# pylint: disable=bad-continuation
 """
 Instructor API endpoint urls.
 """
@@ -35,8 +36,16 @@ urlpatterns = patterns('',  # nopep8
         'instructor.views.api.get_student_progress_url', name="get_student_progress_url"),
     url(r'^reset_student_attempts$',
         'instructor.views.api.reset_student_attempts', name="reset_student_attempts"),
-    url(r'^rescore_problem$',
-        'instructor.views.api.rescore_problem', name="rescore_problem"),
+    url(r'^rescore_problem$', 'instructor.views.api.rescore_problem', name="rescore_problem"),
+    # entrance exam tasks
+    url(r'^reset_student_attempts_for_entrance_exam$',
+        'instructor.views.api.reset_student_attempts_for_entrance_exam',
+        name="reset_student_attempts_for_entrance_exam"),
+    url(r'^rescore_entrance_exam$',
+        'instructor.views.api.rescore_entrance_exam', name="rescore_entrance_exam"),
+    url(r'^list_entrance_exam_instructor_tasks',
+        'instructor.views.api.list_entrance_exam_instructor_tasks', name="list_entrance_exam_instructor_tasks"),
+
     url(r'^list_instructor_tasks$',
         'instructor.views.api.list_instructor_tasks', name="list_instructor_tasks"),
     url(r'^list_background_email_tasks$',

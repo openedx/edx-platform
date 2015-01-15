@@ -47,6 +47,7 @@
             'youtube': '//www.youtube.com/player_api?noext',
             'tender': '//api.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/core': 'xmodule_js/common_static/js/xblock/core',
             'xblock/runtime.v1': 'xmodule_js/common_static/coffee/src/xblock/runtime.v1',
@@ -251,7 +252,10 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-
+            'coffee/src/instructor_dashboard/student_admin': {
+                exports: 'coffee/src/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
@@ -539,6 +543,7 @@
         'lms/include/js/spec/groups/views/cohorts_spec.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
+        'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',

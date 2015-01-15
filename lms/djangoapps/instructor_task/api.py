@@ -23,9 +23,13 @@ from instructor_task.tasks import (
     cohort_students,
 )
 
-from instructor_task.api_helper import (check_arguments_for_rescoring,
-                                        encode_problem_and_student_input,
-                                        submit_task)
+from instructor_task.api_helper import (
+    check_arguments_for_rescoring,
+    encode_problem_and_student_input,
+    encode_entrance_exam_and_student_input,
+    check_entrance_exam_problems_for_rescoring,
+    submit_task,
+)
 from bulk_email.models import CourseEmail
 
 
@@ -53,6 +57,19 @@ def get_instructor_task_history(course_id, usage_key=None, student=None, task_ty
         instructor_tasks = instructor_tasks.filter(task_key=task_key)
     if task_type is not None:
         instructor_tasks = instructor_tasks.filter(task_type=task_type)
+
+    return instructor_tasks.order_by('-id')
+
+
+def get_entrance_exam_instructor_task_history(course_id, usage_key=None, student=None):  # pylint: disable=invalid-name
+    """
+    Returns a query of InstructorTask objects of historical tasks for a given course,
+    that optionally match an entrance exam and student if present.
+    """
+    instructor_tasks = InstructorTask.objects.filter(course_id=course_id)
+    if usage_key is not None or student is not None:
+        _, task_key = encode_entrance_exam_and_student_input(usage_key, student)
+        instructor_tasks = instructor_tasks.filter(task_key=task_key)
 
     return instructor_tasks.order_by('-id')
 
@@ -117,6 +134,38 @@ def submit_rescore_problem_for_all_students(request, usage_key):  # pylint: disa
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
+def submit_rescore_entrance_exam_for_student(request, usage_key, student=None):  # pylint: disable=invalid-name
+    """
+    Request entrance exam problems to be re-scored as a background task.
+
+    The entrance exam problems will be re-scored for given student or if student
+    is None problems for all students who have accessed the entrance exam.
+
+    Parameters are `usage_key`, which must be a :class:`Location`
+    representing entrance exam section and the `student` as a User object.
+
+    ItemNotFoundError is raised if entrance exam does not exists for given
+    usage_key, AlreadyRunningError is raised if the entrance exam
+    is already being re-scored, or NotImplementedError if the problem doesn't
+    support rescoring.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # check problems for rescoring:  let exceptions return up to the caller.
+    check_entrance_exam_problems_for_rescoring(usage_key)
+
+    # check to see if task is already running, and reserve it otherwise
+    task_type = 'rescore_problem'
+    task_class = rescore_problem
+    task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
+    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+
+
 def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylint: disable=invalid-name
     """
     Request to have attempts reset for a problem as a background task.
@@ -146,6 +195,37 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
+def submit_reset_problem_attempts_in_entrance_exam(request, usage_key, student):  # pylint: disable=invalid-name
+    """
+    Request to have attempts reset for a entrance exam as a background task.
+
+    Problem attempts for all problems in entrance exam will be reset
+    for specified student. If student is None problem attempts will be
+    reset for all students.
+
+    Parameters are `usage_key`, which must be a :class:`Location`
+    representing entrance exam section and the `student` as a User object.
+
+    ItemNotFoundError is raised if entrance exam does not exists for given
+    usage_key, AlreadyRunningError is raised if the entrance exam
+    is already being reset.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # check arguments:  make sure entrance exam(section) exists for given usage_key
+    modulestore().get_item(usage_key)
+
+    task_type = 'reset_problem_attempts'
+    task_class = reset_problem_attempts
+    task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
+    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+
+
 def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint: disable=invalid-name
     """
     Request to have state deleted for a problem as a background task.
@@ -172,6 +252,36 @@ def submit_delete_problem_state_for_all_students(request, usage_key):  # pylint:
     task_type = 'delete_problem_state'
     task_class = delete_problem_state
     task_input, task_key = encode_problem_and_student_input(usage_key)
+    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+
+
+def submit_delete_entrance_exam_state_for_student(request, usage_key, student):  # pylint: disable=invalid-name
+    """
+    Requests reset of state for entrance exam as a background task.
+
+    Module state for all problems in entrance exam will be deleted
+    for specified student.
+
+    Parameters are `usage_key`, which must be a :class:`Location`
+    representing entrance exam section and the `student` as a User object.
+
+    ItemNotFoundError is raised if entrance exam does not exists for given
+    usage_key, AlreadyRunningError is raised if the entrance exam
+    is already being reset.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # check arguments:  make sure entrance exam(section) exists for given usage_key
+    modulestore().get_item(usage_key)
+
+    task_type = 'delete_problem_state'
+    task_class = delete_problem_state
+    task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 
