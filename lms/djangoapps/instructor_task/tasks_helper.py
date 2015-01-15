@@ -308,7 +308,8 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     # if entrance_exam is present grab all problems in it
     if entrance_exam_url:
-        usage_keys = get_problems_in_section(entrance_exam_url)
+        problem_descriptors = get_problems_in_section(entrance_exam_url)
+        usage_keys = [descriptor.location for descriptor in problem_descriptors]
 
     # find the modules in question
     modules_to_update = StudentModule.objects.filter(course_id=course_id, module_state_key__in=usage_keys)

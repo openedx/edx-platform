@@ -287,10 +287,10 @@ def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: 
     assert isinstance(usage_key, UsageKey)
     if student is not None:
         task_input = {'entrance_exam_url': unicode(usage_key), 'student': student.username}
-        task_key_stub = "{student}_{entranceexam}".format(student=student.id, problem=unicode(usage_key))
+        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=unicode(usage_key))
     else:
         task_input = {'entrance_exam_url': unicode(usage_key)}
-        task_key_stub = "_{entranceexam}".format(problem=unicode(usage_key))
+        task_key_stub = "_{entranceexam}".format(entranceexam=unicode(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()

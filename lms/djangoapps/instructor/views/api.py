@@ -97,10 +97,11 @@ from .tools import (
     bulk_email_is_enabled_for_course,
     add_block_ids,
 )
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
+from xmodule.modulestore.exceptions import ItemNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -1658,7 +1659,8 @@ def reset_student_attempts_for_entrance_exam(request, course_id):
             return HttpResponseForbidden("Requires instructor access.")
 
     try:
-        instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(request, course.entrance_exam_id, student)
+        entrance_exam_key = course_id.make_usage_key_from_deprecated_string(course.entrance_exam_id)
+        instructor_task.api.submit_reset_problem_attempts_in_entrance_exam(request, entrance_exam_key, student)
     except ItemNotFoundError:
         return HttpResponseBadRequest(_("Course has no valid entrance exam section."))
 
