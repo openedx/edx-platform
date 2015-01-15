@@ -38,6 +38,14 @@ define(["underscore", "js/views/baseview"], function(_, BaseView) {
                 currentPage = collection.currentPage + 1,
                 pageInput = this.$("#page-number-input"),
                 pageNumber = parseInt(pageInput.val(), 10);
+            if (pageNumber > collection.totalPages) {
+                pageNumber = false;
+            }
+            if (pageNumber <= 0) {
+                pageNumber = false;
+            }
+            // If we still have a page number by this point,
+            // and it's not the current page, load it.
             if (pageNumber && pageNumber !== currentPage) {
                 view.setPage(pageNumber - 1);
             }

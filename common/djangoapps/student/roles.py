@@ -6,9 +6,32 @@ adding users, removing users, and listing members
 from abc import ABCMeta, abstractmethod
 
 from django.contrib.auth.models import User
+import logging
 
 from student.models import CourseAccessRole
 from xmodule_django.models import CourseKeyField
+
+
+log = logging.getLogger(__name__)
+
+# A list of registered access roles.
+REGISTERED_ACCESS_ROLES = {}
+
+
+def register_access_role(cls):
+    """
+    Decorator that allows access roles to be registered within the roles module and referenced by their
+    string values.
+
+    Assumes that the decorated class has a "ROLE" attribute, defining its type.
+
+    """
+    try:
+        role_name = getattr(cls, 'ROLE')
+        REGISTERED_ACCESS_ROLES[role_name] = cls
+    except AttributeError:
+        log.exception(u"Unable to register Access Role with attribute 'ROLE'.")
+    return cls
 
 
 class RoleCache(object):
@@ -187,6 +210,7 @@ class OrgRole(RoleBase):
         super(OrgRole, self).__init__(role, org)
 
 
+@register_access_role
 class CourseStaffRole(CourseRole):
     """A Staff member of a course"""
     ROLE = 'staff'
@@ -195,6 +219,7 @@ class CourseStaffRole(CourseRole):
         super(CourseStaffRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
 class CourseInstructorRole(CourseRole):
     """A course Instructor"""
     ROLE = 'instructor'
@@ -203,20 +228,43 @@ class CourseInstructorRole(CourseRole):
         super(CourseInstructorRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
 class CourseFinanceAdminRole(CourseRole):
-    """A course Instructor"""
+    """A course staff member with privileges to review financial data."""
     ROLE = 'finance_admin'
 
     def __init__(self, *args, **kwargs):
         super(CourseFinanceAdminRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
+@register_access_role
+class CourseSalesAdminRole(CourseRole):
+    """A course staff member with privileges to perform sales operations. """
+    ROLE = 'sales_admin'
+
+    def __init__(self, *args, **kwargs):
+        super(CourseSalesAdminRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
 class CourseBetaTesterRole(CourseRole):
     """A course Beta Tester"""
     ROLE = 'beta_testers'
 
     def __init__(self, *args, **kwargs):
         super(CourseBetaTesterRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
+class LibraryUserRole(CourseRole):
+    """
+    A user who can view a library and import content from it, but not edit it.
+    Used in Studio only.
+    """
+    ROLE = 'library_user'
+
+    def __init__(self, *args, **kwargs):
+        super(LibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
 
 
 class OrgStaffRole(OrgRole):
@@ -231,6 +279,18 @@ class OrgInstructorRole(OrgRole):
         super(OrgInstructorRole, self).__init__('instructor', *args, **kwargs)
 
 
+class OrgLibraryUserRole(OrgRole):
+    """
+    A user who can view any libraries in an org and import content from them, but not edit them.
+    Used in Studio only.
+    """
+    ROLE = LibraryUserRole.ROLE
+
+    def __init__(self, *args, **kwargs):
+        super(OrgLibraryUserRole, self).__init__(self.ROLE, *args, **kwargs)
+
+
+@register_access_role
 class CourseCreatorRole(RoleBase):
     """
     This is the group of people who have permission to create new courses (we may want to eventually

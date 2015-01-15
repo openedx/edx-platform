@@ -66,6 +66,9 @@ XQUEUE_INTERFACE['url'] = 'http://localhost:8040'
 # Configure the LMS to use our stub ORA implementation
 OPEN_ENDED_GRADING_INTERFACE['url'] = 'http://localhost:8041/'
 
+# Configure the LMS to use our stub EdxNotes implementation
+EDXNOTES_INTERFACE['url'] = 'http://localhost:8042/api/v1'
+
 # Enable django-pipeline and staticfiles
 STATIC_ROOT = (TEST_ROOT / "staticfiles").abspath()
 
@@ -88,6 +91,17 @@ YOUTUBE_PORT = 9080
 YOUTUBE['API'] = "127.0.0.1:{0}/get_youtube_api/".format(YOUTUBE_PORT)
 YOUTUBE['TEST_URL'] = "127.0.0.1:{0}/test_youtube/".format(YOUTUBE_PORT)
 YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YOUTUBE_PORT)
+
+############################# SECURITY SETTINGS ################################
+# Default to advanced security in common.py, so tests can reset here to use
+# a simpler security model
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

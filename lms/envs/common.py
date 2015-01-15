@@ -227,7 +227,7 @@ FEATURES = {
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
     # whether to use password policy enforcement or not
-    'ENFORCE_PASSWORD_POLICY': False,
+    'ENFORCE_PASSWORD_POLICY': True,
 
     # Give course staff unrestricted access to grade downloads (if set to False,
     # only edX superusers can perform the downloads)
@@ -236,10 +236,10 @@ FEATURES = {
     'ENABLED_PAYMENT_REPORTS': ["refund_report", "itemized_purchase_report", "university_revenue_share", "certificate_status"],
 
     # Turn off account locking if failed login attempts exceeds a limit
-    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': False,
+    'ENABLE_MAX_FAILED_LOGIN_ATTEMPTS': True,
 
     # Hide any Personally Identifiable Information from application logs
-    'SQUELCH_PII_IN_LOGS': False,
+    'SQUELCH_PII_IN_LOGS': True,
 
     # Toggles the embargo functionality, which enable embargoing for particular courses
     'EMBARGO': False,
@@ -263,10 +263,10 @@ FEATURES = {
     'ENABLE_MKTG_SITE': False,
 
     # Prevent concurrent logins per user
-    'PREVENT_CONCURRENT_LOGINS': False,
+    'PREVENT_CONCURRENT_LOGINS': True,
 
-    # Turn off Advanced Security by default
-    'ADVANCED_SECURITY': False,
+    # Turn on Advanced Security by default
+    'ADVANCED_SECURITY': True,
 
     # Show a "Download your certificate" on the Progress page if the lowest
     # nonzero grade cutoff is met
@@ -311,6 +311,9 @@ FEATURES = {
 
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
+
+    # let students save and manage their annotations
+    'ENABLE_EDXNOTES': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -911,6 +914,14 @@ MOCK_PEER_GRADING = False
 # Used for testing, debugging staff grading
 MOCK_STAFF_GRADING = False
 
+
+################################# EdxNotes config  #########################
+
+# Configure the LMS to use our stub EdxNotes implementation
+EDXNOTES_INTERFACE = {
+    'url': 'http://localhost:8120/api/v1',
+}
+
 ################################# Jasmine ##################################
 JASMINE_TEST_DIRECTORY = PROJECT_ROOT + '/static/coffee'
 
@@ -1174,6 +1185,7 @@ PIPELINE_CSS = {
             'js/vendor/CodeMirror/codemirror.css',
             'css/vendor/jquery.treeview.css',
             'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
+            'css/vendor/edxnotes/annotator.min.css',
         ],
         'output_filename': 'css/lms-style-course-vendor.css',
     },
@@ -1229,6 +1241,7 @@ PIPELINE_JS = {
             'js/src/accessibility_tools.js',
             'js/src/ie_shim.js',
             'js/src/string_utils.js',
+            'js/src/logger.js',
         ],
         'output_filename': 'js/lms-application.js',
     },
@@ -1520,6 +1533,8 @@ INSTALLED_APPS = (
     'django_comment_common',
     'notes',
 
+    'edxnotes',
+
     # Splash screen
     'splash',
 
@@ -1540,6 +1555,9 @@ INSTALLED_APPS = (
 
     # Different Course Modes
     'course_modes',
+
+    # Enrollment API
+    'enrollment',
 
     # Student Identity Verification
     'verify_student',
@@ -1663,10 +1681,9 @@ PROGRESS_SUCCESS_BUTTON_URL = 'http://<domain>/<path>/{course_id}'
 PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE = None
 
 #### PASSWORD POLICY SETTINGS #####
-
-PASSWORD_MIN_LENGTH = None
+PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = None
-PASSWORD_COMPLEXITY = {}
+PASSWORD_COMPLEXITY = {"UPPER": 1, "LOWER": 1, "DIGITS": 1}
 PASSWORD_DICTIONARY_EDIT_DISTANCE_THRESHOLD = None
 PASSWORD_DICTIONARY = []
 
@@ -1949,3 +1966,7 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
+
+# for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
+if FEATURES['ENABLE_EDXNOTES']:
+    OAUTH_ID_TOKEN_EXPIRATION = 60 * 60

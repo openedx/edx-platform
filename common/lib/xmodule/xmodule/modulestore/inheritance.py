@@ -172,6 +172,19 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default=default_reset_button
     )
+    edxnotes = Boolean(
+        display_name=_("Enable Student Notes"),
+        help=_("Enter true or false. If true, students can use the Student Notes feature."),
+        default=False,
+        scope=Scope.settings
+    )
+    edxnotes_visibility = Boolean(
+        display_name="Student Notes Visibility",
+        help=_("Indicates whether Student Notes are visible in the course. "
+               "Students can also show or hide their notes in the courseware."),
+        default=True,
+        scope=Scope.user_info
+    )
 
 
 def compute_inherited_metadata(descriptor):
@@ -211,8 +224,8 @@ def inherit_metadata(descriptor, inherited_data):
 
 def own_metadata(module):
     """
-    Return a dictionary that contains only non-inherited field keys,
-    mapped to their serialized values
+    Return a JSON-friendly dictionary that contains only non-inherited field
+    keys, mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
@@ -283,6 +296,8 @@ class InheritanceKeyValueStore(KeyValueStore):
 
     def default(self, key):
         """
-        Check to see if the default should be from inheritance rather than from the field's global default
+        Check to see if the default should be from inheritance. If not
+        inheriting, this will raise KeyError which will cause the caller to use
+        the field's global default.
         """
         return self.inherited_settings[key.field_name]

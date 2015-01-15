@@ -34,7 +34,7 @@ describe 'Crowdsourced hinter', ->
         response =
           success: 'incorrect'
           contents: 'mock grader response'
-        settings.success(response)
+        settings.success(response) if settings
       )
       @problem.answers = 'test answer'
       @problem.check_fd()

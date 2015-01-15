@@ -25,7 +25,7 @@ def i_press_the_button_on_the_registration_form(step):
 
 @step('I should see an email verification prompt')
 def i_should_see_an_email_verification_prompt(step):
-    world.css_has_text('h1.page-header', u'My Courses')
+    world.css_has_text('h1.page-header', u'Studio Home')
     world.css_has_text('div.msg h3.title', u'We need to verify your email address')
 
 

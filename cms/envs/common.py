@@ -116,6 +116,11 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'IS_EDX_DOMAIN': False,
+
+    # let students save and manage their annotations
+    # for consistency in user-experience, keep the value of this feature flag
+    # in sync with the one in lms/envs/common.py
+    'ENABLE_EDXNOTES': False,
 }
 ENABLE_JASMINE = False
 
@@ -502,6 +507,11 @@ REQUIRE_EXCLUDE = ("build.txt",)
 # It can also be a path to a custom class that subclasses require.environments.Environment and defines some "args" function that returns a list with the command arguments to execute.
 REQUIRE_ENVIRONMENT = "node"
 
+# If you want to enable Tender integration (http://tenderapp.com/),
+# put in the domain where Tender hosts tender_widget.js. For example,
+# TENDER_DOMAIN = "example.tenderapp.com"
+TENDER_DOMAIN = None
+
 ################################# CELERY ######################################
 
 # Message configuration
@@ -766,6 +776,7 @@ ADVANCED_COMPONENT_TYPES = [
     'word_cloud',
     'graphical_slider_tool',
     'lti',
+    'library_content',
     # XBlocks from pmitros repos are prototypes. They should not be used
     # except for edX Learning Sciences experiments on edge.edx.org without
     # further work to make them robust, maintainable, finalize data formats,

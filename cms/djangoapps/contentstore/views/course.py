@@ -1,6 +1,7 @@
 """
 Views related to operations on course objects
 """
+from django.shortcuts import redirect
 import json
 import random
 import string  # pylint: disable=deprecated-module
@@ -38,6 +39,7 @@ from contentstore.utils import (
     add_extra_panel_tab,
     remove_extra_panel_tab,
     reverse_course_url,
+    reverse_library_url,
     reverse_usage_url,
     reverse_url,
     remove_all_instructors,
@@ -47,7 +49,7 @@ from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
 from util.string_utils import _has_non_ascii_characters
-from student.auth import has_course_author_access
+from student.auth import has_studio_write_access, has_studio_read_access
 from .component import (
     OPEN_ENDED_COMPONENT_TYPES,
     NOTE_COMPONENT_TYPES,
@@ -56,6 +58,7 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from contentstore.tasks import rerun_course
+from .library import LIBRARIES_ENABLED
 from .item import create_xblock_info
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
 from contentstore import utils
@@ -69,7 +72,8 @@ from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 
 
-__all__ = ['course_info_handler', 'course_handler', 'course_info_update_handler',
+__all__ = ['course_info_handler', 'course_handler', 'course_listing',
+           'course_info_update_handler',
            'course_rerun_handler',
            'settings_handler',
            'grading_handler',
@@ -94,7 +98,7 @@ def get_course_and_check_access(course_key, user, depth=0):
     Internal method used to calculate and return the locator and course module
     for the view functions in this file.
     """
-    if not has_course_author_access(user, course_key):
+    if not has_studio_read_access(user, course_key):
         raise PermissionDenied()
     course_module = modulestore().get_course(course_key, depth=depth)
     return course_module
@@ -128,7 +132,7 @@ def course_notifications_handler(request, course_key_string=None, action_state_i
     course_key = CourseKey.from_string(course_key_string)
 
     if response_format == 'json' or 'application/json' in request.META.get('HTTP_ACCEPT', 'application/json'):
-        if not has_course_author_access(request.user, course_key):
+        if not has_studio_write_access(request.user, course_key):
             raise PermissionDenied()
         if request.method == 'GET':
             return _course_notifications_json_get(action_state_id)
@@ -218,7 +222,7 @@ def course_handler(request, course_key_string=None):
                     return JsonResponse(_course_outline_json(request, course_module))
             elif request.method == 'POST':  # not sure if this is only post. If one will have ids, it goes after access
                 return _create_or_rerun_course(request)
-            elif not has_course_author_access(request.user, CourseKey.from_string(course_key_string)):
+            elif not has_studio_write_access(request.user, CourseKey.from_string(course_key_string)):
                 raise PermissionDenied()
             elif request.method == 'PUT':
                 raise NotImplementedError()
@@ -228,7 +232,7 @@ def course_handler(request, course_key_string=None):
                 return HttpResponseBadRequest()
         elif request.method == 'GET':  # assume html
             if course_key_string is None:
-                return course_listing(request)
+                return redirect(reverse("home"))
             else:
                 return course_index(request, CourseKey.from_string(course_key_string))
         else:
@@ -290,7 +294,7 @@ def _accessible_courses_list(request):
         if course.location.course == 'templates':
             return False
 
-        return has_course_author_access(request.user, course.id)
+        return has_studio_read_access(request.user, course.id)
 
     courses = filter(course_filter, modulestore().get_courses())
     in_process_course_actions = [
@@ -298,7 +302,7 @@ def _accessible_courses_list(request):
         CourseRerunState.objects.find_all(
             exclude_args={'state': CourseRerunUIStateManager.State.SUCCEEDED}, should_display=True
         )
-        if has_course_author_access(request.user, course.course_key)
+        if has_studio_read_access(request.user, course.course_key)
     ]
     return courses, in_process_course_actions
 
@@ -341,6 +345,14 @@ def _accessible_courses_list_from_groups(request):
     return courses_list.values(), in_process_course_actions
 
 
+def _accessible_libraries_list(user):
+    """
+    List all libraries available to the logged in user by iterating through all libraries
+    """
+    # No need to worry about ErrorDescriptors - split's get_libraries() never returns them.
+    return [lib for lib in modulestore().get_libraries() if has_studio_read_access(user, lib.location.library_key)]
+
+
 @login_required
 @ensure_csrf_cookie
 def course_listing(request):
@@ -359,6 +371,8 @@ def course_listing(request):
             # user have some old groups or there was some error getting courses from django groups
             # so fallback to iterating through all courses
             courses, in_process_course_actions = _accessible_courses_list(request)
+
+    libraries = _accessible_libraries_list(request.user) if LIBRARIES_ENABLED else []
 
     def format_course_for_view(course):
         """
@@ -396,6 +410,19 @@ def course_listing(request):
             ) if uca.state == CourseRerunUIStateManager.State.FAILED else ''
         }
 
+    def format_library_for_view(library):
+        """
+        Return a dict of the data which the view requires for each library
+        """
+        return {
+            'display_name': library.display_name,
+            'library_key': unicode(library.location.library_key),
+            'url': reverse_library_url('library_handler', unicode(library.location.library_key)),
+            'org': library.display_org_with_default,
+            'number': library.display_number_with_default,
+            'can_edit': has_studio_write_access(request.user, library.location.library_key),
+        }
+
     # remove any courses in courses that are also in the in_process_course_actions list
     in_process_action_course_keys = [uca.course_key for uca in in_process_course_actions]
     courses = [
@@ -409,6 +436,8 @@ def course_listing(request):
     return render_to_response('index.html', {
         'courses': courses,
         'in_process_course_actions': in_process_course_actions,
+        'libraries_enabled': LIBRARIES_ENABLED,
+        'libraries': [format_library_for_view(lib) for lib in libraries],
         'user': request.user,
         'request_course_creator_url': reverse('contentstore.views.request_course_creator'),
         'course_creator_status': _get_course_creator_status(request.user),
@@ -621,7 +650,7 @@ def _rerun_course(request, org, number, run, fields):
     source_course_key = CourseKey.from_string(request.json.get('source_course_key'))
 
     # verify user has access to the original course
-    if not has_course_author_access(request.user, source_course_key):
+    if not has_studio_write_access(request.user, source_course_key):
         raise PermissionDenied()
 
     # create destination course key
@@ -702,7 +731,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
         provided_id = None
 
     # check that logged in user has permissions to this item (GET shouldn't require this level?)
-    if not has_course_author_access(request.user, usage_key.course_key):
+    if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     if request.method == 'GET':
@@ -838,62 +867,100 @@ def grading_handler(request, course_key_string, grader_index=None):
 
 
 # pylint: disable=invalid-name
-def _config_course_advanced_components(request, course_module):
+def _add_tab(request, tab_type, course_module):
     """
-    Check to see if the user instantiated any advanced components. This
-    is a hack that does the following :
-    1) adds/removes the open ended panel tab to a course automatically
-    if the user has indicated that they want to edit the
-    combinedopendended or peergrading module
-    2) adds/removes the notes panel tab to a course automatically if
-    the user has indicated that they want the notes module enabled in
-    their course
+    Adds tab to the course.
     """
-    # TODO refactor the above into distinct advanced policy settings
-    filter_tabs = True  # Exceptional conditions will pull this to False
-    if ADVANCED_COMPONENT_POLICY_KEY in request.json:  # Maps tab types to components
-        tab_component_map = {
-            'open_ended': OPEN_ENDED_COMPONENT_TYPES,
-            'notes': NOTE_COMPONENT_TYPES,
-        }
-        # Check to see if the user instantiated any notes or open ended components
-        for tab_type in tab_component_map.keys():
-            component_types = tab_component_map.get(tab_type)
-            found_ac_type = False
-            for ac_type in component_types:
+    # Add tab to the course if needed
+    changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
+    # If a tab has been added to the course, then send the
+    # metadata along to CourseMetadata.update_from_json
+    if changed:
+        course_module.tabs = new_tabs
+        request.json.update({'tabs': {'value': new_tabs}})
+        # Indicate that tabs should not be filtered out of
+        # the metadata
+        return True
+    return False
 
-                # Check if the user has incorrectly failed to put the value in an iterable.
-                new_advanced_component_list = request.json[ADVANCED_COMPONENT_POLICY_KEY]['value']
-                if hasattr(new_advanced_component_list, '__iter__'):
-                    if ac_type in new_advanced_component_list and ac_type in ADVANCED_COMPONENT_TYPES:
 
-                        # Add tab to the course if needed
-                        changed, new_tabs = add_extra_panel_tab(tab_type, course_module)
-                        # If a tab has been added to the course, then send the
-                        # metadata along to CourseMetadata.update_from_json
-                        if changed:
-                            course_module.tabs = new_tabs
-                            request.json.update({'tabs': {'value': new_tabs}})
-                            # Indicate that tabs should not be filtered out of
-                            # the metadata
-                            filter_tabs = False  # Set this flag to avoid the tab removal code below.
-                        found_ac_type = True  # break
-                else:
-                    # If not iterable, return immediately and let validation handle.
-                    return
+# pylint: disable=invalid-name
+def _remove_tab(request, tab_type, course_module):
+    """
+    Removes the tab from the course.
+    """
+    changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
+    if changed:
+        course_module.tabs = new_tabs
+        request.json.update({'tabs': {'value': new_tabs}})
+        return True
+    return False
 
-            # If we did not find a module type in the advanced settings,
-            # we may need to remove the tab from the course.
-            if not found_ac_type:  # Remove tab from the course if needed
-                changed, new_tabs = remove_extra_panel_tab(tab_type, course_module)
-                if changed:
-                    course_module.tabs = new_tabs
-                    request.json.update({'tabs': {'value': new_tabs}})
-                    # Indicate that tabs should *not* be filtered out of
-                    # the metadata
-                    filter_tabs = False
 
-    return filter_tabs
+def is_advanced_component_present(request, advanced_components):
+    """
+    Return True when one of `advanced_components` is present in the request.
+
+    raises TypeError
+    when request.ADVANCED_COMPONENT_POLICY_KEY is malformed (not iterable)
+    """
+    if ADVANCED_COMPONENT_POLICY_KEY not in request.json:
+        return False
+
+    new_advanced_component_list = request.json[ADVANCED_COMPONENT_POLICY_KEY]['value']
+    for ac_type in advanced_components:
+        if ac_type in new_advanced_component_list and ac_type in ADVANCED_COMPONENT_TYPES:
+            return True
+
+
+def is_field_value_true(request, field_list):
+    """
+    Return True when one of field values is set to True by request
+    """
+    return any([request.json.get(field, {}).get('value') for field in field_list])
+
+
+# pylint: disable=invalid-name
+def _modify_tabs_to_components(request, course_module):
+    """
+    Automatically adds/removes tabs if user indicated that they want
+    respective modules enabled in the course
+
+    Return True when tab configuration has been modified.
+    """
+    tab_component_map = {
+        # 'tab_type': (check_function, list_of_checked_components_or_values),
+
+        # open ended tab by combinedopendended or peergrading module
+        'open_ended': (is_advanced_component_present, OPEN_ENDED_COMPONENT_TYPES),
+        # notes tab
+        'notes': (is_advanced_component_present, NOTE_COMPONENT_TYPES),
+        # student notes tab
+        'edxnotes': (is_field_value_true, ['edxnotes'])
+    }
+
+    tabs_changed = False
+    for tab_type in tab_component_map.keys():
+        check, component_types = tab_component_map[tab_type]
+        try:
+            tab_enabled = check(request, component_types)
+        except TypeError:
+            # user has failed to put iterable value into advanced component list.
+            # return immediately and let validation handle.
+            return
+
+        if tab_enabled:
+            # check passed, some of this component_types are present, adding tab
+            if _add_tab(request, tab_type, course_module):
+                # tab indeed was added, the change needs to propagate
+                tabs_changed = True
+        else:
+            # the tab should not be present (anymore)
+            if _remove_tab(request, tab_type, course_module):
+                # tab indeed was removed, the change needs to propagate
+                tabs_changed = True
+
+    return tabs_changed
 
 
 @login_required
@@ -925,8 +992,8 @@ def advanced_settings_handler(request, course_key_string):
                 return JsonResponse(CourseMetadata.fetch(course_module))
             else:
                 try:
-                    # Whether or not to filter the tabs key out of the settings metadata
-                    filter_tabs = _config_course_advanced_components(request, course_module)
+                    # do not process tabs unless they were modified according to course metadata
+                    filter_tabs = not _modify_tabs_to_components(request, course_module)
 
                     # validate data formats and update
                     is_valid, errors, updated_data = CourseMetadata.validate_and_update_from_json(

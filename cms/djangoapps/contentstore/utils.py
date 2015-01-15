@@ -30,7 +30,8 @@ log = logging.getLogger(__name__)
 # In order to instantiate an open ended tab automatically, need to have this data
 OPEN_ENDED_PANEL = {"name": _("Open Ended Panel"), "type": "open_ended"}
 NOTES_PANEL = {"name": _("My Notes"), "type": "notes"}
-EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL]])
+EDXNOTES_PANEL = {"name": _("Notes"), "type": "edxnotes"}
+EXTRA_TAB_PANELS = dict([(p['type'], p) for p in [OPEN_ENDED_PANEL, NOTES_PANEL, EDXNOTES_PANEL]])
 
 
 def add_instructor(course_key, requesting_user, new_instructor):
@@ -294,6 +295,13 @@ def reverse_course_url(handler_name, course_key, kwargs=None):
     Creates the URL for handlers that use course_keys as URL parameters.
     """
     return reverse_url(handler_name, 'course_key_string', course_key, kwargs)
+
+
+def reverse_library_url(handler_name, library_key, kwargs=None):
+    """
+    Creates the URL for handlers that use library_keys as URL parameters.
+    """
+    return reverse_url(handler_name, 'library_key_string', library_key, kwargs)
 
 
 def reverse_usage_url(handler_name, usage_key, kwargs=None):
