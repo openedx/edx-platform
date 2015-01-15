@@ -2,10 +2,8 @@
 
 $ ->
 
-  if not MathJax?
-    return
-
-  HUB = MathJax.Hub
+  if MathJax?
+    HUB = MathJax.Hub
 
   class MathJaxProcessor
 
@@ -116,10 +114,11 @@ $ ->
     Markdown.getMathCompatibleConverter = (postProcessor) ->
       postProcessor ||= ((text) -> text)
       converter = Markdown.getSanitizingConverter()
-      processor = new MathJaxProcessor()
-      converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)
-      converter.hooks.chain "postConversion", (text) ->
-        postProcessor(MathJaxProcessor.replaceMathWrapper(processor)(text))
+      if MathJax?
+        processor = new MathJaxProcessor()
+        converter.hooks.chain "preConversion", MathJaxProcessor.removeMathWrapper(processor)
+        converter.hooks.chain "postConversion", (text) ->
+          postProcessor(MathJaxProcessor.replaceMathWrapper(processor)(text))
       converter
 
     Markdown.makeWmdEditor = (elem, appended_id, imageUploadUrl, postProcessor) ->

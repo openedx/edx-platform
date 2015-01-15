@@ -1,0 +1,45 @@
+## mako
+## File:   templates/mathjax_include.html
+##
+## Advanced mathjax using 2.0-latest CDN for Dynamic Math
+##
+## This enables ASCIIMathJAX, and is used by js_textbox
+
+
+<%def name="mathjaxConfig()">
+  %if mathjax_mode is not Undefined and mathjax_mode == 'wiki':
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [ ['$','$'], ["\\(","\\)"]],
+                displayMath: [ ['$$','$$'], ["\\[","\\]"]]}
+    });
+  %else:
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [
+          ["\\(","\\)"],
+          ['[mathjaxinline]','[/mathjaxinline]']
+        ],
+        displayMath: [
+          ["\\[","\\]"],
+          ['[mathjax]','[/mathjax]']
+        ]
+      }
+    });
+  %endif
+  MathJax.Hub.Configured();
+</%def>
+
+<!-- This must appear after all mathjax-config blocks, so it is after the imports from the other templates.
+     It can't be run through static.url because MathJax uses crazy url introspection to do lazy loading of
+     MathJax extension libraries -->
+<script type="text/javascript">
+  var require = RequireJS.require;
+  var define = RequireJS.define;
+  require(['domReady'], function (domReady) {
+    domReady(function () {
+        require(['mathjax'], function(){
+          ${mathjaxConfig()}
+        });;
+    });
+  });
+</script>
