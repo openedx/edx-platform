@@ -139,6 +139,23 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         _groups = [group.name for group in self.course.user_partitions[0].groups]
         self.assertEqual(_groups, user_groups)
 
+    @patch('instructor_task.tasks_helper._get_current_task')
+    @patch('instructor_task.tasks_helper.iterate_grades_for')
+    def test_unicode_in_csv_header(self, mock_iterate_grades_for, _mock_current_task):
+        """
+        Tests that CSV grade report works if unicode in headers.
+        """
+        # mock a response from `iterate_grades_for`
+        mock_iterate_grades_for.return_value = [
+            (
+                self.create_student('username', 'student@example.com'),
+                {'section_breakdown': [{'label': u'\u8282\u540e\u9898 01'}], 'percent': 0},
+                'Cannot grade student'
+            )
+        ]
+        result = upload_grades_csv(None, None, self.course.id, None, 'graded')
+        self.assertDictContainsSubset({'attempted': 1, 'succeeded': 1, 'failed': 0}, result)
+
 
 @ddt.ddt
 class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):

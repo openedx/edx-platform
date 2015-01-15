@@ -572,8 +572,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # We were able to successfully grade this student for this course.
             task_progress.succeeded += 1
             if not header:
-                # Encode the header row in utf-8 encoding in case there are unicode characters
-                header = [section['label'].encode('utf-8') for section in gradeset[u'section_breakdown']]
+                header = [section['label'] for section in gradeset[u'section_breakdown']]
                 rows.append(
                     ["id", "email", "username", "grade"] + header + cohorts_header + group_configs_header
                 )
