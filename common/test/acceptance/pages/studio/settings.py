@@ -76,10 +76,10 @@ class SettingsPage(CoursePage):
         """
         press_the_notification_button(self, "save")
         if wait_for_confirmation:
-            EmptyPromise(
-                lambda: self.q(css='#alert-confirmation-title').present,
-                'Save is confirmed'
-            ).fulfill()
+            self.wait_for_element_visibility(
+                '#alert-confirmation-title',
+                'Save confirmation message is visible'
+            )
 
     def refresh_page(self, wait_for_confirmation=True):
         """
@@ -91,3 +91,4 @@ class SettingsPage(CoursePage):
                 lambda: self.q(css='body.view-settings').present,
                 'Page is refreshed'
             ).fulfill()
+        self.wait_for_ajax()
