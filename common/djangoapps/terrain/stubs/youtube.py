@@ -24,9 +24,6 @@ from urlparse import urlparse
 from collections import OrderedDict
 
 
-IFRAME_API_RESPONSE = None
-
-
 class StubYouTubeHandler(StubHttpRequestHandler):
     """
     A handler for Youtube GET requests.
@@ -50,12 +47,6 @@ class StubYouTubeHandler(StubHttpRequestHandler):
         """
         Handle a GET request from the client and sends response back.
         """
-
-        # Initialize only once if IFRAME_API_RESPONSE is none.
-        global IFRAME_API_RESPONSE  # pylint: disable=global-statement
-        if IFRAME_API_RESPONSE is None:
-            IFRAME_API_RESPONSE = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
-
         self.log_message(
             "Youtube provider received GET request to path {}".format(self.path)
         )
@@ -104,7 +95,12 @@ class StubYouTubeHandler(StubHttpRequestHandler):
             if self.server.config.get('youtube_api_blocked'):
                 self.send_response(404, content='', headers={'Content-type': 'text/plain'})
             else:
-                self.send_response(200, content=IFRAME_API_RESPONSE, headers={'Content-type': 'text/html'})
+                # Get the response to send from YouTube.
+                # We need to do this every time because Google sometimes sends different responses
+                # as part of their own experiments, which has caused our tests to become "flaky"
+                self.log_message("Getting iframe api from youtube.com")
+                iframe_api_response = requests.get('https://www.youtube.com/iframe_api').content.strip("\n")
+                self.send_response(200, content=iframe_api_response, headers={'Content-type': 'text/html'})
 
         else:
             self.send_response(
