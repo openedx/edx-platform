@@ -100,7 +100,8 @@ class MongoModulestoreBuilder(object):
         # Set up a temp directory for storing filesystem content created during import
         fs_root = mkdtemp()
 
-        modulestore = DraftModuleStore(
+        # pylint: disable=attribute-defined-outside-init
+        self.modulestore = DraftModuleStore(
             contentstore,
             doc_store_config,
             fs_root,
@@ -109,19 +110,25 @@ class MongoModulestoreBuilder(object):
             metadata_inheritance_cache_subsystem=MemoryCache(),
             xblock_mixins=XBLOCK_MIXINS,
         )
-        modulestore.ensure_indexes()
+        self.modulestore.ensure_indexes()
 
         try:
-            yield modulestore
+            yield self.modulestore
         finally:
             # Delete the created database
-            modulestore._drop_database()
+            self.modulestore._drop_database()  # pylint: disable=protected-access
 
             # Delete the created directory on the filesystem
             rmtree(fs_root, ignore_errors=True)
 
     def __repr__(self):
         return 'MongoModulestoreBuilder()'
+
+    def asset_collection(self):
+        """
+        Returns the collection storing the asset metadata.
+        """
+        return self.modulestore.asset_collection
 
 
 class VersioningModulestoreBuilder(object):
@@ -160,7 +167,7 @@ class VersioningModulestoreBuilder(object):
             yield modulestore
         finally:
             # Delete the created database
-            modulestore._drop_database()
+            modulestore._drop_database()  # pylint: disable=protected-access
 
             # Delete the created directory on the filesystem
             rmtree(fs_root, ignore_errors=True)
@@ -206,6 +213,7 @@ class MixedModulestoreBuilder(object):
         """
         self.store_builders = store_builders
         self.mappings = mappings or {}
+        self.modulestore = None
 
     @contextmanager
     def build(self, contentstore):
@@ -227,7 +235,7 @@ class MixedModulestoreBuilder(object):
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
 
-            modulestore = MixedModuleStore(
+            self.modulestore = MixedModuleStore(
                 contentstore,
                 self.mappings,
                 stores,
@@ -235,10 +243,28 @@ class MixedModulestoreBuilder(object):
                 xblock_mixins=XBLOCK_MIXINS,
             )
 
-            yield modulestore
+            yield self.modulestore
 
     def __repr__(self):
         return 'MixedModulestoreBuilder({!r}, {!r})'.format(self.store_builders, self.mappings)
+
+    def asset_collection(self):
+        """
+        Returns the collection storing the asset metadata.
+        """
+        all_stores = self.modulestore.modulestores
+        if len(all_stores) > 1:
+            return None
+
+        store = all_stores[0]
+        if hasattr(store, 'asset_collection'):
+            # Mongo modulestore beneath mixed.
+            # Returns the entire collection with *all* courses' asset metadata.
+            return store.asset_collection
+        else:
+            # Split modulestore beneath mixed.
+            # Split stores all asset metadata in the structure collection.
+            return store.db_connection.structures
 
 
 class MongoContentstoreBuilder(object):
@@ -276,7 +302,8 @@ MIXED_MODULESTORE_SETUPS = (
     MixedModulestoreBuilder([('split', VersioningModulestoreBuilder())]),
 )
 MIXED_MS_SETUPS_SHORT = (
-    'mixed_mongo', 'mixed_split'
+    'mixed_mongo',
+    'mixed_split',
 )
 DIRECT_MODULESTORE_SETUPS = (
     MongoModulestoreBuilder(),
