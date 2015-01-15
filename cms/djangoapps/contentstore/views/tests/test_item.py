@@ -1378,6 +1378,20 @@ class TestXBlockInfo(ItemTest):
         json_response = json.loads(resp.content)
         self.validate_course_xblock_info(json_response, course_outline=True)
 
+    def test_chapter_entrance_exam_xblock_info(self):
+        chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
+            user_id=self.user.id, is_entrance_exam=True
+        )
+        chapter = modulestore().get_item(chapter.location)
+        xblock_info = create_xblock_info(
+            chapter,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+        self.assertEqual(xblock_info['override_type'], {'is_entrance_exam': True})
+        self.assertEqual(xblock_info['display_name'], 'Entrance Exam')
+
     def test_chapter_xblock_info(self):
         chapter = modulestore().get_item(self.chapter.location)
         xblock_info = create_xblock_info(
