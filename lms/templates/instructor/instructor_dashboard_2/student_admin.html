@@ -107,6 +107,7 @@
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
     <input type="button" name="rescore-entrance-exam" value="${_('Rescore All Problems')}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
   %endif
+  <input type="button" name="skip-entrance-exam" value="${_('Let Student Skip Entrance Exam')}" data-endpoint="${ section_data['student_can_skip_entrance_exam_url'] }">
 
   <p>
   %if section_data['access']['instructor']:

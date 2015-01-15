@@ -524,6 +524,13 @@ class StudentAdminPage(PageObject):
         return self.q(css='{} input[name=rescore-entrance-exam]'.format(self.EE_CONTAINER))
 
     @property
+    def skip_entrance_exam_button(self):
+        """
+        Return Let Student Skip Entrance Exam button.
+        """
+        return self.q(css='{} input[name=skip-entrance-exam]'.format(self.EE_CONTAINER))
+
+    @property
     def delete_student_state_button(self):
         """
         Returns delete student state button.
@@ -591,6 +598,12 @@ class StudentAdminPage(PageObject):
         clicks rescore submissions button.
         """
         return self.rescore_submission_button.click()
+
+    def click_skip_entrance_exam_button(self):
+        """
+        clicks let student skip entrance exam button.
+        """
+        return self.skip_entrance_exam_button.click()
 
     def click_delete_student_state_button(self):
         """
