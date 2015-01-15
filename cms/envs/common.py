@@ -116,6 +116,11 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'IS_EDX_DOMAIN': False,
+
+    # let students save and manage their annotations
+    # for consistency in user-experience, keep the value of this feature flag
+    # in sync with the one in lms/envs/common.py
+    'ENABLE_EDXNOTES': False,
 }
 ENABLE_JASMINE = False
 

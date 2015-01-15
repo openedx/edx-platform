@@ -5,6 +5,28 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+LMS: Student Notes: Eventing for Student Notes. TNL-931
+
+LMS: Student Notes: Add course structure view. TNL-762
+
+LMS: Student Notes: Scroll and opening of notes. TNL-784
+
+LMS: Student Notes: Add styling to Notes page. TNL-932
+
+LMS: Student Notes: Add more graceful error message.
+
+LMS: Student Notes: Toggle all notes TNL-661
+
+LMS: Student Notes: Use JWT ID-Token for authentication annotation requests. TNL-782
+
+LMS: Student Notes: Add possibility to search notes. TNL-731
+
+LMS: Student Notes: Toggle single note visibility. TNL-660
+
+LMS: Student Notes: Add Notes page. TNL-797
+
+LMS: Student Notes: Add possibility to add/edit/remove notes. TNL-655
+
 Platform: Add group_access field to all xblocks.  TNL-670
 
 LMS: Add support for user partitioning based on cohort.  TNL-710
