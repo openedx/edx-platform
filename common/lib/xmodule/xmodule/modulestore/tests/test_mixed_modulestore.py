@@ -29,7 +29,7 @@ if not settings.configured:
     settings.configure()
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
+from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
@@ -38,7 +38,7 @@ from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
 from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_number_of_calls, \
     mongo_uses_error_check
-from xmodule.modulestore.tests.utils import create_modulestore_instance
+from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
 
@@ -68,7 +68,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         'default_class': DEFAULT_CLASS,
         'fs_root': DATA_DIR,
         'render_template': RENDER_TEMPLATE,
-        'xblock_mixins': (EditInfoMixin, InheritanceMixin),
+        'xblock_mixins': (EditInfoMixin, InheritanceMixin, LocationMixin),
     }
     DOC_STORE_CONFIG = {
         'host': HOST,
@@ -102,7 +102,7 @@ class TestMixedModuleStore(CourseComparisonTest):
                 'OPTIONS': {
                     'data_dir': DATA_DIR,
                     'default_class': 'xmodule.hidden_module.HiddenDescriptor',
-                    'xblock_mixins': (EditInfoMixin, InheritanceMixin),
+                    'xblock_mixins': modulestore_options['xblock_mixins'],
                 }
             },
         ]
@@ -309,9 +309,9 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.store.mappings = {}
         course_key = self.course_locations[self.MONGO_COURSEID].course_key
         with check_exact_number_of_calls(self.store.default_modulestore, 'has_course', 1):
-            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courseid(course_key))
+            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courselike(course_key))  # pylint: disable=protected-access
             self.assertIn(course_key, self.store.mappings)
-            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courseid(course_key))
+            self.assertEqual(self.store.default_modulestore, self.store._get_modulestore_for_courselike(course_key))  # pylint: disable=protected-access
 
     @ddt.data(*itertools.product(
         (ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split),
@@ -881,6 +881,27 @@ class TestMixedModuleStore(CourseComparisonTest):
         course = self.store.get_item(self.course_locations[self.XML_COURSEID1])
         self.assertEqual(course.id, self.course_locations[self.XML_COURSEID1].course_key)
 
+    @ddt.data('draft', 'split')
+    def test_get_library(self, default_ms):
+        """
+        Test that create_library and get_library work regardless of the default modulestore.
+        Other tests of MixedModulestore support are in test_libraries.py but this one must
+        be done here so we can test the configuration where Draft/old is the first modulestore.
+        """
+        self.initdb(default_ms)
+        with self.store.default_store(ModuleStoreEnum.Type.split):  # The CMS also wraps create_library like this
+            library = self.store.create_library("org", "lib", self.user_id, {"display_name": "Test Library"})
+        library_key = library.location.library_key
+        self.assertIsInstance(library_key, LibraryLocator)
+        # Now load with get_library and make sure it works:
+        library = self.store.get_library(library_key)
+        self.assertEqual(library.location.library_key, library_key)
+
+        # Clear the mappings so we can test get_library code path without mapping set:
+        self.store.mappings.clear()
+        library = self.store.get_library(library_key)
+        self.assertEqual(library.location.library_key, library_key)
+
     # notice this doesn't test getting a public item via draft_preferred which draft would have 2 hits (split
     # still only 2)
     # Draft: get_parent
@@ -1007,7 +1028,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         self._create_block_hierarchy()
         self.store.publish(self.course.location, self.user_id)
 
-        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
+        mongo_store = self.store._get_modulestore_for_courselike(course_id)  # pylint: disable=protected-access
         # add another parent (unit) "vertical_x1b" for problem "problem_x1a_1"
         mongo_store.collection.update(
             self.vertical_x1b.to_deprecated_son('_id.'),
@@ -1249,7 +1270,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.store.publish(self.course.location, self.user_id)
 
         # test that problem "problem_x1a_1" has only one published parent
-        mongo_store = self.store._get_modulestore_for_courseid(course_id)  # pylint: disable=protected-access
+        mongo_store = self.store._get_modulestore_for_courselike(course_id)  # pylint: disable=protected-access
         with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
             parent = mongo_store.get_parent_location(self.problem_x1a_1)
             self.assertEqual(parent, self.vertical_x1a)
@@ -1809,7 +1830,7 @@ class TestMixedModuleStore(CourseComparisonTest):
         self.assertEquals(self.store.default_modulestore.get_modulestore_type(), store_type)
 
         # verify internal helper method
-        store = self.store._get_modulestore_for_courseid()  # pylint: disable=protected-access
+        store = self.store._get_modulestore_for_courselike()  # pylint: disable=protected-access
         self.assertEquals(store.get_modulestore_type(), store_type)
 
         # verify store used for creating a course
