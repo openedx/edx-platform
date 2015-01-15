@@ -1,13 +1,22 @@
-(function(Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView) {
-    var CohortEditorView = Backbone.View.extend({
+var edx = edx || {};
+
+(function(Backbone, _, $, gettext, ngettext, interpolate_text, CohortFormView, NotificationModel, NotificationView) {
+    'use strict';
+
+    edx.groups = edx.groups || {};
+
+    edx.groups.CohortEditorView = Backbone.View.extend({
         events : {
-            "submit .cohort-management-group-add-form": "addStudents"
+            'click .wrapper-tabs .tab': 'selectTab',
+            'click .tab-content-settings .action-save': 'saveSettings',
+            'submit .cohort-management-group-add-form': 'addStudents'
         },
 
         initialize: function(options) {
             this.template = _.template($('#cohort-editor-tpl').text());
             this.cohorts = options.cohorts;
-            this.advanced_settings_url = options.advanced_settings_url;
+            this.contentGroups = options.contentGroups;
+            this.context = options.context;
         },
 
         // Any errors that are currently being displayed to the instructor (for example, unknown email addresses).
@@ -18,9 +27,37 @@
         render: function() {
             this.$el.html(this.template({
                 cohort: this.model,
-                advanced_settings_url: this.advanced_settings_url
+                studioAdvancedSettingsUrl: this.context.studioAdvancedSettingsUrl
             }));
+            this.cohortFormView = new CohortFormView({
+                model: this.model,
+                contentGroups: this.contentGroups,
+                context: this.context
+            });
+            this.cohortFormView.render();
+            this.$('.tab-content-settings').append(this.cohortFormView.$el);
             return this;
+        },
+
+        selectTab: function(event) {
+            var tabElement = $(event.currentTarget),
+                tabName = tabElement.data('tab');
+            event.preventDefault();
+            this.$('.wrapper-tabs .tab').removeClass('is-selected');
+            this.$('.wrapper-tabs .tab').find('span.sr').remove();
+            tabElement.addClass('is-selected');
+            tabElement.find('a').prepend('<span class="sr">' + gettext('Selected tab') + ' </span>');
+            this.$('.tab-content').addClass('is-hidden');
+            this.$('.tab-content-' + tabName).removeClass('is-hidden').focus();
+        },
+
+        saveSettings: function(event) {
+            var cohortFormView = this.cohortFormView;
+            event.preventDefault();
+            cohortFormView.saveForm()
+                .done(function() {
+                    cohortFormView.showMessage(gettext('Saved cohort'));
+                });
         },
 
         setCohort: function(cohort) {
@@ -60,7 +97,7 @@
                     self.showErrorMessage(gettext('Error adding students.'), true);
                 });
             } else {
-                self.showErrorMessage(gettext('Please enter a username or email.'), true);
+                self.showErrorMessage(gettext('Enter a username or email.'), true);
                 input.val('');
             }
         },
@@ -110,8 +147,8 @@
             numPresent = modifiedUsers.present.length;
             if (numUsersAdded > 0 || numPresent > 0) {
                 title = interpolate_text(
-                    ngettext("{numUsersAdded} student has been added to this cohort group",
-                        "{numUsersAdded} students have been added to this cohort group", numUsersAdded),
+                    ngettext("{numUsersAdded} student has been added to this cohort",
+                        "{numUsersAdded} students have been added to this cohort", numUsersAdded),
                     {numUsersAdded: numUsersAdded}
                 );
 
@@ -139,8 +176,8 @@
                 if (numPresent > 0) {
                     details.push(
                         interpolate_text(
-                            ngettext("{numPresent} student was already in the cohort group",
-                                "{numPresent} students were already in the cohort group", numPresent),
+                            ngettext("{numPresent} student was already in the cohort",
+                                "{numPresent} students were already in the cohort", numPresent),
                             {numPresent: numPresent}
                         )
                     );
@@ -202,6 +239,5 @@
             }
         }
     });
-
-    this.CohortEditorView = CohortEditorView;
-}).call(this, Backbone, _, $, gettext, ngettext, interpolate_text, NotificationModel, NotificationView);
+}).call(this, Backbone, _, $, gettext, ngettext, interpolate_text, edx.groups.CohortFormView,
+    NotificationModel, NotificationView);

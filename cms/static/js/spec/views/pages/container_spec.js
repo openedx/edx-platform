@@ -1,6 +1,6 @@
 define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_helpers",
         "js/common_helpers/template_helpers", "js/spec_helpers/edit_helpers",
-        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info"],
+        "js/views/pages/container", "js/views/pages/paged_container", "js/models/xblock_info", "jquery.simulate"],
     function ($, _, str, AjaxHelpers, TemplateHelpers, EditHelpers, ContainerPage, PagedContainerPage, XBlockInfo) {
 
         function parameterized_suite(label, global_page_options, fixtures) {
@@ -14,7 +14,9 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     mockBadXBlockContainerXBlockHtml = readFixtures('mock/mock-bad-xblock-container-xblock.underscore'),
                     mockUpdatedContainerXBlockHtml = readFixtures('mock/mock-updated-container-xblock.underscore'),
                     mockXBlockEditorHtml = readFixtures('mock/mock-xblock-editor.underscore'),
-                    PageClass = fixtures.page;
+                    mockXBlockVisibilityEditorHtml = readFixtures('mock/mock-xblock-visibility-editor.underscore'),
+                    PageClass = fixtures.page,
+                    hasVisibilityEditor = fixtures.has_visibility_editor;
 
                 beforeEach(function () {
                     var newDisplayName = 'New Display Name';
@@ -218,6 +220,26 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                             resources: []
                         });
                         expect(EditHelpers.isShowingModal()).toBeTruthy();
+                    });
+
+                    it('can show a visibility modal for a child xblock if supported for the page', function() {
+                        var visibilityButtons;
+                        renderContainerPage(this, mockContainerXBlockHtml);
+                        visibilityButtons = containerPage.$('.wrapper-xblock .visibility-button');
+                        if (hasVisibilityEditor) {
+                            expect(visibilityButtons.length).toBe(6);
+                            visibilityButtons[0].click();
+                            expect(str.startsWith(lastRequest().url, '/xblock/locator-component-A1/visibility_view'))
+                                .toBeTruthy();
+                            AjaxHelpers.respondWithJson(requests, {
+                                html: mockXBlockVisibilityEditorHtml,
+                                resources: []
+                            });
+                            expect(EditHelpers.isShowingModal()).toBeTruthy();
+                        }
+                        else {
+                            expect(visibilityButtons.length).toBe(0);
+                        }
                     });
                 });
 
@@ -572,19 +594,25 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
             });
         }
 
+        // Create a suite for a non-paged container that includes 'edit visibility' buttons
         parameterized_suite("Non paged",
             { },
             {
                 page: ContainerPage,
                 initial: 'mock/mock-container-xblock.underscore',
-                add_response: 'mock/mock-xblock.underscore'
+                add_response: 'mock/mock-xblock.underscore',
+                has_visibility_editor: true
             }
         );
+
+        // Create a suite for a paged container that does not include 'edit visibility' buttons
         parameterized_suite("Paged",
             { page_size: 42 },
             {
                 page: PagedContainerPage,
                 initial: 'mock/mock-container-paged-xblock.underscore',
-                add_response: 'mock/mock-xblock-paged.underscore'
-            });
+                add_response: 'mock/mock-xblock-paged.underscore',
+                has_visibility_editor: false
+            }
+        );
     });

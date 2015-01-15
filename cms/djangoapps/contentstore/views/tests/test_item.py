@@ -18,8 +18,9 @@ from contentstore.views.component import (
     component_handler, get_component_templates
 )
 
-
-from contentstore.views.item import create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name
+from contentstore.views.item import (
+    create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name, add_container_page_publishing_info
+)
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
@@ -116,9 +117,9 @@ class GetItemTest(ItemTest):
         return resp
 
     @ddt.data(
-        (1, 21, 23, 35, 37),
-        (2, 22, 24, 38, 39),
-        (3, 23, 25, 41, 41),
+        (1, 16, 14, 15, 11),
+        (2, 16, 14, 15, 11),
+        (3, 16, 14, 15, 11),
     )
     @ddt.unpack
     def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
@@ -132,6 +133,17 @@ class GetItemTest(ItemTest):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
         with check_mongo_calls(problem_queries):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
+
+    @ddt.data(
+        (1, 26),
+        (2, 28),
+        (3, 30),
+    )
+    @ddt.unpack
+    def test_container_get_query_count(self, branching_factor, unit_queries,):
+        self.populate_course(branching_factor)
+        with check_mongo_calls(unit_queries):
+            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -411,21 +423,46 @@ class TestDuplicateItem(ItemTest):
         except for location and display name.
         """
         def duplicate_and_verify(source_usage_key, parent_usage_key):
+            """ Duplicates the source, parenting to supplied parent. Then does equality check. """
             usage_key = self._duplicate_item(parent_usage_key, source_usage_key)
-            self.assertTrue(check_equality(source_usage_key, usage_key), "Duplicated item differs from original")
+            self.assertTrue(
+                check_equality(source_usage_key, usage_key, parent_usage_key),
+                "Duplicated item differs from original"
+            )
 
-        def check_equality(source_usage_key, duplicate_usage_key):
+        def check_equality(source_usage_key, duplicate_usage_key, parent_usage_key=None):
+            """
+            Gets source and duplicated items from the modulestore using supplied usage keys.
+            Then verifies that they represent equivalent items (modulo parents and other
+            known things that may differ).
+            """
             original_item = self.get_item_from_modulestore(source_usage_key)
             duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
 
             self.assertNotEqual(
-                original_item.location,
-                duplicated_item.location,
+                unicode(original_item.location),
+                unicode(duplicated_item.location),
                 "Location of duplicate should be different from original"
             )
-            # Set the location and display name to be the same so we can make sure the rest of the duplicate is equal.
+
+            # Parent will only be equal for root of duplicated structure, in the case
+            # where an item is duplicated in-place.
+            if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+                self.assertEqual(
+                    unicode(parent_usage_key), unicode(duplicated_item.parent),
+                    "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
+                )
+            else:
+                self.assertNotEqual(
+                    unicode(original_item.parent), unicode(duplicated_item.parent),
+                    "Parent duplicate should be different from source"
+                )
+
+            # Set the location, display name, and parent to be the same so we can make sure the rest of the
+            # duplicate is equal.
             duplicated_item.location = original_item.location
             duplicated_item.display_name = original_item.display_name
+            duplicated_item.parent = original_item.parent
 
             # Children will also be duplicated, so for the purposes of testing equality, we will set
             # the children to the original after recursively checking the children.
@@ -1367,6 +1404,7 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
             include_ancestor_info=True
         )
+        add_container_page_publishing_info(vertical, xblock_info)
         self.validate_vertical_xblock_info(xblock_info)
 
     def test_component_xblock_info(self):
@@ -1487,10 +1525,6 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
-        if xblock_info['category'] == 'vertical' and not course_outline:
-            self.assertEqual(xblock_info['edited_by'], 'testuser')
-        else:
-            self.assertIsNone(xblock_info.get('edited_by', None))
 
 
 class TestLibraryXBlockInfo(ModuleStoreTestCase):
@@ -1595,7 +1629,8 @@ class TestXBlockPublishingInfo(ItemTest):
         )
         if staff_only:
             self._enable_staff_only(child.location)
-        return child
+        # In case the staff_only state was set, return the updated xblock.
+        return modulestore().get_item(child.location)
 
     def _get_child_xblock_info(self, xblock_info, index):
         """
@@ -1683,12 +1718,6 @@ class TestXBlockPublishingInfo(ItemTest):
         Verify the explicit staff lock state of an item in the xblock_info.
         """
         self._verify_xblock_info_state(xblock_info, 'has_explicit_staff_lock', expected_state, path, should_equal)
-
-    def _verify_staff_lock_from_state(self, xblock_info, expected_state, path=None, should_equal=True):
-        """
-        Verify the staff_lock_from state of an item in the xblock_info.
-        """
-        self._verify_xblock_info_state(xblock_info, 'staff_lock_from', expected_state, path, should_equal)
 
     def test_empty_chapter(self):
         empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
@@ -1779,7 +1808,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter", staff_only=True)
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
-        self._create_child(sequential, 'vertical', "Unit")
+        vertical = self._create_child(sequential, 'vertical', "Unit")
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1789,7 +1818,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(chapter), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(chapter), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_section(self):
         """
@@ -1810,7 +1841,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential", staff_only=True)
-        self._create_child(sequential, 'vertical', "Unit")
+        vertical = self._create_child(sequential, 'vertical', "Unit")
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1820,7 +1851,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(sequential), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(sequential), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_subsection(self):
         """
@@ -1838,7 +1871,7 @@ class TestXBlockPublishingInfo(ItemTest):
     def test_staff_only_unit(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
-        unit = self._create_child(sequential, 'vertical', "Unit", staff_only=True)
+        vertical = self._create_child(sequential, 'vertical', "Unit", staff_only=True)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1848,7 +1881,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(unit), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(vertical), vertical_info["staff_lock_from"])
 
     def test_unscheduled_section_with_live_subsection(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")

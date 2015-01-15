@@ -2,8 +2,12 @@
 Utility functions related to databases.
 """
 from functools import wraps
+import random
 
 from django.db import connection, transaction
+
+
+MYSQL_MAX_INT = (2 ** 31) - 1
 
 
 def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
@@ -38,3 +42,18 @@ def commit_on_success_with_read_committed(func):  # pylint: disable=invalid-name
             return func(*args, **kwargs)
 
     return wrapper
+
+
+def generate_int_id(minimum=0, maximum=MYSQL_MAX_INT, used_ids=None):
+    """
+    Return a unique integer in the range [minimum, maximum], inclusive.
+    """
+    if used_ids is None:
+        used_ids = []
+
+    cid = random.randint(minimum, maximum)
+
+    while cid in used_ids:
+        cid = random.randint(minimum, maximum)
+
+    return cid

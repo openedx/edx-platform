@@ -1,6 +1,7 @@
 <%!
 from django.utils.translation import ugettext as _
 from contentstore.views.helpers import xblock_studio_url
+from contentstore.utils import is_visible_to_specific_content_groups
 import json
 %>
 <%
@@ -38,7 +39,11 @@ messages = json.dumps(xblock.validate().to_json())
     <div class="studio-xblock-wrapper" data-locator="${xblock.location | h}" data-course-key="${xblock.location.course_key | h}">
     % endif
 
-    <section class="wrapper-xblock ${section_class} ${collapsible_class}">
+    <section class="wrapper-xblock ${section_class} ${collapsible_class}
+    % if is_visible_to_specific_content_groups(xblock):
+        has-group-visibility-set
+    % endif
+    ">
 % endif
 
 <header class="xblock-header xblock-header-${xblock.category}">
@@ -63,6 +68,14 @@ messages = json.dumps(xblock.validate().to_json())
                                     <span class="action-button-text">${_("Edit")}</span>
                                 </a>
                             </li>
+                            % if can_edit_visibility:
+                                <li class="action-item action-visibility">
+                                    <a href="#" data-tooltip="${_("Visibility Settings")}" class="visibility-button action-button">
+                                        <i class="icon fa fa-eye" aria-hidden="true"></i>
+                                        <span class="sr">${_("Visibility")}</span>
+                                    </a>
+                                </li>
+                            % endif
                             <li class="action-item action-duplicate">
                                 <a href="#" data-tooltip="${_("Duplicate")}" class="duplicate-button action-button">
                                 <i class="icon fa fa-copy"></i>

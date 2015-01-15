@@ -552,3 +552,31 @@ class DiscussionTabHomePage(CoursePage, DiscussionPageMixin):
             lambda: _match_messages(text).results == [],
             "waiting for dismissed alerts to disappear"
         ).fulfill()
+
+    def click_new_post_button(self):
+        """
+        Clicks the 'New Post' button.
+        """
+        self.new_post_button.click()
+        EmptyPromise(
+            lambda: (
+                self.new_post_form
+            ),
+            "New post action succeeded"
+        ).fulfill()
+
+    @property
+    def new_post_button(self):
+        """
+        Returns the new post button.
+        """
+        elements = self.q(css="ol.course-tabs .new-post-btn")
+        return elements.first if elements.visible and len(elements) == 1 else None
+
+    @property
+    def new_post_form(self):
+        """
+        Returns the new post form.
+        """
+        elements = self.q(css=".forum-new-post-form")
+        return elements[0] if elements.visible and len(elements) == 1 else None

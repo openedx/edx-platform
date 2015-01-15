@@ -6,7 +6,20 @@
 
 // ====================
 
+// view-specific utilities
+// --------------------
+%status-value-base {
+  @extend %t-title7;
+  @extend %t-strong;
+}
+
+%status-value-sub1 {
+  @extend %t-title8;
+  display: block;
+}
+
 // UI: container page view
+// --------------------
 .view-container {
   @extend %two-col-1;
 
@@ -102,6 +115,7 @@
       @extend %t-title8;
     }
 
+    // UI: publishing details/summary
     .bit-publishing {
       @extend %bar-module;
 
@@ -159,37 +173,43 @@
       .wrapper-release {
 
         .release-date {
-          @extend %t-strong;
+          @extend %status-value-base;
         }
 
         .release-with {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
       }
 
       .wrapper-visibility {
 
         .copy {
-          @extend %t-strong;
+          @extend %status-value-base;
           margin-bottom: ($baseline/10);
         }
 
         .icon {
-          margin-left: ($baseline/4);
           color: $gray-d1;
         }
 
         .inherited-from {
-          @extend %t-title8;
-          display: block;
+          @extend %status-value-sub1;
         }
 
+        // UI: note about specific access
+        .note-visibility {
+          @extend %status-value-sub1;
 
+          .icon {
+            @include margin-right($baseline/4);
+          }
+        }
       }
 
       .wrapper-pub-actions {
-        padding: ($baseline*0.75);
+        border-top: 1px solid $gray-l4;
+        margin-top: ($baseline/2);
+        padding: $baseline ($baseline*0.75) ($baseline*0.75) ($baseline*0.75);
 
         .action-publish {
           @extend %btn-primary-blue;
@@ -209,7 +229,6 @@
           }
         }
       }
-
     }
 
     // versioning widget
@@ -244,8 +263,7 @@
       .wrapper-unit-id, .wrapper-library-id {
 
         .unit-id-value, .library-id-value {
-          @extend %cont-text-wrap;
-          @extend %t-copy-sub1;
+          @extend %status-value-base;
           display: inline-block;
           width: 100%;
         }
@@ -308,5 +326,3 @@
     }
   }
 }
-
-

@@ -10,11 +10,13 @@ from pymongo import MongoClient
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
 from .helpers import CohortTestMixin
-from ..helpers import UniqueCourseTest
+from ..helpers import UniqueCourseTest, create_user_partition_json
+from xmodule.partitions.partitions import Group
 from ...fixtures.course import CourseFixture
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
+from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
 import uuid
 
@@ -82,17 +84,46 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         Given I have a course with a manual cohort and an automatic cohort defined
         When I view the manual cohort in the instructor dashboard
         There is text specifying that students are only added to the cohort manually
-        And when I vew the automatic cohort in the instructor dashboard
+        And when I view the automatic cohort in the instructor dashboard
         There is text specifying that students are automatically added to the cohort
         """
         self.verify_cohort_description(
             self.manual_cohort_name,
-            'Students are added to this group only when you provide their email addresses or usernames on this page',
+            'Students are added to this cohort only when you provide '
+            'their email addresses or usernames on this page',
         )
         self.verify_cohort_description(
             self.auto_cohort_name,
-            'Students are added to this group automatically',
+            'Students are added to this cohort automatically',
         )
+
+    def test_no_content_groups(self):
+        """
+        Scenario: if the course has no content groups defined (user_partitions of type cohort),
+        the settings in the cohort management tab reflect this
+
+        Given I have a course with a cohort defined but no content groups
+        When I view the cohort in the instructor dashboard and select settings
+        Then the cohort is not linked to a content group
+        And there is text stating that no content groups are defined
+        And I cannot select the radio button to enable content group association
+        And there is a link I can select to open Group settings in Studio
+        """
+        self.cohort_management_page.select_cohort(self.manual_cohort_name)
+        self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
+        self.assertEqual(
+            "Warning:\nNo content groups exist. Create a content group",
+            self.cohort_management_page.get_cohort_related_content_group_message()
+        )
+        self.assertFalse(self.cohort_management_page.select_content_group_radio_button())
+        self.cohort_management_page.select_studio_group_settings()
+        group_settings_page = GroupConfigurationsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        group_settings_page.wait_for_page()
 
     def test_link_to_studio(self):
         """
@@ -133,9 +164,13 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             lambda: 2 == self.cohort_management_page.get_selected_cohort_count(), 'Waiting for added students'
         ).fulfill()
         confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
-        self.assertEqual(2, len(confirmation_messages))
-        self.assertEqual("2 students have been added to this cohort group", confirmation_messages[0])
-        self.assertEqual("1 student was removed from " + self.manual_cohort_name, confirmation_messages[1])
+        self.assertEqual(
+            [
+                "2 students have been added to this cohort",
+                "1 student was removed from " + self.manual_cohort_name
+            ],
+            confirmation_messages
+        )
         self.assertEqual("", self.cohort_management_page.get_cohort_student_input_field_value())
         self.assertEqual(
             self.event_collection.find({
@@ -197,15 +232,21 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).fulfill()
         self.assertEqual(1, self.cohort_management_page.get_selected_cohort_count())
 
-        confirmation_messages = self.cohort_management_page.get_cohort_confirmation_messages()
-        self.assertEqual(2, len(confirmation_messages))
-        self.assertEqual("0 students have been added to this cohort group", confirmation_messages[0])
-        self.assertEqual("1 student was already in the cohort group", confirmation_messages[1])
+        self.assertEqual(
+            [
+                "0 students have been added to this cohort",
+                "1 student was already in the cohort"
+            ],
+            self.cohort_management_page.get_cohort_confirmation_messages()
+        )
 
-        error_messages = self.cohort_management_page.get_cohort_error_messages()
-        self.assertEqual(2, len(error_messages))
-        self.assertEqual("There was an error when trying to add students:", error_messages[0])
-        self.assertEqual("Unknown user: unknown_user", error_messages[1])
+        self.assertEqual(
+            [
+                "There was an error when trying to add students:",
+                "Unknown user: unknown_user"
+            ],
+            self.cohort_management_page.get_cohort_error_messages()
+        )
         self.assertEqual(
             self.student_name + ",unknown_user,",
             self.cohort_management_page.get_cohort_student_input_field_value()
@@ -314,10 +355,10 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         start_time = datetime.now(UTC)
         self.cohort_management_page.upload_cohort_file(filename)
         self._verify_cohort_by_csv_notification(
-            "Your file '{}' has been uploaded. Please allow a few minutes for processing.".format(filename)
+            "Your file '{}' has been uploaded. Allow a few minutes for processing.".format(filename)
         )
 
-        # student_user is moved from manual cohort group to auto cohort group
+        # student_user is moved from manual cohort to auto cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -336,7 +377,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # instructor_user (previously unassigned) is added to manual cohort group
+        # instructor_user (previously unassigned) is added to manual cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -346,7 +387,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # unicode_student_user (previously unassigned) is added to manual cohort group
+        # unicode_student_user (previously unassigned) is added to manual cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
@@ -421,3 +462,196 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).fulfill()
         messages = self.cohort_management_page.get_csv_messages()
         self.assertEquals(expected_message, messages[0])
+
+
+class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
+    """
+    Tests for linking between content groups and cohort in the instructor dashboard.
+    """
+
+    def setUp(self):
+        """
+        Set up a cohorted course with a user_partition of scheme "cohort".
+        """
+        super(CohortContentGroupAssociationTest, self).setUp()
+
+        # create course with single cohort and two content groups (user_partition of type "cohort")
+        self.cohort_name = "OnlyCohort"
+        self.course_fixture = CourseFixture(**self.course_info).install()
+        self.setup_cohort_config(self.course_fixture)
+        self.cohort_id = self.add_manual_cohort(self.course_fixture, self.cohort_name)
+
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Apples, Bananas',
+                        'Content Group Partition',
+                        [Group("0", 'Apples'), Group("1", 'Bananas')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+
+        # login as an instructor
+        self.instructor_name = "instructor_user"
+        self.instructor_id = AutoAuthPage(
+            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            course_id=self.course_id, staff=True
+        ).visit().get_user_id()
+
+        # go to the membership page on the instructor dashboard
+        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        self.instructor_dashboard_page.visit()
+        membership_page = self.instructor_dashboard_page.select_membership()
+        self.cohort_management_page = membership_page.select_cohort_management_section()
+
+    def test_no_content_group_linked(self):
+        """
+        Scenario: In a course with content groups, cohorts are initially not linked to a content group
+
+        Given I have a course with a cohort defined and content groups defined
+        When I view the cohort in the instructor dashboard and select settings
+        Then the cohort is not linked to a content group
+        And there is no text stating that content groups are undefined
+        And the content groups are listed in the selector
+        """
+        self.cohort_management_page.select_cohort(self.cohort_name)
+        self.assertIsNone(self.cohort_management_page.get_cohort_associated_content_group())
+        self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
+        self.assertEquals(["Apples", "Bananas"], self.cohort_management_page.get_all_content_groups())
+
+    def test_link_to_content_group(self):
+        """
+        Scenario: In a course with content groups, cohorts can be linked to content groups
+
+        Given I have a course with a cohort defined and content groups defined
+        When I view the cohort in the instructor dashboard and select settings
+        And I link the cohort to one of the content groups and save
+        Then there is a notification that my cohort has been saved
+        And when I reload the page
+        And I view the cohort in the instructor dashboard and select settings
+        Then the cohort is still linked to the content group
+        """
+        self._link_cohort_to_content_group(self.cohort_name, "Bananas")
+        self.assertEqual("Bananas", self.cohort_management_page.get_cohort_associated_content_group())
+
+    def test_unlink_from_content_group(self):
+        """
+        Scenario: In a course with content groups, cohorts can be unlinked from content groups
+
+        Given I have a course with a cohort defined and content groups defined
+        When I view the cohort in the instructor dashboard and select settings
+        And I link the cohort to one of the content groups and save
+        Then there is a notification that my cohort has been saved
+        And I reload the page
+        And I view the cohort in the instructor dashboard and select settings
+        And I unlink the cohort from any content group and save
+        Then there is a notification that my cohort has been saved
+        And when I reload the page
+        And I view the cohort in the instructor dashboard and select settings
+        Then the cohort is not linked to any content group
+        """
+        self._link_cohort_to_content_group(self.cohort_name, "Bananas")
+        self.cohort_management_page.set_cohort_associated_content_group(None)
+        self._verify_settings_saved_and_reload(self.cohort_name)
+        self.assertEqual(None, self.cohort_management_page.get_cohort_associated_content_group())
+
+    def test_create_new_cohort_linked_to_content_group(self):
+        """
+        Scenario: In a course with content groups, a new cohort can be linked to a content group
+            at time of creation.
+
+        Given I have a course with a cohort defined and content groups defined
+        When I create a new cohort and link it to a content group
+        Then when I select settings I see that the cohort is linked to the content group
+        And when I reload the page
+        And I view the cohort in the instructor dashboard and select settings
+        Then the cohort is still linked to the content group
+        """
+        new_cohort = "correctly linked cohort"
+        self._create_new_cohort_linked_to_content_group(new_cohort, "Apples")
+        self.browser.refresh()
+        self.cohort_management_page.wait_for_page()
+        self.cohort_management_page.select_cohort(new_cohort)
+        self.assertEqual("Apples", self.cohort_management_page.get_cohort_associated_content_group())
+
+    def test_missing_content_group(self):
+        """
+        Scenario: In a course with content groups, if a cohort is associated with a content group that no longer
+            exists, a warning message is shown
+
+        Given I have a course with a cohort defined and content groups defined
+        When I create a new cohort and link it to a content group
+        And I delete that content group from the course
+        And I reload the page
+        And I view the cohort in the instructor dashboard and select settings
+        Then the settings display a message that the content group no longer exists
+        And when I select a different content group and save
+        Then the error message goes away
+        """
+        new_cohort = "linked to missing content group"
+        self._create_new_cohort_linked_to_content_group(new_cohort, "Apples")
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Apples, Bananas',
+                        'Content Group Partition',
+                        [Group("2", 'Pears'), Group("1", 'Bananas')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+        self.browser.refresh()
+        self.cohort_management_page.wait_for_page()
+        self.cohort_management_page.select_cohort(new_cohort)
+        self.assertEqual("Deleted Content Group", self.cohort_management_page.get_cohort_associated_content_group())
+        self.assertEquals(
+            ["Bananas", "Pears", "Deleted Content Group"],
+            self.cohort_management_page.get_all_content_groups()
+        )
+        self.assertEqual(
+            "Warning:\nThe previously selected content group was deleted. Select another content group.",
+            self.cohort_management_page.get_cohort_related_content_group_message()
+        )
+        self.cohort_management_page.set_cohort_associated_content_group("Pears")
+        confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
+        self.assertEqual(["Saved cohort"], confirmation_messages)
+        self.assertIsNone(self.cohort_management_page.get_cohort_related_content_group_message())
+        self.assertEquals(["Bananas", "Pears"], self.cohort_management_page.get_all_content_groups())
+
+    def _create_new_cohort_linked_to_content_group(self, new_cohort, cohort_group):
+        """
+        Creates a new cohort linked to a content group.
+        """
+        self.cohort_management_page.add_cohort(new_cohort, content_group=cohort_group)
+        # After adding the cohort, it should automatically be selected
+        EmptyPromise(
+            lambda: new_cohort == self.cohort_management_page.get_selected_cohort(), "Waiting for new cohort to appear"
+        ).fulfill()
+        self.assertEqual(cohort_group, self.cohort_management_page.get_cohort_associated_content_group())
+
+    def _link_cohort_to_content_group(self, cohort_name, content_group):
+        """
+        Links a cohort to a content group. Saves the changes and verifies the cohort updated properly.
+        Then refreshes the page and selects the cohort.
+        """
+        self.cohort_management_page.select_cohort(cohort_name)
+        self.cohort_management_page.set_cohort_associated_content_group(content_group)
+        self._verify_settings_saved_and_reload(cohort_name)
+
+    def _verify_settings_saved_and_reload(self, cohort_name):
+        """
+        Verifies the confirmation message indicating that a cohort's settings have been updated.
+        Then refreshes the page and selects the cohort.
+        """
+        confirmation_messages = self.cohort_management_page.get_cohort_settings_messages()
+        self.assertEqual(["Saved cohort"], confirmation_messages)
+        self.browser.refresh()
+        self.cohort_management_page.wait_for_page()
+        self.cohort_management_page.select_cohort(cohort_name)

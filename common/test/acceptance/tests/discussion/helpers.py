@@ -3,6 +3,7 @@ Helper functions and classes for discussion tests.
 """
 
 from uuid import uuid4
+import json
 
 from ...fixtures.discussion import (
     SingleThreadViewFixture,
@@ -40,7 +41,7 @@ class CohortTestMixin(object):
     def setup_cohort_config(self, course_fixture, auto_cohort_groups=None):
         """
         Sets up the course to use cohorting with the given list of auto_cohort_groups.
-        If auto_cohort_groups is None, no auto cohort groups are set.
+        If auto_cohort_groups is None, no auto cohorts are set.
         """
         course_fixture._update_xblock(course_fixture._course_location, {
             "metadata": {
@@ -66,17 +67,17 @@ class CohortTestMixin(object):
 
     def add_manual_cohort(self, course_fixture, cohort_name):
         """
-        Adds a cohort group by name, returning the ID for the group.
+        Adds a cohort by name, returning its ID.
         """
-        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/add'
-        data = {"name": cohort_name}
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/'
+        data = json.dumps({"name": cohort_name})
         response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to create cohort")
-        return response.json()['cohort']['id']
+        return response.json()['id']
 
     def add_user_to_cohort(self, course_fixture, username, cohort_id):
         """
-        Adds a user to the specified cohort group.
+        Adds a user to the specified cohort.
         """
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + "/cohorts/{}/add".format(cohort_id)
         data = {"users": username}

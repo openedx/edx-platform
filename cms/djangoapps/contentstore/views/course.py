@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.date_utils import get_default_time_display
+from util.db import generate_int_id, MYSQL_MAX_INT
 from edxmako.shortcuts import render_to_response
 
 from xmodule.course_module import DEFAULT_START_DATE
@@ -29,6 +30,7 @@ from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseErr
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import Location
 from opaque_keys.edx.keys import CourseKey
+from openedx.core.djangoapps.course_groups.partition_scheme import get_cohorted_user_partition
 
 from django_future.csrf import ensure_csrf_cookie
 from contentstore.course_info_model import get_course_updates, update_course_updates, delete_course_update
@@ -70,7 +72,15 @@ from course_action_state.models import CourseRerunState, CourseRerunUIStateManag
 from course_action_state.managers import CourseActionStateItemNotFoundError
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
+from xmodule.split_test_module import get_split_user_partitions
 
+MINIMUM_GROUP_ID = 100
+
+# Note: the following content group configuration strings are not
+# translated since they are not visible to users.
+CONTENT_GROUP_CONFIGURATION_DESCRIPTION = 'The groups in this configuration can be mapped to cohort groups in the LMS.'
+
+CONTENT_GROUP_CONFIGURATION_NAME = 'Content Group Configuration'
 
 __all__ = ['course_info_handler', 'course_handler', 'course_listing',
            'course_info_update_handler',
@@ -1252,23 +1262,16 @@ class GroupConfiguration(object):
         if len(self.configuration.get('groups', [])) < 1:
             raise GroupConfigurationsValidationError(_("must have at least one group"))
 
-    def generate_id(self, used_ids):
-        """
-        Generate unique id for the group configuration.
-        If this id is already used, we generate new one.
-        """
-        cid = random.randint(100, 10 ** 12)
-
-        while cid in used_ids:
-            cid = random.randint(100, 10 ** 12)
-
-        return cid
-
     def assign_id(self, configuration_id=None):
         """
         Assign id for the json representation of group configuration.
         """
-        self.configuration['id'] = int(configuration_id) if configuration_id else self.generate_id(self.get_used_ids())
+        if configuration_id:
+            self.configuration['id'] = int(configuration_id)
+        else:
+            self.configuration['id'] = generate_int_id(
+                MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(self.course)
+            )
 
     def assign_group_ids(self):
         """
@@ -1278,14 +1281,15 @@ class GroupConfiguration(object):
         # Assign ids to every group in configuration.
         for group in self.configuration.get('groups', []):
             if group.get('id') is None:
-                group["id"] = self.generate_id(used_ids)
+                group["id"] = generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, used_ids)
                 used_ids.append(group["id"])
 
-    def get_used_ids(self):
+    @staticmethod
+    def get_used_ids(course):
         """
         Return a list of IDs that already in use.
         """
-        return set([p.id for p in self.course.user_partitions])
+        return set([p.id for p in course.user_partitions])
 
     def get_user_partition(self):
         """
@@ -1296,21 +1300,19 @@ class GroupConfiguration(object):
     @staticmethod
     def get_usage_info(course, store):
         """
-        Get usage information for all Group Configurations.
+        Get usage information for all Group Configurations currently referenced by a split_test instance.
         """
         split_tests = store.get_items(course.id, qualifiers={'category': 'split_test'})
         return GroupConfiguration._get_usage_info(store, course, split_tests)
 
     @staticmethod
-    def add_usage_info(course, store):
+    def get_split_test_partitions_with_usage(course, store):
         """
-        Add usage information to group configurations jsons in course.
-
-        Returns json of group configurations updated with usage information.
+        Returns json split_test group configurations updated with usage information.
         """
         usage_info = GroupConfiguration.get_usage_info(course, store)
         configurations = []
-        for partition in course.user_partitions:
+        for partition in get_split_user_partitions(course.user_partitions):
             configuration = partition.to_json()
             configuration['usage'] = usage_info.get(partition.id, [])
             configurations.append(configuration)
@@ -1384,6 +1386,26 @@ class GroupConfiguration(object):
         configuration_json['usage'] = usage_information.get(configuration.id, [])
         return configuration_json
 
+    @staticmethod
+    def get_or_create_content_group_configuration(course):
+        """
+        Returns the first user partition from the course which uses the
+        CohortPartitionScheme, or generates one if no such partition is
+        found.  The created partition is not saved to the course until
+        the client explicitly creates a group within the partition and
+        POSTs back.
+        """
+        content_group_configuration = get_cohorted_user_partition(course.id)
+        if content_group_configuration is None:
+            content_group_configuration = UserPartition(
+                id=generate_int_id(MINIMUM_GROUP_ID, MYSQL_MAX_INT, GroupConfiguration.get_used_ids(course)),
+                name=CONTENT_GROUP_CONFIGURATION_NAME,
+                description=CONTENT_GROUP_CONFIGURATION_DESCRIPTION,
+                groups=[],
+                scheme_id='cohort'
+            )
+        return content_group_configuration
+
 
 @require_http_methods(("GET", "POST"))
 @login_required
@@ -1405,12 +1427,21 @@ def group_configurations_list_handler(request, course_key_string):
         if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
             group_configuration_url = reverse_course_url('group_configurations_list_handler', course_key)
             course_outline_url = reverse_course_url('course_handler', course_key)
-            configurations = GroupConfiguration.add_usage_info(course, store)
+            should_show_experiment_groups = are_content_experiments_enabled(course)
+            if should_show_experiment_groups:
+                experiment_group_configurations = GroupConfiguration.get_split_test_partitions_with_usage(course, store)
+            else:
+                experiment_group_configurations = None
+            content_group_configuration = GroupConfiguration.get_or_create_content_group_configuration(
+                course
+            ).to_json()
             return render_to_response('group_configurations.html', {
                 'context_course': course,
                 'group_configuration_url': group_configuration_url,
                 'course_outline_url': course_outline_url,
-                'configurations': configurations if should_show_group_configurations_page(course) else None,
+                'experiment_group_configurations': experiment_group_configurations,
+                'should_show_experiment_groups': should_show_experiment_groups,
+                'content_group_configuration': content_group_configuration
             })
         elif "application/json" in request.META.get('HTTP_ACCEPT'):
             if request.method == 'POST':
@@ -1489,9 +1520,9 @@ def group_configurations_detail_handler(request, course_key_string, group_config
             return JsonResponse(status=204)
 
 
-def should_show_group_configurations_page(course):
+def are_content_experiments_enabled(course):
     """
-    Returns true if Studio should show the "Group Configurations" page for the specified course.
+    Returns True if content experiments have been enabled for the course.
     """
     return (
         SPLIT_TEST_COMPONENT_TYPE in ADVANCED_COMPONENT_TYPES and

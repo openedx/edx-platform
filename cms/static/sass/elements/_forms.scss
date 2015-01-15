@@ -1,7 +1,7 @@
 // studio - elements - forms
 // ====================
 
-// Table of Contents 
+// Table of Contents
 // * +Forms - General
 // * +Field - Is Editable
 // * +Field - With Error
@@ -12,7 +12,23 @@
 // * +Form - Grandfathered
 
 // +Forms - General
-// ==================== 
+// ====================
+// element-specific utilities
+// --------------------
+// UI: checkbox/radio inputs
+%input-tickable {
+
+  ~ label {
+    color: $color-copy-base;
+  }
+
+  // STATE: checked/selected
+  &:checked ~ label {
+    @extend %t-strong;
+    color: $ui-action-primary-color-focus;
+  }
+}
+
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -77,7 +93,7 @@ form {
     }
 
     .input-checkbox-checked, .input-checkbox-unchecked {
-      width: $baseline;
+      width: ($baseline*0.75);
     }
 
     .input-checkbox {
@@ -107,8 +123,18 @@ form {
     }
   }
 
+  // CASE: checkbox input
+  .field-checkbox .input-checkbox {
+    @extend %input-tickable;
+  }
+
+  // CASE: radio input
+  .field-radio .input-radio {
+    @extend %input-tickable;
+  }
+
   // CASE: file input
-  input[type=file] {
+  input[type="file"] {
     @extend %t-copy-sub1;
   }
 

@@ -49,7 +49,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
         },
 
         /**
-         * Returns the just the modified metadata values, in the format used to persist to the server.
+         * Returns just the modified metadata values, in the format used to persist to the server.
          */
         getModifiedMetadataValues: function () {
             var modified_values = {};

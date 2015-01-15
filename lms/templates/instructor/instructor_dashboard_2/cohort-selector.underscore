@@ -1,5 +1,5 @@
 <% if (!selectedCohort) { %>
-    <option value=""><%- gettext('Select a cohort group') %></option>
+    <option value=""><%- gettext('Select a cohort') %></option>
 <% } %>
 <% _.each(cohorts, function(cohort) { %>
     <%

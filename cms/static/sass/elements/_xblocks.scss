@@ -150,42 +150,50 @@
 
   // ====================
 
-  // UI: xblocks - calls-to-action
-  .wrapper-xblock .header-actions {
+  .wrapper-xblock {
 
-    .actions-list {
+    // UI: xblocks - calls-to-action
+    .header-actions .actions-list {
       @extend %actions-list;
     }
-  }
 
-  // UI: xblock is collapsible
-  .wrapper-xblock.is-collapsible,
-  .wrapper-xblock.xblock-type-container {
+    // CASE: xblock is collapsible
+    &.is-collapsible,
+    &.xblock-type-container {
 
-    .icon {
-      font-style: normal;
-    }
+      .icon {
+        font-style: normal;
+      }
 
-    .expand-collapse {
-      @extend %expand-collapse;
-      margin: 0 ($baseline/4);
-      height: ($baseline*1.25);
-      width: $baseline;
+      .expand-collapse {
+        @extend %expand-collapse;
+        margin: 0 ($baseline/4);
+        height: ($baseline*1.25);
+        width: $baseline;
 
-      &:focus {
-        outline: 0;
+        &:focus {
+          outline: 0;
+        }
+      }
+
+      .action-view {
+
+        .action-button {
+          transition: none;
+        }
+
+        .action-button-text {
+          padding-right: ($baseline/5);
+          padding-left: 0;
+        }
       }
     }
 
-    .action-view {
+    // CASE: xblock has specific visibility based on content groups set
+    &.has-group-visibility-set {
 
-      .action-button {
-        transition: none;
-      }
-
-      .action-button-text {
-        padding-right: ($baseline/5);
-        padding-left: 0;
+      .action-visibility .visibility-button.visibility-button { // needed to cascade in front of overscoped header-actions CSS rule
+        color: $color-visibility-set;
       }
     }
   }

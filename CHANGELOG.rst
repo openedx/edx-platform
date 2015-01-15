@@ -5,6 +5,8 @@ These are notable changes in edx-platform.  This is a rolling list of changes,
 in roughly chronological order, most recent first.  Add your entries at or near
 the top.  Include a label indicating the component affected.
 
+Studio/LMS: Implement cohorted courseware. TNL-648
+
 LMS: Student Notes: Eventing for Student Notes. TNL-931
 
 LMS: Student Notes: Add course structure view. TNL-762

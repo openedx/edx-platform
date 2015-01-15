@@ -37,6 +37,7 @@ from path import path
 from warnings import simplefilter
 
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
 
@@ -121,6 +122,12 @@ FEATURES = {
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
     'ENABLE_EDXNOTES': False,
+
+    # Enable support for content libraries. Note that content libraries are
+    # only supported in courses using split mongo. Change the setting
+    # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
+    # and libraries created with split.
+    'ENABLE_CONTENT_LIBRARIES': False,
 }
 ENABLE_JASMINE = False
 
@@ -269,7 +276,13 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin, EditInfoMixin)
+XBLOCK_MIXINS = (
+    LmsBlockMixin,
+    InheritanceMixin,
+    XModuleMixin,
+    EditInfoMixin,
+    AuthoringMixin,
+)
 
 # Allow any XBlock in Studio
 # You should also enable the ALLOW_ALL_ADVANCED_COMPONENTS feature flag, so that
