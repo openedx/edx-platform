@@ -9,8 +9,8 @@ information and preferences).
 from django.conf import settings
 from django.db import transaction, IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
-from django.contrib.auth.forms import PasswordResetForm
 
+from ..forms import PasswordResetFormNoActive
 from ..models import User, UserProfile, Registration, PendingEmailChange
 from ..helpers import intercept_errors
 
@@ -353,9 +353,9 @@ def request_password_change(email, orig_host, is_secure):
     """
     # Binding data to a form requires that the data be passed as a dictionary
     # to the Form class constructor.
-    form = PasswordResetForm({'email': email})
+    form = PasswordResetFormNoActive({'email': email})
 
-    # Validate that an active user exists with the given email address.
+    # Validate that a user exists with the given email address.
     if form.is_valid():
         # Generate a single-use link for performing a password reset
         # and email it to the user.
@@ -365,7 +365,7 @@ def request_password_change(email, orig_host, is_secure):
             use_https=is_secure
         )
     else:
-        # No active user with the provided email address exists.
+        # No user with the provided email address exists.
         raise AccountUserNotFound
 
 

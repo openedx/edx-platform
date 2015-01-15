@@ -289,7 +289,11 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 400)
+
+        # Expect that the activation email is still sent,
+        # since the user may have lost the original activation email.
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_password_change_no_user(self):
         # Log out the user created during test setup
