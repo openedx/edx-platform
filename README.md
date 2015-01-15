@@ -9,7 +9,7 @@ Please refer to the following wiki pages in our [configuration repo](https://git
 
 * [edX Developer Stack](https://github.com/edx/configuration/wiki/edX-Developer-Stack)
 <br/>These instructions are for developers who want to contribute or make changes to the edX source code.
-* [edX Production Stack](https://github.com/edx/configuration/wiki/edX-Production-Stack)
+* [edX Full Stack](https://github.com/edx/configuration/wiki/edX-Full-Stack)
 <br/>Using Vagrant/Virtualbox this will setup all edX services on a single server in a production like configuration.
 * [edX Ubuntu 12.04 64-bit Installation](https://github.com/edx/configuration/wiki/edX-Ubuntu-12.04-64-bit-Installation)
 <br/>This will install edX on an existing Ubuntu 12.04 server.
