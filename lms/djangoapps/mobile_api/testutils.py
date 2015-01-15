@@ -10,7 +10,7 @@ Test utilities for mobile API tests:
      MobileCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=False.
      MobileEnrolledCourseAccessTestMixin - tests for APIs with mobile_course_access and verify_enrolled=True.
 """
-# pylint: disable=no-member, invalid-name
+# pylint: disable=no-member
 import ddt
 from mock import patch
 from rest_framework.test import APITestCase
@@ -24,15 +24,6 @@ from student.models import CourseEnrollment
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-
-
-# A tuple of Role Types and Boolean values that indicate whether access should be given to that role.
-ROLE_CASES = (
-    (auth.CourseBetaTesterRole, True),
-    (auth.CourseStaffRole, True),
-    (auth.CourseInstructorRole, True),
-    (None, False)
-)
 
 
 class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
@@ -140,7 +131,7 @@ class MobileCourseAccessTestMixin(object):
     Subclasses are expected to inherit from MobileAPITestCase.
     Subclasses can override verify_success, verify_failure, and init_course_access methods.
     """
-    ALLOW_ACCESS_TO_UNRELEASED_COURSE = False
+    ALLOW_ACCESS_TO_UNRELEASED_COURSE = False  # pylint: disable=invalid-name
 
     def verify_success(self, response):
         """Base implementation of verifying a successful response."""
@@ -177,7 +168,13 @@ class MobileCourseAccessTestMixin(object):
         else:
             self.verify_failure(response)
 
-    @ddt.data(*ROLE_CASES)
+    # A tuple of Role Types and Boolean values that indicate whether access should be given to that role.
+    @ddt.data(
+        (auth.CourseBetaTesterRole, True),
+        (auth.CourseStaffRole, True),
+        (auth.CourseInstructorRole, True),
+        (None, False)
+    )
     @ddt.unpack
     def test_non_mobile_available(self, role, should_succeed):
         self.init_course_access()

@@ -163,11 +163,7 @@ def _has_access_course_desc(user, action, course):
             # check start date
             can_load() and
             # check mobile_available flag
-            (
-                course.mobile_available or
-                auth.has_access(user, CourseBetaTesterRole(course.id)) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
+            is_mobile_available_for_user(user, course)
         )
 
     def can_enroll():
@@ -557,6 +553,20 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     descriptor: something that has a location attribute
     """
     return _has_staff_access_to_location(user, descriptor.location, course_key)
+
+
+def is_mobile_available_for_user(user, course):
+    """
+    Returns whether the given course is mobile_available for the given user.
+    Checks:
+        mobile_available flag on the course
+        Beta User and staff access overrides the mobile_available flag
+    """
+    return (
+        course.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(course.id)) or
+        _has_staff_access_to_descriptor(user, course, course.id)
+    )
 
 
 def get_user_role(user, course_key):

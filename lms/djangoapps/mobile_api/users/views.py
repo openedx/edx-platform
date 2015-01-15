@@ -2,9 +2,6 @@
 Views for user API
 """
 
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-
 from django.shortcuts import redirect
 from django.utils import dateparse
 
@@ -12,11 +9,13 @@ from rest_framework import generics, views
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from courseware.views import get_current_child, save_positions_recursively_up
-
 from opaque_keys.edx.keys import UsageKey
 from opaque_keys import InvalidKeyError
 
+from courseware.access import is_mobile_available_for_user
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from courseware.views import get_current_child, save_positions_recursively_up
 from student.models import CourseEnrollment, User
 
 from xblock.fields import Scope
@@ -25,8 +24,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 
 from .serializers import CourseEnrollmentSerializer, UserSerializer
-from mobile_api import errors
-from mobile_api.utils import mobile_course_listing_access, mobile_view, mobile_course_access
+from .. import errors
+from ..utils import mobile_view, mobile_course_access
 
 
 @mobile_view(is_user=True)
@@ -245,7 +244,7 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         enrollments = self.queryset.filter(user__username=self.kwargs['username'], is_active=True).order_by('created')
         return [
             enrollment for enrollment in enrollments
-            if mobile_course_listing_access(enrollment.course, self.request.user)
+            if enrollment.course and is_mobile_available_for_user(self.request.user, enrollment.course)
         ]
 
 
