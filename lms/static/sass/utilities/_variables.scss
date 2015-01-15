@@ -3,8 +3,6 @@
 
 // BASE
 $baseline: 20px;
-$base-border-radius: ($baseline/5);
-$base-font-size: 16;
 
 // ====================
 
@@ -278,38 +276,6 @@ $audit-color-lvl2: tint($audit-color-lvl1, 33%);
 
 // ====================
 
-// buttons
-$button-color: $blue;
-$focus-button-color: saturate($blue, 25%);
-$button-text-color: $white;
-$focus-button-text-color: $white;
-
-// buttons - base (in view/simple button)
-$button-base-color: $gray-l4;
-$focus-button-base-color: $gray-l3;
-$button-base-text-color: $gray-d4;
-$focus-button-base-text-color: $gray-d4;
-
-// buttons - primary (important/main action)
-$button-primary-color: $blue;
-$focus-button-primary-color: saturate($blue, 25%);
-$button-primary-text-color: $white;
-$focus-button-primary-text-color: $white;
-
-// buttons - secondary (less important/side action)
-$button-secondary-color: $gray-l4;
-$focus-button-secondary-color: $gray-l3;
-$button-secondary-text-color: $gray-d4;
-$focus-button-secondary-text-color: $gray-d4;
-
-// buttons - tertiary (least important/side action)
-$button-tertiary-color: $gray-l4;
-$focus-button-tertiary-color: $gray-l3;
-$button-tertiary-text-color: $gray-d4;
-$focus-button-tertiary-text-color: $gray-d4;
-
-// ====================
-
 // ACTIONS: general
 $button-bg-image: linear-gradient(rgb(255,255,255) 0%, rgb(250,250,250) 50%, rgb(237,237,237) 50%, rgb(220,220,220) 100%);
 $button-bg-color: transparent;
@@ -469,7 +435,9 @@ $f-monospace: 'Bitstream Vera Sans Mono', Consolas, Courier, monospace;
 $header-sans-serif: 'Open Sans', Arial, Helvetica, sans-serif;
 
 // SPLINT: colors
+
 $msg-bg: $action-primary-bg;
+
 
 $dark-gray1: rgb(74,74,74); // #
 $light-gray1: rgb(242,242,242); // #f2f2f2

@@ -1,0 +1,119 @@
+// LMS -- utilities -- mixins
+// ====================
+
+// in this document:
+// --------------------
+// +notes
+// +utility
+// +type
+// +color
+// +alignment
+// +theme
+// +sunsetted
+// +visual
+
+
+// +notes:
+// --------------------
+// * this contains all utility-based/focused mixins that can be used throughout the platform.
+
+
+// +utility
+// --------------------
+// image-replacement hidden text
+@mixin text-hide() {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+// +type
+// --------------------
+// mixins - font sizing
+@mixin font-size($sizeValue: 16){
+  font-size: $sizeValue + px;
+ // font-size: ($sizeValue/10) + rem;
+}
+
+// mixins - line height
+@mixin line-height($fontSize: auto){
+  line-height: ($fontSize*1.48) + px;
+ // line-height: (($fontSize/10)*1.48) + rem;
+}
+
+
+// +color
+// --------------------
+// color brightness/contrast checker
+// (brightness math based on http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx)
+$red-magic-number: 241;
+$green-magic-number: 691;
+$blue-magic-number: 68;
+$brightness-divisor: $red-magic-number + $green-magic-number + $blue-magic-number;
+
+@function brightness($color) {
+  // Extract color components
+  $red-component: red($color);
+  $green-component: green($color);
+  $blue-component: blue($color);
+
+  // Calculate a brightness value in 3d color space between 0 and 255
+  $number: sqrt((($red-component * $red-component * $red-magic-number) + ($green-component * $green-component * $green-magic-number) + ($blue-component * $blue-component * $blue-magic-number)) / $brightness-divisor);
+
+  // Convert to percentage and return
+  @return 100% * $number / 255;
+}
+
+@function contrasting-color($color, $light, $dark) {
+  @if brightness($color) < 65% {
+    @return $light;
+  } @else {
+    @return $dark;
+  }
+}
+
+
+// +alignment
+// --------------------
+@mixin vertically-and-horizontally-centered ( $height, $width ) {
+  left: 50%;
+  margin-left: -$width / 2;
+  //margin-top: -$height / 2;
+  min-height: $height;
+  min-width: $width;
+  position: absolute;
+  top: 150px;
+}
+
+// image-replacement hidden text
+@mixin text-hide() {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+// +theme
+// --------------------
+// theme mixin styles
+@mixin login_register_h1_style {}
+@mixin footer_references_style {}
+
+
+// +sunsetted
+// --------------------
+@mixin hide-text(){
+  text-indent: -9999px;
+  overflow: hidden;
+  display: block;
+}
+
+@function em($pxval, $base: 16) {
+  @return #{$pxval / $base}em;
+}
+
+// line-height
+@function lh($amount: 1) {
+  @return $body-line-height * $amount;
+}
