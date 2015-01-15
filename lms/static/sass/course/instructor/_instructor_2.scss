@@ -796,7 +796,7 @@
       }
       input[disabled] {
         @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
+        padding: 6px 6px ($baseline/4) 6px;
         border: 1px solid $lightGrey1;
         cursor: not-allowed;
       }
@@ -1052,7 +1052,7 @@
 
       .cohort-section-header {
         margin-top: ($baseline*1.5);
-        @include padding($baseline 0 ($baseline/2) 0);
+        padding: $baseline 0 ($baseline/2) 0;
       }
 
       .cohort-section-header > .form-field {
@@ -1074,7 +1074,7 @@
 
       a {
         display: inline-block;
-        padding: ($baseline - 5);
+        padding: ($baseline*0.75);
         // These transitions null out previously/globally set transitions
         -webkit-transition: none;
         -moz-transition: none;
@@ -1088,7 +1088,7 @@
         a {
           padding-bottom: ($baseline - 5);
           border-style: solid;
-          @include border-width(1px 1px 0 1px);
+          border-width: 1px 1px 0 1px;
           border-color: $gray-l4;
           background: $white;
           color: inherit;
@@ -1099,7 +1099,7 @@
   }
 
   .tab-content {
-    @include padding($baseline $baseline 0 $baseline);
+    padding: $baseline $baseline 0 $baseline;
     border: 1px solid $gray-l5;
 
     &.new-cohort-form {
@@ -1582,7 +1582,7 @@ input[name="subject"] {
       @extend .button-reset;
     }
     .modal-form-error {
-      @include margin($baseline 0 ($baseline/2) 0);
+      margin: $baseline 0 ($baseline/2) 0;
       padding: $baseline;
       box-shadow: inset 0 -1px 2px 0 #f3d9db;
       -webkit-box-sizing: border-box;
@@ -1855,7 +1855,7 @@ input[name="subject"] {
   span.code_tip {
     display: block;
     margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) $baseline);
+    @include padding(($baseline/2) ($baseline*0.75) ($baseline/2) $baseline);
     background: none repeat scroll 0 0 #F8F4EC;
     border-bottom: 1px solid #DDDDDD;
     border-top: 1px solid #DDDDDD;
@@ -1872,7 +1872,7 @@ input[name="subject"] {
     display: block;
     line-height: 30px;
     margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) 1px);
+    @include padding(($baseline/2) ($baseline*0.75) ($baseline/2) ($baseline/20));
     .add{
       font-size: em(13);
       @include float(right);
@@ -1882,7 +1882,7 @@ input[name="subject"] {
     display: block;
     height: 37px;
     margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) 1px);
+    @include padding(($baseline/2) ($baseline*0.75) ($baseline/2) ($baseline/20));
     background: none repeat scroll 0 0 #F8F4EC;
     color: #3C3C3C;
     line-height: 30px;
