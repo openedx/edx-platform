@@ -8,10 +8,13 @@ import hashlib
 import json
 import logging
 
+from django.utils.translation import ugettext as _
+
 from celery.result import AsyncResult
 from celery.states import READY_STATES, SUCCESS, FAILURE, REVOKED
 
 from courseware.module_render import get_xqueue_callback_url_prefix
+from courseware.courses import get_problems_in_section
 
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import UsageKey
@@ -253,6 +256,22 @@ def check_arguments_for_rescoring(usage_key):
         raise NotImplementedError(msg)
 
 
+def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=invalid-name
+    """
+    Grabs all problem descriptors in exam and checks each descriptor to
+    confirm that it supports re-scoring.
+
+    An ItemNotFoundException is raised if the corresponding module
+    descriptor doesn't exist for exam_key. NotImplementedError is raised if
+    any of the problem in entrance exam doesn't support re-scoring calls.
+    """
+    problems = get_problems_in_section(exam_key).values()
+    if any(not hasattr(problem, 'module_class') or not hasattr(problem.module_class, 'rescore_problem')
+           for problem in problems):
+        msg = _("Not all problems in entrance exam support re-scoring.")
+        raise NotImplementedError(msg)
+
+
 def encode_problem_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
     """
     Encode optional usage_key and optional student into task_key and task_input values.
@@ -269,6 +288,28 @@ def encode_problem_and_student_input(usage_key, student=None):  # pylint: disabl
     else:
         task_input = {'problem_url': usage_key.to_deprecated_string()}
         task_key_stub = "_{problem}".format(problem=usage_key.to_deprecated_string())
+
+    # create the key value by using MD5 hash:
+    task_key = hashlib.md5(task_key_stub).hexdigest()
+
+    return task_input, task_key
+
+
+def encode_entrance_exam_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
+    """
+    Encode usage_key and optional student into task_key and task_input values.
+
+    Args:
+        usage_key (Location): The usage_key identifying the entrance exam.
+        student (User): the student affected
+    """
+    assert isinstance(usage_key, UsageKey)
+    if student is not None:
+        task_input = {'entrance_exam_url': unicode(usage_key), 'student': student.username}
+        task_key_stub = "{student}_{entranceexam}".format(student=student.id, entranceexam=unicode(usage_key))
+    else:
+        task_input = {'entrance_exam_url': unicode(usage_key)}
+        task_key_stub = "_{entranceexam}".format(entranceexam=unicode(usage_key))
 
     # create the key value by using MD5 hash:
     task_key = hashlib.md5(task_key_stub).hexdigest()
