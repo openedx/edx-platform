@@ -49,17 +49,18 @@ var edx = edx || {};
 	    self = this;
 	    $('#add-all').on('click', function(event) {
 	        event.preventDefault();
-	        this.schedule_apply(self.schedule, show);
+	        self.schedule_apply(self.schedule, self.show);
 	        self.dirty = true;
+		self.schedule_collection.set(self.schedule);
 	        self.render();
 	    });
         },
 
         render: function() {
-	    this.schedule = this.schedule_collection.toJSON();
-            this.hidden = this.pruned(this.schedule, function(node) {
+	    self.schedule = this.schedule_collection.toJSON();
+            self.hidden = this.pruned(self.schedule, function(node) {
               return node.hidden || node.category !== 'vertical'});
-            this.showing = this.pruned(this.schedule, function(node) {
+            this.showing = this.pruned(self.schedule, function(node) {
               return !node.hidden});
             this.$el.html(schedule_template({chapters: this.showing}));
             $('table.poc-schedule .sequential,.vertical').hide();
@@ -80,8 +81,9 @@ var edx = edx || {};
 	    // Click handler for remove all
 	    $('table.poc-schedule a#remove-all').on('click', function(event) {
 	      event.preventDefault();
-	      this.schedule_apply(self.schedule, hide);
+	      self.schedule_apply(self.schedule, self.hide);
 	      self.dirty = true;
+	      self.schedule_collection.set(self.schedule);
 	      self.render();
 	    });
 
@@ -90,7 +92,7 @@ var edx = edx || {};
 	      // Populate chapters select, depopulate others
 	      this.chapter_select.html('')
 		.append('<option value="none">'+gettext("Select a chapter")+'...</option>')
-		.append(this.schedule_options(this.hidden));
+		.append(self.schedule_options(this.hidden));
 	      this.sequential_select.html('').prop('disabled', true);
 	      this.vertical_select.html('').prop('disabled', true);
 	      $('form#add-unit').show();
@@ -124,11 +126,11 @@ var edx = edx || {};
 	    this.sequential_select.on('change', function(event) {
 	      var sequential_location = self.sequential_select.val();
 	      if (sequential_location !== 'all') {
-		var chapter = self.chapter_select.val();
+		var chapter = self.chapter_select.val(),
 		sequential = self.find_unit(self.hidden, chapter, sequential_location);
 		self.vertical_select.html('')
 		  .append('<option value="all">'+gettext("All units")+'</option>')
-		  .append(schedule_options(sequential.children));
+		  .append(self.schedule_options(sequential.children));
 		self.vertical_select.prop('disabled', false);
 		self.set_datetime('start', sequential.start);
 		self.set_datetime('due', sequential.due);
@@ -141,9 +143,9 @@ var edx = edx || {};
 	    this.vertical_select.on('change', function(event) {
 	      var vertical_location = self.vertical_select.val();
 	      if (vertical_location !== 'all') {
-		var chapter = chapter_select.val(),
+		var chapter = self.chapter_select.val(),
 		    sequential = self.sequential_select.val();
-		vertical = self.find_unit(
+		var vertical = self.find_unit(
 		  self.hidden, chapter, sequential, vertical_location);
 		self.set_datetime('start', vertical.start);
 		self.set_datetime('due', vertical.due);
@@ -162,11 +164,12 @@ var edx = edx || {};
 		    vertical == 'all' ? null: vertical),
 		  start = self.get_datetime('start'),
 		  due = self.get_datetime('due');
-	      units.map(show);
-	      unit = units[units.length - 1]
-	      self.schedule_apply([unit], show);      
-	      if (start) unit.start = start;
-	      if (due) unit.due = due;
+	      units.map(self.show);
+	      var unit = units[units.length - 1]
+	      self.schedule_apply([unit], self.show);      
+	      if (unit !== undefined && start) unit.start = start;
+	      if (unit !== undefined && due) unit.due = due;
+	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
 	      self.render();
 	    });
@@ -177,6 +180,7 @@ var edx = edx || {};
 		  path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]);
 	      self.schedule_apply([unit], self.hide);
+	      self.schedule_collection.set(self.schedule);
 	      self.dirty = true;
 	      self.render(); 
 	    });
@@ -197,6 +201,7 @@ var edx = edx || {};
 	},
 
 	save: function() {
+	    self.schedule_collection.set(self.schedule);
 	    var button = $('#dirty-schedule #save-changes');
 	    button.prop('disabled', true).text(gettext("Saving")+'...');
 	    
@@ -204,9 +209,8 @@ var edx = edx || {};
 		url: save_url,
 		type: 'POST',
 		contentType: 'application/json',
-		data: JSON.stringify(this.schedule),
+		data: JSON.stringify(self.schedule),
 		success: function(data, textStatus, jqXHR) {
-		  self.schedule = data.schedule;
 		  self.dirty = false;
 		  self.render();
 		  button.prop('disabled', false).text(gettext("Save changes"));
@@ -220,16 +224,21 @@ var edx = edx || {};
 		  $('#ajax-error').show();
 		  $('#dirty-schedule').hide();
 		  $('form#add-unit select,input,button').prop('disabled', true);
+		  button.prop('disabled', false).text(gettext("Save changes"));
 		}
 	      });
 	},
 
 	hide: function(unit) {
-	    unit.hidden = true;
+	    if (unit !== undefined) {
+	        unit.hidden = true;
+	    }
 	},
 
         show: function(unit) {
-	    unit.hidden = false;
+	    if (unit !== undefined) {
+	        unit.hidden = false;
+	    }
 	},
 
 	get_datetime: function(which) {
@@ -259,7 +268,7 @@ var edx = edx || {};
 	schedule_apply: function(nodes, f) {
 	    nodes.map(function(node) {
 	      f(node);
-	      if (node.children !== undefined) self.schedule_apply(node.children, f);
+	      if (node !== undefined && node.children !== undefined) self.schedule_apply(node.children, f);
 	    });
 	},
 
@@ -331,9 +340,14 @@ var edx = edx || {};
 		  alert('Please enter a valid time');
 		  return;
 		}
-		unit[what] = date + ' ' + time;
+		if (what == 'start') {
+		    unit.start = date + ' ' + time;
+		} else {
+		    unit.due = date + ' ' + time;
+		}
 		modal.find('.close-modal').click();
 		self.dirty = true;
+		self.schedule_collection.set(self.schedule);
 		self.render();
 	      });
 	    }
@@ -374,116 +388,7 @@ var edx = edx || {};
 
     });
 
-	    edx.pocs.schedule.XScheduleView = Backbone.View.extend({
-
-		events: {
-		    'submit': 'submit',
-		    'change': 'change'
-		},
-
-		initialize: function() {
-		    _.bindAll(this, 'render', 'change', 'submit', 'invalidProfile', 'invalidPreference', 'error', 'sync', 'clearStatus');
-		    
-		    this.scheduleModel = new edx.pocs.schedule.ProfileModel();
-		    this.scheduleModel.on('invalid', this.invalidProfile);
-		    this.scheduleModel.on('error', this.error);
-		    this.scheduleModel.on('sync', this.sync);
-
-		    this.preferencesModel = new edx.pocs.schedule.PreferencesModel();
-		    this.preferencesModel.on('invalid', this.invalidPreference);
-		    this.preferencesModel.on('error', this.error);
-		    this.preferencesModel.on('sync', this.sync);
-		},
-
-		render: function() {
-		    this.$el.html(_.template($('#schedule-tpl').html()));
-
-		    this.$nameField = $('#schedule-name', this.$el);
-		    this.$nameStatus = $('#schedule-name-status', this.$el);
-		    
-		    this.$languageChoices = $('#preference-language', this.$el);
-		    this.$languageStatus = $('#preference-language-status', this.$el);
-
-		    this.$submitStatus = $('#submit-status', this.$el);
-
-		    var self = this;
-		    $.getJSON('preferences/languages')
-			.done(function(json) {
-			    /** Asynchronously populate the language choices. */
-			    self.$languageChoices.html(_.template($('#languages-tpl').html(), {languageInfo: json}));
-			})
-			.fail(function() {
-			    self.$languageStatus
-				.addClass('language-list-error')
-				.text(gettext("We couldn't populate the list of language choices."));
-			});
-
-		    return this;
-		},
-
-		change: function() {
-		    this.scheduleModel.set({
-			fullName: this.$nameField.val()
-		    });
-
-		    this.preferencesModel.set({
-			language: this.$languageChoices.val()
-		    });
-		},
-
-		submit: function(event) {
-		    event.preventDefault();
-		    this.clearStatus();
-		    this.scheduleModel.save();
-		    this.preferencesModel.save();
-		},
-
-		invalidProfile: function(model) {
-		    var errors = model.validationError;
-		    if (errors.hasOwnProperty('fullName')) {
-			this.$nameStatus
-			    .addClass('validation-error')
-			    .text(errors.fullName);
-		    }
-		},
-
-		invalidPreference: function(model) {
-		    var errors = model.validationError;
-		    if (errors.hasOwnProperty('language')) {
-			this.$languageStatus
-			    .addClass('validation-error')
-			    .text(errors.language);
-		    }
-		},
-
-		error: function(error) {
-		    this.$submitStatus
-			.addClass('error')
-			.text(error);
-		},
-
-		sync: function() {
-		    this.$submitStatus
-			.addClass('success')
-			.text(gettext("Saved"));
-		},
-
-		clearStatus: function() {
-		    this.$nameStatus
-			.removeClass('validation-error')
-			.text("");
-
-		    this.$languageStatus
-			.removeClass('validation-error')
-			.text("");
-
-		    this.$submitStatus
-			.removeClass('error')
-			.text("");
-		}
-	    });
-
-	})(jQuery, _, Backbone, gettext);
+})(jQuery, _, Backbone, gettext);
 
 
 

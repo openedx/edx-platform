@@ -237,9 +237,9 @@ def get_all_pocs_for_user(user):
         mooc_url: <url to view this MOOC>
     }
     """
-    current_active_poc = get_current_poc(user)
     if user.is_anonymous():
         return []
+    current_active_poc = get_current_poc()
     memberships = []
     for membership in PocMembership.memberships_for_user(user):
         course = get_course_by_id(membership.poc.course_id)

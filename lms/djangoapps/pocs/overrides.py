@@ -20,7 +20,7 @@ class PersonalOnlineCoursesOverrideProvider(FieldOverrideProvider):
     overrides to be made on a per user basis.
     """
     def get(self, block, name, default):
-        poc = get_current_poc(self.user)
+        poc = get_current_poc()
         if poc:
             return get_override_for_poc(poc, block, name, default)
         return default
@@ -51,7 +51,7 @@ def poc_context(poc):
     _POC_CONTEXT.poc = prev
 
 
-def get_current_poc(user):
+def get_current_poc():
     """
     Return the poc that is active for this request.
     """
