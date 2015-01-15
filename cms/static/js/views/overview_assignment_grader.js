@@ -68,7 +68,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/models/assignment_grad
               this.removeMenu(e);
 
                   var saving = new NotificationView.Mini({
-                      title: gettext('Saving') + '&hellip;'
+                      title: gettext('Saving')
                   });
                   saving.show();
 

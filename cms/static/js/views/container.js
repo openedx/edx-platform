@@ -39,7 +39,7 @@ define(["jquery", "underscore", "js/views/xblock", "js/utils/module", "gettext",
                         }
 
                         saving = new NotificationView.Mini({
-                            title: gettext('Saving&hellip;')
+                            title: gettext('Saving')
                         });
                         saving.show();
 

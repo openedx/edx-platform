@@ -477,14 +477,14 @@ function goto( mode)
           <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
           <div class="metrics-left" id="metric_opened_${i}">
             <h3>${_("Count of Students that Opened a Subsection")}</h3>
-            <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading...")}</p>
+            <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
           </div>
           <div class="metrics-right" id="metric_grade_${i}">
             <h3>${_("Grade Distribution per Problem")}</h3>
             %if not metrics_results['section_has_problem'][i]:
               <p>${_("There are no problems in this section.")}</p>
             %else:
-              <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading...")}</p>
+              <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
             %endif
           </div>
         </div>

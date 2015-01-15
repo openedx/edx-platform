@@ -37,7 +37,7 @@ define(["js/views/baseview", "underscore", "gettext", "js/views/feedback_notific
                         click: function(view) {
                             view.hide();
                             var delmsg = new NotificationView.Mini({
-                                title: gettext("Deleting") + "&hellip;"
+                                title: gettext("Deleting")
                             }).show();
                             textbook.destroy({
                                 complete: function() {

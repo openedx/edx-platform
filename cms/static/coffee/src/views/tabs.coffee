@@ -34,7 +34,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       checkbox_element = event.target
       tab_element = $(checkbox_element).parents(".course-tab")[0]
 
-      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving = new NotificationView.Mini({title: gettext("Saving")})
       saving.show()
 
       $.ajax({
@@ -64,7 +64,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
       analytics.track "Reordered Pages",
         course: course_location_analytics
 
-      saving = new NotificationView.Mini({title: gettext("Saving&hellip;")})
+      saving = new NotificationView.Mini({title: gettext("Saving")})
       saving.show()
 
       $.ajax({
@@ -114,7 +114,7 @@ define ["jquery", "jquery.ui", "backbone", "js/views/feedback_prompt", "js/views
                 course: course_location_analytics
                 id: $component.data('locator')
               deleting = new NotificationView.Mini
-                title: gettext('Deleting&hellip;')
+                title: gettext('Deleting')
               deleting.show()
               $.ajax({
                 type: 'DELETE',
