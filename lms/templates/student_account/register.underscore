@@ -22,7 +22,7 @@
             _.each( context.providers, function( provider) {
                 if ( provider.registerUrl ) { %>
                     <button type="button" class="button button-primary button-<%- provider.name %> login-provider register-<%- provider.name %>" data-provider-url="<%- provider.registerUrl %>">
-                        <span class="icon <%- provider.iconClass %>" aria-hidden="true"></span>
+                        <span class="icon fa <%- provider.iconClass %>" aria-hidden="true"></span>
                         <%- provider.name %>
                     </button>
             <%  }
