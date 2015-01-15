@@ -5,6 +5,7 @@ from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 %>
+<%! from microsite_configuration import microsite %>
 
 <%block name="billing_details_highlight">
 % if order_type == 'business':
@@ -371,6 +372,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
+    ## Allow for a microsite to be able to insert additional text at the bottom of the page
+    <%include file="${microsite.get_template_path('receipt_custom_pane.html')}" />
   </section>
 </div>
 </%block>
