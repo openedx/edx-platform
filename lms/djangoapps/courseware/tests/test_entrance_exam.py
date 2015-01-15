@@ -3,10 +3,11 @@ Tests use cases related to LMS Entrance Exam behavior, such as gated content acc
 """
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.core.urlresolvers import reverse
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, toc_for_course
-from courseware.tests.factories import UserFactory
+from courseware.tests.factories import UserFactory, InstructorFactory
 from milestones import api as milestones_api
 from milestones.models import MilestoneRelationshipType
 from xmodule.modulestore.django import modulestore
@@ -57,14 +58,15 @@ class EntranceExamTestCases(ModuleStoreTestCase):
         self.entrance_exam = ItemFactory.create(
             parent=self.course,
             category="chapter",
-            display_name="Entrance Exam Section - Chapter 1"
+            display_name="Entrance Exam Section - Chapter 1",
+            is_entrance_exam=True
         )
         self.exam_1 = ItemFactory.create(
             parent=self.entrance_exam,
             category='sequential',
             display_name="Exam Sequential - Subsection 1",
             graded=True,
-            metadata={'in_entrance_exam': True}
+            in_entrance_exam=True
         )
         subsection = ItemFactory.create(
             parent=self.exam_1,
@@ -130,13 +132,7 @@ class EntranceExamTestCases(ModuleStoreTestCase):
         self.course.entrance_exam_id = unicode(self.entrance_exam.scope_ids.usage_id)
         modulestore().update_item(self.course, user.id)  # pylint: disable=no-member
 
-    def test_entrance_exam_gating(self):
-        """
-        Unit Test: test_entrance_exam_gating
-        """
-        # This user helps to cover a discovered bug in the milestone fulfillment logic
-        chaos_user = UserFactory()
-        expected_locked_toc = (
+        self.expected_locked_toc = (
             [
                 {
                     'active': True,
@@ -155,60 +151,7 @@ class EntranceExamTestCases(ModuleStoreTestCase):
                 }
             ]
         )
-        locked_toc = toc_for_course(
-            self.request,
-            self.course,
-            self.entrance_exam.url_name,
-            self.exam_1.url_name,
-            self.field_data_cache
-        )
-        for toc_section in expected_locked_toc:
-            self.assertIn(toc_section, locked_toc)
-
-        # Set up the chaos user
-        # pylint: disable=maybe-no-member,no-member
-        grade_dict = {'value': 1, 'max_value': 1, 'user_id': chaos_user.id}
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id,
-            chaos_user,
-            self.course,
-            depth=2
-        )
-        # pylint: disable=protected-access
-        module = get_module(
-            chaos_user,
-            self.request,
-            self.problem_1.scope_ids.usage_id,
-            field_data_cache,
-        )._xmodule
-        module.system.publish(self.problem_1, 'grade', grade_dict)
-
-        # pylint: disable=maybe-no-member,no-member
-        grade_dict = {'value': 1, 'max_value': 1, 'user_id': self.request.user.id}
-        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            self.course.id,
-            self.request.user,
-            self.course,
-            depth=2
-        )
-        # pylint: disable=protected-access
-        module = get_module(
-            self.request.user,
-            self.request,
-            self.problem_1.scope_ids.usage_id,
-            field_data_cache,
-        )._xmodule
-        module.system.publish(self.problem_1, 'grade', grade_dict)
-
-        module = get_module(
-            self.request.user,
-            self.request,
-            self.problem_2.scope_ids.usage_id,
-            field_data_cache,
-        )._xmodule  # pylint: disable=protected-access
-        module.system.publish(self.problem_2, 'grade', grade_dict)
-
-        expected_unlocked_toc = (
+        self.expected_unlocked_toc = (
             [
                 {
                     'active': False,
@@ -263,6 +206,64 @@ class EntranceExamTestCases(ModuleStoreTestCase):
             ]
         )
 
+    def test_entrance_exam_gating(self):
+        """
+        Unit Test: test_entrance_exam_gating
+        """
+        # This user helps to cover a discovered bug in the milestone fulfillment logic
+        chaos_user = UserFactory()
+        locked_toc = toc_for_course(
+            self.request,
+            self.course,
+            self.entrance_exam.url_name,
+            self.exam_1.url_name,
+            self.field_data_cache
+        )
+        for toc_section in self.expected_locked_toc:
+            self.assertIn(toc_section, locked_toc)
+
+        # Set up the chaos user
+        # pylint: disable=maybe-no-member,no-member
+        grade_dict = {'value': 1, 'max_value': 1, 'user_id': chaos_user.id}
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            chaos_user,
+            self.course,
+            depth=2
+        )
+        # pylint: disable=protected-access
+        module = get_module(
+            chaos_user,
+            self.request,
+            self.problem_1.scope_ids.usage_id,
+            field_data_cache,
+        )._xmodule
+        module.system.publish(self.problem_1, 'grade', grade_dict)
+
+        # pylint: disable=maybe-no-member,no-member
+        grade_dict = {'value': 1, 'max_value': 1, 'user_id': self.request.user.id}
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id,
+            self.request.user,
+            self.course,
+            depth=2
+        )
+        # pylint: disable=protected-access
+        module = get_module(
+            self.request.user,
+            self.request,
+            self.problem_1.scope_ids.usage_id,
+            field_data_cache,
+        )._xmodule
+        module.system.publish(self.problem_1, 'grade', grade_dict)
+
+        module = get_module(
+            self.request.user,
+            self.request,
+            self.problem_2.scope_ids.usage_id,
+            field_data_cache,
+        )._xmodule  # pylint: disable=protected-access
+        module.system.publish(self.problem_2, 'grade', grade_dict)
         unlocked_toc = toc_for_course(
             self.request,
             self.course,
@@ -271,5 +272,39 @@ class EntranceExamTestCases(ModuleStoreTestCase):
             self.field_data_cache
         )
 
-        for toc_section in expected_unlocked_toc:
+        for toc_section in self.expected_unlocked_toc:
+            self.assertIn(toc_section, unlocked_toc)
+
+    def test_skip_entrance_exame_gating(self):
+        """
+        Tests gating is disabled if skip entrance exam is set for a user.
+        """
+        # make sure toc is locked before allowing user to skip entrance exam
+        locked_toc = toc_for_course(
+            self.request,
+            self.course,
+            self.entrance_exam.url_name,
+            self.exam_1.url_name,
+            self.field_data_cache
+        )
+        for toc_section in self.expected_locked_toc:
+            self.assertIn(toc_section, locked_toc)
+
+        # hit skip entrance exam api in instructor app
+        instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=instructor.username, password='test')
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': self.request.user.email,
+        })
+        self.assertEqual(response.status_code, 200)
+
+        unlocked_toc = toc_for_course(
+            self.request,
+            self.course,
+            self.entrance_exam.url_name,
+            self.exam_1.url_name,
+            self.field_data_cache
+        )
+        for toc_section in self.expected_unlocked_toc:
             self.assertIn(toc_section, unlocked_toc)

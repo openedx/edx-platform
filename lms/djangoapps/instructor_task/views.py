@@ -149,6 +149,7 @@ def get_task_completion_info(instructor_task):
     else:
         student = task_input.get('student')
         problem_url = task_input.get('problem_url')
+        entrance_exam_url = task_input.get('entrance_exam_url')
         email_id = task_input.get('email_id')
 
     if instructor_task.task_state == PROGRESS:
@@ -167,6 +168,17 @@ def get_task_completion_info(instructor_task):
             succeeded = True
             # Translators: {action} is a past-tense verb that is localized separately. {student} is a student identifier.
             msg_format = _("Problem successfully {action} for student '{student}'")
+    elif student is not None and entrance_exam_url is not None:
+        # this reports on actions on entrance exam for a particular student:
+        if num_attempted == 0:
+            # Translators: {action} is a past-tense verb that is localized separately.
+            # {student} is a student identifier.
+            msg_format = _("Unable to find entrance exam submission to be {action} for student '{student}'")
+        else:
+            succeeded = True
+            # Translators: {action} is a past-tense verb that is localized separately.
+            # {student} is a student identifier.
+            msg_format = _("Entrance exam successfully {action} for student '{student}'")
     elif student is None and problem_url is not None:
         # this reports on actions on problems for all students:
         if num_attempted == 0:

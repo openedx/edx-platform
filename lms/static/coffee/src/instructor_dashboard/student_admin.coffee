@@ -46,6 +46,7 @@ class @StudentAdmin
     @$btn_reset_entrance_exam_attempts   = @$section.find "input[name='reset-entrance-exam-attempts']"
     @$btn_delete_entrance_exam_state     = @$section.find "input[name='delete-entrance-exam-state']"
     @$btn_rescore_entrance_exam          = @$section.find "input[name='rescore-entrance-exam']"
+    @$btn_skip_entrance_exam             = @$section.find "input[name='skip-entrance-exam']"
     @$btn_entrance_exam_task_history     = @$section.find "input[name='entrance-exam-task-history']"
     @$table_entrance_exam_task_history   = @$section.find ".entrance-exam-task-history-table"
 
@@ -223,6 +224,28 @@ class @StudentAdmin
           full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
           @$request_response_error_ee.text full_error_message
 
+  # Mark a student to skip entrance exam
+    @$btn_skip_entrance_exam.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Enter a student's username or email address.")
+      confirm_message = gettext("Do you want to allow this student ('{student_id}') to skip the entrance exam?")
+      full_confirm_message = interpolate_text(confirm_message, {student_id: unique_student_identifier})
+      if window.confirm full_confirm_message
+        send_data =
+          unique_student_identifier: unique_student_identifier
+
+        $.ajax
+          dataType: 'json'
+          url: @$btn_skip_entrance_exam.data 'endpoint'
+          data: send_data
+          type: 'POST'
+          success: @clear_errors_then (data) ->
+            alert data.message
+          error: std_ajax_err =>
+            error_message = gettext("An error occurred. Make sure that the student's username or email address is correct and try again.")
+            @$request_response_error_ee.text error_message
+
    # delete student state for entrance exam
     @$btn_delete_entrance_exam_state.click =>
       unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
@@ -249,7 +272,7 @@ class @StudentAdmin
     @$btn_entrance_exam_task_history.click =>
       unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
       if not unique_student_identifier
-        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+        return @$request_response_error_ee.text gettext("Enter a student's username or email address.")
       send_data =
         unique_student_identifier: unique_student_identifier
 

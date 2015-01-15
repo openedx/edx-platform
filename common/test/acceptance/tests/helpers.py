@@ -241,9 +241,9 @@ def element_has_text(page, css_selector, text):
 def get_modal_alert(browser):
     """
     Returns instance of modal alert box shown in browser after waiting
-    for 4 seconds
+    for 6 seconds
     """
-    WebDriverWait(browser, 4).until(EC.alert_is_present())
+    WebDriverWait(browser, 6).until(EC.alert_is_present())
     return browser.switch_to.alert
 
 
