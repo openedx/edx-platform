@@ -867,6 +867,23 @@ function (VideoPlayer, VideoStorage, i18n) {
 
         return true;
     }
+
+    // TODO: Chris Rodriguez
+    // function _configureClosedCaptions(state) {
+    //     if (state.config.showClosedCaptions) {
+    //         state.hide_closed_captions = ($.cookie('hide_closed_captions') === 'true');
+    //     } else {
+    //         state.hide_closed_captions = true;
+
+    //         $.cookie('hide_closed_captions', state.hide_closed_captions, {
+    //             expires: 3650,
+    //             path: '/'
+    //         });
+
+    //         state.el.addClass('cc-closed');
+    //     }
+    // }
+
 });
 
 }(RequireJS.requirejs, RequireJS.require, RequireJS.define));

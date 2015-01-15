@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Ahmad Sofyan <asofyan@niskala.net>, 2013-2014
 # Al Firdaus, 2014
@@ -16,7 +16,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Ahmad Sofyan <asofyan@niskala.net>, 2014
 # Al Firdaus, 2014
@@ -26,14 +26,14 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Eka Y Saputra <ekajogja@ymail.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
@@ -1721,15 +1721,15 @@ msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s detik"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "Caption akan ditampilkan saat"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "Nyalakan captions"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "Matikan captions"
 

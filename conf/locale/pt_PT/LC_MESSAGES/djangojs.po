@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bruno Leandro da Silva <b-leandro2012@bol.com.br>, 2014
 # Carlos <carlos.c.saraiva@gmail.com>, 2013
@@ -13,7 +13,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bruno Leandro da Silva <b-leandro2012@bol.com.br>, 2014
 # Carlos <carlos.c.saraiva@gmail.com>, 2014
@@ -25,13 +25,13 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
@@ -1730,15 +1730,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr ""
 

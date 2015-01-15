@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Faton Nuha <faton11@live.com>, 2014
 # redi12345678 <redimuharremi@hotmail.com>, 2014
@@ -10,21 +10,21 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Faton Nuha <faton11@live.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Faton Nuha <faton11@live.com>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Faton Nuha <faton11@live.com>, 2014
 msgid ""
@@ -1706,15 +1706,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s sekond"
 msgstr[1] "%(value)s sekonda"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr ""
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr ""
 

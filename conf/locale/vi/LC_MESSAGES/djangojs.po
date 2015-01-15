@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Đoàn Trần Hoàng <dthoang92@gmail.com>, 2014
@@ -24,7 +24,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Anh Phan <vietnamesel10n@gmail.com>, 2013
 # Đoàn Trần Hoàng <dthoang92@gmail.com>, 2014
@@ -46,7 +46,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Hoang Ha <halink0803@gmail.com>, 2014
 # Nguyen Don Binh <donbinhvn@gmail.com>, 2014
@@ -55,7 +55,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # dangitdang <dangpham@mit.edu>, 2014
 # dangitdang <dangpham@mit.edu>, 2014
@@ -1740,15 +1740,15 @@ msgid "%(value)s second"
 msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s giây"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "Phụ đề chú thích sẽ hiển thị khi"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "Bật phụ đề"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "Tắt phụ đề"
 

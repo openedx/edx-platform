@@ -5,7 +5,8 @@ from selenium.webdriver.common.keys import Keys
 from xmodule.modulestore.django import modulestore
 
 VIDEO_BUTTONS = {
-    'CC': '.hide-subtitles',
+    'CC': '.captions',
+    'transcript': '.transcript',
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
@@ -114,7 +115,7 @@ def i_edit_the_component(_step):
 
 @step('I have (hidden|toggled) captions$')
 def hide_or_show_captions(step, shown):
-    button_css = 'a.hide-subtitles'
+    button_css = '.transcript'
     if shown == 'hidden':
         world.css_click(button_css)
     if shown == 'toggled':
@@ -167,13 +168,13 @@ def the_youtube_video_is_shown(_step):
 @step('Make sure captions are (.+)$')
 def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
-    world.wait_for_visible('.hide-subtitles')
+    world.wait_for_visible('.transcript')
     if captions_state == 'closed':
         if world.is_css_not_present(SELECTOR):
-            world.css_find('.hide-subtitles').click()
+            world.css_find('.transcript').click()
     else:
         if world.is_css_present(SELECTOR):
-            world.css_find('.hide-subtitles').click()
+            world.css_find('.transcript').click()
 
 
 @step('I hover over button "([^"]*)"$')

@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Amol Bhave <ammubhave@gmail.com>, 2013-2014
 # Anant Vima <anant.vima@anu.edu.au>, 2014
@@ -17,7 +17,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Anant Vima <anant.vima@anu.edu.au>, 2014
 # ria1234 <contactpayal@yahoo.com.au>, 2014
@@ -29,7 +29,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bhupendra Singh Rajawat <bsrajawat14@gmail.com>, 2014
 # Goutam Kumar Dey <de_kumargoutam@yahoo.co.in>, 2014
@@ -37,7 +37,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Amol Bhave <ammubhave@gmail.com>, 2015
 msgid ""
@@ -1733,15 +1733,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s सेकंड"
 msgstr[1] "%(value)s सेकंड"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "उपशीर्षक तब ही प्रदर्शित किया जाएगा जब"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "उपशीर्षक चालू करें"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "उपशीर्षक बंद करें"
 

@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alicia P. <pericia@gmail.com>, 2014
 # AWS <aws@posiziona.eu>, 2015
@@ -33,7 +33,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Antonio Huete Jimenez <tuxillo@quantumachine.net>, 2014
 # spentamanyu <i.delamo@gmail.com>, 2014-2015
@@ -56,7 +56,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alicia P. <pericia@gmail.com>, 2014
 # AWS <aws@posiziona.eu>, 2015
@@ -76,7 +76,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alicia P. <pericia@gmail.com>, 2014
 # Enrique Centelles <ecentelles2003@yahoo.es>, 2014-2015
@@ -1814,15 +1814,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s segundo"
 msgstr[1] "%(value)s segundos"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "Los sibtítulos se mostrarán cuando"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "Activar subtítulos"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "Desactivar subtítulos"
 

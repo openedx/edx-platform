@@ -36,15 +36,14 @@
 
                 it('add caption control to video player', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.video')).toContain('a.hide-subtitles');
+                    expect($('.video')).toContain('.hide-subtitles');
                 });
 
                 it('add ARIA attributes to caption control', function () {
                     state = jasmine.initializePlayer();
-                    var captionControl = $('a.hide-subtitles');
+                    var captionControl = $('.hide-subtitles');
                     expect(captionControl).toHaveAttrs({
-                        'role': 'button',
-                        'title': 'Turn off captions',
+                        'title': 'Turn off the transcript',
                         'aria-disabled': 'false'
                     });
                 });
@@ -1063,8 +1062,8 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn on captions');
+                    expect($('.hide-subtitles'))
+                        .toHaveAttr('title', 'Turn off the transcript');
                 });
             });
 
@@ -1089,8 +1088,8 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn off captions');
+                    expect($('.hide-subtitles'))
+                        .toHaveAttr('title', 'Turn on the transcript');
                 });
 
                 // Test turned off due to flakiness (11/25/13)

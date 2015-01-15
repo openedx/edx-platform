@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013-2014
@@ -24,7 +24,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2013
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2014
@@ -40,7 +40,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2014
 # Christian Layr <Christian.Layr@unisg.ch>, 2014
@@ -51,7 +51,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Alexander L. <alexander.lohberg@paluno.uni-due.de>, 2014
 # Christian Layr <Christian.Layr@unisg.ch>, 2015
@@ -1729,15 +1729,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s Sekunde"
 msgstr[1] "%(value)s Sekunden"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "Untertitel werden angezeigt wenn"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "Untertitel einschalten"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "Untertitel ausschalten"
 
