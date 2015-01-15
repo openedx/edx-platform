@@ -141,4 +141,4 @@ git+https://github.com/mitocw/django-cas.git
 edx-submissions==0.0.7
 
 # Appsembler
-python-intercom==0.2.13
+-r appsembler.txt
