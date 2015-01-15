@@ -6,7 +6,8 @@ import unittest
 from tempfile import mkdtemp
 import itertools
 from shutil import rmtree
-
+from bson.code import Code
+import datetime
 import ddt
 #from nose.plugins.attrib import attr
 
@@ -31,7 +32,7 @@ except ImportError:
     CodeBlockTimer = None
 
 # Number of assets saved in the modulestore per test run.
-ASSET_AMOUNT_PER_TEST = (1, 10, 100, 1000, 10000)
+ASSET_AMOUNT_PER_TEST = (0, 1, 10, 100, 1000, 10000)
 
 # Use only this course in asset metadata performance testing.
 COURSE_NAME = 'manual-testing-complete'
@@ -160,7 +161,7 @@ class FindAssetTest(unittest.TestCase):
     classes with different amounts of asset metadata.
     """
 
-    # Use this attribute to skip this test on regular unittest CI runs.
+    # Use this attr to skip this test on regular unittest CI runs.
     perf_test = True
 
     def setUp(self):
@@ -233,3 +234,79 @@ class FindAssetTest(unittest.TestCase):
                             __ = source_store.get_all_asset_metadata(
                                 source_course_key, 'asset', start=start_middle, sort=sort, maxresults=50
                             )
+
+
+@ddt.ddt
+# Eventually, exclude this attribute from regular unittests while running *only* tests
+# with this attribute during regular performance tests.
+# @attr("perf_test")
+@unittest.skip
+class TestModulestoreAssetSize(unittest.TestCase):
+    """
+    This class exists to measure the size of asset metadata in ifferent modulestore
+    classes with different amount of asset metadata.
+    """
+
+    # Use this attribute to skip this test on regular unittest CI runs.
+    perf_test = True
+
+    test_run_time = datetime.datetime.now()
+
+    @ddt.data(*itertools.product(
+        MODULESTORE_SETUPS,
+        ASSET_AMOUNT_PER_TEST
+    ))
+    @ddt.unpack
+    def test_asset_sizes(self, source_ms, num_assets):
+        """
+        Generate timings for different amounts of asset metadata and different modulestores.
+        """
+        # First, make the fake asset metadata.
+        make_asset_xml(num_assets, ASSET_XML_PATH)
+        validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
+
+        # Construct the contentstore for storing the first import
+        with MongoContentstoreBuilder().build() as source_content:
+            # Construct the modulestore for storing the first import (using the previously created contentstore)
+            with source_ms.build(source_content) as source_store:
+                source_course_key = source_store.make_course_key('a', 'course', 'course')
+
+                import_from_xml(
+                    source_store,
+                    'test_user',
+                    TEST_DATA_ROOT,
+                    course_dirs=TEST_COURSE,
+                    static_content_store=source_content,
+                    target_course_id=source_course_key,
+                    create_course_if_not_present=True,
+                    raise_on_failure=True,
+                )
+
+                asset_collection = source_ms.asset_collection()
+                # Ensure the asset collection exists.
+                if asset_collection.name in asset_collection.database.collection_names():
+
+                    # Map gets the size of each structure.
+                    mapper = Code("""
+                        function() { emit("size", (this == null) ? 0 : Object.bsonsize(this)) }
+                        """)
+
+                    # Reduce finds the largest structure size and returns only it.
+                    reducer = Code("""
+                        function(key, values) {
+                            var max_size = 0;
+                            for (var i=0; i < values.length; i++) {
+                                if (values[i] > max_size) {
+                                    max_size = values[i];
+                                }
+                            }
+                            return max_size;
+                        }
+                    """)
+
+                    results = asset_collection.map_reduce(mapper, reducer, "size_results")
+                    result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
+                        self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]
+                    )
+                    with open("bson_sizes.txt", "a") as f:
+                        f.write(result_str)
