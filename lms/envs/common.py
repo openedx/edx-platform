@@ -314,6 +314,12 @@ FEATURES = {
 
     # let students save and manage their annotations
     'ENABLE_EDXNOTES': False,
+
+    # Milestones application flag
+    'MILESTONES_APP': False,
+
+    # Prerequisite courses feature flag
+    'ENABLE_PREREQUISITE_COURSES': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1643,6 +1649,7 @@ if FEATURES.get('AUTH_USE_CAS'):
     INSTALLED_APPS += ('django_cas',)
     MIDDLEWARE_CLASSES += ('django_cas.middleware.CASMiddleware',)
 
+
 ###################### Registration ##################################
 
 # For each of the fields, give one of the following values:
@@ -1912,7 +1919,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 for app_name in OPTIONAL_APPS:

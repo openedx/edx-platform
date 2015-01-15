@@ -95,3 +95,9 @@ class DashboardPage(PageObject):
             modal_is_visible = self.q(css='section#change_language.modal').visible
             return (language_is_selected and not modal_is_visible)
         return EmptyPromise(_check_func, "language changed and modal hidden")
+
+    def pre_requisite_message_displayed(self):
+        """
+        Verify if pre-requisite course messages are being displayed.
+        """
+        return self.q(css='section.prerequisites > .tip').visible

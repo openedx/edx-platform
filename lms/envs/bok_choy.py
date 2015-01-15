@@ -83,6 +83,12 @@ LOG_OVERRIDES = [
 for log_name, log_level in LOG_OVERRIDES:
     logging.getLogger(log_name).setLevel(log_level)
 
+# Enable milestones app
+FEATURES['MILESTONES_APP'] = True
+
+# Enable pre-requisite course
+FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 

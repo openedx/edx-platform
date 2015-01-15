@@ -56,6 +56,7 @@ import shoppingcart
 from shoppingcart.models import CourseRegistrationCode
 from shoppingcart.utils import is_shopping_cart_enabled
 from opaque_keys import InvalidKeyError
+from util.milestones_helpers import get_prerequisite_courses_display
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -348,6 +349,17 @@ def _index_bulk_op(request, course_key, chapter, section, position):
         # TODO (vshnayder): do course instructors need to be registered to see course?
         log.debug(u'User %s tried to view course %s but is not enrolled', user, course.location.to_deprecated_string())
         return redirect(reverse('about_course', args=[course_key.to_deprecated_string()]))
+
+    # see if all pre-requisites (as per the milestones app feature) have been fulfilled
+    # Note that if the pre-requisite feature flag has been turned off (default) then this check will
+    # always pass
+    if not has_access(user, 'view_courseware_with_prerequisites', course):
+        # prerequisites have not been fulfilled therefore redirect to the Dashboard
+        log.info(
+            u'User %d tried to view course %s '
+            u'without fulfilling prerequisites',
+            user.id, unicode(course.id))
+        return redirect(reverse('dashboard'))
 
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
@@ -757,8 +769,13 @@ def course_about(request, course_id):
         else:
             course_target = reverse('about_course', args=[course.id.to_deprecated_string()])
 
-        show_courseware_link = (has_access(request.user, 'load', course) or
-                                settings.FEATURES.get('ENABLE_LMS_MIGRATION'))
+        show_courseware_link = (
+            (
+                has_access(request.user, 'load', course)
+                and has_access(request.user, 'view_courseware_with_prerequisites', course)
+            )
+            or settings.FEATURES.get('ENABLE_LMS_MIGRATION')
+        )
 
         # Note: this is a flow for payment for course registration, not the Verified Certificate flow.
         registration_price = 0
@@ -790,6 +807,9 @@ def course_about(request, course_id):
 
         is_shib_course = uses_shib(course)
 
+        # get prerequisite courses display names
+        pre_requisite_courses = get_prerequisite_courses_display(course)
+
         return render_to_response('courseware/course_about.html', {
             'course': course,
             'staff_access': staff_access,
@@ -811,6 +831,7 @@ def course_about(request, course_id):
             'disable_courseware_header': True,
             'is_shopping_cart_enabled': _is_shopping_cart_enabled,
             'cart_link': reverse('shoppingcart.views.show_cart'),
+            'pre_requisite_courses': pre_requisite_courses
         })
 
 

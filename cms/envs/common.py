@@ -128,6 +128,12 @@ FEATURES = {
     # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
     # and libraries created with split.
     'ENABLE_CONTENT_LIBRARIES': False,
+
+    # Milestones application flag
+    'MILESTONES_APP': False,
+
+    # Prerequisite courses feature flag
+    'ENABLE_PREREQUISITE_COURSES': False,
 }
 ENABLE_JASMINE = False
 
@@ -744,7 +750,8 @@ OPTIONAL_APPS = (
     'openassessment.xblock',
 
     # edxval
-    'edxval'
+    'edxval',
+    'milestones'
 )
 
 
