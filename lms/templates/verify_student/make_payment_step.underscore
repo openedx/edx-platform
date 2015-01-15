@@ -15,7 +15,7 @@
           ) %>
       </h3>
       <div class="instruction">
-        <%- gettext( "We have successfully verified your identity. You can now enter your payment information and complete your enrollment." ) %>
+        <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
       </div>
     <% } %>
 
