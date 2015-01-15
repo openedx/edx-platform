@@ -29,7 +29,22 @@ class SettingsPage(CoursePage):
         """
         Returns the enable entrance exam checkbox.
         """
-        return self.q(css='#entrance-exam-enabled')
+        return self.q(css='#entrance-exam-enabled').execute()
+
+    def require_entrance_exam(self, required=True):
+        """
+        Set the entrance exam requirement via the checkbox.
+        """
+        checkbox = self.entrance_exam_field[0]
+        selected = checkbox.is_selected()
+        if required and not selected:
+            checkbox.click()
+            self.wait_for_element_visibility('#entrance-exam-minimum-score-pct',
+                'Entrance exam minimum score percent is visible')
+        if not required and selected:
+            checkbox.click()
+            self.wait_for_element_invisibility('#entrance-exam-minimum-score-pct',
+                'Entrance exam minimum score percent is visible')
 
     def save_changes(self, wait_for_confirmation=True):
         """
