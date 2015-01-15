@@ -577,8 +577,8 @@ class TestCourseGrader(TestSubmittingProblems):
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
         self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
-        self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])  # Order matters
-        self.check_grade_percent(0.75)
+        self.assertEqual(self.earned_hw_scores(), [])  # Order matters
+        self.check_grade_percent(0)
 
     def test_dropping_all_correct(self):
         """
