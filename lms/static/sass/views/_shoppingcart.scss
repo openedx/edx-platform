@@ -213,7 +213,7 @@
   }
 
   .course-image {
-    display: inline-block;
+    float: left;
     width: 223px;
     margin-right: ($baseline/2);
     vertical-align: top;
@@ -221,7 +221,7 @@
 
   .enrollment-details {
     margin-bottom: $baseline;
-    display: inline-block;
+    float: left;
     width: calc(100% - 237px);
 
     .sub-title {
