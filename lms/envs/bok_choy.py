@@ -107,6 +107,7 @@ PASSWORD_COMPLEXITY = {}
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+MOCK_SEARCH_BACKING_FILE = (TEST_ROOT / "index_file.dat").abspath()
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.

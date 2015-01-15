@@ -552,7 +552,7 @@ class DraftModuleStore(MongoModuleStore):
 
         self.do_index(location, delete=True)
 
-    def _delete_subtree(self, location, as_functions):
+    def _delete_subtree(self, location, as_functions, draft_only=False):
         """
         Internal method for deleting all of the subtree whose revisions match the as_functions
         """
