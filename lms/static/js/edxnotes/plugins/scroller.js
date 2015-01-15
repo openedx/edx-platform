@@ -47,10 +47,15 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     highlight = $(note.highlights[0]);
                     offset = highlight.position();
                     // Open the note
-                    this.annotator.showFrozenViewer([note], {
-                        top: offset.top + 0.5 * highlight.height(),
-                        left: offset.left + 0.5 * highlight.width()
-                    });
+                    this.annotator.plugins.Accessibility.showViewer(
+                        {
+                            top: offset.top + 0.5 * highlight.height(),
+                            left: offset.left + 0.5 * highlight.width()
+                        },
+                        note
+                    );
+                    // Freeze the viewer
+                    this.annotator.freezeAll();
                     // Scroll to highlight
                     this.scrollIntoView(highlight);
                 }
