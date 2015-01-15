@@ -346,3 +346,82 @@ def verify_expected_problem_visibility(test, courseware_page, expected_problems)
     )
     for index, expected_problem in enumerate(expected_problems):
         test.assertIn(expected_problem, courseware_page.xblock_components[index].text)
+
+
+class UnitPageSequenceBarTest(StaffViewTest):
+    """
+    Verifies that sequence bar shows correct titles with content groups.
+    """
+
+    def setUp(self):
+        super(UnitPageSequenceBarTest, self).setUp()
+        # pylint: disable=protected-access
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,beta',
+                        'Content Group Partition',
+                        [Group("0", 'alpha'), Group("1", 'beta')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Populates test course with chapter, sequential, and 3 problems.
+        One problem is visible to all, one problem is visible only to Group "alpha", and
+        one problem is visible only to Group "beta".
+        """
+        problem_data = dedent("""
+            <problem markdown="Simple Problem" max_attempts="" weight="">
+              <p>Choose Yes.</p>
+              <choiceresponse>
+                <checkboxgroup direction="vertical">
+                  <choice correct="true">Yes</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+        """)
+
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Vertical').add_children(
+                        XBlockFixtureDesc(
+                            'problem', 'Visible to alpha', data=problem_data, metadata={"group_access": {0: [0]}}
+                        ),
+                        XBlockFixtureDesc(
+                            'problem', 'Visible to beta', data=problem_data, metadata={"group_access": {0: [1]}}
+                        ),
+                        XBlockFixtureDesc('problem', 'Visible to everyone', data=problem_data)
+                    )
+                )
+            )
+        )
+
+    def test_sequence_bar_titles(self):
+        """
+        Scenario: When previewing in LMS, sequence bar only shows titles of visible problems.
+        Given I have a course with a cohort user partition
+        And problems that are associated with specific groups in the user partition
+        When I view the courseware in the LMS with staff access
+        Then sequence bar show titles of all problems
+        And I change to previewing as a Student in group beta
+        Then sequence bar only show titles of problems visible to group beta
+        """
+        staff_titles = ['Visible to alpha', 'Visible to beta', 'Visible to everyone']
+        student_beta_titles = ['Visible to beta', 'Visible to everyone']
+        course_page = self._goto_staff_page()
+
+        course_nav = CourseNavPage(self.browser)
+        actual = course_nav.sequence_bar_tooltips()
+        self.assertItemsEqual(staff_titles, actual)
+
+        course_page.set_staff_view_mode('Student in beta')
+        course_nav = CourseNavPage(self.browser)
+        actual = course_nav.sequence_bar_tooltips()
+        self.assertItemsEqual(student_beta_titles, actual)

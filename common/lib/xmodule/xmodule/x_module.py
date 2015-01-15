@@ -398,7 +398,7 @@ class XModuleMixin(XBlockMixin):
         the display_names of all its leaf nodes.
         """
         if self.has_children:
-            return sum((child.get_content_titles() for child in self.get_children()), [])
+            return sum((child.get_content_titles() for child in self.get_display_items()), [])
         else:
             return [self.display_name_with_default]
 
