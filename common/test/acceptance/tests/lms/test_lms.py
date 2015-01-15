@@ -136,7 +136,7 @@ class LoginFromCombinedPageTest(UniqueCourseTest):
 
         # Expect that we're shown a failure message
         self.assertIn(
-            "No active user with the provided email address exists.",
+            "No user with the provided email address exists.",
             self.login_page.wait_for_errors()
         )
 
