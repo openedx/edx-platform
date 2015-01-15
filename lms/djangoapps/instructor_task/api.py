@@ -25,6 +25,7 @@ from instructor_task.tasks import (
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
                                         encode_problem_and_student_input,
+                                        encode_entrance_exam_and_student_input,
                                         submit_task)
 from bulk_email.models import CourseEmail
 
@@ -143,6 +144,37 @@ def submit_reset_problem_attempts_for_all_students(request, usage_key):  # pylin
     task_type = 'reset_problem_attempts'
     task_class = reset_problem_attempts
     task_input, task_key = encode_problem_and_student_input(usage_key)
+    return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
+
+
+def submit_reset_problem_attempts_in_entrance_exam(request, usage_key, student):  # pylint: disable=invalid-name
+    """
+    Request to have attempts reset for a entrance exam as a background task.
+
+    Problem attempts for all problems in entrance exam will be reset
+    for specified student. If student is None problem attempts will be
+    reset for all students.
+
+    Parameters are `usage_key`, which must be a :class:`Location`
+    representing entrance exam section and the `student` as a User object.
+
+    ItemNotFoundError is raised if entrance exam does not exists for given
+    usage_key, AlreadyRunningError is raised if the entrance exam
+    is already being reset.
+
+    This method makes sure the InstructorTask entry is committed.
+    When called from any view that is wrapped by TransactionMiddleware,
+    and thus in a "commit-on-success" transaction, an autocommit buried within here
+    will cause any pending transaction to be committed by a successful
+    save here.  Any future database operations will take place in a
+    separate transaction.
+    """
+    # check arguments:  make sure entrance exam(section) exists for given usage_key
+    modulestore().get_item(usage_key)
+
+    task_type = 'reset_problem_attempts'
+    task_class = reset_problem_attempts
+    task_input, task_key = encode_entrance_exam_and_student_input(usage_key, student)
     return submit_task(request, task_type, task_class, usage_key.course_key, task_input, task_key)
 
 

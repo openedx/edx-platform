@@ -9,7 +9,7 @@ from django.conf import settings
 
 from edxmako.shortcuts import render_to_string
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.content import StaticContent
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -415,3 +415,24 @@ def get_studio_url(course, page):
     if is_studio_course and is_mongo_course:
         studio_link = get_cms_course_link(course, page)
     return studio_link
+
+
+def get_problems_in_section(section):
+    """
+    This returns list of problems in a section.
+    """
+
+    problem_descriptors = []
+    exam_key = UsageKey.from_string(section)
+    # it will be a Mongo performance boost, if you pass in a depth=3 argument here
+    # as it will optimize round trips to the database to fetch all children for the current node
+    section = modulestore().get_item(exam_key, depth=3)
+
+    # iterate over section, sub-section,  unit
+    for subsection in section.get_children():
+        for vertical in subsection.get_children():
+            for unit in vertical.get_children():
+                if unit.location.category == 'problem':
+                    problem_descriptors.append(unit)
+
+    return problem_descriptors
