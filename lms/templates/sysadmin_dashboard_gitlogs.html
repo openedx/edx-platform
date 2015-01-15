@@ -12,6 +12,23 @@
   <%static:css group='style-course'/>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
   <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.axislabels.js')}"></script>
+  <script>
+      $(function() {
+          $(".toggle-import-log").click(function(e) {
+              var self = $(this);
+              var id = self.data("import-log");
+              $("#import-log-" + id).toggle({
+                  duration: 200
+              });
+              if (self.html() === "[ + ]") {
+                  self.html("[ &#8722; ]");
+              } else {
+                  self.html("[ + ]");
+              }
+              e.preventDefault();
+          });
+      });
+  </script>
 </%block>
 <style type="text/css">
 a.active-section {
@@ -41,6 +58,9 @@ table.stat_table td {
 	border-style: solid;
 	border-color: #666666;
 	background-color: #ffffff;
+}
+.import-log {
+    display: none;
 }
 
 a.selectedmode { background-color: yellow; }
@@ -82,11 +102,11 @@ textarea {
           %endif
       %endif
 
-      <table class="stat_table">
+      <table class="stat_table" width="100%">
         <thead>
           <tr>
-            <th>${_('Date')}</th>
-            <th>${_('Course ID')}</th>
+            <th width="15%">${_('Date')}</th>
+            <th width="15%">${_('Course ID')}</th>
             ## Translators: Git is a version-control system; see http://git-scm.com/about
             <th>${_('Git Action')}</th>
           </tr>
@@ -96,11 +116,11 @@ textarea {
           if course_id == None:
               logs = cilset[:10]
           else:
-              logs = cilset[:2]
+              logs = cilset[:5]
 
           cil = None
           %>
-          % for cil in logs:
+          % for index, cil in enumerate(logs):
               <%
                   # Appropriate datetime string for current locale and timezone
                   date = get_time_display(cil.created.replace(tzinfo=UTC),
@@ -108,13 +128,22 @@ textarea {
               %>
               <tr>
                 <td>${date}</td>
-                <td><a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">${cil.course_id | h}</a></td>
-                <td>${cil.git_log}</td>
+                <td>
+                  <a href="${reverse('gitlogs_detail', kwargs={'course_id': unicode(cil.course_id)})}">
+                    ${cil.course_id | h}
+                  </a>
+                </td>
+                <td>
+                  %if course_id is not None:
+                      <a class="toggle-import-log" data-import-log="${index}" href="#">[ + ]</a>
+                  %endif
+                  ${cil.git_log}
+                </td>
               </tr>
 
               ## Show the full log of the latest import if viewing logs for a specific course
               %if course_id is not None:
-                  <tr>
+                  <tr class="import-log" id="import-log-${index}">
                     <td colspan="3">
                       <pre>
                         ${cil.import_log | h}
