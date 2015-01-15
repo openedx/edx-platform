@@ -26,7 +26,7 @@
                 'mouseover.TooltipManager': this.showTooltip,
                 'mousemove.TooltipManager': this.moveTooltip,
                 'mouseout.TooltipManager': this.hideTooltip,
-                'click.TooltipManager': this.hideTooltip
+                'click.TooltipManager': this.click
             }, this.SELECTOR);
         },
 
@@ -66,6 +66,18 @@
             // Wait for a 50ms before hiding the tooltip to avoid blinking when
             // the item contains nested elements.
             this.tooltipTimer = setTimeout(this.hide, 50);
+        },
+
+        click: function(event) {
+            var showOnClick = !!$(event.currentTarget).data('tooltip-show-on-click'); // Default is false
+            if (showOnClick) {
+                this.show();
+                if (this.tooltipTimer) {
+                    clearTimeout(this.tooltipTimer);
+                }
+            } else {
+                this.hideTooltip(event);
+            }
         },
 
         destroy: function () {

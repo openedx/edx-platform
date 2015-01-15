@@ -162,6 +162,12 @@ div.problem {
         white-space: nowrap;
         overflow: hidden;
       }
+      span.clarification i {
+        font-style: normal;
+        &:hover {
+          color: $blue;
+        }
+      }
     }
 
     &.unanswered {
