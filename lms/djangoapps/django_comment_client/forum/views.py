@@ -5,7 +5,6 @@ Views handling read (GET) requests for the Discussion tab and inline discussions
 from functools import wraps
 import json
 import logging
-import xml.sax.saxutils as saxutils
 
 from django.contrib.auth.decorators import login_required
 from django.core.context_processors import csrf
@@ -42,13 +41,6 @@ THREADS_PER_PAGE = 20
 INLINE_THREADS_PER_PAGE = 20
 PAGES_NEARBY_DELTA = 2
 log = logging.getLogger("edx.discussions")
-
-
-def _attr_safe_json(obj):
-    """
-    return a JSON string for obj which is safe to embed as the value of an attribute in a DOM node
-    """
-    return saxutils.escape(json.dumps(obj), {'"': '&quot;'})
 
 
 @newrelic.agent.function_trace()
@@ -199,6 +191,8 @@ def forum_form_discussion(request, course_key):
     user = cc.User.from_django_user(request.user)
     user_info = user.to_dict()
 
+    user_info["can_create_comment"] = cached_has_permission(user, "create_comment", course.id)
+
     try:
         unsafethreads, query_params = get_threads(request, course_key)   # This might process a search query
         is_staff = cached_has_permission(request.user, 'openclose_thread', course.id)
@@ -232,20 +226,20 @@ def forum_form_discussion(request, course_key):
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'staff_access': has_access(request.user, 'staff', course),
-            'threads': _attr_safe_json(threads),
+            'threads': json.dumps(threads),
             'thread_pages': query_params['num_pages'],
-            'user_info': _attr_safe_json(user_info),
+            'user_info': json.dumps(user_info),
             'flag_moderator': cached_has_permission(request.user, 'openclose_thread', course.id) or has_access(request.user, 'staff', course),
-            'annotated_content_info': _attr_safe_json(annotated_content_info),
+            'annotated_content_info': json.dumps(annotated_content_info),
             'course_id': course.id.to_deprecated_string(),
-            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'roles': json.dumps(utils.get_role_ids(course_key)),
             'is_moderator': cached_has_permission(request.user, "see_all_cohorts", course_key),
             'cohorts': course_settings["cohorts"],  # still needed to render _thread_list_template
             'user_cohort': user_cohort_id,  # read from container in NewPostView
             'is_course_cohorted': is_course_cohorted(course_key),  # still needed to render _thread_list_template
             'sort_preference': user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': json.dumps(course_settings)
         }
         # print "start rendering.."
         return render_to_response('discussion/index.html', context)
@@ -327,14 +321,14 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'discussion_id': discussion_id,
             'csrf': csrf(request)['csrf_token'],
             'init': '',   # TODO: What is this?
-            'user_info': _attr_safe_json(user_info),
-            'annotated_content_info': _attr_safe_json(annotated_content_info),
+            'user_info': json.dumps(user_info),
+            'annotated_content_info': json.dumps(annotated_content_info),
             'course': course,
             #'recent_active_threads': recent_active_threads,
             'course_id': course.id.to_deprecated_string(),   # TODO: Why pass both course and course.id to template?
             'thread_id': thread_id,
-            'threads': _attr_safe_json(threads),
-            'roles': _attr_safe_json(utils.get_role_ids(course_key)),
+            'threads': json.dumps(threads),
+            'roles': json.dumps(utils.get_role_ids(course_key)),
             'is_moderator': is_moderator,
             'thread_pages': query_params['num_pages'],
             'is_course_cohorted': is_course_cohorted(course_key),
@@ -343,7 +337,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
             'user_cohort': user_cohort,
             'sort_preference': cc_user.default_sort_key,
             'category_map': course_settings["category_map"],
-            'course_settings': _attr_safe_json(course_settings)
+            'course_settings': json.dumps(course_settings)
         }
         return render_to_response('discussion/index.html', context)
 
@@ -392,7 +386,7 @@ def user_profile(request, course_key, user_id):
                 'discussion_data': threads,
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'annotated_content_info': json.dumps(annotated_content_info),
             })
         else:
             context = {
@@ -400,9 +394,9 @@ def user_profile(request, course_key, user_id):
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': _attr_safe_json(threads),
-                'user_info': _attr_safe_json(user_info),
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'threads': json.dumps(threads),
+                'user_info': json.dumps(user_info),
+                'annotated_content_info': json.dumps(annotated_content_info),
                 'page': query_params['page'],
                 'num_pages': query_params['num_pages'],
             }
@@ -478,9 +472,9 @@ def followed_threads(request, course_key, user_id):
                 'user': request.user,
                 'django_user': User.objects.get(id=user_id),
                 'profiled_user': profiled_user.to_dict(),
-                'threads': _attr_safe_json(threads),
-                'user_info': _attr_safe_json(user_info),
-                'annotated_content_info': _attr_safe_json(annotated_content_info),
+                'threads': json.dumps(threads),
+                'user_info': json.dumps(user_info),
+                'annotated_content_info': json.dumps(annotated_content_info),
                 #                'content': content,
             }
 

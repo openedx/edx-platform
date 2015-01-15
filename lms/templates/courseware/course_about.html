@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -68,8 +68,9 @@
         perms_error = _('The currently logged-in user account does not have permission to enroll in this course. '
                         'You may need to {start_logout_tag}log out{end_tag} then try the register button again. '
                         'Please visit the {start_help_tag}help page{end_tag} for a possible solution.').format(
-                          start_help_tag="<a href='{url}'>".format(url=marketing_link('FAQ')), end_tag='</a>',
-                          start_logout_tag="<a href='{url}'>".format(url=reverse('logout'))
+                          start_help_tag=HTML("<a href='{url}'>").format(url=marketing_link('FAQ')),
+                          start_logout_tag=HTML("<a href='{url}'>").format(url=reverse('logout')),
+                          end_tag=HTML("</a>"),
                           )
       %>
     $('#class_enroll_form').on('ajax:complete', function(event, xhr) {
@@ -144,7 +145,10 @@
 
         %elif in_cart:
           <span class="add-to-cart">
-            ${_('This course is in your <a href="{cart_link}">cart</a>.').format(cart_link=cart_link)}
+              ${_('This course is in your {link_start}cart{link_end}.').format(
+                    link_start=HTML('<a href="{}">').format(cart_link),
+                    link_end=HTML('</a>'),
+                    )}
           </span>
         % elif is_course_full:
           <span class="register disabled">
@@ -174,7 +178,7 @@
           <div id="register_error"></div>
         %else:
           <a href="#" class="register">
-            ${_("Register for {course.display_number_with_default}").format(course=course) | h}
+            ${_("Register for {course.display_number_with_default}").format(course=course)}
           </a>
           <div id="register_error"></div>
         %endif
@@ -217,7 +221,7 @@
       </nav>
 
       <div class="inner-wrapper">
-        ${get_course_about_section(course, "overview")}
+        ${get_course_about_section(course, "overview") | n}
       </div>
     </section>
 
@@ -271,13 +275,13 @@
                 ).replace(u" ", u"%20")
               %>
               <a href="${tweet_action}" class="share">
-                <i class="icon fa fa-twitter"></i><span class="sr">Tweet that you've registered for this course</span>
+                <i class="icon fa fa-twitter"></i><span class="sr">${_("Tweet that you've registered for this course")}</span>
               </a>
               <a href="${facebook_link}" class="share">
-                <i class="icon fa fa-thumbs-up"></i><span class="sr">Post a Facebook message to say you've registered for this course</span>
+                <i class="icon fa fa-thumbs-up"></i><span class="sr">${_("Post a Facebook message to say you've registered for this course")}</span>
               </a>
               <a href="${email_subject}" class="share">
-                <i class="icon fa fa-envelope"></i><span class="sr">Email someone to say you've registered for this course</span>
+                <i class="icon fa fa-envelope"></i><span class="sr">${_("Email someone to say you've registered for this course")}</span>
               </a>
             % endif
           </div>
@@ -285,7 +289,7 @@
         </header>
 
         <ol class="important-dates">
-          <li class="important-dates-item"><i class="icon fa fa-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default | h}</span></li>
+          <li class="important-dates-item"><i class="icon fa fa-info-sign"></i><p class="important-dates-item-title">${_("Course Number")}</p><span class="important-dates-item-text course-number">${course.display_number_with_default}</span></li>
           % if not course.start_date_is_still_default:
             <li class="important-dates-item"><i class="icon fa fa-calendar"></i><p class="important-dates-item-title">${_("Classes Start")}</p><span class="important-dates-item-text start-date">${course.start_datetime_text()}</span></li>
           % endif
@@ -336,7 +340,7 @@
         <section>
           ## "MITOpenCourseware" should *not* be translated
           <h2 class="opencourseware">MITOpenCourseware</h2>
-             ${get_course_about_section(course, "ocw_links")}
+             ${get_course_about_section(course, "ocw_links") | n}
         </section>
       </section>
       %endif
@@ -352,7 +356,7 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <input name="course_id" type="hidden" value="${course.id | h}">
+        <input name="course_id" type="hidden" value="${course.id}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">

@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.template.defaultfilters import escapejs %>
 
@@ -99,7 +99,7 @@ $(document).ready(function() {
             <li class="wizard-step step-proceed">
               <form id="pay_form" method="post" action="${purchase_endpoint}">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-                <input type="hidden" name="course_id" value="${course_id | h}" />
+                <input type="hidden" name="course_id" value="${course_id}" />
                 <button type="submit" class="action-primary" id="pay_button">Go to Secure Payment</button>
               </form>
             </li>

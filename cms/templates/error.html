@@ -1,6 +1,8 @@
-<%! from django.utils.translation import ugettext as _ %>
 <%inherit file="base.html" />
-<%! from django.core.urlresolvers import reverse %>
+<%!
+from django.core.urlresolvers import reverse
+from util.markup import HTML, ugettext as _
+%>
 <%block name="bodyclass">error</%block>
 <%block name="title">
   % if error == '404':
@@ -14,14 +16,14 @@
 from django.conf import settings
 
 if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="//{domain}/discussion/new" class="show-tender" title="{title}">'.format(
+  help_link_start = HTML('<a href="//{domain}/discussion/new" class="show-tender" title="{title}">').format(
     domain=settings.TENDER_DOMAIN,
     title=_("Use our feedback tool, Tender, to share your feedback")
   ),
-  help_link_end = '</a>'
+  help_link_end = HTML('</a>')
 else:
-  help_link_start = '<a href="mailto:{email}">'.format(email=settings.TECH_SUPPORT_EMAIL)
-  help_link_end = '</a>'
+  help_link_start = HTML('<a href="mailto:{email}">').format(email=settings.TECH_SUPPORT_EMAIL)
+  help_link_end = HTML('</a>')
 %>
 
 <%block name="content">

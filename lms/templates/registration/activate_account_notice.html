@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <div class="wrapper-msg urgency-high">
     <div class="msg">
         <div class="msg-content">
@@ -8,7 +8,9 @@
                         "You've successfully created an account on {platform_name}. We've sent an account "
                         "activation message to {email}. To activate your account and start enrolling in "
                         "courses, click the link in the message."
-                        ).format(email="<strong>{}</strong>".format(email), platform_name=platform_name
+                        ).format(
+                            email=HTML("<strong>{}</strong>").format(email),
+                            platform_name=platform_name,
                     )}
                 </p>
             </div>

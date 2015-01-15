@@ -866,8 +866,6 @@ def mktg_course_about(request, course_id):
         org = request.GET.get('org')
         if org:
             org_list = org.split(',')
-            # HTML-escape the provided organization names
-            org_list = [cgi.escape(org) for org in org_list]
             if len(org_list) > 1:
                 if len(org_list) > 2:
                     # Translators: The join of three or more institution names (e.g., Harvard, MIT, and Dartmouth).

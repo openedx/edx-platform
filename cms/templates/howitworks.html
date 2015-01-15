@@ -3,7 +3,7 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.core.urlresolvers import reverse
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
 %>
 
 <%block name="title">${_("Welcome")}</%block>
@@ -16,7 +16,7 @@
     <header>
       ## "edX Studio" should not be translated
       <h1><span class="wrapper-text-welcome">${_("Welcome to {studio_name}").format(
-        studio_name='</span><span class="logo">{studio_name}</span>'.format(
+        studio_name=HTML('</span><span class="logo">{studio_name}</span>').format(
           studio_name=settings.STUDIO_NAME
         )
       )}</h1>
@@ -47,12 +47,16 @@
 
         <div class="copy">
           <h3>${_("Keeping Your Course Organized")}</h3>
-          <p>${_("The backbone of your course is how it is organized. {studio_name} offers an <strong>Outline</strong> editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+          <p>${_("The backbone of your course is how it is organized. {studio_name} offers an {em_start}Outline{em_end} editor, providing a simple hierarchy and easy drag and drop to help you and your students stay organized.").format(
+                em_start=HTML("<strong>"), em_end=HTML("</strong>"), studio_name=settings.STUDIO_SHORT_NAME,
+          )}</p>
 
           <ul class="list-proofpoints">
             <li class="proofpoint">
               <h4 class="title">${_("Simple Organization For Content")}</h4>
-              <p>${_("{studio_name} uses a simple hierarchy of <strong>sections</strong> and <strong>subsections</strong> to organize your content.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+              <p>${_("{studio_name} uses a simple hierarchy of {em_start}sections{em_end} and <strong>subsections</strong> to organize your content.").format(
+                  em_start=HTML("<strong>"), em_end=HTML("</strong>"), studio_name=settings.STUDIO_SHORT_NAME,
+              )}</p>
             </li>
 
             <li class="proofpoint">
@@ -62,7 +66,9 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Go A Week Or A Semester At A Time")}</h4>
-              <p>${_("Build and release <strong>sections</strong> to your students incrementally. You don't have to have it all done at once.")}</p>
+              <p>${_("Build and release {em_start}sections{em_end} to your students incrementally. You don't have to have it all done at once.").format(
+                  em_start=HTML("<strong>"), em_end=HTML("</strong>"),
+              )}</p>
             </li>
           </ul>
         </div>
@@ -125,7 +131,9 @@
 
             <li class="proofpoint">
               <h4 class="title">${_("Release-On Date Publishing")}</h4>
-              <p>${_("When you've finished a <strong>section</strong>, pick when you want it to go live and {studio_name} takes care of the rest. Build your course incrementally.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+              <p>${_("When you've finished a {em_start}section{em_end}, pick when you want it to go live and {studio_name} takes care of the rest. Build your course incrementally.").format(
+                  em_start=HTML("<strong>"), em_end=HTML("</strong>"), studio_name=settings.STUDIO_SHORT_NAME,
+              )}</p>
             </li>
 
             <li class="proofpoint">
@@ -147,7 +155,7 @@
 
     <ul class="list-actions">
       <li class="action-item">
-        <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up &amp; Start Making an {platform_name} Course").format(platform_name=settings.PLATFORM_NAME)}</a>
+        <a href="${reverse('signup')}" class="action action-primary">${_("Sign Up & Start Making an {platform_name} Course").format(platform_name=settings.PLATFORM_NAME) | n}</a>
       </li>
       <li class="action-item">
         <a href="${reverse('login')}" class="action action-secondary">${_("Already have a {studio_name} Account? Sign In").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>

@@ -3,7 +3,7 @@
 <%namespace file='main.html' import="login_query, stanford_theme_enabled"/>
 <%!
 from django.core.urlresolvers import reverse
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 
 # App that handles subdomain specific branding
 import branding
@@ -47,7 +47,7 @@ site_status_msg = get_site_status_msg(course_id)
     </h1>
 
     % if course:
-    <h2><span class="provider">${course.display_org_with_default | h}:</span> ${course.display_number_with_default | h} ${course.display_name_with_default}</h2>
+    <h2><span class="provider">${course.display_org_with_default}:</span> ${course.display_number_with_default} ${course.display_name_with_default}</h2>
     % endif
 
     % if user.is_authenticated():
@@ -132,7 +132,14 @@ site_status_msg = get_site_status_msg(course_id)
 </header>
 % if course:
 <!--[if lte IE 8]>
-<div class="ie-banner" aria-hidden="true">${_('<strong>Warning:</strong> Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(chrome_link='<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>', ff_link='<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>')}</div>
+<div class="ie-banner" aria-hidden="true">
+${_('{em_start}Warning:{em_end} Your browser is not fully supported. We strongly recommend using {chrome_link} or {ff_link}.').format(
+    em_start=HTML('<strong>'),
+    em_end=HTML('</strong>'),
+    chrome_link=HTML('<a href="https://www.google.com/intl/en/chrome/browser/" target="_blank">Chrome</a>'),
+    ff_link=HTML('<a href="http://www.mozilla.org/en-US/firefox/new/" target="_blank">Firefox</a>'),
+    )}
+</div>
 <![endif]-->
 % endif
 

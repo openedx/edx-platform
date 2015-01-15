@@ -1,0 +1,6 @@
+<li class="actions-item">
+    <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
+        <span class="action-label"><%- gettext("Edit") %></span>
+        <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
+    </a>
+</li>

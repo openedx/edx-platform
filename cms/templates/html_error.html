@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%block name="content">
@@ -16,7 +16,7 @@
         % if message:
         <p class="description">
             ${_("Error:")}
-            ${message | h}
+            ${message}
         </p>
         % endif
 

@@ -394,7 +394,7 @@ class SingleCohortedThreadTestCase(CohortedContentTestCase):
         html = response.content
 
         # Verify that the group name is correctly included in the HTML
-        self.assertRegexpMatches(html, r'&quot;group_name&quot;: &quot;student_cohort&quot;')
+        self.assertRegexpMatches(html, r'&#34;group_name&#34;: &#34;student_cohort&#34;')
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
@@ -909,10 +909,10 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertRegexpMatches(html, r'data-num-pages="1"')
         self.assertRegexpMatches(html, r'<span>1</span> discussion started')
         self.assertRegexpMatches(html, r'<span>2</span> comments')
-        self.assertRegexpMatches(html, r'&quot;id&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_ID))
-        self.assertRegexpMatches(html, r'&quot;title&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&quot;body&quot;: &quot;{}&quot;'.format(self.TEST_THREAD_TEXT))
-        self.assertRegexpMatches(html, r'&quot;username&quot;: &quot;{}&quot;'.format(self.student.username))
+        self.assertRegexpMatches(html, r'&#34;id&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_ID))
+        self.assertRegexpMatches(html, r'&#34;title&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#34;body&#34;: &#34;{}&#34;'.format(self.TEST_THREAD_TEXT))
+        self.assertRegexpMatches(html, r'&#34;username&#34;: &#34;{}&#34;'.format(self.student.username))
 
     def check_ajax(self, mock_request, **params):
         response = self.get_response(mock_request, params, HTTP_X_REQUESTED_WITH="XMLHttpRequest")

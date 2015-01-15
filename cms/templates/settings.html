@@ -1,11 +1,11 @@
 <%inherit file="base.html" />
 <%def name="online_help_token()"><% return "schedule" %></%def>
-<%block name="title">${_("Schedule &amp; Details Settings")}</%block>
+<%block name="title">${_("Schedule & Details Settings")}</%block>
 <%block name="bodyclass">is-signedin course schedule view-settings feature-upload</%block>
 
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
   from contentstore import utils
   from contentstore.views.course import should_show_group_configurations_page
   import urllib
@@ -112,7 +112,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                 'Your course summary page will not be viewable until your course '
                 'has been announced. To provide content for the page and preview '
                 'it, follow the instructions provided by your {manager}.').format(
-                  manager='<abbr title="{program_manager}">{pm}</abbr>'.format(
+                  manager=HTML('<abbr title="{program_manager}">{pm}</abbr>').format(
                     ## Translators: This is a job title
                     program_manager=_("Program Manager"),
                     ## Translators: This is an abbreviation for "Program Manager", which is a job title
@@ -197,11 +197,12 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             <h3 class="title">${_("These Dates Are Not Used When Promoting Your Course")}</h3>
             <div class="copy">
               <p>${_(
-                'These dates impact <strong>when your courseware can be viewed</strong>, '
+                'These dates impact {em_start}when your courseware can be viewed{em_end}, '
                 'but they are <strong>not the dates shown on your course summary page</strong>. '
                 'To provide the course start and registration dates as shown on your course '
                 'summary page, follow the instructions provided by your {manager}.').format(
-                  manager='<abbr title="{program_manager}">{pm}</abbr>'.format(
+                  em_start=HTML("<strong>"), em_end=HTML("</strong>"),
+                  manager=HTML('<abbr title="{program_manager}">{pm}</abbr>').format(
                     ## Translators: This is a job title
                     program_manager=_("Program Manager"),
                     ## Translators: This is an abbreviation for "Program Manager", which is a job title
@@ -250,7 +251,10 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                     </span>
 
                     <span class="msg msg-help">
-                    ${_("You can manage this image along with all of your other <a href='{}'>files &amp; uploads</a>").format(upload_asset_url)}
+                    ${_("You can manage this image along with all of your other {link_start}files & uploads{link_end}").format(
+                        link_start=HTML("<a href='{}'>").format(upload_asset_url),
+                        link_end=HTML("</a>"),
+                        )}
                     </span>
 
                     % else:

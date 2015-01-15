@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
 
 <div class="wrapper wrapper-component-action-header">
@@ -27,4 +27,4 @@
     </ul>
 </div>
 <span data-tooltip="${_("Drag to reorder")}" class="drag-handle action"></span>
-${preview}
+${preview | n}

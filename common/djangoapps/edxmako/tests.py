@@ -108,7 +108,7 @@ class MakoMiddlewareTest(TestCase):
         the threadlocal REQUEST_CONTEXT.context. This is meant to run in CMS.
         """
         del context_mock.context
-        self.assertIn("We're having trouble rendering your component", render_to_string("html_error.html", None))
+        self.assertIn("We&#39;re having trouble rendering your component", render_to_string("html_error.html", None))
 
 
 def mako_middleware_process_request(request):

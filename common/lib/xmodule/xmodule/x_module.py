@@ -330,7 +330,7 @@ class XModuleMixin(XBlockMixin):
         name = self.display_name
         if name is None:
             name = self.url_name.replace('_', ' ')
-        return name.replace('<', '&lt;').replace('>', '&gt;')
+        return name
 
     @property
     def xblock_kvs(self):

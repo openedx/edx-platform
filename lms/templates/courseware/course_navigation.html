@@ -1,5 +1,5 @@
 ## mako
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%page args="active_page=None" />
 
 <%
@@ -16,7 +16,6 @@ def url_class(is_active):
 <%! from courseware.access import has_access %>
 <%! from django.conf import settings %>
 <%! from django.core.urlresolvers import reverse %>
-<%! from django.utils.translation import ugettext as _ %>
 <%! from courseware.views import notification_image_for_tab %>
 <%! from student.models import CourseEnrollment%>
 <%
@@ -33,8 +32,8 @@ def url_class(is_active):
             tab_image = notification_image_for_tab(tab, user, course)
         %>
           <li>
-             <a href="${tab.link_func(course, reverse) | h}" class="${url_class(tab_is_active)}">
-                 ${_(tab.name) | h}
+             <a href="${tab.link_func(course, reverse)}" class="${url_class(tab_is_active)}">
+                 ${_(tab.name)}
                  % if tab_is_active:
                    <span class="sr">, current location</span>
                  %endif

@@ -5,7 +5,7 @@
 from courseware.courses import course_image_url, get_course_about_section
 from django.core.urlresolvers import reverse
 from edxmako.shortcuts import marketing_link
-from django.utils.translation import ugettext as _
+from util.markup import ugettext as _
 
 %>
 
@@ -42,7 +42,7 @@ from django.utils.translation import ugettext as _
       <div class="image">
 
            <img style="width: 100%; height: 100%;" src="${course_image_url(course)}"
-                alt="${course.display_number_with_default | h} ${get_course_about_section(course, 'title')} Cover Image" />
+                alt="${course.display_number_with_default} ${get_course_about_section(course, 'title')} Cover Image" />
 
       </div>
       <div class="data-input">

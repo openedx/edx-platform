@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%!
   from django.core.urlresolvers import reverse
   from courseware.courses import course_image_url, get_course_about_section
@@ -7,7 +7,7 @@
 
 <%inherit file="../mktg_iframe.html" />
 
-<%block name="pagetitle">${_("About {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="pagetitle">${_("About {course_number}").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="bodyclass">view-iframe-content view-partial-mktgregister</%block>
 
@@ -85,7 +85,7 @@
             %if not user.is_authenticated():
               href="${reverse('register_user')}?course_id=${course.id | u}&enrollment_action=enroll"
             %endif
-        >${_("Enroll in")} <strong>${course.display_number_with_default | h}</strong>
+        >${_("Enroll in")} <strong>${course.display_number_with_default}</strong>
             %if len(course_modes) > 1:
             <span class="track">
             ## Translators: This is the second line on a button users can click.  The first line is "Enroll in COURSE_NAME"
@@ -121,7 +121,7 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
-        <input name="course_id" type="hidden" value="${course.id | h}">
+        <input name="course_id" type="hidden" value="${course.id}">
         <input name="enrollment_action" type="hidden" value="enroll">
         <input name="email_opt_in" type="hidden" value="true">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">

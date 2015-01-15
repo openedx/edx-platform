@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 <%! from django.core.urlresolvers import reverse %>
 <%inherit file="main.html" />
@@ -26,7 +26,7 @@
             ${homepage_overlay_html}
           % else:
             % if self.stanford_theme_enabled():
-              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
+              <h1>${_("Free courses from {em_start}{university_name}{em_end}").format(university_name="Stanford", em_start=HTML('<strong>'), em_end=HTML('</strong>'))}</h1>
               <h2>${_("For anyone, anywhere, anytime")}</h2>
             % else:
               ## Translators: 'Open edX' is a brand, please keep this untranslated. See http://openedx.org for more information.

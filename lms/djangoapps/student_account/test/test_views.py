@@ -14,6 +14,7 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test.utils import override_settings
 
+from util.markup import escape
 from util.testing import UrlResetMixin
 from third_party_auth.tests.testutil import simulate_running_pipeline
 from openedx.core.djangoapps.user_api.api import account as account_api
@@ -548,10 +549,10 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
     def _assert_third_party_auth_data(self, response, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
         expected_data = u"data-third-party-auth='{auth_info}'".format(
-            auth_info=json.dumps({
+            auth_info=escape(json.dumps({
                 "currentProvider": current_provider,
                 "providers": providers
-            })
+            }))
         )
         self.assertContains(response, expected_data)
 

@@ -4,8 +4,9 @@
 import json
 import logging
 from util.date_utils import get_default_time_display
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 from contentstore.utils import reverse_usage_url
+from django.utils.html import escapejs
 %>
 <%block name="title">${_("Course Outline")}</%block>
 <%block name="bodyclass">is-signedin course view-outline</%block>
@@ -14,7 +15,7 @@ from contentstore.utils import reverse_usage_url
 
 <%block name="requirejs">
     require(["js/factories/outline"], function (OutlineFactory) {
-        OutlineFactory(${json.dumps(course_structure) | n}, ${json.dumps(initial_state) | n});
+        OutlineFactory(JSON.parse('${json.dumps(course_structure) | n,escapejs}'), JSON.parse('${json.dumps(initial_state) | n,escapejs}'));
     });
 </%block>
 
@@ -64,7 +65,7 @@ from contentstore.utils import reverse_usage_url
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location | h}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
+                    <a href="#" class="button button-new" data-category="chapter" data-parent="${context_course.location}" data-default-name="${_('Section')}" title="${_('Click to add a new section')}">
                         <i class="icon fa fa-plus"></i>${_('New Section')}
                     </a>
                 </li>
@@ -107,7 +108,7 @@ from contentstore.utils import reverse_usage_url
                 course_locator = context_course.location
                 %>
                 <h2 class="sr">${_("Course Outline")}</h2>
-                <article class="outline outline-complex outline-course" data-locator="${course_locator | h}" data-course-key="${course_locator.course_key | h}">
+                <article class="outline outline-complex outline-course" data-locator="${course_locator}" data-course-key="${course_locator.course_key}">
                 </article>
             </div>
             <div class="ui-loading">
@@ -125,7 +126,7 @@ from contentstore.utils import reverse_usage_url
                 <p>${_("Select the Configure icon for a section or subsection to set its release date. When you configure a subsection, you can also set the grading policy and due date.")}</p>
                 <h3 class="title-3">${_("Changing the content students see")}</h3>
                 <p>${_("To publish draft content, select the Publish icon for a section, subsection, or unit.")}</p>
-                <p>${_("To hide content from students, select the Configure icon for a section, subsection, or unit, then select {em_start}Hide from students{em_end}.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("To hide content from students, select the Configure icon for a section, subsection, or unit, then select {em_start}Hide from students{em_end}.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
             </div>
             <div class="bit external-help">
                 <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about the course outline")}</a>

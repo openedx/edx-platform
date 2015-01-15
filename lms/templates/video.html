@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 
 % if display_name is not UNDEFINED and display_name is not None:
     <h2>${display_name}</h2>
@@ -104,14 +104,19 @@
   <ul class="wrapper-downloads">
     % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+            ${_("{link_start}Download video{link_end}").format(
+                link_start=HTML('<a href="{}">').format(download_video_link),
+                link_end=HTML('</a>'),
+            )}
         </li>
     % endif
     % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
+            ${_("{link_start}Download transcript{link_end}").format(
+                link_start=HTML('<a href="{}">').format(track),
+                link_end=HTML('</a>'),
+            )}
             <div class="a11y-menu-container">
                 <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
                 <ol class="a11y-menu-list">
@@ -131,14 +136,19 @@
                 </ol>
             </div>
           % else:
-            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
-            }
+            ${_('{link_start}Download transcript{link_end}').format(
+                link_start=HTML('<a href="{}" class="external-track">').format(track),
+                link_end=HTML('</a>'),
+            )}
           % endif
         </li>
     % endif
     % if handout:
         <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+            ${_('{link_start}Download Handout{link_end}').format(
+                link_start=HTML('<a href="{}" target="_blank">').format(handout),
+                link_end=HTML('</a>'),
+            )}
         </li>
     % endif
   </ul>

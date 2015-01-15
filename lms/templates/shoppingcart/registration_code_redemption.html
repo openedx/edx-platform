@@ -1,5 +1,5 @@
 <%!
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section
 %>
@@ -50,8 +50,8 @@ from courseware.courses import course_image_url, get_course_about_section
               "to see if you're enrolled in the course, or contact your "
               "company's administrator."
             ).format(
-              link_start='<a href="{url}">'.format(url=reverse('dashboard')),
-              link_end='</a>',
+              link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')),
+              link_end=HTML('</a>'),
             )}
           </p>
           % elif redemption_success:
@@ -69,8 +69,8 @@ from courseware.courses import course_image_url, get_course_about_section
               "You're already registered for this course. "
               "Visit your {link_start}dashboard{link_end} to see the course."
             ).format(
-              link_start='<a href="{url}">'.format(url=reverse('dashboard')),
-              link_end='</a>',
+              link_start=HTML('<a href="{url}">').format(url=reverse('dashboard')),
+              link_end=HTML('</a>'),
             )}
           </p>
           % elif redeem_code_error:

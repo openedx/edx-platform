@@ -5,6 +5,7 @@ if Backbone?
       DiscussionUtil.loadRolesFromContainer()
       element = $(elem)
       window.$$course_id = element.data("course-id")
+      window.course_name = element.data("course-name")
       user_info = element.data("user-info")
       sort_preference = element.data("sort-preference")
       threads = element.data("threads")

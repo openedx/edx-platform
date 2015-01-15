@@ -355,7 +355,7 @@ class CourseFields(object):
                         "long_description": _("Establish your course's student enrollment and launch dates on the Schedule and Details page."),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Details &amp; Schedule"),
+                        "action_text": _("Edit Course Details & Schedule"),
                         "action_external": False,
                     },
                     {
@@ -474,7 +474,7 @@ class CourseFields(object):
                         "long_description": _("Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course."),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_text": _("Edit Course Schedule & Details"),
                         "action_external": False,
                     },
                     {
@@ -482,7 +482,7 @@ class CourseFields(object):
                         "long_description": _("Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page."),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_text": _("Edit Course Schedule & Details"),
                         "action_external": False,
                     },
                     {
@@ -490,7 +490,7 @@ class CourseFields(object):
                         "long_description": _("Include a short list of frequently asked questions about your course."),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_text": _("Edit Course Schedule & Details"),
                         "action_external": False,
                     },
                     {
@@ -498,7 +498,7 @@ class CourseFields(object):
                         "long_description": _("Let students know what knowledge and/or skills they should have before they enroll in your course."),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Schedule &amp; Details"),
+                        "action_text": _("Edit Course Schedule & Details"),
                         "action_external": False,
                     },
                 ],

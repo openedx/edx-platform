@@ -1,10 +1,10 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import ugettext as _ %>
 <%! from django.template.defaultfilters import escapejs %>
 
 <%inherit file="../main.html" />
 <%namespace name='static' file='../static_content.html'/>
 <%block name="bodyclass">discussion</%block>
-<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default) | h}</%block>
+<%block name="pagetitle">${_("Discussion - {course_number}").format(course_number=course.display_number_with_default)}</%block>
 
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
@@ -32,7 +32,7 @@
       </nav>
     </section>
 
-    <section class="course-content container discussion-user-threads" data-course-id="${course.id | h}" data-threads="${threads}" data-user-info="${user_info}" data-page="${page}" data-num-pages="${num_pages}"/>
+    <section class="course-content container discussion-user-threads" data-course-id="${course.id}" data-course-name="${course.display_name_with_default}" data-threads="${threads}" data-user-info="${user_info}" data-page="${page}" data-num-pages="${num_pages}"/>
   </div>
 </section>
 

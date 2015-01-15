@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -168,7 +168,10 @@
           %if upgrade:
             <span class="help help-inline">${_("Missing something? You can always continue to audit this course instead.")}</span>
           %else:
-            <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(a_start='<a href="{}">'.format(course_modes_choose_url), a_end="</a>")}</span>
+            <span class="help help-inline">${_("Missing something? You can always {a_start}audit this course instead{a_end}").format(
+                a_start=HTML('<a href="{}">').format(course_modes_choose_url),
+                a_end=HTML('</a>')
+            )}</span>
           %endif
         %endif
 

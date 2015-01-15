@@ -1,4 +1,4 @@
-<%! from django.utils.translation import ugettext as _ %>
+<%! from util.markup import HTML, ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 
 <%inherit file="../main.html" />
@@ -34,7 +34,10 @@
     <div class="msg-content">
       <h3 class="title">${_("No Flash Detected")}</h3>
       <div class="copy">
-        <p>${_("You don't seem to have Flash installed. {a_start} Get Flash {a_end} to continue your registration.").format(a_start='<a rel="external" href="http://get.adobe.com/flashplayer/">', a_end="</a>")}</p>
+        <p>${_("You don't seem to have Flash installed. {a_start}Get Flash{a_end} to continue your registration.").format(
+                a_start=HTML('<a rel="external" href="http://get.adobe.com/flashplayer/">'),
+                a_end=HTML('</a>'),
+        )}</p>
       </div>
     </div>
   </div>
@@ -348,7 +351,7 @@
 
                     <div class="copy">
                         <p>${_("Make sure your full name on your {platform_name} account ({full_name}) matches your ID. We will also use this as the name on your certificate.").format(
-                          full_name="<span id='full-name'>{name}</span>".format(name=user_full_name),
+                          full_name=HTML("<span id='full-name'>{name}</span>").format(name=user_full_name),
                           platform_name=settings.PLATFORM_NAME,
                         )}</p>
                     </div>

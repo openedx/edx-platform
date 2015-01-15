@@ -11,7 +11,8 @@ else:
 import json
 
 from contentstore.views.helpers import xblock_studio_url, xblock_type_display_name
-from django.utils.translation import ugettext as _
+from util.markup import HTML, ugettext as _
+from django.utils.html import escapejs
 %>
 <%block name="title">${xblock.display_name_with_default} ${xblock_type_display_name(xblock)}</%block>
 <%block name="bodyclass">is-signedin course container view-container</%block>
@@ -30,10 +31,10 @@ from django.utils.translation import ugettext as _
 <%block name="requirejs">
     require(["js/factories/container"], function(ContainerFactory) {
         ContainerFactory(
-            ${component_templates | n}, ${json.dumps(xblock_info) | n},
+            ${component_templates | n,escapejs}, ${json.dumps(xblock_info) | n,escapejs},
             "${action}",
             {
-                isUnitPage: ${json.dumps(is_unit_page)},
+                isUnitPage: ${json.dumps(is_unit_page) | n,escapejs},
                 canEdit: true
             }
         );
@@ -52,15 +53,15 @@ from django.utils.translation import ugettext as _
                     ancestor_url = xblock_studio_url(ancestor)
                     %>
                     % if ancestor_url:
-                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default | h}</a>
+                        <a href="${ancestor_url}" class="navigation-item navigation-link navigation-parent">${ancestor.display_name_with_default}</a>
                     % else:
-                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default | h}</span>
+                        <span class="navigation-item navigation-parent">${ancestor.display_name_with_default}</span>
                     % endif
                 % endfor
             </small>
             <div class="wrapper-xblock-field incontext-editor is-editable"
                  data-field="display_name" data-field-display-name="${_("Display Name")}">
-                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default | h}</span></h1>
+                <h1 class="page-header-title xblock-field-value incontext-editor-value"><span class="title-value">${xblock.display_name_with_default}</span></h1>
             </div>
         </div>
 
@@ -97,7 +98,7 @@ from django.utils.translation import ugettext as _
 
             <article class="content-primary">
                 <div class="container-message wrapper-message"></div>
-                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator | h}" data-course-key="${xblock_locator.course_key | h}">
+                <section class="wrapper-xblock level-page is-hidden studio-xblock-wrapper" data-locator="${xblock_locator}" data-course-key="${xblock_locator.course_key}">
                 </section>
                 <div class="ui-loading">
                     <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
@@ -107,10 +108,10 @@ from django.utils.translation import ugettext as _
                 % if xblock.category == 'split_test':
                     <div class="bit">
                         <h3 class="title-3">${_("Adding components")}</h3>
-                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <p>${_("Select a component type under {em_start}Add New Component{em_end}. Then select a template.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                         <p>${_("The new component is added at the bottom of the page or group. You can then edit and move the component.")}</p>
                         <h3 class="title-3">${_("Editing components")}</h3>
-                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start='<strong>', em_end="</strong>")}</p>
+                        <p>${_("Click the {em_start}Edit{em_end} icon in a component to edit its content.").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
                         <h3 class="title-3">${_("Reorganizing components")}</h3>
                         <p>${_("Drag components to new locations within this component.")}</p>
                         <p>${_("For content experiments, you can drag components to other groups.")}</p>
@@ -128,7 +129,7 @@ from django.utils.translation import ugettext as _
                         <div class="wrapper-unit-id bar-mod-content">
                             <h5 class="title">${_("Location ID")}</h5>
                             <p class="unit-id">
-                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name | h}</span>
+                                <span class="unit-id-value" id="unit-location-id-input">${unit.location.name}</span>
                                 <span class="tip"><span class="sr">Tip: </span>${_("Use this ID when you create links to this unit from other course content. You enter the ID in the URL field.")}</span>
                             </p>
                         </div>

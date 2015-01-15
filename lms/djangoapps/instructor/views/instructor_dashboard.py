@@ -20,6 +20,7 @@ from django.utils.html import escape
 from django.http import Http404, HttpResponseServerError
 from django.conf import settings
 from util.json_request import JsonResponse
+from util.markup import HTML
 from mock import patch
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -117,7 +118,9 @@ def instructor_dashboard_2(request, course_id):
         link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
         analytics_dashboard_message = _("To gain insights into student enrollment and participation {link_start}visit {analytics_dashboard_name}, our new course analytics product{link_end}.")
         analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+            link_start=HTML(link_start), link_end=HTML("</a>"),
+            analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME,
+        )
 
     context = {
         'course': course,

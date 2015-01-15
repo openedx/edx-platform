@@ -2,7 +2,7 @@
 <%def name="online_help_token()"><% return "advanced" %></%def>
 <%namespace name='static' file='static_content.html'/>
 <%!
-  from django.utils.translation import ugettext as _
+  from util.markup import HTML, ugettext as _
   from contentstore import utils
   from contentstore.views.course import should_show_group_configurations_page
   from django.utils.html import escapejs
@@ -20,7 +20,7 @@
 
 <%block name="requirejs">
     require(["js/factories/settings_advanced"], function(SettingsAdvancedFactory) {
-        SettingsAdvancedFactory(${advanced_dict | n}, "${advanced_settings_url}");
+        SettingsAdvancedFactory(JSON.parse('${advanced_dict | n,escapejs}'), "${advanced_settings_url}");
     });
 </%block>
 
@@ -53,7 +53,10 @@
 
           </header>
 
-          <p class="instructions">${_("<strong>Warning</strong>: Do not modify these policies unless you are familiar with their purpose.")}</p>
+          <p class="instructions">${_("{em_start}Warning{em_end}: Do not modify these policies unless you are familiar with their purpose.").format(
+            em_start=HTML("<strong>"),
+            em_end=HTML("</strong>"),
+          )}</p>
 
           <div class="wrapper-options">
             <div class="wrapper-deprecated-setting">
@@ -76,7 +79,7 @@
 
         <p>${_("Any policies you modify here override all other information you've defined elsewhere in {studio_name}. Do not edit policies unless you are familiar with both their purpose and syntax.").format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
-        <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (&quot;) around the string. Do not use single quotation marks (&apos;).").format(em_start='<strong>', em_end="</strong>")}</p>
+        <p>${_("{em_start}Note:{em_end} When you enter strings as policy values, ensure that you use double quotation marks (\") around the string. Do not use single quotation marks (').").format(em_start=HTML("<strong>"), em_end=HTML("</strong>"))}</p>
       </div>
 
       <div class="bit">
@@ -89,7 +92,7 @@
       <h3 class="title-3">${_("Other Course Settings")}</h3>
         <nav class="nav-related">
           <ul>
-            <li class="nav-item"><a href="${details_url}">${_("Details &amp; Schedule")}</a></li>
+            <li class="nav-item"><a href="${details_url}">${_("Details & Schedule")}</a></li>
             <li class="nav-item"><a href="${grading_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
             % if should_show_group_configurations_page(context_course):
