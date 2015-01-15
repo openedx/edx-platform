@@ -212,22 +212,19 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         self.cached_metadata = cached_metadata
         self.cached_modules = {}
 
-    #def get_block(self, usage_id):
-    #    """
-    #    Overrides the base impl to figure out if you want draft or published and then
-    #    to strip the revision if it got a draft
-    #    """
-    #    if (
-    #        self.modulestore.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred
-    #        and usage_id.category not in DIRECT_ONLY_CATEGORIES
-    #    ):
-    #        try:
-    #            block = super(CachingDescriptorSystem, self).get_block(as_draft(usage_id))
-    #            return wrap_draft(block)
-    #        except ItemNotFoundError:
-    #            pass  # do the below
-    #    block = super(CachingDescriptorSystem, self).get_block(usage_id)
-    #    return block
+#     def get_block(self, usage_id):
+#         """
+#         Overrides the base impl to figure out if you want draft or published and then
+#         to strip the revision if it got a draft
+#         """
+#         if self.modulestore.get_branch_setting() == ModuleStoreEnum.Branch.draft_preferred:
+#             try:
+#                 block = super(CachingDescriptorSystem, self).get_block(as_draft(usage_id))
+#                 return wrap_draft(block)
+#             except ItemNotFoundError:
+#                 pass  # do the below
+#         block = super(CachingDescriptorSystem, self).get_block(usage_id)
+#         return wrap_draft(block)
 
     def load_item(self, location):
         """
@@ -374,14 +371,29 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         """
         Returns the JSON payload of the xblock at location.
         """
+        if location in self.module_data:
+            return self.module_data[location]
 
         try:
-            json = self.module_data[location]
-        except KeyError:
             json = self.modulestore._find_one(location)
             self.module_data[location] = json
+        except ItemNotFoundError as e:
+            self.module_data[location] = None  # cache non-existence to prevent future Q
+            raise e
 
         return json
+
+    def has_item(self, location):
+        """
+        Determine whether this location exists either in this transaction or in
+        the db.
+        """
+        if location in self.cached_modules:
+            return self.cached_modules[location] is not None
+        try:
+            return self.lookup_item(location) is not None
+        except ItemNotFoundError:
+            return False
 
     def get_edited_by(self, xblock):
         """
@@ -1024,11 +1036,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Returns True if location exists in this ModuleStore.
         """
-        try:
-            self._find_one(usage_key)
-            return True
-        except ItemNotFoundError:
-            return False
+        with self.bulk_operations(usage_key.course_key):
+            bulk_rec = self._get_bulk_ops_record(usage_key.course_key)
+            return bulk_rec.runtime.has_item(usage_key)
 
     def get_item(self, usage_key, depth=0):
         """
@@ -1045,9 +1055,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             in the request. The depth is counted in the number of
             calls to get_children() to cache. None indicates to cache all descendents.
         """
-        item = self._find_one(usage_key)
-        module = self._load_items(usage_key.course_key, [item], depth)[0]
-        return module
+        with self.bulk_operations(usage_key.course_key):
+            bulk_rec = self._get_bulk_ops_record(usage_key.course_key)
+            item = bulk_rec.runtime.lookup_item(usage_key)
+            module = self._load_items(usage_key.course_key, [item], depth)[0]
+            return module
 
     @staticmethod
     def _course_key_to_son(course_id, tag='i4x'):

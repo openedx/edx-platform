@@ -957,6 +957,7 @@ class TestEditItem(ItemTest):
         # The unit and its children should be private initially
         unit_update_url = reverse_usage_url('xblock_handler', unit_usage_key)
         self.assertFalse(self._is_location_published(unit_usage_key))
+        self.assertFalse(self._is_location_published(wrapper_usage_key))
         self.assertFalse(self._is_location_published(html_usage_key))
 
         # Make the unit public and verify that the problem is also made public

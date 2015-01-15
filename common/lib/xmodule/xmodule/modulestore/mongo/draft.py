@@ -30,6 +30,8 @@ def wrap_draft(item):
     Sets `item.is_draft` to `True` if the item is DRAFT, and `False` otherwise.
     Sets the item's location to the non-draft location in either case.
     """
+    if hasattr(item, 'is_draft'):
+        return item
     setattr(item, 'is_draft', item.location.revision == MongoRevisionKey.draft)
     item.location = item.location.replace(revision=MongoRevisionKey.published)
     return item
@@ -375,7 +377,6 @@ class DraftModuleStore(MongoModuleStore):
         self._convert_to_draft(location, user_id, ignore_if_draft=True)
 
         # return the new draft item (does another fetch)
-        # get_item will wrap_draft so don't call it here (otherwise, it would override the is_draft attribute)
         return self.get_item(location)
 
     def _convert_to_draft(self, location, user_id, delete_published=False, ignore_if_draft=False):
