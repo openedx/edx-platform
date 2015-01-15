@@ -3,6 +3,7 @@
 
 // in this document:
 // --------------------
+// +extends
 // +notes
 // +local variables/utilities
 // +toggling notes
@@ -10,6 +11,22 @@
 // +creating/editing notes
 // +listing notes
 // +necessary, but ugly overrides
+
+// +extends:
+// --------------------
+%bubble {
+  @include transform(rotate(45deg));
+  @include left(12px);
+  position: absolute;
+  bottom: -($baseline/2);
+  display: block;
+  width: 16px;
+  height: 16px;
+  content: " ";
+  background: $white; // Set a default
+  border-bottom: 1px solid $gray-l2;
+  border-right: 1px solid $gray-l2;
+}
 
 // +notes:
 // --------------------
@@ -117,6 +134,21 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
   .annotator-listing {
     padding: 0 !important;
     margin: 0 !important;
+
+    .annotator-widget {
+      &:after {
+        @extend %bubble;
+      }
+    }
+  }
+
+  .annotator-editor {
+    .annotator-widget {
+      &:after {
+        @extend %bubble;
+        background: $gray-l5;
+      }
+    }
   }
 
   .annotator-item {
@@ -148,15 +180,9 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 
       // using annotatorJS triangle styling for adder
       &:before {
-        position: absolute;
-        @include left(8px);
-        bottom: -($baseline/2);
-        display: block;
-        width: 18px;
-        height: ($baseline/2);
-        content: "";
-        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAEiCAYAAAD0w4JOAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBNYWNpbnRvc2giIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6RDY0MTMzNTM2QUQzMTFFMUE2REJERDgwQTM3Njg5NTUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6RDY0MTMzNTQ2QUQzMTFFMUE2REJERDgwQTM3Njg5NTUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo2ODkwQjlFQzZBRDExMUUxQTZEQkREODBBMzc2ODk1NSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpENjQxMzM1MjZBRDMxMUUxQTZEQkREODBBMzc2ODk1NSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PkijPpwAABBRSURBVHja7JsJVBRXFoarq5tNQZZWo6BxTRQXNOooxhWQBLcYlwRkMirmOKMnmVFHUcYdDUp0Yo5OopM4cQM1TlyjUSFGwIUWFQUjatxNQEFEFtnX+W/7Sovqqt7w5EwMdc6ltldf3/fevffderxSZWVlZbi5uTXh6rAVFBTkqbVubl07eno2d3BwaGgtZNPGjYf5wsLCDRu/+ir20aNH2dZCcnNzN6uPHTv2S2xsbHZaWpqLJZqJIR9FRMTxdHFJeHiiJZrl5+fniiF0jRdumgsjyOZNm44AshHPxAnXeXEhUzAJJEF8j5cWVoIZg9CmqqiokK3CksWLX3d0dJwy+f3331Cr1RoliEajMQ4Sw2xsbHglTZ6CampquOex8dxz2l5gkEY4qKyslOu1Qa6urpPRs9VkW2RjFmskQCaFhASQLZEZkDlYBBJDnJ2dXSnwmYLxpiDCdVMw3hyIObCnlr1g/nwfQCYpQcQbOTM5tbgDeDEkZPLkoaYgSpqpKysqnkIaNWrkYq7dUEim0EwhmkI1bw1ETjNVTk7OA2sg0jarDyO/ZhiJjtpS4923L1dWVs5VV1vW8Dyv4uzsbLnkc+c4dceOnn1LS0vat23bhnvSgypOpTItajXP2dvbcefOneVSL146ys+dOzvgyuWrMadOJeKGrb6AeRBb7syZM1xqyo9HwfDncZ0L+0dowGXATpw4qVfVGEyAJCUBkvrjUTzrTwzUkirDcfOewk5w9oBp8AD9iljoGt07rTvNpaRcPDqPIOx5+mlOkPnz5wakpV2JiU84ztlRNTVqTsXzeuHValyz4xJ1Ou4CICjrL37WoPsXLAgD7HJMXFw8Z2ur4dT8E23s7Wy4UydPchcupB5FGX8ZOxKUeyYLF84LSLt0OebYsXi9ZvYOdtwJBsE9f7lnVAUFuYp2smxpxJFOnTu9aWtry6VcSDm6cNF8f6WyRkEMFg7rclq0aP7fjZWrDyNmeL9c8iDedu7YMRK7xoHjx28y2tjGcsivt29PaOTsPNAGeSIGidNBwcF9La6aAPH18+UG+QzmtFqtN67pLALt2LYtAUOUHoLMWO/1BMM45o17OgUQ2dEz2R4drYf4AMLzakTNahY5n8FQRid9rpZG26KiE5ypOkP89JqIjZWOVSqeG+zrw7lp3bxRVidbteitUQnOLtQmhhApzMfXFzCtN57R1QJFbdkKiMtAP0Ao7lB16CE5oXtUTYJRB+BZPUzd6uWXE1xcXQcO8R+iqIms3aADWrdpw2VmZrbQJeoCeBdoYinkWTVVHNVC21jrrSopKakh67Y2ChCMXmw0xizbXM2I8dyc9gUObBpTBTw8WqixGw45n5GRnl4XjaZD9kP+DaibVSA8OAu7SHZKWm3GtTYWgfDATOxWQGxElynsepkNAoSq808JhII7DZKHzWpsQGYwiPhHyPzD0NifmtVGrE1WUlSQaDIXkNVm2REgc1jDiqtTBQk1pkmtqgEyCLu/SqpKkFmArDHLsgGxw57euaiXIkSQOeZCBI1egtCs324IxVGy3s9NtYkcqCtkGBtXHkLeAyTBGl8rZPZxCfIAkNIXLB6h9/4A6a/gMv0hvUyCUKgLdlsoXODYXwJ5E7sDzPM7G7OjPtjvgnjSizNkqwDDPoD9AL08E2QXaa7Ua40gLUTXmkHW44Gd2I9ndiZsLVh52ar9AAlmNiRs7eg9ByIOYtkMHGe0+6HBW9ithbSSKXcH8iFs7DuTvYZC31KKpFAuyhhE2v3kJkEK5YJZwytbtru7B8GGQjZCmhopmwkJgcRCu2o5jXwh2yWQWyxS3pH05teQwUpVK4Jkia49YA07l/ast8T3ihR7DfXvhuP/Mq2CATksarsRrBPuQQJx76Kp7vfGzh4F42V8zQe7YtxL+u2EkVoDZJ8+fej8VQi9vPRmg8BpCKXAN5OSkqpNVg0QR7VaPR3n05FLN6k9mcJnYLcK178ErEQRBIgTMtMNyG4Djaqv0XyJMtMBM4jrPCC8vb19KEHatWtXMHbs2LtOTk7lQoHGjRuXjBs37q6Hh0cRyvwZr+5/kW1s3GhXVVWlfxXv27fvhTlz5iybNm1aCuBVeEsqnzFjRmJoaOjS7t27X2fVXIgfdzfQtnnz5sPv3r2r/3/Rvn37WkdHR/8I1UNdXV1X4kdK+vfvPxsPNm3YsKE++JWWlmpbtNBH0C21QDY2NgOEk8LCwlY4340HhwM2DZfKcaxFJ+wsKip6OlfZoEGDwVIQD/Vrzc1Ciyb+/v4UGS9A0nx8fDxRHSdxGbzTaQ2q1qpVq3vnz58XGrYUbZIM0FVo0gOXyqBZ8p49ey6tW7fO8/Hjx7ZUrm3btgbZLe/p6Xnczs6ODI8bMWJEGiDTAfGAFjGo5nc4rh4zZswMaKYPKdSjXl5e8XLdfzQgIEBf6ODBg2qcv47qRcH4GuNlpRWOd+Bap8TERH0CNnz48Gv9+vVLkDNINXrtg8jIyEWootaYQaIHs2AKc5s1a7aVZS8GLuJ0//798M2bN4+NiYlxxztcLR90dHSsGDlyZHpwcHBU06ZNKWUuNRZGnGAjwTdu3BifkpLS7PLly05oJ65r164FMMZ0WH0UXIRG5GJz4pGajaad2RBOnXCZSYa0OrVAMueOEFc23tODuUyKxSBpQBS3hcbd3b396NGj+/v6+np16NDhVfRcNar40/fff5+ya9euk/n5+XeYlsoRomfPnv3j4+O3oJ0e1Ug2uMeDQ4cOfdmlS5deQlSVzgfoqzNkyJDXrl+/Hl9jYrt48eIh/GBHWRCq4HTq1KmtVLC4uDgZu48QVrKFhxGD7mC3DCZxjc5jY2M/o9HGAAQfGlBeXv6YCqEtKLd2weFYNM9jALNwTJ7e5OzZs1Hsx7JXrlzZ3QCk0+nmCb+el5d3Jzw8/ANKpnDqC6FBQLt27dp5CDGZQrnjx49/aACCe2yRNOx9wPsJvQBN3iorK8sXl7l58+bnUpDGwcGh1lQEQqyNt7d3GYUdeqXo1atXKQraissgWlbIDAyaZOzfZ/8+TMd5iEqluhMWFvZHmEIpjncDNAHttR6RUsuC31kDA4LanihUxOq+ivLGNWvWzAYjF4Hs3qJFi6bgWuvU1NStrBepR1satBH+0ERLJBXKyMi4AMP7Ag2bJbRHbm7unQMHDqzPzs7+ic5RNgw7lZxB0oErfumgKYOE5tHYNVSybAHmBlkB+8mXAnDtISALcdhI7LRiUUnmgowmEWj4akXvF1+g4Zs6hYmGRUIyhXLKRIzlUuJshEYOyvZDUBUHaTaCax/jcINcAiHORlpi6NmJHulrIhtZi06ZDViF3HAE43aINAahZAIWD0bl3wD7E55RGYBcXFy84f3vKkFo9IWVJ82aNSsVY34lNF8Ky25pAELW8Ta6VnZCSqvV0hB+ys/Pb/qZM2d2oRxlI+4Y194wAKFLe9IBDduBgYG3e/TooX/dwg+UzZw5U4chnNKatgjDoXAnDc07oikGGrQf1G1AB+3bt8/FABgJ1duvWrXqvUGDBl0HZBYgbSgtRBu6irIRZwONkDTRywqH0UL7zjvvvILBMQLD9+qhQ4cS5GVAvkIju4pMoQY/+osBCDFbh8arIkdEo89euHDhAgC+ZZpsFEP0bzbNmhUhG/nBADRgwIADqEbG0ymaqqrZqN5+xJ5NgBhMzmHcO4cU57gBqGXLlmkTJ07c0K1bt0dPp68qKjoCaLAOibJbZL00o5Oj5CKu6enpS5CIvo3hpjnito2kOsVBQUE/jxo16hP0zUY2q6OYRDijjQJv3boViDzJHdGyCaUz6Lnszp07X0GnbGRv5JXmZCPk/ZRD08wE2UoBez2/xhIJztxshGfZiBsbRSgePWKQEuk8tlI2Yo8M1xOJZz9kI52QWL2CqpYg6F9FHE/duXMnrX24K9c+4s0B7jEKxngQXV6ikI18gQy4h7FsRD116tQ3MzMzL5kK/uiEfTDgNrIgdKv7lStXYk2MHlmIkAV0jKHpYyRkDQxAyOqDULDMCITSGh/kRpMoa8GWsXr16l5SEA8H7AdHtJVrOGjxC+5NQui4mpyc3Ap7Ncb95sgHDGe+7t279x0biovhGovx8H6mSQZpQoYdFRW1VEgJcb/q9u3b6wyq9vDhwz1suD6PzL4nUhZnnG6AUBRshiQ+HJA80WBZmZWV9YkBKCcnZxErUI3R4Ru4Ak1wksO6b9q0abEYwjQtR0IWaABCKvc6bhYLBRGbd+NV9D1UJ4IyEmnjI9ymYecul43YoTfWiwtTBoJrRXK9iLYMUkwicPASChwxIxtZRm9TprKRxpDlaKocmWzkKnYTITbmZiNqNuNH89tjWSSk6aBk2FCWMe9/kf+7vnz5ilp1k55b8q+/moiI5TWiHpCemyVKD1sM44w8bDXI6mrJgercRnWGGbPsGpkB1CqDVP3GXeR3CLI4CsgZFzPGOvmaVRADkLWQWiApxKp4pACxDPQ8IIL3S728xlKHFexIVRevr3faFwZkdQIhE0ZeoJFWLh5ZBTOlidkwc6plFkwpibA4tPAW/FOh3tfqQRaBrHrRMZWNmDvyPheIrPdbmwO8wBmbNB5ZldLI2ZGq3td+RRBNz0NWWr2ShRaguLi4LFOr1R9UVVXdx6U5FoP8/Pym2dvbr8jLy3O2em1NUFDQ4cLCwoA6t9G2bdscpk6des3BwaGyTiC0yachISHX9+zZk4Qq3qtrxuYEmQWJO3v2bEzv3r2/qWui1R6y5Hl4f72vWTgjY0n78UoDZp2rplKpHCCd6gIiB+44evTod1NSUhZb21Yvd+jQYZROp9tZWVlZVlxcnKU03aFo2di8du/evVa88MQqEP58IZ0Itxakhkyj1R51AkkWDui1QzXvWw0SAWmVyjeWguq9vx70XCIkxjD6T3E4ZGlSUlK+1Rrt3buXFpPSmtFbyEimQdRWgRo0aPA2O6b/X6+DXAQs4Hm0EYXZw4CF1Qnk5uZWGhgY+CnaK9KqjM3W1rZ62LBhVydMmDDdw8PjqMWNlJubewL5UWZiYmIo/WPTmgRCiJBLIc2tBdTHo/+3tMaS1IZnRknLX23qpNLBgwddk5OT93p5edG/nFtLtTTbIOPi4uif4TXl5eUFBw4cWOfo6EgfWTS1GiRa7vnzmjVrKD9qXyeQaAuzBCS37OxnyAykf3utCiPck9U8tEIzEpASa15qaHkHLfloY860UL3314Pk4pG7u4ex+7QYhT60bA6Jh2yAlGZkpBu1bOlGn6HtF52P4Z587duVk6xpM1a1cSLIEchJkYazzG0jWuxOCTstfKMv6OhLMlquF8vuDzcH1I5BaKO1o/tEk3jC0sUcUyD69RvckwWDHIuStIDSHjKE3actwlgYoRXj/2HH9GYkfGlInyreEZ3/jXuyoFlWIy8RRBgAxJ+WCRD6cPdfxgzyI3ZMHwPu4Z6sgKaPLO+z6ze5J0usPzMVIYWPKZ0YuJr1lPB91ihImjmhlj5bfI118SlIHkRIRqeYAxFchNZiX+EMP6ScImq7WpuSi5SwTHYyc4u7rFEvWuS09TH79wz6nwADANCoQA3w0fcjAAAAAElFTkSuQmCC);
-        background-position: 0 0;
+        @extend %bubble;
+        @include left(10px);
+        background: whitesmoke;
       }
     }
   }
@@ -167,20 +193,22 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
     .annotator-controls {
       @include text-align(left);
       @include clearfix();
-      background: $notes-annotator-background-med !important; //matches annotator JS editing bubble triangle color
-      font-family: $f-sans-serif !important;
+      @extend %ui-depth1;
+      position: relative;
       padding: 8px;
       border: none !important;
       border-radius: 0 !important;
+      background: $gray-l5 !important;
+      font-family: $f-sans-serif !important;
 
       // actions
       .annotator-save, .annotator-cancel {
         @extend %notes-reset-background;
-        font-family: $f-sans-serif !important;
-        font-size: 14px !important;
         padding: ($baseline/4) ($baseline/2) !important;
         border: none;
         box-shadow: none;
+        font-family: $f-sans-serif !important;
+        font-size: 14px !important;
         text-shadow: none !important;
 
         // removing vendor icons
@@ -292,7 +320,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         &:before {
           top: 0;
           @include left(0);
-          content: "\f044";
+          content: "\f040"; // .fa-pencil
         }
       }
 
@@ -301,7 +329,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         &:before {
           top: -($baseline/20);
           @include left(0);
-          content: "\f1f8";
+          content: "\f1f8"; // .fa-trash
         }
       }
 
@@ -310,7 +338,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
         &:before {
           top: -($baseline/20);
           @include left(0);
-          content: "\f00d";
+          content: "\f00d"; // .fa-close
         }
       }
     }
