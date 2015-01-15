@@ -12,7 +12,7 @@ function () {
 
         // Changing quality for now only works for YouTube videos.
         if (state.videoType !== 'youtube') {
-            state.el.find('a.quality-control').remove();
+            state.el.find('.quality').remove();
             return;
         }
 
@@ -51,7 +51,7 @@ function () {
     //     make the created DOM elements available via the 'state' object. Much easier to work this
     //     way - you don't have to do repeated jQuery element selects.
     function _renderElements(state) {
-        state.videoQualityControl.el = state.el.find('a.quality-control');
+        state.videoQualityControl.el = state.el.find('.quality');
 
         state.videoQualityControl.el.show();
         state.videoQualityControl.quality = 'large';
@@ -82,7 +82,8 @@ function () {
      * @public
      */
     function showQualityControl() {
-        this.videoQualityControl.el.removeClass('is-hidden');
+        this.videoQualityControl.el
+            .removeAttr('disabled');
     }
 
     // This function can only be called once as _.once has been used.
@@ -117,18 +118,21 @@ function () {
         var controlStateStr;
         this.videoQualityControl.quality = value;
         if (_.contains(this.config.availableHDQualities, value)) {
-            controlStateStr = gettext('HD on');
+            controlStateStr = gettext('HD');
+            aria = 'true';
             this.videoQualityControl.el
-                                    .addClass('active')
-                                    .attr('title', controlStateStr)
-                                    .text(controlStateStr);
+                .addClass('is-active')
+                .attr('title', controlStateStr)
+                .attr('aria-pressed', aria)
+                .text(controlStateStr);
         } else {
-            controlStateStr = gettext('HD off');
+            controlStateStr = gettext('HD');
+            aria = 'false';
             this.videoQualityControl.el
-                                    .removeClass('active')
-                                    .attr('title', controlStateStr)
-                                    .text(controlStateStr);
-
+                .removeClass('is-active')
+                .attr('title', controlStateStr)
+                .attr('aria-pressed', aria)
+                .text(controlStateStr);
         }
     }
 

@@ -2,7 +2,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Andre Eduardo <andre_meneses2001@hotmail.com>, 2015
@@ -47,7 +47,7 @@
 # edX translation file.
 # Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
@@ -78,7 +78,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
 # Bruno Sette <brunosette@gmail.com>, 2015
@@ -96,7 +96,7 @@
 # edX translation file
 # Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
-# 
+#
 # Translators:
 # Bruno Sette <brunosette@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
@@ -1788,15 +1788,15 @@ msgid_plural "%(value)s seconds"
 msgstr[0] "%(value)s segundo"
 msgstr[1] "%(value)s segundos"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Caption will be displayed when "
 msgstr "A legenda será exibida quando"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn on captions"
 msgstr "Ativar legenda"
 
-#: common/lib/xmodule/xmodule/js/src/video/09_video_caption.js
+#: common/lib/xmodule/xmodule/js/src/video/09_video_transcript.js
 msgid "Turn off captions"
 msgstr "Desativar legenda"
 

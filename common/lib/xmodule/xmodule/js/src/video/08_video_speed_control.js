@@ -86,6 +86,9 @@ function (Iterator) {
                 'click': this.clickMenuHandler.bind(this),
                 'keydown': this.keyDownMenuHandler.bind(this)
             });
+            $(document).on({
+                'click': this.mouseLeaveHandler.bind(this)
+            });
 
             // Attach click and keydown event handlers to the individual speed
             // entries.
@@ -133,10 +136,21 @@ function (Iterator) {
             // element to have clicks close the menu when they happen
             // outside of it.
             if (bindEvent) {
-                $(window).on('click.speedMenu', this.clickMenuHandler.bind(this));
+                $(window).on('click.speed', this.clickMenuHandler.bind(this));
             }
 
-            this.el.addClass('is-opened');
+            $(document).find('.menu.is-opened')
+                .removeClass('is-opened');
+
+            this.el
+                .find('.menu')
+                    .addClass('is-opened');
+
+            this.el
+                .find('.fa')
+                    .removeClass('fa-caret-right')
+                    .addClass('fa-caret-up');
+
             this.speedButton.attr('tabindex', -1);
         },
 
@@ -147,10 +161,18 @@ function (Iterator) {
         closeMenu: function (unBindEvent) {
             // Remove the previously added clickHandler from window element.
             if (unBindEvent) {
-                $(window).off('click.speedMenu');
+                $(window).off('click.speed');
             }
 
-            this.el.removeClass('is-opened');
+            this.el
+                .find('.menu')
+                    .removeClass('is-opened');
+
+            this.el
+                .find('.fa')
+                    .removeClass('fa-caret-up')
+                    .addClass('fa-caret-right');
+
             this.speedButton.attr('tabindex', 0);
         },
 
@@ -197,8 +219,8 @@ function (Iterator) {
         clickLinkHandler: function (event) {
             var speed = $(event.currentTarget).parent().data('speed');
 
-            this.closeMenu();
             this.state.videoCommands.execute('speed', speed);
+            this.closeMenu();
 
             return false;
         },
@@ -313,7 +335,6 @@ function (Iterator) {
                     this.closeMenu(true);
                     this.speedButton.focus();
                     this.setSpeed(this.state.speedToString(speed));
-
                     return false;
             }
 

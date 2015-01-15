@@ -43,6 +43,7 @@ lib_paths:
     - common_static/js/vendor/jquery.min.js
     - common_static/js/vendor/jquery-ui.min.js
     - common_static/js/vendor/jquery.ui.draggable.js
+    - common_static/js/vendor/draggabilly.pkgd.js
     - common_static/js/vendor/jquery.cookie.js
     - common_static/js/vendor/json2.js
     - common_static/js/vendor/underscore-min.js

@@ -2,7 +2,7 @@
 
 // VideoCaption module.
 define(
-'video/09_video_caption.js',
+'video/09_video_transcript.js',
 ['video/00_sjson.js', 'video/00_async_process.js'],
 function (Sjson, AsyncProcess) {
     /**
@@ -41,9 +41,9 @@ function (Sjson, AsyncProcess) {
                 languages = this.state.config.transcriptLanguages;
 
             this.loaded = false;
-            this.subtitlesEl = state.el.find('ol.subtitles');
+            this.subtitlesEl = state.el.find('.subtitles');
             this.container = state.el.find('.lang');
-            this.hideSubtitlesEl = state.el.find('a.hide-subtitles');
+            this.hideSubtitlesEl = state.el.find('.transcript');
 
             if (_.keys(languages).length) {
                 this.renderLanguageMenu(languages);
@@ -780,18 +780,26 @@ function (Sjson, AsyncProcess) {
                 type = 'hide_transcript';
                 state.captionsHidden = true;
                 state.el.addClass('closed');
-                text = gettext('Turn on captions');
+                active_class = '';
+                aria = 'false';
+                text = gettext('Turn off the transcript');
             } else {
                 type = 'show_transcript';
                 state.captionsHidden = false;
                 state.el.removeClass('closed');
+                active_class = 'is-active';
+                aria = 'true';
                 this.scrollCaption();
-                text = gettext('Turn off captions');
+                text = gettext('Turn on the transcript');
             }
 
             hideSubtitlesEl
                 .attr('title', text)
-                .text(gettext(text));
+                .attr('aria-pressed', aria)
+                .removeClass('is-active')
+                .addClass(active_class)
+                .find('.sr')
+                    .text(gettext(text));
 
             if (state.videoPlayer) {
                 state.videoPlayer.log(type, {

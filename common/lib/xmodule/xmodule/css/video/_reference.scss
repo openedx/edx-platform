@@ -1,0 +1,800 @@
+& {
+    margin-bottom: ($baseline*1.5);
+}
+
+// div.video {
+//   @include clearfix();
+//   background: #f3f3f3;
+//   display: block;
+//   margin: 0 -12px;
+//   padding: 12px;
+//   border-radius: 5px;
+//   outline: none;
+
+//   &:focus, &:active, &:hover {
+//     border: 0;
+//   }
+
+//   &.is-initialized {
+//     article.video-wrapper {
+//       .spinner {
+//         display: none;
+//       }
+//     }
+//   }
+
+//   div.tc-wrapper {
+//     @include clearfix();
+//     position: relative;
+//   }
+
+//   div.focus_grabber {
+//     position: relative;
+//     display: inline;
+//     width: 0px;
+//     height: 0px;
+//   }
+
+//   .wrapper-downloads {
+//     margin: 0;
+//     padding: 0;
+
+//     .video-download-button{
+//       display: inline-block;
+//       vertical-align: top;
+//       margin: ($baseline*0.75) ($baseline/2) 0 0;
+
+//       > a {
+//         @include transition(all $tmg-f2 ease-in-out 0s);
+//         @include font-size(14);
+//         line-height : 14px;
+//         float: left;
+//         border-radius: 3px;
+//         background-color: $very-light-text;
+//         padding: ($baseline*0.75);
+//         color: $lighter-base-font-color;
+
+//         &:hover, &:focus {
+//           background-color: $action-primary-active-bg;
+//           color: $very-light-text;
+//         }
+//       }
+//     }
+//     .video-tracks {
+//       > a {
+//         border-radius: 3px 0 0 3px;
+//       }
+//       > a.external-track {
+//         border-radius: 3px;
+//       }
+//     }
+
+//     .branding {
+//       display: inline-block;
+//       float: right;
+//       margin: 15px 0 0 10px;
+//       vertical-align: top;
+
+//       .host-tag {
+//         @include margin-right($baseline/2);
+//         position: absolute;
+//         left: -9999em;
+//         display: inline-block;
+//         vertical-align: middle;
+//         font-size: 70%;
+//         color: #777;
+//       }
+
+//       .brand-logo {
+//         display: inline-block;
+//         max-width: 100%;
+//         max-height: ($baseline*2);
+//         padding: ($baseline/4) 0;
+//         vertical-align: middle;
+//       }
+//     }
+//   }
+
+//   article.video-wrapper {
+//     float: left;
+//     margin-right: flex-gutter(9);
+//     width: flex-grid(6, 9);
+//     background-color: black;
+//     position: relative;
+
+//     div.video-player-pre, div.video-player-post {
+//        height: 50px;
+//        background-color: black;
+//     }
+
+//     .spinner {
+//       @include transform(translate(-50%, -50%));
+//       position: absolute;
+//       z-index: 1;
+//       background: rgba(0, 0, 0, 0.7);
+//       top: 50%;
+//       left: 50%;
+//       padding: 30px;
+//       border-radius: 25%;
+
+//       &:after{
+//         @include animation(rotateCW 3s infinite linear);
+//         content: '';
+//         display: block;
+//         width: 30px;
+//         height: 30px;
+//         border: 7px solid white;
+//         border-top-color: transparent;
+//         border-radius: 100%;
+//         position: relative;
+//       }
+//     }
+
+//     .btn-play {
+//       @include transform(translate(-50%, -50%));
+//       position: absolute;
+//       z-index: 1;
+//       background: rgba(0, 0, 0, 0.7);
+//       top: 50%;
+//       left: 50%;
+//       padding: 30px;
+//       border-radius: 25%;
+
+//       &:after{
+//         content: '';
+//         display: block;
+//         width: 0px;
+//         height: 0px;
+//         border-style: solid;
+//         border-width: 30px 0 30px 50px;
+//         border-color: transparent transparent transparent $white;
+//         position: relative;
+//       }
+//     }
+
+//     section.video-player {
+//       overflow: hidden;
+//       min-height: 300px;
+
+//       > div {
+//         height: 100%;
+
+//         &.hidden {
+//           display: none;
+//         }
+//       }
+
+//       object, iframe, video {
+//         border: none;
+//         width: 100%;
+//       }
+
+//       h3 {
+//         text-align: center;
+//         color: white;
+
+//         &.hidden {
+//           display: none;
+//         }
+//       }
+//     }
+
+//     section.video-controls {
+//       @include clearfix();
+//       background: #333;
+//       border: 1px solid $black;
+//       border-top: 0;
+//       color: $gray-l3;
+//       position: relative;
+
+//       &:hover, &:focus {
+//         ul, div {
+//           opacity: 1;
+//         }
+//       }
+
+//       %video-button {
+//         @extend %ui-fake-link;
+//         @include transition(none);
+//         display: block;
+//         font-weight: 800;
+//         line-height: 46px;
+//         margin: 0;
+//         padding: 0 0 0 15px;
+//         overflow: hidden;
+//         text-indent: -9999px;
+//         -webkit-font-smoothing: antialiased;
+//         box-shadow: 1px 0 0 #555, inset 1px 0 0 #555;
+//         color: $white;
+//         border-width: 0 1px;
+//         border-style: solid;
+//         border-color: $black;
+
+//         &:hover, &:focus {
+//           background-color: #444;
+//           color: $white;
+//           text-decoration: none;
+//         }
+
+//         &:active,
+//         &:focus {
+//           color: $white;
+//           background-color: #444;
+//           text-decoration: none;
+//         }
+//       }
+
+//       div.slider {
+//         @include clearfix();
+//         @include transform(scaleY(0.5) translate3d(0, 50%, 0));
+//         background: #c2c2c2;
+//         border: 1px solid $black;
+//         border-radius: 0;
+//         border-top: 1px solid $black;
+//         box-shadow: inset 0 1px 0 #eee, 0 1px 0 #555;
+//         position: absolute;
+//         z-index: 1;
+//         bottom: 100%;
+//         left: 0;
+//         right: 0;
+//         height: 14px;
+//         margin-left: -1px;
+//         margin-right: -1px;
+//         -webkit-transition: -webkit-transform 0.7s ease-in-out;
+//         -moz-transition: -moz-transform 0.7s ease-in-out;
+//         -ms-transition: -ms-transform 0.7s ease-in-out;
+//         transition: transform 0.7s ease-in-out;
+
+//         div.ui-widget-header {
+//           background: #777;
+//           box-shadow: inset 0 1px 0 #999;
+//         }
+
+//         div.ui-corner-all.slider-range {
+//           background-color: #1e91d3;
+//           opacity: 0.3;
+//         }
+
+//         a.ui-slider-handle {
+//           @extend %ui-fake-link;
+//           @include transform(scale(.7, 1.3) translate3d(-80%, -15%, 0));
+//           background: $pink url(../images/slider-handle.png) center center no-repeat;
+//           background-size: 50%;
+//           border: 1px solid darken($pink, 20%);
+//           border-radius: 50%;
+//           box-shadow: inset 0 1px 0 lighten($pink, 10%);
+//           height: 20px;
+//           margin-left: 0;
+//           top: 0;
+//           -webkit-transition: -webkit-transform 0.7s ease-in-out;
+//           -moz-transition: -moz-transform 0.7s ease-in-out;
+//           -ms-transition: -ms-transform 0.7s ease-in-out;
+//           transition: transform 0.7s ease-in-out;
+//           width: 20px;
+
+//           &:focus, &:hover {
+//             background-color: lighten($pink, 10%);
+//           }
+//         }
+//       }
+
+//       ul.vcr {
+//         float: left;
+//         list-style: none;
+//         margin: 0 lh() 0 0;
+//         padding: 0;
+
+//         @media (max-width: 1120px) {
+//           margin-right: lh(0.5);
+//           font-size: em(14);
+//         }
+
+//         li {
+//           float: left;
+//           margin-bottom: 0;
+
+//           a {
+//             @extend %video-button;
+//             background-image: url('../images/vcr.png');
+//             background-position: 15px 15px ;
+//             background-repeat: no-repeat;
+//             border-left: none;
+//             box-shadow: 1px 0 0 #555;
+//             padding: 0 lh(.75);
+//             width: 14px;
+
+//             &:focus {
+//               @extend %ui-depth4;
+//               position: relative;
+//               outline: $white dotted thin;
+//               outline-offset: -2px;
+//             }
+
+//             &:empty {
+//               height: 46px;
+//               background-position: 15px 15px;
+//             }
+
+//             &.play {
+//               background-position: 17px -114px;
+//             }
+
+//             &.pause {
+//               background-position: 16px -50px;
+//             }
+//           }
+
+//           div.vidtime {
+//             font-weight: bold;
+//             line-height: 46px; //height of play pause buttons
+//             -webkit-font-smoothing: antialiased;
+//             padding-left: lh(.75);
+//             @media (max-width: 1120px) {
+//               padding-left: lh(0.5);
+//             }
+//           }
+//         }
+//       }
+
+//       div.secondary-controls {
+//         float: right;
+
+//         a.speed-button,
+//         div.volume > a,
+//         a.add-fullscreen,
+//         a.quality-control,
+//         a.hide-subtitles {
+//           // overflow is used to bypass Firefox CSS :focus outline bug
+//           // http://johndoesdesign.com/blog/2012/css/firefox-and-its-css-focus-outline-bug/
+//           &:focus {
+//             @extend %ui-depth5;
+//             position: relative;
+//             outline: $white dotted thin;
+//             outline-offset: -2px;
+//             overflow: auto;
+//           }
+//         }
+
+//         .menu-container {
+//           float: left;
+//           position: relative;
+
+//           &.is-opened {
+//             .menu {
+//               display: block;
+//               opacity: 1;
+//               padding: 0;
+//               margin: 0;
+//               list-style: none;
+//             }
+//           }
+
+//           .menu {
+//             @include transition(none);
+//             @extend %ui-depth1;
+//             box-shadow: inset 1px 0 0 #555, 0 1px 0 #444;
+//             background-color: #444;
+//             border: 1px solid $black;
+//             bottom: 46px;
+//             display: none;
+//             opacity: 0;
+//             position: absolute;
+
+//             li {
+//               @extend %ui-fake-link;
+//               box-shadow:  0 1px 0 #555;
+//               border-bottom: 1px solid $black;
+//               color: $white;
+
+//               a {
+//                 border: 0;
+//                 color: $white;
+//                 display: block;
+//                 padding: lh(0.5);
+//                 overflow: hidden;
+//                 text-overflow: ellipsis;
+//                 white-space: nowrap;
+
+//                 &:hover, &:focus {
+//                   background-color: #666;
+//                   color: #aaa;
+//                   outline-offset: -4px;
+//                 }
+//               }
+
+//               &.is-active{
+//                 a {
+//                   font-weight: bold;
+//                 }
+//               }
+
+//               &:last-child {
+//                 box-shadow: none;
+//                 border-bottom: 0;
+//                 margin-top: 0;
+//               }
+//             }
+//           }
+//         }
+
+//         div.speeds {
+//           &.is-opened {
+//             .speed-button {
+//               background-image: url('../images/open-arrow.png');
+//             }
+//           }
+
+//           .menu{
+//             width: 131px;
+
+//             @media (max-width: 1120px) {
+//               width: 80px;
+//             }
+//           }
+
+//           .speed-button {
+//             @extend %video-button;
+//             @include clearfix();
+//             background-image: url('../images/closed-arrow.png');
+//             background-position: 10px center;
+//             background-repeat: no-repeat;
+//             min-width: 116px;
+//             text-indent: 0;
+
+//             @media (max-width: 1120px) {
+//               min-width: 0;
+//               width: 60px;
+//             }
+
+//             .label {
+//               float: left;
+//               font-size: em(14);
+//               font-weight: normal;
+//               letter-spacing: 1px;
+//               padding: 0 lh(0.25) 0 lh(0.5);
+//               line-height: 46px;
+//               text-transform: uppercase;
+//               color: #999;
+
+//               @media (max-width: 1120px) {
+//                 display: none;
+//               }
+//             }
+
+//             .value {
+//               float: left;
+//               font-weight: bold;
+//               margin-bottom: 0;
+//               padding: 0 lh(0.5) 0 0;
+
+//               @media (max-width: 1120px) {
+//                 padding: 0 lh(0.5) 0 lh(0.5);
+//               }
+
+//               line-height: 46px;
+//               color: $white;
+//             }
+//           }
+//         }
+
+//         div.volume {
+//           float: left;
+//           position: relative;
+
+//           &.is-opened {
+//             .volume-slider-container {
+//               display: block;
+//               opacity: 1;
+//             }
+//           }
+
+//           &.is-muted {
+//             & > a {
+//               background-image: url('../images/mute.png');
+//             }
+//           }
+
+//           & > a {
+//             @extend %video-button;
+//             @include clearfix();
+//             background-image: url('../images/volume.png');
+//             background-position: 10px center;
+//             background-repeat: no-repeat;
+//             border-left: none;
+//             width: 30px;
+//             height: 46px;
+//           }
+
+//           .volume-slider-container {
+//             @include transition(none);
+//             @extend %ui-depth1;
+//             box-shadow: inset 1px 0 0 #555, 0 3px 0 #444;
+//             background-color: #444;
+//             border: 1px solid $black;
+//             bottom: 46px;
+//             display: none;
+//             opacity: 0;
+//             position: absolute;
+//             width: 45px;
+//             height: 125px;
+//             margin-left: -1px;
+
+//             .volume-slider {
+//               height: 100px;
+//               border: 0;
+//               width: 5px;
+//               margin: 14px auto;
+//               background: #666;
+//               border: 1px solid $black;
+//               box-shadow: 0 1px 0 #333;
+
+//               a.ui-slider-handle {
+//                 @extend %ui-fake-link;
+//                 @include transition(height $tmg-s2 ease-in-out 0s, width $tmg-s2 ease-in-out 0s);
+//                 background: $pink url(../images/slider-handle.png) center center no-repeat;
+//                 background-size: 50%;
+//                 border: 1px solid darken($pink, 20%);
+//                 border-radius: 15px;
+//                 box-shadow: inset 0 1px 0 lighten($pink, 10%);
+//                 height: 15px;
+//                 left: -6px;
+//                 width: 15px;
+//               }
+
+//               .ui-slider-range {
+//                 background: #ddd;
+//               }
+//             }
+//           }
+//         }
+
+//         a.add-fullscreen {
+//           @extend %video-button;
+//           background: url(../images/fullscreen.png) center no-repeat;
+//           border-left: none;
+//           float: left;
+//           padding: 0 11px;
+//           width: 30px;
+//         }
+
+
+//         a.quality-control {
+//           @extend %video-button;
+//           background: url(../images/hd.png) center no-repeat;
+//           border-left: none;
+//           float: left;
+//           padding: 0 11px;
+//           width: 30px;
+
+//           &.active {
+//             background-color: #F44;
+//             color: #0ff;
+//             text-decoration: none;
+//           }
+
+//           &.is-hidden {
+//             display: none !important;
+//           }
+//         }
+
+//         div.lang {
+//           & > a.hide-subtitles {
+//             @extend %video-button;
+//             @include transition(none);
+//             box-shadow: inset 1px 0 0 #555;
+//             background: url('../images/cc.png') center no-repeat;
+//             border-left: none;
+//             border-right: none;
+//             padding: 0 11px;
+//             width: 30px;
+
+//             &.off {
+//               opacity: 0.7;
+//             }
+//           }
+
+//           .menu.langs-list {
+//             right: -1px;
+//             width: 150px;
+//           }
+//         }
+//       }
+//     }
+
+//     &:hover section.video-controls {
+//       ul, div {
+//         opacity: 1;
+//       }
+
+//       div.slider {
+//         @include transform(scaleY(1) translate3d(0, 0, 0));
+
+//         a.ui-slider-handle {
+//           @include transform(scale(1) translate3d(-50%, -15%, 0));
+//         }
+//       }
+//     }
+//   }
+
+//   ol.subtitles {
+//     padding-left: 0;
+//     float: left;
+//     max-height: 460px;
+//     overflow: auto;
+//     width: flex-grid(3, 9);
+//     margin: 0;
+//     font-size: 14px;
+//     list-style: none;
+//     visibility: visible;
+
+//     li {
+//       @extend %ui-fake-link;
+//       border: 0;
+//       color: rgb(29,157,217);
+//       margin-bottom: 8px;
+//       padding: 0;
+//       line-height: lh();
+
+//       &.current {
+//         color: #333;
+//         font-weight: 700;
+//       }
+
+//       &.focused {
+//         outline: #000 dotted thin;
+//         outline-offset: -1px;
+//       }
+
+//       &:hover, &:focus {
+//         text-decoration: underline;
+//       }
+
+//       &:empty {
+//         margin-bottom: 0;
+//       }
+//     }
+//   }
+
+//   &.closed {
+
+//     article.video-wrapper {
+//       width: flex-grid(9,9);
+
+//       background-color: inherit;
+//     }
+
+//     article.video-wrapper section.video-controls.html5 {
+//       bottom: 0;
+//       left: 0;
+//       right: 0;
+//       position: absolute;
+//       z-index: 1;
+//     }
+
+//     article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
+//         height: 0;
+//     }
+
+//     article.video-wrapper section.video-player {
+//       h3 {
+//         color: black;
+//       }
+//     }
+
+//     ol.subtitles {
+//         width: 0;
+//         height: 0;
+//     }
+
+//     ol.subtitles.html5 {
+//         @extend %ui-depth0;
+//         background-color: rgba(243, 243, 243, 0.8);
+//         height: 100%;
+//         position: absolute;
+//         right: 0;
+//         bottom: 0;
+//         top: 0;
+//         width: 275px;
+//         padding: 0 $baseline;
+//         display: none;
+//     }
+//   }
+
+//   &.video-fullscreen {
+//     @extend %ui-depth4;
+//     background: rgba(#000, .95);
+//     border: 0;
+//     bottom: 0;
+//     height: 100%;
+//     left: 0;
+//     margin: 0;
+//     padding: 0;
+//     position: fixed;
+//     top: 0;
+//     width: 100%;
+//     vertical-align: middle;
+//     border-radius: 0;
+
+//     &.closed {
+//       div.tc-wrapper {
+//         article.video-wrapper {
+//           width: 100%;
+//         }
+//       }
+//     }
+
+//     article.video-wrapper div.video-player-pre, article.video-wrapper div.video-player-post {
+//         height: 0;
+//     }
+
+//     article.video-wrapper {
+//         position: static;
+//     }
+
+//     article.video-wrapper section.video-player {
+//       h3 {
+//         color: white;
+//       }
+//     }
+
+//     div.tc-wrapper {
+//       @include clearfix();
+//       width: 100%;
+//       height: 100%;
+
+//       position: static;
+
+//       article.video-wrapper {
+//         height: 100%;
+//         width: 75%;
+//         vertical-align: middle;
+//         margin-right: 0;
+
+//         object, iframe, video{
+//           position: absolute;
+//           width: auto;
+//           height: auto;
+//         }
+//       }
+
+//       section.video-controls {
+//         @extend %ui-depth4;
+//         bottom: 0;
+//         left: 0;
+//         position: absolute;
+//         width: 100%;
+//       }
+//     }
+
+//     ol.subtitles {
+//       @include box-sizing(border-box);
+//       @include transition(none);
+//       background: $black;
+//       height: 100%;
+//       width: 25%;
+//       padding: lh();
+//       visibility: visible;
+
+//       li {
+//         color: #aaa;
+
+//         &.current {
+//           color: $white;
+//         }
+//       }
+//     }
+//   }
+
+//   &.is-touch {
+//     div.tc-wrapper {
+//       article.video-wrapper {
+//         object, iframe, video{
+//           width: 100%;
+//           height: 100%;
+//         }
+//       }
+//     }
+//   }
+// }
+
+

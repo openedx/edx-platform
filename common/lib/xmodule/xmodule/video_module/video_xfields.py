@@ -108,6 +108,12 @@ class VideoFields(object):
         scope=Scope.settings,
         default=True
     )
+    show_overlay_captions = Boolean(
+        help=_("Specify whether the captions appear overlaying the video by default."),
+        display_name=_("Show Captions"),
+        scope=Scope.settings,
+        default=False
+    )
     # Data format: {'de': 'german_translation', 'uk': 'ukrainian_translation'}
     transcripts = Dict(
         help=_("Add transcripts in different languages. Click below to specify a language and upload an .srt transcript file for that language."),
