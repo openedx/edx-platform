@@ -558,6 +558,7 @@
         'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
         'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',
         'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
