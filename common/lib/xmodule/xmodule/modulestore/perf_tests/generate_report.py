@@ -8,7 +8,10 @@ various parts of the system.
 import sqlite3
 from lxml.builder import E
 import lxml.html
-#import click
+try:
+    import click
+except ImportError:
+    click = None
 
 
 DB_NAME = 'block_times.db'
@@ -70,105 +73,217 @@ class HTMLDocument(object):
         return lxml.html.tostring(self.html, pretty_print=pretty_print)
 
 
-def read_timing_data():
+class ReportGenerator(object):
     """
-    Read in the timing data from the sqlite DB and save into a dict.
+    Base class for report generation.
     """
-    run_data = {}
-
-    # Read data from all modulestore combos.
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    sel_sql = 'select id, run_id, block_desc, elapsed, timestamp FROM block_times ORDER BY run_id DESC'
-    cur = conn.cursor()
-    cur.execute(sel_sql)
-    all_modulestore_combos = set()
-    for row in cur.fetchall():
-        time_taken = row[3]
-
-        # Split apart the description into its parts.
-        desc_parts = row[2].split(':')
-        modulestores = desc_parts[1]
-        all_modulestore_combos.add(modulestores)
-        amount_md = desc_parts[2]
-        test_phase = 'all'
-        if len(desc_parts) > 3:
-            test_phase = desc_parts[3]
-
-        # Save the data in a multi-level dict - { phase1: { amount1: {ms1->ms2: duration, ...}, ...}, ...}.
-        phase_data = run_data.setdefault(test_phase, {})
-        amount_data = phase_data.setdefault(amount_md, {})
-        __ = amount_data.setdefault(modulestores, time_taken)
-
-    return all_modulestore_combos, run_data
+    def __init__(self, db_name):
+        # Read data from all modulestore combos.
+        conn = sqlite3.connect(db_name)
+        conn.row_factory = sqlite3.Row
+        sel_sql = 'select id, run_id, block_desc, elapsed, timestamp FROM block_times ORDER BY run_id DESC'
+        cur = conn.cursor()
+        cur.execute(sel_sql)
+        self.all_rows = cur.fetchall()
 
 
-def generate_html(all_ms_combos, run_data):
+class ImportExportReportGen(ReportGenerator):
     """
-    Generate HTML.
+    Class which generates report for course import/export performance test data.
     """
+    def __init__(self, db_name):
+        super(ImportExportReportGen, self).__init__(db_name)
+        self._read_timing_data()
 
-    html = HTMLDocument("Results")
+    def _read_timing_data(self):
+        """
+        Read in the timing data from the sqlite DB and save into a dict.
+        """
+        self.run_data = {}
 
-    # Output comparison of each phase to a different table.
-    for phase in run_data.keys():
-        if phase in ('fake_assets',):
-            continue
-        per_phase = run_data[phase]
-        html.add_header(1, phase)
+        self.all_modulestore_combos = set()
+        for row in self.all_rows:
+            time_taken = row[3]
 
-        title_map = {
-            'duration': 'Total Duration (ms)',
-            'ratio': 'Total Duration Per Number of Assets (ms/asset)',
-            'variable_cost': 'Asset Export Duration Per Number of Assets (ms/asset)'
-        }
-        for table_type in ('duration', 'ratio', 'variable_cost'):
-            if phase == 'all' and table_type in ('ratio', 'variable_cost'):
+            # Split apart the description into its parts.
+            desc_parts = row[2].split(':')
+            modulestores = desc_parts[1]
+            self.all_modulestore_combos.add(modulestores)
+            amount_md = desc_parts[2]
+            test_phase = 'all'
+            if len(desc_parts) > 3:
+                test_phase = desc_parts[3]
+
+            # Save the data in a multi-level dict - { phase1: { amount1: {ms1->ms2: duration, ...}, ...}, ...}.
+            phase_data = self.run_data.setdefault(test_phase, {})
+            amount_data = phase_data.setdefault(amount_md, {})
+            __ = amount_data.setdefault(modulestores, time_taken)
+
+    def generate_html(self):
+        """
+        Generate HTML.
+        """
+        html = HTMLDocument("Results")
+
+        # Output comparison of each phase to a different table.
+        for phase in self.run_data.keys():
+            if phase in ('fake_assets',):
                 continue
+            per_phase = self.run_data[phase]
+            html.add_header(1, phase)
+
+            title_map = {
+                'duration': 'Total Duration (ms)',
+                'ratio': 'Total Duration Per Number of Assets (ms/asset)',
+                'variable_cost': 'Asset Export Duration Per Number of Assets (ms/asset)'
+            }
+            for table_type in ('duration', 'ratio', 'variable_cost'):
+                if phase == 'all' and table_type in ('ratio', 'variable_cost'):
+                    continue
+                # Make the table header columns and the table.
+                columns = ["Asset Metadata Amount", ]
+                ms_keys = sorted(self.all_modulestore_combos)
+                for k in ms_keys:
+                    columns.append("{} ({})".format(k, table_type))
+                phase_table = HTMLTable(columns)
+
+                # Make a row for each amount of asset metadata.
+                for amount in sorted(per_phase.keys()):
+                    per_amount = per_phase[amount]
+                    num_assets = int(amount)
+                    row = [amount, ]
+                    for modulestore in ms_keys:
+                        if table_type == 'duration':
+                            value = per_amount[modulestore]
+                        elif table_type == 'ratio':
+                            if num_assets != 0:
+                                value = per_amount[modulestore] / float(amount)
+                            else:
+                                value = 0
+                        elif table_type == 'variable_cost':
+                            if num_assets == 0:
+                                value = 0
+                            else:
+                                value = (per_amount[modulestore] - per_phase['0'][modulestore]) / float(amount)
+                        row.append("{}".format(value))
+                    phase_table.add_row(row)
+
+                # Add the table title and the table.
+                html.add_header(2, title_map[table_type])
+                html.add_to_body(phase_table.table)
+
+        return html
+
+
+class FindReportGen(ReportGenerator):
+    """
+    Class which generates report for asset access performance test data.
+    """
+    def __init__(self, db_name):
+        super(FindReportGen, self).__init__(db_name)
+        self._read_timing_data()
+
+    def _read_timing_data(self):
+        """
+        Read in the timing data from the sqlite DB and save into a dict.
+        """
+        self.run_data = {}
+
+        self.all_modulestores = set()
+        for row in self.all_rows:
+            time_taken = row[3]
+
+            # Split apart the description into its parts.
+            desc_parts = row[2].split(':')
+            if desc_parts[0] != 'FindAssetTest':
+                continue
+            modulestore, amount_md = desc_parts[1:3]
+            self.all_modulestores.add(modulestore)
+            test_phase = 'all'
+            sort = None
+            if len(desc_parts) >= 4:
+                test_phase = desc_parts[3]
+            if len(desc_parts) >= 5:
+                sort = desc_parts[4]
+
+            # Save the data in a multi-level dict:
+            #   { phase1: { [sort1: {] amount1: { modulestore1: duration, ...}, ...}, ...}.
+            phase_data = self.run_data.setdefault(test_phase, {})
+            if test_phase == 'get_asset_list':
+                # Add a level here for the sort.
+                phase_data = phase_data.setdefault(sort, {})
+            amount_data = phase_data.setdefault(amount_md, {})
+            __ = amount_data.setdefault(modulestore, time_taken)
+
+    def generate_html(self):
+        """
+        Generate HTML.
+        """
+        html = HTMLDocument("Results")
+
+        # Output comparison of each phase to a different table.
+        # for store in self.run_data.keys():
+        #     per_phase = self.run_data[store]
+        #     html.add_header(1, store)
+
+        for phase in self.run_data.keys():
+            per_phase = self.run_data[phase]
+
             # Make the table header columns and the table.
             columns = ["Asset Metadata Amount", ]
-            ms_keys = sorted(all_ms_combos)
+            ms_keys = sorted(self.all_modulestores)
             for k in ms_keys:
-                columns.append("{} ({})".format(k, table_type))
+                columns.append("Time Taken (ms) ({})".format(k))
             phase_table = HTMLTable(columns)
+            if phase != 'get_asset_list':
+                for amount in sorted(per_phase.keys()):
+                    per_amount = per_phase[amount]
+                    row = [amount, ]
+                    for modulestore in ms_keys:
+                        time_taken = per_amount[modulestore]
+                        row.append("{}".format(time_taken))
+                    phase_table.add_row(row)
+                html.add_header(2, phase)
+                html.add_to_body(phase_table.table)
+            else:
+                # get_asset_list phase includes the sort as well.
+                html.add_header(2, phase)
+                for sort in per_phase.keys():
+                    sort_table = HTMLTable(columns)
+                    per_sort = per_phase[sort]
+                    for amount in sorted(per_sort.keys()):
+                        per_amount = per_sort[amount]
+                        row = [amount, ]
+                        for modulestore in ms_keys:
+                            # Each sort has two different ranges retrieved.
+                            time_taken = per_amount[modulestore] / 2.0
+                            row.append("{}".format(time_taken))
+                        sort_table.add_row(row)
+                    html.add_header(3, sort)
+                    html.add_to_body(sort_table.table)
 
-            # Make a row for each amount of asset metadata.
-            for amount in sorted(per_phase.keys()):
-                per_amount = per_phase[amount]
-                num_assets = int(amount)
-                row = [amount, ]
-                for modulestore in ms_keys:
-                    if table_type == 'duration':
-                        value = per_amount[modulestore]
-                    elif table_type == 'ratio':
-                        if num_assets != 0:
-                            value = per_amount[modulestore] / float(amount)
-                        else:
-                            value = 0
-                    elif table_type == 'variable_cost':
-                        if num_assets == 0:
-                            value = 0
-                        else:
-                            value = (per_amount[modulestore] - per_phase['0'][modulestore]) / float(amount)
-                    row.append("{}".format(value))
-                phase_table.add_row(row)
-
-            # Add the table title and the table.
-            html.add_header(2, title_map[table_type])
-            html.add_to_body(phase_table.table)
-
-    return html
+        return html
 
 
-# @click.command()
-# @click.argument('outfile', type=click.File('w'), default='-', required=False)
-# def cli(outfile):
-#     """
-#     Generate an HTML report from the sqlite timing data.
-#     """
-#     all_ms_combos, run_data = read_timing_data()
-#     html = generate_html(all_ms_combos, run_data)
-#     click.echo(html.tostring(), file=outfile)
+if click is not None:
+    @click.command()
+    @click.argument('outfile', type=click.File('w'), default='-', required=False)
+    @click.option('--db_name', help='Name of sqlite database from which to read data.', default=DB_NAME)
+    @click.option('--data_type', help='Data type to process. One of: "imp_exp" or "find"', default="find")
+    def cli(outfile, db_name, data_type):
+        """
+        Generate an HTML report from the sqlite timing data.
+        """
+        if data_type == 'imp_exp':
+            ie_gen = ImportExportReportGen(db_name)
+            html = ie_gen.generate_html()
+        elif data_type == 'find':
+            f_gen = FindReportGen(db_name)
+            html = f_gen.generate_html()
+        click.echo(html.tostring(), file=outfile)
 
-# if __name__ == '__main__':
-#     cli()  # pylint: disable=no-value-for-parameter
+if __name__ == '__main__':
+    if click is not None:
+        cli()  # pylint: disable=no-value-for-parameter
+    else:
+        print "Aborted! Module 'click' is not installed."
