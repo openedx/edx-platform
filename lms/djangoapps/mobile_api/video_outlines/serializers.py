@@ -209,4 +209,9 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "language": video_descriptor.get_default_transcript_language(),
         "category": video_descriptor.category,
         "id": unicode(video_descriptor.scope_ids.usage_id),
+        "encodings": {
+            "low": video_url,
+            "high": video_url,
+            "youtube": video_url,
+        }
     }
