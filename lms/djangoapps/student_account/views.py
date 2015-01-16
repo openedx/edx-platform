@@ -9,6 +9,7 @@ from django.http import (
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
+from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -261,11 +262,11 @@ def password_change_request_handler(request):
             # Increment the rate limit counter
             limiter.tick_bad_request_counter(request)
 
-            return HttpResponseBadRequest("No active user with the provided email address exists.")
+            return HttpResponseBadRequest(_("No user with the provided email address exists."))
 
         return HttpResponse(status=200)
     else:
-        return HttpResponseBadRequest("No email address provided.")
+        return HttpResponseBadRequest(_("No email address provided."))
 
 
 def _third_party_auth_context(request):
