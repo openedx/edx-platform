@@ -4,6 +4,7 @@ The container page is used both for displaying units, and
 for displaying containers within units.
 """
 from nose.plugins.attrib import attr
+from unittest import skip
 
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.component_editor import ComponentEditorView, ComponentVisibilityEditorView
@@ -69,6 +70,7 @@ class NestedVerticalTest(ContainerBase):
         )
 
 
+@skip("Flaky: 01/16/2015")
 @attr('shard_1')
 class DragAndDropTest(NestedVerticalTest):
     """
