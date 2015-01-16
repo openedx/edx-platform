@@ -39,7 +39,7 @@ class CourseUpdatesList(generics.ListAPIView):
     @mobile_course_access()
     def list(self, request, course, *args, **kwargs):
         course_updates_module = get_course_info_section_module(request, course, 'updates')
-        update_items = list(reversed(get_course_update_items(course_updates_module)))
+        update_items = get_course_update_items(course_updates_module)
 
         updates_to_show = [
             update for update in update_items
