@@ -139,6 +139,100 @@ class CourseDetailsTestCase(CourseTestCase):
             self.assertNotContains(response, "Course Introduction Video")
             self.assertNotContains(response, "Requirements")
 
+    def _seed_milestone_relationship_types(self):
+        """
+        Helper method to prepopulate MRTs so the tests can run
+        Note the settings check -- exams feature must be enabled for the tests to run correctly
+        """
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+            from milestones.models import MilestoneRelationshipType
+            MilestoneRelationshipType.objects.create(name='requires')
+            MilestoneRelationshipType.objects.create(name='fulfills')
+
+    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    def test_entrance_exam_created_and_deleted_successfully(self):
+        self._seed_milestone_relationship_types()
+        settings_details_url = get_url(self.course.id)
+        data = {
+            'entrance_exam_enabled': 'true',
+            'entrance_exam_minimum_score_pct': '60',
+            'syllabus': 'none',
+            'short_description': 'empty',
+            'overview': '',
+            'effort': '',
+            'intro_video': ''
+        }
+        response = self.client.post(settings_details_url, data=json.dumps(data), content_type='application/json',
+                                    HTTP_ACCEPT='application/json')
+        self.assertEquals(response.status_code, 200)
+        course = modulestore().get_course(self.course.id)
+        self.assertTrue(course.entrance_exam_enabled)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, .60)
+
+        # Delete the entrance exam
+        data['entrance_exam_enabled'] = "false"
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        course = modulestore().get_course(self.course.id)
+        self.assertEquals(response.status_code, 200)
+        self.assertFalse(course.entrance_exam_enabled)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, None)
+
+    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    def test_entrance_exam_store_default_min_score(self):
+        """
+        test that creating an entrance exam should store the default value, if key missing in json request
+        or entrance_exam_minimum_score_pct is an empty string
+        """
+        self._seed_milestone_relationship_types()
+        settings_details_url = get_url(self.course.id)
+        test_data_1 = {
+            'entrance_exam_enabled': 'true',
+            'syllabus': 'none',
+            'short_description': 'empty',
+            'overview': '',
+            'effort': '',
+            'intro_video': ''
+        }
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(test_data_1),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        self.assertEquals(response.status_code, 200)
+        course = modulestore().get_course(self.course.id)
+        self.assertTrue(course.entrance_exam_enabled)
+
+        # entrance_exam_minimum_score_pct is not present in the request so default value should be saved.
+        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+
+        #add entrance_exam_minimum_score_pct with empty value in json request.
+        test_data_2 = {
+            'entrance_exam_enabled': 'true',
+            'entrance_exam_minimum_score_pct': '',
+            'syllabus': 'none',
+            'short_description': 'empty',
+            'overview': '',
+            'effort': '',
+            'intro_video': ''
+        }
+
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(test_data_2),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        self.assertEquals(response.status_code, 200)
+        course = modulestore().get_course(self.course.id)
+        self.assertTrue(course.entrance_exam_enabled)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, .5)
+
     def test_editable_short_description_fetch(self):
         settings_details_url = get_url(self.course.id)
 

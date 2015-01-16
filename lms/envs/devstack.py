@@ -104,6 +104,15 @@ FEATURES['ADVANCED_SECURITY'] = False
 PASSWORD_MIN_LENGTH = None
 PASSWORD_COMPLEXITY = {}
 
+
+########################### Milestones #################################
+FEATURES['MILESTONES_APP'] = True
+
+
+########################### Entrance Exams #################################
+FEATURES['ENTRANCE_EXAMS'] = True
+
+
 #####################################################################
 # See if the developer has any local overrides.
 try:

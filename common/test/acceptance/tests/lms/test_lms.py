@@ -7,13 +7,14 @@ from textwrap import dedent
 from unittest import skip
 from nose.plugins.attrib import attr
 
-from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise
+from bok_choy.web_app_test import WebAppTest
 from ..helpers import (
     UniqueCourseTest,
     load_data_str,
     generate_course_key,
     select_option_by_value,
+    element_has_text
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.common.logout import LogoutPage
@@ -27,6 +28,7 @@ from ...pages.lms.dashboard import DashboardPage
 from ...pages.lms.problem import ProblemPage
 from ...pages.lms.video.video import VideoPage
 from ...pages.lms.courseware import CoursewarePage
+from ...pages.studio.settings import SettingsPage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...pages.studio.settings import SettingsPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
@@ -771,3 +773,73 @@ class ProblemExecutionTest(UniqueCourseTest):
         problem_page.fill_answer("4")
         problem_page.click_check()
         self.assertFalse(problem_page.is_correct())
+
+
+class EntranceExamTest(UniqueCourseTest):
+    """
+    Tests that course has an entrance exam.
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(EntranceExamTest, self).setUp()
+
+        CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        ).install()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_entrance_exam_section(self):
+        """
+         Scenario: Any course that is enabled for an entrance exam, should have entrance exam section at course info
+         page.
+            Given that I am on the course info page
+            When I view the course info that has an entrance exam
+            Then there should be an "Entrance Exam" section.'
+        """
+
+        # visit course info page and make sure there is not entrance exam section.
+        self.course_info_page.visit()
+        self.course_info_page.wait_for_page()
+        self.assertFalse(element_has_text(
+            page=self.course_info_page,
+            css_selector='div ol li a',
+            text='Entrance Exam'
+        ))
+
+        # Logout and login as a staff.
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(self.browser, course_id=self.course_id, staff=True).visit()
+
+        # visit course settings page and set/enabled entrance exam for that course.
+        self.settings_page.visit()
+        self.settings_page.wait_for_page()
+        self.assertTrue(self.settings_page.is_browser_on_page())
+        self.settings_page.entrance_exam_field[0].click()
+        self.settings_page.save_changes()
+
+        # Logout and login as a student.
+        LogoutPage(self.browser).visit()
+        AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
+
+        # visit course info page and make sure there is an "Entrance Exam" section.
+        self.course_info_page.visit()
+        self.course_info_page.wait_for_page()
+        self.assertTrue(element_has_text(
+            page=self.course_info_page,
+            css_selector='div ol li a',
+            text='Entrance Exam'
+        ))

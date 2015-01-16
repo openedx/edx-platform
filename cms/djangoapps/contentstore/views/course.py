@@ -60,6 +60,8 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from contentstore.tasks import rerun_course
+from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam
+
 from .library import LIBRARIES_ENABLED
 from .item import create_xblock_info
 from course_creators.views import get_course_creator_status, add_user_with_status_unrequested
@@ -824,7 +826,8 @@ def settings_handler(request, course_key_string):
                 'details_url': reverse_course_url('settings_handler', course_key),
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
-                'upload_asset_url': upload_asset_url
+                'upload_asset_url': upload_asset_url,
+                'course_handler_url': reverse_course_url('course_handler', course_key),
             }
             if prerequisite_course_enabled:
                 courses, in_process_course_actions = get_courses_accessible_to_user(request)
@@ -843,13 +846,40 @@ def settings_handler(request, course_key_string):
                     # encoder serializes dates, old locations, and instances
                     encoder=CourseSettingsEncoder
                 )
-            else:  # post or put, doesn't matter.
+            # For every other possible method type submitted by the caller...
+            else:
                 # if pre-requisite course feature is enabled set pre-requisite course
                 if prerequisite_course_enabled:
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
                     if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
                         return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
                     set_prerequisite_courses(course_key, prerequisite_course_keys)
+
+                # If the entrance exams feature has been enabled, we'll need to check for some
+                # feature-specific settings and handle them accordingly
+                # We have to be careful that we're only executing the following logic if we actually
+                # need to create or delete an entrance exam from the specified course
+                if settings.FEATURES.get('ENTRANCE_EXAMS', False):
+                    course_entrance_exam_present = course_module.entrance_exam_enabled
+                    entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
+                    ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
+
+                    # If the entrance exam box on the settings screen has been checked,
+                    # and the course does not already have an entrance exam attached...
+                    if entrance_exam_enabled and not course_entrance_exam_present:
+                        # Load the default minimum score threshold from settings, then try to override it
+                        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+                        if ee_min_score_pct and ee_min_score_pct != '':
+                            entrance_exam_minimum_score_pct = float(ee_min_score_pct)
+                        # Create the entrance exam
+                        create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+
+                    # If the entrance exam box on the settings screen has been unchecked,
+                    # and the course has an entrance exam attached...
+                    elif not entrance_exam_enabled and course_entrance_exam_present:
+                        delete_entrance_exam(request, course_key)
+
+                # Perform the normal update workflow for the CourseDetails model
                 return JsonResponse(
                     CourseDetails.update_from_json(course_key, request.json, request.user),
                     encoder=CourseSettingsEncoder
