@@ -840,5 +840,26 @@ ADVANCED_PROBLEM_TYPES = [
         'boilerplate_name': None,
     }
 ]
+
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
+
+# Files and Uploads type filter values
+
+FILES_AND_UPLOAD_TYPE_FILTERS = {
+    "Images": ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/tiff', 'image/tif', 'image/x-icon'],
+    "Documents": [
+        'application/pdf',
+        'text/plain',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+        'application/vnd.openxmlformats-officedocument.presentationml.template',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+        'application/msword',
+        'application/vnd.ms-excel',
+        'application/vnd.ms-powerpoint',
+    ],
+}

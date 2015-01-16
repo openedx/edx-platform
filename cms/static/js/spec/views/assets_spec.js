@@ -1,6 +1,6 @@
-define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views/assets",
+define([ "jquery", "js/common_helpers/ajax_helpers", "URI", "js/views/asset", "js/views/assets",
     "js/models/asset", "js/collections/asset", "js/spec_helpers/view_helpers"],
-    function ($, AjaxHelpers, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
+    function ($, AjaxHelpers, URI, AssetView, AssetsView, AssetModel, AssetCollection, ViewHelpers) {
 
         describe("Assets", function() {
             var assetsView, mockEmptyAssetsResponse, mockAssetUploadResponse, mockFileUpload,
@@ -28,6 +28,7 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     collection: collection,
                     el: $('#asset_table_body')
                 });
+
                 assetsView.render();
             });
 
@@ -50,6 +51,68 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 totalCount: 0
             };
 
+            var mockExampleAssetsResponse = {
+                sort: "uploadDate",
+                end: 2,
+                assets: [
+                    {
+                        "display_name": "test.jpg",
+                        "url": "/c4x/A/CS102/asset/test.jpg",
+                        "date_added": "Nov 07, 2014 at 17:47 UTC",
+                        "id": "/c4x/A/CS102/asset/test.jpg",
+                        "portable_url": "/static/test.jpg",
+                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
+                    },
+                    {
+                        "display_name": "test.pdf",
+                        "url": "/c4x/A/CS102/asset/test.pdf",
+                        "date_added": "Oct 20, 2014 at 11:00 UTC",
+                        "id": "/c4x/A/CS102/asset/test.pdf",
+                        "portable_url": "/static/test.pdf",
+                        "thumbnail": null,
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.pdf"
+                    },
+                    {
+                        "display_name": "test.odt",
+                        "url": "/c4x/A/CS102/asset/test.odt",
+                        "date_added": "Oct 20, 2014 at 11:00 UTC",
+                        "id": "/c4x/A/CS102/asset/test.odt",
+                        "portable_url": "/static/test.odt",
+                        "thumbnail": null,
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.odt"
+                    }
+                ],
+                pageSize: 2,
+                totalCount: 2,
+                start: 0,
+                page: 0
+            };
+
+            var mockExampleFilteredAssetsResponse = {
+                sort: "uploadDate",
+                end: 1,
+                assets: [
+                    {
+                        "display_name": "test.jpg",
+                        "url": "/c4x/A/CS102/asset/test.jpg",
+                        "date_added": "Nov 07, 2014 at 17:47 UTC",
+                        "id": "/c4x/A/CS102/asset/test.jpg",
+                        "portable_url": "/static/test.jpg",
+                        "thumbnail": "/c4x/A/CS102/thumbnail/test.jpg",
+                        "locked": false,
+                        "external_url": "localhost:8000/c4x/A/CS102/asset/test.jpg"
+                    }
+                ],
+                pageSize: 1,
+                totalCount: 1,
+                start: 0,
+                page: 0
+            };
+
             mockAssetUploadResponse = {
                 asset: mockAsset,
                 msg: "Upload completed"
@@ -59,16 +122,30 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                 files: [{name: 'largefile', size: 0}]
             };
 
-            var event = {}
+            var respondWithMockAssets = function(requests) {
+                var requestIndex = requests.length - 1;
+                var request = requests[requestIndex];
+                var url = new URI(request.url);
+                var queryParameters = url.query(true); // Returns an object with each query parameter stored as a value
+                var asset_type = queryParameters.asset_type;
+                var response = asset_type !== '' ? mockExampleFilteredAssetsResponse : mockExampleAssetsResponse;
+                AjaxHelpers.respondWithJson(requests, response, requestIndex);
+            };
+
+            var event = {};
             event.target = {"value": "dummy.jpg"};
 
             describe("AssetsView", function () {
                 var setup;
-                setup = function() {
-                    var requests;
-                    requests = AjaxHelpers.requests(this);
+                setup = function(responseData) {
+                    var requests = AjaxHelpers.requests(this);
                     assetsView.setPage(0);
-                    AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
+                    if (!responseData){
+                        AjaxHelpers.respondWithJson(requests, mockEmptyAssetsResponse);
+                    }
+                    else{
+                        AjaxHelpers.respondWithJson(requests, responseData);
+                    }
                     return requests;
                 };
 
@@ -168,6 +245,106 @@ define([ "jquery", "js/common_helpers/ajax_helpers", "js/views/asset", "js/views
                     $(".upload-modal .file-chooser").fileupload('add', mockFileUpload);
 
                     expect(assetsView.largeFileErrorMsg).toBeNull();
+                });
+
+                it('returns the registered info for a filter column', function () {
+                    assetsView.registerSortableColumn('test-col', 'Test Column', 'testField', 'asc');
+                    assetsView.registerFilterableColumn('js-asset-type-col', 'Type', 'asset_type');
+                    var filterInfo = assetsView.filterableColumnInfo('js-asset-type-col');
+                    expect(filterInfo.displayName).toBe('Type');
+                    expect(filterInfo.fieldName).toBe('asset_type');
+                });
+
+                it('throws an exception for an unregistered filter column', function () {
+                    expect(function() {
+                        assetsView.filterableColumnInfo('no-such-column');
+                    }).toThrow();
+                });
+
+
+                it('make sure selectFilter sets collection filter if undefined', function () {
+                    expect(assetsView).toBeDefined();
+                    assetsView.collection.filterField = '';
+                    assetsView.selectFilter('js-asset-type-col');
+                    expect(assetsView.collection.filterField).toEqual('asset_type');
+                });
+
+                it('make sure _toggleFilterColumn filters asset list', function () {
+                    expect(assetsView).toBeDefined();
+                    var requests = AjaxHelpers.requests(this);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                        var $typeColumn = $('#' + columnID);
+                        assetsView.setPage(0);
+                        respondWithMockAssets(requests);
+                        var assetsNumber = assetsView.collection.length;
+                        assetsView._toggleFilterColumn('Images', 'Images');
+                        respondWithMockAssets(requests);
+                        var assetsNumberFiltered = assetsView.collection.length;
+                        expect(assetsNumberFiltered).toBeLessThan(assetsNumber);
+                        expect($typeColumn.find('.title .type-filter')).not.toEqual(assetsView.allLabel);
+                    });
+                });
+
+                it('opens and closes select type menu', function () {
+                    expect(assetsView).toBeDefined();
+                    setup.call(this, mockExampleAssetsResponse);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData){
+                        var $typeColumn = $('#' + columnID);
+                        expect($typeColumn).toBeVisible();
+                        var assetsNumber = $('#asset-table-body .type-col').length;
+                        assetsView.openFilterColumn($typeColumn);
+                        expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
+                        expect($typeColumn.find('.title')).toHaveClass('is-selected');
+                        expect($typeColumn.find('.column-filter-link')).toBeVisible();
+                        $typeColumn.find('.wrapper-nav-sub').trigger('click');
+                        expect($typeColumn.find('.wrapper-nav-sub').hasClass('is-shown')).toBe(false);
+                    });
+                });
+
+                it('check filtering works with sorting by column on', function () {
+                    expect(assetsView).toBeDefined();
+                    var requests = AjaxHelpers.requests(this);
+                    assetsView.registerSortableColumn('name-col', 'Name Column', 'nameField', 'asc');
+                    assetsView.registerFilterableColumn('js-asset-type-col', gettext('Type'), 'asset_type');
+                    assetsView.setInitialSortColumn('name-col');
+                    assetsView.setPage(0);
+                    respondWithMockAssets(requests);
+                    var sortInfo = assetsView.sortableColumnInfo('name-col');
+                    expect(sortInfo.defaultSortDirection).toBe('asc');
+                    var $firstFilter = $($('#js-asset-type-col').find('li.nav-item a')[1]);
+                    $firstFilter.trigger('click');
+                    respondWithMockAssets(requests);
+                    var assetsNumberFiltered = assetsView.collection.length;
+                    expect(assetsNumberFiltered).toBe(1);
+
+                });
+
+                it('shows type select menu, selects type, and filters results', function () {
+                    expect(assetsView).toBeDefined();
+                    var requests = AjaxHelpers.requests(this);
+                    $.each(assetsView.filterableColumns, function(columnID, columnData) {
+                        assetsView.setPage(0);
+                        respondWithMockAssets(requests);
+                        var $typeColumn = $('#' + columnID);
+                        expect($typeColumn).toBeVisible();
+                        var assetsNumber = assetsView.collection.length;
+                        $typeColumn.trigger('click');
+                        expect($typeColumn.find('.wrapper-nav-sub')).toHaveClass('is-shown');
+                        expect($typeColumn.find('.title')).toHaveClass('is-selected');
+                        var $allFilter = $($typeColumn.find('li.nav-item a')[0]);
+                        var $firstFilter = $($typeColumn.find('li.nav-item a')[1]);
+                        var $otherFilter = $($typeColumn.find('li.nav-item a[data-assetfilter="OTHER"]')[0]);
+                        var select_filter_and_check = function($filterEl, result) {
+                            $filterEl.trigger('click');
+                            respondWithMockAssets(requests);
+                            var assetsNumberFiltered = assetsView.collection.length;
+                            expect(assetsNumberFiltered).toBe(result);
+                        };
+
+                        select_filter_and_check($firstFilter, 1);
+                        select_filter_and_check($allFilter, assetsNumber);
+                        select_filter_and_check($otherFilter, 1);
+                    });
                 });
 
                 it('hides the error modal if a large file, then small file is uploaded', function() {
