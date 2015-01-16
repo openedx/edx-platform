@@ -7,6 +7,8 @@ from django.utils import timezone
 
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from student.models import CourseEnrollment
+from certificates.models import CertificateStatuses
+from certificates.tests.factories import GeneratedCertificateFactory
 
 from .. import errors
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin
@@ -98,6 +100,29 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
         response = self.api_response()
         course_data = response.data[0]['course']
         self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
+
+    def test_no_certificate(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertDictEqual(certificate_data, {})
+
+    def test_certificate(self):
+        self.login_and_enroll()
+
+        certificate_url = "http://test_certificate_url"
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url=certificate_url,
+        )
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertEquals(certificate_data['url'], certificate_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
