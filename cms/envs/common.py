@@ -127,7 +127,7 @@ FEATURES = {
     # let students save and manage their annotations
     # for consistency in user-experience, keep the value of this feature flag
     # in sync with the one in lms/envs/common.py
-    'ENABLE_EDXNOTES': False,
+    'ENABLE_EDXNOTES': True,
 
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo. Change the setting
