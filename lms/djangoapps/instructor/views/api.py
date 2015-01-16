@@ -1099,7 +1099,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     """
     # csv headers
     query_features = [
-        'code', 'course_id', 'company_name', 'created_by',
+        'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
         'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
     ]
 
@@ -1267,8 +1267,11 @@ def generate_registration_codes(request, course_id):
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
     for registration_code in registration_codes:
-        csv_writer.writerow([registration_code.code])
-
+        full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
+            base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+            redeem_code_url=reverse('register_code_redemption', kwargs={'registration_code': registration_code.code})
+        )
+        csv_writer.writerow([registration_code.code, full_redeem_code_url])
     finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
     if finance_email:
         # append the finance email into the recipient_list
