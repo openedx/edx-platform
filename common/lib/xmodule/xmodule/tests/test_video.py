@@ -806,3 +806,27 @@ class VideoDescriptorIndexingTestCase(unittest.TestCase):
             },
             "content_type": "Video"
         })
+
+        xml_data_transcript_not_found = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+              <transcript language="ne" src="subs_ne.srt" />
+            </video>
+        '''
+
+        descriptor = instantiate_descriptor(data=xml_data_transcripts)
+        self.assertEqual(descriptor.index_view(), {
+            "content": {
+                "display_name": "Test Video",
+                "transcript_ne": "",
+            },
+            "content_type": "Video"
+        })

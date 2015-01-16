@@ -622,12 +622,12 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         def _update_transcript_for_index(language=None):
             """ Find video transcript - if not found, don't update index """
+            transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
             try:
                 transcript = self.get_transcript(transcript_format='txt', lang=language)[0].replace("\n", " ")
-                transcript_index_name = "transcript_{}".format(language if language else self.transcript_language)
                 video_body.update({transcript_index_name: transcript})
             except NotFoundError:
-                pass
+                video_body.update({transcript_index_name: ""})
 
         if self.sub:
             _update_transcript_for_index()
