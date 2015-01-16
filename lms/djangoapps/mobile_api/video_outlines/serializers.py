@@ -153,7 +153,7 @@ class BlockOutline(object):
 
                 yield {
                     "path": block_path,
-                    "named_path": [b["name"] for b in block_path[:-1]],
+                    "named_path": [b["name"] for b in block_path],
                     "unit_url": unit_url,
                     "section_url": section_url,
                     "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)

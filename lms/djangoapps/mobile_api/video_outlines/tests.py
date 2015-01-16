@@ -128,15 +128,62 @@ class TestVideoAPITestCase(MobileAPITestCase):
         )
 
 
-class TestEmptyCourseVideoSummaryList(MobileAPITestCase):
+class TestNonStandardCourseStructure(MobileAPITestCase):
     """
     Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
     """
     REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
 
-    def test_chapter_is_none(self):
+    def _verify_paths(self, course_outline, path_list):
         """
-        Tests when there is no chapter under course, and video under course
+        Takes a path_list and compares it against the course_outline
+
+        Attributes:
+            path_list (list): A list of the expected strings
+            course_outline (list): A list of dictionaries that includes a 'path'
+                and 'named_path' field which we will be comparing path_list to
+        """
+        path = course_outline[0]['path']
+        self.assertEqual(len(path), len(path_list))
+        for i in range(0, len(path_list)):
+            self.assertEqual(path_list[i], path[i]['name'])
+        #named_path will be deprecated eventually
+        named_path = course_outline[0]['named_path']
+        self.assertEqual(len(named_path), len(path_list))
+        for i in range(0, len(path_list)):
+            self.assertEqual(path_list[i], named_path[i])
+
+    def setUp(self):
+        super(TestNonStandardCourseStructure, self).setUp()
+        self.chapter_under_course = ItemFactory.create(
+            parent_location=self.course.location,
+            category="chapter",
+            display_name=u"test factory chapter under course omega \u03a9",
+        )
+        self.section_under_course = ItemFactory.create(
+            parent_location=self.course.location,
+            category="sequential",
+            display_name=u"test factory section under course omega \u03a9",
+        )
+        self.section_under_chapter = ItemFactory.create(
+            parent_location=self.chapter_under_course.location,
+            category="sequential",
+            display_name=u"test factory section under chapter omega \u03a9",
+        )
+        self.vertical_under_course = ItemFactory.create(
+            parent_location=self.course.location,
+            category="vertical",
+            display_name=u"test factory vertical under course omega \u03a9",
+        )
+        self.vertical_under_section = ItemFactory.create(
+            parent_location=self.section_under_chapter.location,
+            category="vertical",
+            display_name=u"test factory vertical under section omega \u03a9",
+        )
+
+    def test_structure_course_video(self):
+        """
+        Tests when there is a video without a vertical directly under course
         """
         self.login_and_enroll()
         ItemFactory.create(
@@ -149,22 +196,17 @@ class TestEmptyCourseVideoSummaryList(MobileAPITestCase):
         section_url = course_outline[0]["section_url"]
         unit_url = course_outline[0]["unit_url"]
         self.assertRegexpMatches(section_url, r'courseware$')
-        self.assertTrue(section_url)
-        self.assertTrue(unit_url)
         self.assertEqual(section_url, unit_url)
 
-    def test_section_is_none(self):
+        self._verify_paths(course_outline, [])
+
+    def test_structure_course_vert_video(self):
         """
-        Tests when there is no section under chapter, and video under chapter
+        Tests when there is a video under vertical directly under course
         """
         self.login_and_enroll()
-        self.chapter = ItemFactory.create(  # pylint:disable=W0201
-            parent_location=self.course.location,
-            category="chapter",
-            display_name=u"test factory chapter omega \u03a9",
-        )
         ItemFactory.create(
-            parent_location=self.chapter.location,
+            parent_location=self.vertical_under_course.location,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -174,24 +216,53 @@ class TestEmptyCourseVideoSummaryList(MobileAPITestCase):
         unit_url = course_outline[0]["unit_url"]
         self.assertRegexpMatches(
             section_url,
-            r'courseware/test_factory_chapter_omega_%CE%A9/$'
+            r'courseware/test_factory_vertical_under_course_omega_%CE%A9/$'
         )
-        self.assertTrue(section_url)
-        self.assertTrue(unit_url)
         self.assertEqual(section_url, unit_url)
 
-    def test_section_under_course(self):
+        self._verify_paths(
+            course_outline,
+            [
+                u'test factory vertical under course omega \u03a9'
+            ]
+        )
+
+    def test_structure_course_chap_video(self):
+        """
+        Tests when there is a video directly under chapter
+        """
+        self.login_and_enroll()
+
+        ItemFactory.create(
+            parent_location=self.chapter_under_course.location,
+            category="video",
+            display_name=u"test factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(
+            section_url,
+            r'courseware/test_factory_chapter_under_course_omega_%CE%A9/$'
+        )
+
+        self.assertEqual(section_url, unit_url)
+
+        self._verify_paths(
+            course_outline,
+            [
+                u'test factory chapter under course omega \u03a9',
+            ]
+        )
+
+    def test_structure_course_section_video(self):
         """
         Tests when chapter is none, and video under section under course
         """
         self.login_and_enroll()
-        self.section = ItemFactory.create(  # pylint:disable=W0201
-            parent_location=self.course.location,
-            category="sequential",
-            display_name=u"test factory section omega \u03a9",
-        )
         ItemFactory.create(
-            parent_location=self.section.location,
+            parent_location=self.section_under_course.location,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -201,11 +272,88 @@ class TestEmptyCourseVideoSummaryList(MobileAPITestCase):
         unit_url = course_outline[0]["unit_url"]
         self.assertRegexpMatches(
             section_url,
-            r'courseware/test_factory_section_omega_%CE%A9/$'
+            r'courseware/test_factory_section_under_course_omega_%CE%A9/$'
         )
-        self.assertTrue(section_url)
-        self.assertTrue(unit_url)
+
         self.assertEqual(section_url, unit_url)
+
+        self._verify_paths(
+            course_outline,
+            [
+                u'test factory section under course omega \u03a9',
+            ]
+        )
+
+    def test_structure_course_chap_section_video(self):
+        """
+        Tests when chapter and sequential exists, with a video with no vertical.
+        """
+        self.login_and_enroll()
+
+        ItemFactory.create(
+            parent_location=self.section_under_chapter.location,
+            category="video",
+            display_name=u"meow factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(
+            section_url,
+            (
+                r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
+                'test_factory_section_under_chapter_omega_%CE%A9/$'
+            )
+        )
+
+        self.assertEqual(section_url, unit_url)
+
+        self._verify_paths(
+            course_outline,
+            [
+                u'test factory chapter under course omega \u03a9',
+                u'test factory section under chapter omega \u03a9',
+            ]
+        )
+
+    def test_structure_course_section_vert_video(self):
+        """
+        Tests chapter->section->vertical->unit
+        """
+        self.login_and_enroll()
+        ItemFactory.create(
+            parent_location=self.vertical_under_section.location,
+            category="video",
+            display_name=u"test factory video omega \u03a9",
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 1)
+        section_url = course_outline[0]["section_url"]
+        unit_url = course_outline[0]["unit_url"]
+        self.assertRegexpMatches(
+            section_url,
+            (
+                r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
+                'test_factory_section_under_chapter_omega_%CE%A9/$'
+            )
+        )
+        self.assertRegexpMatches(
+            unit_url,
+            (
+                r'courseware/test_factory_chapter_under_course_omega_%CE%A9/' +
+                'test_factory_section_under_chapter_omega_%CE%A9/1$'
+            )
+        )
+
+        self._verify_paths(
+            course_outline,
+            [
+                u'test factory chapter under course omega \u03a9',
+                u'test factory section under chapter omega \u03a9',
+                u'test factory vertical under section omega \u03a9'
+            ]
+        )
 
 
 class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
