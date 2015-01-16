@@ -277,7 +277,7 @@ def add_staff_markup(user, has_instructor_access, block, view, frag, context):  
     return wrap_fragment(frag, render_to_string("staff_problem_info.html", staff_context))
 
 
-def add_inline_analytics(user, has_instructor_access, block, view, frag, context):  # pylint: disable=unused-argument
+def add_inline_analytics(user, block, view, frag, context):  # pylint: disable=unused-argument
     """
     Adds a fragment for in-line analytics.
 
@@ -296,7 +296,6 @@ def add_inline_analytics(user, has_instructor_access, block, view, frag, context
             'element_id': block.location.html_id().replace('-', '_'),
             'answer_dist_url': reverse('get_analytics_answer_dist'),
             'responses_data': responses_data,
-            'has_instructor_access': has_instructor_access,
             'course_id': block.course_id.to_deprecated_string(),
         }
         return wrap_fragment(frag, render_to_string("inline_analytics.html", analytics_context))
