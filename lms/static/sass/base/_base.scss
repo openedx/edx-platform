@@ -103,7 +103,7 @@ a:link, a:visited {
   }
 
   &:disabled, &.is-disabled, &.disabled {
-    pointer-events: none;
+    @extend %ui-disabled;
     opacity: 0.5;
     cursor: not-allowed;
   }

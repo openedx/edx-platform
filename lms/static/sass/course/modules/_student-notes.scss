@@ -215,6 +215,33 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
 // highlight
 .annotator-hl {
   background: $student-notes-highlight-color-focus;
+
+  // CASE: a highlight contains a link
+  a {
+    color: $link-color;
+
+    // STATE: hover/focus
+    &:hover, &:focus {
+      text-decoration: underline;
+    }
+
+    // STATE: disabled
+    &:disabled, &.is-disabled {
+      @extend %ui-disabled;
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// CASE: a link contains a highlight
+a .annotator-hl {
+  color: $link-color;
+
+  // STATE: hover/focus
+  &:hover, &:focus {
+    text-decoration: underline;
+  }
 }
 
 // content
