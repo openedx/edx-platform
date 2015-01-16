@@ -30,6 +30,8 @@ def intercom_update(custom_data):
 
 
 def update_user_statistics():
+    if not intercom.Intercom.app_id:
+        return
     custom_data = {
         'Users - total': User.objects.count(),
         'Users - active': User.objects.filter(is_active=True).count(),
@@ -53,6 +55,8 @@ def user_save_callback(sender, instance, created, raw, **kwargs):
 
 
 def update_course_statistics():
+    if not intercom.Intercom.app_id:
+        return
     custom_data = {
         # TODO: Figure out whether we need to filter out broken items or not
         #       https://github.com/edx/edx-platform/blob/d4de932c2b46dbe1ad6439731b4312fb36813d6d/cms/djangoapps/contentstore/views/course.py#L281
