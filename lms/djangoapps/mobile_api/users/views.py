@@ -210,6 +210,8 @@ class UserCourseEnrollmentsList(generics.ListAPIView):
         * mode: The type of certificate registration for this course:  honor or
           certified.
         * is_active: Whether the course is currently active; true or false.
+        * certificate: Information about the user's earned certificate in the course.
+          * url: URL to the downloadable version of the certificate, if exists.
         * course: A collection of data about the course:
 
           * course_about: The URI to get the data for the course About page.

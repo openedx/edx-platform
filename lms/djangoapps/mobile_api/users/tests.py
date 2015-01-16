@@ -1,13 +1,14 @@
 """
 Tests for users API
 """
-
 import datetime
 from django.utils import timezone
 
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
+from certificates.models import CertificateStatuses
+from certificates.tests.factories import GeneratedCertificateFactory
 
 from .. import errors
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin
@@ -82,6 +83,29 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
                 response.data[course_num]['course']['id'],  # pylint: disable=no-member
                 unicode(courses[num_courses - course_num - 1].id)
             )
+
+    def test_no_certificate(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']  # pylint: disable=no-member
+        self.assertDictEqual(certificate_data, {})
+
+    def test_certificate(self):
+        self.login_and_enroll()
+
+        certificate_url = "http://test_certificate_url"
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url=certificate_url,
+        )
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']  # pylint: disable=no-member
+        self.assertEquals(certificate_data['url'], certificate_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
