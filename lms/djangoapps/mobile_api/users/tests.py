@@ -5,7 +5,7 @@ Tests for users API
 import datetime
 from django.utils import timezone
 
-from xmodule.modulestore.tests.factories import ItemFactory
+from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
 
@@ -65,6 +65,23 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
         self.assertEqual(response.status_code, 200)
         courses = response.data
         self.assertEqual(len(courses), 0)
+
+    def test_sort_order(self):
+        self.login()
+
+        num_courses = 3
+        courses = []
+        for course_num in range(num_courses):
+            courses.append(CourseFactory.create(mobile_available=True))
+            self.enroll(courses[course_num].id)
+
+        # verify courses are returned in the order of enrollment, with most recently enrolled first.
+        response = self.api_response()
+        for course_num in range(num_courses):
+            self.assertEqual(
+                response.data[course_num]['course']['id'],  # pylint: disable=no-member
+                unicode(courses[num_courses - course_num - 1].id)
+            )
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
