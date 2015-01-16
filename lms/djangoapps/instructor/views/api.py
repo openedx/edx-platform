@@ -97,7 +97,7 @@ from .tools import (
     bulk_email_is_enabled_for_course,
     add_block_ids,
 )
-from opaque_keys.edx.keys import CourseKey, UsageKey
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
@@ -1610,7 +1610,7 @@ def reset_student_attempts(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @common_exceptions_400
-def reset_student_attempts_for_entrance_exam(request, course_id):
+def reset_student_attempts_for_entrance_exam(request, course_id):  # pylint: disable=invalid-name
     """
 
     Resets a students attempts counter or starts a task to reset all students
@@ -1666,6 +1666,7 @@ def reset_student_attempts_for_entrance_exam(request, course_id):
 
     response_payload = {'student': student_identifier or 'All Students', 'task': 'created'}
     return JsonResponse(response_payload)
+
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
