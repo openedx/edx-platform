@@ -9,9 +9,12 @@ from shoppingcart.models import (
     OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
 )
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 import xmodule.graders as xmgraders
 from django.core.exceptions import ObjectDoesNotExist
+from microsite_configuration import microsite
 
 
 STUDENT_FEATURES = ('id', 'username', 'first_name', 'last_name', 'is_staff', 'email')
@@ -251,6 +254,7 @@ def course_registration_features(features, registration_codes, csv_type):
         :param features:
         :param csv_type:
         """
+        site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
         registration_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
@@ -265,6 +269,11 @@ def course_registration_features(features, registration_codes, csv_type):
             course_registration_dict['customer_reference_number'] = sale_invoice.customer_reference_number
             course_registration_dict['internal_reference'] = sale_invoice.internal_reference
 
+        course_registration_dict['redeem_code_url'] = 'http://{base_url}{redeem_code_url}'.format(
+            base_url=site_name,
+            redeem_code_url=reverse('register_code_redemption',
+                                    kwargs={'registration_code': registration_code.code})
+        )
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.
         #  They have not been redeemed yet

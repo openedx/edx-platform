@@ -284,7 +284,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
     def test_course_registration_features(self):
         query_features = [
-            'code', 'course_id', 'company_name', 'created_by',
+            'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
             'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
         ]
         order = Order(user=self.instructor, status='purchased')
