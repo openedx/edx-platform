@@ -245,7 +245,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         else:
             # load the module and apply the inherited metadata
             try:
-                category = json_data['location']['category']
+                category = json_data['_id']['category']
                 class_ = self.load_block_type(category)
 
                 definition = json_data.get('definition', {})
@@ -372,7 +372,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         Returns the JSON payload of the xblock at location.
         """
         if location in self.module_data:
-            return self.module_data[location]
+            json = self.module_data[location]
+            if json is None:
+                raise ItemNotFoundError(location)
+            return json
 
         try:
             json = self.modulestore._find_one(location)
@@ -394,6 +397,21 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             return self.lookup_item(location) is not None
         except ItemNotFoundError:
             return False
+
+    def clear_from_caches(self, course_key, usage_id_dicts):
+        """
+        Clear these elements from caches (usually b/c they're being deleted)
+
+        Args:
+            course_key: a full course key from which all the others are usages (needed for the run)
+            usage_id_dicts: a list of the dicts passed to cause the deletion (in mongo repr)
+        """
+        for usage_spec in usage_id_dicts:
+            usage = course_key.make_usage_key(usage_spec['category'], usage_spec['name'])
+            if usage in self.cached_modules:
+                del self.cached_modules[usage]
+            if usage in self.module_data:
+                del self.module_data[usage]
 
     def get_edited_by(self, xblock):
         """
@@ -850,13 +868,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             if runtime:
                 runtime.cached_metadata = cached_metadata
 
-    def _clean_item_data(self, item):
-        """
-        Renames the '_id' field in item to 'location'
-        """
-        item['location'] = item['_id']
-        del item['_id']
-
     @autoretry_read()
     def _query_children_for_cache_children(self, course_key, items):
         """
@@ -873,8 +884,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
     def _cache_children(self, course_key, items, depth=0):
         """
         Returns a dictionary mapping Location -> item data, populated with json data
-        for all descendents of items up to the specified depth.
-        (0 = no descendents, 1 = children, 2 = grandchildren, etc)
+        for all descendants of items up to the specified depth.
+        (0 = no descendants, 1 = children, 2 = grandchildren, etc)
         If depth is None, will load all the children.
         This will make a number of queries that is linear in the depth.
         """
@@ -887,8 +898,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         while to_process and depth is None or depth >= 0:
             children = []
             for item in to_process:
-                self._clean_item_data(item)
-                item_location = Location._from_deprecated_son(item['location'], course_key.run)
+                item_location = Location._from_deprecated_son(item['_id'], course_key.run)
                 item_children = item.get('definition', {}).get('children', [])
                 children.extend(item_children)
                 for item_child in item_children:
@@ -918,7 +928,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         course_key = self.fill_in_run(course_key)
         # create a runtime if one doesn't exist
         with self.bulk_operations(course_key):
-            location = Location._from_deprecated_son(item['location'], course_key.run)
+            location = Location._from_deprecated_son(item['_id'], course_key.run)
 
             bulk_rec = self._get_bulk_ops_record(course_key)
             data_dir = getattr(item, 'data_dir', location.course)
@@ -943,7 +953,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         return [
             self._load_item(
                 course_key, item, data_cache,
-                apply_cached_metadata=(item['location']['category'] != 'course' or depth != 0)
+                apply_cached_metadata=(item['_id']['category'] != 'course' or depth != 0)
             )
             for item in items
         ]
@@ -1057,7 +1067,11 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         with self.bulk_operations(usage_key.course_key):
             bulk_rec = self._get_bulk_ops_record(usage_key.course_key)
+            if usage_key in bulk_rec.runtime.cached_modules:
+                return bulk_rec.runtime.cached_modules[usage_key]
+
             item = bulk_rec.runtime.lookup_item(usage_key)
+
             module = self._load_items(usage_key.course_key, [item], depth)[0]
             return module
 
@@ -1225,6 +1239,10 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             ScopeIds(None, block_type, location, location),
             dbmodel,
         )
+        # fix the runtime's caches
+        runtime.cached_modules[location] = xmodule
+        if location in runtime.module_data:  # no json repr but don't leave a notfound semaphore
+            del runtime.module_data[location]
         if fields is not None:
             for key, value in fields.iteritems():
                 setattr(xmodule, key, value)

@@ -418,7 +418,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     #    sends: update problem and then each ancestor up to course (edit info)
     # split: active_versions, definitions (calculator field), structures
     #  2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data(('draft', 7, 5), ('split', 3, 2))
+    @ddt.data(('draft', 7, 1), ('split', 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """

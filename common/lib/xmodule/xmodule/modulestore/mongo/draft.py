@@ -306,10 +306,23 @@ class DraftModuleStore(MongoModuleStore):
         :param runtime: if you already have an xmodule from the course, the xmodule.runtime value
         :param fields: a dictionary of field names and values for the new xmodule
         """
+        if runtime is None:
+            if self._is_in_bulk_operation(course_key):
+                runtime = self._get_bulk_ops_record(course_key).runtime
+
         new_block = super(DraftModuleStore, self).create_xblock(
             runtime, course_key, block_type, block_id, fields, **kwargs
         )
+        # move cache to new location and remove from old
+        if runtime:
+            del runtime.cached_modules[new_block.location]
+
         new_block.location = self.for_branch_setting(new_block.location)
+
+        # now fix the cached modules dict
+        if runtime:
+            runtime.cached_modules[new_block.location] = new_block
+
         return wrap_draft(new_block)
 
     def get_items(self, course_key, revision=None, **kwargs):
@@ -421,6 +434,8 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             try:
                 self.collection.insert(item)
+                # clear it from the caches which record not founds
+                bulk_record.runtime.clear_from_caches(location.course_key, item['_id'])
             except pymongo.errors.DuplicateKeyError:
                 # prevent re-creation of DRAFT versions, unless explicitly requested to ignore
                 if not ignore_if_draft:
@@ -582,7 +597,7 @@ class DraftModuleStore(MongoModuleStore):
 
     def _breadth_first(self, function, root_usages):
         """
-        Get the root_usage from the db and do a depth first scan. Call the function on each. The
+        Get the root_usage from the db and do a breadth first scan. Call the function on each. The
         function should return a list of SON for any next tier items to process and should
         add the SON for any items to delete to the to_be_deleted array.
 
@@ -610,6 +625,8 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(root_usages[0].course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}}, safe=self.collection.safe)
+            if bulk_record.runtime:
+                bulk_record.runtime.clear_from_caches(root_usages[0].course_key, to_be_deleted)
 
     @MongoModuleStore.memoize_request_cache
     def has_changes(self, xblock):
@@ -713,6 +730,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+            bulk_record.runtime.clear_from_caches(location.course_key, to_be_deleted)
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
