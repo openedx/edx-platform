@@ -376,6 +376,10 @@ class DiscussionTab(EnrolledOrStaffTab):
         )
 
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+        if settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False):
+            from pocs.overrides import get_current_poc
+            if get_current_poc():
+                return False
         super_can_display = super(DiscussionTab, self).can_display(
             course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
         )
