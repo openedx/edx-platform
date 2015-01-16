@@ -381,7 +381,11 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         lib_tools = self.runtime.service(self, 'library_tools')
         user_service = self.runtime.service(self, 'user')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
-        user_id = user_service.user_id if user_service else None  # May be None when creating bok choy test fixtures
+        if user_service:
+            # May be None when creating bok choy test fixtures
+            user_id = user_service.get_current_user().opt_attrs.get('edx-platform.user_id', None)
+        else:
+            user_id = None
         lib_tools.update_children(self, user_id, user_perms)
         return Response()
 
