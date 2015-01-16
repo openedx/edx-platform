@@ -12,7 +12,7 @@
     <% if (hasMoreResults) { %>
         <a class="search-load-next" href="javascript:void(0);">
             <%- interpolate(gettext("Load next %s results"), [pageSize], false) %>
-            <i class="icon-refresh icon-spin"></i>
+            <i class="icon fa fa-refresh icon-spin"></i>
         </a>
     <% } %>
 
