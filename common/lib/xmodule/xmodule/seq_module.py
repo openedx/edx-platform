@@ -52,7 +52,7 @@ class SequenceFields(object):
             "Tag this course module as an Entrance Exam.  " +
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
-        scope=Scope.settings,
+        scope=Scope.content,
     )
 
 

@@ -10,7 +10,8 @@ from django_future.csrf import ensure_csrf_cookie
 from django.http import HttpResponse
 from django.test import RequestFactory
 
-from contentstore.views.item import create_item, delete_item
+from contentstore.views.helpers import create_xblock
+from contentstore.views.item import delete_item
 from milestones import api as milestones_api
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import CourseKey, UsageKey
@@ -108,10 +109,14 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         'is_entrance_exam': True,
         'in_entrance_exam': True,
     }
-    factory = RequestFactory()
-    internal_request = factory.post('/', json.dumps(payload), content_type="application/json")
-    internal_request.user = request.user
-    created_item = json.loads(create_item(internal_request).content)
+    parent_locator = unicode(course.location)
+    created_block = create_xblock(
+        parent_locator=parent_locator,
+        user=request.user,
+        category='chapter',
+        display_name='Entrance Exam',
+        is_entrance_exam=True
+    )
 
     # Set the entrance exam metadata flags for this course
     # Reload the course so we don't overwrite the new child reference
@@ -119,7 +124,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     metadata = {
         'entrance_exam_enabled': True,
         'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct / 100,
-        'entrance_exam_id': created_item['locator'],
+        'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)
 
@@ -146,7 +151,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     )
     milestones_api.add_course_content_milestone(
         unicode(course.id),
-        created_item['locator'],
+        unicode(created_block.location),
         relationship_types['FULFILLS'],
         milestone
     )
