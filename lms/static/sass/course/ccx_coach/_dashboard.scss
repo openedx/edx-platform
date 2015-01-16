@@ -1,9 +1,9 @@
-.poc-schedule-container {
+.ccx-schedule-container {
     float: left;
     width: 750px;
 }
 
-table.poc-schedule {
+table.ccx-schedule {
     width: 100%;
 
     thead {
@@ -34,19 +34,19 @@ table.poc-schedule {
     }
 }
 
-.poc-schedule-sidebar {
+.ccx-schedule-sidebar {
     float: left;
     width: 295px;
     margin-left: 20px;
 }
 
-.poc-sidebar-panel {
+.ccx-sidebar-panel {
     border: 1px solid #cbcbcb;
     padding: 15px;
     margin-bottom: 20px;
 }
 
-form.poc-form {
+form.ccx-form {
     line-height: 1.5;
     select {
         width: 100%;

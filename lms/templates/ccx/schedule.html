@@ -15,18 +15,18 @@
     .ui-datepicker { z-index: 100000 !important; }
     input.date, input.time { width: auto !important; display: inline !important; }
   </style>
-  <%static:js group='pocs'/>
+  <%static:js group='ccx'/>
 </%block>
 
 %for template_name in ["schedule"]:
-  <script type="text/template" id="poc-${template_name}-template">
-    <%static:include path="pocs/${template_name}.underscore" />
+  <script type="text/template" id="ccx-${template_name}-template">
+    <%static:include path="ccx/${template_name}.underscore" />
   </script>
 %endfor
 
-<div class="poc-schedule-container">
-  <div id="poc-schedule"></div>
-  <div id="new-poc-schedule"></div>
+<div class="ccx-schedule-container">
+  <div id="ccx-schedule"></div>
+  <div id="new-ccx-schedule"></div>
 </div>
 
 <section id="enter-date-modal" class="modal" aria-hidden="true">
@@ -53,8 +53,8 @@
   </div>
 </section>
 
-<div class="poc-schedule-sidebar">
-  <div class="poc-sidebar-panel" id="dirty-schedule">
+<div class="ccx-schedule-sidebar">
+  <div class="ccx-sidebar-panel" id="dirty-schedule">
     <h2>${_('Save changes')}</h2>
     <form role="form">
       <p>${_("You have unsaved changes.")}</p>
@@ -64,13 +64,13 @@
       </div>
     </form>
   </div>
-  <div class="poc-sidebar-panel" id="ajax-error">
+  <div class="ccx-sidebar-panel" id="ajax-error">
     <h2>${_('Error')}</h2>
     <p>${_("There was an error saving changes.")}</p>
   </div>
-  <div class="poc-sidebar-panel">
+  <div class="ccx-sidebar-panel">
     <h2>${_('Schedule a Unit')}</h2>
-    <form role="form" id="add-unit" name="add-unit" class="poc-form">
+    <form role="form" id="add-unit" name="add-unit" class="ccx-form">
       <div class="field">
         <b>${_('Section')}</b><br/>
         <select name="chapter"></select>
@@ -110,12 +110,12 @@
 
 <script>
 $(function() {
-    schedule_template = _.template($('#poc-schedule-template').html());
-    var view = new edx.pocs.schedule.ScheduleView({
-        el: $('#new-poc-schedule')
+    schedule_template = _.template($('#ccx-schedule-template').html());
+    var view = new edx.ccx.schedule.ScheduleView({
+        el: $('#new-ccx-schedule')
     });
     view.render();
-    //poc_schedule.render();
+    //ccx_schedule.render();
     $('.datepair .time').timepicker({
         'showDuration': true,
         'timeFormat': 'G:i'

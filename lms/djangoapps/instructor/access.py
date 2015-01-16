@@ -15,7 +15,7 @@ from django_comment_common.models import Role
 from student.roles import (
     CourseBetaTesterRole,
     CourseInstructorRole,
-    CoursePocCoachRole,
+    CourseCcxCoachRole,
     CourseStaffRole,
 )
 
@@ -26,7 +26,7 @@ ROLES = {
     'beta': CourseBetaTesterRole,
     'instructor': CourseInstructorRole,
     'staff': CourseStaffRole,
-    'poc_coach': CoursePocCoachRole,
+    'ccx_coach': CourseCcxCoachRole,
 }
 
 

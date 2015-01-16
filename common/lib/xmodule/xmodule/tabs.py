@@ -193,7 +193,7 @@ class CourseTab(object):
             'edxnotes': EdxNotesTab,
             'syllabus': SyllabusTab,
             'instructor': InstructorTab,  # not persisted
-            'poc_coach': PocCoachTab,  # not persisted
+            'ccx_coach': CcxCoachTab,  # not persisted
         }
 
         tab_type = tab_dict.get('type')
@@ -376,9 +376,9 @@ class DiscussionTab(EnrolledOrStaffTab):
         )
 
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-        if settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False):
-            from pocs.overrides import get_current_poc
-            if get_current_poc():
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+            from ccx.overrides import get_current_ccx
+            if get_current_ccx():
                 return False
         super_can_display = super(DiscussionTab, self).can_display(
             course, settings, is_user_authenticated, is_user_staff, is_user_enrolled
@@ -738,26 +738,26 @@ class InstructorTab(StaffTab):
         )
 
 
-class PocCoachTab(CourseTab):
+class CcxCoachTab(CourseTab):
     """
-    A tab for the personal online course coaches.
+    A tab for the custom course coaches.
     """
-    type = 'poc_coach'
+    type = 'ccx_coach'
 
     def __init__(self, tab_dict=None):  # pylint: disable=unused-argument
-        super(PocCoachTab, self).__init__(
-            name=_('POC Coach'),
+        super(CcxCoachTab, self).__init__(
+            name=_('CCX Coach'),
             tab_id=self.type,
-            link_func=link_reverse_func('poc_coach_dashboard'),
+            link_func=link_reverse_func('ccx_coach_dashboard'),
         )
 
     def can_display(self, course, settings, *args, **kw):
-        # TODO Check that user actually has 'poc_coach' role on course
+        # TODO Check that user actually has 'ccx_coach' role on course
         #      this is difficult to do because the user isn't passed in.
         #      We need either a hack or an architectural realignment.
         return (
-            settings.FEATURES.get('PERSONAL_ONLINE_COURSES', False) and
-            super(PocCoachTab, self).can_display(course, settings, *args, **kw))
+            settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and
+            super(CcxCoachTab, self).can_display(course, settings, *args, **kw))
 
 
 class CourseTabList(List):
@@ -860,9 +860,9 @@ class CourseTabList(List):
         instructor_tab = InstructorTab()
         if instructor_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
             yield instructor_tab
-        poc_coach_tab = PocCoachTab()
-        if poc_coach_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
-            yield poc_coach_tab
+        ccx_coach_tab = CcxCoachTab()
+        if ccx_coach_tab.can_display(course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
+            yield ccx_coach_tab
 
     @staticmethod
     def iterate_displayable_cms(

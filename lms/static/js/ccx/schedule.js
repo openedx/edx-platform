@@ -3,18 +3,18 @@ var edx = edx || {};
 (function($, _, Backbone, gettext) {
     'use strict';
 
-    edx.pocs = edx.pocs || {};
-    edx.pocs.schedule = edx.pocs.schedule || {};
+    edx.ccx = edx.ccx || {};
+    edx.ccx.schedule = edx.ccx.schedule || {};
 
     var syncErrorMessage = gettext("The data could not be saved.");
 
     var self;
 
-    edx.pocs.schedule.reloadPage = function() {
+    edx.ccx.schedule.reloadPage = function() {
         location.reload();
     };
 
-    edx.pocs.schedule.UnitModel = Backbone.Model.extend({
+    edx.ccx.schedule.UnitModel = Backbone.Model.extend({
         defaults: {
             location: '',
             display_name: '',
@@ -27,18 +27,18 @@ var edx = edx || {};
 
     });
 
-    edx.pocs.schedule.Schedule = Backbone.Collection.extend({
+    edx.ccx.schedule.Schedule = Backbone.Collection.extend({
 
-        model: edx.pocs.schedule.UnitModel,
-        url: 'poc_schedule'
+        model: edx.ccx.schedule.UnitModel,
+        url: 'ccx_schedule'
 
     });
 
-    edx.pocs.schedule.ScheduleView = Backbone.View.extend({
+    edx.ccx.schedule.ScheduleView = Backbone.View.extend({
 
         initialize: function() {
             _.bindAll(this, 'render');
-	    this.schedule_collection = new edx.pocs.schedule.Schedule();
+	    this.schedule_collection = new edx.ccx.schedule.Schedule();
 	    this.schedule = {};
 	    this.schedule_collection.bind('reset', this.render);
 	    this.schedule_collection.fetch({reset: true});
@@ -63,23 +63,23 @@ var edx = edx || {};
             this.showing = this.pruned(self.schedule, function(node) {
               return !node.hidden});
             this.$el.html(schedule_template({chapters: this.showing}));
-            $('table.poc-schedule .sequential,.vertical').hide();
-            $('table.poc-schedule .toggle-collapse').on('click', this.toggle_collapse);
+            $('table.ccx-schedule .sequential,.vertical').hide();
+            $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
 	    //
 	    // Hidden hover fields for empty date fields
-	    $('table.poc-schedule .date a').each(function() {
+	    $('table.ccx-schedule .date a').each(function() {
 	      if (! $(this).text()) {
 		$(this).text('Set date').addClass('empty');
 	      }
 	    });
 	    
 	    // Handle date edit clicks
-	    $('table.poc-schedule .date a').attr('href', '#enter-date-modal')
+	    $('table.ccx-schedule .date a').attr('href', '#enter-date-modal')
 	      .leanModal({closeButton: '.close-modal'});
-	    $('table.poc-schedule .due-date a').on('click', this.enterNewDate('due'));
-	    $('table.poc-schedule .start-date a').on('click', this.enterNewDate('start'));
+	    $('table.ccx-schedule .due-date a').on('click', this.enterNewDate('due'));
+	    $('table.ccx-schedule .start-date a').on('click', this.enterNewDate('start'));
 	    // Click handler for remove all
-	    $('table.poc-schedule a#remove-all').on('click', function(event) {
+	    $('table.ccx-schedule a#remove-all').on('click', function(event) {
 	      event.preventDefault();
 	      self.schedule_apply(self.schedule, self.hide);
 	      self.dirty = true;
@@ -175,7 +175,7 @@ var edx = edx || {};
 	    });
 
 	    // Remove unit handler
-	    $('table.poc-schedule a.remove-unit').on('click', function(event) {
+	    $('table.ccx-schedule a.remove-unit').on('click', function(event) {
 	      var row = $(this).closest('tr'),
 		  path = row.data('location').split(' '),
 		  unit = self.find_unit(self.schedule, path[0], path[1], path[2]);

@@ -8,12 +8,12 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from ..models import PersonalOnlineCourse
-from ..overrides import override_field_for_poc
+from ..models import CustomCourseForEdX
+from ..overrides import override_field_for_ccx
 
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'pocs.overrides.PersonalOnlineCoursesOverrideProvider',))
+    'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
 class TestFieldOverrides(ModuleStoreTestCase):
     """
     Make sure field overrides behave in the expected manner.
@@ -22,6 +22,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         """
         Set up tests
         """
+        super(TestFieldOverrides, self).setUp()
         self.course = course = CourseFactory.create()
 
         # Create a course outline
@@ -41,15 +42,15 @@ class TestFieldOverrides(ModuleStoreTestCase):
             [ItemFactory.create(parent=vertical) for _ in xrange(2)]
             for vertical in verticals])
 
-        self.poc = poc = PersonalOnlineCourse(
+        self.ccx = ccx = CustomCourseForEdX(
             course_id=course.id,
-            display_name='Test POC',
+            display_name='Test CCX',
             coach=AdminFactory.create())
-        poc.save()
+        ccx.save()
 
-        patch = mock.patch('pocs.overrides.get_current_poc')
-        self.get_poc = get_poc = patch.start()
-        get_poc.return_value = poc
+        patch = mock.patch('ccx.overrides.get_current_ccx')
+        self.get_ccx = get_ccx = patch.start()
+        get_ccx.return_value = ccx
         self.addCleanup(patch.stop)
 
         # Apparently the test harness doesn't use LmsFieldStorage, and I'm not
@@ -60,24 +61,30 @@ class TestFieldOverrides(ModuleStoreTestCase):
             block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
                 AdminFactory.create(), block._field_data)  # pylint: disable=protected-access
 
+        # and after everything is done, clean up by un-doing the change to the
+        # OverrideFieldData object that is done during the wrap method.
+        def cleanup_provider_classes():
+            OverrideFieldData.provider_classes = None
+        self.addCleanup(cleanup_provider_classes)
+
     def test_override_start(self):
         """
         Test that overriding start date on a chapter works.
         """
-        poc_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.course.get_children()[0]
-        override_field_for_poc(self.poc, chapter, 'start', poc_start)
-        self.assertEquals(chapter.start, poc_start)
+        override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+        self.assertEquals(chapter.start, ccx_start)
 
     def test_override_is_inherited(self):
         """
         Test that sequentials inherit overridden start date from chapter.
         """
-        poc_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
         chapter = self.course.get_children()[0]
-        override_field_for_poc(self.poc, chapter, 'start', poc_start)
-        self.assertEquals(chapter.get_children()[0].start, poc_start)
-        self.assertEquals(chapter.get_children()[1].start, poc_start)
+        override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+        self.assertEquals(chapter.get_children()[0].start, ccx_start)
+        self.assertEquals(chapter.get_children()[1].start, ccx_start)
 
     def test_override_is_inherited_even_if_set_in_mooc(self):
         """
@@ -85,12 +92,12 @@ class TestFieldOverrides(ModuleStoreTestCase):
         (verticals) even if a due date is set explicitly on grandchildren in
         the mooc.
         """
-        poc_due = datetime.datetime(2015, 1, 1, 00, 00, tzinfo=pytz.UTC)
+        ccx_due = datetime.datetime(2015, 1, 1, 00, 00, tzinfo=pytz.UTC)
         chapter = self.course.get_children()[0]
         chapter.display_name = 'itsme!'
-        override_field_for_poc(self.poc, chapter, 'due', poc_due)
+        override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
         vertical = chapter.get_children()[0].get_children()[0]
-        self.assertEqual(vertical.due, poc_due)
+        self.assertEqual(vertical.due, ccx_due)
 
 
 def flatten(seq):

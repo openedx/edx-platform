@@ -11,7 +11,7 @@ from courseware.tests.helpers import LoginEnrollmentTestCase
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_response
-from student.roles import CoursePocCoachRole
+from student.roles import CourseCcxCoachRole
 from student.tests.factories import (
     AdminFactory,
     CourseEnrollmentFactory,
@@ -23,18 +23,18 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
 )
-from pocs import ACTIVE_POC_KEY
+from ccx import ACTIVE_CCX_KEY
 from ..models import (
-    PersonalOnlineCourse,
-    PocMembership,
-    PocFutureMembership,
+    CustomCourseForEdX,
+    CcxMembership,
+    CcxFutureMembership,
 )
-from ..overrides import get_override_for_poc, override_field_for_poc
-from .. import ACTIVE_POC_KEY
+from ..overrides import get_override_for_ccx, override_field_for_ccx
+from .. import ACTIVE_CCX_KEY
 from .factories import (
-    PocFactory,
-    PocMembershipFactory,
-    PocFutureMembershipFactory,
+    CcxFactory,
+    CcxMembershipFactory,
+    CcxFutureMembershipFactory,
 )
 
 
@@ -54,12 +54,13 @@ def intercept_renderer(path, context):
 
 class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Tests for Personal Online Courses views.
+    Tests for Custom Courses views.
     """
     def setUp(self):
         """
         Set up tests
         """
+        super(TestCoachDashboard, self).setUp()
         self.course = course = CourseFactory.create()
 
         # Create instructor account
@@ -89,12 +90,12 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
     def make_coach(self):
-        role = CoursePocCoachRole(self.course.id)
+        role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.coach)
 
-    def make_poc(self):
-        poc = PocFactory(course_id=self.course.id, coach=self.coach)
-        return poc
+    def make_ccx(self):
+        ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
+        return ccx
 
     def get_outbox(self):
         from django.core import mail
@@ -111,51 +112,51 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         User is not a coach, should get Forbidden response.
         """
         url = reverse(
-            'poc_coach_dashboard',
+            'ccx_coach_dashboard',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
-    def test_no_poc_created(self):
+    def test_no_ccx_created(self):
         """
-        No POC is created, coach should see form to add a POC.
+        No CCX is created, coach should see form to add a CCX.
         """
         self.make_coach()
         url = reverse(
-            'poc_coach_dashboard',
+            'ccx_coach_dashboard',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search(
-            '<form action=".+create_poc"',
+            '<form action=".+create_ccx"',
             response.content))
 
-    def test_create_poc(self):
+    def test_create_ccx(self):
         """
-        Create POC. Follow redirect to coach dashboard, confirm we see
-        the coach dashboard for the new POC.
+        Create CCX. Follow redirect to coach dashboard, confirm we see
+        the coach dashboard for the new CCX.
         """
         self.make_coach()
         url = reverse(
-            'create_poc',
+            'create_ccx',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
-        response = self.client.post(url, {'name': 'New POC'})
+        response = self.client.post(url, {'name': 'New CCX'})
         self.assertEqual(response.status_code, 302)
         url = response.get('location')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(re.search('id="poc-schedule"', response.content))
+        self.assertTrue(re.search('id="ccx-schedule"', response.content))
 
-    @patch('pocs.views.render_to_response', intercept_renderer)
-    @patch('pocs.views.TODAY')
+    @patch('ccx.views.render_to_response', intercept_renderer)
+    @patch('ccx.views.TODAY')
     def test_edit_schedule(self, today):
         """
-        Get POC schedule, modify it, save it.
+        Get CCX schedule, modify it, save it.
         """
         today.return_value = datetime.datetime(2014, 11, 25, tzinfo=pytz.UTC)
-        self.test_create_poc()
+        self.test_create_ccx()
         url = reverse(
-            'poc_coach_dashboard',
+            'ccx_coach_dashboard',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
         schedule = json.loads(response.mako_context['schedule'])
@@ -170,12 +171,12 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
         url = reverse(
-            'save_poc',
+            'save_ccx',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         def unhide(unit):
             """
-            Recursively unhide a unit and all of its children in the POC
+            Recursively unhide a unit and all of its children in the CCX
             schedule.
             """
             unit['hidden'] = False
@@ -198,12 +199,12 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         # Make sure start date set on course, follows start date of earliest
         # scheduled chapter
-        poc = PersonalOnlineCourse.objects.get()
-        course_start = get_override_for_poc(poc, self.course, 'start')
+        ccx = CustomCourseForEdX.objects.get()
+        course_start = get_override_for_ccx(ccx, self.course, 'start')
         self.assertEqual(str(course_start)[:-9], u'2014-11-20 00:00')
 
         # Make sure grading policy adjusted
-        policy = get_override_for_poc(poc, self.course, 'grading_policy',
+        policy = get_override_for_ccx(ccx, self.course, 'grading_policy',
                                       self.course.grading_policy)
         self.assertEqual(policy['GRADER'][0]['type'], 'Homework')
         self.assertEqual(policy['GRADER'][0]['min_count'], 4)
@@ -218,14 +219,14 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """enroll a list of students who are members of the class
         """
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         outbox = self.get_outbox()
         self.assertEqual(len(outbox), 0)
 
         url = reverse(
-            'poc_invite',
+            'ccx_invite',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -240,25 +241,25 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(302 in response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
         self.assertTrue(student.email in outbox[0].recipients())
-        # a PocMembership exists for this student
+        # a CcxMembership exists for this student
         self.assertTrue(
-            PocMembership.objects.filter(poc=poc, student=student).exists()
+            CcxMembership.objects.filter(ccx=ccx, student=student).exists()
         )
 
     def test_unenroll_member_student(self):
         """unenroll a list of students who are members of the class
         """
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         outbox = self.get_outbox()
         self.assertEqual(len(outbox), 0)
-        # student is member of POC:
-        PocMembershipFactory(poc=poc, student=student)
+        # student is member of CCX:
+        CcxMembershipFactory(ccx=ccx, student=student)
 
         url = reverse(
-            'poc_invite',
+            'ccx_invite',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -275,7 +276,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertTrue(student.email in outbox[0].recipients())
         # the membership for this student is gone
         self.assertFalse(
-            PocMembership.objects.filter(poc=poc, student=student).exists()
+            CcxMembership.objects.filter(ccx=ccx, student=student).exists()
         )
 
     def test_enroll_non_user_student(self):
@@ -283,12 +284,12 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         test_email = "nobody@nowhere.com"
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         outbox = self.get_outbox()
         self.assertEqual(len(outbox), 0)
 
         url = reverse(
-            'poc_invite',
+            'ccx_invite',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -304,8 +305,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(outbox), 1)
         self.assertTrue(test_email in outbox[0].recipients())
         self.assertTrue(
-            PocFutureMembership.objects.filter(
-                poc=poc, email=test_email
+            CcxFutureMembership.objects.filter(
+                ccx=ccx, email=test_email
             ).exists()
         )
 
@@ -314,13 +315,13 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """
         test_email = "nobody@nowhere.com"
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         outbox = self.get_outbox()
-        PocFutureMembershipFactory(poc=poc, email=test_email)
+        CcxFutureMembershipFactory(ccx=ccx, email=test_email)
         self.assertEqual(len(outbox), 0)
 
         url = reverse(
-            'poc_invite',
+            'ccx_invite',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -336,8 +337,8 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(outbox), 1)
         self.assertTrue(test_email in outbox[0].recipients())
         self.assertFalse(
-            PocFutureMembership.objects.filter(
-                poc=poc, email=test_email
+            CcxFutureMembership.objects.filter(
+                ccx=ccx, email=test_email
             ).exists()
         )
 
@@ -345,7 +346,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         """enroll a single student who is a member of the class already
         """
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         # no emails have been sent so far
@@ -353,7 +354,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(outbox), 0)
 
         url = reverse(
-            'poc_manage_student',
+            'ccx_manage_student',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -366,25 +367,25 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
         self.assertEqual(len(outbox), 0)
-        # a PocMembership exists for this student
+        # a CcxMembership exists for this student
         self.assertTrue(
-            PocMembership.objects.filter(poc=poc, student=student).exists()
+            CcxMembership.objects.filter(ccx=ccx, student=student).exists()
         )
 
     def test_manage_remove_single_student(self):
         """unenroll a single student who is a member of the class already
         """
         self.make_coach()
-        poc = self.make_poc()
+        ccx = self.make_ccx()
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
-        PocMembershipFactory(poc=poc, student=student)
+        CcxMembershipFactory(ccx=ccx, student=student)
         # no emails have been sent so far
         outbox = self.get_outbox()
         self.assertEqual(len(outbox), 0)
 
         url = reverse(
-            'poc_manage_student',
+            'ccx_manage_student',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         data = {
@@ -397,22 +398,23 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
         self.assertEqual(len(outbox), 0)
-        # a PocMembership exists for this student
+        # a CcxMembership exists for this student
         self.assertFalse(
-            PocMembership.objects.filter(poc=poc, student=student).exists()
+            CcxMembership.objects.filter(ccx=ccx, student=student).exists()
         )
 
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
-    'pocs.overrides.PersonalOnlineCoursesOverrideProvider',))
-class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
+class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
-    Tests for Personal Online Courses views.
+    Tests for Custom Courses views.
     """
     def setUp(self):
         """
         Set up tests
         """
+        super(TestCCXGrades, self).setUp()
         self.course = course = CourseFactory.create()
 
         # Create instructor account
@@ -431,13 +433,13 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 metadata={'graded': True, 'format': 'Homework'})
             for _ in xrange(4)]
 
-        role = CoursePocCoachRole(self.course.id)
+        role = CourseCcxCoachRole(self.course.id)
         role.add_users(coach)
-        self.poc = poc = PocFactory(course_id=self.course.id, coach=self.coach)
+        self.ccx = ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
 
         self.student = student = UserFactory.create()
         CourseEnrollmentFactory.create(user=student, course_id=self.course.id)
-        PocMembershipFactory(poc=poc, student=student, active=True)
+        CcxMembershipFactory(ccx=ccx, student=student, active=True)
 
         for i, section in enumerate(sections):
             for j in xrange(4):
@@ -466,12 +468,18 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             block._field_data_cache = {}
             visible_children(block)
 
-        patch_context = patch('pocs.views.get_course_by_id')
+        # and after everything is done, clean up by un-doing the change to the
+        # OverrideFieldData object that is done during the wrap method.
+        def cleanup_provider_classes():
+            OverrideFieldData.provider_classes = None
+        self.addCleanup(cleanup_provider_classes)
+
+        patch_context = patch('ccx.views.get_course_by_id')
         get_course = patch_context.start()
         get_course.return_value = course
         self.addCleanup(patch_context.stop)
 
-        override_field_for_poc(poc, course, 'grading_policy', {
+        override_field_for_ccx(ccx, course, 'grading_policy', {
             'GRADER': [
                 {'drop_count': 0,
                  'min_count': 2,
@@ -481,13 +489,13 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ],
             'GRADE_CUTOFFS': {'Pass': 0.75},
         })
-        override_field_for_poc(
-            poc, sections[-1], 'visible_to_staff_only', True)
+        override_field_for_ccx(
+            ccx, sections[-1], 'visible_to_staff_only', True)
 
-    @patch('pocs.views.render_to_response', intercept_renderer)
+    @patch('ccx.views.render_to_response', intercept_renderer)
     def test_gradebook(self):
         url = reverse(
-            'poc_gradebook',
+            'ccx_gradebook',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         response = self.client.get(url)
@@ -502,7 +510,7 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_grades_csv(self):
         url = reverse(
-            'poc_grades_csv',
+            'ccx_grades_csv',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
         response = self.client.get(url)
@@ -527,9 +535,9 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.client.login(username=self.student.username, password="test")
         session = self.client.session
-        session[ACTIVE_POC_KEY] = self.poc.id
+        session[ACTIVE_CCX_KEY] = self.ccx.id
         session.save()
-        self.client.session.get(ACTIVE_POC_KEY)
+        self.client.session.get(ACTIVE_CCX_KEY)
         url = reverse(
             'progress',
             kwargs={'course_id': self.course.id.to_deprecated_string()}
@@ -542,175 +550,176 @@ class TestPocGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(grades['section_breakdown']), 4)
 
 
-class TestSwitchActivePoc(ModuleStoreTestCase, LoginEnrollmentTestCase):
-    """Verify the view for switching which POC is active, if any
+class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """Verify the view for switching which CCX is active, if any
     """
     def setUp(self):
+        super(TestSwitchActiveCCX, self).setUp()
         self.course = course = CourseFactory.create()
         coach = AdminFactory.create()
-        role = CoursePocCoachRole(course.id)
+        role = CourseCcxCoachRole(course.id)
         role.add_users(coach)
-        self.poc = PocFactory(course_id=course.id, coach=coach)
+        self.ccx = CcxFactory(course_id=course.id, coach=coach)
         enrollment = CourseEnrollmentFactory.create(course_id=course.id)
         self.user = enrollment.user
         self.target_url = reverse(
             'course_root', args=[course.id.to_deprecated_string()]
         )
 
-    def register_user_in_poc(self, active=False):
-        """create registration of self.user in self.poc
+    def register_user_in_ccx(self, active=False):
+        """create registration of self.user in self.ccx
 
         registration will be inactive unless active=True
         """
-        PocMembershipFactory(poc=self.poc, student=self.user, active=active)
+        CcxMembershipFactory(ccx=self.ccx, student=self.user, active=active)
 
-    def revoke_poc_registration(self):
-        from ..models import PocMembership
-        membership = PocMembership.objects.filter(
-            poc=self.poc, student=self.user
+    def revoke_ccx_registration(self):
+        from ..models import CcxMembership
+        membership = CcxMembership.objects.filter(
+            ccx=self.ccx, student=self.user
         )
         membership.delete()
 
-    def verify_active_poc(self, request, id=None):
+    def verify_active_ccx(self, request, id=None):
         if id:
             id = str(id)
-        self.assertEqual(id, request.session.get(ACTIVE_POC_KEY, None))
+        self.assertEqual(id, request.session.get(ACTIVE_CCX_KEY, None))
 
-    def test_unauthorized_cannot_switch_to_poc(self):
+    def test_unauthorized_cannot_switch_to_ccx(self):
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
 
     def test_unauthorized_cannot_switch_to_mooc(self):
         switch_url = reverse(
-            'switch_active_poc',
+            'switch_active_ccx',
             args=[self.course.id.to_deprecated_string()]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
 
-    def test_enrolled_inactive_user_cannot_select_poc(self):
-        self.register_user_in_poc(active=False)
+    def test_enrolled_inactive_user_cannot_select_ccx(self):
+        self.register_user_in_ccx(active=False)
         self.client.login(username=self.user.username, password="test")
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        # if the poc were active, we'd need to pass the ID of the poc here.
-        self.verify_active_poc(self.client)
+        # if the ccx were active, we'd need to pass the ID of the ccx here.
+        self.verify_active_ccx(self.client)
 
-    def test_enrolled_user_can_select_poc(self):
-        self.register_user_in_poc(active=True)
+    def test_enrolled_user_can_select_ccx(self):
+        self.register_user_in_ccx(active=True)
         self.client.login(username=self.user.username, password="test")
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        self.verify_active_poc(self.client, self.poc.id)
+        self.verify_active_ccx(self.client, self.ccx.id)
 
     def test_enrolled_user_can_select_mooc(self):
-        self.register_user_in_poc(active=True)
+        self.register_user_in_ccx(active=True)
         self.client.login(username=self.user.username, password="test")
-        # pre-seed the session with the poc id
+        # pre-seed the session with the ccx id
         session = self.client.session
-        session[ACTIVE_POC_KEY] = str(self.poc.id)
+        session[ACTIVE_CCX_KEY] = str(self.ccx.id)
         session.save()
         switch_url = reverse(
-            'switch_active_poc',
+            'switch_active_ccx',
             args=[self.course.id.to_deprecated_string()]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        self.verify_active_poc(self.client)
+        self.verify_active_ccx(self.client)
 
-    def test_unenrolled_user_cannot_select_poc(self):
+    def test_unenrolled_user_cannot_select_ccx(self):
         self.client.login(username=self.user.username, password="test")
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        # if the poc were active, we'd need to pass the ID of the poc here.
-        self.verify_active_poc(self.client)
+        # if the ccx were active, we'd need to pass the ID of the ccx here.
+        self.verify_active_ccx(self.client)
 
     def test_unenrolled_user_switched_to_mooc(self):
         self.client.login(username=self.user.username, password="test")
-        # pre-seed the session with the poc id
+        # pre-seed the session with the ccx id
         session = self.client.session
-        session[ACTIVE_POC_KEY] = str(self.poc.id)
+        session[ACTIVE_CCX_KEY] = str(self.ccx.id)
         session.save()
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        # we tried to select the poc but are not registered, so we are switched
+        # we tried to select the ccx but are not registered, so we are switched
         # back to the mooc view
-        self.verify_active_poc(self.client)
+        self.verify_active_ccx(self.client)
 
-    def test_unassociated_course_and_poc_not_selected(self):
+    def test_unassociated_course_and_ccx_not_selected(self):
         new_course = CourseFactory.create()
         self.client.login(username=self.user.username, password="test")
         expected_url = reverse(
             'course_root', args=[new_course.id.to_deprecated_string()]
         )
-        # the poc and the course are not related.
+        # the ccx and the course are not related.
         switch_url = reverse(
-            'switch_active_poc',
-            args=[new_course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[new_course.id.to_deprecated_string(), self.ccx.id]
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(expected_url))
         # the mooc should be active
-        self.verify_active_poc(self.client)
+        self.verify_active_ccx(self.client)
 
-    def test_missing_poc_cannot_be_selected(self):
-        self.register_user_in_poc()
+    def test_missing_ccx_cannot_be_selected(self):
+        self.register_user_in_ccx()
         self.client.login(username=self.user.username, password="test")
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
-        # delete the poc
-        self.poc.delete()
+        # delete the ccx
+        self.ccx.delete()
 
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.get('Location', '').endswith(self.target_url))
-        # we tried to select the poc it doesn't exist anymore, so we are
+        # we tried to select the ccx it doesn't exist anymore, so we are
         # switched back to the mooc view
-        self.verify_active_poc(self.client)
+        self.verify_active_ccx(self.client)
 
-    def test_revoking_poc_membership_revokes_active_poc(self):
-        self.register_user_in_poc(active=True)
+    def test_revoking_ccx_membership_revokes_active_ccx(self):
+        self.register_user_in_ccx(active=True)
         self.client.login(username=self.user.username, password="test")
-        # ensure poc is active in the request session
+        # ensure ccx is active in the request session
         switch_url = reverse(
-            'switch_active_poc',
-            args=[self.course.id.to_deprecated_string(), self.poc.id]
+            'switch_active_ccx',
+            args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         self.client.get(switch_url)
-        self.verify_active_poc(self.client, self.poc.id)
-        # unenroll the user from the poc
-        self.revoke_poc_registration()
-        # request the course root and verify that the poc is not active
+        self.verify_active_ccx(self.client, self.ccx.id)
+        # unenroll the user from the ccx
+        self.revoke_ccx_registration()
+        # request the course root and verify that the ccx is not active
         self.client.get(self.target_url)
-        self.verify_active_poc(self.client)
+        self.verify_active_ccx(self.client)
 
 
 def flatten(seq):

@@ -1,0 +1,29 @@
+<%page args="ccx, membership, course" />
+
+<%! from django.utils.translation import ugettext as _ %>
+<%!
+  from django.core.urlresolvers import reverse
+  from courseware.courses import course_image_url, get_course_about_section
+%>
+<%
+  ccx_switch_target = reverse('switch_active_ccx', args=[course.id.to_deprecated_string(), ccx.id])
+%>
+<li class="course-item">
+  <article class="course">
+    <a href="${ccx_switch_target}" class="cover">
+      <img src="${course_image_url(course)}" alt="${_('{course_number} {ccx_name} Cover Image').format(course_number=course.number, ccx_name=ccx.display_name) |h}" />
+    </a>
+    <section class="info">
+      <hgroup>
+        <p class="date-block">
+        Custom Course
+        </p>
+        <h2 class="university">${get_course_about_section(course, 'university')}</h2>
+        <h3>
+          <a href="${ccx_switch_target}">${course.display_number_with_default | h} ${ccx.display_name}</a>
+        </h3>
+      </hgroup>
+      <a href="${ccx_switch_target}" class="enter-course">${_('View Course')}</a>
+    </section>
+  </article>
+</li>

@@ -214,8 +214,8 @@ FEATURES = {
     # True.
     'INDIVIDUAL_DUE_DATES': False,
 
-    # Enable Personal Online Courses
-    'PERSONAL_ONLINE_COURSES': False,
+    # Enable Custom Courses for EdX
+    'CUSTOM_COURSES_EDX': False,
 
     # Enable legacy instructor dashboard
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
@@ -1203,7 +1203,8 @@ reverify_js = [
     'js/verify_student/incourse_reverify.js',
 ]
 
-pocs_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/pocs/**/*.js'))
+ccx_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/ccx/**/*.js'))
+
 
 PIPELINE_CSS = {
     'style-vendor': {
@@ -1399,9 +1400,9 @@ PIPELINE_JS = {
         'source_filenames': reverify_js,
         'output_filename': 'js/reverify.js'
     },
-    'pocs': {
-        'source_filenames': pocs_js,
-        'output_filename': 'js/pocs.js'
+    'ccx': {
+        'source_filenames': ccx_js,
+        'output_filename': 'js/ccx.js'
     }
 }
 

@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div class="batch-enrollment" style="float:left;width:50%">
-  <form method="POST" action="poc_invite">
+  <form method="POST" action="ccx_invite">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
@@ -46,7 +46,7 @@
 </div>
 
 <div class="member-lists-management" style="float:left;width:50%">
-  <form method="POST" action="poc_manage_student">
+  <form method="POST" action="ccx_manage_student">
   <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
   <div class="auth-list-container active">
     <div class="member-list-widget">
@@ -61,7 +61,7 @@
             </tr>
           </thead>
           <tbody>
-            %for member in poc_members:
+            %for member in ccx_members:
             <tr>
               <td>${member.student}</td>
               <td>${member.student.email}</td>

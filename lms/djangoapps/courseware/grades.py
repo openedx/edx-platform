@@ -248,7 +248,7 @@ def _grade(student, request, course, keep_raw_scores):
 
         totaled_scores[section_format] = format_scores
 
-    # Grading policy might be overriden by a POC, need to reset it
+    # Grading policy might be overriden by a CCX, need to reset it
     course.set_grading_policy(course.grading_policy)
     grade_summary = course.grader.grade(totaled_scores, generate_random_scores=settings.GENERATE_PROFILE_SCORES)
 
