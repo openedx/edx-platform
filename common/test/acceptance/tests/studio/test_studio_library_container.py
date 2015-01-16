@@ -3,6 +3,8 @@ Acceptance tests for Library Content in LMS
 """
 import textwrap
 import ddt
+from unittest import skip
+
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture
 from ..helpers import UniqueCourseTest
@@ -252,6 +254,7 @@ class StudioLibraryContainerTest(StudioLibraryTest, UniqueCourseTest):
             library_container.validation_warning_text
         )
 
+    @skip("Flaky: 01/16/2015")
     def test_settings_overrides(self):
         """
         Scenario: Given I have a library, a course and library content xblock in a course
