@@ -448,6 +448,9 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
 
         correct = 0.0
         total = problem.max_score()
+        if student_module and student_module.max_grade is None:
+            student_module.max_grade = total
+            student_module.save()
 
         # Problem may be an error module (if something in the problem builder failed)
         # In which case total might be None
