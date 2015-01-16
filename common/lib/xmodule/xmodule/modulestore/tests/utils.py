@@ -27,7 +27,15 @@ def load_function(path):
 
 
 # pylint: disable=unused-argument
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None, fs_service=None):
+def create_modulestore_instance(
+        engine,
+        contentstore,
+        doc_store_config,
+        options,
+        i18n_service=None,
+        fs_service=None,
+        user_service=None
+):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -69,7 +77,7 @@ class MixedSplitTestCase(TestCase):
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,

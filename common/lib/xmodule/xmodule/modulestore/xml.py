@@ -64,7 +64,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
 
-        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        # Adding the course_id as passed in for later reference rather than
+        # having to recombine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
         self.modulestore = xmlstore
@@ -292,8 +293,8 @@ class XMLModuleStore(ModuleStoreReadBase):
     An XML backed ModuleStore
     """
     def __init__(
-        self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-        load_error_modules=True, i18n_service=None, fs_service=None, **kwargs
+            self, data_dir, default_class=None, course_dirs=None, course_ids=None,
+            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -304,8 +305,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             default_class (str): dot-separated string defining the default descriptor
                 class to use if none is specified in entry_points
 
-            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load. Otherwise,
-                load all courses. Note, providing both
+            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load.
+                Otherwise, load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
 
@@ -331,6 +332,7 @@ class XMLModuleStore(ModuleStoreReadBase):
 
         self.i18n_service = i18n_service
         self.fs_service = fs_service
+        self.user_service = user_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -478,6 +480,9 @@ class XMLModuleStore(ModuleStoreReadBase):
 
             if self.fs_service:
                 services['fs'] = self.fs_service
+
+            if self.user_service:
+                services['user'] = self.user_service
 
             system = ImportSystem(
                 xmlstore=self,

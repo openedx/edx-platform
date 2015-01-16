@@ -281,7 +281,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 # decache any computed pending field settings
                 module.save()
                 return module
-            except:
+            except Exception:                   # pylint: disable=broad-except
                 log.warning("Failed to load descriptor from %s", json_data, exc_info=True)
                 return ErrorDescriptor.from_json(
                     json_data,
@@ -498,6 +498,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  error_tracker=null_error_tracker,
                  i18n_service=None,
                  fs_service=None,
+                 user_service=None,
                  retry_wait_time=0.1,
                  **kwargs):
         """
@@ -551,6 +552,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.render_template = render_template
         self.i18n_service = i18n_service
         self.fs_service = fs_service
+        self.user_service = user_service
 
         self._course_run_cache = {}
 
@@ -850,6 +852,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if self.fs_service:
             services["fs"] = self.fs_service
 
+        if self.user_service:
+            services["user"] = self.user_service
+
         system = CachingDescriptorSystem(
             modulestore=self,
             course_key=course_key,
@@ -932,7 +937,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         """
         Get the course with the given courseid (org/course/run)
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         course_key = self.fill_in_run(course_key)
         location = course_key.make_usage_key('course', course_key.run)
         try:
@@ -949,7 +954,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         If ignore_case is True, do a case insensitive search,
         otherwise, do a case sensitive search
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         if isinstance(course_key, LibraryLocator):
             return None  # Libraries require split mongo
         course_key = self.fill_in_run(course_key)
@@ -1149,6 +1154,9 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
 
             if self.fs_service:
                 services["fs"] = self.fs_service
+
+            if self.user_service:
+                services["user"] = self.user_service
 
             runtime = CachingDescriptorSystem(
                 modulestore=self,
@@ -1598,7 +1606,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         elif isinstance(course_assets['assets'], list):
             # This record is in the old course assets format.
             # Ensure that no data exists before updating the format.
-            assert(len(course_assets['assets']) == 0)
+            assert len(course_assets['assets']) == 0
             # Update the format to a dict.
             self.asset_collection.update(
                 {'_id': doc_id},

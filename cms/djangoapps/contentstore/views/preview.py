@@ -24,6 +24,7 @@ from xblock.django.request import webob_to_django_response, django_to_webob_requ
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
 from student.auth import has_studio_read_access, has_studio_write_access
+from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -112,20 +113,6 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         ]
 
 
-class StudioUserService(object):
-    """
-    Provides a Studio implementation of the XBlock user service.
-    """
-
-    def __init__(self, request):
-        super(StudioUserService, self).__init__()
-        self._request = request
-
-    @property
-    def user_id(self):
-        return self._request.user.id
-
-
 class StudioPermissionsService(object):
     """
     Service that can provide information about a user's permissions.
@@ -176,7 +163,6 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
-    descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
     descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
@@ -204,6 +190,7 @@ def _preview_module_system(request, descriptor, field_data):
             "i18n": ModuleI18nService(),
             "field-data": field_data,
             "library_tools": LibraryToolsService(modulestore()),
+            "user": DjangoXBlockUserService(request.user),
         },
     )
 
