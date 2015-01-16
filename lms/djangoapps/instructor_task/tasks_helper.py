@@ -25,7 +25,7 @@ from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor.utils import collect_ora2_data
-from instructor_analytics.basic import student_submissions, enrolled_students_features
+from instructor_analytics.basic import student_submission_rows, enrolled_students_features
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
@@ -614,8 +614,7 @@ def push_student_submissions_to_s3(_xmodule_instance_args, _entry_id, course_id,
         TASK_LOG.error(e.message)
         return "failed"
 
-    header, datarows = student_submissions(course)
-    rows = [header] + datarows
+    rows = student_submission_rows(course)
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")

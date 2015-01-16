@@ -146,3 +146,6 @@ git+https://github.com/mitocw/django-cas.git
 
 # edX packages
 edx-submissions==0.0.8
+
+# XBlocks from PyPi
+xblock-image-modal >=0.1.0, <1.0.0

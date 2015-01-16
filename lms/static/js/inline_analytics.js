@@ -390,6 +390,7 @@ window.InlineAnalytics = (function() {
 
             var location = this.dataset.location;
             var answerDistUrl = this.dataset.answer_dist_url;
+            var courseId = this.dataset.course_id;
 
             // If data already retrieved for this problem, just show the div
             if (elementsRetrieved.indexOf(elementId) !== -1) {
@@ -432,6 +433,7 @@ window.InlineAnalytics = (function() {
             		module_id: location,
             		question_types_by_part: questionTypesByPart,
             		num_options_by_part: numOptionsByPart,
+            		course_id: courseId,
             };
 
             if (partsToGet.length > 0) {

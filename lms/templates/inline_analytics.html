@@ -5,7 +5,7 @@ ${block_content}
 
 % if has_instructor_access:
   <div aria-hidden="true" class="wrap-instructor-info">
-    <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button" data-location="${location}" data-answer_dist_url="${answer_dist_url}">${_("Staff Analytics Info")}</a>
+    <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button" data-location="${location}" data-answer_dist_url="${answer_dist_url}" data-course_id="${course_id}">${_("Staff Analytics Info")}</a>
   </div>
 
   <div id="${element_id}_analytics_error_message" style="display: none;">

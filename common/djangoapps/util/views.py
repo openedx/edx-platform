@@ -19,6 +19,7 @@ import track.views
 
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+from student.models import UserProfile
 
 log = logging.getLogger(__name__)
 
@@ -199,7 +200,7 @@ def submit_feedback(request):
     additional_info = {}
 
     required_fields = ["subject", "details"]
-    if not request.user.is_authenticated():
+    if not UserProfile.has_registered(request.user):
         required_fields += ["name", "email"]
     required_field_errs = {
         "subject": "Please provide a subject.",
@@ -218,7 +219,7 @@ def submit_feedback(request):
         [(tag, request.POST[tag]) for tag in ["issue_type", "course_id"] if tag in request.POST]
     )
 
-    if request.user.is_authenticated():
+    if UserProfile.has_registered(request.user):
         realname = request.user.profile.name
         email = request.user.email
         additional_info["username"] = request.user.username
