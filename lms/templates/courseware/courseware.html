@@ -29,6 +29,10 @@ ${page_title_breadcrumbs(course_name())}
 <%block name="headextra">
 <%static:css group='style-course-vendor'/>
 <%static:css group='style-course'/>
+## Utility: Notes
+% if is_edxnotes_enabled(course):
+<%static:css group='style-student-notes'/>
+% endif
 
 <%block name="nav_skip">${"#seq_content" if section_title else "#course-content"}</%block>
 
