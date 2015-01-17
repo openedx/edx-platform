@@ -241,6 +241,9 @@ def _section_course_info(course, access):
         message = _("Enrollment data is now available in {dashboard_link}.").format(dashboard_link=dashboard_link)
         section_data['enrollment_message'] = message
 
+    if settings.FEATURES.get('ENABLE_SYSADMIN_DASHBOARD'):
+        section_data['detailed_gitlogs_url'] = reverse('gitlogs_detail', kwargs={'course_id': unicode(course_key)})
+
     try:
         advance = lambda memo, (letter, score): "{}: {}, ".format(letter, score) + memo
         section_data['grade_cutoffs'] = reduce(advance, course.grade_cutoffs.items(), "")[:-2]
