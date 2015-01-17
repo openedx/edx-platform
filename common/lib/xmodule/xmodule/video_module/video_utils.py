@@ -5,6 +5,7 @@ import json
 import logging
 import urllib
 import requests
+import urlparse
 
 from requests.exceptions import RequestException
 
@@ -33,7 +34,7 @@ def create_youtube_string(module):
     ])
 
 
-def get_video_from_cdn(cdn_base_url, original_video_url):
+def get_video_from_cdn(cdn_base_url, original_video_url, **kwargs):
     """
     Get video URL from CDN.
 
@@ -54,6 +55,12 @@ def get_video_from_cdn(cdn_base_url, original_video_url):
 
     if not cdn_base_url:
         return None
+
+    if kwargs.get('play_video_local'):
+        scheme, netloc = cdn_base_url.split('://')
+        parsed = urlparse.urlparse(original_video_url)
+        replaced = parsed._replace(netloc=netloc, scheme=scheme)
+        return replaced.geturl()
 
     request_url = cdn_base_url + urllib.quote(original_video_url)
 
