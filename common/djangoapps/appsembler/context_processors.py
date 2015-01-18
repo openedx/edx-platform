@@ -4,7 +4,6 @@ import os
 
 from django.conf import settings
 
-from course_creators.models import CourseCreator
 from student import roles
 
 
@@ -15,20 +14,19 @@ def intercom(request):
     if not intercom_app_id:
         return data
 
-    if settings.PROJECT_ROOT.endwisth('edx-platform/cms') or \
-            (settings.PROJECT_ROOT.endwisth('edx-platform/lms') and request.get_host().startswith('preview.')):
+    if settings.PROJECT_ROOT.endswith('edx-platform/cms') or \
+            (settings.PROJECT_ROOT.endswith('edx-platform/lms') and request.get_host().startswith('preview.')):
         data['show_intercom_widget'] = True
 
-    if not data['show_intercom_widget']:
+    if not data['show_intercom_widget'] and request.user.is_authenticated():
         user = request.user
-        if user.is_authenticated():
-            # TODO: the logic below will need tweaking for sure
-            if (user.is_staff or user.is_superuser or
-                user.coursecreator_set.filter(state=CourseCreator.GRANTED).exists() or
+
+        # TODO: the logic below will need tweaking for sure
+        if (user.is_staff or user.is_superuser or
                 # the following line doesn't check whether the role is for the current course
                 user.courseaccessrole_set.filter(role__in=(roles.CourseStaffRole.ROLE,
                                                            roles.CourseInstructorRole.ROLE)).exists()):
-                data['show_intercom_widget'] = True
+            data['show_intercom_widget'] = True
 
     if not data['show_intercom_widget']:
         return data
