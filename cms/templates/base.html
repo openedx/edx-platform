@@ -370,7 +370,7 @@
     <%block name="jsextra"></%block>
     <div class="modal-cover"></div>
 
-    % if not intercom_app_id is UNDEFINED:
+    % if show_intercom_widget:
       <script>
         window.intercomSettings = {
           email: "${intercom_user_email}",
