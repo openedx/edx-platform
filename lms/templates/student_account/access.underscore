@@ -1,9 +1,3 @@
-<section id="form-load-fail" class="form-type hidden">
-    <div class="status submission-error">
-        <p class="message-copy"><%- gettext("Sorry, we're having some technical problems. Wait a few minutes and try again.") %></p>
-    </div>
-</section>
-
 <section id="login-anchor" class="form-type">
     <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
 </section>
