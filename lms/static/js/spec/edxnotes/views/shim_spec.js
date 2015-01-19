@@ -49,6 +49,13 @@ define([
             _.invoke(Annotator._instances, 'destroy');
         });
 
+        it('does not show the viewer if the editor is opened', function() {
+            annotators[0].showEditor({}, {});
+            highlights[0].mouseover();
+            expect($('#edx-notes-wrapper-123 .annotator-editor')).not.toHaveClass('annotator-hide');
+            expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
+        });
+
         it('clicking a highlight freezes mouseover and mouseout in all highlighted text', function() {
             _.each(annotators, function(annotator) {
                 expect(annotator.isFrozen).toBe(false);
