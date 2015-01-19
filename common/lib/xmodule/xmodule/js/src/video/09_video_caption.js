@@ -47,11 +47,11 @@ function (Sjson, AsyncProcess) {
             this.loaded = false;
             this.container = state.el.find('.lang');
 
-            this.hideCaptionsEl = state.el.find('a.hide-captions');
-            this.subtitlesEl = state.el.find('ol.subtitles');
+            this.hideCaptionsEl = state.el.find('.hide-captions');
+            this.subtitlesEl = state.el.find('.subtitles');
 
-            this.hideClosedCaptionsEl = state.el.find('a.hide-closed-captions');
-            this.closedCaptionsEl = state.el.find('section.closed-caption');
+            this.hideClosedCaptionsEl = state.el.find('.hide-closed-captions');
+            this.closedCaptionsEl = state.el.find('.closed-caption');
 
             if (_.keys(languages).length) {
                 this.renderLanguageMenu(languages);
