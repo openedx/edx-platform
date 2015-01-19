@@ -8,3 +8,4 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@ac49b30452aff0cc34cace6a34b788e100490f24#egg=xblock-ooyala
 -e git+https://github.com/edx-solutions/xblock-group-project.git@394a3a495be5eceea8cbf582f6b2b43ff995ff0c#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@30894de41ee7efe7d5b6400086463d12995893f7#egg=xblock-adventure
+-e git+https://github.com/mckinseyacademy/xblock-poll.git@1b9c44da7c6d76a650184d6db2ab72aefd6aa3d3#egg=xblock-poll
