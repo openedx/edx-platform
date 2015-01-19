@@ -24,6 +24,9 @@ from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
 
+from db_utils import transaction
+
+
 log = logging.getLogger(__name__)
 
 
@@ -353,6 +356,7 @@ class DjangoKeyValueStore(KeyValueStore):
         """
         self.set_many({key: value})
 
+    @transaction.commit_on_success_with_read_committed()
     def set_many(self, kv_dict):
         """
         Provide a bulk save mechanism.

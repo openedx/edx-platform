@@ -65,6 +65,9 @@ FEATURES['EMBARGO'] = True
 
 FEATURES['ENABLE_COMBINED_LOGIN_REGISTRATION'] = True
 
+# Toggle change in transaction levels ('repeatable_read', 'read_committed') for testing
+FEATURES['CHANGE_TRANSACTION_LEVEL'] = False
+
 # Need wiki for courseware views to work. TODO (vshnayder): shouldn't need it.
 WIKI_ENABLED = True
 
