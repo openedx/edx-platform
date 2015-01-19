@@ -481,7 +481,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
         raise NotImplementedError()
     
     def _additional_discussion_id(self):
-        """ Returns initial discussion_id for InlineDiscussionPage """
+        """ Returns initial discussion_id for second discussion for InlineDiscussionPage """
         raise NotImplementedError()
 
     @property
@@ -491,7 +491,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
     
     @property
     def additional_discussion_id(self):
-        """ Returns additional discussion id """
+        """ Returns additional discussion id for second discussion"""
         raise NotImplemented()
 
     def __init__(self, *args, **kwargs):
@@ -596,15 +596,15 @@ class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, D
         return XBlockFixtureDesc(
             'discussion',
             "Test Discussion",
-            metadata={"discussion_id": self.discussion_id}
+            metadata={"discussion_id": self.additional_discussion_id}
         )
 
     def _initial_discussion_id(self):
         """ Returns initial discussion_id for InlineDiscussionPage """
         return self.discussion_id
-    
-    def _addiional_discussion_id(self):
-        """ Returns initial discussion_id for InlineDiscussionPage """
+
+    def _additional_discussion_id(self):
+        """ Returns initial discussion_id for second discussion for InlineDiscussionPage """
         return self.additional_discussion_id
 
     @property
@@ -616,7 +616,7 @@ class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, D
     
     @property
     def additional_discussion_id(self):
-        """ Returns selected discussion_id """
+        """ Returns selected discussion_id for second discussion"""
         if getattr(self, '_additional_discussion_id', None) is None:
             self._discussion_id = "test_discussion_{}".format(uuid4().hex)
         return self._discussion_id
@@ -632,8 +632,19 @@ class DiscussionXBlockInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, Di
             "Test Discussion"
         )
 
+    def _get_additional_xblock_fixture_desc(self):
+        """ Returns Discussion XBlockFixtureDescriptor """
+        return XBlockFixtureDesc(
+            'discussion-forum',
+            "Test Discussion 2"
+        )
+
     def _initial_discussion_id(self):
         """ Returns initial discussion_id for InlineDiscussionPage """
+        return None
+
+    def _additional_discussion_id(self):
+        """ Returns initial discussion_id for second discussion for InlineDiscussionPage """
         return None
 
     @property
