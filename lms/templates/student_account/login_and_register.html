@@ -26,8 +26,11 @@
     <div id="login-and-registration-container"
         class="login-register"
         data-initial-mode="${initial_mode}"
-        data-third-party-auth='${third_party_auth}'
+        data-third-party-auth='${third_party_auth|h}'
         data-platform-name='${platform_name}'
+        data-login-form-desc='${login_form_desc|h}'
+        data-registration-form-desc='${registration_form_desc|h}'
+        data-password-reset-form-desc='${password_reset_form_desc|h}'
     />
 </div>
 

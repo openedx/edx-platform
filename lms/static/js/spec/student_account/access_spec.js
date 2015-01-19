@@ -13,20 +13,6 @@ define([
 
             var requests = null,
                 view = null,
-                AJAX_INFO = {
-                    register: {
-                        url: '/user_api/v1/account/registration/',
-                        requestIndex: 1
-                    },
-                    login: {
-                        url: '/user_api/v1/account/login_session/',
-                        requestIndex: 0
-                    },
-                    password_reset: {
-                        url: '/user_api/v1/account/password_reset/',
-                        requestIndex: 1
-                    }
-                },
                 FORM_DESCRIPTION = {
                     method: 'post',
                     submit_url: '/submit',
@@ -58,16 +44,6 @@ define([
                 FORWARD_URL = '/courseware/next',
                 COURSE_KEY = 'edx/DemoX/Fall';
 
-            var ajaxAssertAndRespond = function(url, requestIndex) {
-                // Verify that the client contacts the server as expected
-                AjaxHelpers.expectJsonRequest(requests, 'GET', url, null, requestIndex);
-
-                /* Simulate a response from the server containing
-                /* a dummy form description
-                 */
-                AjaxHelpers.respondWithJson(requests, FORM_DESCRIPTION);
-            };
-
             var ajaxSpyAndInitialize = function(that, mode) {
                 // Spy on AJAX requests
                 requests = AjaxHelpers.requests(that);
@@ -79,7 +55,10 @@ define([
                         currentProvider: null,
                         providers: []
                     },
-                    platformName: 'edX'
+                    platformName: 'edX',
+                    loginFormDesc: FORM_DESCRIPTION,
+                    registrationFormDesc: FORM_DESCRIPTION,
+                    passwordResetFormDesc: FORM_DESCRIPTION
                 });
 
                 // Mock the redirect call
@@ -88,9 +67,6 @@ define([
                 // Mock the enrollment and shopping cart interfaces
                 spyOn( EnrollmentInterface, 'enroll' ).andCallFake( function() {} );
                 spyOn( ShoppingCartInterface, 'addCourseToCart' ).andCallFake( function() {} );
-
-                // Initialize the subview
-                ajaxAssertAndRespond(AJAX_INFO[mode].url);
             };
 
             var assertForms = function(visibleType, hiddenType) {
@@ -106,8 +82,6 @@ define([
 
                 // Load form corresponding to the change event
                 view.toggleForm(changeEvent);
-
-                ajaxAssertAndRespond(AJAX_INFO[type].url, AJAX_INFO[type].requestIndex);
             };
 
             /**
@@ -174,11 +148,6 @@ define([
 
                 // Simulate a click on the reset password link
                 view.resetPassword();
-
-                ajaxAssertAndRespond(
-                    AJAX_INFO.password_reset.url,
-                    AJAX_INFO.password_reset.requestIndex
-                );
 
                 // Verify that the password reset wrapper is populated
                 expect($('#password-reset-wrapper')).not.toBeEmpty();
@@ -253,26 +222,6 @@ define([
                 expect( view.redirect ).toHaveBeenCalledWith( "/dashboard" );
             });
 
-            it('displays an error if a form definition could not be loaded', function() {
-                // Spy on AJAX requests
-                requests = AjaxHelpers.requests(this);
-
-                // Init AccessView
-                view = new AccessView({
-                    mode: 'login',
-                    thirdPartyAuth: {
-                        currentProvider: null,
-                        providers: []
-                    },
-                    platformName: 'edX'
-                });
-
-                // Simulate an error from the LMS servers
-                AjaxHelpers.respondWithError(requests);
-
-                // Error message should be displayed
-                expect( $('#form-load-fail').hasClass('hidden') ).toBe(false);
-            });
         });
     }
 );
