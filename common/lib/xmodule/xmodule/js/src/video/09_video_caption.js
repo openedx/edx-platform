@@ -843,7 +843,8 @@ function (Sjson, AsyncProcess) {
         * @param {jquery Event} event
         *
         */
-        toggleCaptions: function () {
+        toggleCaptions: function (e) {
+            e.preventDefault();
             var hide_captions = !this.state.el.hasClass('closed');
             this.hideCaptions(hide_captions);
         },
