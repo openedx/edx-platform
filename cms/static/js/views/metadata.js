@@ -142,6 +142,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                     model: new LicenseModel(this.model.getValue()),
                     el: this.$el.find('.wrapper-license-selector')
                 });
+                this.initialized = true;
             }
         },
 
@@ -151,7 +152,7 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
 
         setValueInEditor: function (value) {
             if (this.initialized) {
-                this.licenseSelector.model.set('kind', value);
+                this.licenseSelector.model.set('kind', value.kind);
             }
         }
     });
