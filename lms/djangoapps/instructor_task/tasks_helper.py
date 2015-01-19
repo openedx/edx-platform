@@ -33,6 +33,7 @@ from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
+from opaque_keys.edx.keys import UsageKey
 from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
 from student.models import CourseEnrollment
 
@@ -300,16 +301,21 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
     problem_url = task_input.get('problem_url')
     entrance_exam_url = task_input.get('entrance_exam_url')
     student_identifier = task_input.get('student')
+    problems = {}
 
     # if problem_url is present make a usage key from it
     if problem_url:
         usage_key = course_id.make_usage_key_from_deprecated_string(problem_url)
         usage_keys.append(usage_key)
 
+        # find the problem descriptor:
+        problem_descriptor = modulestore().get_item(usage_key)
+        problems[unicode(usage_key)] = problem_descriptor
+
     # if entrance_exam is present grab all problems in it
     if entrance_exam_url:
-        problem_descriptors = get_problems_in_section(entrance_exam_url)
-        usage_keys = [descriptor.location for descriptor in problem_descriptors]
+        problems = get_problems_in_section(entrance_exam_url)
+        usage_keys = [UsageKey.from_string(location) for location in problems.keys()]
 
     # find the modules in question
     modules_to_update = StudentModule.objects.filter(course_id=course_id, module_state_key__in=usage_keys)
@@ -336,9 +342,7 @@ def perform_module_state_update(update_fcn, filter_fcn, _entry_id, course_id, ta
 
     for module_to_update in modules_to_update:
         task_progress.attempted += 1
-        # find the problem descriptor:
-        module_descriptor = modulestore().get_item(module_to_update.module_state_key)
-
+        module_descriptor = problems[unicode(module_to_update.module_state_key)]
         # There is no try here:  if there's an error, we let it throw, and the task will
         # be marked as FAILED, with a stack trace.
         with dog_stats_api.timer('instructor_tasks.module.time.step', tags=[u'action:{name}'.format(name=action_name)]):

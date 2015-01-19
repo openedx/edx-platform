@@ -103,14 +103,14 @@
   <input type="button" name="reset-entrance-exam-attempts" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }">
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
-    <input type="button" name="rescore-entrance-exam" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_problem_url'] }">
+    <input type="button" name="rescore-entrance-exam" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
   %endif
   </p>
 
   <p>
   %if section_data['access']['instructor']:
-    <p> ${_('You may also delete the entire state of a student for the specified problem:')} </p>
-    <p><input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_("Delete Student State for Problem")}" data-endpoint="${ section_data['reset_student_attempts_url'] }"></p>
+    <p> ${_('You may also delete the entire state of a student for the entrance exam:')} </p>
+    <p><input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_("Delete Student State for entrance exam")}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }"></p>
   %endif
   </p>
 
@@ -121,7 +121,7 @@
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
-    <p><input type="button" name="entrance-exam-task-history" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></p>
+    <p><input type="button" name="entrance-exam-task-history" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_entrace_exam_instructor_tasks_url'] }"></p>
     <div class="entrance-exam-task-history-table"></div>
   %endif
   <hr>

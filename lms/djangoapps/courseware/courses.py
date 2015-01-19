@@ -419,20 +419,25 @@ def get_studio_url(course, page):
 
 def get_problems_in_section(section):
     """
-    This returns list of problems in a section.
+    This returns a dict having problems in a section.
+    Returning dict has problem location as keys and problem
+    descriptor as values.
     """
 
-    problem_descriptors = []
-    exam_key = UsageKey.from_string(section)
+    problem_descriptors = defaultdict()
+    if not isinstance(section, UsageKey):
+        section_key = UsageKey.from_string(section)
+    else:
+        section_key = section
     # it will be a Mongo performance boost, if you pass in a depth=3 argument here
     # as it will optimize round trips to the database to fetch all children for the current node
-    section = modulestore().get_item(exam_key, depth=3)
+    section_descriptor = modulestore().get_item(section_key, depth=3)
 
-    # iterate over section, sub-section,  unit
-    for subsection in section.get_children():
+    # iterate over section, sub-section, vertical
+    for subsection in section_descriptor.get_children():
         for vertical in subsection.get_children():
-            for unit in vertical.get_children():
-                if unit.location.category == 'problem':
-                    problem_descriptors.append(unit)
+            for component in vertical.get_children():
+                if component.location.category == 'problem' and getattr(component, 'has_score', False):
+                    problem_descriptors[unicode(component.location)] = component
 
     return problem_descriptors

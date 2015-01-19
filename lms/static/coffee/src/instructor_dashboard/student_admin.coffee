@@ -187,7 +187,6 @@ class StudentAdmin
         return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
       send_data =
         unique_student_identifier: unique_student_identifier
-        problem_to_reset: 'entrance_exam' # 'entrance_exam' is an system defined constant
         delete_module: false
       success_message = gettext("Entrance exam attempts is being reset for student '<%= student_id %>'.")
       error_message = gettext("Error resetting entrance exam attempts for student '<%= student_id %>'. Make sure student identifier is correct.")
@@ -199,6 +198,63 @@ class StudentAdmin
         url: @$btn_reset_entrance_exam_attempts.data 'endpoint'
         data: send_data
         success: @clear_errors_then -> alert full_success_message
+        error: std_ajax_err => @$request_response_error_ee.text full_error_message
+
+   # start task to rescore entrance exam for student
+    @$btn_rescore_entrance_exam.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+      success_message = gettext("Started entrance exam rescore task for student '<%= student_id %>'. Click the 'Show Background Task History for Student' button to see the status of the task.")
+      full_success_message = _.template(success_message, {student_id: unique_student_identifier})
+      error_message = gettext("Error starting a task to rescore entrance exam for student '<%= student_id %>'. Make sure that entrance exam has problems in it and student identifier is correct.")
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier})
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_rescore_entrance_exam.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then -> alert full_success_message
+        error: std_ajax_err => @$request_response_error_ee.text full_error_message
+
+   # delete student state for entrance exam
+    @$btn_delete_entrance_exam_state.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+        delete_module: true
+      success_message = gettext("Entrance exam state is being deleted for student '<%= student_id %>'.")
+      error_message = gettext("Error deleting entrance exam state for student '<%= student_id %>'. Make sure student identifier is correct.")
+      full_success_message = _.template(success_message, {student_id: unique_student_identifier})
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier})
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_delete_entrance_exam_state.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then -> alert full_success_message
+        error: std_ajax_err => @$request_response_error_ee.text full_error_message
+
+    # list entrance exam task history for student
+    @$btn_entrance_exam_task_history.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      send_data =
+        unique_student_identifier: unique_student_identifier
+      error_message = gettext("Error getting entrance exam task history for student '<%= student_id %>'. Make sure student identifier is correct.")
+      full_error_message = _.template(error_message, {student_id: unique_student_identifier})
+
+      $.ajax
+        dataType: 'json'
+        url: @$btn_entrance_exam_task_history.data 'endpoint'
+        data: send_data
+        success: @clear_errors_then (data) =>
+          create_task_list_table @$table_entrance_exam_task_history, data.tasks
         error: std_ajax_err => @$request_response_error_ee.text full_error_message
 
     # start task to reset attempts on problem for all students
