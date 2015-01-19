@@ -269,10 +269,10 @@
 }
 
 .xmodule_licensable {
-  @include transition(opacity .25s ease-in-out);
+  @include transition(opacity $tmg-f2 ease-in-out);
   clear: both;
   padding: ($baseline / 4) 0;
-  opacity: .4;
+  opacity: 0.4;
   &, .license, .license-text {
     color: $black;
   }
