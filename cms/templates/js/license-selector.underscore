@@ -8,7 +8,7 @@
       </button>
       <p class='tip tip-inline'><%=
         interpolate(
-            gettext("If you are not familiar with the options, %(link_start)slearn more%(link_end)s prior to selecting a license."),
+            gettext("%(link_start)sLearn more%(link_end)s about Creative Commons."),
             {
                 link_start: "<a href='http://creativecommons.org/about' target='_blank'>",
                 link_end: "</a>"
@@ -59,8 +59,8 @@
   </ul>
 </div>
 <div class="selected-license-text">
-  <label class='label setting-label' for="license"><%= gettext('License Display') %></label>
-  <p class='tip tip-inline'><%= gettext("The following message will be displayed underneath the content.") %></p>
+  <label class='label setting-label' for="license"><%= gettext('Copyright Notice') %></label>
+  <p class='tip tip-inline'><%= gettext("Students will see the following copyright notice beneath course content.") %></p>
   <span class="xmodule_licensable opaque"><%= license_preview %></span>
   <input class="license" type="hidden" name="license" aria-required="false" value="<%= license_data %>" />
 </div>
