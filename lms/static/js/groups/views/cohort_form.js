@@ -76,8 +76,12 @@ var edx = edx || {};
         },
 
         getUpdatedCohortName: function() {
-            var cohortName = this.$('.cohort-name').val();
-            return cohortName ? cohortName.trim() : this.model.get('name');
+            var cohortName = this.$('#cohort-name').val();
+            return cohortName ? cohortName.trim() : '';
+        },
+
+        getAssignmentType: function() {
+            return $('input[name="rename-cohort"]:checked').val();
         },
 
         showMessage: function(message, type, details) {
@@ -109,16 +113,18 @@ var edx = edx || {};
                 cohort = this.model,
                 saveOperation = $.Deferred(),
                 isUpdate = !_.isUndefined(this.model.id),
-                fieldData, selectedContentGroup, errorMessages, showErrorMessage;
+                fieldData, selectedContentGroup, selectedAssignmentType, errorMessages, showErrorMessage;
             showErrorMessage = function(message, details) {
                 self.showMessage(message, 'error', details);
             };
             this.removeNotification();
             selectedContentGroup = this.getSelectedContentGroup();
+            selectedAssignmentType = this.getAssignmentType();
             fieldData = {
                 name: this.getUpdatedCohortName(),
                 group_id: selectedContentGroup ? selectedContentGroup.id : null,
-                user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null
+                user_partition_id: selectedContentGroup ? selectedContentGroup.get('user_partition_id') : null,
+                assignment_type: selectedAssignmentType
             };
             errorMessages = this.validate(fieldData);
             if (errorMessages.length > 0) {

@@ -36,6 +36,11 @@ class CourseUserGroup(models.Model):
     GROUP_TYPE_CHOICES = ((COHORT, 'Cohort'),)
     group_type = models.CharField(max_length=20, choices=GROUP_TYPE_CHOICES)
 
+    RANDOM = 'random'
+    MANUAL = 'manual'
+    ASSIGNMENT_TYPE_CHOICES = ((RANDOM, 'Random'), (MANUAL, 'Manual'),)
+    assignment_type = models.CharField(max_length=6, choices=ASSIGNMENT_TYPE_CHOICES, default=MANUAL)
+
 
 class CourseUserGroupPartitionGroup(models.Model):
     """

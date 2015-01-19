@@ -81,31 +81,6 @@ def _cohort_membership_changed(sender, **kwargs):
 DEFAULT_COHORT_NAME = "Default Group"
 
 
-class CohortAssignmentType(object):
-    """
-    The various types of rule-based cohorts
-    """
-    # No automatic rules are applied to this cohort; users must be manually added.
-    NONE = "none"
-
-    # One of (possibly) multiple cohorts to which users are randomly assigned.
-    # Note: The 'default' cohort is included in this category iff it exists and
-    # there are no other random groups. (Also see Note 2 above.)
-    RANDOM = "random"
-
-    @staticmethod
-    def get(cohort, course):
-        """
-        Returns the assignment type of the given cohort for the given course
-        """
-        if cohort.name in course.auto_cohort_groups:
-            return CohortAssignmentType.RANDOM
-        elif len(course.auto_cohort_groups) == 0 and cohort.name == DEFAULT_COHORT_NAME:
-            return CohortAssignmentType.RANDOM
-        else:
-            return CohortAssignmentType.NONE
-
-
 # tl;dr: global state is bad.  capa reseeds random every time a problem is loaded.  Even
 # if and when that's fixed, it's a good idea to have a local generator to avoid any other
 # code that messes with the global random module.
@@ -246,7 +221,8 @@ def get_cohort(user, course_key, assign=True):
     group, __ = CourseUserGroup.objects.get_or_create(
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
-        name=group_name
+        name=group_name,
+        assignment_type=CourseUserGroup.RANDOM
     )
     user.course_groups.add(group)
     return group
@@ -269,7 +245,8 @@ def get_course_cohorts(course):
         CourseUserGroup.objects.get_or_create(
             course_id=course.location.course_key,
             group_type=CourseUserGroup.COHORT,
-            name=group_name
+            name=group_name,
+            assignment_type=CourseUserGroup.RANDOM
         )
 
     return list(CourseUserGroup.objects.filter(
@@ -304,7 +281,7 @@ def get_cohort_by_id(course_key, cohort_id):
     )
 
 
-def add_cohort(course_key, name):
+def add_cohort(course_key, name, assignment_type):
     """
     Add a cohort to a course.  Raises ValueError if a cohort of the same name already
     exists.
@@ -323,7 +300,8 @@ def add_cohort(course_key, name):
     cohort = CourseUserGroup.objects.create(
         course_id=course.id,
         group_type=CourseUserGroup.COHORT,
-        name=name
+        name=name,
+        assignment_type=assignment_type
     )
     tracker.emit(
         "edx.cohort.creation_requested",
@@ -394,3 +372,34 @@ def get_group_info_for_cohort(cohort):
     if len(res):
         return res[0].group_id, res[0].partition_id
     return None, None
+
+
+def rename_cohort(cohort_id, course_key, new_name):
+    """
+    Rename an existing cohort.
+
+    Arguments:
+        cohort_id: Cohort Id
+        course_key: CourseKey
+        new_name: New name of cohort
+    """
+    try:
+        course = courses.get_course_by_id(course_key)
+    except Http404:
+        raise ValueError("Invalid course_key")
+
+    if not course.is_cohorted:
+        return None
+
+    try:
+        cohort = CourseUserGroup.objects.get(
+            course_id=course_key,
+            group_type=CourseUserGroup.COHORT,
+            id=cohort_id
+        )
+        cohort.name = new_name
+        cohort.save()
+    except CourseUserGroup.DoesNotExist:
+        return None
+
+    return cohort
