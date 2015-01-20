@@ -1060,7 +1060,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -1089,7 +1089,8 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         created_by=user,
         invoice=invoice,
         order=order,
-        mode_slug=mode_slug
+        mode_slug=mode_slug,
+        invoice_item=invoice_item
     )
     try:
         course_registration.save()
@@ -1204,7 +1205,7 @@ def generate_registration_codes(request, course_id):
         customer_reference_number=customer_reference_number
     )
 
-    course_reg_code_invoice_item = CourseRegistrationCodeInvoiceItem.object.create(
+    course_reg_code_invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
         invoice=sale_invoice,
         qty=course_code_number,
         unit_price=sale_price,
@@ -1231,7 +1232,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, course_reg_code_invoice_item, order=None
+            request.user, course_id, course_mode.slug, sale_invoice, order=None, invoice_item=course_reg_code_invoice_item
         )
         registration_codes.append(generated_registration_code)
 
