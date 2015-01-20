@@ -1801,6 +1801,7 @@ def auto_auth(request):
     * `course_id`: Enroll the student in the course with `course_id`
     * `roles`: Comma-separated list of roles to grant the student in the course with `course_id`
     * `no_login`: Define this to create the user but not login
+    * `redirect`: Set to "true" will redirect to course if course_id is defined, otherwise it will redirect to dashboard
 
     If username, email, or password are not provided, use
     randomly generated credentials.
@@ -1825,6 +1826,7 @@ def auto_auth(request):
     if course_id:
         course_key = CourseLocator.from_string(course_id)
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
+    redirect_when_done = request.GET.get('redirect', None)
     login_when_done = 'no_login' not in request.GET
 
     form = AccountCreationForm(
@@ -1887,7 +1889,15 @@ def auto_auth(request):
     create_comments_service_user(user)
 
     # Provide the user with a valid CSRF token
-    # then return a 200 response
+    # then return a 200 response unless redirect is true
+    if redirect_when_done:
+        # Redirect to course info page if course_id is known
+        if course_id:
+            return redirect(reverse('info', kwargs={'course_id': unicode(course_id)}))
+        # Otherwise redirect to dashboard
+        else:
+            return redirect(reverse('dashboard'))
+
     if request.META.get('HTTP_ACCEPT') == 'application/json':
         response = JsonResponse({
             'created_status': u"Logged in" if login_when_done else "Created",
