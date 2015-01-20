@@ -56,23 +56,7 @@ class License(JSONField):
         """
         Construct a new license object from a valid JSON representation
         """
-        if not field or field is "":
-            return ARRLicense()
-        elif isinstance(field, basestring):
-            if field == "ARR":
-                return ARRLicense()
-            elif field[0:5] == "CC-BY" or field == "CC0":
-                return CCLicense(field)
-            else:
-                raise ValueError('Invalid license.')
-        elif isinstance(field, dict) and 'license' in field and 'version' in field:
-            return parse_license(field['license'], field['version'])
-        elif isinstance(field, dict) and 'kind' in field and 'version' in field:
-            return parse_license(field['kind'], field['version'])
-        elif isinstance(field, License):
-            return field
-        else:
-            raise ValueError('Invalid license.')
+        return parse_license(field)
 
     enforce_type = from_json
 
@@ -107,9 +91,7 @@ class CCLicense(License):
         # the most recent version of a CC license and fetch
         # that using the API.
         if self.kind and not self.version:
-            data = CCLicense.get_cc_api_data(self.kind)
-            license_img = data.find(".//a")
-            self.version = license_img.get("href").split("/")[-2]
+            self.version = "4.0"
 
     @property
     def html(self):
@@ -160,79 +142,11 @@ class CCLicense(License):
             version=self.version
         )
 
-    @staticmethod
-    def cc_attributes_from_license(kind):
-        """
-        Convert a license object to a tuple of values representing the relevant CC attributes
-
-        The returning tuple contains a string and two boolean values which represent:
-          - The license class, either 'zero' or 'standard'
-          - Are commercial applications of the content allowed, 'y' - yes, 'n' - no, or 'sa' - only under the same license (share alike)
-          - Are derivatives of the content allowed, 'y' - yes, or 'n' - no. Default: 'y'
-        """
-        commercial = "y"
-        derivatives = "y"
-
-        if kind == "CC0":
-            license_class = "zero"
-        else:
-            license_class = "standard"
-
-            # Split the license attributes and remove the 'CC-' from the beginning of the string
-            attrs = iter(kind.split("-")[1:])
-
-            # Then iterate over the remaining attributes that are set
-            for attr in attrs:
-                if attr == "SA":
-                    derivatives = "sa"
-                elif attr == "NC":
-                    commercial = "n"
-                elif attr == "ND":
-                    derivatives = "n"
-
-        return (license_class, commercial, derivatives)
-
-    @staticmethod
-    def get_cc_api_data(kind):
-        """
-        Constructs the CC license according to the specification of creativecommons.org
-        """
-        (license_class, commercial, derivatives) = CCLicense.cc_attributes_from_license(kind)
-
-        # Format the url for the particular license
-        url = "http://api.creativecommons.org/rest/1.5/license/{license_class}/get?commercial={commercial}&derivatives={derivatives}".format(
-            license_class=license_class,
-            commercial=commercial,
-            derivatives=derivatives
-        )
-
-        # Fetch the license data
-        xml_data = requests.get(url).content
-
-        # Set up the response parser
-        edx_xml_parser = etree.XMLParser(
-            dtd_validation=False,
-            load_dtd=False,
-            remove_comments=True,
-            remove_blank_text=True
-        )
-
-        # Parse the response file and extract the relevant data
-        license_file = StringIO(xml_data.encode('ascii', 'ignore'))
-        xml_obj = etree.parse(
-            license_file,
-            parser=edx_xml_parser
-        ).getroot()
-        data = xml_obj.find("html")
-
-        return data
-
-
 def parse_license(kind_or_license, version=None):
     """
     Return a license object appropriate to the license
 
-    This is a simple utility function to allowed for easy conversion between license strings and license objects. It
+    This is a simple utility function to allow for easy conversion between license strings and license objects. It
     accepts a license string and an optional license version and returns the corresponding license object. It also accounts
     for the license parameter already being a license object.
     """
