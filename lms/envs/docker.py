@@ -15,6 +15,3 @@ FEATURES.update(PREVIEW_LMS_BASE=os.environ.get("EDX_PREVIEW_LMS_BASE", ""))
 SITE_NAME = LMS_BASE
 PLATFORM_NAME = 'Appsembler Open edX Testdrive'
 DEFAULT_FROM_EMAIL = 'registration@appsembler.com'
-
-# Allows putting Intercom env variables passed from Docker into templates
-TEMPLATE_CONTEXT_PROCESSORS += ('appsembler.context_processors.intercom',)

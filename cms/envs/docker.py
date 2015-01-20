@@ -16,9 +16,5 @@ SITE_NAME = CMS_BASE
 PLATFORM_NAME = 'Appsembler Open edX Testdrive'
 DEFAULT_FROM_EMAIL = 'registration@appsembler.com'
 
-
-# Allows putting Intercom env variables passed from Docker into templates
-TEMPLATE_CONTEXT_PROCESSORS += ('appsembler.context_processors.intercom',)
-
 # Needed for the recommender XBlock
 ALLOW_ALL_ADVANCED_COMPONENTS = True
