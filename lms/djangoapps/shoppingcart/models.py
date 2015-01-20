@@ -1739,11 +1739,12 @@ class InvoiceItem(TimeStampedModel):
     """
     objects = InheritanceManager()
     invoice = models.ForeignKey(Invoice, db_index=True)
-    user = models.ForeignKey(User, db_index=True)
-
     qty = models.IntegerField(default=1)
     unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     billed_unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+
+    def __unicode__(self):
+        return "company: {}".format(self.invoice.company_name)
 
 
 class CourseRegistrationInvoiceItem(InvoiceItem):
@@ -1751,3 +1752,6 @@ class CourseRegistrationInvoiceItem(InvoiceItem):
     This is an inventory item for paying for a course registration
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
+
+    def __unicode__(self):
+        return "course: {}".format(self.course_id)
