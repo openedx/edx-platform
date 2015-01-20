@@ -773,7 +773,7 @@ class OrderItem(TimeStampedModel):
         self.save()
 
 
-class Invoice(models.Model):
+class Invoice(TimeStampedModel):
     """
          This table capture all the information needed to support "invoicing"
          which is when a user wants to purchase Registration Codes,
@@ -796,6 +796,7 @@ class Invoice(models.Model):
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
+    created_by = models.ForeignKey(User)
 
     def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
         """
