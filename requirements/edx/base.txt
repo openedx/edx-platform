@@ -140,3 +140,5 @@ git+https://github.com/mitocw/django-cas.git
 # edX packages
 edx-submissions==0.0.7
 
+# Appsembler
+-r appsembler.txt

@@ -577,6 +577,10 @@ def _create_new_course(request, org, number, run, fields):
             fields=fields,
         )
 
+    # Send statistics
+    from appsembler.models import update_course_statistics
+    update_course_statistics()
+
     # Make sure user has instructor and staff access to the new course
     add_instructor(new_course.id, request.user, request.user)
 
