@@ -8,6 +8,18 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'InvoiceItem'
+        db.create_table('shoppingcart_invoiceitem', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
+            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
+            ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Invoice'])),
+            ('qty', self.gf('django.db.models.fields.IntegerField')(default=1)),
+            ('unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
+            ('billed_unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
+        ))
+        db.send_create_signal('shoppingcart', ['InvoiceItem'])
+
         # Adding model 'InvoiceTransaction'
         db.create_table('shoppingcart_invoicetransaction', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -22,27 +34,17 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('shoppingcart', ['InvoiceTransaction'])
 
-        # Adding model 'CourseRegistrationInvoiceItem'
-        db.create_table('shoppingcart_courseregistrationinvoiceitem', (
+        # Adding model 'CourseRegistrationCodeInvoiceItem'
+        db.create_table('shoppingcart_courseregistrationcodeinvoiceitem', (
             ('invoiceitem_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['shoppingcart.InvoiceItem'], unique=True, primary_key=True)),
             ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=128, db_index=True)),
         ))
-        db.send_create_signal('shoppingcart', ['CourseRegistrationInvoiceItem'])
+        db.send_create_signal('shoppingcart', ['CourseRegistrationCodeInvoiceItem'])
 
-        # Adding model 'InvoiceItem'
-        db.create_table('shoppingcart_invoiceitem', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
-            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Invoice'])),
-            ('qty', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
-            ('billed_unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
-        ))
-        db.send_create_signal('shoppingcart', ['InvoiceItem'])
-
-        # Deleting field 'Invoice.course_id'
-        db.delete_column('shoppingcart_invoice', 'course_id')
+        # Adding field 'CourseRegistrationCode.invoice_item'
+        db.add_column('shoppingcart_courseregistrationcode', 'invoice_item',
+                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.CourseRegistrationCodeInvoiceItem'], null=True),
+                      keep_default=False)
 
         # Adding field 'Invoice.created'
         db.add_column('shoppingcart_invoice', 'created',
@@ -54,35 +56,25 @@ class Migration(SchemaMigration):
                       self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now),
                       keep_default=False)
 
-        # Adding field 'Invoice.created_by'
-        db.add_column('shoppingcart_invoice', 'created_by',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['auth.User']),
-                      keep_default=False)
-
 
     def backwards(self, orm):
-        # Deleting model 'InvoiceTransaction'
-        db.delete_table('shoppingcart_invoicetransaction')
-
-        # Deleting model 'CourseRegistrationInvoiceItem'
-        db.delete_table('shoppingcart_courseregistrationinvoiceitem')
-
         # Deleting model 'InvoiceItem'
         db.delete_table('shoppingcart_invoiceitem')
 
-        # Adding field 'Invoice.course_id'
-        db.add_column('shoppingcart_invoice', 'course_id',
-                      self.gf('xmodule_django.models.CourseKeyField')(default=None, max_length=255, db_index=True),
-                      keep_default=False)
+        # Deleting model 'InvoiceTransaction'
+        db.delete_table('shoppingcart_invoicetransaction')
+
+        # Deleting model 'CourseRegistrationCodeInvoiceItem'
+        db.delete_table('shoppingcart_courseregistrationcodeinvoiceitem')
+
+        # Deleting field 'CourseRegistrationCode.invoice_item'
+        db.delete_column('shoppingcart_courseregistrationcode', 'invoice_item_id')
 
         # Deleting field 'Invoice.created'
         db.delete_column('shoppingcart_invoice', 'created')
 
         # Deleting field 'Invoice.modified'
         db.delete_column('shoppingcart_invoice', 'modified')
-
-        # Deleting field 'Invoice.created_by'
-        db.delete_column('shoppingcart_invoice', 'created_by_id')
 
 
     models = {
@@ -168,11 +160,12 @@ class Migration(SchemaMigration):
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_by_user'", 'to': "orm['auth.User']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invoice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Invoice']", 'null': 'True'}),
+            'invoice_item': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.CourseRegistrationCodeInvoiceItem']", 'null': 'True'}),
             'mode_slug': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'purchase_order'", 'null': 'True', 'to': "orm['shoppingcart.Order']"})
         },
-        'shoppingcart.courseregistrationinvoiceitem': {
-            'Meta': {'object_name': 'CourseRegistrationInvoiceItem', '_ormbases': ['shoppingcart.InvoiceItem']},
+        'shoppingcart.courseregistrationcodeinvoiceitem': {
+            'Meta': {'object_name': 'CourseRegistrationCodeInvoiceItem', '_ormbases': ['shoppingcart.InvoiceItem']},
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '128', 'db_index': 'True'}),
             'invoiceitem_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['shoppingcart.InvoiceItem']", 'unique': 'True', 'primary_key': 'True'})
         },
@@ -199,8 +192,8 @@ class Migration(SchemaMigration):
             'company_contact_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'company_name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'db_index': 'True'}),
             'country': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True'}),
+            'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'customer_reference_number': ('django.db.models.fields.CharField', [], {'max_length': '63', 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'internal_reference': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True'}),

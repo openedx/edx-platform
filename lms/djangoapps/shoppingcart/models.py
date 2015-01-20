@@ -796,7 +796,6 @@ class Invoice(TimeStampedModel):
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
     is_valid = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User)
 
     def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
         """
