@@ -222,7 +222,7 @@ def get_cohort(user, course_key, assign=True):
         course_id=course_key,
         group_type=CourseUserGroup.COHORT,
         name=group_name,
-        assignment_type=CourseUserGroup.RANDOM
+        defaults={'assignment_type': CourseUserGroup.RANDOM}
     )
     user.course_groups.add(group)
     return group
@@ -246,7 +246,7 @@ def get_course_cohorts(course):
             course_id=course.location.course_key,
             group_type=CourseUserGroup.COHORT,
             name=group_name,
-            assignment_type=CourseUserGroup.RANDOM
+            defaults={'assignment_type': CourseUserGroup.RANDOM}
         )
 
     return list(CourseUserGroup.objects.filter(

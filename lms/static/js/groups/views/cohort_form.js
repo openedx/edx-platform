@@ -77,11 +77,11 @@ var edx = edx || {};
 
         getUpdatedCohortName: function() {
             var cohortName = this.$('#cohort-name').val();
-            return cohortName ? cohortName.trim() : '';
+            return cohortName ? cohortName.trim() : this.model.get('name');
         },
 
         getAssignmentType: function() {
-            return $('input[name="rename-cohort"]:checked').val();
+            return $('input[name="cohort-assignment-type"]:checked').val();
         },
 
         showMessage: function(message, type, details) {

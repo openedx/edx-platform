@@ -13,7 +13,7 @@
             var selectedUserPartitionId = cohort.get('user_partition_id');
             var hasSelectedContentGroup = selectedContentGroupId != null;
             var hasContentGroups = contentGroups.length > 0;
-            var assignmentMethod = cohort.get('assignment_type');
+            var assignment_type = cohort.get('assignment_type');
             var cohort_name = cohort.get('name');
             var cohort_name_value = isNewCohort ? '' : cohort_name;
             var placeholder_value = isNewCohort ? gettext('Enter the name of the cohort') : '';
@@ -34,10 +34,10 @@
                         <%- gettext('Students in this cohort are:') %>
                     </h4>
                     <label>
-                        <input type="radio" name="rename-cohort" value="random"  <%- assignmentMethod == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
+                        <input type="radio" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
                     </label>
                     <label>
-                        <input type="radio" name="rename-cohort" value="manual"  <%- assignmentMethod == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
+                        <input type="radio" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
                     </label>
                 </div>
                 <hr class="divider divider-lv1">
