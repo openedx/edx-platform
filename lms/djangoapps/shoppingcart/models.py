@@ -791,7 +791,7 @@ class Invoice(TimeStampedModel):
     state = models.CharField(max_length=255, null=True)
     zip = models.CharField(max_length=15, null=True)
     country = models.CharField(max_length=64, null=True)
-    # course_id = CourseKeyField(max_length=255, db_index=True)
+    course_id = CourseKeyField(max_length=255, db_index=True)
     total_amount = models.FloatField()
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
@@ -828,6 +828,55 @@ class Invoice(TimeStampedModel):
     def __unicode__(self):
         return "company: {}".format(self.company_name)
 
+
+INVOICE_TRANSACTION_STATUSES = (
+
+    ('started', 'started'),
+    ('completed', 'completed'),
+    ('cancelled', 'cancelled'),
+)
+
+
+class InvoiceTransaction(TimeStampedModel):
+    """
+         This table capture all the information needed to support "InvoicingTransactions"
+    """
+    invoice = models.ForeignKey(Invoice)
+    amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    comments = models.TextField(null=True)
+    created_by = models.ForeignKey(User)
+    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
+    status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
+
+
+class InvoiceItem(TimeStampedModel):
+    """
+    This is the basic interface for invoice items.
+    invoice items are line items that fill up the invoices.
+
+    Each implementation of InvoiceItem should provide its own purchased_callback as
+    a method.
+    """
+    objects = InheritanceManager()
+    invoice = models.ForeignKey(Invoice, db_index=True)
+    qty = models.IntegerField(default=1)
+    unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    billed_unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+
+    def __unicode__(self):
+        return "company: {}".format(self.invoice.company_name)
+
+
+class CourseRegistrationCodeInvoiceItem(InvoiceItem):
+    """
+    This is an inventory item for paying for a course registration
+    """
+    course_id = CourseKeyField(max_length=128, db_index=True)
+
+    def __unicode__(self):
+        return "course: {}".format(self.course_id)
+
+
 class CourseRegistrationCode(models.Model):
     """
     This table contains registration codes
@@ -839,6 +888,7 @@ class CourseRegistrationCode(models.Model):
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
     order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
     invoice = models.ForeignKey(Invoice, null=True)
+    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
     mode_slug = models.CharField(max_length=100, null=True)
 
 
@@ -1707,51 +1757,3 @@ class Donation(OrderItem):
             How to display this item on a PDF printed receipt file.
         """
         return self._line_item_description(course_id=self.course_id)
-
-
-INVOICE_TRANSACTION_STATUSES = (
-
-    ('started', 'started'),
-    ('completed', 'completed'),
-    ('cancelled', 'cancelled'),
-)
-
-
-class InvoiceTransaction(TimeStampedModel):
-    """
-         This table capture all the information needed to support "InvoicingTransactions"
-    """
-    invoice = models.ForeignKey(Invoice)
-    amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    comments = models.TextField(null=True)
-    created_by = models.ForeignKey(User)
-    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
-    status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
-
-
-class InvoiceItem(TimeStampedModel):
-    """
-    This is the basic interface for invoice items.
-    invoice items are line items that fill up the invoices.
-
-    Each implementation of InvoiceItem should provide its own purchased_callback as
-    a method.
-    """
-    objects = InheritanceManager()
-    invoice = models.ForeignKey(Invoice, db_index=True)
-    qty = models.IntegerField(default=1)
-    unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    billed_unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-
-    def __unicode__(self):
-        return "company: {}".format(self.invoice.company_name)
-
-
-class CourseRegistrationInvoiceItem(InvoiceItem):
-    """
-    This is an inventory item for paying for a course registration
-    """
-    course_id = CourseKeyField(max_length=128, db_index=True)
-
-    def __unicode__(self):
-        return "course: {}".format(self.course_id)

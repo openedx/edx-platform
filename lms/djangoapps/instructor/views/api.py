@@ -49,7 +49,14 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    RegistrationCodeRedemption,
+    Invoice,
+    CourseMode,
+    CourseRegistrationCodeInvoiceItem
+)
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -1197,6 +1204,13 @@ def generate_registration_codes(request, course_id):
         customer_reference_number=customer_reference_number
     )
 
+    course_reg_code_invoice_item = CourseRegistrationCodeInvoiceItem.object.create(
+        invoice=sale_invoice,
+        qty=course_code_number,
+        unit_price=sale_price,
+        course_id=course_id
+    )
+
     course = get_course_by_id(course_id, depth=0)
     paid_modes = CourseMode.paid_modes_for_course(course_id)
 
@@ -1217,7 +1231,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, sale_invoice, order=None
+            request.user, course_id, course_mode.slug, course_reg_code_invoice_item, order=None
         )
         registration_codes.append(generated_registration_code)
 
