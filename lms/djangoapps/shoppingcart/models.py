@@ -1709,7 +1709,6 @@ class Donation(OrderItem):
         return self._line_item_description(course_id=self.course_id)
 
 
-
 INVOICE_TRANSACTION_STATUSES = (
 
     ('started', 'started'),
@@ -1728,6 +1727,7 @@ class InvoiceTransaction(TimeStampedModel):
     created_by = models.ForeignKey(User)
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
     status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
+
 
 class InvoiceItem(TimeStampedModel):
     """
