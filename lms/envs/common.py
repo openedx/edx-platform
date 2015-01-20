@@ -234,14 +234,14 @@ FEATURES = {
     # when enrollment exceeds this number
     'MAX_ENROLLMENT_INSTR_BUTTONS': 200,
 
-    # Grade calculation and submission report requests started from the new instructor dashboard will write
+    # Grade calculation and response report requests started from the new instructor dashboard will write
     # CSV files to S3 and give links for downloads.
     'ENABLE_S3_GRADE_DOWNLOADS': False,
 
     # whether to use password policy enforcement or not
     'ENFORCE_PASSWORD_POLICY': False,
 
-    # Give course staff unrestricted access to grade and student submissions downloads (if set to False,
+    # Give course staff unrestricted access to grade and student responses downloads (if set to False,
     # only edX superusers can perform the downloads)
     'ALLOW_COURSE_STAFF_GRADE_DOWNLOADS': False,
 
@@ -1632,13 +1632,13 @@ GRADES_DOWNLOAD = {
     'ROOT_PATH': '/tmp/edx-s3/grades',
 }
 
-#################### Student Submissions Reports Downloads #################
-STUDENT_SUBMISSIONS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+#################### Student Responses Reports Downloads #################
+STUDENT_RESPONSES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
-STUDENT_SUBMISSIONS_DOWNLOAD = {
+STUDENT_RESPONSES_DOWNLOAD = {
     'STORAGE_TYPE': 'localfs',
-    'BUCKET': 'edx-student-submissions',
-    'ROOT_PATH': '/tmp/edx-s3/student-submissions',
+    'BUCKET': 'edx-student-responses',
+    'ROOT_PATH': '/tmp/edx-s3/student-responses',
 }
 
 ##################### ORA2 Responses Download #######################

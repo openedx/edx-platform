@@ -16,7 +16,7 @@ from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedempti
 
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
-    coupon_codes_features, student_submissions, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
+    coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
 from course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
@@ -274,7 +274,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
-    """ Test basic student submissions analytics function. """
+    """ Test basic student responses analytics function. """
     def load_course(self, course_id):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         self.course = get_course(course_key)
@@ -287,13 +287,13 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.create_student()
 
-        datarows = list(student_submissions(self.course))
+        datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
 
     def test_full_course_no_students(self):
         self.load_course('edX/simple/2012_Fall')
 
-        datarows = list(student_submissions(self.course))
+        datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
 
     def test_invalid_module_state(self):
@@ -309,6 +309,6 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
             state=u'{"student_answers":{"fake-problem":"No idea"}}}'
         )
 
-        datarows = list(student_submissions(self.course))
-        #Invalid module state submission will be skipped, so datarows should be empty
+        datarows = list(student_responses(self.course))
+        #Invalid module state response will be skipped, so datarows should be empty
         self.assertEqual(len(datarows), 0)
