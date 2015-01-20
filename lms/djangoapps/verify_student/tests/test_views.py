@@ -309,6 +309,8 @@ class TestVerifiedView(ModuleStoreTestCase):
     """
     def setUp(self):
         self.user = UserFactory.create(username="abc", password="test")
+        self.user.profile.name = u"Røøsty Bøøgins"
+        self.user.save()
         self.client.login(username="abc", password="test")
         self.course = CourseFactory.create(org='MITx', number='999.1x', display_name='Verified Course')
         self.course_id = self.course.id
@@ -357,6 +359,8 @@ class TestReverifyView(ModuleStoreTestCase):
     """
     def setUp(self):
         self.user = UserFactory.create(username="rusty", password="test")
+        self.user.profile.name = u"Røøsty Bøøgins"
+        self.user.profile.save()
         self.client.login(username="rusty", password="test")
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
