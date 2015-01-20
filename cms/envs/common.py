@@ -743,7 +743,7 @@ DELTA_YEAR = 12
 MAX_YEAR_ALLOWED = 70
 
 RAVEN_CONFIG = {
-    'dsn': 'https://59734eda618a43afa2179d781549edeb:311de1f2e01247f284f3f72fbcd5844f@sentry.upex.edu.ec/3',
+    'dsn': 'https://1bfa24f2ad1d466ebf86f7d0740e2b7b:201a61502a4643da97f485433e038fe2@sentry.upex.edu.ec/3',
 }
 
 INSTALLED_APPS = INSTALLED_APPS + (
