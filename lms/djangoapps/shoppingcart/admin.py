@@ -3,7 +3,8 @@ Allows django admin site to add PaidCourseRegistrationAnnotations
 """
 from ratelimitbackend import admin
 from shoppingcart.models import (
-    PaidCourseRegistrationAnnotation, Coupon, DonationConfiguration
+    PaidCourseRegistrationAnnotation, Coupon, DonationConfiguration,
+    InvoiceTransaction
 )
 
 
@@ -49,6 +50,16 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
 
     really_delete_selected.short_description = "Delete s selected entries"
 
+
+class InvoiceTransactionAdmin(admin.ModelAdmin):
+    """
+    Admin for the Invoice transactions table.
+    """
+    list_display = ('amount', 'comments', 'created_by', 'last_modified_by', 'status')
+    raw_id_fields = ("created_by",)
+    # readonly_fields = ('created_at',)
+
 admin.site.register(PaidCourseRegistrationAnnotation)
 admin.site.register(Coupon, SoftDeleteCouponAdmin)
 admin.site.register(DonationConfiguration)
+admin.site.register(InvoiceTransaction, InvoiceTransactionAdmin)

@@ -791,7 +791,7 @@ class Invoice(models.Model):
     state = models.CharField(max_length=255, null=True)
     zip = models.CharField(max_length=15, null=True)
     country = models.CharField(max_length=64, null=True)
-    course_id = CourseKeyField(max_length=255, db_index=True)
+    # course_id = CourseKeyField(max_length=255, db_index=True)
     total_amount = models.FloatField()
     internal_reference = models.CharField(max_length=255, null=True)
     customer_reference_number = models.CharField(max_length=63, null=True)
@@ -824,6 +824,8 @@ class Invoice(models.Model):
 
         return pdf_buffer
 
+    def __unicode__(self):
+        return "company: {}".format(self.company_name)
 
 class CourseRegistrationCode(models.Model):
     """
@@ -1721,10 +1723,10 @@ class InvoiceTransaction(TimeStampedModel):
     """
     invoice = models.ForeignKey(Invoice)
     amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    Comments = models.TextField(null=True)
+    comments = models.TextField(null=True)
     created_by = models.ForeignKey(User)
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
-    status = models.CharField(max_length=32, default='cart', choices=INVOICE_TRANSACTION_STATUSES)
+    status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
 
 class InvoiceItem(TimeStampedModel):
     """
