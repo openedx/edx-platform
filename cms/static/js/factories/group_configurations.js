@@ -14,6 +14,7 @@ define([
         experimentGroupConfigurations.url = groupConfigurationUrl;
         experimentGroupConfigurations.outlineUrl = courseOutlineUrl;
         contentGroupConfiguration.urlRoot = groupConfigurationUrl;
+        contentGroupConfiguration.outlineUrl = courseOutlineUrl;
         new GroupConfigurationsPage({
             el: $('#content'),
             experimentsEnabled: experimentsEnabled,

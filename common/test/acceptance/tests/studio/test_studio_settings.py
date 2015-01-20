@@ -5,9 +5,15 @@ Acceptance tests for Studio's Setting pages
 from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
-
+from bok_choy.promise import EmptyPromise
+from ...fixtures.course import XBlockFixtureDesc
+from ..helpers import create_user_partition_json
+from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from unittest import skip
+from textwrap import dedent
+from xmodule.partitions.partitions import Group
 
 
 @attr('shard_1')
@@ -25,6 +31,26 @@ class ContentGroupConfigurationTest(StudioCourseTest):
             self.course_info['run']
         )
 
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+
+    def populate_course_fixture(self, course_fixture):
+        """
+        Populates test course with chapter, sequential, and 1 problems.
+        The problem is visible only to Group "alpha".
+        """
+        course_fixture.add_children(
+            XBlockFixtureDesc('chapter', 'Test Section').add_children(
+                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
+                    XBlockFixtureDesc('vertical', 'Test Unit')
+                )
+            )
+        )
+
     def create_and_verify_content_group(self, name, existing_groups):
         """
         Creates a new content group and verifies that it was properly created.
@@ -38,7 +64,7 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.name = name
         # Save the content group
         self.assertEqual(config.get_text('.action-primary'), "Create")
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertFalse(config.delete_button_is_present)
         config.save()
         self.assertIn(name, config.name)
         return config
@@ -84,16 +110,68 @@ class ContentGroupConfigurationTest(StudioCourseTest):
 
         self.assertIn("Updated Second Content Group", second_config.name)
 
-    def test_cannot_delete_content_group(self):
+    def test_cannot_delete_used_content_group(self):
         """
-        Scenario: Delete is not currently supported for content groups.
-        Given I have a course without content groups
-        When I create a content group
-        Then there is no delete button
+        Scenario: Ensure that the user cannot delete used content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I try to delete the Content Group with name "New Content Group"
+        Then I see the delete button is disabled.
+        """
+        self.course_fixture._update_xblock(self.course_fixture._course_location, {
+            "metadata": {
+                u"user_partitions": [
+                    create_user_partition_json(
+                        0,
+                        'Configuration alpha,',
+                        'Content Group Partition',
+                        [Group("0", 'alpha')],
+                        scheme="cohort"
+                    )
+                ],
+            },
+        })
+        problem_data = dedent("""
+            <problem markdown="Simple Problem" max_attempts="" weight="">
+              <p>Choose Yes.</p>
+              <choiceresponse>
+                <checkboxgroup direction="vertical">
+                  <choice correct="true">Yes</choice>
+                </checkboxgroup>
+              </choiceresponse>
+            </problem>
+        """)
+        vertical = self.course_fixture.get_nested_xblocks(category="vertical")[0]
+        self.course_fixture.create_xblock(
+            vertical.locator,
+            XBlockFixtureDesc('problem', "VISIBLE TO ALPHA", data=problem_data, metadata={"group_access": {0: [0]}}),
+        )
+        self.group_configurations_page.visit()
+        config = self.group_configurations_page.content_groups[0]
+        self.assertTrue(config.delete_button_is_disabled)
+
+    def test_can_delete_unused_content_group(self):
+        """
+        Scenario: Ensure that the user can delete unused content group.
+        Given I have a course with 1 Content Group
+        And I go to the Group Configuration page
+        When I delete the Content Group with name "New Content Group"
+        Then I see that there is no Content Group
+        When I refresh the page
+        Then I see that the content group has been deleted
         """
         self.group_configurations_page.visit()
         config = self.create_and_verify_content_group("New Content Group", 0)
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertTrue(config.delete_button_is_present)
+
+        self.assertEqual(len(self.group_configurations_page.content_groups), 1)
+
+        # Delete content group
+        config.delete()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
+
+        self.group_configurations_page.visit()
+        self.assertEqual(len(self.group_configurations_page.content_groups), 0)
 
     def test_must_supply_name(self):
         """
@@ -128,6 +206,26 @@ class ContentGroupConfigurationTest(StudioCourseTest):
         config.name = "Content Group"
         config.cancel()
         self.assertEqual(0, len(self.group_configurations_page.content_groups))
+
+    def test_content_group_empty_usage(self):
+        """
+        Scenario: When content group is not used, ensure that the link to outline page works correctly.
+        Given I have a course without content group
+        And I create new content group
+        Then I see a link to the outline page
+        When I click on the outline link
+        Then I see the outline page
+        """
+        self.group_configurations_page.visit()
+        config = self.create_and_verify_content_group("New Content Group", 0)
+        config.toggle()
+        config.click_outline_anchor()
+
+        # Waiting for the page load and verify that we've landed on course outline page
+        EmptyPromise(
+            lambda: self.outline_page.is_browser_on_page(), "loaded page {!r}".format(self.outline_page),
+            timeout=30
+        ).fulfill()
 
 
 @attr('shard_1')
