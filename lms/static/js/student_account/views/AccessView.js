@@ -40,10 +40,18 @@ var edx = edx || {};
             _.mixin( _s.exports() );
 
             this.tpl = $(this.tpl).html();
+
             this.activeForm = obj.mode || 'login';
+
             this.thirdPartyAuth = obj.thirdPartyAuth || {
                 currentProvider: null,
                 providers: []
+            };
+
+            this.formDescriptions = {
+                login: obj.loginFormDesc,
+                register: obj.registrationFormDesc,
+                reset: obj.passwordResetFormDesc
             };
 
             this.platformName = obj.platformName;
@@ -73,80 +81,62 @@ var edx = edx || {};
         },
 
         loadForm: function( type ) {
-            this.getFormData( type, this );
+            var loadFunc = _.bind( this.load[type], this );
+            loadFunc( this.formDescriptions[type] );
         },
 
         load: {
-            login: function( data, context ) {
+            login: function( data ) {
                 var model = new edx.student.account.LoginModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.login =  new edx.student.account.LoginView({
+                this.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
-                    resetModel: context.resetModel,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    resetModel: this.resetModel,
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'password-help' event to toggle sub-views
-                context.listenTo( context.subview.login, 'password-help', context.resetPassword );
+                this.listenTo( this.subview.login, 'password-help', this.resetPassword );
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.login, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.login, 'auth-complete', this.authComplete );
 
             },
 
-            reset: function( data, context ) {
-                context.resetModel.ajaxType = data.method;
-                context.resetModel.urlRoot = data.submit_url;
+            reset: function( data ) {
+                this.resetModel.ajaxType = data.method;
+                this.resetModel.urlRoot = data.submit_url;
 
-                context.subview.passwordHelp = new edx.student.account.PasswordResetView({
+                this.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
-                    model: context.resetModel
+                    model: this.resetModel
                 });
 
                 // Listen for 'password-email-sent' event to toggle sub-views
-                context.listenTo( context.subview.passwordHelp, 'password-email-sent', context.passwordEmailSent );
+                this.listenTo( this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent );
             },
 
-            register: function( data, context ) {
+            register: function( data ) {
                 var model = new edx.student.account.RegisterModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.register =  new edx.student.account.RegisterView({
+                this.subview.register =  new edx.student.account.RegisterView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.register, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.register, 'auth-complete', this.authComplete );
             }
-        },
-
-        getFormData: function( type, context ) {
-            var urls = {
-                login: 'login_session',
-                register: 'registration',
-                reset: 'password_reset'
-            };
-
-            $.ajax({
-                url: '/user_api/v1/account/' + urls[type] + '/',
-                type: 'GET',
-                dataType: 'json',
-                context: this,
-                success: function( data ) {
-                    this.load[type]( data, context );
-                },
-                error: this.showFormError
-            });
         },
 
         passwordEmailSent: function() {
@@ -163,10 +153,6 @@ var edx = edx || {};
             this.element.hide( $(this.el).find('#login-anchor') );
             this.loadForm('reset');
             this.element.scrollTop( $('#password-reset-anchor') );
-        },
-
-        showFormError: function() {
-            this.element.show( $('#form-load-fail') );
         },
 
         toggleForm: function( e ) {

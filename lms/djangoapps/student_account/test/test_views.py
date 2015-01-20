@@ -8,6 +8,7 @@ import json
 
 import mock
 import ddt
+import markupsafe
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -551,11 +552,15 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
 
     def _assert_third_party_auth_data(self, response, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
-        expected_data = u"data-third-party-auth='{auth_info}'".format(
-            auth_info=json.dumps({
+        auth_info = markupsafe.escape(
+            json.dumps({
                 "currentProvider": current_provider,
                 "providers": providers
             })
+        )
+
+        expected_data = u"data-third-party-auth='{auth_info}'".format(
+            auth_info=auth_info
         )
         self.assertContains(response, expected_data)
 
