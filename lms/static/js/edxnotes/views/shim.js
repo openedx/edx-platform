@@ -1,6 +1,8 @@
 ;(function (define, undefined) {
 'use strict';
-define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
+define([
+    'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/utils'
+], function ($, _, Annotator, Utils) {
     var _t = Annotator._t;
 
     /**
@@ -116,6 +118,36 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
     ].join('');
 
     /**
+     * Overrides Annotator._setupViewer to add a "click" event on viewer and to
+     * improve line breaks.
+     **/
+    Annotator.prototype._setupViewer = function () {
+        var self = this;
+        this.viewer = new Annotator.Viewer({readOnly: this.options.readOnly});
+        this.viewer.element.on('click', _.bind(this.onNoteClick, this));
+        this.viewer.hide()
+            .on("edit", this.onEditAnnotation)
+            .on("delete", this.onDeleteAnnotation)
+            .addField({
+                load: function (field, annotation) {
+                    if (annotation.text) {
+                        $(field).html(Utils.nl2br(Annotator.Util.escape(annotation.text)));
+                    } else {
+                        $(field).html('<i>' + _t('No Comment') + '</i>');
+                        self.publish('annotationViewerTextField', [field, annotation]);
+                    }
+                }
+            })
+            .element.appendTo(this.wrapper).bind({
+                "mouseover": this.clearViewerHideTimer,
+                "mouseout":  this.startViewerHideTimer
+            });
+        return this;
+    };
+
+    Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
+
+    /**
      * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
      * editor is opened.
      **/
@@ -127,17 +159,6 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 return false;
             }
             return func.call(this, event);
-        },
-        Annotator.prototype._setupViewer
-    );
-
-    /**
-     * Modifies Annotator._setupViewer to add a "click" event on viewer.
-     **/
-    Annotator.prototype._setupViewer = _.compose(
-        function () {
-            this.viewer.element.on('click', _.bind(this.onNoteClick, this));
-            return this;
         },
         Annotator.prototype._setupViewer
     );

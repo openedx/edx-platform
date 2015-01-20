@@ -1,6 +1,6 @@
 ;(function (define) {
 'use strict';
-define(['backbone', 'underscore.string'], function (Backbone) {
+define(['backbone', 'js/edxnotes/utils/utils', 'underscore.string'], function (Backbone, Utils) {
     var NoteModel = Backbone.Model.extend({
         defaults: {
             'id': null,
@@ -42,7 +42,7 @@ define(['backbone', 'underscore.string'], function (Backbone) {
             }
         },
 
-        getNoteText: function () {
+        getQuote: function () {
             var message = this.get('quote');
 
             if (!this.get('is_expanded') && this.get('show_link')) {
@@ -50,6 +50,10 @@ define(['backbone', 'underscore.string'], function (Backbone) {
             }
 
             return message;
+        },
+
+        getText: function () {
+            return Utils.nl2br(this.get('text'));
         }
 
     });

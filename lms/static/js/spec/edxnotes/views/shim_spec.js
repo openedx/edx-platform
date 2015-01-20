@@ -135,5 +135,88 @@ define([
                 'click', '.annotator-hl'
             );
         });
+
+        describe('_setupViewer', function () {
+            var mockViewer = null;
+
+            beforeEach(function () {
+                var  element = $('<div />');
+                mockViewer = {
+                    fields: [],
+                    element: element
+                };
+
+                mockViewer.on = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.hide = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.destroy = jasmine.createSpy().andReturn(mockViewer);
+                mockViewer.addField = jasmine.createSpy().andCallFake(function (options) {
+                    mockViewer.fields.push(options);
+                    return mockViewer;
+                });
+
+                spyOn(element, 'bind').andReturn(element);
+                spyOn(element, 'appendTo').andReturn(element);
+                spyOn(Annotator, 'Viewer').andReturn(mockViewer);
+
+                annotators[0]._setupViewer();
+            });
+
+            it('should create a new instance of Annotator.Viewer and set Annotator#viewer', function () {
+                expect(annotators[0].viewer).toEqual(mockViewer);
+            });
+
+            it('should hide the annotator on creation', function () {
+                expect(mockViewer.hide.callCount).toBe(1);
+            });
+
+            it('should setup the default text field', function () {
+                var args = mockViewer.addField.mostRecentCall.args[0];
+
+                expect(mockViewer.addField.callCount).toBe(1);
+                expect(_.isFunction(args.load)).toBeTruthy();
+            });
+
+            it('should set the contents of the field on load', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: 'text \nwith\r\nline\n\rbreaks \r'};
+
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect($(field).html()).toBe('text <br>with<br>line<br>breaks <br>');
+            });
+
+            it('should set the contents of the field to placeholder text when empty', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: ''};
+
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect($(field).html()).toBe('<i>No Comment</i>');
+            });
+
+            it('should setup the default text field to publish an event on load', function () {
+                var field = document.createElement('div'),
+                    annotation = {text: ''},
+                    callback = jasmine.createSpy();
+
+                annotators[0].on('annotationViewerTextField', callback);
+                annotators[0].viewer.fields[0].load(field, annotation);
+                expect(callback).toHaveBeenCalledWith(field, annotation);
+            });
+
+            it('should subscribe to custom events', function () {
+                expect(mockViewer.on).toHaveBeenCalledWith('edit', annotators[0].onEditAnnotation);
+                expect(mockViewer.on).toHaveBeenCalledWith('delete', annotators[0].onDeleteAnnotation);
+            });
+
+            it('should bind to browser mouseover and mouseout events', function () {
+                expect(mockViewer.element.bind).toHaveBeenCalledWith({
+                    'mouseover': annotators[0].clearViewerHideTimer,
+                    'mouseout':  annotators[0].startViewerHideTimer
+                });
+            });
+
+            it('should append the Viewer#element to the Annotator#wrapper', function () {
+                expect(mockViewer.element.appendTo).toHaveBeenCalledWith(annotators[0].wrapper);
+            });
+        });
     });
 });
