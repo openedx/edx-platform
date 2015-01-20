@@ -47,6 +47,8 @@ class License(JSONField):
             return {"kind": "ARR", "version": "1.0"}
         elif isinstance(value, License):
             return {"kind": value.kind, "version": value.version}
+        elif isinstance(value, dict) and 'kind' in value and 'version' in value:
+            return {"kind": value['kind'], "version": value['version']}
         else:
             raise TypeError("Cannot convert {!r} to json".format(value))
 
