@@ -9,17 +9,19 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage, verifyHeader,
                 expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup, saveFormAndExpectErrors,
                 MOCK_COHORTED_USER_PARTITION_ID, MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL,
-                MOCK_STUDIO_GROUP_CONFIGURATIONS_URL;
+                MOCK_STUDIO_GROUP_CONFIGURATIONS_URL, MOCK_ASSIGNMENT_TYPE;
 
+            MOCK_ASSIGNMENT_TYPE = 'manual';
             MOCK_COHORTED_USER_PARTITION_ID = 0;
             MOCK_UPLOAD_COHORTS_CSV_URL = 'http://upload-csv-file-url/';
             MOCK_STUDIO_ADVANCED_SETTINGS_URL = 'http://studio/settings/advanced';
             MOCK_STUDIO_GROUP_CONFIGURATIONS_URL = 'http://studio/group_configurations';
 
-            createMockCohort = function (name, id, userCount, groupId, userPartitionId) {
+            createMockCohort = function (name, id, userCount, groupId, userPartitionId, assignmentType) {
                 return {
                     id: id !== undefined ? id : 1,
                     name: name,
+                    assignment_type: assignmentType ? assignmentType : MOCK_ASSIGNMENT_TYPE,
                     user_count: userCount !== undefined ? userCount : 0,
                     group_id: groupId,
                     user_partition_id: userPartitionId
@@ -73,13 +75,13 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 AjaxHelpers.respondWithJson(requests, createMockCohorts(catCount, dogCount));
             };
 
-            expectCohortAddRequest = function(name, groupId, userPartitionId) {
+            expectCohortAddRequest = function(name, groupId, userPartitionId, assignmentType) {
                 AjaxHelpers.expectJsonRequest(
                     requests, 'POST', '/mock_service/cohorts',
                     {
                         name: name,
                         user_count: 0,
-                        assignment_type: '',
+                        assignment_type: assignmentType,
                         group_id: groupId,
                         user_partition_id: userPartitionId
                     }
@@ -130,7 +132,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 });
             };
 
-            verifyHeader = function(expectedCohortId, expectedTitle, expectedCount) {
+            verifyHeader = function(expectedCohortId, expectedTitle, expectedCount, assignmentType) {
                 var header = cohortsView.$('.cohort-management-group-header');
                 expect(cohortsView.$('.cohort-select').val()).toBe(expectedCohortId.toString());
                 expect(cohortsView.$('.cohort-select option:selected').text()).toBe(
@@ -267,6 +269,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
             describe("Add Cohorts Form", function () {
                 var defaultCohortName = 'New Cohort';
+                var assignmentType = 'random';
 
                 it("can add a cohort", function() {
                     var contentGroupId = 0,
@@ -277,28 +280,30 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     expect(cohortsView.$('.cohort-management-nav')).toHaveClass('is-disabled');
                     expect(cohortsView.$('.cohort-management-group')).toHaveClass('is-hidden');
                     cohortsView.$('.cohort-name').val(defaultCohortName);
+                    cohortsView.$('.type-random').prop('checked', true).change();
                     selectContentGroup(contentGroupId, MOCK_COHORTED_USER_PARTITION_ID);
                     cohortsView.$('.action-save').click();
-                    expectCohortAddRequest(defaultCohortName, contentGroupId, MOCK_COHORTED_USER_PARTITION_ID);
+                    expectCohortAddRequest(defaultCohortName, contentGroupId, MOCK_COHORTED_USER_PARTITION_ID, assignmentType);
                     AjaxHelpers.respondWithJson(
                         requests,
                         {
                             id: 1,
                             name: defaultCohortName,
+                            assignment_type: assignmentType,
                             group_id: contentGroupId,
                             user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
                         }
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        { cohorts: createMockCohort(defaultCohortName) }
+                        { cohorts: createMockCohort(defaultCohortName, 1, 0, null, null, assignmentType) }
                     );
                     verifyMessage(
                         'The ' + defaultCohortName + ' cohort has been created.' +
                             ' You can manually add students to this cohort below.',
                         'confirmation'
                     );
-                    verifyHeader(1, defaultCohortName, 0);
+                    verifyHeader(1, defaultCohortName, 0, assignmentType);
                     expect(cohortsView.$('.cohort-management-nav')).not.toHaveClass('is-disabled');
                     expect(cohortsView.$('.cohort-management-group')).not.toHaveClass('is-hidden');
                     expect(getAddModal().find('.cohort-management-settings-form').length).toBe(0);
@@ -309,7 +314,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.action-create').click();
                     cohortsView.$('.cohort-name').val('  New Cohort   ');
                     cohortsView.$('.action-save').click();
-                    expectCohortAddRequest('New Cohort', null, null);
+                    expectCohortAddRequest('New Cohort', null, null, MOCK_ASSIGNMENT_TYPE);
                 });
 
                 it("does not allow a blank cohort name to be submitted", function() {
@@ -594,6 +599,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                             requests, 'PATCH', '/mock_service/cohorts/1',
                             {
                                 name: 'Cat Lovers',
+                                assignment_type: MOCK_ASSIGNMENT_TYPE,
                                 group_id: 0,
                                 user_partition_id: MOCK_COHORTED_USER_PARTITION_ID
                             }
@@ -608,7 +614,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     it("can clear selected content group", function () {
                         createCohortsView(this, {
                             cohorts: [
-                                {id: 1, name: 'Cat Lovers', group_id: 0}
+                                {id: 1, name: 'Cat Lovers', group_id: 0, 'assignment_type': MOCK_ASSIGNMENT_TYPE}
                             ],
                             selectCohort: 1
                         });
@@ -622,6 +628,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                             requests, 'PATCH', '/mock_service/cohorts/1',
                             {
                                 name: 'Cat Lovers',
+                                'assignment_type': MOCK_ASSIGNMENT_TYPE,
                                 group_id: null,
                                 user_partition_id: null
                             }

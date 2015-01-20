@@ -231,7 +231,6 @@ class TestCohorts(TestCase):
         # get_cohort should return a group for user
         self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
 
-
     def test_auto_cohorting(self):
         """
         Make sure cohorts.get_cohort() does the right thing with auto_cohort_groups
@@ -519,8 +518,9 @@ class TestCohorts(TestCase):
         Make sure cohorts.add_cohort() properly adds a cohort to a course and handles
         errors.
         """
+        assignment_type = CourseUserGroup.RANDOM
         course = modulestore().get_course(self.toy_course_key)
-        added_cohort = cohorts.add_cohort(course.id, "My Cohort")
+        added_cohort = cohorts.add_cohort(course.id, "My Cohort", assignment_type)
         mock_tracker.emit.assert_any_call(
             "edx.cohort.creation_requested",
             {"cohort_name": added_cohort.name, "cohort_id": added_cohort.id}
@@ -529,11 +529,12 @@ class TestCohorts(TestCase):
         self.assertEqual(added_cohort.name, "My Cohort")
         self.assertRaises(
             ValueError,
-            lambda: cohorts.add_cohort(course.id, "My Cohort")
+            lambda: cohorts.add_cohort(course.id, "My Cohort", assignment_type)
         )
+        does_not_exist_course_key = SlashSeparatedCourseKey("course", "does_not", "exist")
         self.assertRaises(
             ValueError,
-            lambda: cohorts.add_cohort(SlashSeparatedCourseKey("course", "does_not", "exist"), "My Cohort")
+            lambda: cohorts.add_cohort(does_not_exist_course_key, "My Cohort", assignment_type)
         )
 
     @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")

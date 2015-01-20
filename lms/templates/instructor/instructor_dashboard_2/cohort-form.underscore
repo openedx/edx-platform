@@ -25,7 +25,7 @@
                             <%- gettext('Cohort Name') %> *
                             <span class="sr"><%- gettext('(Required Field)')%></span>
                     </label>
-                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input" id="cohort-name"
+                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name" id="cohort-name"
                            placeholder="<%- placeholder_value %>" required="required" type="text">
                 </div>
                 <hr class="divider divider-lv1">
@@ -34,10 +34,10 @@
                         <%- gettext('Students in this cohort are:') %>
                     </h4>
                     <label>
-                        <input type="radio" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
+                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
                     </label>
                     <label>
-                        <input type="radio" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
+                        <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
                     </label>
                 </div>
                 <hr class="divider divider-lv1">
