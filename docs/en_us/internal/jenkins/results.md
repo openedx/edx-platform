@@ -21,7 +21,7 @@ the 'Upstream Builds' section:
 
 ## Coverage Reports
 
-Note: Coverage reports are only generated when your tests pass.
+Note: Coverage reports are generated now even when tests fail. Be careful when inspecting these, since coverage on failure is not likely to match coverage reported when tests pass.
   
 * How to find:
 
@@ -55,7 +55,7 @@ Note: Coverage reports are only generated when your tests pass.
 ## Code Quality Reports  
 
 These are generated regardless of test restults.
-Note that a passing build does __not__ mean that you have not introduced new pep8/pylint violations.
+Note that the quality check will now fail if you have introduced new pep8 or pylint violations. It will also fail if the total number of violations is above a certain threshold.
 
 * How to find:
 
