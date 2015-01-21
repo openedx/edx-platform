@@ -5,3 +5,7 @@ lazy==1.1
 path.py==3.0.1
 watchdog==0.7.1
 python-memcached
+
+# Requirements to run paver with pip-accel
+-e git+https://github.com/jzoldak/pip.git@v1.4.1patch772#egg=pip
+pip-accel[s3]==0.22
