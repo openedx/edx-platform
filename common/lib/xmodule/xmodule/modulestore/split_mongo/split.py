@@ -53,7 +53,6 @@ Representation:
         definition. Acts as a pseudo-object identifier.
 """
 import copy
-import threading
 import datetime
 import hashlib
 import logging
@@ -618,10 +617,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         self.db_connection = MongoConnection(**doc_store_config)
         self.db = self.db_connection.database
 
-        # Code review question: How should I expire entries?
-        # _add_cache could use a lru mechanism to control the cache size?
-        self.thread_cache = threading.local()
-
         if default_class is not None:
             module_path, __, class_name = default_class.rpartition('.')
             class_ = getattr(import_module(module_path), class_name)
@@ -732,10 +727,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Find the descriptor cache for this course if it exists
         :param course_version_guid:
         """
-        if not hasattr(self.thread_cache, 'course_cache'):
-            self.thread_cache.course_cache = {}
-        system = self.thread_cache.course_cache
-        return system.get(course_version_guid)
+        if self.request_cache is None:
+            return None
+
+        return self.request_cache.data.setdefault('course_cache', {}).get(course_version_guid)
 
     def _add_cache(self, course_version_guid, system):
         """
@@ -743,9 +738,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param course_version_guid:
         :param system:
         """
-        if not hasattr(self.thread_cache, 'course_cache'):
-            self.thread_cache.course_cache = {}
-        self.thread_cache.course_cache[course_version_guid] = system
+        if self.request_cache is not None:
+            self.request_cache.data.setdefault('course_cache', {})[course_version_guid] = system
         return system
 
     def _clear_cache(self, course_version_guid=None):
@@ -753,15 +747,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Should only be used by testing or something which implements transactional boundary semantics.
         :param course_version_guid: if provided, clear only this entry
         """
+        if self.request_cache is None:
+            return
+
         if course_version_guid:
-            if not hasattr(self.thread_cache, 'course_cache'):
-                self.thread_cache.course_cache = {}
             try:
-                del self.thread_cache.course_cache[course_version_guid]
+                del self.request_cache.data.setdefault('course_cache', {})[course_version_guid]
             except KeyError:
                 pass
         else:
-            self.thread_cache.course_cache = {}
+            self.request_cache.data['course_cache'] = {}
 
     def _lookup_course(self, course_key):
         '''
