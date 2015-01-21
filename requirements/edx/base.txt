@@ -69,7 +69,7 @@ python-memcached==1.48
 python-openid==2.2.5
 python-dateutil==2.1
 python-social-auth==0.1.23
-pytz==2012h
+pytz==2015.2
 pysrt==0.4.7
 PyYAML==3.10
 requests==2.3.0
