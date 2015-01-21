@@ -43,7 +43,7 @@ define([
         describe('destroy', function () {
             it('should unbind all events', function () {
                 spyOn($.fn, 'off');
-                spyOn(this.annotator, 'unsubscribe');
+                spyOn(this.annotator, 'unsubscribe').andCallThrough();
                 this.plugin.destroy();
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationViewerTextField', this.plugin.addAriaAttributes
@@ -53,6 +53,9 @@ define([
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationCreated', this.plugin.addDescriptions
+                );
+                expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
+                    'annotationCreated', this.plugin.focusOnHighlightedText
                 );
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationDeleted', this.plugin.removeDescription
@@ -136,11 +139,9 @@ define([
             it('should focus highlighted text after closing', function () {
                 var note;
                 highlight.trigger(keyDownEvent(this.KEY.ENTER));
-                expect(this.plugin.savedHighlights).toBeDefined();
                 note = this.annotator.element.find('.annotator-edit');
                 note.trigger(keyDownEvent(this.KEY.ESCAPE));
                 expect(highlight).toBeFocused();
-                expect(this.plugin.savedHighlights).toBeNull();
             });
 
             it('should focus on grabber after being deleted', function () {
