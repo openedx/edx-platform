@@ -50,6 +50,7 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
+    'ALLOW_COURSE_RERUNS': True,
     'USE_DJANGO_PIPELINE': True,
 
     'GITHUB_PUSH': False,
