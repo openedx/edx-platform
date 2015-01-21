@@ -39,7 +39,6 @@
     } else {
         paths.tinymce = "js/vendor/tinymce/js/tinymce/jquery.tinymce.min";
     }
-
     config = {
         // NOTE: baseUrl has been previously set in lms/static/templates/main.html
         waitSeconds: 60,
@@ -47,7 +46,18 @@
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
             "backbone": "js/vendor/backbone-min",
+            "gettext": "/i18n",
+            "jquery": "js/vendor/jquery.min",
+            "jquery.cookie": "js/vendor/jquery.cookie",
+            "jquery.url": "js/vendor/url.min",
+            "text": "js/vendor/text",
+            "underscore": "js/vendor/underscore-min",
             "underscore.string": "js/vendor/underscore.string.min",
+
+            // This module defines some global functions.
+            // TODO: replace these with RequireJS-compatible modules
+            "utility": "js/src/utility",
+
             // Files needed by OVA
             "annotator": "js/vendor/ova/annotator-full",
             "annotator-harvardx": "js/vendor/ova/annotator-full-firebase-auth",
@@ -80,12 +90,23 @@
             "jquery": {
                 exports: "$"
             },
+            "jquery.cookie": {
+                deps: ["jquery"],
+                exports: "jQuery.fn.cookie"
+            },
+            "jquery.url": {
+                deps: ["jquery"],
+                exports: "jQuery.url"
+            },
             "underscore": {
                 exports: "_"
             },
             "backbone": {
                 deps: ["underscore", "jquery"],
                 exports: "Backbone"
+            },
+            "gettext": {
+                exports: "gettext"
             },
             "logger": {
                 exports: "Logger"
