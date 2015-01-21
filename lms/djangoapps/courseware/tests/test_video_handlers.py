@@ -322,6 +322,11 @@ class TestTranscriptTranslationGetDispatch(TestVideo):
         response = self.item.transcript(request=request, dispatch='translation/ru')
         self.assertEqual(response.status, '404 Not Found')
 
+        # Youtube_id is invalid or does not exist
+        request = Request.blank('/translation/uk?videoId=9855256955511225')
+        response = self.item.transcript(request=request, dispatch='translation/uk')
+        self.assertEqual(response.status, '404 Not Found')
+
     def test_translaton_en_youtube_success(self):
         subs = {"start": [10], "end": [100], "text": ["Hi, welcome to Edx."]}
         good_sjson = _create_file(json.dumps(subs))
