@@ -39,7 +39,7 @@ from django_comment_common.utils import seed_permissions_roles
 from microsite_configuration import microsite
 from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
-    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
+    PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem
 )
 from shoppingcart.pdf import PDFInvoice
 from student.models import (
@@ -1713,6 +1713,12 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
             internal_reference="A", course_id=self.course.id, is_valid=True
         )
+        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.sale_invoice_1,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
 
         self.students = [UserFactory() for _ in xrange(6)]
         for student in self.students:
@@ -1725,7 +1731,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
+                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1745,7 +1751,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         data['event_type'] = "re_validate"
         self.assert_request_status_code(200, url, method="POST", data=data)
 
-        # Now re_validate the same actove invoice number and expect an Bad request
+        # Now re_validate the same active invoice number and expect an Bad request
         response = self.assert_request_status_code(400, url, method="POST", data=data)
         self.assertIn("This invoice is already active.", response.content)
 
