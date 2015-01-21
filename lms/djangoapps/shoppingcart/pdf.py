@@ -369,24 +369,34 @@ class PDFInvoice(object):
         totals_data = [
             [(_('Total')), self.total_cost],
             [(_('Payment Received')), self.payment_received],
-            [(_('Balance')), self.balance],
-            ['', '{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
+            [(_('Balance')), self.balance]
         ]
+
+        if self.is_invoice:
+            # only print TaxID if we are generating an Invoice
+            totals_data.append(
+                ['', '{tax_label}:  {tax_id}'.format(tax_label=self.tax_label, tax_id=self.tax_id)]
+            )
 
         heights = 8 * mm
         totals_table = Table(totals_data, 40 * mm, heights)
 
-        totals_table.setStyle(TableStyle([
+        styles = [
             # Styling for the totals table.
             ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
 
             # Styling for the Amounts cells
-            ('RIGHTPADDING', (-1, 0), (-1, -2), 7 * mm),
-            ('GRID', (-1, 0), (-1, -2), 3.0, colors.white),
-            ('BACKGROUND', (-1, 0), (-1, -2), '#EEEEEE'),
-        ]))
+            # NOTE: since we are not printing the TaxID for Credit Card
+            # based receipts, we need to change the cell range for
+            # these formatting rules
+            ('RIGHTPADDING', (-1, 0), (-1, -2 if self.is_invoice else -1), 7 * mm),
+            ('GRID', (-1, 0), (-1, -2 if self.is_invoice else -1), 3.0, colors.white),
+            ('BACKGROUND', (-1, 0), (-1, -2 if self.is_invoice else -1), '#EEEEEE'),
+        ]
+
+        totals_table.setStyle(TableStyle(styles))
 
         __, rendered_height = totals_table.wrap(0, 0)
 
