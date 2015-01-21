@@ -58,7 +58,6 @@ lib_paths:
     - xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min.js
     - xmodule_js/common_static/js/test/i18n.js
     - xmodule_js/common_static/js/vendor/date.js
-    - xmodule_js/common_static/js/vendor/text.js
 
 # Paths to source JavaScript files
 src_paths:
