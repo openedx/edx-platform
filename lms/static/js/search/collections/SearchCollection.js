@@ -1,12 +1,12 @@
-var edx = edx || {};
-
-(function (Backbone) {
+RequireJS.define([
+    'backbone',
+    'js/search/models/SearchResult'
+], function (Backbone, SearchResult) {
     'use strict';
 
-    edx.search = edx.search || {};
+    return Backbone.Collection.extend({
 
-    edx.search.Collection = Backbone.Collection.extend({
-        model: edx.search.Result,
+        model: SearchResult,
         pageSize: 20,
         totalCount: 0,
         accessDeniedCount: 0,
@@ -84,5 +84,5 @@ var edx = edx || {};
 
     });
 
-})(Backbone);
+});
 

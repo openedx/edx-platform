@@ -1,11 +1,13 @@
-var edx = edx || {};
-
-(function ($, _, Backbone, gettext) {
+RequireJS.define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext'
+], function ($, _, Backbone, gettext) {
    'use strict';
 
-    edx.search = edx.search || {};
+    return Backbone.View.extend({
 
-    edx.search.Item = Backbone.View.extend({
         tagName: 'li',
         className: 'search-results-item',
         attributes: {
@@ -21,7 +23,6 @@ var edx = edx || {};
             this.$el.html(this.tpl(this.model.attributes));
             return this;
         }
-
     });
 
-})(jQuery, _, Backbone, gettext);
+});
