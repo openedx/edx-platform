@@ -6,6 +6,7 @@
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
 <%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
+<%include file="make_invoice_transaction_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
    <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
@@ -16,6 +17,8 @@
             <span class="code_tip">${_('Click to generate Registration Codes')}
             <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
             </span>
+            <span class="tip">${_("Click to make Transactions'")} <a id="make_invoice_transaction_link" href="#make_invoice_transaction_modal" rel="leanModal"
+                   class="add blue-button">+ ${_("Make Transaction")}</a></span>
             %endif
             <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>

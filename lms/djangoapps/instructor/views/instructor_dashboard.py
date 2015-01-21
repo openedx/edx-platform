@@ -177,7 +177,8 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled):
         'sales_admin': access['sales_admin'],
         'coupons_enabled': coupons_enabled,
         'course_price': course_price,
-        'total_amount': total_amount
+        'total_amount': total_amount,
+        'make_invoice_transaction_url': reverse('make_invoice_transaction', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 

@@ -1553,7 +1553,8 @@ input[name="subject"] {
       width: 930px;
     }
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal,
+  #registration_code_generation_modal, #make_invoice_transaction_modal{
     .inner-wrapper {
       background: $white;
     }
