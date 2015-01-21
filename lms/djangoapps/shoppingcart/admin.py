@@ -69,7 +69,7 @@ class InvoiceTransactionAdmin(admin.ModelAdmin):
     readonly_fields = ('created',)
 
 
-class CourseRegistrationInvoiceItemAdmin(admin.ModelAdmin):
+class CourseRegistrationCodeInvoiceItemAdmin(admin.ModelAdmin):
     """
     Admin for the Invoice transactions table.
     """
@@ -82,4 +82,4 @@ admin.site.register(Coupon, SoftDeleteCouponAdmin)
 admin.site.register(DonationConfiguration)
 admin.site.register(InvoiceTransaction, InvoiceTransactionAdmin)
 admin.site.register(Invoice, InvoiceAdmin)
-admin.site.register(CourseRegistrationCodeInvoiceItem, CourseRegistrationInvoiceItemAdmin)
+admin.site.register(CourseRegistrationCodeInvoiceItem, CourseRegistrationCodeInvoiceItemAdmin)
