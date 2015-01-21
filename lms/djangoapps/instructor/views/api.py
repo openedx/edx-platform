@@ -1071,6 +1071,7 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
         mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
         invoice (Invoice): (Optional) The associated invoice for this code.
         order (Order): (Optional) The associated order for this code.
+        invoice_item (CourseRegistrationCodeInvoiceItem) : (Optional) The associated CourseRegistrationCodeInvoiceItem
 
     Returns:
         The newly created CourseRegistrationCode.
@@ -1081,7 +1082,9 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
     course_registration = CourseRegistrationCode(
         code=code,
@@ -1096,7 +1099,9 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None,
         course_registration.save()
         return course_registration
     except IntegrityError:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
