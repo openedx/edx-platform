@@ -83,7 +83,7 @@ class TestPdfFile(unittest.TestCase):
         self.assertTrue(any(str(self.total_cost) in s for s in pdf_content))
         self.assertTrue(any(str(self.payment_received) in s for s in pdf_content))
         self.assertTrue(any(str(self.balance) in s for s in pdf_content))
-        self.assertTrue(any('edX Tax ID' in s for s in pdf_content))
+        self.assertFalse(any('edX Tax ID' in s for s in pdf_content))
 
         # PDF_RECEIPT_TERMS_AND_CONDITIONS not displayed in the receipt pdf
         self.assertFalse(any(
