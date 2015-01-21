@@ -1,4 +1,4 @@
-"""
+﻿"""
 Test the various password reset flows
 """
 import json
@@ -92,7 +92,7 @@ class ResetPasswordTests(TestCase):
         cache.clear()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('django.core.mail.send_mail')
+    @patch('mail.send_mail')
     @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
     def test_reset_password_email(self, send_email):
         """Tests contents of reset password email, and that user is not active"""
@@ -119,7 +119,7 @@ class ResetPasswordTests(TestCase):
         re.search(r'password_reset_confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/', msg).groupdict()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', "Test only valid in LMS")
-    @patch('django.core.mail.send_mail')
+    @patch('mail.send_mail')
     @ddt.data((False, 'http://'), (True, 'https://'))
     @ddt.unpack
     def test_reset_password_email_https(self, is_secure, protocol, send_email):

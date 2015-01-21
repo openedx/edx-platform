@@ -1,0 +1,15 @@
+<%! from microsite_configuration.middleware import microsite %>
+<em>Copyright © 2013 edX, All rights reserved.</em><br>
+<br>
+<br>
+  <b>Our mailing address is:</b><br>
+  edX<br>
+  11 Cambridge Center, Suite 101<br>
+  Cambridge, MA, USA 02142<br>
+<br>
+<br>
+This email was automatically sent from ${microsite.get_value(
+        'platform_name',
+        settings.PLATFORM_NAME
+    )
+  }. <br>

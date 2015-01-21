@@ -1,0 +1,26 @@
+<%inherit file="one_call_to_action.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="title"></%block>
+
+<%block name="msg_header">
+  ${_("Dear {full_name}").format(full_name=full_name)}
+  <br/>
+</%block>
+
+<%block name="msg_content" >
+  ${_("You have been enrolled in {course_name} at {site_name} by a member "
+    "of the course staff. The course should now appear on your {site_name} "
+    "dashboard.").format(
+      course_name=course.display_name_with_default,
+      site_name=site_name
+    )}
+  <br/>
+  ${_("To start accessing course materials, please visit {course_url} or use the button below.").format(
+      course_url=course_url
+    )}
+</%block>
+
+<%block name="call_to_action_href">${ course_url }</%block>
+
+<%block name="call_to_action_label">${_("Take me there")}</%block>

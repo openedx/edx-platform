@@ -1,0 +1,35 @@
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+<%inherit file="one_call_to_action.html" />
+
+<%block name="title">
+${_("Beta tester")}
+</%block>
+
+<%block name="msg_header">
+${_("Dear {full_name}").format(full_name=full_name)}
+</%block>
+
+<%block name="msg_content" >
+${_("You have been invited to be a beta tester for {course_name} at {site_name} by a "
+  "member of the course staff.").format(
+    course_name=course.display_name_with_default,
+    site_name=site_name
+  )}
+<br/>
+</%block>
+
+<%block name="call_to_action_href">
+% if course_about_url is not None:
+  ${course_about_url}
+% else:
+  ${site_name}
+% endif
+</%block>
+<%block name="call_to_action_label">
+% if course_about_url is not None:
+  ${_("Join the course")}
+% else:
+  ${_("Enroll in the course")}
+% endif
+</%block>

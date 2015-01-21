@@ -1,0 +1,15 @@
+<%inherit file="one_content_box.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="title">Retiro del curso | eduNEXT</%block>
+
+<%block name="msg_header">
+  ${_("Dear student,")}
+  <br/>
+</%block>
+
+<%block name="msg_content" >
+${_("You have been un-enrolled from course {course_name} by a member "
+    "of the course staff. Please disregard the invitation "
+    "previously sent.").format(course_name=course.display_name_with_default)}
+</%block>

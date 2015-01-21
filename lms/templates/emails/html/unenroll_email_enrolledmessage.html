@@ -1,0 +1,20 @@
+<%inherit file="one_content_box.html" />
+<%! from django.utils.translation import ugettext as _ %>
+
+<%block name="msg_header">
+  ${_("Dear {full_name},").format(full_name=full_name)}
+  <br/>
+</%block>
+
+<%block name="msg_content" >
+${_("You have been un-enrolled in {course_name} at {site_name} by a member "
+    "of the course staff. The course will no longer appear on your "
+    "{site_name} dashboard.").format(
+    	course_name=course.display_name_with_default, site_name=site_name
+    )}
+</%block>
+
+<%block name="msg_content_2" >
+  ${_("Your other courses have not been affected.")}
+  <br/>
+</%block>

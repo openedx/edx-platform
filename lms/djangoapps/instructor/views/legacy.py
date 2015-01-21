@@ -23,7 +23,7 @@ from django.http import HttpResponse
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
 from django.core.urlresolvers import reverse
-from django.core.mail import send_mail
+from mail import send_mail
 from django.utils import timezone
 
 import xmodule.graders as xmgraders
@@ -1023,16 +1023,20 @@ def send_mail_to_student(student, param_dict):
     message_type = param_dict['message']
 
     email_template_dict = {
-        'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt'),
-        'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt'),
-        'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt'),
-        'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt'),
+        'allowed_enroll': ('emails/enroll_email_allowedsubject.txt', 'emails/enroll_email_allowedmessage.txt', 'emails/html/enroll_email_allowedmessage.html'),
+        'enrolled_enroll': ('emails/enroll_email_enrolledsubject.txt', 'emails/enroll_email_enrolledmessage.txt', 'emails/html/enroll_email_enrolledmessage.html'),
+        'allowed_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_allowedmessage.txt', 'emails/html/unenroll_email_allowedmessage.html'),
+        'enrolled_unenroll': ('emails/unenroll_email_subject.txt', 'emails/unenroll_email_enrolledmessage.txt', 'emails/html/unenroll_email_enrolledmessage.html'),
     }
 
-    subject_template, message_template = email_template_dict.get(message_type, (None, None))
+    subject_template, message_template, html_template = email_template_dict.get(message_type, (None, None, None))
     if subject_template is not None and message_template is not None:
         subject = render_to_string(subject_template, param_dict)
         message = render_to_string(message_template, param_dict)
+
+    message_html = None
+    if (settings.FEATURES.get('ENABLE_MULTIPART_EMAIL')):
+        message_html = render_to_string(html_template, param_dict)
 
     if subject and message:
         # Remove leading and trailing whitespace from body
@@ -1045,7 +1049,7 @@ def send_mail_to_student(student, param_dict):
             settings.DEFAULT_FROM_EMAIL
         )
 
-        send_mail(subject, message, from_address, [student], fail_silently=False)
+        send_mail(subject, message, from_address, [student], fail_silently=False, html_message=message_html)
 
         return True
     else:
