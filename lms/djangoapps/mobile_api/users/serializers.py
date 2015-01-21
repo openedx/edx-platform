@@ -60,6 +60,8 @@ class CourseField(serializers.RelatedField):
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
             "course_about": course_about_url,
+            # TODO Placeholder value until we get the correct API from the Drupal site to the actual course' URL
+            "course_url": "https://www.edx.org/course?search_query=" + course.display_name,
         }
 
 

@@ -84,6 +84,12 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
                 unicode(courses[num_courses - course_num - 1].id)
             )
 
+    def test_course_url(self):
+        self.login_and_enroll()
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertIsNotNone(course_data['course_url'])
+
     def test_no_facebook_url(self):
         self.login_and_enroll()
 
