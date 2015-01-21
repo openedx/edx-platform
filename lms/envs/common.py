@@ -1499,6 +1499,7 @@ INSTALLED_APPS = (
     'licenses',
     'openedx.core.djangoapps.course_groups',
     'bulk_email',
+    'branding',
 
     # External auth (OpenID, shib)
     'external_auth',
