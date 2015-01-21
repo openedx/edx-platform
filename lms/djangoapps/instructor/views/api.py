@@ -57,11 +57,12 @@ from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
+    get_user_email_language,
     enroll_email,
     send_mail_to_student,
     get_email_params,
     send_beta_role_email,
-    unenroll_email
+    unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
@@ -497,12 +498,14 @@ def students_update_enrollment(request, course_id):
         # First try to get a user object from the identifer
         user = None
         email = None
+        language = None
         try:
             user = get_student_from_identifier(identifier)
         except User.DoesNotExist:
             email = identifier
         else:
             email = user.email
+            language = get_user_email_language(user)
 
         try:
             # Use django.core.validators.validate_email to check email address
@@ -511,9 +514,13 @@ def students_update_enrollment(request, course_id):
             validate_email(email)  # Raises ValidationError if invalid
 
             if action == 'enroll':
-                before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
+                before, after = enroll_email(
+                    course_id, email, auto_enroll, email_students, email_params, language=language
+                )
             elif action == 'unenroll':
-                before, after = unenroll_email(course_id, email, email_students, email_params)
+                before, after = unenroll_email(
+                    course_id, email, email_students, email_params, language=language
+                )
             else:
                 return HttpResponseBadRequest(strip_tags(
                     "Unrecognized action '{}'".format(action)

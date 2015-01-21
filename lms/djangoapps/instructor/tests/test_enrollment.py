@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Unit tests for instructor.enrollment methods.
 """
@@ -9,6 +10,8 @@ from courseware.models import StudentModule
 from django.conf import settings
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.translation import get_language
+from django.utils.translation import override as override_language
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
@@ -20,7 +23,8 @@ from instructor.enrollment import (
     get_email_params,
     reset_student_attempts,
     send_beta_role_email,
-    unenroll_email
+    unenroll_email,
+    render_message_to_string,
 )
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -472,3 +476,50 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertEqual(result['course_about_url'], None)
         self.assertEqual(result['registration_url'], self.registration_url)
         self.assertEqual(result['course_url'], self.course_url)
+
+
+class TestRenderMessageToString(TestCase):
+    """
+    Test that email templates can be rendered in a language chosen manually.
+    """
+
+    def setUp(self):
+        self.subject_template = 'emails/enroll_email_allowedsubject.txt'
+        self.message_template = 'emails/enroll_email_allowedmessage.txt'
+        self.course = CourseFactory.create()
+
+    def get_email_params(self):
+        """
+        Returns a dictionary of parameters used to render an email.
+        """
+        email_params = get_email_params(self.course, True)
+        email_params["email_address"] = "user@example.com"
+        email_params["full_name"] = "Jean Reno"
+
+        return email_params
+
+    def get_subject_and_message(self, language):
+        """
+        Returns the subject and message rendered in the specified language.
+        """
+        return render_message_to_string(
+            self.subject_template,
+            self.message_template,
+            self.get_email_params(),
+            language=language
+        )
+
+    def test_subject_and_message_translation(self):
+        subject, message = self.get_subject_and_message('fr')
+        language_after_rendering = get_language()
+
+        you_have_been_invited_in_french = u"Vous avez été invité"
+        self.assertIn(you_have_been_invited_in_french, subject)
+        self.assertIn(you_have_been_invited_in_french, message)
+        self.assertEqual(settings.LANGUAGE_CODE, language_after_rendering)
+
+    def test_platform_language_is_used_for_logged_in_user(self):
+        with override_language('zh_CN'):    # simulate a user login
+            subject, message = self.get_subject_and_message(None)
+            self.assertIn("You have been", subject)
+            self.assertIn("You have been", message)
