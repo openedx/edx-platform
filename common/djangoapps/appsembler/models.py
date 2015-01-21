@@ -22,14 +22,19 @@ intercom.Intercom.api_key = os.environ.get("INTERCOM_APP_SECRET", "")
 INTERCOM_USER_EMAIL = os.environ.get("INTERCOM_USER_EMAIL", "")
 
 
-def intercom_update(custom_data):
+def intercom_update(custom_data, verbose):
+    if verbose:
+        print custom_data
     try:
         intercom.Intercom.update_user(email=INTERCOM_USER_EMAIL, custom_data=custom_data)
+        if verbose:
+            print "Update succeeded"
     except (intercom.IntercomError, requests.exceptions.RequestException):
-        pass
+        if verbose:
+            print "Update failed"
 
 
-def update_user_statistics():
+def update_user_statistics(verbose=False):
     if not intercom.Intercom.app_id:
         return
     custom_data = {
@@ -42,10 +47,7 @@ def update_user_statistics():
     # if CourseCreator:
     #     custom_data['Users - course creation rights granted'] = User.objects.filter(
     #         coursecreator__state=CourseCreator.GRANTED).count()
-    intercom_update(custom_data=custom_data)
-
-
-update_user_statistics()
+    intercom_update(custom_data=custom_data, verbose=verbose)
 
 
 @receiver(post_save, dispatch_uid='user_save_callback')
@@ -54,7 +56,7 @@ def user_save_callback(sender, instance, created, raw, **kwargs):
         update_user_statistics()
 
 
-def update_course_statistics():
+def update_course_statistics(verbose=False):
     if not intercom.Intercom.app_id:
         return
     custom_data = {
@@ -66,10 +68,7 @@ def update_course_statistics():
         #       https://github.com/appsembler/edx-platform/blob/d4de932c2b46dbe1ad6439731b4312fb36813d6d/cms/djangoapps/contentstore/views/course.py#L295
         'Courses - reruns': CourseRerunState.objects.count(),
     }
-    intercom_update(custom_data=custom_data)
-
-
-update_course_statistics()
+    intercom_update(custom_data=custom_data, verbose=verbose)
 
 
 @receiver(post_save, sender=CourseRerunState, dispatch_uid='course_save_callback')
