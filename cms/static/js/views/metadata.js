@@ -3,9 +3,11 @@ define(
         "js/views/baseview", "underscore", "js/models/metadata", "js/views/abstract_editor",
         "js/models/uploads", "js/views/uploads",
         "js/views/video/transcripts/metadata_videolist",
-        "js/views/video/translations_editor"
+        "js/views/video/translations_editor",
+        "js/views/license-selector",
+        "js/models/license"
     ],
-function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, VideoList, VideoTranslations) {
+function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, VideoList, VideoTranslations, LicenseSelector, LicenseModel) {
     var Metadata = {};
 
     Metadata.Editor = BaseView.extend({
@@ -115,6 +117,43 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
 
         setValueInEditor : function (value) {
             this.$el.find('input').val(value);
+        }
+    });
+
+    /**
+     * Provides convenient way to set the license metadata field.
+     * The license selector will provide a way to set the license correctly
+     * to All rights reserved, or one of the Creative Commons licensing types.
+     */
+    Metadata.License = AbstractEditor.extend({
+
+        events: {
+            "click .license-button" : "updateModel",
+        },
+
+        templateName: "metadata-license-entry",
+
+        render: function () {
+            AbstractEditor.prototype.render.apply(this);
+
+            // Render selector
+            if (!this.initialized) {
+                this.licenseSelector = new LicenseSelector({
+                    model: new LicenseModel(this.model.getValue()),
+                    el: this.$el.find('.wrapper-license-selector')
+                });
+                this.initialized = true;
+            }
+        },
+
+        getValueFromEditor: function () {
+            return this.licenseSelector.model.toJSON();
+        },
+
+        setValueInEditor: function (value) {
+            if (this.initialized) {
+                this.licenseSelector.model.set('kind', value.kind);
+            }
         }
     });
 

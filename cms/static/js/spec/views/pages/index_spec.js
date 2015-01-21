@@ -47,7 +47,8 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                     org: 'DemoX',
                     number: 'DM101',
                     run: '2014',
-                    display_name: 'Demo course'
+                    display_name: 'Demo course',
+                    license: {}
                 });
                 AjaxHelpers.respondWithJson(requests, {
                     url: 'dummy_test_url'

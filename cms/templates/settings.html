@@ -6,12 +6,13 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from django.utils.translation import ugettext as _
+  from django.conf import settings
   from contentstore import utils
   import urllib
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -342,6 +343,26 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </ol>
             </section>
           % endif
+          % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licensable:
+            <hr class="divide" />
+            <section class="group-settings license">
+              <header>
+                <h2 class="title-2">${_("Course Content Licensing")}</h2>
+                ## Translators: At the course settings, the editor is able to select the default course content license.
+                ## The course content will have this license set, some assets can override the license with their own.
+                ## In the form, the license selector for course content is described using the following string:
+                <span class="tip">${_("Select the default license for course content.")}</span>
+              </header>
+
+              <ol class="list-input">
+                <li class="field text" id="field-course-license">
+                  <div id="course-license-form"></div>
+                </li>
+              </ol>
+            </section>
+          % endif
+
+
       </form>
     </article>
     <aside class="content-supplementary" role="complementary">

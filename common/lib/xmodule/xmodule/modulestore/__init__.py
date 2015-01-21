@@ -25,6 +25,7 @@ from xblock.plugin import default_select
 from .exceptions import InvalidLocationError, InsufficientSpecificationError
 from xmodule.errortracker import make_error_tracker
 from xmodule.assetstore import AssetMetadata
+from xmodule.license import License
 from opaque_keys.edx.keys import CourseKey, UsageKey, AssetKey
 from opaque_keys.edx.locations import Location  # For import backwards compatibility
 from opaque_keys import InvalidKeyError
@@ -1189,5 +1190,7 @@ class EdxJSONEncoder(json.JSONEncoder):
                     return obj.isoformat()
             else:
                 return obj.isoformat()
+        elif isinstance(obj, License):
+            return obj.to_json(obj)
         else:
             return super(EdxJSONEncoder, self).default(obj)

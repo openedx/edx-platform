@@ -22,7 +22,8 @@ define([
                 course_image_asset_path : '',
                 pre_requisite_courses : [],
                 entrance_exam_enabled : '',
-                entrance_exam_minimum_score_pct: '50'
+                entrance_exam_minimum_score_pct: '50',
+                license : { kind : 'ARR', version : '' }
             },
             mockSettingsPage = readFixtures('mock/mock-settings-page.underscore');
 

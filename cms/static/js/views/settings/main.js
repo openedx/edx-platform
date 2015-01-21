@@ -1,6 +1,6 @@
 define(["js/views/validation", "codemirror", "underscore", "jquery", "jquery.ui", "js/utils/date_utils", "js/models/uploads",
-    "js/views/uploads", "js/utils/change_on_enter", "jquery.timepicker", "date"],
-    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter) {
+    "js/views/uploads", "js/utils/change_on_enter", "js/views/license-selector", "jquery.timepicker", "date"],
+    function(ValidatingView, CodeMirror, _, $, ui, DateUtils, FileUploadModel, FileUploadDialog, TriggerChangeEventOnEnter, LicenseSelector) {
 
 var DetailsView = ValidatingView.extend({
     // Model class is CMS.Models.Settings.CourseDetails
@@ -26,6 +26,12 @@ var DetailsView = ValidatingView.extend({
         this.$el.find("#course-organization").val(this.model.get('org'));
         this.$el.find("#course-number").val(this.model.get('course_id'));
         this.$el.find("#course-name").val(this.model.get('run'));
+
+        if(!this.model.has('license')){
+            this.model.set('license', {kind: 'ARR', version: '1.0'});
+        }
+        this.linkLicense();
+
         this.$el.find('.set-date').datepicker({ 'dateFormat': 'm/d/yy' });
 
         // Avoid showing broken image on mistyped/nonexistent image
@@ -37,8 +43,15 @@ var DetailsView = ValidatingView.extend({
         });
 
         this.listenTo(this.model, 'invalid', this.handleValidationError);
-        this.listenTo(this.model, 'change', this.showNotificationBar);
+        this.listenTo(this.model, 'change nested-change', this.showNotificationBar);
         this.selectorToField = _.invert(this.fieldToSelectorMap);
+    },
+
+    linkLicense: function() {
+        this.licenseSelector = new LicenseSelector({
+            model: this.model.get('license'),
+            el: document.getElementById("course-license-form")
+        });
     },
 
     render: function() {
@@ -81,6 +94,7 @@ var DetailsView = ValidatingView.extend({
 
         return this;
     },
+
     fieldToSelectorMap : {
         'start_date' : "course-start",
         'end_date' : 'course-end',
@@ -284,6 +298,11 @@ var DetailsView = ValidatingView.extend({
         // call validate ourselves.
         this.model.set(attr, value);
         this.model.isValid();
+    },
+
+    showSavedBar: function(title, message){
+        this.linkLicense();
+        ValidatingView.prototype.showSavedBar.call(this, title, message);
     },
 
     showNotificationBar: function() {

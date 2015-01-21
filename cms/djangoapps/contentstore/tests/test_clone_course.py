@@ -57,7 +57,7 @@ class CloneCourseTest(CourseTestCase):
             org="edx3", course="split3", run="rerun_test"
         )
         # Mark the action as initiated
-        fields = {'display_name': 'rerun'}
+        fields = {'display_name': 'rerun', 'license': None, 'licensable': False}
         CourseRerunState.objects.initiated(mongo_course1_id, split_course3_id, self.user, fields['display_name'])
         result = rerun_course.delay(unicode(mongo_course1_id), unicode(split_course3_id), self.user.id,
                                     json.dumps(fields, cls=EdxJSONEncoder))

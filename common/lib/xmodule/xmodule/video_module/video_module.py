@@ -230,6 +230,20 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
+        course = None
+        course_id = module_attr('course_id')
+
+        licensable = False
+        video_license = None
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            if course_id is not None and hasattr(self.runtime, 'modulestore'):
+                course = self.runtime.modulestore.get_course(course_id)
+            video_license = self.license
+            if video_license is not None:
+                licensable = True
+            elif course is not None:
+                licensable = course.licensable
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -261,6 +275,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'licensable': licensable,
+            'video_license': video_license,
         })
 
 
@@ -270,6 +286,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    course_id = module_attr('course_id')
 
     tabs = [
         {
@@ -375,6 +392,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        if not(hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False)):
+            editable_fields.pop('license', None)
+            editable_fields.pop('license_version', None)
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
         languages.insert(0, {'label': 'Table of Contents', 'code': 'table'})
@@ -439,6 +460,11 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and self.license:
+            attrs['license'] = self.license.kind
+            attrs['license_version'] = self.license.version
+
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
@@ -480,6 +506,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
+
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
@@ -513,6 +540,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'display_name': display_name,
             'video_url': video_url
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            metadata['license'] = metadata_fields['license']
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context
@@ -561,6 +591,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'from': 'start_time',
             'to': 'end_time'
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            field_data['license'] = xml.get('license')
+
         sources = xml.findall('source')
         if sources:
             field_data['html5_sources'] = [ele.get('src') for ele in sources]
