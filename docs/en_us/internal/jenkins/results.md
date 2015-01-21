@@ -2,15 +2,13 @@
 _build log_ will refer to something from the following urls:
 
 ```
-https://jenkins.testeng.edx.org/job/edx-all-tests-auto-pr/[NUMBER]/
-https://jenkins.testeng.edx.org/job/edx-all-tests-manual-pr/[NUMBER]/
-https://jenkins.testeng.edx.org/job/edx-all-tests-manual-commit/[NUMBER]/ 
+https://build.testeng.edx.org/job/edx-platform-all-tests/[NUMBER]/
 ```
 
 _build report_ will refer to something with the following urls:
 
 ```
-https://jenkins.testeng.edx.org/job/edx-platform-report/[NUMBER]/
+https://build.testeng.edx.org/job/edx-platform-report/[NUMBER]/
 ```
 
 Note that navigating to a build via github (clicking 'details') while it is in a pending or failed state
@@ -23,7 +21,7 @@ the 'Upstream Builds' section:
 
 ## Coverage Reports
 
-Note: Coverage reports are only generated when your tests pass.
+Note: Coverage reports are generated now even when tests fail. Be careful when inspecting these, since coverage on failure is not likely to match coverage reported when tests pass.
   
 * How to find:
 
@@ -57,7 +55,7 @@ Note: Coverage reports are only generated when your tests pass.
 ## Code Quality Reports  
 
 These are generated regardless of test restults.
-Note that a passing build does __not__ mean that you have not introduced new pep8/pylint violations.
+Note that the quality check will now fail if you have introduced new pep8 or pylint violations. It will also fail if the total number of violations is above a certain threshold.
 
 * How to find:
 

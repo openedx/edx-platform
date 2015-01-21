@@ -1,9 +1,10 @@
 # Troubleshooting failing jenkins builds
 
 ###### Check the logs to find out why your build failed.
-  * See [here](results.md#console-output-for-the-shard) for how to find the log.
+  * See [here](results.md#console-output-for-the-shard) for how to find the console log.
   * If the log shows the build erroring out before tests begin running, report this to the test 
     engineering team. Be sure to share the link to your build log.
+  * For Bok Choy tests, server logs are also available in the build artifacts under the "test_root/log" directory.
 
 ###### Run tests on devstack
   * If a build fails on jenkins, try to reporoduce and debug the failures in devstack.
@@ -28,5 +29,5 @@
     build will start when you do this on an open PR.)
 
 ###### Check if the failure is occurring on the master branch
-  * Tests run for the master branch are [here](https://jenkins.testeng.edx.org/job/edx-all-tests-auto-master/).
+  * Tests run for the master branch are [here](https://build.testeng.edx.org/job/edx-platform-all-tests-master/).
     You can inspect them the same way you would a PR build. 
