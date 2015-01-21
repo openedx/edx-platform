@@ -12,11 +12,7 @@ from .dashboard import DashboardPage
 class PaymentAndVerificationFlow(PageObject):
     """Interact with the split payment and verification flow.
 
-    These pages are currently hidden behind the feature flag
-    `SEPARATE_VERIFICATION_FROM_PAYMENT`, which is enabled in
-    the Bok Choy settings.
-
-    When enabled, the flow can be accessed at the following URLs:
+    The flow can be accessed at the following URLs:
         `/verify_student/start-flow/{course}/`
         `/verify_student/upgrade/{course}/`
         `/verify_student/verify-now/{course}/`
@@ -121,7 +117,7 @@ class PaymentAndVerificationFlow(PageObject):
         else:
             raise Exception("The dashboard can only be accessed from the enrollment confirmation.")
 
-        DashboardPage(self.browser, separate_verified=True).wait_for_page()
+        DashboardPage(self.browser).wait_for_page()
 
 
 class FakePaymentPage(PageObject):

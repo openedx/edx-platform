@@ -70,18 +70,6 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         else:
             self.assertEquals(response.status_code, 200)
 
-    def test_upgrade_copy(self):
-        # Create the course modes
-        for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
-
-        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
-        response = self.client.get(url, {"upgrade": True})
-
-        # Verify that the upgrade copy is displayed instead
-        # of the usual text.
-        self.assertContains(response, "Upgrade Your Enrollment")
-
     def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
@@ -137,10 +125,10 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
         response = self.client.get(choose_track_url)
 
-        # Expect that we're redirected immediately to the "show requirements" page
-        # (since the only available track is professional ed)
-        show_reqs_url = reverse('verify_student_show_requirements', args=[unicode(self.course.id)])
-        self.assertRedirects(response, show_reqs_url)
+        # Since the only available track is professional ed, expect that
+        # we're redirected immediately to the start of the payment flow.
+        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
+        self.assertRedirects(response, start_flow_url)
 
         # Now enroll in the course
         CourseEnrollmentFactory(
@@ -164,7 +152,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
     @ddt.data(
         ('honor', 'dashboard'),
-        ('verified', 'show_requirements'),
+        ('verified', 'start-flow'),
     )
     @ddt.unpack
     def test_choose_mode_redirect(self, course_mode, expected_redirect):
@@ -179,11 +167,11 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # Verify the redirect
         if expected_redirect == 'dashboard':
             redirect_url = reverse('dashboard')
-        elif expected_redirect == 'show_requirements':
+        elif expected_redirect == 'start-flow':
             redirect_url = reverse(
-                'verify_student_show_requirements',
+                'verify_student_start_flow',
                 kwargs={'course_id': unicode(self.course.id)}
-            ) + "?upgrade=False"
+            )
         else:
             self.fail("Must provide a valid redirect URL name")
 

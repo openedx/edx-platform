@@ -13,32 +13,15 @@ class DashboardPage(PageObject):
     Student dashboard, where the student can view
     courses she/he has registered for.
     """
-    def __init__(self, browser, separate_verified=False):
+    def __init__(self, browser):
         """Initialize the page.
 
         Arguments:
             browser (Browser): The browser instance.
-
-        Keyword Arguments:
-            separate_verified (Boolean): Whether to use the split payment and
-                verification flow.
         """
         super(DashboardPage, self).__init__(browser)
 
-        if separate_verified:
-            self._querystring = "?separate-verified=1"
-        else:
-            self._querystring = "?disable-separate-verified=1"
-
-    @property
-    def url(self):
-        """Return the URL corresponding to the dashboard."""
-        url = "{base}/dashboard{querystring}".format(
-            base=BASE_URL,
-            querystring=self._querystring
-        )
-
-        return url
+    url = "{base}/dashboard".format(base=BASE_URL)
 
     def is_browser_on_page(self):
         return self.q(css='section.my-courses').present

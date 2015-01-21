@@ -39,5 +39,5 @@ ${order.bill_to_country.upper()}
 % endif
 
 % for order_item in order_items:
-${order_item.additional_instruction_text(separate_verification=getattr(request, 'session', {}).get('separate-verified', False))}
+${order_item.additional_instruction_text()}
 % endfor

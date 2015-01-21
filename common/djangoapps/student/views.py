@@ -573,22 +573,11 @@ def dashboard(request):
     #
     # If a course is not included in this dictionary,
     # there is no verification messaging to display.
-    #
-    # TODO (ECOM-188): After the A/B test completes, we can remove the check
-    # for the GET param and the session var.
-    # The A/B test framework will set the GET param for users in the experimental
-    # group; we then set the session var so downstream views can check this.
-    if settings.FEATURES.get("SEPARATE_VERIFICATION_FROM_PAYMENT") and request.GET.get('separate-verified', False):
-        request.session['separate-verified'] = True
-        verify_status_by_course = check_verify_status_by_course(
-            user,
-            course_enrollment_pairs,
-            all_course_modes
-        )
-    else:
-        if request.GET.get('disable-separate-verified', False) and 'separate-verified' in request.session:
-            del request.session['separate-verified']
-        verify_status_by_course = {}
+    verify_status_by_course = check_verify_status_by_course(
+        user,
+        course_enrollment_pairs,
+        all_course_modes
+    )
 
     cert_statuses = {
         course.id: cert_info(request.user, course)

@@ -52,19 +52,6 @@ class ChooseModeView(View):
         """
         course_key = CourseKey.from_string(course_id)
 
-        upgrade = request.GET.get('upgrade', False)
-        request.session['attempting_upgrade'] = upgrade
-
-        # TODO (ECOM-188): Once the A/B test of decoupled/verified flows
-        # completes, we can remove this flag.
-        # The A/B test framework will reload the page with the ?separate-verified GET param
-        # set if the user is in the experimental condition.  We then store this flag
-        # in a session variable so downstream views can check it.
-        if request.GET.get('separate-verified', False):
-            request.session['separate-verified'] = True
-        elif request.GET.get('disable-separate-verified', False) and 'separate-verified' in request.session:
-            del request.session['separate-verified']
-
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
 
@@ -73,22 +60,12 @@ class ChooseModeView(View):
         # to the usual "choose your track" page.
         has_enrolled_professional = (enrollment_mode == "professional" and is_active)
         if "professional" in modes and not has_enrolled_professional:
-            # TODO (ECOM-188): Once the A/B test of separating verification / payment completes,
-            # we can remove the check for the session variable.
-            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
-                return redirect(
-                    reverse(
-                        'verify_student_start_flow',
-                        kwargs={'course_id': unicode(course_key)}
-                    )
+            return redirect(
+                reverse(
+                    'verify_student_start_flow',
+                    kwargs={'course_id': unicode(course_key)}
                 )
-            else:
-                return redirect(
-                    reverse(
-                        'verify_student_show_requirements',
-                        kwargs={'course_id': unicode(course_key)}
-                    )
-                )
+            )
 
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
@@ -113,7 +90,6 @@ class ChooseModeView(View):
             "course_num": course.display_number_with_default,
             "chosen_price": chosen_price,
             "error": error,
-            "upgrade": upgrade,
             "can_audit": "audit" in modes,
             "responsive": True
         }
@@ -156,8 +132,6 @@ class ChooseModeView(View):
             error_msg = _("Enrollment is closed")
             return self.get(request, course_id, error=error_msg)
 
-        upgrade = request.GET.get('upgrade', False)
-
         requested_mode = self._get_requested_mode(request.POST)
 
         allowed_modes = CourseMode.modes_for_course_dict(course_key)
@@ -192,22 +166,12 @@ class ChooseModeView(View):
             donation_for_course[unicode(course_key)] = amount_value
             request.session["donation_for_course"] = donation_for_course
 
-            # TODO (ECOM-188): Once the A/B test of separate verification flow completes,
-            # we can remove the check for the session variable.
-            if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
-                return redirect(
-                    reverse(
-                        'verify_student_start_flow',
-                        kwargs={'course_id': unicode(course_key)}
-                    )
+            return redirect(
+                reverse(
+                    'verify_student_start_flow',
+                    kwargs={'course_id': unicode(course_key)}
                 )
-            else:
-                return redirect(
-                    reverse(
-                        'verify_student_show_requirements',
-                        kwargs={'course_id': unicode(course_key)}
-                    ) + "?upgrade={}".format(upgrade)
-                )
+            )
 
     def _get_requested_mode(self, request_dict):
         """Get the user's requested mode

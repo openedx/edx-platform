@@ -311,9 +311,6 @@ FEATURES = {
     # Enable display of enrollment counts in instructor and legacy analytics dashboard
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 
-    # Separate the verification flow from the payment flow
-    'SEPARATE_VERIFICATION_FROM_PAYMENT': False,
-
     # Show the mobile app links in the footer
     'ENABLE_FOOTER_MOBILE_APP_LINKS': False,
 

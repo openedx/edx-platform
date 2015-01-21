@@ -253,12 +253,12 @@ class PayAndVerifyTest(UniqueCourseTest):
         """
         super(PayAndVerifyTest, self).setUp()
 
-        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id, separate_verified=True)
+        self.track_selection_page = TrackSelectionPage(self.browser, self.course_id)
         self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
         self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
         self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
         self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
-        self.dashboard_page = DashboardPage(self.browser, separate_verified=True)
+        self.dashboard_page = DashboardPage(self.browser)
 
         # Create a course
         CourseFixture(
@@ -278,7 +278,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Create a user and log them in
         AutoAuthPage(self.browser).visit()
 
-        # Navigate to the track selection page with the appropriate GET parameter in the URL
+        # Navigate to the track selection page
         self.track_selection_page.visit()
 
         # Enter the payment and verification flow by choosing to enroll as verified
@@ -304,7 +304,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Submit photos and proceed to the enrollment confirmation step
         self.payment_and_verification_flow.next_verification_step(self.immediate_verification_page)
 
-        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        # Navigate to the dashboard
         self.dashboard_page.visit()
 
         # Expect that we're enrolled as verified in the course
@@ -315,7 +315,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Create a user and log them in
         AutoAuthPage(self.browser).visit()
 
-        # Navigate to the track selection page with the appropriate GET parameter in the URL
+        # Navigate to the track selection page
         self.track_selection_page.visit()
 
         # Enter the payment and verification flow by choosing to enroll as verified
@@ -327,7 +327,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        # Navigate to the dashboard
         self.dashboard_page.visit()
 
         # Expect that we're enrolled as verified in the course
@@ -338,7 +338,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Create a user, log them in, and enroll them in the honor mode
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
-        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        # Navigate to the dashboard
         self.dashboard_page.visit()
 
         # Expect that we're enrolled as honor in the course
@@ -357,7 +357,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
-        # Navigate to the dashboard with the appropriate GET parameter in the URL
+        # Navigate to the dashboard
         self.dashboard_page.visit()
 
         # Expect that we're enrolled as verified in the course
