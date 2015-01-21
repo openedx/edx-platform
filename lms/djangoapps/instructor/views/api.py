@@ -23,6 +23,7 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.shortcuts import redirect
 from django.utils.html import strip_tags
 import string  # pylint: disable=deprecated-module
 import random
@@ -56,7 +57,8 @@ from shoppingcart.models import (
     RegistrationCodeRedemption,
     Invoice,
     CourseMode,
-    CourseRegistrationCodeInvoiceItem
+    CourseRegistrationCodeInvoiceItem,
+    InvoiceTransaction
 )
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
@@ -2132,3 +2134,24 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_sales_admin
+@require_POST
+def make_invoice_transaction(request, course_id):
+    """
+    Adding invoice transaction  (payment or refund) for the Invoice.
+    """
+    course_key = CourseKey.from_string(course_id)
+    invoice_id = request.POST.get('invoice_id')
+    amount_type = request.POST.get('amount_type')
+    amount = int(request.POST.get('amount'))
+    comments = request.POST.get('comments')
+    if invoice_id and amount and amount_type:
+        if amount_type == 'refund':
+            amount *=  -1
+        InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user)
+        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
+    return redirect(url)

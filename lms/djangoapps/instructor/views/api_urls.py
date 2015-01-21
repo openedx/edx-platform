@@ -87,4 +87,7 @@ urlpatterns = patterns('',  # nopep8
     # Cohort management
     url(r'add_users_to_cohorts$',
         'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
+
+    url(r'make_invoice_transaction',
+        'instructor.views.api.make_invoice_transaction', name="make_invoice_transaction"),
 )
