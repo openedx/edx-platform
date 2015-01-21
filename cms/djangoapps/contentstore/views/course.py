@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 import django.utils
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse, Http404
@@ -295,37 +295,28 @@ def course_rerun_handler(request, course_key_string):
 
 @login_required
 @ensure_csrf_cookie
-@require_http_methods(["GET"])
+@require_GET
 def course_index_handler(request, course_key_string):
     """
     The restful handler for course indexing.
     GET
-        json: return status of indexing task
+        html: return status of indexing task
     """
     # Only global staff (PMs) are able to rerun courses during the soft launch
     if not GlobalStaff().has_user(request.user):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        if request.method == 'GET':
-            error = reindex_course_and_check_access(course_key, request.user)
-            if error:
-                return HttpResponse(
-                    json.dumps({"status": error}),
-                    content_type='application/json'
-                )
+        error = reindex_course_and_check_access(course_key, request.user)
+        if error:
             return HttpResponse(
-                json.dumps({"status": 'success'}),
-                content_type='application/json'
+                error,
+                status=500
             )
-        elif request.method == 'POST':
-            raise NotImplementedError()
-        elif request.method == 'PUT':
-            raise NotImplementedError()
-        elif request.method == 'DELETE':
-            raise NotImplementedError()
-        else:
-            return HttpResponseBadRequest()
+        return HttpResponse(
+            {},
+            status=200
+        )
 
 
 def _course_outline_json(request, course_module):

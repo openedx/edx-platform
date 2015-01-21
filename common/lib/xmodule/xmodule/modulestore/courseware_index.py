@@ -16,11 +16,6 @@ DOCUMENT_TYPE = "courseware_content"
 log = logging.getLogger('edx.modulestore')
 
 
-class IndexWriteError(Exception):
-    """ Raised to indicate that indexing of particular key failed """
-    pass
-
-
 class ModuleStoreCoursewareIndexMixin(object):
     """
     Mixin class to enable indexing for courseware search from different modulestores
@@ -73,16 +68,15 @@ class ModuleStoreCoursewareIndexMixin(object):
                         item_index.update({
                             'id': unicode(item.scope_ids.usage_id),
                         })
-
                         if current_start_date:
                             item_index.update({
                                 "start_date": current_start_date
                             })
 
                         searcher.index(DOCUMENT_TYPE, item_index)
-                    except IndexWriteError:
+                    except Exception:
                         log.warning('Could not index item: %s', item_location)
-                        error.append('Could not index item: {}'.format(item_location))
+                        error.append('Could not index item: {} <br>'.format(item_location))
 
         def remove_index_item_location(item_location):
             """ remove this item from the search index """
@@ -103,10 +97,9 @@ class ModuleStoreCoursewareIndexMixin(object):
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
                 "Indexing error encountered, courseware index may be out of date %s - %s",
-                location.course_key,
+                course_key,
                 str(err)
             )
-
         return error
 
     def do_course_reindex(self, course_key):

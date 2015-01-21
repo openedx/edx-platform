@@ -9,10 +9,12 @@
  *  - adding units will automatically redirect to the unit page rather than showing them inline
  */
 define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_utils", "js/views/utils/xblock_utils",
-        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop"],
+        "js/models/xblock_outline_info", "js/views/modals/course_outline_modals", "js/utils/drag_and_drop",
+        "gettext", "js/views/feedback_alert"],
     function(
         $, _, XBlockOutlineView, ViewUtils, XBlockViewUtils,
-        XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger
+        XBlockOutlineInfo, CourseOutlineModalsFactory, ContentDragger,
+        gettext, AlertView
     ) {
 
         var CourseOutlineView = XBlockOutlineView.extend({
@@ -217,11 +219,9 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                 event.preventDefault();
                 var target = $(event.currentTarget);
                 target.css('cursor', 'wait');
-                this.startReIndex().done(function(data) {
-                    if(data.status !== 'success') {
-                        self.onIndexError(data.status);
-                    }
-                }).always(function() {target.css('cursor', 'pointer');});
+                this.startReIndex()
+                    .done(function() {self.onIndexSuccess();})
+                    .always(function() {target.css('cursor', 'pointer');});
             },
 
             startReIndex: function() {
@@ -232,8 +232,13 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
                     });
             },
 
-            onIndexError: function(errors) {
-                alert(errors.join('\n'));
+            onIndexSuccess: function() {
+                var msg = new AlertView.Announcement({
+                        title: gettext('Course Index'),
+                        message: gettext('Course has been successfully reindexed.'),
+                        intent: 'announcement'
+                    });
+                msg.show();
             }
         });
 
