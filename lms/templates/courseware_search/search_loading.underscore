@@ -1,1 +1,2 @@
-<%= gettext("Loading&hellip;") %>
+<i class="icon fa fa-spinner fa-spin"></i> <%= gettext("Loading") %>
+
