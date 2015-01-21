@@ -170,7 +170,7 @@ class TextbookList(List):
 class CourseFields(object):
     lti_passports = List(
         display_name=_("LTI Passports"),
-        help=_("Enter the passports for course LTI tools in the following format: \"id:client_key:client_secret\"."),
+        help=_('Enter the passports for course LTI tools in the following format: "id:client_key:client_secret".'),
         scope=Scope.settings
     )
     textbooks = TextbookList(help="List of pairs of (title, url) for textbooks used in this course",
@@ -185,7 +185,10 @@ class CourseFields(object):
     end = Date(help="Date that this class ends", scope=Scope.settings)
     advertised_start = String(
         display_name=_("Course Advertised Start Date"),
-        help=_("Enter the date you want to advertise as the course start date, if this date is different from the set start date. To advertise the set start date, enter null."),
+        help=_(
+            "Enter the date you want to advertise as the course start date, if this date is different from the set "
+            "start date. To advertise the set start date, enter null."
+        ),
         scope=Scope.settings
     )
     pre_requisite_courses = List(
@@ -245,7 +248,7 @@ class CourseFields(object):
     )
     course_edit_method = String(
         display_name=_("Course Editor"),
-        help=_("Enter the method by which this course is edited (\"XML\" or \"Studio\")."),
+        help=_('Enter the method by which this course is edited ("XML" or "Studio").'),
         default="Studio",
         scope=Scope.settings,
         deprecated=True  # Deprecated because someone would not edit this value within Studio.
@@ -264,18 +267,32 @@ class CourseFields(object):
     )
     discussion_blackouts = List(
         display_name=_("Discussion Blackout Dates"),
-        help=_("Enter pairs of dates between which students cannot post to discussion forums. Each pair should be formatted as [\"YYYY-MM-DD\", \"YYYY-MM-DD\"]. To specify times as well as dates, format each pair as [\"YYYY-MM-DDTHH:MM\", \"YYYY-MM-DDTHH:MM\"] (be sure to include the \"T\" between the date and time). An entry defining more than one blackout period might look like this: [[\"2014-09-15\", \"2014-09-21\"], [\"2014-10-01\", \"2014-10-08\"]]"),
+        help=_(
+            'Enter pairs of dates between which students cannot post to discussion forums. Each pair should be '
+            'formatted as ["YYYY-MM-DD", "YYYY-MM-DD"]. To specify times as well as dates, format each pair '
+            'as ["YYYY-MM-DDTHH:MM", "YYYY-MM-DDTHH:MM"] (be sure to include the "T" between the date and '
+            'time). An entry defining more than one blackout period might look like this: '
+            '[["2014-09-15", "2014-09-21"], ["2014-10-01", "2014-10-08"]]'
+        ),
         scope=Scope.settings
     )
     discussion_topics = Dict(
         display_name=_("Discussion Topic Mapping"),
-        help=_("Enter discussion categories in the following format: \"CategoryName\": {\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-UniversityX-MUS101-course-2014_T1\"}. The \"id\" value for each category must be unique."),
+        help=_(
+            'Enter discussion categories in the following format: "CategoryName": '
+            '{"id": "i4x-InstitutionName-CourseNumber-course-CourseRun"}. For example, one discussion '
+            'category may be "Lydian Mode": {"id": "i4x-UniversityX-MUS101-course-2014_T1"}. The "id" '
+            'value for each category must be unique.'
+        ),
         scope=Scope.settings
     )
     discussion_sort_alpha = Boolean(
         display_name=_("Discussion Sorting Alphabetical"),
         scope=Scope.settings, default=False,
-        help=_("Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. If false, they are sorted chronologically.")
+        help=_(
+            "Enter true or false. If true, discussion categories and subcategories are sorted alphabetically. "
+            "If false, they are sorted chronologically."
+        )
     )
     announcement = Date(
         display_name=_("Course Announcement Date"),
@@ -284,12 +301,18 @@ class CourseFields(object):
     )
     cohort_config = Dict(
         display_name=_("Cohort Configuration"),
-        help=_("Enter policy keys and values to enable the cohort feature, define automated student assignment to groups, or identify any course-wide discussion topics as private to cohort members."),
+        help=_(
+            "Enter policy keys and values to enable the cohort feature, define automated student assignment to "
+            "groups, or identify any course-wide discussion topics as private to cohort members."
+        ),
         scope=Scope.settings
     )
     is_new = Boolean(
         display_name=_("Course Is New"),
-        help=_("Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! badge temporarily appears next to the course image."),
+        help=_(
+            "Enter true or false. If true, the course appears in the list of new courses on edx.org, and a New! "
+            "badge temporarily appears next to the course image."
+        ),
         scope=Scope.settings
     )
     mobile_available = Boolean(
@@ -321,12 +344,18 @@ class CourseFields(object):
     )
     html_textbooks = List(
         display_name=_("HTML Textbooks"),
-        help=_("For HTML textbooks that appear as separate tabs in the courseware, enter the name of the tab (usually the name of the book) as well as the URLs and titles of all the chapters in the book."),
+        help=_(
+            "For HTML textbooks that appear as separate tabs in the courseware, enter the name of the tab (usually "
+            "the name of the book) as well as the URLs and titles of all the chapters in the book."
+        ),
         scope=Scope.settings
     )
     remote_gradebook = Dict(
         display_name=_("Remote Gradebook"),
-        help=_("Enter the remote gradebook mapping. Only use this setting when REMOTE_GRADEBOOK_URL has been specified."),
+        help=_(
+            "Enter the remote gradebook mapping. Only use this setting when "
+            "REMOTE_GRADEBOOK_URL has been specified."
+        ),
         scope=Scope.settings
     )
     allow_anonymous = Boolean(
@@ -336,7 +365,10 @@ class CourseFields(object):
     )
     allow_anonymous_to_peers = Boolean(
         display_name=_("Allow Anonymous Discussion Posts to Peers"),
-        help=_("Enter true or false. If true, students can create discussion posts that are anonymous to other students. This setting does not make posts anonymous to course staff."),
+        help=_(
+            "Enter true or false. If true, students can create discussion posts that are anonymous to other "
+            "students. This setting does not make posts anonymous to course staff."
+        ),
         scope=Scope.settings, default=False
     )
     advanced_modules = List(
@@ -353,7 +385,9 @@ class CourseFields(object):
                 "items": [
                     {
                         "short_description": _("Add Course Team Members"),
-                        "long_description": _("Grant your collaborators permission to edit your course so you can work together."),
+                        "long_description": _(
+                            "Grant your collaborators permission to edit your course so you can work together."
+                        ),
                         "is_checked": False,
                         "action_url": "ManageUsers",
                         "action_text": _("Edit Course Team"),
@@ -361,7 +395,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Set Important Dates for Your Course"),
-                        "long_description": _("Establish your course's student enrollment and launch dates on the Schedule and Details page."),
+                        "long_description": _(
+                            "Establish your course's student enrollment and launch dates on the Schedule and Details "
+                            "page."
+                        ),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
                         "action_text": _("Edit Course Details &amp; Schedule"),
@@ -369,7 +406,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Draft Your Course's Grading Policy"),
-                        "long_description": _("Set up your assignment types and grading policy even if you haven't created all your assignments."),
+                        "long_description": _(
+                            "Set up your assignment types and grading policy even if you haven't created all your "
+                            "assignments."
+                        ),
                         "is_checked": False,
                         "action_url": "SettingsGrading",
                         "action_text": _("Edit Grading Settings"),
@@ -377,7 +417,9 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Explore the Other Studio Checklists"),
-                        "long_description": _("Discover other available course authoring tools, and find help when you need it."),
+                        "long_description": _(
+                            "Discover other available course authoring tools, and find help when you need it."
+                        ),
                         "is_checked": False,
                         "action_url": "",
                         "action_text": "",
@@ -398,7 +440,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Set Section Release Dates"),
-                        "long_description": _("Specify the release dates for each Section in your course. Sections become visible to students on their release dates."),
+                        "long_description": _(
+                            "Specify the release dates for each Section in your course. Sections become visible to "
+                            "students on their release dates."
+                        ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
                         "action_text": _("Edit Course Outline"),
@@ -406,7 +451,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Designate a Subsection as Graded"),
-                        "long_description": _("Set a Subsection to be graded as a specific assignment type. Assignments within graded Subsections count toward a student's final grade."),
+                        "long_description": _(
+                            "Set a Subsection to be graded as a specific assignment type. Assignments within graded "
+                            "Subsections count toward a student's final grade."
+                        ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
                         "action_text": _("Edit Course Outline"),
@@ -430,7 +478,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Deleting Course Content"),
-                        "long_description": _("Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is no Undo function."),
+                        "long_description": _(
+                            "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is "
+                            "no Undo function."
+                        ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
                         "action_text": _("Edit Course Outline"),
@@ -438,7 +489,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Add an Instructor-Only Section to Your Outline"),
-                        "long_description": _("Some course authors find using a section for unsorted, in-progress work useful. To do this, create a section and set the release date to the distant future."),
+                        "long_description": _(
+                            "Some course authors find using a section for unsorted, in-progress work useful. To do "
+                            "this, create a section and set the release date to the distant future."
+                        ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
                         "action_text": _("Edit Course Outline"),
@@ -451,7 +505,10 @@ class CourseFields(object):
                 "items": [
                     {
                         "short_description": _("Explore the Studio Help Forum"),
-                        "long_description": _("Access the Studio Help forum from the menu that appears when you click your user name in the top right corner of Studio."),
+                        "long_description": _(
+                            "Access the Studio Help forum from the menu that appears when you click your user name "
+                            "in the top right corner of Studio."
+                        ),
                         "is_checked": False,
                         "action_url": "http://help.edge.edx.org/",
                         "action_text": _("Visit Studio Help"),
@@ -480,7 +537,10 @@ class CourseFields(object):
                 "items": [
                     {
                         "short_description": _("Draft a Course Description"),
-                        "long_description": _("Courses on edX have an About page that includes a course video, description, and more. Draft the text students will read before deciding to enroll in your course."),
+                        "long_description": _(
+                            "Courses on edX have an About page that includes a course video, description, and more. "
+                            "Draft the text students will read before deciding to enroll in your course."
+                        ),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
                         "action_text": _("Edit Course Schedule &amp; Details"),
@@ -488,7 +548,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Add Staff Bios"),
-                        "long_description": _("Showing prospective students who their instructor will be is helpful. Include staff bios on the course About page."),
+                        "long_description": _(
+                            "Showing prospective students who their instructor will be is helpful. "
+                            "Include staff bios on the course About page."
+                        ),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
                         "action_text": _("Edit Course Schedule &amp; Details"),
@@ -504,7 +567,10 @@ class CourseFields(object):
                     },
                     {
                         "short_description": _("Add Course Prerequisites"),
-                        "long_description": _("Let students know what knowledge and/or skills they should have before they enroll in your course."),
+                        "long_description": _(
+                            "Let students know what knowledge and/or skills they should have before "
+                            "they enroll in your course."
+                        ),
                         "is_checked": False,
                         "action_url": "SettingsDetails",
                         "action_text": _("Edit Course Schedule &amp; Details"),
@@ -516,15 +582,24 @@ class CourseFields(object):
     )
     info_sidebar_name = String(
         display_name=_("Course Info Sidebar Name"),
-        help=_("Enter the heading that you want students to see above your course handouts on the Course Info page. Your course handouts appear in the right panel of the page."),
+        help=_(
+            "Enter the heading that you want students to see above your course handouts on the Course Info page. "
+            "Your course handouts appear in the right panel of the page."
+        ),
         scope=Scope.settings, default='Course Handouts')
     show_timezone = Boolean(
-        help="True if timezones should be shown on dates in the courseware. Deprecated in favor of due_date_display_format.",
+        help=_(
+            "True if timezones should be shown on dates in the courseware. "
+            "Deprecated in favor of due_date_display_format."
+        ),
         scope=Scope.settings, default=True
     )
     due_date_display_format = String(
         display_name=_("Due Date Display Format"),
-        help=_("Enter the format due dates are displayed in. Due dates must be in MM-DD-YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."),
+        help=_(
+            "Enter the format due dates are displayed in. Due dates must be in MM-DD-YYYY, DD-MM-YYYY, YYYY-MM-DD, "
+            "or YYYY-DD-MM format."
+        ),
         scope=Scope.settings, default=None
     )
     enrollment_domain = String(
@@ -534,7 +609,10 @@ class CourseFields(object):
     )
     certificates_show_before_end = Boolean(
         display_name=_("Certificates Downloadable Before End"),
-        help=_("Enter true or false. If true, students can download certificates before the course ends, if they've met certificate requirements."),
+        help=_(
+            "Enter true or false. If true, students can download certificates before the course ends, if they've "
+            "met certificate requirements."
+        ),
         scope=Scope.settings,
         default=False,
         deprecated=True
@@ -542,13 +620,21 @@ class CourseFields(object):
 
     certificates_display_behavior = String(
         display_name=_("Certificates Display Behavior"),
-        help=_("Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' is the default behavior, where certificates will only appear after a course has ended. 'early_with_info' will display all certificate information before a course has ended. 'early_no_info' will hide all certificate information unless a student has earned a certificate."),
+        help=_(
+            "Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' is the default behavior, "
+            "where certificates will only appear after a course has ended. 'early_with_info' will display all "
+            "certificate information before a course has ended. 'early_no_info' will hide all certificate "
+            "information unless a student has earned a certificate."
+        ),
         scope=Scope.settings,
         default="end"
     )
     course_image = String(
         display_name=_("Course About Page Image"),
-        help=_("Edit the name of the course image file. You must upload this file on the Files & Uploads page. You can also set the course image on the Settings & Details page."),
+        help=_(
+            "Edit the name of the course image file. You must upload this file on the Files & Uploads page. "
+            "You can also set the course image on the Settings & Details page."
+        ),
         scope=Scope.settings,
         # Ensure that courses imported from XML keep their image
         default="images_course_image.jpg"
@@ -556,13 +642,19 @@ class CourseFields(object):
 
     ## Course level Certificate Name overrides.
     cert_name_short = String(
-        help=_("Between quotation marks, enter the short name of the course to use on the certificate that students receive when they complete the course."),
+        help=_(
+            "Between quotation marks, enter the short name of the course to use on the certificate that "
+            "students receive when they complete the course."
+        ),
         display_name=_("Certificate Name (Short)"),
         scope=Scope.settings,
         default=""
     )
     cert_name_long = String(
-        help=_("Between quotation marks, enter the long name of the course to use on the certificate that students receive when they complete the course."),
+        help=_(
+            "Between quotation marks, enter the long name of the course to use on the certificate that students "
+            "receive when they complete the course."
+        ),
         display_name=_("Certificate Name (Long)"),
         scope=Scope.settings,
         default=""
@@ -608,31 +700,49 @@ class CourseFields(object):
 
     display_organization = String(
         display_name=_("Course Organization Display String"),
-        help=_("Enter the course organization that you want to appear in the courseware. This setting overrides the organization that you entered when you created the course. To use the organization that you entered when you created the course, enter null."),
+        help=_(
+            "Enter the course organization that you want to appear in the courseware. This setting overrides the "
+            "organization that you entered when you created the course. To use the organization that you entered "
+            "when you created the course, enter null."
+        ),
         scope=Scope.settings
     )
 
     display_coursenumber = String(
         display_name=_("Course Number Display String"),
-        help=_("Enter the course number that you want to appear in the courseware. This setting overrides the course number that you entered when you created the course. To use the course number that you entered when you created the course, enter null."),
+        help=_(
+            "Enter the course number that you want to appear in the courseware. This setting overrides the course "
+            "number that you entered when you created the course. To use the course number that you entered when "
+            "you created the course, enter null."
+        ),
         scope=Scope.settings
     )
 
     max_student_enrollments_allowed = Integer(
         display_name=_("Course Maximum Student Enrollment"),
-        help=_("Enter the maximum number of students that can enroll in the course. To allow an unlimited number of students, enter null."),
+        help=_(
+            "Enter the maximum number of students that can enroll in the course. To allow an unlimited number of "
+            "students, enter null."
+        ),
         scope=Scope.settings
     )
 
-    allow_public_wiki_access = Boolean(display_name=_("Allow Public Wiki Access"),
-                                       help=_("Enter true or false. If true, edX users can view the course wiki even if they're not enrolled in the course."),
-                                       default=False,
-                                       scope=Scope.settings)
+    allow_public_wiki_access = Boolean(
+        display_name=_("Allow Public Wiki Access"),
+        help=_(
+            "Enter true or false. If true, edX users can view the course wiki even "
+            "if they're not enrolled in the course."
+        ),
+        default=False,
+        scope=Scope.settings
+    )
 
-    invitation_only = Boolean(display_name=_("Invitation Only"),
-                              help="Whether to restrict enrollment to invitation by the course staff.",
-                              default=False,
-                              scope=Scope.settings)
+    invitation_only = Boolean(
+        display_name=_("Invitation Only"),
+        help=_("Whether to restrict enrollment to invitation by the course staff."),
+        default=False,
+        scope=Scope.settings
+    )
 
     course_survey_name = String(
         display_name=_("Pre-Course Survey Name"),
@@ -644,7 +754,10 @@ class CourseFields(object):
 
     course_survey_required = Boolean(
         display_name=_("Pre-Course Survey Required"),
-        help=_("Specify whether students must complete a survey before they can view your course content. If you set this value to true, you must add a name for the survey to the Course Survey Name setting above."),
+        help=_(
+            "Specify whether students must complete a survey before they can view your course content. If you "
+            "set this value to true, you must add a name for the survey to the Course Survey Name setting above."
+        ),
         default=False,
         scope=Scope.settings,
         deprecated=True
@@ -652,7 +765,11 @@ class CourseFields(object):
 
     catalog_visibility = String(
         display_name=_("Course Visibility In Catalog"),
-        help=_("Defines the access permissions for showing the course in the course catalog. This can be set to one of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access to about page), 'none' (do not show in catalog and do not allow access to an about page)."),
+        help=_(
+            "Defines the access permissions for showing the course in the course catalog. This can be set to one "
+            "of three values: 'both' (show in catalog and allow access to about page), 'about' (only allow access "
+            "to about page), 'none' (do not show in catalog and do not allow access to an about page)."
+        ),
         default=CATALOG_VISIBILITY_CATALOG_AND_ABOUT,
         scope=Scope.settings,
         values=[
@@ -664,8 +781,9 @@ class CourseFields(object):
     entrance_exam_enabled = Boolean(
         display_name=_("Entrance Exam Enabled"),
         help=_(
-            "Specify whether students must complete an entrance exam before they can view your course content." +
-            "Note, you must enable Entrance Exams for this course setting to take effect."),
+            "Specify whether students must complete an entrance exam before they can view your course content."
+            "Note, you must enable Entrance Exams for this course setting to take effect."
+        ),
         default=False,
         scope=Scope.settings,
     )
@@ -673,8 +791,9 @@ class CourseFields(object):
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
-            "Specify a minimum percentage score for an entrance exam before students can view your course content." +
-            "Note, you must enable Entrance Exams for this course setting to take effect."),
+            "Specify a minimum percentage score for an entrance exam before students can view your course content."
+            "Note, you must enable Entrance Exams for this course setting to take effect."
+        ),
         default=65,
         scope=Scope.settings,
     )
