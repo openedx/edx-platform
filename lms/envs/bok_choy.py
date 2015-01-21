@@ -117,7 +117,12 @@ PASSWORD_COMPLEXITY = {}
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
-MOCK_SEARCH_BACKING_FILE = (TEST_ROOT / "index_file.dat").abspath()
+# Path at which to store the mock index - can remove disable=invalid-name
+# once global settings are set to disable this error and
+# disable=no-value-for-parameter follow the pattern above
+MOCK_SEARCH_BACKING_FILE = (  # pylint: disable=invalid-name
+    TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
+).abspath()
 
 #####################################################################
 # Lastly, see if the developer has any local overrides.
