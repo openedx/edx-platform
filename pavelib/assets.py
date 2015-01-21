@@ -165,7 +165,7 @@ def collect_assets(systems, settings):
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        sh(django_cmd(sys, settings, "collectstatic --clear --noinput > /dev/null"))
+        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
 
 
 @task

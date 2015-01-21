@@ -61,7 +61,7 @@
          * As of 2.1.10, mainConfigFile can be an array of values, with the last
          * value's config take precedence over previous values in the array.
          */
-        mainConfigFile: 'require-config-studio.js',
+        mainConfigFile: 'require-config.js',
         /**
          * Set paths for modules. If relative paths, set relative to baseUrl above.
          * If a special value of "empty:" is used for the path value, then that
