@@ -819,7 +819,7 @@ class PreRequisiteCourseTest(UniqueCourseTest):
         """
         set pre-requisite course
         """
-        select_option_by_value(self.settings_page.pre_requisite_course, self.pre_requisite_course_id)
+        select_option_by_value(self.settings_page.pre_requisite_course_options, self.pre_requisite_course_id)
         self.settings_page.save_changes()
 
 
@@ -954,7 +954,7 @@ class EntranceExamTest(UniqueCourseTest):
         self.settings_page.visit()
         self.settings_page.wait_for_page()
         self.assertTrue(self.settings_page.is_browser_on_page())
-        self.settings_page.entrance_exam_field[0].click()
+        self.settings_page.entrance_exam_field.click()
         self.settings_page.save_changes()
 
         # Logout and login as a student.

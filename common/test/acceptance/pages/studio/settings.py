@@ -17,25 +17,45 @@ class SettingsPage(CoursePage):
     def is_browser_on_page(self):
         return self.q(css='body.view-settings').present
 
+    def get_elements(self, css_selector):
+        self.wait_for_element_presence(
+            css_selector,
+            'Elements matching "{}" selector are present'.format(css_selector)
+        )
+        results = self.q(css=css_selector)
+        return results
+
+    def get_element(self, css_selector):
+        results = self.get_elements(css_selector=css_selector)
+        return results[0] if results else None
+
     @property
-    def pre_requisite_course(self):
+    def pre_requisite_course_options(self):
         """
-        Returns the pre-requisite course drop down field.
+        Returns the pre-requisite course drop down field options.
         """
-        return self.q(css='#pre-requisite-course')
+        return self.get_elements('#pre-requisite-course')
 
     @property
     def entrance_exam_field(self):
         """
         Returns the enable entrance exam checkbox.
         """
-        return self.q(css='#entrance-exam-enabled').execute()
+        return self.get_element('#entrance-exam-enabled')
+
+    @property
+    def alert_confirmation_title(self):
+        """
+        Returns the alert confirmation element, which contains text
+        such as 'Your changes have been saved.'
+        """
+        return self.get_element('#alert-confirmation-title')
 
     def require_entrance_exam(self, required=True):
         """
         Set the entrance exam requirement via the checkbox.
         """
-        checkbox = self.entrance_exam_field[0]
+        checkbox = self.entrance_exam_field
         selected = checkbox.is_selected()
         if required and not selected:
             checkbox.click()
@@ -47,7 +67,7 @@ class SettingsPage(CoursePage):
             checkbox.click()
             self.wait_for_element_invisibility(
                 '#entrance-exam-minimum-score-pct',
-                'Entrance exam minimum score percent is visible'
+                'Entrance exam minimum score percent is invisible'
             )
 
     def save_changes(self, wait_for_confirmation=True):
@@ -58,11 +78,16 @@ class SettingsPage(CoursePage):
         if wait_for_confirmation:
             EmptyPromise(
                 lambda: self.q(css='#alert-confirmation-title').present,
-                'Waiting for save confirmation...'
+                'Save is confirmed'
             ).fulfill()
 
-    def refresh_page(self):
+    def refresh_page(self, wait_for_confirmation=True):
         """
         Reload the page.
         """
         self.browser.refresh()
+        if wait_for_confirmation:
+            EmptyPromise(
+                lambda: self.q(css='body.view-settings').present,
+                'Page is refreshed'
+            ).fulfill()
