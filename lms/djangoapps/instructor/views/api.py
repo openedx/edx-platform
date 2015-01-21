@@ -1210,7 +1210,7 @@ def generate_registration_codes(request, course_id):
         customer_reference_number=customer_reference_number
     )
 
-    course_reg_code_invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+    invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
         invoice=sale_invoice,
         qty=course_code_number,
         unit_price=sale_price,
@@ -1237,7 +1237,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, sale_invoice, order=None, invoice_item=course_reg_code_invoice_item
+            request.user, course_id, course_mode.slug, sale_invoice, order=None, invoice_item=invoice_item
         )
         registration_codes.append(generated_registration_code)
 

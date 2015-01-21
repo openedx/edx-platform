@@ -11,7 +11,7 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
-    Invoice, Coupon, CourseRegCodeItem, CouponRedemption
+    Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
 )
 from course_modes.models import CourseMode
 from instructor_analytics.basic import (
@@ -145,12 +145,18 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         sale_invoice = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
             company_contact_email='test@company.com', recipient_name='Testw_1', recipient_email='test2@test.com',
-            customer_reference_number='2Fwe23S', internal_reference="ABC", course_id=self.course.id
+            customer_reference_number='2Fwe23S', internal_reference="ABC"
+        )
+        invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=sale_invoice,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
         )
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice, mode_slug='honor'
+                created_by=self.instructor, invoice_item=invoice_item, mode_slug='honor'
             )
             course_code.save()
 
