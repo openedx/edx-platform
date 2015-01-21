@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 
 %>
 
+
 <%block name="custom_content">
 
 <div class="container">
@@ -108,7 +109,9 @@ from django.utils.translation import ugettext as _
                     </p>
               </div>
                <div name="payment" class="hidden">
-                ${form_html}
+                <div id="processor_form">
+                  ${form_html}
+                </div>
                 <p>
                     ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
                     ${_('will be enrolled in this course.')}
@@ -141,13 +144,31 @@ from django.utils.translation import ugettext as _
         <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
       </div>
     % endif
-
 </div>
+<form id='refresh_tracker'>
+   <input id="reloadValue" type="hidden" name="reloadValue" value="" />
+</form>
 </%block>
 <script>
     $(function() {
         var isSpinnerBtnEnabled = true;
         var prevQty = 0;
+
+        // This snipnet of code is to detect when and
+        // end-user has clicked the back button to the
+        // page. We want to force refresh to make
+        // sure there is no cached data happening
+        var d = new Date();
+        d = d.getTime();
+        if (jQuery('#reloadValue').val().length == 0)
+        {
+          jQuery('#reloadValue').val(d);
+        } else
+        {
+          jQuery('body').hide();
+          jQuery('#reloadValue').val('');
+          location.reload(true);
+        }
 
       $('a.btn-remove').click(function(event) {
       event.preventDefault();
@@ -317,6 +338,7 @@ from django.utils.translation import ugettext as _
                   var prevTotal = data['total_cost'];
                   $('html').css({'cursor':'default'});
                   $(".button").css({'cursor':'default'});
+                  $("#processor_form").html(data['form_html']);
                   if(typeChanged){
                       var submit_button = $('.col-2.relative').find("input[type='submit']")
                       submit_button.removeAttr('disabled');
@@ -410,4 +432,5 @@ from django.utils.translation import ugettext as _
 
 	});
 });
+
 </script>
