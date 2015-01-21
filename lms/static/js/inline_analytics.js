@@ -2,10 +2,12 @@ window.InlineAnalytics = (function() {
 
     'use strict';
 
-    function processResponse(response,
+    function processResponse(
+        response,
         partsToGet,
         questionTypesByPart,
-        correctResponses) {
+        correctResponses,
+        choiceNameListByPart) {
 
         var dataByPart = response.data_by_part;
         var countByPart = response.count_by_part;
@@ -41,15 +43,18 @@ window.InlineAnalytics = (function() {
             }
 
             if (questionTypesByPart[partId] === 'radio') {
-                renderRadioAnalytics(dataByPart[partId],
+                renderRadioAnalytics(
+                    dataByPart[partId],
                     partId,
                     totalAttemptCount,
                     totalCorrectCount,
                     totalIncorrectCount,
                     correctResponses[partId],
-                    lastUpdateDate);
+                    lastUpdateDate,
+                    choiceNameListByPart[partId]);
             } else if (questionTypesByPart[partId] === 'checkbox') {
-                renderCheckboxAnalytics(dataByPart[partId],
+                renderCheckboxAnalytics(
+                    dataByPart[partId],
                     partId,
                     totalAttemptCount,
                     totalCorrectCount,
@@ -58,11 +63,13 @@ window.InlineAnalytics = (function() {
                     lastUpdateDate);
             } else {
                 // Just set the text on the div
-                setCountAndDate(partId,
+                setCountAndDate(
+                    partId,
                     totalAttemptCount,
                     lastUpdateDate);
 
-                setAggregateCounts(partId,
+                setAggregateCounts(
+                    partId,
                     totalAttemptCount,
                     totalCorrectCount,
                     totalIncorrectCount);
@@ -71,13 +78,15 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function renderRadioAnalytics(result,
+    function renderRadioAnalytics(
+        result,
         partId,
         totalAttemptCount,
         totalCorrectCount,
         totalIncorrectCount,
         correctResponse,
-        lastUpdateDate) {
+        lastUpdateDate,
+        choiceNameString) {
 
         var valueId;
         var currentIndex;
@@ -89,71 +98,78 @@ window.InlineAnalytics = (function() {
         var answerClass;
         var index;
         var tr;
+        var tdChoice;
+        var tdDot;
+        var tdCount;
+        var tdPercent;
         var trs = [];
+        var valueIdArray;
+        var arrayLength;
         var lastRow = $('#' + partId + '_table tr:last');
 
         // Build the array of choice texts
         var choiceText = getChoiceTexts(partId);
+        
+        // Generate choice name array
+        var choiceNameArray = JSON.parse(choiceNameString);
 
         if (result) {
-            // Loop through results and construct row array
-            // Rows returned from the analytics API are in "option" order so we use this
-            // to determine if any rows are "missing" from the data.
-            var arrayLength = result.length;
+            // Build the array of value_id's
+            valueIdArray = constructValueIdArray(result);
+        	
+            // Loop through choiceNameArray and construct row array.
+            // We can determine if any rows are "missing" from the api data
+            // since the choiceNameArray is a list of all possible rows.
+            arrayLength = choiceNameArray.length;
             for (index = 0; index < arrayLength; index++) {
-
-                // valueId: option for this row in the api result
-                valueId = result[index]['value_id'];
-                // currentIndex: number of rows already added to graphic
-                currentIndex = trs.length;
-                // valueIndex: index of the option for this row in the api result
-                valueIndex = valueId.replace('choice_', '');
-
-                // If the current row we are looking to add is less than the row indicated
-                // by the option for this index then add rows for those that are missing
-                if (currentIndex < valueIndex) {
-                    insertMissingRows(partId,
-                        currentIndex,
-                        valueIndex,
-                        correctResponse,
-                        choiceText,
-                        trs);
-                }
-
-                correct = result[index]['correct'];
-                count = result[index]['count'];
-                percent = Math.round(count * 1000 / (totalAttemptCount * 10));
-
-                if (correct) {
-                    answerClass = 'inline-analytics-correct';
+            
+                // If value is not in array then add row
+                if (valueIdArray.indexOf(choiceNameArray[index]) === -1) {
+                	insertMissingRows(partId,
+                	    index,
+                	    index + 1,
+                	    correctResponse,
+                	    choiceText,
+                	    choiceNameArray,
+                	    trs);
                 } else {
-                    answerClass = 'inline-analytics-incorrect';
+                    correct = result[index]['correct'];
+                    count = result[index]['count'];
+                    percent = Math.round(count * 1000 / (totalAttemptCount * 10));
+
+                    if (correct) {
+                        answerClass = 'inline-analytics-correct';
+                    } else {
+                        answerClass = 'inline-analytics-incorrect';
+                    }
+                    
+                    tr = $('<tr>');
+                    tdChoice = $('<td class="answer_box">');
+                    tdChoice.attr('title', choiceText[index]);
+                    tdChoice.text(parseInt(index, 10) + 1);
+                    tdDot = $('<td class="answer_box">');
+                    tdDot.addClass(answerClass);
+                    tdDot.append($('<span class="dot">'));
+                    tdCount = $('<td class="answer_box">');
+                    tdCount.text(count);
+                    tdPercent = $('<td class="answer_box">');
+                    tdPercent.text(percent + '%');
+                    
+                    tr.append(tdChoice);
+                    tr.append(tdDot);
+                    tr.append(tdCount);
+                    tr.append(tdPercent);
+                    trs.push(tr[0]);
                 }
-                tr = $('<tr><td class="answer_box" title="' + choiceText[valueIndex] + '">' +
-                    (parseInt(valueIndex, 10) + 1) + '</td><td class="answer_box ' +
-                    answerClass + '"><span class="dot"></span></td><td class="answer_box">' +
-                    count + '</td><td class="answer_box">' + percent + '%</td></tr>');
-                trs.push(tr[0]);
             }
-
-            // Generate rows for missing answers at the end of results
-            lastIndex = parseInt(result[result.length - 1]['value_id'].replace('choice_', ''), 10);
-            if (lastIndex < choiceText.length - 1) {
-                insertMissingRows(partId,
-                    lastIndex + 1,
-                    choiceText.length,
-                    correctResponse,
-                    choiceText,
-                    trs);
-            }
-
         } else {
             // There were no results
             trs = insertMissingRows(partId,
                 0,
-                choiceText.length,
+                choiceNameArray.length,
                 correctResponse,
                 choiceText,
+                choiceNameArray,
                 trs);
         }
 
@@ -167,28 +183,48 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function insertMissingRows(partId,
+    function insertMissingRows(
+        partId,
         currentIndex,
         finalIndex,
         correctResponse,
         choiceText,
+        choiceNameArray,
         trs) {
 
         var answerClass;
         var tr;
+        var tdChoice;
+        var tdDot;
+        var tdCount;
+        var tdPercent;
+        
         correctResponse = correctResponse.substring(2, correctResponse.length - 2);
 
         // Insert rows between currentIndex and finalIndex
         while (currentIndex < finalIndex) {
-            if ('choice_' + currentIndex === correctResponse) {
+            if (choiceNameArray[currentIndex] === correctResponse) {
                 answerClass = 'inline-analytics-correct';
             } else {
                 answerClass = 'inline-analytics-incorrect';
             }
-            tr = $('<tr><td class="answer_box" title="' + choiceText[currentIndex] + '">' + (currentIndex + 1) +
-                '</td><td class="answer_box ' + answerClass +
-                '"><span class="dot"></span> \
-                </td><td class="answer_box">0</td><td class="answer_box">0%</td></tr>');
+            
+            tr = $('<tr>');
+            tdChoice = $('<td class="answer_box">');
+            tdChoice.attr('title', choiceText[currentIndex]);
+            tdChoice.text(parseInt(currentIndex, 10) + 1);
+            tdDot = $('<td class="answer_box">');
+            tdDot.addClass(answerClass);
+            tdDot.append($('<span class="dot">'));
+            tdCount = $('<td class="answer_box">');
+            tdCount.text(0);
+            tdPercent = $('<td class="answer_box">');
+            tdPercent.text('0%');
+            
+            tr.append(tdChoice);
+            tr.append(tdDot);
+            tr.append(tdCount);
+            tr.append(tdPercent);
             trs.push(tr[0]);
             currentIndex += 1;
         }
@@ -196,7 +232,8 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function renderCheckboxAnalytics(result,
+    function renderCheckboxAnalytics(
+        result,
         partId,
         totalAttemptCount,
         totalCorrectCount,
@@ -314,7 +351,8 @@ window.InlineAnalytics = (function() {
         $('#' + partId + '_table #last_attempt').after(countRow);
 
         // Set student count and last_update_date
-        setCountAndDate(partId,
+        setCountAndDate(
+            partId,
             totalAttemptCount,
             lastUpdateDate);
     }
@@ -332,7 +370,8 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function setCountAndDate(partId,
+    function setCountAndDate(
+        partId,
         totalAttemptCount,
         lastUpdateDate) {
 
@@ -345,7 +384,8 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function setAggregateCounts(partId,
+    function setAggregateCounts(
+        partId,
         totalAttemptCount,
         totalCorrectCount,
         totalIncorrectCount) {
@@ -372,9 +412,20 @@ window.InlineAnalytics = (function() {
     }
 
 
-    function setErrorMessageOnPart(elementId, message) {
+    function setErrorMessageOnPart(
+        elementId,
+        message) {
         // Set the error message on the element
     	$('#' + elementId + '_analytics').html(message);
+    }
+
+
+    function constructValueIdArray(result) {
+        var valueIdArray = [];
+        valueIdArray = result.map(function(element) {
+            return element['value_id'];
+        });
+    	return valueIdArray;
     }
 
 
@@ -389,8 +440,8 @@ window.InlineAnalytics = (function() {
         $('#' + elementId + '_analytics_button').click(function(event) {
 
             var location = this.dataset.location;
-            var answerDistUrl = this.dataset.answer_dist_url;
-            var courseId = this.dataset.course_id;
+            var answerDistUrl = this.dataset.answerDistUrl;
+            var courseId = this.dataset.courseId;
 
             // If data already retrieved for this problem, just show the div
             if (elementsRetrieved.indexOf(elementId) !== -1) {
@@ -407,6 +458,7 @@ window.InlineAnalytics = (function() {
             var index;
             var id, partId;
             var numOptionsByPart = {};
+            var choiceNameListByPart = {};
 
             var divs = $('.' + elementId + '_analytics_div');
 
@@ -415,18 +467,21 @@ window.InlineAnalytics = (function() {
             for (index = 0; index < arrayLength; index++) {
                 id = divs[index].id;
                 partId = id.substring(0, id.indexOf('_analytics'));
-                if (divs[index].dataset.question_type) {
+                if (divs[index].dataset.questionType) {
                     partsToGet.push(partId);
                 }
 
                 // Build dict of question types
-                questionTypesByPart[partId] = divs[index].dataset.question_type;
+                questionTypesByPart[partId] = divs[index].dataset.questionType;
 
                 // Build dict of correct responses
-                correctResponses[partId] = divs[index].dataset.correct_response;
+                correctResponses[partId] = divs[index].dataset.correctResponse;
 
                 // Build dict of number of options (choices)
                 numOptionsByPart[partId] = getChoiceTexts(partId).length;
+                
+                // Build dict of choice name lists
+                choiceNameListByPart[partId] = divs[index].dataset.choiceNameList;
             }
 
             var data = {
@@ -447,7 +502,7 @@ window.InlineAnalytics = (function() {
 
                     success: function(response) {
                         if (response) {
-                            window.InlineAnalytics.processResponse(response, partsToGet, questionTypesByPart, correctResponses);
+                            window.InlineAnalytics.processResponse(response, partsToGet, questionTypesByPart, correctResponses, choiceNameListByPart);
                             // Store that we retrieved data for this problem
                             elementsRetrieved.push(elementId);
                             // Show all the graphics

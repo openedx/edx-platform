@@ -2,6 +2,8 @@
 Inline Analytics functions
 """
 
+import json
+import cgi
 from lxml import etree
 from collections import namedtuple
 
@@ -9,8 +11,8 @@ from django.conf import settings
 
 from xmodule.capa_module import CapaModule
 
-ValidResponse = namedtuple('ValidResponse', 'correct_response response_type')  # pylint: disable=C0103
-AnalyticsContextResponse = namedtuple('AnalyticsContextResponse', 'id correct_response response_type message')  # pylint: disable=C0103
+ValidResponse = namedtuple('ValidResponse', 'correct_response response_type choice_name_list')  # pylint: disable=invalid-name
+AnalyticsContextResponse = namedtuple('AnalyticsContextResponse', 'id correct_response response_type message choice_name_list')  # pylint: disable=invalid-name
 
 
 def get_responses_data(block):
@@ -54,10 +56,18 @@ def get_responses_data(block):
         response_answers = response.get_answers().items()
         if response_answers:
             part_id, correct_response = response_answers[0]
-            valid_responses[part_id] = ValidResponse(correct_response, response_type)
+
+            # Get a list of the choice names in the order displayed to the user.
+            # The is necessary since masking may have been used on the name but
+            # only on MultipleChoiceResponse type as of writing.
+            try:
+                choice_name_list = response.unmask_order()
+            except AttributeError:
+                choice_name_list = []
+
+            valid_responses[part_id] = ValidResponse(correct_response, response_type, choice_name_list)
 
     if valid_responses:
-
         # Loop through all the nodes finding the group elements for each response
         # We need to do this to get the responses in the same order as on the page
         for node in block.lcp.tree.iter(tag=etree.Element):
@@ -67,12 +77,11 @@ def get_responses_data(block):
 
                 if valid_responses[part_id].response_type == 'other':
                     # Response type is not supported by the analytics api
-                    responses_data.append(AnalyticsContextResponse(part_id, None, None, "The analytics cannot be displayed for this type of question."))
+                    responses_data.append(AnalyticsContextResponse(part_id, None, None, "The analytics cannot be displayed for this type of question.", None))
                 elif rerandomize:
                     # Response, actually the problem, has rerandomize != 'never'
-                    responses_data.append(AnalyticsContextResponse(part_id, valid_responses[part_id].correct_response, valid_responses[part_id].response_type, "The analytics cannot be displayed for this question as it uses randomization."))
+                    responses_data.append(AnalyticsContextResponse(part_id, valid_responses[part_id].correct_response, valid_responses[part_id].response_type, "The analytics cannot be displayed for this question as it uses randomization.", None))
                 else:
                     # Response is supported by the analytics api and rerandomize == 'never'
-                    responses_data.append(AnalyticsContextResponse(part_id, valid_responses[part_id].correct_response, valid_responses[part_id].response_type, None))
-
+                    responses_data.append(AnalyticsContextResponse(part_id, valid_responses[part_id].correct_response, valid_responses[part_id].response_type, None, cgi.escape(json.dumps(valid_responses[part_id].choice_name_list), quote=True)))
     return responses_data
