@@ -850,6 +850,17 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._verify_modulestore_support(xblock.location.course_key, 'has_changes')
         return store.has_changes(xblock)
 
+    def check_supports(self, course_key, method):
+        """
+        Verifies that the modulestore for a particular course supports a feature.
+        Returns True/false based on this.
+        """
+        try:
+            self._verify_modulestore_support(course_key, method)
+            return True
+        except NotImplementedError:
+            return False
+
     def _verify_modulestore_support(self, course_key, method):
         """
         Finds and returns the store that contains the course for the given location, and verifying
