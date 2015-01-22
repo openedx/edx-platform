@@ -1900,3 +1900,7 @@ input[name="subject"] {
   @include left(2em);
   @include right(auto);
 }
+.radio-custom {
+  width: auto;
+  margin-right: 10px;
+}
