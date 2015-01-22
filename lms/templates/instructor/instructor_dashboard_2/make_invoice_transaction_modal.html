@@ -13,12 +13,13 @@
 
         <div id="coupon-content">
             <header>
-                <h2>${_("Add Coupon")}</h2>
+                <h2>${_("Add invoice payments and refunds")}</h2>
             </header>
+            <h3 class="error-msgs" id="error-msgs-invoice"></h3>
 
             <div class="instructions">
                 <p>
-                    ${_("Please enter Coupon detail below")}</p>
+                    ${_("Please enter valid credentials")}</p>
             </div>
 
             <form action="${ section_data['make_invoice_transaction_url'] }" id="frm_make_invoice_transaction"
@@ -46,12 +47,12 @@
 
                         <li class="field text" id="make_invoice-modal-field-amount-type">
                             <label>
-                                <input style="width:auto;margin-right: 10px" type="radio" name="amount_type"
-                                       value="payment" checked>Payment
+                                <input class="radio-custom" type="radio" name="amount_type"
+                                       value="payment" checked>${_("Payment")}
                             </label>
                             <label>
-                                <input style="width:auto;margin-right: 10px" type="radio" name="amount_type"
-                                       value="refund">Refund
+                                <input class="radio-custom" type="radio" name="amount_type"
+                                       value="refund">${_("Refund")}
                             </label>
                         </li>
 
@@ -66,24 +67,31 @@
                                    value="${section_data['course_id'] | h}"
                                    readonly aria-required="true"/>
                         </li>
-
-
                     </ol>
                 </fieldset>
 
                 <div class="submit">
-                    <input name="submit" type="submit" id="add_invoice_button" value="${_('Add Invoice Transaction')}"/>
+                    <input name="submit_btn" type="button" id="add_invoice_button" value="${_('Add Invoice Transaction')}"/>
                 </div>
             </form>
         </div>
     </div>
 </section>
 
-<!--<script>-->
-    <!--$(function () {-->
-        <!--$("#add_invoice_button").click(function () {-->
-            <!--$("#frm_make_invoice_transaction").submit();-->
-        <!--});-->
-     <!--});-->
-<!--</script>-->
+<script>
+    $(function () {
+        $("#add_invoice_button").click(function (e) {
+            if (!($.isNumeric($("#invoice_id").val()))) {
+                 $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
+                return false
+             }
+            if (!($.isNumeric($("#amount").val()))) {
+                $('h3#error-msgs-invoice').html('Please enter valid numeric value in amount.').show();
+                return false
+            }
+            $('h3#error-msgs-invoice').hide();
+            $("#frm_make_invoice_transaction").submit();
+        });
+     });
+</script>
 
