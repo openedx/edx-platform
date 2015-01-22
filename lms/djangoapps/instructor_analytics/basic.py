@@ -33,7 +33,7 @@ SALE_ORDER_FEATURES = ('id', 'company_name', 'company_contact_name', 'company_co
 
 AVAILABLE_FEATURES = STUDENT_FEATURES + PROFILE_FEATURES
 COURSE_REGISTRATION_FEATURES = ('code', 'course_id', 'created_by', 'created_at')
-COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date')
+COUPON_FEATURES = ('code', 'course_id', 'percentage_discount', 'description', 'expiration_date', 'is_active')
 
 
 def sale_order_record_features(course_id, features):
@@ -225,7 +225,9 @@ def coupon_codes_features(features, coupons_list):
         coupon_features = [x for x in COUPON_FEATURES if x in features]
 
         coupon_dict = dict((feature, getattr(coupon, feature)) for feature in coupon_features)
-        coupon_dict['code_redeemed_count'] = coupon.couponredemption_set.all().count()
+        coupon_dict['code_redeemed_count'] = coupon.couponredemption_set.filter(
+            order__status="purchased"
+        ).count()
 
         # we have to capture the redeemed_by value in the case of the downloading and spent registration
         # codes csv. In the case of active and generated registration codes the redeemed_by value will be None.

@@ -18,7 +18,6 @@ from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
-from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
@@ -1044,16 +1043,12 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     Respond with csv which contains a summary of all Active Coupons.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    active_coupons = Coupon.objects.filter(
-        Q(course_id=course_id),
-        Q(is_active=True),
-        Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
-        Q(expiration_date__isnull=True)
-    )
+    coupons = Coupon.objects.filter(course_id=course_id)
+
     query_features = [
-        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date'
+        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date', 'is_active'
     ]
-    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, active_coupons)
+    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
     header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
