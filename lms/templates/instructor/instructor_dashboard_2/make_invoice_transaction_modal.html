@@ -63,7 +63,7 @@
                         </li>
 
                         <li class="field" id="make_invoice-modal-field-course_id">
-                            <input class="field hidden" id="coupon_course_id" type="text" name="course_id"
+                            <input class="field hidden" id="course_id" type="text" name="course_id"
                                    value="${section_data['course_id'] | h}"
                                    readonly aria-required="true"/>
                         </li>
@@ -81,6 +81,7 @@
 <script>
     $(function () {
         $("#add_invoice_button").click(function (e) {
+            $("#add_invoice_button").attr('disabled', true);
             if (!($.isNumeric($("#invoice_id").val()))) {
                  $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
                 return false
@@ -90,8 +91,29 @@
                 return false
             }
             $('h3#error-msgs-invoice').hide();
-            $("#frm_make_invoice_transaction").submit();
+
+            $.ajax({
+             type: "POST",
+             data: {
+               "course_id"  :$('#course_id').val(),
+               "invoice_id": $("#invoice_id").val(),
+               "amount": $("#amount").val(),
+               "amount_type": $('input[name="amount_type"]:checked').val(),
+               "comments": $("#comments").val()
+             },
+             url: "${ section_data['make_invoice_transaction_url'] }",
+             success: function (data) {
+                 location.reload(true);
+               },
+             error: function(jqXHR, textStatus, errorThrown) {
+                var data = $.parseJSON(jqXHR.responseText);
+                $('h3#error-msgs-invoice').html(data.message).show();
+                $("#add_invoice_button").removeAttr('disabled');
+             }
+           });
+
         });
      });
+
 </script>
 

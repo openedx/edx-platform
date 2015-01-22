@@ -2148,14 +2148,24 @@ def make_invoice_transaction(request, course_id):
     """
     Adding invoice transaction  (payment or refund) for the Invoice.
     """
-    course_key = CourseKey.from_string(course_id)
-    invoice_id = request.POST.get('invoice_id')
-    amount_type = request.POST.get('amount_type')
-    amount = int(request.POST.get('amount'))
-    comments = request.POST.get('comments')
-    if invoice_id and amount and amount_type:
-        if amount_type == 'refund':
-            amount *=  -1
-        InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user)
-        url = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
-    return redirect(url)
+    error_data = []
+    try:
+        course_key = CourseKey.from_string(course_id)
+        invoice_id = request.POST.get('invoice_id')
+        amount_type = request.POST.get('amount_type')
+        amount = int(request.POST.get('amount'))
+        comments = request.POST.get('comments')
+        if invoice_id and amount and amount_type:
+            if amount_type == 'refund':
+                amount *= -1
+            InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+        else:
+            return JsonResponse(
+                {'message': _("Please pass the all required values.")}, status=400)
+    except:
+        return JsonResponse(
+            {'message': _("Invoice id not valid.")}, status=400)
+
+    return JsonResponse(
+        {'message': _("Invoice added successfully.")}
+    )
