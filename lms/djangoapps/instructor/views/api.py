@@ -2143,8 +2143,8 @@ def spoc_gradebook(request, course_id):
 def make_invoice_transaction(request, course_id):
     """
     Adding invoice transaction  (payment or refund) for the Invoice.
+    invoice id should be valid for making transaction.
     """
-    error_data = []
     try:
         course_key = CourseKey.from_string(course_id)
         invoice_id = request.POST.get('invoice_id')
