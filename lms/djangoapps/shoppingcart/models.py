@@ -833,6 +833,8 @@ INVOICE_TRANSACTION_STATUSES = (
     ('started', 'started'),
     ('completed', 'completed'),
     ('cancelled', 'cancelled'),
+    ('payment', 'payment'),
+    ('refund', 'refund'),
 )
 
 
@@ -857,7 +859,7 @@ class InvoiceTransaction(TimeStampedModel):
             invoice = Invoice.objects.get(id=invoice_id)
             invoice_transaction = InvoiceTransaction(
                 invoice=invoice, amount=amount, comments=comments,
-                created_by=user, status='completed', last_modified_by=user)
+                created_by=user, status=status, last_modified_by=user)
             invoice_transaction.save()
             return invoice_transaction
         except Invoice.DoesNotExist:
@@ -1295,7 +1297,7 @@ class CourseRegCodeItem(OrderItem):
         # is in another PR (for another feature)
         from instructor.views.api import save_registration_code
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
-            save_registration_code(self.user, self.course_id, self.mode, invoice=None, order=self.order)
+            save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member

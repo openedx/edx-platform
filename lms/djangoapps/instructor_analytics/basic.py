@@ -259,7 +259,7 @@ def course_registration_features(features, registration_codes, csv_type):
             course_registration_dict['company_name'] = getattr(registration_code.invoice_item.invoice, 'company_name')
         course_registration_dict['redeemed_by'] = None
         if registration_code.invoice_item:
-            sale_invoice = Invoice.objects.get(id=registration_code.invoice_item.invoice_id)
+            sale_invoice = registration_code.invoice_item.invoice
             course_registration_dict['invoice_id'] = sale_invoice.id
             course_registration_dict['purchaser'] = sale_invoice.recipient_name
             course_registration_dict['customer_reference_number'] = sale_invoice.customer_reference_number
