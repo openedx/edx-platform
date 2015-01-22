@@ -1198,7 +1198,6 @@ def generate_registration_codes(request, course_id):
         company_name=company_name,
         company_contact_email=company_contact_email,
         company_contact_name=company_contact_name,
-        course_id=course_id,
         recipient_name=recipient_name,
         recipient_email=recipient_email,
         address_line_1=address_line_1,
