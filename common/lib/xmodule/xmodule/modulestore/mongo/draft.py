@@ -637,13 +637,6 @@ class DraftModuleStore(MongoModuleStore):
         else:
             return False
 
-    def do_course_reindex(self, course_key, depth=0, **kwargs):
-        """
-        Get the course with the given courseid (org/course/run)
-        """
-        location = course_key.make_usage_key('course', course_key.run)
-        return self.do_index(location, delete=False)
-
     def publish(self, location, user_id, **kwargs):
         """
         Publish the subtree rooted at location to the live course and remove the drafts.

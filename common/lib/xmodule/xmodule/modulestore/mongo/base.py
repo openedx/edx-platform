@@ -44,13 +44,12 @@ from xmodule.errortracker import null_error_tracker, exc_info_to_str
 from xmodule.exceptions import HeartbeatFailure
 from xmodule.mako_module import MakoDescriptorSystem
 from xmodule.modulestore import ModuleStoreWriteBase, ModuleStoreEnum, BulkOperationsMixin, BulkOpsRecord
+from xmodule.modulestore.courseware_index import ModuleStoreCoursewareIndexMixin
 from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.edit_info import EditInfoRuntimeMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError
 from xmodule.modulestore.inheritance import InheritanceMixin, inherit_metadata, InheritanceKeyValueStore
 from xmodule.modulestore.xml import CourseLocationManager
-
-from search.search_engine_base import SearchEngine
 
 log = logging.getLogger(__name__)
 
@@ -70,10 +69,6 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
     name for name, class_ in XBlock.load_classes() if getattr(class_, 'has_children', False)
 ))
 
-# Use default index and document names for now
-INDEX_NAME = "courseware_index"
-DOCUMENT_TYPE = "courseware_content"
-
 # Allow us to call _from_deprecated_(son|string) throughout the file
 # pylint: disable=protected-access
 
@@ -91,14 +86,6 @@ class InvalidWriteError(Exception):
     """
     Raised to indicate that writing to a particular key
     in the KeyValueStore is disabled
-    """
-    pass
-
-
-class IndexWriteError(Exception):
-    """
-    Raised to indicate that indexing of particular key
-    failed
     """
     pass
 
@@ -289,7 +276,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                     raw_metadata = json_data.get('metadata', {})
                     # published_on was previously stored as a list of time components instead of a datetime
                     if raw_metadata.get('published_date'):
-                        module._edit_info['published_date'] = datetime(*raw_metadata.get('published_date')[0:6]).replace(tzinfo=UTC)
+                        module._edit_info['published_date'] = datetime(
+                            *raw_metadata.get('published_date')[0:6]
+                        ).replace(tzinfo=UTC)
                     module._edit_info['published_by'] = raw_metadata.get('published_by')
 
                 # decache any computed pending field settings
@@ -496,7 +485,7 @@ class ParentLocationCache(dict):
             del self[key]
 
 
-class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin):
+class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin, ModuleStoreCoursewareIndexMixin):
     """
     A Mongodb backed ModuleStore
     """
@@ -958,92 +947,6 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             return self.get_item(location, depth=depth)
         except ItemNotFoundError:
             return None
-
-    def do_index(self, location, delete=False):
-        """
-        Main routine to index (for purposes of searching) from given location and other stuff on down
-        """
-        error = []
-        # TODO - inline for now, need to move this out to a celery task
-        searcher = SearchEngine.get_search_engine(INDEX_NAME)
-        if not searcher:
-            return
-
-        location_info = {
-            "course": unicode(location.course_key),
-        }
-
-        def _fetch_item(item_location):
-            """ Fetch the item from the modulestore location, log if not found, but continue """
-            try:
-                item = self.get_item(item_location, revision=ModuleStoreEnum.RevisionOption.published_only)
-            except ItemNotFoundError:
-                log.warning('Cannot find: %s', item_location)
-                return None
-
-            return item
-
-        def index_item_location(item_location, current_start_date):
-            """ add this item to the search index """
-            item = _fetch_item(item_location)
-            if item:
-                if item.category in ['course', 'chapter', 'sequential', 'vertical', 'html', 'video']:
-                    if item.start and (not current_start_date or item.start > current_start_date):
-                        current_start_date = item.start
-
-                    if item.has_children:
-                        for child_loc in item.children:
-                            index_item_location(child_loc, current_start_date)
-
-                    item_index = {}
-                    try:
-                        item_index.update(location_info)
-                        item_index.update(item.index_dictionary())
-                        item_index.update({
-                            'id': unicode(item.scope_ids.usage_id),
-                        })
-
-                        if current_start_date:
-                            item_index.update({
-                                "start_date": current_start_date
-                            })
-
-                        searcher.index(DOCUMENT_TYPE, item_index)
-                    except IndexWriteError:
-                        log.warning('Could not index item: %s', item_location)
-                        error.append('Could not index item: {}'.format(item_location))
-
-        def remove_index_item_location(item_location):
-            """ remove this item from the search index """
-            item = _fetch_item(item_location)
-            if item:
-                if item.has_children:
-                    for child_loc in item.children:
-                        remove_index_item_location(child_loc)
-
-                searcher.remove(DOCUMENT_TYPE, unicode(item.scope_ids.usage_id))
-
-        try:
-            if delete:
-                remove_index_item_location(location)
-            else:
-                index_item_location(location, None)
-        except Exception as err:  # pylint: disable=broad-except
-            # broad exception so that index operation does not prevent the rest of the application from working
-            log.exception(
-                "Indexing error encountered, courseware index may be out of date %s - %s",
-                location.course_key,
-                str(err)
-            )
-
-        return error
-
-    def do_course_reindex(self, course_key, depth=0, **kwargs):
-        """
-        Get the course with the given courseid (org/course/run)
-        """
-        location = course_key.make_usage_key('course', course_key.run)
-        return self.do_index(location, delete=False)
 
     def has_course(self, course_key, ignore_case=False, **kwargs):
         """

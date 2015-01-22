@@ -19,6 +19,7 @@ from xmodule.assetstore import AssetMetadata
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
+from .courseware_index import ModuleStoreCoursewareIndexMixin
 from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .split_migrator import SplitMigrator
@@ -95,7 +96,7 @@ def strip_key(func):
     return inner
 
 
-class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
+class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, ModuleStoreCoursewareIndexMixin):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
@@ -318,21 +319,6 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         store = self._get_modulestore_for_courseid(course_key)
         try:
             return store.get_course(course_key, depth=depth, **kwargs)
-        except ItemNotFoundError:
-            return None
-
-    @strip_key
-    def do_index(self, course_key, depth=0, **kwargs):
-        """
-        restarts index on a course with the course_id. If no such course exists,
-        it returns None
-
-        :param course_key: must be a CourseKey
-        """
-        assert(isinstance(course_key, CourseKey))
-        store = self._get_modulestore_for_courseid(course_key)
-        try:
-            return store.do_course_reindex(course_key, depth=depth, **kwargs)
         except ItemNotFoundError:
             return None
 
