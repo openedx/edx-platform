@@ -1041,10 +1041,9 @@ courseware_js = (
 )
 
 # Include JS files needed for courseware search
-if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-    courseware_js += (
-        'js/search/main.js',
-    )
+courseware_js += (
+    'js/search/main.js',
+)
 
 
 # Before a student accesses courseware, we do not
