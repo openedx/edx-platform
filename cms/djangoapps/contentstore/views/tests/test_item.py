@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 import ddt
 
-from mock import patch
+from mock import patch, Mock, PropertyMock
 from pytz import UTC
 from webob import Response
 
@@ -12,21 +12,24 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from contentstore.utils import reverse_usage_url, reverse_course_url
-from contentstore.views.preview import StudioUserService
 
 from contentstore.views.component import (
     component_handler, get_component_templates
 )
 
-from contentstore.views.item import create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name
+from contentstore.views.item import (
+    create_xblock_info, ALWAYS, VisibilityState, _xblock_type_and_display_name, add_container_page_publishing_info
+)
 from contentstore.tests.utils import CourseTestCase
 from student.tests.factories import UserFactory
 from xmodule.capa_module import CapaDescriptor
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.factories import ItemFactory, check_mongo_calls
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import ItemFactory, LibraryFactory, check_mongo_calls
 from xmodule.x_module import STUDIO_VIEW, STUDENT_VIEW
 from xblock.exceptions import NoSuchHandlerError
+from xblock_django.user_service import DjangoXBlockUserService
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
@@ -85,12 +88,18 @@ class ItemTest(CourseTestCase):
 class GetItemTest(ItemTest):
     """Tests for '/xblock' GET url."""
 
-    def _get_container_preview(self, usage_key):
+    def _get_preview(self, usage_key, data=None):
+        """ Makes a request to xblock preview handler """
+        preview_url = reverse_usage_url("xblock_view_handler", usage_key, {'view_name': 'container_preview'})
+        data = data if data else {}
+        resp = self.client.get(preview_url, data, HTTP_ACCEPT='application/json')
+        return resp
+
+    def _get_container_preview(self, usage_key, data=None):
         """
         Returns the HTML and resources required for the xblock at the specified UsageKey
         """
-        preview_url = reverse_usage_url("xblock_view_handler", usage_key, {'view_name': 'container_preview'})
-        resp = self.client.get(preview_url, HTTP_ACCEPT='application/json')
+        resp = self._get_preview(usage_key, data)
         self.assertEqual(resp.status_code, 200)
         resp_content = json.loads(resp.content)
         html = resp_content['html']
@@ -99,10 +108,18 @@ class GetItemTest(ItemTest):
         self.assertIsNotNone(resources)
         return html, resources
 
+    def _get_container_preview_with_error(self, usage_key, expected_code, data=None, content_contains=None):
+        """ Make request and asserts on response code and response contents """
+        resp = self._get_preview(usage_key, data)
+        self.assertEqual(resp.status_code, expected_code)
+        if content_contains:
+            self.assertIn(content_contains, resp.content)
+        return resp
+
     @ddt.data(
-        (1, 21, 23, 35, 37),
-        (2, 22, 24, 38, 39),
-        (3, 23, 25, 41, 41),
+        (1, 16, 14, 15, 11),
+        (2, 16, 14, 15, 11),
+        (3, 16, 14, 15, 11),
     )
     @ddt.unpack
     def test_get_query_count(self, branching_factor, chapter_queries, section_queries, unit_queries, problem_queries):
@@ -116,6 +133,17 @@ class GetItemTest(ItemTest):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['vertical'][-1]))
         with check_mongo_calls(problem_queries):
             self.client.get(reverse_usage_url('xblock_handler', self.populated_usage_keys['problem'][-1]))
+
+    @ddt.data(
+        (1, 26),
+        (2, 28),
+        (3, 30),
+    )
+    @ddt.unpack
+    def test_container_get_query_count(self, branching_factor, unit_queries,):
+        self.populate_course(branching_factor)
+        with check_mongo_calls(unit_queries):
+            self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
 
     def test_get_vertical(self):
         # Add a vertical
@@ -246,6 +274,40 @@ class GetItemTest(ItemTest):
         self.assertIn('New_NAME_A', html)
         self.assertIn('New_NAME_B', html)
 
+    def test_valid_paging(self):
+        """
+        Tests that valid paging is passed along to underlying block
+        """
+        with patch('contentstore.views.item.get_preview_fragment') as patched_get_preview_fragment:
+            retval = Mock()
+            type(retval).content = PropertyMock(return_value="Some content")
+            type(retval).resources = PropertyMock(return_value=[])
+            patched_get_preview_fragment.return_value = retval
+
+            root_usage_key = self._create_vertical()
+            _, _ = self._get_container_preview(
+                root_usage_key,
+                {'enable_paging': 'true', 'page_number': 0, 'page_size': 2}
+            )
+            call_args = patched_get_preview_fragment.call_args[0]
+            _, _, context = call_args
+            self.assertIn('paging', context)
+            self.assertEqual({'page_number': 0, 'page_size': 2}, context['paging'])
+
+    @ddt.data([1, 'invalid'], ['invalid', 2])
+    @ddt.unpack
+    def test_invalid_paging(self, page_number, page_size):
+        """
+        Tests that valid paging is passed along to underlying block
+        """
+        root_usage_key = self._create_vertical()
+        self._get_container_preview_with_error(
+            root_usage_key,
+            400,
+            data={'enable_paging': 'true', 'page_number': page_number, 'page_size': page_size},
+            content_contains="Couldn't parse paging parameters"
+        )
+
 
 class DeleteItem(ItemTest):
     """Tests for '/xblock' DELETE url."""
@@ -361,21 +423,46 @@ class TestDuplicateItem(ItemTest):
         except for location and display name.
         """
         def duplicate_and_verify(source_usage_key, parent_usage_key):
+            """ Duplicates the source, parenting to supplied parent. Then does equality check. """
             usage_key = self._duplicate_item(parent_usage_key, source_usage_key)
-            self.assertTrue(check_equality(source_usage_key, usage_key), "Duplicated item differs from original")
+            self.assertTrue(
+                check_equality(source_usage_key, usage_key, parent_usage_key),
+                "Duplicated item differs from original"
+            )
 
-        def check_equality(source_usage_key, duplicate_usage_key):
+        def check_equality(source_usage_key, duplicate_usage_key, parent_usage_key=None):
+            """
+            Gets source and duplicated items from the modulestore using supplied usage keys.
+            Then verifies that they represent equivalent items (modulo parents and other
+            known things that may differ).
+            """
             original_item = self.get_item_from_modulestore(source_usage_key)
             duplicated_item = self.get_item_from_modulestore(duplicate_usage_key)
 
             self.assertNotEqual(
-                original_item.location,
-                duplicated_item.location,
+                unicode(original_item.location),
+                unicode(duplicated_item.location),
                 "Location of duplicate should be different from original"
             )
-            # Set the location and display name to be the same so we can make sure the rest of the duplicate is equal.
+
+            # Parent will only be equal for root of duplicated structure, in the case
+            # where an item is duplicated in-place.
+            if parent_usage_key and unicode(original_item.parent) == unicode(parent_usage_key):
+                self.assertEqual(
+                    unicode(parent_usage_key), unicode(duplicated_item.parent),
+                    "Parent of duplicate should equal parent of source for root xblock when duplicated in-place"
+                )
+            else:
+                self.assertNotEqual(
+                    unicode(original_item.parent), unicode(duplicated_item.parent),
+                    "Parent duplicate should be different from source"
+                )
+
+            # Set the location, display name, and parent to be the same so we can make sure the rest of the
+            # duplicate is equal.
             duplicated_item.location = original_item.location
             duplicated_item.display_name = original_item.display_name
+            duplicated_item.parent = original_item.parent
 
             # Children will also be duplicated, so for the purposes of testing equality, we will set
             # the children to the original after recursively checking the children.
@@ -893,6 +980,29 @@ class TestEditItem(ItemTest):
         self._verify_published_with_draft(unit_usage_key)
         self._verify_published_with_draft(html_usage_key)
 
+    def test_field_value_errors(self):
+        """
+        Test that if the user's input causes a ValueError on an XBlock field,
+        we provide a friendly error message back to the user.
+        """
+        response = self.create_xblock(parent_usage_key=self.seq_usage_key, category='video')
+        video_usage_key = self.response_usage_key(response)
+        update_url = reverse_usage_url('xblock_handler', video_usage_key)
+
+        response = self.client.ajax_post(
+            update_url,
+            data={
+                'id': unicode(video_usage_key),
+                'metadata': {
+                    'saved_video_position': "Not a valid relative time",
+                },
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        parsed = json.loads(response.content)
+        self.assertIn("error", parsed)
+        self.assertIn("Incorrect RelativeTime value", parsed["error"])  # See xmodule/fields.py
+
 
 class TestEditSplitModule(ItemTest):
     """
@@ -1060,7 +1170,7 @@ class TestEditSplitModule(ItemTest):
         # (CachingDescriptorSystem is used in tests, PreviewModuleSystem in Studio).
         # CachingDescriptorSystem doesn't have user service, that's needed for
         # SplitTestModule. So, in this line of code we add this service manually.
-        split_test.runtime._services['user'] = StudioUserService(self.request)  # pylint: disable=protected-access
+        split_test.runtime._services['user'] = DjangoXBlockUserService(self.user)  # pylint: disable=protected-access
 
         # Call add_missing_groups method to add the missing group.
         split_test.add_missing_groups(self.request)
@@ -1294,6 +1404,7 @@ class TestXBlockInfo(ItemTest):
             include_children_predicate=ALWAYS,
             include_ancestor_info=True
         )
+        add_container_page_publishing_info(vertical, xblock_info)
         self.validate_vertical_xblock_info(xblock_info)
 
     def test_component_xblock_info(self):
@@ -1414,10 +1525,90 @@ class TestXBlockInfo(ItemTest):
                     )
         else:
             self.assertIsNone(xblock_info.get('child_info', None))
-        if xblock_info['category'] == 'vertical' and not course_outline:
-            self.assertEqual(xblock_info['edited_by'], 'testuser')
-        else:
-            self.assertIsNone(xblock_info.get('edited_by', None))
+
+
+class TestLibraryXBlockInfo(ModuleStoreTestCase):
+    """
+    Unit tests for XBlock Info for XBlocks in a content library
+    """
+    def setUp(self):
+        super(TestLibraryXBlockInfo, self).setUp()
+        user_id = self.user.id
+        self.library = LibraryFactory.create()
+        self.top_level_html = ItemFactory.create(
+            parent_location=self.library.location, category='html', user_id=user_id, publish_item=False
+        )
+        self.vertical = ItemFactory.create(
+            parent_location=self.library.location, category='vertical', user_id=user_id, publish_item=False
+        )
+        self.child_html = ItemFactory.create(
+            parent_location=self.vertical.location, category='html', display_name='Test HTML Child Block',
+            user_id=user_id, publish_item=False
+        )
+
+    def test_lib_xblock_info(self):
+        html_block = modulestore().get_item(self.top_level_html.location)
+        xblock_info = create_xblock_info(html_block)
+        self.validate_component_xblock_info(xblock_info, html_block)
+        self.assertIsNone(xblock_info.get('child_info', None))
+
+    def test_lib_child_xblock_info(self):
+        html_block = modulestore().get_item(self.child_html.location)
+        xblock_info = create_xblock_info(html_block, include_ancestor_info=True, include_child_info=True)
+        self.validate_component_xblock_info(xblock_info, html_block)
+        self.assertIsNone(xblock_info.get('child_info', None))
+        ancestors = xblock_info['ancestor_info']['ancestors']
+        self.assertEqual(len(ancestors), 2)
+        self.assertEqual(ancestors[0]['category'], 'vertical')
+        self.assertEqual(ancestors[0]['id'], unicode(self.vertical.location))
+        self.assertEqual(ancestors[1]['category'], 'library')
+
+    def validate_component_xblock_info(self, xblock_info, original_block):
+        """
+        Validate that the xblock info is correct for the test component.
+        """
+        self.assertEqual(xblock_info['category'], original_block.category)
+        self.assertEqual(xblock_info['id'], unicode(original_block.location))
+        self.assertEqual(xblock_info['display_name'], original_block.display_name)
+        self.assertIsNone(xblock_info.get('has_changes', None))
+        self.assertIsNone(xblock_info.get('published', None))
+        self.assertIsNone(xblock_info.get('published_on', None))
+        self.assertIsNone(xblock_info.get('graders', None))
+
+
+class TestLibraryXBlockCreation(ItemTest):
+    """
+    Tests the adding of XBlocks to Library
+    """
+    def test_add_xblock(self):
+        """
+        Verify we can add an XBlock to a Library.
+        """
+        lib = LibraryFactory.create()
+        self.create_xblock(parent_usage_key=lib.location, display_name='Test', category="html")
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertTrue(lib.children)
+        xblock_locator = lib.children[0]
+        self.assertEqual(self.store.get_item(xblock_locator).display_name, 'Test')
+
+    def test_no_add_discussion(self):
+        """
+        Verify we cannot add a discussion module to a Library.
+        """
+        lib = LibraryFactory.create()
+        response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='discussion')
+        self.assertEqual(response.status_code, 400)
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertFalse(lib.children)
+
+    def test_no_add_advanced(self):
+        lib = LibraryFactory.create()
+        lib.advanced_modules = ['lti']
+        lib.save()
+        response = self.create_xblock(parent_usage_key=lib.location, display_name='Test', category='lti')
+        self.assertEqual(response.status_code, 400)
+        lib = self.store.get_library(lib.location.library_key)
+        self.assertFalse(lib.children)
 
 
 class TestXBlockPublishingInfo(ItemTest):
@@ -1438,7 +1629,8 @@ class TestXBlockPublishingInfo(ItemTest):
         )
         if staff_only:
             self._enable_staff_only(child.location)
-        return child
+        # In case the staff_only state was set, return the updated xblock.
+        return modulestore().get_item(child.location)
 
     def _get_child_xblock_info(self, xblock_info, index):
         """
@@ -1526,12 +1718,6 @@ class TestXBlockPublishingInfo(ItemTest):
         Verify the explicit staff lock state of an item in the xblock_info.
         """
         self._verify_xblock_info_state(xblock_info, 'has_explicit_staff_lock', expected_state, path, should_equal)
-
-    def _verify_staff_lock_from_state(self, xblock_info, expected_state, path=None, should_equal=True):
-        """
-        Verify the staff_lock_from state of an item in the xblock_info.
-        """
-        self._verify_xblock_info_state(xblock_info, 'staff_lock_from', expected_state, path, should_equal)
 
     def test_empty_chapter(self):
         empty_chapter = self._create_child(self.course, 'chapter', "Empty Chapter")
@@ -1622,7 +1808,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter", staff_only=True)
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
-        self._create_child(sequential, 'vertical', "Unit")
+        vertical = self._create_child(sequential, 'vertical', "Unit")
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1632,7 +1818,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(chapter), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(chapter), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_section(self):
         """
@@ -1653,7 +1841,7 @@ class TestXBlockPublishingInfo(ItemTest):
         """
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential", staff_only=True)
-        self._create_child(sequential, 'vertical', "Unit")
+        vertical = self._create_child(sequential, 'vertical', "Unit")
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1663,7 +1851,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, True, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(sequential), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(sequential), vertical_info["staff_lock_from"])
 
     def test_no_staff_only_subsection(self):
         """
@@ -1681,7 +1871,7 @@ class TestXBlockPublishingInfo(ItemTest):
     def test_staff_only_unit(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")
         sequential = self._create_child(chapter, 'sequential', "Test Sequential")
-        unit = self._create_child(sequential, 'vertical', "Unit", staff_only=True)
+        vertical = self._create_child(sequential, 'vertical', "Unit", staff_only=True)
         xblock_info = self._get_xblock_info(chapter.location)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only)
         self._verify_visibility_state(xblock_info, VisibilityState.staff_only, path=self.FIRST_SUBSECTION_PATH)
@@ -1691,7 +1881,9 @@ class TestXBlockPublishingInfo(ItemTest):
         self._verify_explicit_staff_lock_state(xblock_info, False, path=self.FIRST_SUBSECTION_PATH)
         self._verify_explicit_staff_lock_state(xblock_info, True, path=self.FIRST_UNIT_PATH)
 
-        self._verify_staff_lock_from_state(xblock_info, _xblock_type_and_display_name(unit), path=self.FIRST_UNIT_PATH)
+        vertical_info = self._get_xblock_info(vertical.location)
+        add_container_page_publishing_info(vertical, vertical_info)
+        self.assertEqual(_xblock_type_and_display_name(vertical), vertical_info["staff_lock_from"])
 
     def test_unscheduled_section_with_live_subsection(self):
         chapter = self._create_child(self.course, 'chapter', "Test Chapter")

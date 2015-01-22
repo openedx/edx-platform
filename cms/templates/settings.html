@@ -7,7 +7,6 @@
 <%!
   from django.utils.translation import ugettext as _
   from contentstore import utils
-  from contentstore.views.course import should_show_group_configurations_page
   import urllib
 %>
 
@@ -308,6 +307,38 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
                   <input type="text" class="short time" id="course-effort" placeholder="HH:MM" />
                   <span class="tip tip-inline">${_("Time spent on all course work")}</span>
                 </li>
+                % if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES'):
+                <li class="field field-select" id="field-pre-requisite-course">
+                  <form action="#" class="pre-requisite-course-form" method="post">
+                    <label for="pre-requisite-course">${_("Prerequisite Course")}</label>
+                    <select class="input" id="pre-requisite-course">
+                        <option value="">${_("None")}</option>
+                        % for course_info in sorted(possible_pre_requisite_courses, key=lambda s: s['display_name'].lower() if s['display_name'] is not None else ''):
+                        <option value="${course_info['course_key']}">${course_info['display_name']}</option>
+                        % endfor
+                    </select>
+                    <span class="tip tip-inline">${_("Course that students must complete before beginning this course")}</span>
+                    <button type="submit" class="sr" name="submit" value="submit">${_("set pre-requisite course")}</button>
+                   </form>
+                </li>
+                % endif
+                % if settings.FEATURES.get('ENTRANCE_EXAMS'):
+                <li>
+                    <h3 id="heading-entrance-exam">${_("Entrance Exam")}</h3>
+                    <div class="show-data">
+                        <div class="heading">
+                            <input type="checkbox" id="entrance-exam-enabled" />
+                            <label for="entrance-exam-enabled">${_("Require students to pass an exam before beginning the course.")}</label>
+                        </div>
+                         <div class="div-grade-requirements" hidden="hidden">
+                          <p><span class="tip tip-inline">${_("You can now view and author your course entrance exam from the ")}<a href='${course_handler_url}'>${_("Course Outline")}</a></span></p>
+                          <p><h3>${_("Grade Requirements")}</h3></p>
+                          <p><div><input type="text" id="entrance-exam-minimum-score-pct" aria-describedby="min-score-format"><span id="min-score-format" class="tip tip-inline">${_(" %")}</span></div></p>
+                          <p><span class="tip tip-inline">${_("The score student must meet in order to successfully complete the entrance exam. ")}</span></p>
+                        </div>
+                    </div>
+                </li>
+                % endif
               </ol>
             </section>
           % endif
@@ -333,9 +364,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
           <ul>
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            % if should_show_group_configurations_page(context_course):
-              <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-            % endif
+            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
             <li class="nav-item"><a href="${advanced_config_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>

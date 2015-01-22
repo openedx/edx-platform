@@ -213,6 +213,17 @@ filterwarnings('ignore', message='No request passed to the backend, unable to ra
 # or "error" to convert all into errors
 simplefilter('ignore')
 
+############################# SECURITY SETTINGS ################################
+# Default to advanced security in common.py, so tests can reset here to use
+# a simpler security model
+FEATURES['ENFORCE_PASSWORD_POLICY'] = False
+FEATURES['ENABLE_MAX_FAILED_LOGIN_ATTEMPTS'] = False
+FEATURES['SQUELCH_PII_IN_LOGS'] = False
+FEATURES['PREVENT_CONCURRENT_LOGINS'] = False
+FEATURES['ADVANCED_SECURITY'] = False
+PASSWORD_MIN_LENGTH = None
+PASSWORD_COMPLEXITY = {}
+
 ######### Third-party auth ##########
 FEATURES['ENABLE_THIRD_PARTY_AUTH'] = True
 
@@ -425,3 +436,16 @@ MONGODB_LOG = {
     'password': '',
     'db': 'xlog',
 }
+
+
+# Enable EdxNotes for tests.
+FEATURES['ENABLE_EDXNOTES'] = True
+
+# Add milestones to Installed apps for testing
+INSTALLED_APPS += ('milestones', )
+
+# MILESTONES
+FEATURES['MILESTONES_APP'] = True
+
+# ENTRANCE EXAMS
+FEATURES['ENTRANCE_EXAMS'] = True

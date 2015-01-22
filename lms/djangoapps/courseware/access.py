@@ -13,11 +13,13 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_ABOUT)
 from xmodule.error_module import ErrorDescriptor
 from xmodule.x_module import XModule
+from xmodule.split_test_module import get_split_user_partitions
 
 from xblock.core import XBlock
+from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
 
 from external_auth.models import ExternalAuthMap
-from courseware.masquerade import is_masquerading_as_student
+from courseware.masquerade import get_masquerade_role, is_masquerading_as_student
 from django.utils.timezone import UTC
 from student import auth
 from student.roles import (
@@ -26,6 +28,7 @@ from student.roles import (
 )
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from opaque_keys.edx.keys import CourseKey, UsageKey
+from util.milestones_helpers import get_pre_requisite_courses_not_completed
 DEBUG_ACCESS = False
 
 log = logging.getLogger(__name__)
@@ -163,11 +166,7 @@ def _has_access_course_desc(user, action, course):
             # check start date
             can_load() and
             # check mobile_available flag
-            (
-                course.mobile_available or
-                auth.has_access(user, CourseBetaTesterRole(course.id)) or
-                _has_staff_access_to_descriptor(user, course, course.id)
-            )
+            is_mobile_available_for_user(user, course)
         )
 
     def can_enroll():
@@ -265,8 +264,24 @@ def _has_access_course_desc(user, action, course):
             _has_staff_access_to_descriptor(user, course, course.id)
         )
 
+    def can_view_courseware_with_prerequisites():  # pylint: disable=invalid-name
+        """
+        Checks if prerequisite courses feature is enabled and course has prerequisites
+        and user is neither staff nor anonymous then it returns False if user has not
+        passed prerequisite courses otherwise return True.
+        """
+        if settings.FEATURES['ENABLE_PREREQUISITE_COURSES'] \
+                and not _has_staff_access_to_descriptor(user, course, course.id) \
+                and course.pre_requisite_courses \
+                and not user.is_anonymous() \
+                and get_pre_requisite_courses_not_completed(user, [course.id]):
+            return False
+        else:
+            return True
+
     checkers = {
         'load': can_load,
+        'view_courseware_with_prerequisites': can_view_courseware_with_prerequisites,
         'load_forum': can_load_forum,
         'load_mobile': can_load_mobile,
         'load_mobile_no_enrollment_check': can_load_mobile_no_enroll_check,
@@ -301,6 +316,71 @@ def _has_access_error_desc(user, action, descriptor, course_key):
     return _dispatch(checkers, action, user, descriptor)
 
 
+def _has_group_access(descriptor, user, course_key):
+    """
+    This function returns a boolean indicating whether or not `user` has
+    sufficient group memberships to "load" a block (the `descriptor`)
+    """
+    if len(descriptor.user_partitions) == len(get_split_user_partitions(descriptor.user_partitions)):
+        # Short-circuit the process, since there are no defined user partitions that are not
+        # user_partitions used by the split_test module. The split_test module handles its own access
+        # via updating the children of the split_test module.
+        return True
+
+    # use merged_group_access which takes group access on the block's
+    # parents / ancestors into account
+    merged_access = descriptor.merged_group_access
+    # check for False in merged_access, which indicates that at least one
+    # partition's group list excludes all students.
+    if False in merged_access.values():
+        log.warning("Group access check excludes all students, access will be denied.", exc_info=True)
+        return False
+
+    # resolve the partition IDs in group_access to actual
+    # partition objects, skipping those which contain empty group directives.
+    # if a referenced partition could not be found, access will be denied.
+    try:
+        partitions = [
+            descriptor._get_user_partition(partition_id)  # pylint:disable=protected-access
+            for partition_id, group_ids in merged_access.items()
+            if group_ids is not None
+        ]
+    except NoSuchUserPartitionError:
+        log.warning("Error looking up user partition, access will be denied.", exc_info=True)
+        return False
+
+    # next resolve the group IDs specified within each partition
+    partition_groups = []
+    try:
+        for partition in partitions:
+            groups = [
+                partition.get_group(group_id)
+                for group_id in merged_access[partition.id]
+            ]
+            if groups:
+                partition_groups.append((partition, groups))
+    except NoSuchUserPartitionGroupError:
+        log.warning("Error looking up referenced user partition group, access will be denied.", exc_info=True)
+        return False
+
+    # look up the user's group for each partition
+    user_groups = {}
+    for partition, groups in partition_groups:
+        user_groups[partition.id] = partition.scheme.get_group_for_user(
+            course_key,
+            user,
+            partition,
+        )
+
+    # finally: check that the user has a satisfactory group assignment
+    # for each partition.
+    if not all(user_groups.get(partition.id) in groups for partition, groups in partition_groups):
+        return False
+
+    # all checks passed.
+    return True
+
+
 def _has_access_descriptor(user, action, descriptor, course_key=None):
     """
     Check if user has access to this descriptor.
@@ -323,8 +403,14 @@ def _has_access_descriptor(user, action, descriptor, course_key=None):
         if descriptor.visible_to_staff_only and not _has_staff_access_to_descriptor(user, descriptor, course_key):
             return False
 
+        # enforce group access
+        if not _has_group_access(descriptor, user, course_key):
+            # if group_access check failed, deny access unless the requestor is staff,
+            # in which case immediately grant access.
+            return _has_staff_access_to_descriptor(user, descriptor, course_key)
+
         # If start dates are off, can always load
-        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user):
+        if settings.FEATURES['DISABLE_START_DATES'] and not is_masquerading_as_student(user, course_key):
             debug("Allow: DISABLE_START_DATES")
             return True
 
@@ -507,7 +593,7 @@ def _has_access_to_course(user, access_level, course_key):
         debug("Deny: no user or anon user")
         return False
 
-    if is_masquerading_as_student(user):
+    if is_masquerading_as_student(user, course_key):
         return False
 
     if GlobalStaff().has_user(user):
@@ -559,13 +645,28 @@ def _has_staff_access_to_descriptor(user, descriptor, course_key):
     return _has_staff_access_to_location(user, descriptor.location, course_key)
 
 
+def is_mobile_available_for_user(user, course):
+    """
+    Returns whether the given course is mobile_available for the given user.
+    Checks:
+        mobile_available flag on the course
+        Beta User and staff access overrides the mobile_available flag
+    """
+    return (
+        course.mobile_available or
+        auth.has_access(user, CourseBetaTesterRole(course.id)) or
+        _has_staff_access_to_descriptor(user, course, course.id)
+    )
+
+
 def get_user_role(user, course_key):
     """
     Return corresponding string if user has staff, instructor or student
     course role in LMS.
     """
-    if is_masquerading_as_student(user):
-        return 'student'
+    role = get_masquerade_role(user, course_key)
+    if role:
+        return role
     elif has_access(user, 'instructor', course_key):
         return 'instructor'
     elif has_access(user, 'staff', course_key):

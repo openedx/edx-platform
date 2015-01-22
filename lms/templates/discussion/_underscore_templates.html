@@ -81,7 +81,7 @@
                 <ul class="discussion-errors"></ul>
                 <label class="sr" for="add-new-comment">${_("Add a comment")}</label>
                 <div class="comment-body" id="add-new-comment" data-id="${'<%- wmdId %>'}"
-                data-placeholder="${_('Add a comment...') | h}"></div>
+                data-placeholder="${_('Add a comment') | h}"></div>
                 <div class="comment-post-control">
                     <a class="discussion-submit-comment control-button" href="#">${_("Submit")}</a>
                 </div>
@@ -399,7 +399,7 @@
                     ${'<% }); %>'}
                  </select>
             </label><div class="field-help">
-                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.")}
+                ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.")}
             </div>
         </div>
         ${'<% } %>'}
@@ -411,7 +411,7 @@
                 ${_("Add a clear and descriptive title to encourage participation.")}
             </span>
         </div>
-        <div class="post-field js-post-body editor" name="body" data-placeholder="${_(u'Enter your question or comment…')}"></div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="${_('Enter your question or comment')}"></div>
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
@@ -571,7 +571,7 @@ ${secondaryStateAction("close", "lock", _("Close"), _("Close"), _("Open"))}
     </script>
 </%def>
 
-${secondaryAction("edit", "pencil", _("Edit"))}
+${secondaryAction("edit", "pencil-square-o", _("Edit"))}
 ${secondaryAction("delete", "remove", _("Delete"))}
 
 <script type="text/template" id="forum-actions">

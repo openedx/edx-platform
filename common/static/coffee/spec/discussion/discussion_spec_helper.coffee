@@ -328,7 +328,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                     <% }); %>
                  </select>
             </label><div class="field-help">
-                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort group.
+                Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.
             </div>
         </div>
         <% } %>
@@ -340,7 +340,7 @@ browser and pasting the output.  When that file changes, this one should be rege
                 Add a clear and descriptive title to encourage participation.
             </span>
         </div>
-        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment…"></div>
+        <div class="post-field js-post-body editor" name="body" data-placeholder="Enter your question or comment"></div>
         <div class="post-options">
             <label class="post-option is-enabled">
                 <input type="checkbox" name="follow" class="post-option-input js-follow" checked>
@@ -546,7 +546,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
                 <span class="action-label">Edit</span>
-                <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
+                <span class="action-icon"><i class="icon fa fa-pencil-square-o"></i></span>
             </a>
         </li>
     </script>

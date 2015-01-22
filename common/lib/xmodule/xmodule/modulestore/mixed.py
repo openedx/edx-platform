@@ -99,7 +99,17 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
-    def __init__(self, contentstore, mappings, stores, i18n_service=None, fs_service=None, create_modulestore_instance=None, **kwargs):
+    def __init__(
+            self,
+            contentstore,
+            mappings,
+            stores,
+            i18n_service=None,
+            fs_service=None,
+            user_service=None,
+            create_modulestore_instance=None,
+            **kwargs
+    ):
         """
         Initialize a MixedModuleStore. Here we look into our passed in kwargs which should be a
         collection of other modulestore configuration information
@@ -139,6 +149,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 store_settings.get('OPTIONS', {}),
                 i18n_service=i18n_service,
                 fs_service=fs_service,
+                user_service=user_service,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
@@ -303,7 +314,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         :param course_key: must be a CourseKey
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courseid(course_key)
         try:
             return store.get_course(course_key, depth=depth, **kwargs)
@@ -340,7 +351,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         * ignore_case (bool): If True, do a case insensitive search. If
             False, do a case sensitive search
         """
-        assert(isinstance(course_id, CourseKey))
+        assert isinstance(course_id, CourseKey)
         store = self._get_modulestore_for_courseid(course_id)
         return store.has_course(course_id, ignore_case, **kwargs)
 
@@ -348,7 +359,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         See xmodule.modulestore.__init__.ModuleStoreWrite.delete_course
         """
-        assert(isinstance(course_key, CourseKey))
+        assert isinstance(course_key, CourseKey)
         store = self._get_modulestore_for_courseid(course_key)
         return store.delete_course(course_key, user_id)
 
@@ -508,6 +519,18 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._get_modulestore_for_courseid(location.course_key)
         return store.get_parent_location(location, **kwargs)
+
+    def get_block_original_usage(self, usage_key):
+        """
+        If a block was inherited into another structure using copy_from_template,
+        this will return the original block usage locator from which the
+        copy was inherited.
+        """
+        try:
+            store = self._verify_modulestore_support(usage_key.course_key, 'get_block_original_usage')
+            return store.get_block_original_usage(usage_key)
+        except NotImplementedError:
+            return None, None
 
     def get_modulestore_type(self, course_id):
         """
@@ -675,6 +698,14 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         store = self._verify_modulestore_support(course_key, 'import_xblock')
         return store.import_xblock(user_id, course_key, block_type, block_id, fields, runtime)
+
+    @strip_key
+    def copy_from_template(self, source_keys, dest_key, user_id, **kwargs):
+        """
+        See :py:meth `SplitMongoModuleStore.copy_from_template`
+        """
+        store = self._verify_modulestore_support(dest_key.course_key, 'copy_from_template')
+        return store.copy_from_template(source_keys, dest_key, user_id)
 
     @strip_key
     def update_item(self, xblock, user_id, allow_not_found=False, **kwargs):

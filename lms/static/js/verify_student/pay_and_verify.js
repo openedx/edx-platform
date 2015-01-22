@@ -70,6 +70,12 @@ var edx = edx || {};
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
+            'face-photo-step': {
+                platformName: el.data('platform-name')
+            },
+            'id-photo-step': {
+                platformName: el.data('platform-name')
+            },
             'review-photos-step': {
                 fullName: el.data('full-name'),
                 platformName: el.data('platform-name')
@@ -78,12 +84,6 @@ var edx = edx || {};
                 courseName: el.data('course-name'),
                 courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
-                platformName: el.data('platform-name')
-            },
-            'face-photo-step': {
-                platformName: el.data('platform-name')
-            },
-            'id-photo-step': {
                 platformName: el.data('platform-name')
             }
         }

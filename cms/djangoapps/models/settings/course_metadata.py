@@ -1,3 +1,6 @@
+"""
+Django module for Course Metadata class -- manages advanced settings and related parameters
+"""
 from xblock.fields import Scope
 from xmodule.modulestore.django import modulestore
 from django.utils.translation import ugettext as _
@@ -33,6 +36,10 @@ class CourseMetadata(object):
         'tags',  # from xblock
         'visible_to_staff_only',
         'group_access',
+        'pre_requisite_courses',
+        'entrance_exam_enabled',
+        'entrance_exam_minimum_score_pct',
+        'entrance_exam_id',
     ]
 
     @classmethod
@@ -47,6 +54,10 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_EXPORT_GIT'):
             filtered_list.append('giturl')
 
+        # Do not show edxnotes if the feature is disabled.
+        if not settings.FEATURES.get('ENABLE_EDXNOTES'):
+            filtered_list.append('edxnotes')
+
         return filtered_list
 
     @classmethod
@@ -56,21 +67,28 @@ class CourseMetadata(object):
         persistence and return a CourseMetadata model.
         """
         result = {}
+        metadata = cls.fetch_all(descriptor)
+        for key, value in metadata.iteritems():
+            if key in cls.filtered_list():
+                continue
+            result[key] = value
+        return result
 
+    @classmethod
+    def fetch_all(cls, descriptor):
+        """
+        Fetches all key:value pairs from persistence and returns a CourseMetadata model.
+        """
+        result = {}
         for field in descriptor.fields.values():
             if field.scope != Scope.settings:
                 continue
-
-            if field.name in cls.filtered_list():
-                continue
-
             result[field.name] = {
                 'value': field.read_json(descriptor),
                 'display_name': _(field.display_name),
                 'help': _(field.help),
                 'deprecated': field.runtime_options.get('deprecated', False)
             }
-
         return result
 
     @classmethod

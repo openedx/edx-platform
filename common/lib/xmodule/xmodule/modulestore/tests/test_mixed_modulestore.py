@@ -5,7 +5,6 @@ Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Dr
 from collections import namedtuple
 import datetime
 import ddt
-from importlib import import_module
 import itertools
 import mimetypes
 from uuid import uuid4
@@ -33,7 +32,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, ModuleStoreDraftAndPublished
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
@@ -358,12 +357,12 @@ class TestMixedModuleStore(CourseComparisonTest):
             self.store.has_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
 
     # draft queries:
-    #   problem: find draft item, find all items pertinent to inheritance computation
+    #   problem: find draft item, find all items pertinent to inheritance computation, find parent
     #   non-existent problem: find draft, find published
     # split:
     #   problem: active_versions, structure
     #   non-existent problem: ditto
-    @ddt.data(('draft', [2, 2], 0), ('split', [2, 2], 0))
+    @ddt.data(('draft', [3, 2], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_get_item(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -388,10 +387,10 @@ class TestMixedModuleStore(CourseComparisonTest):
             self.store.get_item(self.fake_location, revision=ModuleStoreEnum.RevisionOption.draft_preferred)
 
     # Draft:
-    #    wildcard query, 6! load pertinent items for inheritance calls, course root fetch (why)
+    #    wildcard query, 6! load pertinent items for inheritance calls, load parents, course root fetch (why)
     # Split:
     #    active_versions (with regex), structure, and spurious active_versions refetch
-    @ddt.data(('draft', 8, 0), ('split', 3, 0))
+    @ddt.data(('draft', 14, 0), ('split', 3, 0))
     @ddt.unpack
     def test_get_items(self, default_ms, max_find, max_send):
         self.initdb(default_ms)
@@ -405,7 +404,6 @@ class TestMixedModuleStore(CourseComparisonTest):
 
         course_locn = self.course_locations[self.MONGO_COURSEID]
         with check_mongo_calls(max_find, max_send):
-            # NOTE: use get_course if you just want the course. get_items is expensive
             modules = self.store.get_items(course_locn.course_key, qualifiers={'category': 'problem'})
         self.assertEqual(len(modules), 6)
 
@@ -416,12 +414,11 @@ class TestMixedModuleStore(CourseComparisonTest):
                 revision=ModuleStoreEnum.RevisionOption.draft_preferred
             )
 
-    # draft: get draft, count parents, get parents, count & get grandparents, count & get greatgrand,
-    #        count & get next ancestor (chapter's parent), count non-existent next ancestor, get inheritance
+    # draft: get draft, get ancestors up to course (2-6), compute inheritance
     #    sends: update problem and then each ancestor up to course (edit info)
     # split: active_versions, definitions (calculator field), structures
     #  2 sends to update index & structure (note, it would also be definition if a content field changed)
-    @ddt.data(('draft', 11, 5), ('split', 3, 2))
+    @ddt.data(('draft', 7, 5), ('split', 3, 2))
     @ddt.unpack
     def test_update_item(self, default_ms, max_find, max_send):
         """
@@ -886,9 +883,9 @@ class TestMixedModuleStore(CourseComparisonTest):
 
     # notice this doesn't test getting a public item via draft_preferred which draft would have 2 hits (split
     # still only 2)
-    # Draft: count via definition.children query, then fetch via that query
+    # Draft: get_parent
     # Split: active_versions, structure
-    @ddt.data(('draft', 2, 0), ('split', 2, 0))
+    @ddt.data(('draft', 1, 0), ('split', 2, 0))
     @ddt.unpack
     def test_get_parent_locations(self, default_ms, max_find, max_send):
         """
@@ -922,35 +919,47 @@ class TestMixedModuleStore(CourseComparisonTest):
         # publish the course
         self.course = self.store.publish(self.course.location, self.user_id)
 
-        # make drafts of verticals
-        self.store.convert_to_draft(self.vertical_x1a, self.user_id)
-        self.store.convert_to_draft(self.vertical_y1a, self.user_id)
+        with self.store.bulk_operations(self.course.id):
+            # make drafts of verticals
+            self.store.convert_to_draft(self.vertical_x1a, self.user_id)
+            self.store.convert_to_draft(self.vertical_y1a, self.user_id)
 
-        # move child problem_x1a_1 to vertical_y1a
-        child_to_move_location = self.problem_x1a_1
-        new_parent_location = self.vertical_y1a
-        old_parent_location = self.vertical_x1a
+            # move child problem_x1a_1 to vertical_y1a
+            child_to_move_location = self.problem_x1a_1
+            new_parent_location = self.vertical_y1a
+            old_parent_location = self.vertical_x1a
 
-        old_parent = self.store.get_item(old_parent_location)
-        old_parent.children.remove(child_to_move_location.replace(version_guid=old_parent.location.version_guid))
-        self.store.update_item(old_parent, self.user_id)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                old_parent = self.store.get_item(child_to_move_location).get_parent()
 
-        new_parent = self.store.get_item(new_parent_location)
-        new_parent.children.append(child_to_move_location.replace(version_guid=new_parent.location.version_guid))
-        self.store.update_item(new_parent, self.user_id)
+            self.assertEqual(old_parent_location, old_parent.location)
 
-        self.verify_get_parent_locations_results([
-            (child_to_move_location, new_parent_location, None),
-            (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, old_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
-        ])
+            child_to_move_contextualized = child_to_move_location.map_into_course(old_parent.location.course_key)
+            old_parent.children.remove(child_to_move_contextualized)
+            self.store.update_item(old_parent, self.user_id)
+
+            new_parent = self.store.get_item(new_parent_location)
+            new_parent.children.append(child_to_move_location)
+            self.store.update_item(new_parent, self.user_id)
+
+            with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
+                self.assertEqual(new_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
+            with self.store.branch_setting(ModuleStoreEnum.Branch.published_only):
+                self.assertEqual(old_parent_location, self.store.get_item(child_to_move_location).get_parent().location)
+            old_parent_published_location = old_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
+            self.verify_get_parent_locations_results([
+                (child_to_move_location, new_parent_location, None),
+                (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
+                (child_to_move_location, old_parent_published_location, ModuleStoreEnum.RevisionOption.published_only),
+            ])
 
         # publish the course again
         self.store.publish(self.course.location, self.user_id)
+        new_parent_published_location = new_parent_location.for_branch(ModuleStoreEnum.BranchName.published)
         self.verify_get_parent_locations_results([
             (child_to_move_location, new_parent_location, None),
             (child_to_move_location, new_parent_location, ModuleStoreEnum.RevisionOption.draft_preferred),
-            (child_to_move_location, new_parent_location.for_branch(ModuleStoreEnum.BranchName.published), ModuleStoreEnum.RevisionOption.published_only),
+            (child_to_move_location, new_parent_published_location, ModuleStoreEnum.RevisionOption.published_only),
         ])
 
     @ddt.data('draft')
@@ -1022,20 +1031,12 @@ class TestMixedModuleStore(CourseComparisonTest):
     # Draft:
     #   Problem path:
     #    1. Get problem
-    #    2-3. count matches definition.children called 2x?
-    #    4. get parent via definition.children query
-    #    5-7. 2 counts and 1 get grandparent via definition.children
-    #    8-10. ditto for great-grandparent
-    #    11-13. ditto for next ancestor
-    #    14. fail count query looking for parent of course (unnecessary)
-    #    15. get course record direct query (not via definition.children) (already fetched in 13)
-    #    16. get items for inheritance computation
-    #    17. get vertical (parent of problem)
-    #    18. get items for inheritance computation (why? caching should handle)
-    #    19-20. get vertical_x1b (? why? this is the only ref in trace) & items for inheritance computation
-    #   Chapter path: get chapter, count parents 2x, get parents, count non-existent grandparents
+    #    2-6. get parent and rest of ancestors up to course
+    #    7-8. get sequential, compute inheritance
+    #    8-9. get vertical, compute inheritance
+    #    10-11. get other vertical_x1b (why?) and compute inheritance
     # Split: active_versions & structure
-    @ddt.data(('draft', [20, 5], 0), ('split', [2, 2], 0))
+    @ddt.data(('draft', [12, 3], 0), ('split', [2, 2], 0))
     @ddt.unpack
     def test_path_to_location(self, default_ms, num_finds, num_sends):
         """

@@ -68,7 +68,7 @@ class Extensions
 
     @$show_unit_extensions.click =>
       @clear_display()
-      @$grid_table.text 'Loading...'
+      @$grid_table.text 'Loading'
 
       @$url_input = @$section.find("#view-granted-extensions select[name='url']")
       url = @$show_unit_extensions.data 'endpoint'
@@ -83,7 +83,7 @@ class Extensions
 
     @$show_student_extensions.click =>
       @clear_display()
-      @$grid_table.text 'Loading...'
+      @$grid_table.text 'Loading'
 
       url = @$show_student_extensions.data 'endpoint'
       @$student_input = @$section.find("#view-granted-extensions input[name='student']")

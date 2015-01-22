@@ -57,15 +57,6 @@ class InheritanceMixin(XBlockMixin):
         default=False,
         scope=Scope.settings,
     )
-    group_access = Dict(
-        help="A dictionary that maps which groups can be shown this block. The keys "
-             "are group configuration ids and the values are a list of group IDs. "
-             "If there is no key for a group configuration or if the list of group IDs "
-             "is empty then the block is considered visible to all. Note that this "
-             "field is ignored if the block is visible_to_staff_only.",
-        default={},
-        scope=Scope.settings,
-    )
     course_edit_method = String(
         display_name=_("Course Editor"),
         help=_("Enter the method by which this course is edited (\"XML\" or \"Studio\")."),
@@ -172,6 +163,27 @@ class InheritanceMixin(XBlockMixin):
         scope=Scope.settings,
         default=default_reset_button
     )
+    edxnotes = Boolean(
+        display_name=_("Enable Student Notes"),
+        help=_("Enter true or false. If true, students can use the Student Notes feature."),
+        default=False,
+        scope=Scope.settings
+    )
+    edxnotes_visibility = Boolean(
+        display_name="Student Notes Visibility",
+        help=_("Indicates whether Student Notes are visible in the course. "
+               "Students can also show or hide their notes in the courseware."),
+        default=True,
+        scope=Scope.user_info
+    )
+
+    in_entrance_exam = Boolean(
+        display_name=_("Tag this module as part of an Entrance Exam section"),
+        help=_("Enter true or false. If true, answer submissions for problem modules will be "
+               "considered in the Entrance Exam scoring/gating algorithm."),
+        scope=Scope.settings,
+        default=False
+    )
 
 
 def compute_inherited_metadata(descriptor):
@@ -211,8 +223,8 @@ def inherit_metadata(descriptor, inherited_data):
 
 def own_metadata(module):
     """
-    Return a dictionary that contains only non-inherited field keys,
-    mapped to their serialized values
+    Return a JSON-friendly dictionary that contains only non-inherited field
+    keys, mapped to their serialized values
     """
     return module.get_explicitly_set_fields_by_scope(Scope.settings)
 
@@ -283,6 +295,8 @@ class InheritanceKeyValueStore(KeyValueStore):
 
     def default(self, key):
         """
-        Check to see if the default should be from inheritance rather than from the field's global default
+        Check to see if the default should be from inheritance. If not
+        inheriting, this will raise KeyError which will cause the caller to use
+        the field's global default.
         """
         return self.inherited_settings[key.field_name]

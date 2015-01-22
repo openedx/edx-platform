@@ -246,6 +246,7 @@ class CombinedLoginAndRegisterPage(PageObject):
     def wait_for_errors(self):
         """Wait for errors to be visible, then return them. """
         def _check_func():
+            """Return success status and any errors that occurred."""
             errors = self.errors
             return (bool(errors), errors)
         return Promise(_check_func, "Errors are visible").fulfill()
@@ -259,6 +260,7 @@ class CombinedLoginAndRegisterPage(PageObject):
     def wait_for_success(self):
         """Wait for a success message to be visible, then return it."""
         def _check_func():
+            """Return success status and any errors that occurred."""
             success = self.success
             return (bool(success), success)
         return Promise(_check_func, "Success message is visible").fulfill()

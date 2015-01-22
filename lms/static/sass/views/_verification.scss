@@ -1539,6 +1539,21 @@
             width: 23px;
             padding: 3px 0;
           }
+
+          &.old-id-card {
+            width: 88px;
+            height: 88px;
+
+            .fa-list-alt {
+              left: -7px;
+            }
+
+            .id-photo {
+              top: 13px;
+              left: -3px;
+              line-height: 1.1em;
+            }
+          }
         }
 
         .copy {

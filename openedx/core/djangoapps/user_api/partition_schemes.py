@@ -1,11 +1,13 @@
 """
 Provides partition support to the user service.
 """
-
+import logging
 import random
 import api.course_tag as course_tag_api
 
-from xmodule.partitions.partitions import UserPartitionError
+from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
+
+log = logging.getLogger(__name__)
 
 
 class RandomUserPartitionScheme(object):
@@ -15,14 +17,29 @@ class RandomUserPartitionScheme(object):
     RANDOM = random.Random()
 
     @classmethod
-    def get_group_for_user(cls, course_id, user, user_partition, assign=True, track_function=None):
+    def get_group_for_user(cls, course_key, user, user_partition, assign=True, track_function=None):
         """
         Returns the group from the specified user position to which the user is assigned.
         If the user has not yet been assigned, a group will be randomly chosen for them if assign flag is True.
         """
         partition_key = cls._key_for_partition(user_partition)
-        group_id = course_tag_api.get_course_tag(user, course_id, partition_key)
-        group = user_partition.get_group(int(group_id)) if not group_id is None else None
+        group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
+
+        group = None
+        if group_id is not None:
+            # attempt to look up the presently assigned group
+            try:
+                group = user_partition.get_group(int(group_id))
+            except NoSuchUserPartitionGroupError:
+                # jsa: we can turn off warnings here if this is an expected case.
+                log.warn(
+                    "group not found in RandomUserPartitionScheme: %r",
+                    {
+                        "requested_partition_id": user_partition.id,
+                        "requested_group_id": group_id,
+                    },
+                    exc_info=True
+                )
 
         if group is None and assign:
             if not user_partition.groups:
@@ -35,7 +52,7 @@ class RandomUserPartitionScheme(object):
             group = cls.RANDOM.choice(user_partition.groups)
 
             # persist the value as a course tag
-            course_tag_api.set_course_tag(user, course_id, partition_key, group.id)
+            course_tag_api.set_course_tag(user, course_key, partition_key, group.id)
 
             if track_function:
                 # emit event for analytics

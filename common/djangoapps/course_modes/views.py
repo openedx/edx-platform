@@ -5,7 +5,7 @@ Views for the course_mode module
 import decimal
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.views.generic.base import View
 from django.utils.translation import ugettext as _
@@ -226,3 +226,48 @@ class ChooseModeView(View):
             return 'honor'
         else:
             return None
+
+
+def create_mode(request, course_id):
+    """Add a mode to the course corresponding to the given course ID.
+
+    Only available when settings.FEATURES['MODE_CREATION_FOR_TESTING'] is True.
+
+    Attempts to use the following querystring parameters from the request:
+        `mode_slug` (str): The mode to add, either 'honor', 'verified', or 'professional'
+        `mode_display_name` (str): Describes the new course mode
+        `min_price` (int): The minimum price a user must pay to enroll in the new course mode
+        `suggested_prices` (str): Comma-separated prices to suggest to the user.
+        `currency` (str): The currency in which to list prices.
+
+    By default, this endpoint will create an 'honor' mode for the given course with display name
+    'Honor Code', a minimum price of 0, no suggested prices, and using USD as the currency.
+
+    Args:
+        request (`Request`): The Django Request object.
+        course_id (unicode): The slash-separated course key.
+
+    Returns:
+        Response
+    """
+    PARAMETERS = {
+        'mode_slug': u'honor',
+        'mode_display_name': u'Honor Code Certificate',
+        'min_price': 0,
+        'suggested_prices': u'',
+        'currency': u'usd',
+    }
+
+    # Try pulling querystring parameters out of the request
+    for parameter, default in PARAMETERS.iteritems():
+        PARAMETERS[parameter] = request.GET.get(parameter, default)
+
+    # Attempt to create the new mode for the given course
+    course_key = CourseKey.from_string(course_id)
+    CourseMode.objects.get_or_create(course_id=course_key, **PARAMETERS)
+
+    # Return a success message and a 200 response
+    return HttpResponse("Mode '{mode_slug}' created for course with ID '{course_id}'.".format(
+        mode_slug=PARAMETERS['mode_slug'],
+        course_id=course_id
+    ))

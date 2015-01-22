@@ -840,8 +840,15 @@ class MiscCourseTests(ContentStoreTestCase):
             self.store.unpublish(self.chapter_loc, self.user.id)
 
     def test_bad_contentstore_request(self):
-        resp = self.client.get_html('http://localhost:8001/c4x/CDX/123123/asset/&images_circuits_Lab7Solution2.png')
+        """
+        Test that user get proper responses for urls with invalid url or
+        asset/course key
+        """
+        resp = self.client.get_html('/c4x/CDX/123123/asset/&invalid.png')
         self.assertEqual(resp.status_code, 400)
+
+        resp = self.client.get_html('/c4x/CDX/123123/asset/invalid.png')
+        self.assertEqual(resp.status_code, 404)
 
     def test_delete_course(self):
         """
@@ -1166,11 +1173,10 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_course_index_view_with_no_courses(self):
         """Test viewing the index page with no courses"""
-        # Create a course so there is something to view
-        resp = self.client.get_html('/course/')
+        resp = self.client.get_html('/home/')
         self.assertContains(
             resp,
-            '<h1 class="page-header">My Courses</h1>',
+            '<h1 class="page-header">Studio Home</h1>',
             status_code=200,
             html=True
         )
@@ -1189,7 +1195,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_course_index_view_with_course(self):
         """Test viewing the index page with an existing course"""
         CourseFactory.create(display_name='Robot Super Educational Course')
-        resp = self.client.get_html('/course/')
+        resp = self.client.get_html('/home/')
         self.assertContains(
             resp,
             '<h3 class="course-title">Robot Super Educational Course</h3>',
@@ -1604,7 +1610,7 @@ class RerunCourseTest(ContentStoreTestCase):
         Asserts that the given course key is in the accessible course listing section of the html
         and NOT in the unsucceeded course action section of the html.
         """
-        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
         self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 1)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 0)
 
@@ -1613,7 +1619,7 @@ class RerunCourseTest(ContentStoreTestCase):
         Asserts that the given course key is in the unsucceeded course action section of the html
         and NOT in the accessible course listing section of the html.
         """
-        course_listing = lxml.html.fromstring(self.client.get_html('/course/').content)
+        course_listing = lxml.html.fromstring(self.client.get_html('/home/').content)
         self.assertEqual(len(self.get_course_listing_elements(course_listing, course_key)), 0)
         self.assertEqual(len(self.get_unsucceeded_course_action_elements(course_listing, course_key)), 1)
 

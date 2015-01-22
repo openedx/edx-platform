@@ -1,0 +1,19 @@
+<form class="collection-edit-form">
+    <% if (error && error.message) { %>
+        <div class="content-group-edit-error message message-status message-status error is-shown">
+          <%= gettext(error.message) %>
+        </div>
+    <% } %>
+    <div class="wrapper-form">
+        <fieldset class="collection-fields">
+            <div class="input-wrap field text required add-collection-name <% if(error && error.attributes && error.attributes.name) { print('error'); } %>">
+                <label for="group-cohort-name-<%= uniqueId %>"><%= gettext("Content Group Name") %></label>
+                <input name="group-cohort-name" id="group-cohort-name-<%= uniqueId %>" class="collection-name-input input-text" value="<%- name %>" type="text" placeholder="<%= gettext("This is the name of the group") %>">
+            </div>
+        </fieldset>
+    </div>
+    <div class="actions">
+        <button class="action action-primary" type="submit"><% if (isNew) { print(gettext("Create")) } else { print(gettext("Save")) } %></button>
+        <button class="action action-secondary action-cancel"><%= gettext("Cancel") %></button>
+    </div>
+</form>

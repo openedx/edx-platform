@@ -1396,6 +1396,41 @@ class TestItemCrud(SplitModuleTest):
         for _ in range(4):
             self.create_subtree_for_deletion(node_loc, category_queue[1:])
 
+    def test_split_modulestore_create_child_with_position(self):
+        """
+        This test is designed to hit a specific set of use cases having to do with
+        the child positioning logic found in split_mongo/split.py:create_child()
+        """
+        # Set up the split module store
+        store = modulestore()
+        user = random.getrandbits(32)
+        course_key = CourseLocator('test_org', 'test_transaction', 'test_run')
+        with store.bulk_operations(course_key):
+            new_course = store.create_course('test_org', 'test_transaction', 'test_run', user, BRANCH_NAME_DRAFT)
+            new_course_locator = new_course.id
+            versionless_course_locator = new_course_locator.version_agnostic()
+            first_child = store.create_child(
+                self.user_id,
+                new_course.location,
+                "chapter"
+            )
+            refetch_course = store.get_course(versionless_course_locator)
+            second_child = store.create_child(
+                self.user_id,
+                refetch_course.location,
+                "chapter",
+                position=0
+            )
+
+            # First child should have been moved to second position, and better child takes the lead
+            refetch_course = store.get_course(versionless_course_locator)
+            children = refetch_course.get_children()
+            self.assertEqual(unicode(children[1].location), unicode(first_child.location))
+            self.assertEqual(unicode(children[0].location), unicode(second_child.location))
+
+            # Clean up the data so we don't break other tests which apparently expect a particular state
+            store.delete_course(refetch_course.id, user)
+
 
 class TestCourseCreation(SplitModuleTest):
     """

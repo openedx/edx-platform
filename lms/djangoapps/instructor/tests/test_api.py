@@ -13,7 +13,6 @@ import random
 import requests
 import shutil
 import tempfile
-from unittest import TestCase
 from urllib import quote
 
 from django.conf import settings
@@ -42,11 +41,12 @@ from shoppingcart.models import (
     RegistrationCodeRedemption, Order, CouponRedemption,
     PaidCourseRegistration, Coupon, Invoice, CourseRegistrationCode
 )
+from shoppingcart.pdf import PDFInvoice
 from student.models import (
     CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError
 )
-from student.tests.factories import UserFactory
-from student.roles import CourseBetaTesterRole
+from student.tests.factories import UserFactory, CourseModeFactory
+from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -62,7 +62,10 @@ from instructor_task.api_helper import AlreadyRunningError
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
-EXPECTED_CSV_HEADER = '"code","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser","customer_reference_number","internal_reference"'
+EXPECTED_CSV_HEADER = (
+    '"code","redeem_code_url","course_id","company_name","created_by","redeemed_by","invoice_id","purchaser",'
+    '"customer_reference_number","internal_reference"'
+)
 EXPECTED_COUPON_CSV_HEADER = '"code","course_id","percentage_discount","code_redeemed_count","description"'
 
 # ddt data for test cases involving reports
@@ -1722,7 +1725,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1
+                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1807,6 +1810,10 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             percentage_discount='10', created_by=self.instructor, is_active=True
         )
         coupon.save()
+
+        # Coupon Redeem Count only visible for Financial Admins.
+        CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
+
         PaidCourseRegistration.add_to_order(self.cart, self.course.id)
         # apply the coupon code to the item in the cart
         resp = self.client.post(reverse('shoppingcart.views.use_code'), {'code': coupon.code})
@@ -1838,7 +1845,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1
+                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1853,7 +1860,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1
+                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1872,7 +1879,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1
+                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1886,7 +1893,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='xyzmn{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice_2
+                created_by=self.instructor, invoice=sale_invoice_2, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -2994,8 +3001,10 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         Fixtures.
         """
         self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, min_price=50)
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
 
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -3110,6 +3119,38 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 17)
+
+    def test_generate_course_registration_with_redeem_url_codes_csv(self):
+        """
+        Test to generate a response of all the generated course registration codes
+        """
+        url = reverse('generate_registration_codes',
+                      kwargs={'course_id': self.course.id.to_deprecated_string()})
+
+        data = {
+            'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
+        }
+
+        response = self.client.post(url, data, **{'HTTP_HOST': 'localhost'})
+
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        body = response.content.replace('\r', '')
+        self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
+        self.assertEqual(len(body.split('\n')), 17)
+        rows = body.split('\n')
+        index = 1
+        while index < len(rows):
+            if rows[index]:
+                row_data = rows[index].split(',')
+                code = row_data[0].replace('"', '')
+                self.assertTrue(row_data[1].startswith('"http')
+                                and row_data[1].endswith('/shoppingcart/register/redeem/{0}/"'.format(code)))
+            index += 1
 
     @patch.object(instructor.views.api, 'random_code_generator',
                   Mock(side_effect=['first', 'second', 'third', 'fourth']))
@@ -3290,6 +3331,25 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
         self.assertEqual(len(body.split('\n')), 11)
+
+    def test_pdf_file_throws_exception(self):
+        """
+        test to mock the pdf file generation throws an exception
+        when generating registration codes.
+        """
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+        data = {
+            'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
+        }
+        with patch.object(PDFInvoice, 'generate_pdf', side_effect=Exception):
+            response = self.client.post(generate_code_url, data)
+            self.assertEqual(response.status_code, 200, response.content)
 
     def test_get_codes_with_sale_invoice(self):
         """

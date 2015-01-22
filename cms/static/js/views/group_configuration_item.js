@@ -1,77 +1,45 @@
+/**
+ * This class defines an controller view for content experiment group configurations.
+ * It renders an editor view or a details view depending on the state
+ * of the underlying model.
+ * It is expected to be backed by a Group model.
+ */
 define([
-    'js/views/baseview', 'jquery', "gettext", 'js/views/group_configuration_details',
-    'js/views/group_configuration_edit', "js/views/utils/view_utils"
+    'js/views/list_item', 'js/views/group_configuration_details', 'js/views/group_configuration_editor', 'gettext'
 ], function(
-    BaseView, $, gettext, GroupConfigurationDetails, GroupConfigurationEdit, ViewUtils
+    ListItemView, GroupConfigurationDetailsView, GroupConfigurationEditorView, gettext
 ) {
     'use strict';
-    var GroupConfigurationsItem = BaseView.extend({
+
+    var GroupConfigurationItemView = ListItemView.extend({
+        events: {
+            'click .delete': 'deleteItem'
+        },
+
         tagName: 'section',
+
+        baseClassName: 'group-configuration',
+
+        canDelete: true,
+
+        // Translators: this refers to a collection of groups.
+        itemDisplayName: gettext('group configuration'),
+
         attributes: function () {
             return {
                 'id': this.model.get('id'),
                 'tabindex': -1
             };
         },
-        events: {
-            'click .delete': 'deleteConfiguration'
+
+        createEditView: function() {
+            return new GroupConfigurationEditorView({model: this.model});
         },
 
-        className: function () {
-            var index = this.model.collection.indexOf(this.model);
-
-            return [
-                'group-configuration',
-                'group-configurations-list-item',
-                'group-configurations-list-item-' + index
-            ].join(' ');
-        },
-
-        initialize: function() {
-            this.listenTo(this.model, 'change:editing', this.render);
-            this.listenTo(this.model, 'remove', this.remove);
-        },
-
-        deleteConfiguration: function(event) {
-            if(event && event.preventDefault) { event.preventDefault(); }
-            var self = this;
-            ViewUtils.confirmThenRunOperation(
-                gettext('Delete this Group Configuration?'),
-                gettext('Deleting this Group Configuration is permanent and cannot be undone.'),
-                gettext('Delete'),
-                function() {
-                    return ViewUtils.runOperationShowingMessage(
-                        gettext('Deleting') + '&hellip;',
-                        function () {
-                            return self.model.destroy({ wait: true });
-                        }
-                    );
-                }
-            );
-        },
-
-        render: function() {
-            // Removes a view from the DOM, and calls stopListening to remove
-            // any bound events that the view has listened to.
-            if (this.view) {
-                this.view.remove();
-            }
-
-            if (this.model.get('editing')) {
-                this.view = new GroupConfigurationEdit({
-                    model: this.model
-                });
-            } else {
-                this.view = new GroupConfigurationDetails({
-                    model: this.model
-                });
-            }
-
-            this.$el.html(this.view.render().el);
-
-            return this;
+        createDetailsView: function() {
+            return new GroupConfigurationDetailsView({model: this.model});
         }
     });
 
-    return GroupConfigurationsItem;
+    return GroupConfigurationItemView;
 });

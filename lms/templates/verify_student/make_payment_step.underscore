@@ -15,7 +15,7 @@
           ) %>
       </h3>
       <div class="instruction">
-        <%- gettext( "We have successfully verified your identity. You can now enter your payment information and complete your enrollment." ) %>
+        <%- gettext( "You can now enter your payment information and complete your enrollment." ) %>
       </div>
     <% } %>
 
@@ -35,7 +35,7 @@
               <p>
                 <% if ( !upgrade ) { %>
                   <%- _.sprintf(
-                      gettext( "Please confirm your contribution for this course (min. $ %(minPrice)s %(currency)s)" ),
+                      gettext( "Please confirm your contribution for this course (min. %(minPrice)s %(currency)s)" ),
                       { minPrice: minPrice, currency: currency }
                   ) %>
                 <% } %>

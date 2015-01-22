@@ -5,6 +5,7 @@ Test for lms courseware app, module render unit
 from functools import partial
 import json
 
+from bson import ObjectId
 import ddt
 from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
@@ -13,6 +14,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
+from opaque_keys.edx.keys import UsageKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
@@ -28,7 +30,7 @@ from courseware.tests.factories import StudentModuleFactory, UserFactory, Global
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE,
-    TEST_DATA_XML_MODULESTORE
+    TEST_DATA_XML_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
 from courseware.tests.test_submitting_problems import TestSubmittingProblems
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
@@ -44,6 +46,10 @@ from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
+@XBlock.needs("field-data")
+@XBlock.needs("i18n")
+@XBlock.needs("fs")
+@XBlock.needs("user")
 class PureXBlock(XBlock):
     """
     Pure XBlock to use in tests.
@@ -971,12 +977,13 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
 
     def test_context_contains_display_name(self, mock_tracker):
         problem_display_name = u'Option Response Problem'
-        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker, problem_display_name)
-        self.assertEquals(problem_display_name, actual_display_name)
+        module_info = self.handle_callback_and_get_module_info(mock_tracker, problem_display_name)
+        self.assertEquals(problem_display_name, module_info['display_name'])
 
-    def handle_callback_and_get_display_name_from_event(self, mock_tracker, problem_display_name=None):
+    def handle_callback_and_get_module_info(self, mock_tracker, problem_display_name=None):
         """
-        Creates a fake module, invokes the callback and extracts the display name from the emitted problem_check event.
+        Creates a fake module, invokes the callback and extracts the 'module'
+        metadata from the emitted problem_check event.
         """
         descriptor_kwargs = {
             'category': 'problem',
@@ -1000,11 +1007,27 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
         event = mock_call[1][0]
 
         self.assertEquals(event['event_type'], 'problem_check')
-        return event['context']['module']['display_name']
+        return event['context']['module']
 
     def test_missing_display_name(self, mock_tracker):
-        actual_display_name = self.handle_callback_and_get_display_name_from_event(mock_tracker)
+        actual_display_name = self.handle_callback_and_get_module_info(mock_tracker)['display_name']
         self.assertTrue(actual_display_name.startswith('problem'))
+
+    def test_library_source_information(self, mock_tracker):
+        """
+        Check that XBlocks that are inherited from a library include the
+        information about their library block source in events.
+        We patch the modulestore to avoid having to create a library.
+        """
+        original_usage_key = UsageKey.from_string(u'block-v1:A+B+C+type@problem+block@abcd1234')
+        original_usage_version = ObjectId()
+        mock_get_original_usage = lambda _, key: (original_usage_key, original_usage_version)
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_block_original_usage', mock_get_original_usage):
+            module_info = self.handle_callback_and_get_module_info(mock_tracker)
+            self.assertIn('original_usage_key', module_info)
+            self.assertEqual(module_info['original_usage_key'], unicode(original_usage_key))
+            self.assertIn('original_usage_version', module_info)
+            self.assertEqual(module_info['original_usage_version'], unicode(original_usage_version))
 
 
 class TestXmoduleRuntimeEvent(TestSubmittingProblems):
@@ -1158,3 +1181,40 @@ class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
         mock_track_function.assert_called_once_with(request)
 
         mock_track_function.return_value.assert_called_once_with(event_type, event)
+
+
+@ddt.ddt
+class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
+    """
+    Tests that the LMS Module System (XBlock Runtime) provides an expected set of services.
+    """
+    def setUp(self):
+        """
+        Set up the user and other fields that will be used to instantiate the runtime.
+        """
+        super(LMSXBlockServiceBindingTest, self).setUp()
+        self.user = UserFactory()
+        self.field_data_cache = Mock()
+        self.course = CourseFactory.create()
+        self.track_function = Mock()
+        self.xqueue_callback_url_prefix = Mock()
+        self.request_token = Mock()
+
+    @XBlock.register_temp_plugin(PureXBlock, identifier='pure')
+    @ddt.data("user", "i18n", "fs", "field-data")
+    def test_expected_services_exist(self, expected_service):
+        """
+        Tests that the 'user', 'i18n', and 'fs' services are provided by the LMS runtime.
+        """
+        descriptor = ItemFactory(category="pure", parent=self.course)
+        runtime, _ = render.get_module_system_for_user(
+            self.user,
+            self.field_data_cache,
+            descriptor,
+            self.course.id,
+            self.track_function,
+            self.xqueue_callback_url_prefix,
+            self.request_token
+        )
+        service = runtime.service(descriptor, expected_service)
+        self.assertIsNotNone(service)

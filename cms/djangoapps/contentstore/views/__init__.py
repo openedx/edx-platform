@@ -8,10 +8,12 @@ from .assets import *
 from .checklist import *
 from .component import *
 from .course import *
+from .entrance_exam import *
 from .error import *
 from .helpers import *
 from .item import *
 from .import_export import *
+from .library import *
 from .preview import *
 from .public import *
 from .export_git import *

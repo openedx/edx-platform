@@ -1,5 +1,4 @@
 (function(requirejs, define) {
-
     // TODO: how can we share the vast majority of this config that is in common with CMS?
     requirejs.config({
         paths: {
@@ -44,9 +43,9 @@
             'jasmine.async': 'xmodule_js/common_static/js/vendor/jasmine.async',
             'draggabilly': 'xmodule_js/common_static/js/vendor/draggabilly.pkgd',
             'domReady': 'xmodule_js/common_static/js/vendor/domReady',
-            'mathjax': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured',
+            'mathjax': '//cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured',
             'youtube': '//www.youtube.com/player_api?noext',
-            'tender': '//edxedge.tenderapp.com/tender_widget',
+            'tender': '//api.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/core': 'xmodule_js/common_static/js/xblock/core',
@@ -54,6 +53,7 @@
             'xblock/lms.runtime.v1': 'coffee/src/xblock/lms.runtime.v1',
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
+            'logger': 'xmodule_js/common_static/js/src/logger',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -61,13 +61,15 @@
             'js/staff_debug_actions': 'js/staff_debug_actions',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
-            'js/views/file_uploader': 'js/views/file_uploader',
-            'js/models/cohort': 'js/models/cohort',
-            'js/collections/cohort': 'js/collections/cohort',
-            'js/views/cohort_editor': 'js/views/cohort_editor',
-            'js/views/cohorts': 'js/views/cohorts',
-            'js/views/notification': 'js/views/notification',
             'js/models/notification': 'js/models/notification',
+            'js/views/file_uploader': 'js/views/file_uploader',
+            'js/views/notification': 'js/views/notification',
+            'js/groups/models/cohort': 'js/groups/models/cohort',
+            'js/groups/models/content_group': 'js/groups/models/content_group',
+            'js/groups/collections/cohort': 'js/groups/collections/cohort',
+            'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
+            'js/groups/views/cohort_form': 'js/groups/views/cohort_form',
+            'js/groups/views/cohorts': 'js/groups/views/cohorts',
             'js/student_account/account': 'js/student_account/account',
             'js/student_account/views/FormView': 'js/student_account/views/FormView',
             'js/student_account/models/LoginModel': 'js/student_account/models/LoginModel',
@@ -77,7 +79,10 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
-            'js/student_profile/profile': 'js/student_profile/profile'
+            'js/student_profile/profile': 'js/student_profile/profile',
+
+            // edxnotes
+            'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -211,6 +216,9 @@
             'xmodule': {
                 exports: 'XModule'
             },
+            'logger': {
+                exports: 'Logger'
+            },
             'sinon': {
                 exports: 'sinon'
             },
@@ -274,23 +282,36 @@
                 exports: 'edx.instructor_dashboard.ecommerce.ExpiryCouponView',
                 deps: ['backbone', 'jquery', 'underscore']
             },
-            'js/models/cohort': {
-                exports: 'CohortModel',
+            'js/groups/models/cohort': {
+                exports: 'edx.groups.CohortModel',
                 deps: ['backbone']
             },
-            'js/collections/cohort': {
-                exports: 'CohortCollection',
-                deps: ['backbone', 'js/models/cohort']
+            'js/groups/models/content_group': {
+                exports: 'edx.groups.ContentGroupModel',
+                deps: ['backbone']
             },
-            'js/views/cohort_editor': {
-                exports: 'CohortsEditor',
-                deps: ['backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
+            'js/groups/collections/cohort': {
+                exports: 'edx.groups.CohortCollection',
+                deps: ['backbone', 'js/groups/models/cohort']
+            },
+            'js/groups/views/cohort_form': {
+                exports: 'edx.groups.CohortFormView',
+                deps: [
+                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
                     'string_utils'
                 ]
             },
-            'js/views/cohorts': {
-                exports: 'CohortsView',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/views/cohort_editor',
+            'js/groups/views/cohort_editor': {
+                exports: 'edx.groups.CohortEditorView',
+                deps: [
+                    'backbone', 'jquery', 'underscore', 'js/views/notification', 'js/models/notification',
+                    'string_utils', 'js/groups/views/cohort_form'
+                ]
+            },
+            'js/groups/views/cohorts': {
+                exports: 'edx.groups.CohortsView',
+                deps: [
+                    'jquery', 'underscore', 'backbone', 'gettext', 'string_utils', 'js/groups/views/cohort_editor',
                     'js/views/notification', 'js/models/notification', 'js/views/file_uploader'
                 ]
             },
@@ -304,7 +325,8 @@
             },
             'js/views/file_uploader': {
                 exports: 'FileUploaderView',
-                deps: ['backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
+                deps: [
+                    'backbone', 'jquery', 'underscore', 'gettext', 'string_utils', 'js/views/notification',
                     'js/models/notification', 'jquery.fileupload'
                 ]
             },
@@ -488,18 +510,23 @@
                     'js/verify_student/views/enrollment_confirmation_step_view'
                 ]
             },
+            // Student Notes
+            'annotator': {
+                exports: 'Annotator',
+                deps: ['jquery']
+            }
         }
     });
 
     // TODO: why do these need 'lms/include' at the front but the CMS equivalent logic doesn't?
     define([
         // Run the LMS tests
-        'lms/include/js/spec/views/cohorts_spec.js',
         'lms/include/js/spec/photocapture_spec.js',
         'lms/include/js/spec/staff_debug_actions_spec.js',
         'lms/include/js/spec/views/notification_spec.js',
         'lms/include/js/spec/views/file_uploader_spec.js',
         'lms/include/js/spec/dashboard/donation.js',
+        'lms/include/js/spec/groups/views/cohorts_spec.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
@@ -514,7 +541,26 @@
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
-        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js'
+        'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
+        'lms/include/js/spec/edxnotes/utils/logger_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/views/shim_spec.js',
+        'lms/include/js/spec/edxnotes/views/note_item_spec.js',
+        'lms/include/js/spec/edxnotes/views/notes_page_spec.js',
+        'lms/include/js/spec/edxnotes/views/search_box_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs_list_spec.js',
+        'lms/include/js/spec/edxnotes/views/tab_item_spec.js',
+        'lms/include/js/spec/edxnotes/views/tab_view_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/search_results_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/recent_activity_spec.js',
+        'lms/include/js/spec/edxnotes/views/tabs/course_structure_spec.js',
+        'lms/include/js/spec/edxnotes/views/visibility_decorator_spec.js',
+        'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
+        'lms/include/js/spec/edxnotes/models/tab_spec.js',
+        'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/events_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
+        'lms/include/js/spec/edxnotes/collections/notes_spec.js'
     ]);
 
 }).call(this, requirejs, define);

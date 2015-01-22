@@ -53,7 +53,7 @@ def clean_out_mako_templating(xml_string):
 
 class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
     def __init__(self, xmlstore, course_id, course_dir,
-                 error_tracker, parent_tracker,
+                 error_tracker,
                  load_error_modules=True, **kwargs):
         """
         A class that handles loading from xml.  Does some munging to ensure that
@@ -64,7 +64,8 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
         self.unnamed = defaultdict(int)  # category -> num of new url_names for that category
         self.used_names = defaultdict(set)  # category -> set of used url_names
 
-        # cdodge: adding the course_id as passed in for later reference rather than having to recomine the org/course/url_name
+        # Adding the course_id as passed in for later reference rather than
+        # having to recombine the org/course/url_name
         self.course_id = course_id
         self.load_error_modules = load_error_modules
         self.modulestore = xmlstore
@@ -205,11 +206,20 @@ class ImportSystem(XMLParsingSystem, MakoDescriptorSystem):
 
             descriptor.data_dir = course_dir
 
+            if descriptor.scope_ids.usage_id in xmlstore.modules[course_id]:
+                # keep the parent pointer if any but allow everything else to overwrite
+                other_copy = xmlstore.modules[course_id][descriptor.scope_ids.usage_id]
+                descriptor.parent = other_copy.parent
+                if descriptor != other_copy:
+                    log.warning("%s has more than one definition", descriptor.scope_ids.usage_id)
             xmlstore.modules[course_id][descriptor.scope_ids.usage_id] = descriptor
 
             if descriptor.has_children:
                 for child in descriptor.get_children():
-                    parent_tracker.add_parent(child.scope_ids.usage_id, descriptor.scope_ids.usage_id)
+                    # parent is alphabetically least
+                    if child.parent is None or child.parent > descriptor.scope_ids.usage_id:
+                        child.parent = descriptor.location
+                        child.save()
 
             # After setting up the descriptor, save any changes that we have
             # made to attributes on the descriptor to the underlying KeyValueStore.
@@ -278,48 +288,13 @@ class CourseLocationManager(OpaqueKeyReader, AsideKeyGenerator):
         return usage_id
 
 
-class ParentTracker(object):
-    """A simple class to factor out the logic for tracking location parent pointers."""
-    def __init__(self):
-        """
-        Init
-        """
-        # location -> parent.  Not using defaultdict because we care about the empty case.
-        self._parents = dict()
-
-    def add_parent(self, child, parent):
-        """
-        Add a parent of child location to the set of parents.  Duplicate calls have no effect.
-
-        child and parent must be :class:`.Location` instances.
-        """
-        self._parents[child] = parent
-
-    def is_known(self, child):
-        """
-        returns True iff child has some parents.
-        """
-        return child in self._parents
-
-    def make_known(self, location):
-        """Tell the parent tracker about an object, without registering any
-        parents for it.  Used for the top level course descriptor locations."""
-        self._parents.setdefault(location, None)
-
-    def parent(self, child):
-        """
-        Return the parent of this child.  If not is_known(child), will throw a KeyError
-        """
-        return self._parents[child]
-
-
 class XMLModuleStore(ModuleStoreReadBase):
     """
     An XML backed ModuleStore
     """
     def __init__(
-        self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-        load_error_modules=True, i18n_service=None, fs_service=None, **kwargs
+            self, data_dir, default_class=None, course_dirs=None, course_ids=None,
+            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir
@@ -330,8 +305,8 @@ class XMLModuleStore(ModuleStoreReadBase):
             default_class (str): dot-separated string defining the default descriptor
                 class to use if none is specified in entry_points
 
-            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load. Otherwise,
-                load all courses. Note, providing both
+            course_dirs or course_ids (list of str): If specified, the list of course_dirs or course_ids to load.
+                Otherwise, load all courses. Note, providing both
         """
         super(XMLModuleStore, self).__init__(**kwargs)
 
@@ -352,13 +327,12 @@ class XMLModuleStore(ModuleStoreReadBase):
             class_ = getattr(import_module(module_path), class_name)
             self.default_class = class_
 
-        self.parent_trackers = defaultdict(ParentTracker)
-
         # All field data will be stored in an inheriting field data.
         self.field_data = inheriting_field_data(kvs=DictKeyValueStore())
 
         self.i18n_service = i18n_service
         self.fs_service = fs_service
+        self.user_service = user_service
 
         # If we are specifically asked for missing courses, that should
         # be an error.  If we are asked for "all" courses, find the ones
@@ -400,7 +374,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         else:
             self.courses[course_dir] = course_descriptor
             self._course_errors[course_descriptor.id] = errorlog
-            self.parent_trackers[course_descriptor.id].make_known(course_descriptor.scope_ids.usage_id)
+            course_descriptor.parent = None
 
     def __unicode__(self):
         '''
@@ -507,12 +481,14 @@ class XMLModuleStore(ModuleStoreReadBase):
             if self.fs_service:
                 services['fs'] = self.fs_service
 
+            if self.user_service:
+                services['user'] = self.user_service
+
             system = ImportSystem(
                 xmlstore=self,
                 course_id=course_id,
                 course_dir=course_dir,
                 error_tracker=tracker,
-                parent_tracker=self.parent_trackers[course_id],
                 load_error_modules=self.load_error_modules,
                 get_policy=get_policy,
                 mixins=self.xblock_mixins,
@@ -756,10 +732,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         '''Find the location that is the parent of this location in this
         course.  Needed for path_to_location().
         '''
-        if not self.parent_trackers[location.course_key].is_known(location):
-            raise ItemNotFoundError("{0} not in {1}".format(location, location.course_key))
-
-        return self.parent_trackers[location.course_key].parent(location)
+        block = self.get_item(location, 0)
+        return block.parent
 
     def get_modulestore_type(self, course_key=None):
         """

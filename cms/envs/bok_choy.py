@@ -54,6 +54,15 @@ for log_name, log_level in LOG_OVERRIDES:
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 
+# Enable milestones app
+FEATURES['MILESTONES_APP'] = True
+
+# Enable pre-requisite course
+FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+########################### Entrance Exams #################################
+FEATURES['ENTRANCE_EXAMS'] = True
+
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True
 

@@ -32,7 +32,8 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'edited_on':null,
             /**
-             * User who last edited the xblock or any of its descendants.
+             * User who last edited the xblock or any of its descendants. Will only be present if
+             * publishing info was explicitly requested.
              */
             'edited_by':null,
             /**
@@ -44,7 +45,8 @@ function(Backbone, _, str, ModuleUtils) {
              */
             'published_on': null,
             /**
-             * User who last published the xblock, or null if never published.
+             * User who last published the xblock, or null if never published. Will only be present if
+             * publishing info was explicitly requested.
              */
             'published_by': null,
             /**
@@ -70,12 +72,14 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The xblock which is determining the release date. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
-             * This can be null if the release date is unscheduled.
+             * This can be null if the release date is unscheduled. Will only be present if
+             * publishing info was explicitly requested.
              */
             'release_date_from':null,
             /**
              * True if this xblock is currently visible to students. This is computed server-side
-             * so that the logic isn't duplicated on the client.
+             * so that the logic isn't duplicated on the client. Will only be present if
+             * publishing info was explicitly requested.
              */
             'currently_visible_to_students': null,
             /**
@@ -114,13 +118,24 @@ function(Backbone, _, str, ModuleUtils) {
             /**
              * The xblock which is determining the staff lock value. For instance, for a unit,
              * this will either be the parent subsection or the grandparent section.
-             * This can be null if the xblock has no inherited staff lock.
+             * This can be null if the xblock has no inherited staff lock. Will only be present if
+             * publishing info was explicitly requested.
              */
             'staff_lock_from': null,
             /**
              * True iff this xblock should display a "Contains staff only content" message.
              */
-            'staff_only_message': null
+            'staff_only_message': null,
+            /**
+             * True iff this xblock is a unit, and it has children that are only visible to certain
+             * content groups. Note that this is not a recursive property. Will only be present if
+             * publishing info was explicitly requested.
+             */
+            'has_content_group_components': null,
+            /**
+             * Indicate the type of xblock
+             */
+            'override_type': null
         },
 
         initialize: function () {
@@ -155,6 +170,19 @@ function(Backbone, _, str, ModuleUtils) {
 
         isPublishable: function(){
             return !this.get('published') || this.get('has_changes');
+        },
+
+        canBeDeleted: function(){
+            //get the type of xblock
+            if(this.get('override_type') != null) {
+                var type = this.get('override_type');
+
+                //hide/remove the delete trash icon if type is entrance exam.
+                if (_.has(type, 'is_entrance_exam') && type['is_entrance_exam']) {
+                    return false;
+                }
+            }
+            return true;
         },
 
         /**

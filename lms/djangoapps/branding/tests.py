@@ -19,6 +19,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from django.core.urlresolvers import reverse
+from courseware.tests.helpers import LoginEnrollmentTestCase
+
+from util.milestones_helpers import (
+    seed_milestone_relationship_types,
+    set_prerequisite_courses,
+)
 
 FEATURES_WITH_STARTDATE = settings.FEATURES.copy()
 FEATURES_WITH_STARTDATE['DISABLE_START_DATES'] = False
@@ -107,6 +113,52 @@ class AnonymousIndexPageTest(ModuleStoreTestCase):
         self.assertIsInstance(response, HttpResponseRedirect)
         # Location should be "/login".
         self.assertEqual(response._headers.get("location")[1], "/login")
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test to simulate and verify fix for disappearing courses in
+    course catalog when using pre-requisite courses
+    """
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    def setUp(self):
+        seed_milestone_relationship_types()
+
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    def test_course_with_prereq(self):
+        """
+        Simulate having a course which has closed enrollments that has
+        a pre-req course
+        """
+        pre_requisite_course = CourseFactory.create(
+            org='edX',
+            course='900',
+            display_name='pre requisite course',
+        )
+
+        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+
+        # for this failure to occur, the enrollment window needs to be in the past
+        course = CourseFactory.create(
+            org='edX',
+            course='1000',
+            display_name='course that has pre requisite',
+            # closed enrollment
+            enrollment_start=datetime.datetime(2013, 1, 1),
+            enrollment_end=datetime.datetime(2014, 1, 1),
+            start=datetime.datetime(2013, 1, 1),
+            end=datetime.datetime(2030, 1, 1),
+            pre_requisite_courses=pre_requisite_courses,
+        )
+        set_prerequisite_courses(course.id, pre_requisite_courses)
+
+        resp = self.client.get('/')
+        self.assertEqual(resp.status_code, 200)
+
+        # make sure both courses are visible in the catalog
+        self.assertIn('pre requisite course', resp.content)
+        self.assertIn('course that has pre requisite', resp.content)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
