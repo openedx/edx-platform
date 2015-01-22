@@ -24,7 +24,12 @@ from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 
 
-def mixed_store_config(data_dir, mappings, include_xml=False, xml_course_dirs=None):
+class StoreConstructors(object):
+    """Enumeration of store constructor types."""
+    draft, split, xml = range(3)
+
+
+def mixed_store_config(data_dir, mappings, include_xml=False, xml_course_dirs=None, store_order=None):
     """
     Return a `MixedModuleStore` configuration, which provides
     access to both Mongo- and XML-backed courses.
@@ -53,20 +58,24 @@ def mixed_store_config(data_dir, mappings, include_xml=False, xml_course_dirs=No
             * mappings should be configured, pointing the xml courses to the xml modulestore
 
     """
-    stores = [
-        draft_mongo_store_config(data_dir)['default'],
-        split_mongo_store_config(data_dir)['default']
-    ]
+    if store_order is None:
+        store_order = [StoreConstructors.draft, StoreConstructors.split]
 
-    if include_xml:
-        stores.append(xml_store_config(data_dir, course_dirs=xml_course_dirs)['default'])
+    if include_xml and StoreConstructors.xml not in store_order:
+        store_order.append(StoreConstructors.xml)
+
+    store_constructors = {
+        StoreConstructors.split: split_mongo_store_config(data_dir)['default'],
+        StoreConstructors.draft: draft_mongo_store_config(data_dir)['default'],
+        StoreConstructors.xml: xml_store_config(data_dir, course_dirs=xml_course_dirs)['default'],
+    }
 
     store = {
         'default': {
             'ENGINE': 'xmodule.modulestore.mixed.MixedModuleStore',
             'OPTIONS': {
                 'mappings': mappings,
-                'stores': stores,
+                'stores': [store_constructors[store] for store in store_order],
             }
         }
     }
@@ -176,6 +185,16 @@ TEST_DATA_MIXED_GRADED_MODULESTORE = mixed_store_config(
 # Use this modulestore if you specifically want to test mongo and not a mocked modulestore.
 # This modulestore definition below will not load any xml courses.
 TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp(), {}, include_xml=False)
+
+# All store requests now go through mixed
+# Use this modulestore if you specifically want to test split-mongo and not a mocked modulestore.
+# This modulestore definition below will not load any xml courses.
+TEST_DATA_SPLIT_MODULESTORE = mixed_store_config(
+    mkdtemp(),
+    {},
+    include_xml=False,
+    store_order=[StoreConstructors.split, StoreConstructors.draft]
+)
 
 # Unit tests that are not specifically testing the modulestore implementation but just need course context can use a mocked modulestore.
 # Use this modulestore if you do not care about the underlying implementation.
