@@ -1407,8 +1407,9 @@ def _do_create_account(post_vars, extended_profile=None):
     profile.goals = post_vars.get('goals')
     profile.cedula = post_vars.get('cedula')
 
-    city = City.objects.get(id=post_vars['city_id'])
-    profile.city = city
+    if post_vars.get('city_id'):
+        city = City.objects.get(id=post_vars['city_id'])
+        profile.city = city
     type_id = post_vars['type_id']
     if type_id == 'cedula':
         js = {}
