@@ -1,6 +1,8 @@
 """
 Test courseware search
 """
+import os
+import pickle
 
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
@@ -32,10 +34,16 @@ class CoursewareSearchTest(UniqueCourseTest):
     EDITED_CHAPTER_NAME = "Section 2 - edited"
     EDITED_SEARCH_STRING = "edited"
 
+    TEST_INDEX_FILENAME = "test_root/index_file.dat"
+
     def setUp(self):
         """
         Create search page and course content to search
         """
+        # create test file in which index for this test will live
+        with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
+            pickle.dump({}, index_file)
+
         super(CoursewareSearchTest, self).setUp()
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)
 
@@ -62,6 +70,9 @@ class CoursewareSearchTest(UniqueCourseTest):
                 XBlockFixtureDesc('sequential', 'Subsection 2')
             )
         ).install()
+
+    def tearDown(self):
+        os.remove(self.TEST_INDEX_FILENAME)
 
     def _auto_auth(self, username, email, staff):
         """
