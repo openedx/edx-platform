@@ -81,7 +81,7 @@
 <script>
     $(function () {
         $("#add_invoice_button").click(function (e) {
-            $("#add_invoice_button").attr('disabled', true);
+
             if (!($.isNumeric($("#invoice_id").val()))) {
                  $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
                 return false
@@ -91,7 +91,7 @@
                 return false
             }
             $('h3#error-msgs-invoice').hide();
-
+            $("#add_invoice_button").attr('disabled', true);
             $.ajax({
              type: "POST",
              data: {
