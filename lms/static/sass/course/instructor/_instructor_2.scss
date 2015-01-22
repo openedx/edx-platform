@@ -1593,6 +1593,10 @@ input[name="subject"] {
       border-bottom: 3px solid #a0050e;
       background: #fbf2f3;
     }
+    .radio-custom {
+      width: auto;
+      margin-right: 10px;
+    }
     ol.list-input{
       li{
         width: 278px;
@@ -1617,12 +1621,6 @@ input[name="subject"] {
       }
       li:last-child{
         margin-bottom: 0px !important;
-      }
-    }
-    form#frm_make_invoice_transaction {
-      .radio-custom {
-        width: auto;
-        margin-right: 10px;
       }
     }
     form#generate_codes ol.list-input{
@@ -1905,4 +1903,8 @@ input[name="subject"] {
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
   @include left(2em);
   @include right(auto);
+}
+.radio-custom {
+  width: auto;
+  margin-right: 10px;
 }
