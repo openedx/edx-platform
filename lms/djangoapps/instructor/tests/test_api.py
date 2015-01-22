@@ -3406,7 +3406,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
         # filter all the coupons
         for coupon in Coupon.objects.all():
-            self.assertIn('"{code}","{course_id}","{discount}","0","{description}","{expiration_date}"'.format(
+            self.assertIn('"{code}","{course_id}","{discount}","0","{description}","{expiration_date}","True"'.format(
                 code=coupon.code,
                 course_id=coupon.course_id,
                 discount=coupon.percentage_discount,
