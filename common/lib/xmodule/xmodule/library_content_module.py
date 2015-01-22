@@ -434,6 +434,18 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         validation = super(LibraryContentDescriptor, self).validate()
         if not isinstance(validation, StudioValidation):
             validation = StudioValidation.copy(validation)
+        library_tools = self.runtime.service(self, "library_tools")
+        if not (library_tools and library_tools.can_use_library_content(self)):
+            validation.set_summary(
+                StudioValidationMessage(
+                    StudioValidationMessage.ERROR,
+                    _(
+                        u"This course does not support content libraries. "
+                        u"Contact your system administrator for more information."
+                    )
+                )
+            )
+            return validation
         if not self.source_libraries:
             validation.set_summary(
                 StudioValidationMessage(
