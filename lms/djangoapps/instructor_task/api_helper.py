@@ -272,7 +272,6 @@ def check_entrance_exam_problems_for_rescoring(exam_key):  # pylint: disable=inv
         raise NotImplementedError(msg)
 
 
-
 def encode_problem_and_student_input(usage_key, student=None):  # pylint: disable=invalid-name
     """
     Encode optional usage_key and optional student into task_key and task_input values.
