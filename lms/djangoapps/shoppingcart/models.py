@@ -849,7 +849,7 @@ class InvoiceTransaction(TimeStampedModel):
 
 
     @classmethod
-    def add_invoice_transaction(cls, invoice_id, amount, comments, user):
+    def add_invoice_transaction(cls, invoice_id, amount, comments, user,status):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
@@ -861,7 +861,7 @@ class InvoiceTransaction(TimeStampedModel):
             invoice_transaction.save()
             return invoice_transaction
         except Invoice.DoesNotExist:
-            return u""
+            raise Invoice.DoesNotExist
 
 
 class InvoiceItem(TimeStampedModel):
