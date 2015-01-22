@@ -307,14 +307,35 @@ $edx-footer-bg-color: rgb(252,252,252);
     @extend %edx-footer-title;
   }
 
-  .footer-about-logo {
+  .footer-about-logo, .footer-about-openedx-logo {
     margin-bottom: $edx-footer-spacing;
+
+    img {
+      height: 47px;
+    }
+
+    a {
+      display: block;
+
+      &:hover {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  .footer-about-logo {
+    float: left;
+  }
+
+  .footer-about-openedx-logo {
+    float: right;
   }
 
   .footer-about-copy {
     @extend %t-copy-sub1;
     margin-bottom: $edx-footer-spacing;
     color: rgb(61, 62, 63);
+    clear: both;
 
     p {
       // NOTE: needed for poor LMS span styling
