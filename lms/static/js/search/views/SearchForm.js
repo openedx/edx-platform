@@ -1,11 +1,8 @@
-var edx = edx || {};
-
-(function ($, Backbone) {
+RequireJS.define(['jquery', 'backbone'], function ($, Backbone) {
    'use strict';
 
-    edx.search = edx.search || {};
+    return Backbone.View.extend({
 
-    edx.search.Form = Backbone.View.extend({
         el: '#courseware-search-bar',
         events: {
             'submit form': 'submitForm',
@@ -62,4 +59,4 @@ var edx = edx || {};
 
     });
 
-})(jQuery, Backbone);
+});

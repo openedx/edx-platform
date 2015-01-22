@@ -1,11 +1,15 @@
-var edx = edx || {};
+RequireJS.define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'gettext',
+    'js/search/views/SearchItemView'
+], function ($, _, Backbone, gettext, SearchItemView) {
 
-(function ($, _, Backbone, gettext, interpolate) {
    'use strict';
 
-    edx.search = edx.search || {};
+    return Backbone.View.extend({
 
-    edx.search.List = Backbone.View.extend({
         el: '#courseware-search-results',
         events: {
             'click .search-load-next': 'loadNext'
@@ -47,7 +51,7 @@ var edx = edx || {};
 
         renderItems: function () {
             var items = this.collection.map(function (result) {
-                var item = new edx.search.Item({ model: result });
+                var item = new SearchItemView({ model: result });
                 return item.render().el;
             });
             this.$el.find('.search-results').append(items);
@@ -78,4 +82,4 @@ var edx = edx || {};
 
     });
 
-})(jQuery, _, Backbone, gettext, interpolate);
+});

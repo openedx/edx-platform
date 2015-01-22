@@ -1,24 +1,38 @@
+// See lms/static/js/RequireJS-namespace-undefine.js
+RequireJS.define = define;
+
 define([
     'jquery',
     'sinon',
     'backbone',
     'js/common_helpers/template_helpers',
-    'js/search/views/form',
-    'js/search/views/item',
-    'js/search/models/result',
-    'js/search/collections/collection',
-    'js/search/views/list',
-    'js/search/router',
-    'js/search/app'
-],
-function($, Sinon, Backbone, TemplateHelpers) {
+    'js/search/views/SearchForm',
+    'js/search/views/SearchItemView',
+    'js/search/views/SearchListView',
+    'js/search/models/SearchResult',
+    'js/search/collections/SearchCollection',
+    'js/search/SearchRouter',
+    'js/search/SearchApp'
+], function(
+    $,
+    Sinon,
+    Backbone,
+    TemplateHelpers,
+    SearchForm,
+    SearchItemView,
+    SearchListView,
+    SearchResult,
+    SearchCollection,
+    SearchRouter,
+    SearchApp
+) {
     'use strict';
 
-    describe('edx.search.Form', function () {
+    describe('SearchForm', function () {
 
         beforeEach(function () {
             loadFixtures('js/fixtures/search_form.html');
-            this.form = new edx.search.Form();
+            this.form = new SearchForm();
             this.onClear = jasmine.createSpy('onClear');
             this.onSearch = jasmine.createSpy('onSearch');
             this.form.on('clear', this.onClear);
@@ -78,7 +92,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.Item', function () {
+    describe('SearchItemView', function () {
 
         beforeEach(function () {
             TemplateHelpers.installTemplate('templates/courseware_search/search_item');
@@ -90,7 +104,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
                     url: 'path/to/content'
                 }
             };
-            this.item = new edx.search.Item({ model: this.model });
+            this.item = new SearchItemView({ model: this.model });
         });
 
         it('has useful html attributes', function () {
@@ -112,10 +126,10 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.Result', function () {
+    describe('SearchResult', function () {
 
         beforeEach(function () {
-            this.result = new edx.search.Result();
+            this.result = new SearchResult();
         });
 
         it('has properties', function () {
@@ -128,11 +142,11 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.Collection', function () {
+    describe('SearchCollection', function () {
 
         beforeEach(function () {
             this.server = Sinon.fakeServer.create();
-            this.collection = new edx.search.Collection();
+            this.collection = new SearchCollection();
 
             this.onSearch = jasmine.createSpy('onSearch');
             this.collection.on('search', this.onSearch);
@@ -149,7 +163,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
         });
 
         it('appends course_id to url', function () {
-            var collection = new edx.search.Collection([], { course_id: 'edx101' });
+            var collection = new SearchCollection([], { course_id: 'edx101' });
             expect(collection.url).toEqual('/search/edx101');
         });
 
@@ -262,7 +276,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.List', function () {
+    describe('SearchListView', function () {
 
         beforeEach(function () {
             setFixtures(
@@ -280,11 +294,11 @@ function($, Sinon, Backbone, TemplateHelpers) {
             this.collection = new MockCollection();
 
             // spy on these methods before they are bound to events
-            spyOn(edx.search.List.prototype, 'render').andCallThrough();
-            spyOn(edx.search.List.prototype, 'renderNext').andCallThrough();
-            spyOn(edx.search.List.prototype, 'showErrorMessage').andCallThrough();
+            spyOn(SearchListView.prototype, 'render').andCallThrough();
+            spyOn(SearchListView.prototype, 'renderNext').andCallThrough();
+            spyOn(SearchListView.prototype, 'showErrorMessage').andCallThrough();
 
-            this.listView = new edx.search.List({ collection: this.collection });
+            this.listView = new SearchListView({ collection: this.collection });
         });
 
         it('shows loading message', function () {
@@ -383,10 +397,10 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.Router', function () {
+    describe('SearchRouter', function () {
 
         beforeEach(function () {
-            this.router = new edx.search.Router();
+            this.router = new SearchRouter();
         });
 
         it ('has a search route', function () {
@@ -396,7 +410,7 @@ function($, Sinon, Backbone, TemplateHelpers) {
     });
 
 
-    describe('edx.search.App', function () {
+    describe('SearchApp', function () {
 
         beforeEach(function () {
             TemplateHelpers.installTemplate('templates/courseware_search/search_item');
@@ -405,15 +419,15 @@ function($, Sinon, Backbone, TemplateHelpers) {
             TemplateHelpers.installTemplate('templates/courseware_search/search_error');
 
             // spy on these methods before they are bound to events
-            spyOn(edx.search.Router.prototype, 'navigate').andCallThrough();
-            spyOn(edx.search.Form.prototype, 'doSearch').andCallThrough();
-            spyOn(edx.search.Collection.prototype, 'performSearch').andCallThrough();
-            spyOn(edx.search.Collection.prototype, 'cancelSearch').andCallThrough();
-            spyOn(edx.search.Collection.prototype, 'loadNextPage').andCallThrough();
-            spyOn(edx.search.List.prototype, 'showLoadingMessage').andCallThrough();
-            spyOn(edx.search.List.prototype, 'clear').andCallThrough();
+            spyOn(SearchRouter.prototype, 'navigate').andCallThrough();
+            spyOn(SearchForm.prototype, 'doSearch').andCallThrough();
+            spyOn(SearchCollection.prototype, 'performSearch').andCallThrough();
+            spyOn(SearchCollection.prototype, 'cancelSearch').andCallThrough();
+            spyOn(SearchCollection.prototype, 'loadNextPage').andCallThrough();
+            spyOn(SearchListView.prototype, 'showLoadingMessage').andCallThrough();
+            spyOn(SearchListView.prototype, 'clear').andCallThrough();
 
-            this.app = new edx.search.App('a/b/c');
+            this.app = new SearchApp('a/b/c');
 
         });
 

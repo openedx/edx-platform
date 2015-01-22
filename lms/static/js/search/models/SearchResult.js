@@ -1,11 +1,7 @@
-var edx = edx || {};
-
-(function (Backbone) {
+RequireJS.define(['backbone'], function (Backbone) {
     'use strict';
 
-    edx.search = edx.search || {};
-
-    edx.search.Result = Backbone.Model.extend({
+    return Backbone.Model.extend({
         defaults: {
             location: [],
             content_type: '',
@@ -14,4 +10,4 @@ var edx = edx || {};
         }
     });
 
-})(Backbone);
+});

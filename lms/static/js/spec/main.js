@@ -514,34 +514,6 @@
             'annotator': {
                 exports: 'Annotator',
                 deps: ['jquery']
-            },
-            'js/search/views/form': {
-                exports: 'edx.search.Form',
-                deps: ['jquery', 'underscore', 'backbone']
-            },
-            'js/search/views/item': {
-                exports: 'edx.search.Item',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
-            },
-            'js/search/models/result': {
-                exports: 'edx.search.Result',
-                deps: ['backbone']
-            },
-            'js/search/collections/collection': {
-                exports: 'edx.search.Collection',
-                deps: ['backbone']
-            },
-            'js/search/views/list': {
-                exports: 'edx.search.List',
-                deps: ['jquery', 'underscore', 'backbone', 'gettext']
-            },
-            'js/search/router': {
-                exports: 'edx.search.Router',
-                deps: ['backbone']
-            },
-            'js/search/app': {
-                exports: 'edx.search.App',
-                deps: ['backbone', 'underscore']
             }
         }
     });
@@ -588,7 +560,7 @@
         'lms/include/js/spec/edxnotes/models/note_spec.js',
         'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
-        'lms/include/js/spec/edxnotes/collections/notes_spec.js'
+        'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js'
     ]);
 

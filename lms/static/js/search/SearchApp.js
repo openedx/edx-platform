@@ -1,18 +1,20 @@
-
-var edx = edx || {};
-
-(function(Backbone) {
+RequireJS.define([
+    'backbone',
+    'js/search/SearchRouter',
+    'js/search/views/SearchForm',
+    'js/search/views/SearchListView',
+    'js/search/collections/SearchCollection'
+], function(Backbone, SearchRouter, SearchForm, SearchListView, SearchCollection) {
     'use strict';
 
-    edx.search = edx.search || {};
+    return function (course_id) {
 
-    edx.search.App = function (course_id) {
         var self = this;
 
-        this.router = new edx.search.Router();
-        this.form = new edx.search.Form();
-        this.collection = new edx.search.Collection([], { course_id: course_id });
-        this.results = new edx.search.List({ collection: this.collection });
+        this.router = new SearchRouter();
+        this.form = new SearchForm();
+        this.collection = new SearchCollection([], { course_id: course_id });
+        this.results = new SearchListView({ collection: this.collection });
 
         this.form.on('search', this.results.showLoadingMessage, this.results);
         this.form.on('search', this.collection.performSearch, this.collection);
@@ -25,11 +27,7 @@ var edx = edx || {};
 
         this.results.on('next', this.collection.loadNextPage, this.collection);
         this.router.on('route:search', this.form.doSearch, this.form);
+
     };
 
-    var course_id = $('#courseware-search-results').attr('data-course-id');
-    var app = new edx.search.App(course_id);
-    Backbone.history.start();
-    return  app;
-
-})(Backbone);
+});
