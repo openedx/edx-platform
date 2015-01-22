@@ -8,18 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'InvoiceItem'
-        db.create_table('shoppingcart_invoiceitem', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
-            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
-            ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Invoice'])),
-            ('qty', self.gf('django.db.models.fields.IntegerField')(default=1)),
-            ('unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
-            ('billed_unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
-        ))
-        db.send_create_signal('shoppingcart', ['InvoiceItem'])
-
         # Adding model 'InvoiceTransaction'
         db.create_table('shoppingcart_invoicetransaction', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -33,6 +21,18 @@ class Migration(SchemaMigration):
             ('status', self.gf('django.db.models.fields.CharField')(default='started', max_length=32)),
         ))
         db.send_create_signal('shoppingcart', ['InvoiceTransaction'])
+
+        # Adding model 'InvoiceItem'
+        db.create_table('shoppingcart_invoiceitem', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now)),
+            ('modified', self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now)),
+            ('invoice', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.Invoice'])),
+            ('qty', self.gf('django.db.models.fields.IntegerField')(default=1)),
+            ('unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
+            ('billed_unit_price', self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2)),
+        ))
+        db.send_create_signal('shoppingcart', ['InvoiceItem'])
 
         # Adding model 'CourseRegistrationCodeInvoiceItem'
         db.create_table('shoppingcart_courseregistrationcodeinvoiceitem', (
@@ -58,11 +58,11 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Deleting model 'InvoiceItem'
-        db.delete_table('shoppingcart_invoiceitem')
-
         # Deleting model 'InvoiceTransaction'
         db.delete_table('shoppingcart_invoicetransaction')
+
+        # Deleting model 'InvoiceItem'
+        db.delete_table('shoppingcart_invoiceitem')
 
         # Deleting model 'CourseRegistrationCodeInvoiceItem'
         db.delete_table('shoppingcart_courseregistrationcodeinvoiceitem')
@@ -125,7 +125,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Coupon'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '32', 'db_index': 'True'}),
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 20, 0, 0)'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 22, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'expiration_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
@@ -156,7 +156,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'CourseRegistrationCode'},
             'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32', 'db_index': 'True'}),
             'course_id': ('xmodule_django.models.CourseKeyField', [], {'max_length': '255', 'db_index': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 20, 0, 0)'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 22, 0, 0)'}),
             'created_by': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'created_by_user'", 'to': "orm['auth.User']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invoice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Invoice']", 'null': 'True'}),
@@ -290,7 +290,7 @@ class Migration(SchemaMigration):
             'course_enrollment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['student.CourseEnrollment']", 'null': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Order']", 'null': 'True'}),
-            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 20, 0, 0)', 'null': 'True'}),
+            'redeemed_at': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2015, 1, 22, 0, 0)', 'null': 'True'}),
             'redeemed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'registration_code': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.CourseRegistrationCode']"})
         },
