@@ -888,8 +888,12 @@ def sale_validation(request, course_id):
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
-    except Invoice.DoesNotExist:
+        obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
+            id=invoice_number,
+            course_id=course_id
+        )
+        obj_invoice = obj_invoice.invoice
+    except CourseRegistrationCodeInvoiceItem.DoesNotExist:
         return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
 
     if event_type == "invalidate":
