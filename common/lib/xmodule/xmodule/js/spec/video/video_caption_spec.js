@@ -593,7 +593,7 @@
             it(msg, function () {
                 spyOn(Caption, 'fetchAvailableTranslations');
                 $.ajax.andCallFake(function (settings) {
-//                    settings.error([]);
+                    settings.error([]);
                 });
 
                 state.config.transcriptLanguages = {};
