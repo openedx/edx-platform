@@ -82,6 +82,7 @@ class EnrollmentView(APIView):
             A JSON serialized representation of the course enrollment.
 
         """
+        user = user if user else request.user.username
         if request.user.username != user:
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
