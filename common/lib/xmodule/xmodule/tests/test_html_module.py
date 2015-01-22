@@ -94,3 +94,30 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
             "content": {"html_content": " Text has spaces :) ", "display_name": "Text"},
             "content_type": "HTML Content"
         })
+
+        sample_xml_comment = '''
+            <html>
+                <p>This has HTML comment in it.</p>
+                <!-- Html Comment -->
+            </html>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml_comment)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {"html_content": " This has HTML comment in it. ", "display_name": "Text"},
+            "content_type": "HTML Content"
+        })
+
+        sample_xml_mix_comment_cdata = '''
+            <html>
+                <!-- Beginning of the html -->
+                <p>This has HTML comment in it.<!-- Commenting Content --></p>
+                <!-- Here comes CDATA -->
+                <![CDATA[This is just a CDATA!]]>
+                <p>HTML end.</p>
+            </html>
+        '''
+        descriptor = instantiate_descriptor(data=sample_xml_mix_comment_cdata)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
+            "content_type": "HTML Content"
+        })
