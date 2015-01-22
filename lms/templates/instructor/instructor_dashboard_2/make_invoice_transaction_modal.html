@@ -1,0 +1,97 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%page args="section_data"/>
+<section id="make_invoice_transaction_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon')}">
+    <div class="inner-wrapper">
+        <button class="close-modal">
+            <i class="icon fa fa-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_('Close')}
+      </span>
+        </button>
+
+        <div id="coupon-content">
+            <header>
+                <h2>${_("Add invoice payments and refunds")}</h2>
+            </header>
+            <h3 class="error-msgs" id="error-msgs-invoice"></h3>
+
+            <div class="instructions">
+                <p>
+                    ${_("Please enter valid credentials")}</p>
+            </div>
+
+            <form action="${ section_data['make_invoice_transaction_url'] }" id="frm_make_invoice_transaction"
+                  method="post">
+
+                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
+                <div id="make_invoice_form_error" class="modal-form-error"></div>
+
+                <div id="coupon_form_error" class="make_invoice-modal-form-error"></div>
+                <fieldset class="group group-form group-form-requiredinformation">
+                    <legend class="is-hidden">${_("Required Information")}</legend>
+
+                    <ol class="list-input">
+                        <li class="field required text" id="make_invoice-modal-field-invoice-id">
+                            <label for="invoice_id" class="required">${_("Invoice Id")}</label>
+                            <input class="" id="invoice_id" type="text" name="invoice_id" maxlength="16" value=""
+                                   placeholder="example: 1234"
+                                   aria-required="true"/>
+                        </li>
+                        <li class="field required text" id="make_invoice-modal-field-amount">
+                            <label for="amount" class="required text">${_("Amount")}</label>
+                            <input class="field required" id="amount" type="text" name="amount" value="" maxlength="6"
+                                   aria-required="true"/>
+                        </li>
+
+                        <li class="field text" id="make_invoice-modal-field-amount-type">
+                            <label>
+                                <input class="radio-custom" type="radio" name="amount_type"
+                                       value="payment" checked>${_("Payment")}
+                            </label>
+                            <label>
+                                <input class="radio-custom" type="radio" name="amount_type"
+                                       value="refund">${_("Refund")}
+                            </label>
+                        </li>
+
+                        <li class="field" id="make_invoice-modal-field-description">
+                            <label for="comments">${_("Description")}</label>
+                            <textarea class="field" id="comments" type="text" name="comments" value=""
+                                      aria-describedby="pwd_reset_email-tip" aria-required="true"> </textarea>
+                        </li>
+
+                        <li class="field" id="make_invoice-modal-field-course_id">
+                            <input class="field hidden" id="coupon_course_id" type="text" name="course_id"
+                                   value="${section_data['course_id'] | h}"
+                                   readonly aria-required="true"/>
+                        </li>
+                    </ol>
+                </fieldset>
+
+                <div class="submit">
+                    <input name="submit_btn" type="button" id="add_invoice_button" value="${_('Add Invoice Transaction')}"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function () {
+        $("#add_invoice_button").click(function (e) {
+            if (!($.isNumeric($("#invoice_id").val()))) {
+                 $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
+                return false
+             }
+            if (!($.isNumeric($("#amount").val()))) {
+                $('h3#error-msgs-invoice').html('Please enter valid numeric value in amount.').show();
+                return false
+            }
+            $('h3#error-msgs-invoice').hide();
+            $("#frm_make_invoice_transaction").submit();
+        });
+     });
+</script>
+
