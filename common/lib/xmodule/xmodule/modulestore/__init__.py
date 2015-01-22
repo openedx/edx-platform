@@ -441,6 +441,17 @@ class ModuleStoreAssetBase(object):
             ret_assets.append(new_asset)
         return ret_assets
 
+    # pylint: disable=unused-argument
+    def check_supports(self, course_key, method):
+        """
+        Verifies that a modulestore supports a particular method.
+
+        Some modulestores may differ based on the course_key, such
+        as mixed (since it has to find the underlying modulestore),
+        so it's required as part of the method signature.
+        """
+        return hasattr(self, method)
+
 
 class ModuleStoreAssetWriteInterface(ModuleStoreAssetBase):
     """
