@@ -106,6 +106,23 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.assertEqual(1, len(data['course_details']['course_modes']))
         self.assertEqual('professional', data['course_details']['course_modes'][0]['slug'])
 
+    def test_user_not_specified(self):
+        CourseModeFactory.create(
+            course_id=self.course.id,
+            mode_slug='honor',
+            mode_display_name='Honor',
+        )
+        # Create an enrollment
+        self._create_enrollment()
+        resp = self.client.get(
+            reverse('courseenrollment', kwargs={"course_id": unicode(self.course.id)})
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.content)
+        self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual('honor', data['mode'])
+        self.assertTrue(data['is_active'])
+
     def test_user_not_authenticated(self):
         # Log out, so we're no longer authenticated
         self.client.logout()
