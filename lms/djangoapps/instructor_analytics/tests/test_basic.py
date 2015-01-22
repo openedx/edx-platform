@@ -312,11 +312,11 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
             self.assertIn(
                 course_registration['company_name'],
-                [getattr(registration_code.invoice, 'company_name') for registration_code in registration_codes]
+                [getattr(registration_code.invoice_item.invoice, 'company_name') for registration_code in registration_codes]
             )
             self.assertIn(
                 course_registration['invoice_id'],
-                [registration_code.invoice_id for registration_code in registration_codes]
+                [registration_code.invoice_item.invoice_id for registration_code in registration_codes]
             )
 
     def test_coupon_codes_features(self):

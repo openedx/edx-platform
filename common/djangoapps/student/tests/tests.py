@@ -272,13 +272,12 @@ class DashboardTest(ModuleStoreTestCase):
     def test_blocked_course_scenario(self, log_warning):
 
         self.client.login(username="jack", password="test")
-
+        # from nose.tools import set_trace; set_trace()
         #create testing invoice 1
         sale_invoice_1 = shoppingcart.models.Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='Testw',
             company_contact_email='test1@test.com', customer_reference_number='2Fwe23S',
-            recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
-            course_id=self.course.id, is_valid=False
+            recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A", is_valid=False
         )
         invoice_item = shoppingcart.models.CourseRegistrationCodeInvoiceItem.objects.create(
             invoice=sale_invoice_1,

@@ -1709,9 +1709,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         #create testing invoice 1
         self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
-            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="A", course_id=self.course.id, is_valid=True
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
+            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True
         )
         self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
             invoice=self.sale_invoice_1,
@@ -1851,7 +1851,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
+                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1866,7 +1866,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
+                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1876,7 +1876,13 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertIn('sale', res_json)
 
         for res in res_json['sale']:
-            self.validate_sale_records_response(res, course_registration_code, self.sale_invoice_1, 0)
+            self.validate_sale_records_response(
+                res,
+                course_registration_code,
+                self.sale_invoice_1,
+                0,
+                invoice_item=self.invoice_item
+            )
 
     def test_get_sale_records_features_with_multiple_invoices(self):
         """
@@ -1885,21 +1891,28 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=self.sale_invoice_1, mode_slug='honor'
+                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
         #create test invoice 2
         sale_invoice_2 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
-            recipient_name='Testw_2', recipient_email='test2@test.com', customer_reference_number='2Fwe23S',
-            internal_reference="B", course_id=self.course.id
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com', recipient_name='Testw_2', recipient_email='test2@test.com',
+            customer_reference_number='2Fwe23S', internal_reference="B"
+        )
+
+        invoice_item_2 = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.sale_invoice_2,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
         )
 
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='xyzmn{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice_2, mode_slug='honor'
+                created_by=self.instructor, invoice_item=invoice_item_2, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1908,10 +1921,22 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         res_json = json.loads(response.content)
         self.assertIn('sale', res_json)
 
-        self.validate_sale_records_response(res_json['sale'][0], course_registration_code, self.sale_invoice_1, 0)
-        self.validate_sale_records_response(res_json['sale'][1], course_registration_code, sale_invoice_2, 0)
+        self.validate_sale_records_response(
+            res_json['sale'][0],
+            course_registration_code,
+            self.sale_invoice_1,
+            0,
+            invoice_item=self.invoice_item
+        )
+        self.validate_sale_records_response(
+            res_json['sale'][1],
+            course_registration_code,
+            sale_invoice_2,
+            0,
+            invoice_item=invoice_item_2
+        )
 
-    def validate_sale_records_response(self, res, course_registration_code, invoice, used_codes):
+    def validate_sale_records_response(self, res, course_registration_code, invoice, used_codes, invoice_item):
         """
         validate sale records attribute values with the response object
         """
@@ -1925,7 +1950,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(res['customer_reference_number'], invoice.customer_reference_number)
         self.assertEqual(res['invoice_number'], invoice.id)
         self.assertEqual(res['created_by'], course_registration_code.created_by.username)
-        self.assertEqual(res['course_id'], invoice.course_id.to_deprecated_string())
+        self.assertEqual(res['course_id'], invoice_item.course_id.to_deprecated_string())
         self.assertEqual(res['total_used_codes'], used_codes)
         self.assertEqual(res['total_codes'], 5)
 
