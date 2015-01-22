@@ -1990,6 +1990,9 @@ COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 #date format the api will be formatting the datetime values
 API_DATE_FORMAT = '%Y-%m-%d'
 
+# Enrollment API Cache Timeout
+ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
+
 # for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
