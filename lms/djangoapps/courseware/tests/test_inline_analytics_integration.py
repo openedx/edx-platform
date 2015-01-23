@@ -10,7 +10,6 @@ from courseware.views import get_analytics_answer_dist, process_analytics_answer
 from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class InlineAnalyticsTest(ModuleStoreTestCase):
