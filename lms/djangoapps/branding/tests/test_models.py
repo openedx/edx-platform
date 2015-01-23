@@ -1,3 +1,6 @@
+"""
+Tests for the Video Branding configuration.
+"""
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from branding.models import BrandingInfoConfig
@@ -39,9 +42,9 @@ class BrandingInfoConfigTest(TestCase):
         self.config.save()
         expected_config = {
             "CN": {
-                    "url": "http://www.xuetangx.com",
-                    "logo_src": "http://www.xuetangx.com/static/images/logo.png",
-                    "logo_tag": "Video hosted by XuetangX.com"
+                "url": "http://www.xuetangx.com",
+                "logo_src": "http://www.xuetangx.com/static/images/logo.png",
+                "logo_tag": "Video hosted by XuetangX.com"
             }
         }
         self.assertEquals(self.config.get_config(), expected_config)
