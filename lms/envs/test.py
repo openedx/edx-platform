@@ -428,15 +428,6 @@ VERIFY_STUDENT["SOFTWARE_SECURE"] = {
 VIDEO_CDN_URL = {
     'CN': 'http://api.xuetangx.com/edx/video?s3_url='
 }
-VIDEO_CDN_INFO = {
-    'CN': {
-        'BRANDING': {
-            'url': 'http://www.xuetangx.com',
-            'logo_src': 'http://www.xuetangx.com/static/images/logo.png',
-            'logo_tag': 'Video hosted by XuetangX.com',
-        },
-    },
-}
 
 ######### dashboard git log settings #########
 MONGODB_LOG = {
