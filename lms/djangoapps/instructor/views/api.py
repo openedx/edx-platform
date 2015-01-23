@@ -889,7 +889,7 @@ def sale_validation(request, course_id):
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
         obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
-            id=invoice_number,
+            invoice_id=invoice_number,
             course_id=course_id
         )
         obj_invoice = obj_invoice.invoice
