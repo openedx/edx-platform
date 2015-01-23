@@ -96,6 +96,9 @@ def strip_key(func):
     return inner
 
 
+# pylint triggers interface-not-implemented for this class, which appears to be due
+# to the NotImplementedError being raised when a specific implementation does not provide the desired service
+# pylint: disable=interface-not-implemented
 class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, ModuleStoreCoursewareIndexMixin):
     """
     ModuleStore knows how to route requests to the right persistence ms
