@@ -19,7 +19,6 @@ from xmodule.assetstore import AssetMetadata
 
 from . import ModuleStoreWriteBase
 from . import ModuleStoreEnum
-from .courseware_index import ModuleStoreCoursewareIndexMixin
 from .exceptions import ItemNotFoundError, DuplicateCourseError
 from .draft_and_published import ModuleStoreDraftAndPublished
 from .split_migrator import SplitMigrator
@@ -96,10 +95,7 @@ def strip_key(func):
     return inner
 
 
-# pylint triggers interface-not-implemented for this class, which appears to be due
-# to the NotImplementedError being raised when a specific implementation does not provide the desired service
-# pylint: disable=interface-not-implemented
-class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, ModuleStoreCoursewareIndexMixin):
+class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
     """
     ModuleStore knows how to route requests to the right persistence ms
     """
@@ -923,3 +919,17 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Modul
         """
         for store in self.modulestores:
             store.ensure_indexes()
+
+    def do_index(self, location, delete=False):
+        """
+        Add to courseware search index from given location and its children
+        """
+        store = self._verify_modulestore_support(location.course_key, 'has_changes')
+        store.do_index(location, delete)
+
+    def do_course_reindex(self, course_key):
+        """
+        (Re)index all content within the given course
+        """
+        store = self._verify_modulestore_support(course_key, 'do_course_reindex')
+        store.do_course_reindex(course_key)

@@ -17,20 +17,18 @@ log = logging.getLogger('edx.modulestore')
 
 
 class IndexWriteError(Exception):
-
     """ Raised to indicate that indexing of particular key failed """
     pass
 
 
 class ModuleStoreCoursewareIndexMixin(object):
-
     """
     Mixin class to enable indexing for courseware search from different modulestores
     """
 
     def do_index(self, location, delete=False):
         """
-        Main routine to index (for purposes of searching) from given location and other stuff on down
+        Add to courseware search index from given location and its children
         """
         error = []
         # TODO - inline for now, need to move this out to a celery task
@@ -113,6 +111,6 @@ class ModuleStoreCoursewareIndexMixin(object):
 
     def do_course_reindex(self, course_key):
         """
-        Get the course with the given courseid (org/course/run)
+        (Re)index all content within the given course
         """
         return self.do_index(course_key, delete=False)
