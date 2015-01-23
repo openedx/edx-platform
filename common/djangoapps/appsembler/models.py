@@ -18,7 +18,7 @@ from course_action_state.models import CourseRerunState
 #     CourseCreator = None
 
 intercom.Intercom.app_id = os.environ.get("INTERCOM_APP_ID", "")
-intercom.Intercom.api_key = os.environ.get("INTERCOM_APP_SECRET", "")
+intercom.Intercom.api_key = os.environ.get("INTERCOM_API_KEY", "")
 INTERCOM_USER_EMAIL = os.environ.get("INTERCOM_USER_EMAIL", "")
 
 
