@@ -489,3 +489,23 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.assertIn(unicode_text, self.video.captions_text)
         self.assertEqual(self.video.caption_languages.keys(), [u'table', u'uk'])
         self.assertEqual(self.video.caption_languages.keys()[0], 'table')
+
+    def test_upload_transcript_with_BOM(self):
+        """
+        Scenario: User can upload transcript file with BOM(Byte Order Mark) in it.
+        Given I have created a Video component
+        And I edit the component
+        And I open tab "Advanced"
+        And I upload transcript file "chinese_transcripts_with_BOM.srt" for "zh" language code
+        And I save changes
+        Then when I view the video it does show the captions
+        And I see "莎拉·佩林 (Sarah Palin)" text in the captions
+        """
+        self._create_video_component()
+        self.edit_component()
+        self.open_advanced_tab()
+        self.video.upload_translation('chinese_transcripts_with_BOM.srt', 'zh')
+        self.save_unit_settings()
+        self.assertTrue(self.video.is_captions_visible())
+        unicode_text = "莎拉·佩林 (Sarah Palin)".decode('utf-8')
+        self.assertIn(unicode_text, self.video.captions_lines())
