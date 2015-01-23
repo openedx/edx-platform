@@ -486,11 +486,9 @@ class ParentLocationCache(dict):
 
 
 class MongoModuleStore(
-        ModuleStoreDraftAndPublished,
-        ModuleStoreWriteBase,
-        MongoBulkOpsMixin,
+        ModuleStoreDraftAndPublished, ModuleStoreWriteBase, MongoBulkOpsMixin,
         ModuleStoreCoursewareIndexMixin
-    ):
+    ):  # noqa
     """
     A Mongodb backed ModuleStore
     """
