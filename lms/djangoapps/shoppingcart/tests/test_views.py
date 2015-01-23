@@ -62,12 +62,6 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(ModuleStoreTestCase):
@@ -1255,7 +1249,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class ReceiptRedirectTest(ModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """
 
@@ -1317,7 +1310,6 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
         self.assertRedirects(resp, redirect_url)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
     """
@@ -1431,7 +1423,6 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertIn('40.00', resp.content)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     """
@@ -1562,7 +1553,6 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         self.assertIn(self.course.display_name, response.content)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class DonationViewTest(ModuleStoreTestCase):
     """Tests for making a donation.
@@ -1720,7 +1710,6 @@ class DonationViewTest(ModuleStoreTestCase):
         return reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": order_id})
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class CSVReportViewsTest(ModuleStoreTestCase):
     """
     Test suite for CSV Purchase Reporting

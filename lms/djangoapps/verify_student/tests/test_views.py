@@ -37,11 +37,6 @@ from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
@@ -64,7 +59,6 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class TestPayAndVerifyView(ModuleStoreTestCase):
     """
@@ -769,7 +763,6 @@ class TestPayAndVerifyView(ModuleStoreTestCase):
         self.assertRedirects(response, url)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestCreateOrder(ModuleStoreTestCase):
     """
     Tests for the create order view.
@@ -854,7 +847,6 @@ class TestCreateOrder(ModuleStoreTestCase):
         attempt.approve()
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
@@ -1126,7 +1118,6 @@ class TestSubmitPhotosForVerification(TestCase):
         self.assertEqual(info['full_name'], full_name)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
@@ -1343,7 +1334,6 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIsNotNone(CourseEnrollment.objects.get(course_id=self.course_id))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestReverifyView(ModuleStoreTestCase):
     """
     Tests for the reverification views
@@ -1392,7 +1382,6 @@ class TestReverifyView(ModuleStoreTestCase):
         self.assertTrue(context['error'])
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestMidCourseReverifyView(ModuleStoreTestCase):
     """
     Tests for the midcourse reverification views.
@@ -1515,7 +1504,6 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestReverificationBanner(ModuleStoreTestCase):
     """
     Tests for toggling the "midcourse reverification failed" banner off.

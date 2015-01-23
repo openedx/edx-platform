@@ -27,7 +27,6 @@ from class_dashboard.views import has_instructor_access_for_class
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/dashboard_data.py

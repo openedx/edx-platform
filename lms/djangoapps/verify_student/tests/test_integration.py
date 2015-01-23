@@ -14,12 +14,6 @@ from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestProfEdVerification(ModuleStoreTestCase):
     """
     Integration test for professional ed verification, including course mode selection.

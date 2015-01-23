@@ -22,7 +22,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ReportTypeTests(ModuleStoreTestCase):
     """
     Tests for the models used to generate certificate status reports
@@ -180,7 +179,6 @@ class ReportTypeTests(ModuleStoreTestCase):
         self.assertEqual(csv.replace('\r\n', '\n').strip(), self.CORRECT_UNI_REVENUE_SHARE_CSV.strip())
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     """
     Tests for the models used to generate itemized purchase reports

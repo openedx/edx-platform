@@ -17,7 +17,6 @@ from course_wiki.utils import user_is_article_course_staff, course_wiki_slug
 from course_wiki import settings
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
     def setUp(self):

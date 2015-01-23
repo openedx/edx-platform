@@ -20,7 +20,6 @@ from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.

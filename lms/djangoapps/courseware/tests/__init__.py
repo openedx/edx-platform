@@ -24,7 +24,6 @@ from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class BaseTestXmodule(ModuleStoreTestCase):
     """Base class for testing Xmodules with mongo store.
 
@@ -41,6 +40,8 @@ class BaseTestXmodule(ModuleStoreTestCase):
     This class should not contain any tests, because CATEGORY
     should be defined in child class.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+
     USER_COUNT = 2
     COURSE_DATA = {}
 

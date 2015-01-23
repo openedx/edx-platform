@@ -18,7 +18,6 @@ from instructor.views import legacy
 # pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
     def setUp(self):
         super(TestXss, self).setUp()

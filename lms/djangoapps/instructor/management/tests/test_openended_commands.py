@@ -29,7 +29,6 @@ from instructor.utils import get_module_for_student
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
@@ -131,7 +130,6 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 

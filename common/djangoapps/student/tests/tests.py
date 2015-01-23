@@ -28,7 +28,6 @@ from student.views import (process_survey_link, _cert_info,
 from student.tests.factories import UserFactory, CourseModeFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 # These imports refer to lms djangoapps.
 # Their testcases are only run under lms.
@@ -180,7 +179,6 @@ class CourseEndingTest(TestCase):
         self.assertIsNone(_cert_info(user, course2, cert_status))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class DashboardTest(ModuleStoreTestCase):
     """
     Tests for dashboard utility functions
@@ -615,7 +613,6 @@ class EnrollInCourseTest(TestCase):
         self.assert_enrollment_mode_change_event_was_emitted(user, course_id, "honor")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class ChangeEnrollmentViewTest(ModuleStoreTestCase):
     """Tests the student.views.change_enrollment view"""
@@ -698,7 +695,6 @@ class ChangeEnrollmentViewTest(ModuleStoreTestCase):
         self.assertEqual(enrollment_mode, u'honor')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class PaidRegistrationTest(ModuleStoreTestCase):
     """
     Tests for paid registration functionality (not verified student), involves shoppingcart
@@ -731,7 +727,6 @@ class PaidRegistrationTest(ModuleStoreTestCase):
             shoppingcart.models.Order.get_cart_for_user(self.user), self.course.id))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AnonymousLookupTable(ModuleStoreTestCase):
     """
     Tests for anonymous_id_functions

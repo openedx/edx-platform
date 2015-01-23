@@ -124,7 +124,6 @@ class TestLTI(BaseTestXmodule):
         self.assertEqual(generated_content, expected_content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestLTIModuleListing(ModuleStoreTestCase):
     """
     a test for the rest endpoint that lists LTI modules in a course

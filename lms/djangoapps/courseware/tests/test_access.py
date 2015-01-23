@@ -16,6 +16,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -27,7 +28,7 @@ from util.milestones_helpers import (
 # pylint: disable=protected-access
 
 
-class AccessTestCase(LoginEnrollmentTestCase):
+class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the various access controls on the student dashboard
     """

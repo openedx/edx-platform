@@ -17,17 +17,13 @@ from student.helpers import (
 )
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from course_modes.tests.factories import CourseModeFactory
 from verify_student.models import SoftwareSecurePhotoVerification  # pylint: disable=F0401
 from util.testing import UrlResetMixin
 
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt

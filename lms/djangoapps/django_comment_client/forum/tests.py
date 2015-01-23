@@ -38,7 +38,6 @@ log = logging.getLogger(__name__)
 # pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -182,7 +181,6 @@ class PartialDictMatcher(object):
         ])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('requests.request')
 class SingleThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
@@ -295,12 +293,12 @@ class SingleThreadTestCase(ModuleStoreTestCase):
 
 @ddt.ddt
 @patch('requests.request')
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     """
     Ensures the number of modulestore queries is deterministic based on the
     number of responses retrieved for a given discussion thread.
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
         # old mongo: number of responses plus 16.  TODO: O(n)!
@@ -341,7 +339,6 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
             self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('requests.request')
 class SingleCohortedThreadTestCase(CohortedContentTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
@@ -834,7 +831,6 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, Cohorted
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(InlineDiscussionTestCase, self).setUp()
@@ -866,7 +862,6 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('requests.request')
 class UserProfileTestCase(ModuleStoreTestCase):
 
@@ -980,7 +975,6 @@ class UserProfileTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 405)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('requests.request')
 class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
@@ -991,7 +985,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         password = "bar"
 
         # Invoke UrlResetMixin
-        super(CommentsServiceRequestHeadersTestCase, self).setUp()
+        super(CommentsServiceRequestHeadersTestCase, self).setUp(create_user=False)
         self.course = CourseFactory.create()
         self.student = UserFactory.create(username=username, password=password)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
@@ -1043,7 +1037,6 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assert_all_calls_have_header(mock_request, "X-Edx-Api-Key", "test_api_key")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(InlineDiscussionUnicodeTestCase, self).setUp()
@@ -1065,7 +1058,6 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(ForumFormDiscussionUnicodeTestCase, self).setUp()
@@ -1088,7 +1080,6 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
@@ -1115,7 +1106,6 @@ class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(SingleThreadUnicodeTestCase, self).setUp()
@@ -1139,7 +1129,6 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["content"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(UserProfileUnicodeTestCase, self).setUp()
@@ -1162,7 +1151,6 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(FollowedThreadsUnicodeTestCase, self).setUp()
@@ -1185,7 +1173,6 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
         self.assertEqual(response_data["discussion_data"][0]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class EnrollmentTestCase(ModuleStoreTestCase):
     """
     Tests for the behavior of views depending on if the student is enrolled

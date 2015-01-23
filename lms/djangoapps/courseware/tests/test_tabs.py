@@ -26,9 +26,10 @@ if settings.FEATURES.get('MILESTONES_APP', False):
     from milestones.models import MilestoneRelationshipType
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(StaticTabDateTestCase, self).setUp()
@@ -76,11 +77,13 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", static_tab)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the static tab dates of an XML course
     """
+
+    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that tabs still appear when
     # the course is already closed
@@ -107,11 +110,12 @@ class StaticTabDateTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with Entrance Exams
     """
+    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+
     if settings.FEATURES.get('ENTRANCE_EXAMS', False):
 
         def setUp(self):

@@ -100,7 +100,6 @@ class InstructorTaskTestCase(TestCase):
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Base test class for InstructorTask-related tests that require
@@ -185,7 +184,6 @@ class InstructorTaskCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase)
         return request
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
     """
     Base test class for InstructorTask-related tests that require

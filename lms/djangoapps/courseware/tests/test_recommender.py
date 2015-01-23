@@ -20,10 +20,7 @@ from courseware.tests.factories import GlobalStaffFactory
 
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that Recommender state is saved properly

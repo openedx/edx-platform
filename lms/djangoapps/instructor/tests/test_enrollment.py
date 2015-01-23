@@ -292,7 +292,6 @@ class TestInstructorUnenrollDB(TestEnrollmentChangeBase):
         return self._run_state_change_test(before_ideal, after_ideal, action)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorEnrollmentStudentModule(TestCase):
     """ Test student module manipulations. """
     def setUp(self):
@@ -439,7 +438,6 @@ class TestSendBetaRoleEmail(TestCase):
             send_beta_role_email(bad_action, self.user, self.email_params)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGetEmailParams(ModuleStoreTestCase):
     """
     Test what URLs the function get_email_params returns under different
@@ -484,7 +482,7 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.assertEqual(result['course_url'], self.course_url)
 
 
-class TestRenderMessageToString(TestCase):
+class TestRenderMessageToString(ModuleStoreTestCase):
     """
     Test that email templates can be rendered in a language chosen manually.
     """

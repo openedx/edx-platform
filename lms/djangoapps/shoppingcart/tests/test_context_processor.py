@@ -16,7 +16,6 @@ from shoppingcart.models import Order, PaidCourseRegistration
 from shoppingcart.context_processor import user_has_cart_context_processor
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     """
     Unit test for shoppingcart context_processor

@@ -27,7 +27,6 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     return grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGradeIteration(ModuleStoreTestCase):
     """
     Test iteration through student gradesets.

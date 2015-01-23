@@ -56,7 +56,7 @@ class TestProblem(object):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesDecoratorTest(TestCase):
+class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
     Tests for edxnotes decorator.
     """
@@ -775,7 +775,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesViewsTest(TestCase):
+class EdxNotesViewsTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes views.
     """

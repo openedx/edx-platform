@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_wiki.views import get_or_create_root
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestWikiAccessMiddleware(ModuleStoreTestCase):
     """Tests for WikiAccessMiddleware."""
 

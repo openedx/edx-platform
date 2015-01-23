@@ -46,7 +46,6 @@ HTML_BOOK = {
 }
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class StaticBookTest(ModuleStoreTestCase):
     """
     Helpers for the static book tests.

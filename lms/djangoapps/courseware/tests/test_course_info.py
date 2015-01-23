@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from .helpers import LoginEnrollmentTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page
@@ -49,11 +48,12 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertNotIn("OOGIE BLOOGIE", resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class CourseInfoTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the Course Info page for an XML course
     """
+    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that a course info page still appears when
     # the course is already closed

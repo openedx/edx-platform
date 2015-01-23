@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     This is testing of the Microsite feature

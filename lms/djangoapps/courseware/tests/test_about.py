@@ -33,7 +33,6 @@ REG_STR = "<form id=\"class_enroll_form\" method=\"post\" data-remote=\"true\" a
 SHIB_ERROR_STR = "The currently logged-in user account does not have permission to enroll in this course."
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests about xblock.
@@ -182,11 +181,12 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)
 class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the course about page
     """
+    MODULESTORE = TEST_DATA_MIXED_CLOSED_MODULESTORE
+
     # The following XML test course (which lives at common/test/data/2014)
     # is closed; we're testing that an about page still appears when
     # the course is already closed
@@ -212,7 +212,6 @@ class AboutTestCaseXML(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(self.xml_data, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     This test case will check the About page when a course has a capped enrollment
@@ -263,7 +262,6 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
         self.assertNotIn(REG_STR, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithInvitationOnly(ModuleStoreTestCase):
     """
     This test case will check the About page when a course is invitation only.
@@ -311,7 +309,6 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
 
 
 @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': True})
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
@@ -351,7 +348,6 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertIn(REG_STR, resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AboutWithClosedEnrollment(ModuleStoreTestCase):
     """
     This test case will check the About page for a course that has enrollment start/end
@@ -395,7 +391,6 @@ class AboutWithClosedEnrollment(ModuleStoreTestCase):
         self.assertNotIn('<span class="important-dates-item-text">$10</span>', resp.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_SHOPPING_CART': True})
 @patch.dict(settings.FEATURES, {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):

@@ -19,7 +19,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     """

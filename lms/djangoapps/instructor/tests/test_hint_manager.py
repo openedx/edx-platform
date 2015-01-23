@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 # pylint: disable=missing-docstring
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class HintManagerTest(ModuleStoreTestCase):
 
     def setUp(self):

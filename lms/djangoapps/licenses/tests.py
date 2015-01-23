@@ -146,7 +146,6 @@ class LicenseTestCase(TestCase):
         self.assertEqual(302, response.status_code)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CommandTest(ModuleStoreTestCase):
     '''Test management command for importing serial numbers'''
     def setUp(self):

@@ -19,7 +19,6 @@ from instructor.access import (allow_access,
                                update_forum_role)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
@@ -43,7 +42,6 @@ class TestInstructorAccessList(ModuleStoreTestCase):
         self.assertEqual(set(beta_testers), set(self.beta_testers))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
@@ -79,7 +77,6 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
         allow_access(self.course, user, 'staff')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
@@ -115,7 +112,6 @@ class TestInstructorAccessRevoke(ModuleStoreTestCase):
         revoke_access(self.course, user, 'robot-not-a-level')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAccessForum(ModuleStoreTestCase):
     """
     Test forum access control.

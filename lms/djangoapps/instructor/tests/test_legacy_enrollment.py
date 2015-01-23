@@ -22,7 +22,6 @@ USER_COUNT = 4
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check Enrollment/Unenrollment with/without auto-enrollment on activation and with/without email notification

@@ -72,7 +72,6 @@ class EmptyXModuleDescriptor(XModuleDescriptor):  # pylint: disable=abstract-met
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests of courseware.module_render
@@ -248,7 +247,6 @@ class ModuleRenderTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
         render.get_module_for_descriptor(self.mock_user, request, descriptor, field_data_cache, self.toy_course.id)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test the handle_xblock_callback function
@@ -403,7 +401,6 @@ class TestHandleXBlockCallback(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestTOC(ModuleStoreTestCase):
     """Check the Table of Contents for a course"""
     def setup_modulestore(self, default_ms, num_finds, num_sends):
@@ -499,7 +496,6 @@ class TestTOC(ModuleStoreTestCase):
                 self.assertIn(toc_section, actual)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestHtmlModifiers(ModuleStoreTestCase):
     """
     Tests to verify that standard modifications to the output of XModule/XBlock
@@ -695,7 +691,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
         self.module = self._get_module(course_key, descriptor, location)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class MongoViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mongo backed course."""
 
@@ -724,12 +719,10 @@ class MongoViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class MixedViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mixed mongo backed course."""
 
-    def setUp(self):
-        super(MixedViewInStudioTest, self).setUp()
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def test_view_in_studio_link_mongo_backed(self):
         """Mixed mongo courses that are mongo backed should see 'View in Studio' links."""
@@ -750,12 +743,9 @@ class MixedViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
 class XmlViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in an xml backed course."""
-
-    def setUp(self):
-        super(XmlViewInStudioTest, self).setUp()
+    MODULESTORE = TEST_DATA_XML_MODULESTORE
 
     def test_view_in_studio_link_xml_backed(self):
         """Course in XML only modulestore should not see 'View in Studio' links."""
@@ -764,7 +754,6 @@ class XmlViewInStudioTest(ViewInStudioTest):
         self.assertNotIn('View Unit in Studio', result_fragment.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict('django.conf.settings.FEATURES', {'DISPLAY_DEBUG_INFO_TO_STAFF': True, 'DISPLAY_HISTOGRAMS_TO_STAFF': True})
 @patch('courseware.module_render.has_access', Mock(return_value=True))
 class TestStaffDebugInfo(ModuleStoreTestCase):
@@ -886,7 +875,6 @@ PER_STUDENT_ANONYMIZED_DESCRIPTORS = set(
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test that anonymous_student_id is set correctly across a variety of XBlock types
@@ -954,7 +942,6 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('track.views.tracker')
 class TestModuleTrackingContext(ModuleStoreTestCase):
     """
@@ -1148,7 +1135,6 @@ class TestRebindModule(TestSubmittingProblems):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestEventPublishing(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Tests of event publishing for both XModules and XBlocks.

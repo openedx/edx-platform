@@ -16,7 +16,6 @@ from xmodule.modulestore.django import modulestore
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and

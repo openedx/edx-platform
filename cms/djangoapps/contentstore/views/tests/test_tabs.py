@@ -6,6 +6,7 @@ from contentstore.tests.utils import CourseTestCase
 from django.test import TestCase
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.tabs import CourseTabList, WikiTab
 from contentstore.utils import reverse_course_url
 from xmodule.modulestore.django import modulestore
@@ -192,7 +193,7 @@ class TabsPageTests(CourseTestCase):
         self.assertIn('<span data-tooltip="Drag to reorder" class="drag-handle action"></span>', html)
 
 
-class PrimitiveTabEdit(TestCase):
+class PrimitiveTabEdit(ModuleStoreTestCase):
     """Tests for the primitive tab edit data manipulations"""
 
     def test_delete(self):

@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CoursewareMiddlewareTestCase(ModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 

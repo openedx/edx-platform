@@ -22,14 +22,8 @@ from course_about import api
 from course_about.errors import CourseNotFoundError, CourseAboutError
 from xmodule.modulestore.django import modulestore
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class CourseInfoTest(ModuleStoreTestCase, APITestCase):
     """

@@ -35,11 +35,11 @@ from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.views import ensure_valid_course_key
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TestJumpTo, self).setUp()
@@ -77,8 +77,7 @@ class TestJumpTo(ModuleStoreTestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class ViewsTestCase(TestCase):
+class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
@@ -467,7 +466,7 @@ class ViewsTestCase(TestCase):
 
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
+@override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -583,7 +582,6 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -639,7 +637,6 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ProgressPageTests(ModuleStoreTestCase):
     """
     Tests that verify that the progress page works correctly.

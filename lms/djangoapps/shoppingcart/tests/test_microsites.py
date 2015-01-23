@@ -20,11 +20,6 @@ from student.tests.factories import UserFactory
 from course_modes.models import CourseMode
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 def fake_all_orgs(default=None):  # pylint: disable=unused-argument
     """
     create a fake list of all microsites
@@ -46,7 +41,6 @@ def non_microsite(name, default=None):  # pylint: disable=unused-argument
     return None
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
     """

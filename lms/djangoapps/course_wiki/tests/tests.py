@@ -2,14 +2,13 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from courseware.tests.tests import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class WikiRedirectTestCase(LoginEnrollmentTestCase):
+class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
     """

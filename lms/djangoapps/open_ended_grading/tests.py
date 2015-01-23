@@ -104,13 +104,13 @@ class StudentProblemListMockQuery(object):
         }
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
     access control and error handling logic -- all the actual work is on the
     backend.
     '''
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TestStaffGradingService, self).setUp()
@@ -258,7 +258,6 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
     Check that staff grading service proxy works.  Basically just checking the
@@ -446,7 +445,6 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestPanel(ModuleStoreTestCase):
     """
     Run tests on the open ended panel
@@ -491,7 +489,6 @@ class TestPanel(ModuleStoreTestCase):
         self.assertRegexpMatches(response.content, "Here is a list of open ended problems for this course.")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestPeerGradingFound(ModuleStoreTestCase):
     """
     Test to see if peer grading modules can be found properly.
@@ -514,7 +511,6 @@ class TestPeerGradingFound(ModuleStoreTestCase):
         self.assertEqual(found, False)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestStudentProblemList(ModuleStoreTestCase):
     """
     Test if the student problem list correctly fetches and parses problems.

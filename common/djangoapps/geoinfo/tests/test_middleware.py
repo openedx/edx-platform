@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, AnonymousUserFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CountryMiddlewareTests(TestCase):
     """
     Tests of CountryMiddleware.

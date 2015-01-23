@@ -16,13 +16,9 @@ from django.test.utils import override_settings
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 
-
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
 THIRD_PARTY_AUTH_CONFIGURED = (
     settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH') and
@@ -31,7 +27,6 @@ THIRD_PARTY_AUTH_CONFIGURED = (
 
 
 @unittest.skipUnless(THIRD_PARTY_AUTH_CONFIGURED, "Third party auth must be configured")
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class PipelineEnrollmentTest(ModuleStoreTestCase):
     """Test that the pipeline auto-enrolls students upon successful authentication. """

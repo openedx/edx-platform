@@ -10,11 +10,12 @@ import django_comment_common.models as models
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class RoleClassTestCase(ModuleStoreTestCase):
     """
     Tests for roles of the comment client service integration
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
         super(RoleClassTestCase, self).setUp()
 

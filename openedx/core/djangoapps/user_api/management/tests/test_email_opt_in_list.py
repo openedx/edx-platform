@@ -24,12 +24,8 @@ from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 @ddt.ddt
 @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class EmailOptInListTest(ModuleStoreTestCase):
     """Tests for the email opt-in list management command. """
 

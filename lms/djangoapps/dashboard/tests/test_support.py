@@ -16,7 +16,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class RefundTests(ModuleStoreTestCase):
     """
     Tests for the manual refund page

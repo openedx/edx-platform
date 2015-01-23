@@ -505,7 +505,6 @@ class TestPhotoVerification(TestCase):
         self.assertEqual(result, second_attempt)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.VERIFY_STUDENT, FAKE_SETTINGS)
 @patch('verify_student.models.S3Connection', new=MockS3Connection)
 @patch('verify_student.models.Key', new=MockKey)

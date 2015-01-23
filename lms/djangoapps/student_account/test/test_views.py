@@ -26,9 +26,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import CourseModeFactory
 
 
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 @ddt.ddt
 class StudentAccountUpdateTest(UrlResetMixin, TestCase):
     """ Tests for the student account views that update the user's account information. """
@@ -377,7 +374,6 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
     """ Tests for the student account views that update the user's account information. """
 

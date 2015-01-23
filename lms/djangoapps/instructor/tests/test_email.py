@@ -16,7 +16,6 @@ from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
@@ -106,7 +105,6 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         self.assertFalse(self.email_link in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
