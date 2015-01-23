@@ -4,6 +4,7 @@ class @Sequence
     @el = $(element).find('.sequence')
     @contents = @$('.seq_contents')
     @content_container = @$('#seq_content')
+    @sr_container = @$('#sr-is-focusable')
     @num_contents = @contents.length
     @id = @el.data('id')
     @ajaxUrl = @el.data('ajax-url')
@@ -114,6 +115,8 @@ class @Sequence
 
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
+
+      @sr_container.focus();
     @$("a.active").blur()
 
   goto: (event) =>

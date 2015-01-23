@@ -106,10 +106,6 @@ nav.sequence-nav {
         padding: 0;
         position: relative;
 
-/*        &:focus {
-          outline: 0;
-        }
-*/
         &:hover, &:focus {
           background-color: $white;
           background-repeat: no-repeat;
@@ -119,17 +115,6 @@ nav.sequence-nav {
         &.active {
           @extend %ui-depth1;
           background-color: $white;
-
-          // &:after {
-          //   content: '▲';
-          //   position: absolute;
-          //   top: 28px;
-          //   left: 50%;
-          //   z-index: 9999;
-          //   margin-left: -5px;
-          //   font-size: 12px;
-          //   color: #aaa;
-          // }
 
           &:hover, &:focus {
             background-color: $white;
@@ -213,7 +198,6 @@ nav.sequence-nav {
           visibility: hidden;
           pointer-events: none;
 
-
           &:empty {
             background: none;
 
@@ -280,10 +264,6 @@ nav.sequence-nav {
           overflow: hidden;
           @include transition(all .2s $ease-in-out-quad 0s);
 
-/*          &:focus {
-            outline: 0;
-          }
-*/
           &:hover, &:focus {
             opacity: 0.5;
           }
@@ -382,11 +362,7 @@ nav.sequence-bottom {
           &.disabled {
             opacity: 0.4;
           }
-
-/*          &:focus {
-            outline: 0;
-          }
-*/        }
+        }
       }
 
       &.prev {
@@ -429,15 +405,10 @@ nav.sequence-bottom {
   }
 }
 
-.xmodule_VerticalModule div.vert-mod > div ul.sequence-nav-buttons {
-  list-style: none !important;
-}
+#seq_content {
 
-.xmodule_SequenceModule nav.sequence-bottom ul li.next a,
-.xmodule_SequenceModule nav.sequence-bottom ul li.prev a {
-
-/*  &:focus {
-    outline: 0;
+  &:focus,
+  &:active {
+    outline: none;
   }
-*/
 }
