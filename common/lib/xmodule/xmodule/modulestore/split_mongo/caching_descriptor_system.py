@@ -173,7 +173,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             course_key, class_, field, self.course_entry.structure['blocks'],
         )
 
-        if definition_id is not None and not json_data.get('definition_loaded', False):
+        # ALERT: I'm most unsure about this line below! Tests seem to pass - but I'm likely running
+        # afoul of caching since I'm not using json_data?
+        if definition_id is not None and not self.course_entry.structure.is_definition_loaded(block_key):
             definition_loader = DefinitionLazyLoader(
                 self.modulestore,
                 course_key,

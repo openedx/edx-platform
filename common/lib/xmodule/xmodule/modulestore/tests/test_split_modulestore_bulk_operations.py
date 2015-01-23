@@ -3,6 +3,7 @@ import ddt
 import unittest
 from bson.objectid import ObjectId
 from mock import MagicMock, Mock, call
+from xmodule.modulestore.split_mongo import CourseStructure
 from xmodule.modulestore.split_mongo.split import SplitBulkWriteMixin
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection
 
@@ -20,7 +21,7 @@ class TestBulkWriteMixin(unittest.TestCase):
 
         self.course_key = CourseLocator('org', 'course', 'run-a', branch='test')
         self.course_key_b = CourseLocator('org', 'course', 'run-b', branch='test')
-        self.structure = {'this': 'is', 'a': 'structure', '_id': ObjectId()}
+        self.structure = CourseStructure({'this': 'is', 'a': 'structure', '_id': ObjectId()})
         self.definition = {'this': 'is', 'a': 'definition', '_id': ObjectId()}
         self.index_entry = {'this': 'is', 'an': 'index'}
 
@@ -39,7 +40,10 @@ class TestBulkWriteMixinPreviousTransaction(TestBulkWriteMixin):
         super(TestBulkWriteMixinPreviousTransaction, self).setUp()
         self.bulk._begin_bulk_operation(self.course_key)
         self.bulk.insert_course_index(self.course_key, MagicMock('prev-index-entry'))
-        self.bulk.update_structure(self.course_key, {'this': 'is', 'the': 'previous structure', '_id': ObjectId()})
+        self.bulk.update_structure(
+            self.course_key,
+            CourseStructure({'this': 'is', 'the': 'previous structure', '_id': ObjectId()})
+        )
         self.bulk._end_bulk_operation(self.course_key)
         self.conn.reset_mock()
         self.clear_cache.reset_mock()
@@ -132,10 +136,10 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
 
     def test_write_multiple_structures_on_close(self):
         self.conn.get_course_index.return_value = None
-        self.bulk._begin_bulk_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)  # pylint: disable=protected-access
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
-        other_structure = {'another': 'structure', '_id': ObjectId()}
+        other_structure = CourseStructure({'another': 'structure', '_id': ObjectId()})
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.assertConnCalls()
         self.bulk._end_bulk_operation(self.course_key)
@@ -226,10 +230,10 @@ class TestBulkWriteMixinClosed(TestBulkWriteMixin):
     def test_write_index_and_multiple_structures_on_close(self):
         original_index = {'versions': {'a': ObjectId(), 'b': ObjectId()}}
         self.conn.get_course_index.return_value = copy.deepcopy(original_index)
-        self.bulk._begin_bulk_operation(self.course_key)
+        self.bulk._begin_bulk_operation(self.course_key)  # pylint: disable=protected-access
         self.conn.reset_mock()
         self.bulk.update_structure(self.course_key.replace(branch='a'), self.structure)
-        other_structure = {'another': 'structure', '_id': ObjectId()}
+        other_structure = CourseStructure({'another': 'structure', '_id': ObjectId()})
         self.bulk.update_structure(self.course_key.replace(branch='b'), other_structure)
         self.bulk.insert_course_index(self.course_key, {'versions': {'a': self.structure['_id'], 'b': other_structure['_id']}})
         self.bulk._end_bulk_operation(self.course_key)
@@ -364,8 +368,8 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     )
     @ddt.unpack
     def test_find_structures_by_id(self, search_ids, active_ids, db_ids):
-        db_structure = lambda _id: {'db': 'structure', '_id': _id}
-        active_structure = lambda _id: {'active': 'structure', '_id': _id}
+        db_structure = lambda _id: CourseStructure({'db': 'structure', '_id': _id})
+        active_structure = lambda _id: CourseStructure({'active': 'structure', '_id': _id})
 
         db_structures = [db_structure(_id) for _id in db_ids if _id not in active_ids]
         for n, _id in enumerate(active_ids):
@@ -440,11 +444,11 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
     def test_find_structures_derived_from(self, search_ids, active_ids, db_ids):
         def db_structure(_id):
             previous, _, current = _id.partition('.')
-            return {'db': 'structure', 'previous_version': previous, '_id': current}
+            return CourseStructure({'db': 'structure', 'previous_version': previous, '_id': current})
 
         def active_structure(_id):
             previous, _, current = _id.partition('.')
-            return {'active': 'structure', 'previous_version': previous, '_id': current}
+            return CourseStructure({'active': 'structure', 'previous_version': previous, '_id': current})
 
         db_structures = [db_structure(_id) for _id in db_ids]
         active_structures = []
@@ -489,17 +493,54 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
         #   - non-matching documents in the cache
         #   - expected documents returned from the db
         #   - unexpected documents returned from the db
-        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], [], []),
-        ('ov', 'bi', [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}, '_id': 'foo'}], [], [], [{'_id': 'foo'}]),
-        ('ov', 'bi', [], [{'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], [], []),
-        ('ov', 'bi', [], [{'original_version': 'ov'}], [], []),
-        ('ov', 'bi', [], [], [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}], []),
         (
             'ov',
             'bi',
-            [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}}],
+            [CourseStructure({'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}})],
             [],
-            [{'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'bar'}}}}],
+            [],
+            []
+        ),
+        (
+            'ov',
+            'bi',
+            [CourseStructure(
+                {'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}, '_id': 'foo'}
+            )],
+            [],
+            [],
+            [CourseStructure({'_id': 'foo'})]
+        ),
+        (
+            'ov',
+            'bi',
+            [],
+            [CourseStructure({'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}})],
+            [],
+            []
+        ),
+        (
+            'ov',
+            'bi',
+            [],
+            [CourseStructure({'original_version': 'ov'})],
+            [],
+            []
+        ),
+        (
+            'ov',
+            'bi',
+            [],
+            [],
+            [CourseStructure({'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}})],
+            []
+        ),
+        (
+            'ov',
+            'bi',
+            [CourseStructure({'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'foo'}}}})],
+            [],
+            [CourseStructure({'original_version': 'ov', 'blocks': {'bi': {'edit_info': {'update_version': 'bar'}}}})],
             []
         ),
     )
@@ -663,7 +704,7 @@ class TestBulkWriteMixinOpen(TestBulkWriteMixin):
         # Directly updating an index so that the draft branch points to the published index
         # version should work, and should only persist a single structure
         self.maxDiff = None
-        published_structure = {'published': 'structure', '_id': ObjectId()}
+        published_structure = CourseStructure({'published': 'structure', '_id': ObjectId()})
         self.bulk.update_structure(self.course_key, published_structure)
         index = {'versions': {'published': published_structure['_id']}}
         self.bulk.insert_course_index(self.course_key, index)

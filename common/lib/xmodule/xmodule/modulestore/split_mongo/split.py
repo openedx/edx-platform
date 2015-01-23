@@ -79,7 +79,7 @@ from xmodule.modulestore import (
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
-from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope, CourseStructure
 from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
@@ -112,6 +112,7 @@ EXCLUDE_ALL = '*'
 
 new_contract('BlockUsageLocator', BlockUsageLocator)
 new_contract('BlockKey', BlockKey)
+new_contract('CourseStructure', CourseStructure)
 
 
 class SplitBulkWriteRecord(BulkOpsRecord):
@@ -154,6 +155,7 @@ class SplitBulkWriteRecord(BulkOpsRecord):
     def structure_for_branch(self, branch):
         return self.structures.get(self.index.get('versions', {}).get(branch))
 
+    @contract(branch=basestring, structure='CourseStructure')
     def set_structure_for_branch(self, branch, structure):
         if self.index is not None:
             self.index.setdefault('versions', {})[branch] = structure['_id']
@@ -313,6 +315,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
             version_guid = course_key.as_object_id(version_guid)
             return self.db_connection.get_structure(version_guid)
 
+    @contract(structure='CourseStructure')
     def update_structure(self, course_key, structure):
         """
         Update a course structure, respecting the current bulk operation status
@@ -420,6 +423,7 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
         else:
             self.db_connection.insert_definition(definition)
 
+    @contract(returns='CourseStructure')
     def version_structure(self, course_key, structure, user_id):
         """
         Copy the structure and update the history info (edited_by, edited_on, previous_version)
@@ -681,8 +685,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
-                    # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
-                    copy.deepcopy(system.course_entry.structure['blocks']),
+                    system.course_entry.structure['blocks'],
                     block_id,
                     depth,
                     new_module_data
@@ -706,7 +709,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                         definition = definitions[block['definition']]
                         # convert_fields was being done here, but it gets done later in the runtime's xblock_from_json
                         block['fields'].update(definition.get('fields'))
-                        block['definition_loaded'] = True
+                        system.course_entry.structure.mark_definition_loaded(block)
 
             system.module_data.update(new_module_data)
             return system.module_data
@@ -2774,6 +2777,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     fields[field_name] = xblock_class.fields[field_name].to_json(value)
         return fields
 
+    @contract(returns='CourseStructure')
     def _new_structure(self, user_id, root_block_key, block_fields=None, definition_id=None):
         """
         Internal function: create a structure element with no previous version. Must provide the root id
@@ -2791,7 +2795,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             }
         else:
             blocks = {}
-        return {
+        return CourseStructure({
             '_id': new_id,
             'root': root_block_key,
             'previous_version': None,
@@ -2800,7 +2804,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             'edited_on': datetime.datetime.now(UTC),
             'blocks': blocks,
             'schema_version': self.SCHEMA_VERSION,
-        }
+        })
 
     @contract(block_key=BlockKey)
     def _get_parents_from_structure(self, block_key, structure):
