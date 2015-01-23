@@ -1900,7 +1900,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         )
 
         invoice_item_2 = CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=self.sale_invoice_2,
+            invoice=sale_invoice_2,
             qty=1,
             unit_price=1234.32,
             course_id=self.course.id
@@ -3600,7 +3600,7 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
             company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
             customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True
         )
-        generate_code_url = reverse(
+        self.generate_code_url = reverse(
             'make_invoice_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
 
@@ -3609,7 +3609,7 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
             'comments': 'testing comments'
         }
 
-        response = self.client.post(generate_code_url,data, **{'HTTP_HOST': 'localhost'})
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_add_new_invoice_transaction_payment_with_invalid_invoice_id(self):
