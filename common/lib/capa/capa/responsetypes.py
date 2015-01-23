@@ -844,11 +844,14 @@ class ChoiceResponse(LoncapaResponse):
                             hint_divs += '<div class="{0}">{1}</div>'.format(QUESTION_HINT_TEXT_STYLE, text)
                         break
             if hint_divs:
-                # Complication: if there is only a single label specified, we use it. However if there are multiple, we use none.
+                # Complication: if there is only a single label specified, we use it.
+                # However if there are multiple, we use none.
                 if label_count > 1:
                     label = None
-                new_cmap[self.answer_id]['msg'] += self.make_hint_div(None, new_cmap[self.answer_id]['correctness'] == 'correct',
-                                                                      label, hint_divs)
+                new_cmap[self.answer_id]['msg'] += (
+                    self.make_hint_div(None,
+                                       new_cmap[self.answer_id]['correctness'] == 'correct',
+                                       label, hint_divs))
 
     def get_compound_hints(self, new_cmap, student_answers):
         """
@@ -948,11 +951,14 @@ class MultipleChoiceResponse(LoncapaResponse):
             if isinstance(student_answer, list):
                 student_answer = student_answer[0]
 
-            # Find the named choice used by the student (according to the unit tests, silently ignore a bad choice-name)
-            choice = self.xml.find('./choicegroup[@id="{0}"]/choice[@name="{1}"]'.format(self.answer_id, student_answer))
+            # Find the named choice used by the student. Silently ignore a non-matching
+            # choice name.
+            choice = self.xml.find('./choicegroup[@id="{0}"]/choice[@name="{1}"]'.format(self.answer_id,
+                                                                                         student_answer))
             if choice is not None:
                 hint_node = choice.find('./choicehint')
-                new_cmap[self.answer_id]['msg'] += self.make_hint_div(hint_node, choice.get('correct').upper() == 'TRUE')
+                new_cmap[self.answer_id]['msg'] += self.make_hint_div(hint_node,
+                                                                      choice.get('correct').upper() == 'TRUE')
 
     def mc_setup_response(self):
         """
@@ -1284,7 +1290,8 @@ class OptionResponse(LoncapaResponse):
         if answer_id in student_answers:
             student_answer = student_answers[answer_id]
             # If we run into an old-style optioninput, there is not <option> tag, so we just won't find anything
-            options = self.xml.xpath('//optioninput[@id=$id]/option[contains(.,$ans)]', id=answer_id, ans=student_answer)
+            options = self.xml.xpath('//optioninput[@id=$id]/option[contains(.,$ans)]',
+                                     id=answer_id, ans=student_answer)
             if options:
                 option = options[0]
                 hint_node = option.find('./optionhint')
@@ -1545,9 +1552,10 @@ class StringResponse(LoncapaResponse):
             return
         # end of backward compatibility
 
-        # XML compatibility note: in 2015 additional_answer switched to having a 'answer' attribute.
+        # XML compatibility note: in 2015, additional_answer switched to having a 'answer' attribute.
         # See make_xml_compatible in capa_problem which translates the old format.
-        correct_answers = [self.xml.get('answer')] + [element.get('answer') for element in self.xml.findall('additional_answer')]
+        correct_answers = [self.xml.get('answer')] + [element.get('answer')
+                           for element in self.xml.findall('additional_answer')]
         self.correct_answer = [contextualize_text(answer, self.context).strip() for answer in correct_answers]
 
     def get_score(self, student_answers):
