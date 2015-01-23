@@ -1,9 +1,9 @@
 '''
-django admin pages for branding model
+Django admin pages for Video Branding Configuration.
 '''
 from django.contrib import admin
 from config_models.admin import ConfigurationModelAdmin
 
-from branding.models import BrandingInfo
+from .models import BrandingInfoConfig
 
-admin.site.register(BrandingInfo, ConfigurationModelAdmin)
+admin.site.register(BrandingInfoConfig, ConfigurationModelAdmin)

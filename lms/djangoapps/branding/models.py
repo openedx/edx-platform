@@ -1,37 +1,46 @@
 """
-Models used by LMS XBlock infrastructure.
+Model used by Video module for Branding configuration.
 
 Includes:
-    XBlockAsidesConfig: A ConfigurationModel for managing how XBlockAsides are
-        rendered in the LMS.
+    BrandingInfoConfig: A ConfigurationModel for managing how Video Module will
+        use Branding.
 """
-
-from django.db.models import URLField, TextField
-
+import json
+from django.db.models import TextField
+from django.core.exceptions import ValidationError
 from config_models.models import ConfigurationModel
 
 
-class BrandingInfo(ConfigurationModel):
+class BrandingInfoConfig(ConfigurationModel):
     """
     Configuration for Branding.
+
+    Example of configuration that must be stored:
+        {
+            "CN": {
+                    "url": "http://www.xuetangx.com",
+                    "logo_src": "http://www.xuetangx.com/static/images/logo.png",
+                    "logo_tag": "Video hosted by XuetangX.com"
+            }
+        }
     """
-    url = URLField(
-        help_text="Link to the site."
+    configuration = TextField(
+        help_text="JSON data of Configuration for Video Branding."
     )
 
-    logo_src = URLField(
-        help_text="A source for the logo."
-    )
-
-    logo_tag = TextField(
-        help_text="Text for the logo."
-    )
+    def clean(self):
+        """
+        Validates configuration text field.
+        """
+        try:
+            json.loads(self.configuration)
+        except ValueError:
+            raise ValidationError('Must be valid JSON string.')
 
     @classmethod
-    def get_info(cls):
+    def get_config(cls):
         """
-        Get the list of status values to include files for in the encoding
-        download
+        Get the Video Branding Configuration.
         """
         info = cls.current()
-        return info if info.enabled else None
+        return json.loads(info.configuration) if info.enabled else {}

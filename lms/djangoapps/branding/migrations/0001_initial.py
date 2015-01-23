@@ -1,21 +1,28 @@
 # -*- coding: utf-8 -*-
+import datetime
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import models
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CourseEmail'
-        db.create_table('branding_info', (
+        # Adding model 'BrandingInfoConfig'
+        db.create_table('branding_brandinginfoconfig', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('html_message', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('change_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('changed_by', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'], null=True, on_delete=models.PROTECT)),
+            ('enabled', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('configuration', self.gf('django.db.models.fields.TextField')()),
         ))
-        db.send_create_signal('bulk_email', ['Branding'])
+        db.send_create_signal('branding', ['BrandingInfoConfig'])
+
 
     def backwards(self, orm):
-        # Deleting model 'Optout'
-        db.delete_table('BrandingInfo')
+        # Deleting model 'BrandingInfoConfig'
+        db.delete_table('branding_brandinginfoconfig')
+
 
     models = {
         'auth.group': {
@@ -47,20 +54,21 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'branding.brandinginfoconfig': {
+            'Meta': {'object_name': 'BrandingInfoConfig'},
+            'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
+            'configuration': ('django.db.models.fields.TextField', [], {}),
+            'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'branding.info': {
-            'Meta': {'object_name': 'BrandingInfo'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {}),
-            'logo_src': ('django.db.models.fields.URLField', [], {}),
-            'logo_tag': ('django.db.models.fields.TextField', [], {'default': "''"}),
         }
     }
 
-    complete_apps = ['bulk_email']
+    complete_apps = ['branding']

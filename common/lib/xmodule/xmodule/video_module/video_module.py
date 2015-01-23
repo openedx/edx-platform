@@ -72,9 +72,9 @@ except ImportError:
     edxval_api = None
 
 try:
-    from branding.models import BrandingInfo
+    from branding.models import BrandingInfoConfig
 except ImportError:
-    BrandingInfo = None
+    BrandingInfoConfig = None
 
 log = logging.getLogger(__name__)
 _ = lambda text: text
@@ -174,6 +174,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         sources = filter(None, self.html5_sources)
 
         download_video_link = None
+        branding_info = None
         youtube_streams = ""
 
         # If we have an edx_video_id, we prefer its values over what we store
@@ -212,9 +213,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # Video caching is disabled for Studio. User_location is always None in Studio.
         # CountryMiddleware disabled for Studio.
         cdn_url = getattr(settings, 'VIDEO_CDN_URL', {}).get(self.system.user_location)
-
         if getattr(self, 'video_speed_optimizations', True) and cdn_url:
-            cdn_info = getattr(settings, 'VIDEO_CDN_INFO', {}).get(self.system.user_location)
+            branding_info = BrandingInfoConfig.get_config().get(self.system.user_location)
 
             for index, source_url in enumerate(sources):
                 new_url = get_video_from_cdn(cdn_url, source_url)
@@ -234,7 +234,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
-            "branding_info": BrandingInfo.get_info() if BrandingInfo else None,
+            'branding_info': branding_info,
             # This won't work when we move to data that
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
