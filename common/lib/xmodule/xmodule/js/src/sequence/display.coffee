@@ -71,22 +71,22 @@ class @Sequence
         when 'done' then element.addClass('progress-done')
 
   toggleArrows: =>
-    @$('.sequence-nav-buttons a').unbind('click')
+    @$('.sequence-nav-button').unbind('click')
 
     if @contents.length == 0
-      @$('.sequence-nav-buttons .prev a').addClass('disabled').attr('aria-hidden', 'true')
-      @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
+      @$('.sequence-nav-button.prev').addClass('disabled').attr('aria-hidden', 'true').attr('disabled')
+      @$('.sequence-nav-button.next').addClass('disabled').attr('aria-hidden', 'true').attr('disabled')
       return
 
     if @position == 1
-      @$('.sequence-nav-buttons .prev a').addClass('disabled').attr('aria-hidden', 'true')
+      @$('.sequence-nav-button.prev').addClass('disabled').attr('aria-hidden', 'true').attr('disabled')
     else
-      @$('.sequence-nav-buttons .prev a').removeClass('disabled').attr('aria-hidden', 'false').click(@previous)
+      @$('.sequence-nav-button.prev').removeClass('disabled').attr('aria-hidden', 'false').removeAttr('disabled').click(@previous)
 
     if @position == @contents.length
-      @$('.sequence-nav-buttons .next a').addClass('disabled').attr('aria-hidden', 'true')
+      @$('.sequence-nav-button.next').addClass('disabled').attr('aria-hidden', 'true').attr('disabled')
     else
-      @$('.sequence-nav-buttons .next a').removeClass('disabled').attr('aria-hidden', 'false').click(@next)
+      @$('.sequence-nav-button.next').removeClass('disabled').attr('aria-hidden', 'false').removeAttr('disabled').click(@next)
 
   render: (new_position) ->
     if @position != new_position
@@ -114,6 +114,8 @@ class @Sequence
 
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
+
+      @content_container.focus();
     @$("a.active").blur()
 
   goto: (event) =>

@@ -40,11 +40,11 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'disable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).toHaveClass 'disabled'
+        expect($('.sequence-nav-button.prev')).toHaveClass 'disabled'
 
       it 'enable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .next a')).toHandleWith 'click', @sequence.next
+        expect($('.sequence-nav-button.next')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.next')).toHandleWith 'click', @sequence.next
 
     describe 'when the middle tab is active', ->
       beforeEach ->
@@ -52,12 +52,12 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'enable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .prev a')).toHandleWith 'click', @sequence.previous
+        expect($('.sequence-nav-button.prev')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.prev')).toHandleWith 'click', @sequence.previous
 
       it 'enable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .next a')).toHandleWith 'click', @sequence.next
+        expect($('.sequence-nav-button.next')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.next')).toHandleWith 'click', @sequence.next
 
     describe 'when the last tab is active', ->
       beforeEach ->
@@ -65,11 +65,11 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'enable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .prev a')).toHandleWith 'click', @sequence.previous
+        expect($('.sequence-nav-button.prev')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.prev')).toHandleWith 'click', @sequence.previous
 
       it 'disable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).toHaveClass 'disabled'
+        expect($('.sequence-nav-button.next')).toHaveClass 'disabled'
 
   describe 'render', ->
     beforeEach ->
