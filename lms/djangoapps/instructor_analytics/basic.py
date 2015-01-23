@@ -110,7 +110,7 @@ def sale_record_features(course_id, features):
         {'company_name': 'group_C', 'total_codes': '3', total_amount:'total_amount3 in decimal'.}
     ]
     """
-    sales = CourseRegistrationCodeInvoiceItem.select_related('invoice').objects.filter(course_id=course_id)
+    sales = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').filter(course_id=course_id)
 
     def sale_records_info(sale, features):
         """ convert sales records to dictionary """
