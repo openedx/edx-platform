@@ -3,72 +3,70 @@
 
 ${block_content}
 
-% if has_instructor_access:
-  <div aria-hidden="true" class="wrap-instructor-info">
-    <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button" data-location="${location}" data-answer_dist_url="${answer_dist_url}" data-course_id="${course_id}">${_("Staff Analytics Info")}</a>
-  </div>
+<div aria-hidden="true" class="wrap-instructor-info">
+  <a class="instructor-info-action instructor-analytics-action" id="${element_id}_analytics_button" data-location="${location}" data-answer_dist_url="${answer_dist_url}" data-course_id="${course_id}">${_("Staff Analytics Info")}</a>
+</div>
 
-  <div id="${element_id}_analytics_error_message" style="display: none;">
-    <p><strong></strong></p>
-  </div>
+<div id="${element_id}_analytics_error_message" style="display: none;">
+  <p><strong></strong></p>
+</div>
 
-  <div id="${element_id}_analytics_close" style="display: none;" class="analytics_close_button" href="#">
-    <button class="close">X</button>
+<div id="${element_id}_analytics_close" style="display: none;" class="analytics_close_button" href="#">
+  <button class="close">X</button>
 
-    % for part_id, correct_response, question_type, message in responses_data:
-      % if message:
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item">${message}
-          <p><strong></strong></p>
-        </div>
-      % elif question_type == 'radio':
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
-          <section aria-hidden="true" >
-            <div class="grid-wrapper radio">
-              <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
-              <p>Last updated: <strong class="last-update"></strong></p>
-              <div class="grid-block table">
-                <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
-                  <tr>
-                    <td width="65px">Choice</td>
-                    <td width="50px"></td>
-                    <td width="125px" colspan="2">Last Attempt</td>
-                  </tr>
-                </table>
-              </div>
+  % for part_id, correct_response, question_type, message in responses_data:
+    % if message:
+      <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item">${message}
+        <p><strong></strong></p>
+      </div>
+    % elif question_type == 'radio':
+      <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
+        <section aria-hidden="true" >
+          <div class="grid-wrapper radio">
+            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question.</p>
+            <p>Last updated: <strong class="last-update"></strong></p>
+            <div class="grid-block table">
+              <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
+                <tr>
+                  <td width="65px">Choice</td>
+                  <td width="50px"></td>
+                  <td width="125px" colspan="2">Last Attempt</td>
+                </tr>
+              </table>
             </div>
-          </section>
-        </div>
-      % elif question_type == 'checkbox':
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
-          <section aria-hidden="true" >
-            <div class="grid-wrapper checkbox">
-              <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
-              <p>Last updated: <strong class="last-update"></strong></p>
-              <div class="grid-block table">
-                <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
-                  <tr class="checkbox_header_row">
-                    <td width="65px">Choice</td>
-                  </tr>
-                </table>
-              </div>
+          </div>
+        </section>
+      </div>
+    % elif question_type == 'checkbox':
+      <div id="${part_id}_analytics" class="${element_id}_analytics_div inline-analytics-item" data-correct_response="${correct_response}" data-question_type="${question_type}">
+        <section aria-hidden="true" >
+          <div class="grid-wrapper checkbox">
+            <p>Answer distribution of the <strong class="num-students"></strong> students who answered this question:</p>
+            <p>Last updated: <strong class="last-update"></strong></p>
+            <div class="grid-block table">
+              <table cellspacing="2px" id="${part_id}_table" class="analytics-table">
+                <tr class="checkbox_header_row">
+                  <td width="65px">Choice</td>
+                </tr>
+              </table>
             </div>
-          </section>
-        </div>
-      % else:
-        <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-question_type="${question_type}">
-          <section aria-hidden="true" >
-            <div class="grid-wrapper">
-              <p>
-                <strong class="num-students"></strong> students answered this question: <br/>
-                <strong class="num-students-extra"></strong>
-              </p>
-              <p>Last updated: <strong class="last-update"></strong></p>
-            </div>
-          </section>
-        </div>
-      % endif
-    % endfor
-  </div>
+          </div>
+        </section>
+      </div>
+    % else:
+      <div id="${part_id}_analytics" class="${element_id}_analytics_div" data-question_type="${question_type}">
+        <section aria-hidden="true" >
+          <div class="grid-wrapper">
+            <p>
+              <strong class="num-students"></strong> students answered this question: <br/>
+              <strong class="num-students-extra"></strong>
+            </p>
+            <p>Last updated: <strong class="last-update"></strong></p>
+          </div>
+        </section>
+      </div>
+    % endif
+  % endfor
+</div>
 
-    <script>$(document).ready(function () {window.InlineAnalytics.runDocReady("${element_id}");});</script>
-% endif
+<script>$(document).ready(function () {window.InlineAnalytics.runDocReady("${element_id}");});</script>
