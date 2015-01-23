@@ -25,7 +25,7 @@ class @Problem
     window.update_schematics()
 
     problem_prefix = @element_id.replace(/problem_/,'')
-    @inputs = @$("[id^=input_#{problem_prefix}_]")
+    @inputs = @$("[id^='input_#{problem_prefix}_']")
     @$('div.action input:button').click @refreshAnswers
     @checkButton = @$('div.action input.check')
     @checkButtonCheckText = @checkButton.val()
