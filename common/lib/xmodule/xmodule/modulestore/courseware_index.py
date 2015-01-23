@@ -52,31 +52,39 @@ class ModuleStoreCoursewareIndexMixin(object):
         def index_item_location(item_location, current_start_date):
             """ add this item to the search index """
             item = _fetch_item(item_location)
-            if item:
-                if item.category in ['course', 'chapter', 'sequential', 'vertical', 'html', 'video']:
-                    if item.start and (not current_start_date or item.start > current_start_date):
-                        current_start_date = item.start
+            if not item:
+                return
 
-                    if item.has_children:
-                        for child_loc in item.children:
-                            index_item_location(child_loc, current_start_date)
+            is_indexable = hasattr(item, "index_dictionary")
+            # if it's not indexable and it does not have children, then ignore
+            if not is_indexable and not item.has_children:
+                return
 
-                    item_index = {}
-                    try:
-                        item_index.update(location_info)
-                        item_index.update(item.index_dictionary())
-                        item_index.update({
-                            'id': unicode(item.scope_ids.usage_id),
-                        })
-                        if current_start_date:
-                            item_index.update({
-                                "start_date": current_start_date
-                            })
+            # if it has a defined start, then apply it and to it's children
+            if item.start and (not current_start_date or item.start > current_start_date):
+                current_start_date = item.start
 
-                        searcher.index(DOCUMENT_TYPE, item_index)
-                    except Exception:
-                        log.warning('Could not index item: %s', item_location)
-                        error.append('Could not index item: {} <br>'.format(item_location))
+            if item.has_children:
+                for child_loc in item.children:
+                    index_item_location(child_loc, current_start_date)
+
+            item_index = {}
+            item_index_dictionary = item.index_dictionary() if is_indexable else None
+
+            # if it has something to add to the index, then add it
+            if item_index_dictionary:
+                try:
+                    item_index.update(location_info)
+                    item_index.update(item_index_dictionary)
+                    item_index['id'] = unicode(item.scope_ids.usage_id)
+                    if current_start_date:
+                        item_index['start_date'] = current_start_date
+
+                    searcher.index(DOCUMENT_TYPE, item_index)
+                except Exception as err:  # pylint: disable=broad-except
+                    # broad exception so that index operation does not fail on one item of many
+                    log.warning('Could not index item: %s - %s', item_location, unicode(err))
+                    error.append('Could not index item: {} <br>'.format(item_location))
 
         def remove_index_item_location(item_location):
             """ remove this item from the search index """
@@ -98,7 +106,7 @@ class ModuleStoreCoursewareIndexMixin(object):
             log.exception(
                 "Indexing error encountered, courseware index may be out of date %s - %s",
                 course_key,
-                str(err)
+                unicode(err)
             )
         return error
 
