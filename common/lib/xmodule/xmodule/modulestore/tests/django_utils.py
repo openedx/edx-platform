@@ -14,6 +14,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from request_cache.middleware import RequestCache
 
+from util.tests.test_cases import disable_transaction_methods
+
 from xmodule.contentstore.django import _CONTENTSTORE
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
@@ -180,6 +182,8 @@ TEST_DATA_MONGO_MODULESTORE = mixed_store_config(mkdtemp(), {}, include_xml=Fals
 # TODO: acutally mock out the modulestore for this in a subsequent PR.
 TEST_DATA_MOCK_MODULESTORE = mixed_store_config(mkdtemp(), {}, include_xml=False)
 
+
+disable_transaction_methods()
 
 class ModuleStoreTestCase(TestCase):
     """
