@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! from django.core.urlresolvers import reverse %>
 <%page args="section_data"/>
-<section id="make_invoice_transaction_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add Coupon')}">
+<section id="make_invoice_transaction_modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Add invoice payments and refunds')}">
     <div class="inner-wrapper">
         <button class="close-modal">
             <i class="icon fa fa-remove"></i>
@@ -11,7 +11,7 @@
       </span>
         </button>
 
-        <div id="coupon-content">
+        <div id="invoice-content">
             <header>
                 <h2>${_("Add invoice payments and refunds")}</h2>
             </header>
@@ -28,7 +28,7 @@
                 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                 <div id="make_invoice_form_error" class="modal-form-error"></div>
 
-                <div id="coupon_form_error" class="make_invoice-modal-form-error"></div>
+                <div id="invoice_form_error" class="make_invoice-modal-form-error"></div>
                 <fieldset class="group group-form group-form-requiredinformation">
                     <legend class="is-hidden">${_("Required Information")}</legend>
 
@@ -82,11 +82,13 @@
     $(function () {
         $("#add_invoice_button").click(function (e) {
 
-            if (!($.isNumeric($("#invoice_id").val()))) {
+            var invoice_id = $("#invoice_id").val();
+            var amount = $("#amount").val();
+            if (!($.isNumeric(invoice_id))) {
                  $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
                 return false
              }
-            if (!($.isNumeric($("#amount").val()))) {
+            if (!($.isNumeric(amount))) {
                 $('h3#error-msgs-invoice').html('Please enter valid numeric value in amount.').show();
                 return false
             }
@@ -96,8 +98,8 @@
              type: "POST",
              data: {
                "course_id"  :$('#course_id').val(),
-               "invoice_id": $("#invoice_id").val(),
-               "amount": $("#amount").val(),
+               "invoice_id": invoice_id,
+               "amount": amount,
                "amount_type": $('input[name="amount_type"]:checked').val(),
                "comments": $("#comments").val()
              },

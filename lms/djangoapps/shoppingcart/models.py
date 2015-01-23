@@ -855,15 +855,12 @@ class InvoiceTransaction(TimeStampedModel):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
-        try:
-            invoice = Invoice.objects.get(id=invoice_id)
-            invoice_transaction = InvoiceTransaction(
-                invoice=invoice, amount=amount, comments=comments,
-                created_by=user, status=status, last_modified_by=user)
-            invoice_transaction.save()
-            return invoice_transaction
-        except Invoice.DoesNotExist:
-            raise Invoice.DoesNotExist
+        invoice = Invoice.objects.get(id=invoice_id)
+        invoice_transaction = InvoiceTransaction(
+            invoice=invoice, amount=amount, comments=comments,
+            created_by=user, status=status, last_modified_by=user)
+        invoice_transaction.save()
+        return invoice_transaction
 
 
 class InvoiceItem(TimeStampedModel):

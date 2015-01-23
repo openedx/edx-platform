@@ -2162,14 +2162,11 @@ def make_invoice_transaction(request, course_id):
         if invoice_id and amount and amount_type:
             if amount_type == 'refund':
                 amount *= -1
-            InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+            inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+            return JsonResponse({'message': _("Invoice added successfully.")})
         else:
-            return JsonResponse(
-                {'message': _("Please pass the all required values.")}, status=400)
+            return JsonResponse({'message': _("Please pass the all required values.")}, status=400)
+    except Invoice.DoesNotExist:
+        return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
     except:
-        return JsonResponse(
-            {'message': _("Invoice id not valid.")}, status=400)
-
-    return JsonResponse(
-        {'message': _("Invoice added successfully.")}
-    )
+        return JsonResponse({'message': _("Internal server error.")}, status=400)
