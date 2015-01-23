@@ -15,13 +15,15 @@ from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 
 
 class CoursewareSearchTest(UniqueCourseTest):
-
     """
     Test courseware search.
     """
-
     USERNAME = 'STUDENT_TESTER'
     EMAIL = 'student101@example.com'
+
+    STAFF_USERNAME = "STAFF_TESTER"
+    STAFF_EMAIL = "staff101@example.com"
+
     HTML_CONTENT = """
             Someday I'll wish upon a star
             And wake up where the clouds are far
@@ -133,7 +135,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         Reindex course content on studio course page
         """
 
-        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self.course_outline.visit()
         self.course_outline.start_reindex()
         self.course_outline.wait_for_ajax()
@@ -144,7 +146,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
 
         # Create content in studio without publishing.
-        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_add_content(0)
 
         # Do a search, there should be no results shown.
@@ -154,7 +156,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         assert self.SEARCH_STRING not in self.courseware_search_page.search_results.html[0]
 
         # Publish in studio to trigger indexing.
-        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_publish_content(0)
 
         # Do the search again, this time we expect results.
@@ -169,7 +171,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
 
         # Create content in studio without publishing.
-        self._auto_auth('STAFF_USER', 'staff101@example.com', True)
+        self._auto_auth(self.STAFF_USERNAME, self.STAFF_EMAIL, True)
         self._studio_add_content(1)
 
         # Publish in studio to trigger indexing, and edit chapter name afterwards.
