@@ -101,6 +101,7 @@ module.exports = function (grunt) {
                     '<%= c.lms %>/css/lms-style-app-extend2.css',
                     '<%= c.lms %>/css/lms-style-app-extend2-rtl.css',
                     '<%= c.lms %>/css/lms-style-course-vendor.css',
+                    '<%= c.lms %>/css/lms-style-student-notes.css',
                     '<%= c.lms %>/css/lms-style-course.css',
                     '<%= c.lms %>/css/lms-style-course-rtl.css',
                     '<%= c.lms %>/css/lms-style-xmodule-annotations.css'
@@ -177,6 +178,9 @@ module.exports = function (grunt) {
                         '<%= c.common %>/css/vendor/jquery.qtip.min.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.css',
                         '<%= c.lms %>/css/vendor/responsive-carousel/responsive-carousel.slide.css'
+                    ],
+                    '<%= c.lms %>/css/lms-style-student-notes.css': [
+                        '<%= c.common %>/css/lms-style-student-notes.css'
                     ],
                     '<%= c.lms %>/css/lms-style-vendor-tinymce-content.css': [
                         '<%= c.common %>/js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'

@@ -1161,12 +1161,6 @@ verify_student_js = [
     'js/verify_student/pay_and_verify.js',
 ]
 
-    'style-student-notes': {
-        'source_filenames': [
-            'css/vendor/edxnotes/annotator.min.css',
-        ],
-        'output_filename': 'css/lms-style-student-notes.css',
-    },
 common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 
