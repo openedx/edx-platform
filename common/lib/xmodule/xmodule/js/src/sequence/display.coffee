@@ -114,6 +114,8 @@ class @Sequence
 
       sequence_links = @content_container.find('a.seqnav')
       sequence_links.click @goto
+
+      @content_container.focus();
     @$("a.active").blur()
 
   goto: (event) =>

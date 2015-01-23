@@ -302,6 +302,14 @@ $sequence--border-color: #C8C8C8;
   display: none;
 }
 
+#seq_content {
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
+}
+
 .sequence-bottom {
   position: relative;
   width: ($baseline*4) - 1;
