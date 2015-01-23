@@ -3576,3 +3576,72 @@ class TestBulkCohorting(ModuleStoreTestCase):
         self.verify_success_on_file_content(
             'username,email,cohort\r\nfoo_username,bar_email,baz_cohort', mock_store_upload, mock_cohort_task
         )
+
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
+    """
+    Test data dumps for Invoice Transactions
+    """
+
+    def setUp(self):
+        """
+        Fixtures.
+        """
+        self.course = CourseFactory.create()
+        CourseModeFactory.create(course_id=self.course.id, min_price=50)
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        self.client.login(username=self.instructor.username, password='test')
+        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
+
+        self.sale_invoice_1 = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
+            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True
+        )
+        generate_code_url = reverse(
+            'make_invoice_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+
+        data = {
+            'invoice_id': self.sale_invoice_1.id, 'amount': 110, 'amount_type': 'payment',
+            'comments': 'testing comments'
+        }
+
+        response = self.client.post(generate_code_url,data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_add_new_invoice_transaction_payment_with_invalid_invoice_id(self):
+        """
+        Test to add invoice transaction with invalid invoice id
+        """
+        data = {
+            'invoice_id': 100, 'amount': 110, 'amount_type': 'payment',
+            'comments': 'testing comments'
+        }
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Invoice id not valid', response.content)
+
+    def test_add_new_invoice_transaction_refund_with_valid_invoice_id(self):
+        """
+        Test to add invoice transaction with invalid invoice id
+        """
+        data = {
+            'invoice_id': self.sale_invoice_1.id, 'amount': 200, 'amount_type': 'refund',
+            'comments': 'testing comments'
+        }
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+
+    def test_add_new_invoice_transaction_refund_with_missing_required_data(self):
+        """
+        Test to add invoice transaction with invalid invoice id
+        """
+        data = {
+            'invoice_id': self.sale_invoice_1.id, 'amount': None, 'amount_type': None,
+            'comments': 'testing comments'
+        }
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
