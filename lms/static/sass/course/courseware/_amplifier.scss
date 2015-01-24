@@ -94,7 +94,7 @@ section.tool-wrapper {
 
         input#playButton {
           border-color: darken(#002b36, 6%);
-          @include button(simple, lighten( #586e75, 5% ));
+          @include button-bourbon(simple, lighten( #586e75, 5% ));
           display: block;
           float: right;
           font: bold 14px $body-font-family;
@@ -105,7 +105,7 @@ section.tool-wrapper {
           }
 
           &[value="Stop"] {
-            @include button(simple, darken(#268bd2, 30%));
+            @include button-bourbon(simple, darken(#268bd2, 30%));
             font: bold 14px $body-font-family;
 
             &:active {
