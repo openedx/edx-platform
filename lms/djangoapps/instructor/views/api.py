@@ -28,6 +28,7 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
+import decimal
 from student import auth
 from student.roles import CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
@@ -2160,18 +2161,35 @@ def make_invoice_transaction(request, course_id):
     """
     try:
         course_key = CourseKey.from_string(course_id)
-        invoice_id = request.POST.get('invoice_id')
-        amount_type = request.POST.get('amount_type')
-        amount = int(request.POST.get('amount'))
+        invoice_id = request.POST.get('invoice_id', None)
+
+        if not invoice_id:
+            return JsonResponse({'message': _("Please enter the valid invoice id.")}, status=400)
+        amount_type = request.POST.get('amount_type', None)
+        if not amount_type:
+            return JsonResponse({'message': _("Please select the amount type.")}, status=400)
+        amount = request.POST.get('amount', None)
+        if not amount:
+            return JsonResponse({'message': _("Please enter the amount.")}, status=400)
+
+        amount = (
+            decimal.Decimal(amount)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+        if amount < decimal.Decimal('0.01'):
+            return JsonResponse({'message': _("Amount must be greater than 0")})
+
         comments = request.POST.get('comments')
-        if invoice_id and amount and amount_type:
-            if amount_type == 'refund':
-                amount *= -1
-            inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
-            return JsonResponse({'message': _("Invoice added successfully.")})
-        else:
-            return JsonResponse({'message': _("Please pass the all required values.")}, status=400)
+        if amount_type == 'refund':
+            amount *= -1
+        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+        return JsonResponse({'message': _("Invoice added successfully.")})
+
     except Invoice.DoesNotExist:
         return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
+    except decimal.InvalidOperation:
+        return JsonResponse({'message': _("Could not parse amount as a decimal")}, status=400)
     except:
         return JsonResponse({'message': _("Internal server error.")}, status=400)
