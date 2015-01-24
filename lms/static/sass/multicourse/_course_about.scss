@@ -99,7 +99,7 @@
           width: flex-grid(12);
 
           > a.find-courses, a.register, a.add-to-cart {
-            @include button(shiny, $button-color);
+            @include button-bourbon(shiny, $button-color);
             @include box-sizing(border-box);
             border-radius: 3px;
             display: block;
@@ -122,7 +122,7 @@
           }
 
           strong {
-            @include button(shiny, $button-color);
+            @include button-bourbon(shiny, $button-color);
             @include box-sizing(border-box);
             border-radius: 3px;
             display: block;

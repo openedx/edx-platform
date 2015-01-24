@@ -57,7 +57,7 @@ input[type="submit"],
 input[type="button"],
 button,.button {
   border-radius: 3px;
-  @include button(shiny, $button-color);
+  @include button-bourbon(shiny, $button-color);
   font: normal 1.2rem/1.6rem $sans-serif;
   letter-spacing: 1px;
   padding: 4px 20px;

@@ -455,7 +455,7 @@
         }
 
         .enter-course {
-          @include button(simple, $button-color);
+          @include button-bourbon(simple, $button-color);
           @include box-sizing(border-box);
           border-radius: 3px;
           display: block;
@@ -467,7 +467,7 @@
           margin-top: 16px;
 
           &.archived {
-            @include button(simple, $button-archive-color);
+            @include button-bourbon(simple, $button-archive-color);
             font: normal 15px/1.6rem $sans-serif;
             padding: 6px 32px 7px;
 
@@ -864,13 +864,13 @@
       }
 
       .exam-button {
-        @include button(simple, $pink);
+        @include button-bourbon(simple, $pink);
         margin-top: 0;
         float: right;
       }
 
       .contact-button {
-        @include button(simple, $pink);
+        @include button-bourbon(simple, $pink);
       }
 
       .button {
@@ -962,7 +962,7 @@
         float: left;
 
         .cta {
-          @include button(simple, $green-d1);
+          @include button-bourbon(simple, $green-d1);
           @include box-sizing(border-box);
           @include float(right);
           border-radius: 3px;
@@ -1199,7 +1199,7 @@
     color:white;
     box-shadow:none;
     &.archived {
-            @include button(simple, $button-archive-color);
+            @include button-bourbon(simple, $button-archive-color);
             font: normal 15px/1.6rem $sans-serif;
             padding: 6px 32px 7px;
 
