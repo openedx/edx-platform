@@ -526,7 +526,7 @@
 
       .icon {
         color: inherit;
-        margin-right: $baseline/2;
+        @include margin-right($baseline/2);
       }
 
       &:last-child {
