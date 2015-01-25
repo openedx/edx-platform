@@ -118,7 +118,7 @@
 // ====================
 
 // mixins - grandfathered
-@mixin button {
+@mixin button-sunsetted {
   @include transition(background-color 0.15s, box-shadow 0.15s);
   @extend %t-action3;
   @extend %t-strong;
@@ -144,7 +144,7 @@
 }
 
 @mixin green-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $green-d1;
@@ -166,7 +166,7 @@
 }
 
 @mixin blue-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $blue-d1;
   border-radius: 3px;
@@ -187,7 +187,7 @@
 }
 
 @mixin red-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $red-d1;
   border-radius: 3px;
@@ -208,7 +208,7 @@
 }
 
 @mixin pink-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   border: 1px solid $pink-d1;
   border-radius: 3px;
@@ -229,7 +229,7 @@
 }
 
 @mixin orange-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $orange-d1;
@@ -251,7 +251,7 @@
 }
 
 @mixin white-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $mediumGrey;
@@ -267,7 +267,7 @@
 }
 
 @mixin grey-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
   border: 1px solid $gray-d2;
@@ -282,7 +282,7 @@
 }
 
 .gray-button {
-  @include button;
+  @include button-sunsetted();
   @include linear-gradient(top, $white-t1, rgba(255, 255, 255, 0));
   box-shadow: 0 1px 0 $white-t1 inset;
   border: 1px solid $gray-d1;
