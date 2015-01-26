@@ -12,17 +12,12 @@ from django.core.management import call_command
 from django_comment_common.utils import are_permissions_roles_seeded
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class TestImport(ModuleStoreTestCase):
     """
     Unit tests for importing a course from command line
     """
-
-    BASE_COURSE_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2013_Spring')
-    DIFF_KEY = SlashSeparatedCourseKey(u'edX', u'test_import_course', u'2014_Spring')
-    TRUNCATED_KEY = SlashSeparatedCourseKey(u'edX', u'test_import', u'2014_Spring')
 
     def create_course_xml(self, content_dir, course_id):
         directory = tempfile.mkdtemp(dir=content_dir)
@@ -44,11 +39,11 @@ class TestImport(ModuleStoreTestCase):
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
 
+        self.BASE_COURSE_KEY = self.store.make_course_key(u'edX', u'test_import_course', u'2013_Spring')
+        self.TRUNCATED_KEY = self.store.make_course_key(u'edX', u'test_import', u'2014_Spring')
+
         # Create good course xml
         self.good_dir = self.create_course_xml(self.content_dir, self.BASE_COURSE_KEY)
-
-        # Create run changed course xml
-        self.dupe_dir = self.create_course_xml(self.content_dir, self.DIFF_KEY)
 
         # Create course XML where TRUNCATED_COURSE.org == BASE_COURSE_ID.org
         # and BASE_COURSE_ID.startswith(TRUNCATED_COURSE.course)
@@ -61,21 +56,6 @@ class TestImport(ModuleStoreTestCase):
         self.assertFalse(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
         call_command('import', self.content_dir, self.good_dir)
         self.assertTrue(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
-
-    def test_duplicate_with_url(self):
-        """
-        Check to make sure an import doesn't import courses that have the
-        same org and course, but they have different runs in order to
-        prevent modulestore "findone" exceptions on deletion
-        """
-        # Load up base course and verify it is available
-        call_command('import', self.content_dir, self.good_dir)
-        store = modulestore()
-        self.assertIsNotNone(store.get_course(self.BASE_COURSE_KEY))
-
-        # Now load up duped course and verify it doesn't load
-        call_command('import', self.content_dir, self.dupe_dir)
-        self.assertIsNone(store.get_course(self.DIFF_KEY))
 
     def test_truncated_course_with_url(self):
         """
