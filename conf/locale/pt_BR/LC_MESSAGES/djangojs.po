@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Álex Filipe <alexfilipe@outlook.com>, 2014
+# Andre Eduardo <andre_meneses2001@hotmail.com>, 2015
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # Andrei Bosco Bezerra Torres <andreibosco@gmail.com>, 2013
 # brk0_0, 2013
@@ -53,6 +54,7 @@
 # Bruno Horphoz <horphoz@gmail.com>, 2014
 # brunojm <brunojm@gmail.com>, 2014
 # Daniel Linhares <danielinhares@gmail.com>, 2014
+# Deusilene Sousa Matos <deusymatos@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
@@ -62,11 +64,13 @@
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
+# Pedro Guimarães Martins <pedrogmartins7@gmail.com>, 2015
 # Rafael Escrich <rafaelescrich@gmail.com>, 2015
 # RenataBarboza, 2013
 # Renata Barboza-Murray, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
 # Thiago Perrotta <thiagoperrotta95@gmail.com>, 2014
+# Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -76,6 +80,7 @@
 # Andrea Z. Bitencourt <azbitencourt@gmail.com>, 2015
 # Bruno Sette <brunosette@gmail.com>, 2015
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
+# Felipe Lube de Bragança <felipe.lubra@gmail.com>, 2015
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # G <glaucogm@ufpr.br>, 2014
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
@@ -99,13 +104,14 @@
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # mmauryx <matheus_w_dias@hotmail.com>, 2014
 # Ricardo Pietrobon <pietr007@gmail.com>, 2014
+# Victor Hochgreb de Freitas <victorhochgreb@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:22+0000\n"
-"PO-Revision-Date: 2015-01-20 14:31+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-24 03:50+0000\n"
+"Last-Translator: Victor Hochgreb de Freitas <victorhochgreb@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -3564,6 +3570,10 @@ msgstr ""
 msgid "All groups must have a name."
 msgstr ""
 
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a unique name."
+msgstr ""
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -4338,12 +4348,6 @@ msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid ""
-"Sorry, we're having some technical problems. Wait a few minutes and try "
-"again."
 msgstr ""
 
 #: lms/templates/student_account/account.underscore

@@ -39,6 +39,7 @@
 # Translators:
 # Abdallah Nassif <abdoosh00@gmail.com>, 2013
 # abdallah.nassif <abdallah_n@hotmail.com>, 2013
+# Abdallah Nassif <abdoosh00@gmail.com>, 2015
 # a.nassif <a.nassif@sit-mena.com>, 2013
 # Assyass Mahmoud <mahmoud.assyass@edu.uiz.ac.ma>, 2015
 # AzizAhmed <dr.zezo@gmail.com>, 2014
@@ -121,7 +122,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:23+0000\n"
+"POT-Creation-Date: 2015-01-26 13:22+0000\n"
 "PO-Revision-Date: 2015-01-10 05:20+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -141,6 +142,7 @@ msgid "Open Ended Panel"
 msgstr "لوحة مفتوحة"
 
 #: cms/djangoapps/contentstore/utils.py common/lib/xmodule/xmodule/tabs.py
+#: lms/templates/edxnotes/edxnotes.html
 msgid "Notes"
 msgstr "ملاحظات"
 
@@ -264,6 +266,7 @@ msgid "Community TA"
 msgstr "مساعد أستاذ لشؤون المتعلّمين"
 
 #: common/djangoapps/django_comment_common/models.py
+#: lms/templates/courseware/course_navigation.html
 msgid "Student"
 msgstr "الطالب"
 
@@ -321,11 +324,17 @@ msgstr "شهادة الثانوية الصغرى/الإعدادية/المتوس
 msgid "Elementary/primary school"
 msgstr "المدرسة الابتدائية"
 
+#. #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: 'None' refers to the student's level of education
 #: common/djangoapps/student/models.py
-#: common/lib/xmodule/xmodule/course_module.py
+#: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
+#, fuzzy
 msgid "None"
-msgstr "لا شيء"
+msgstr ""
+"#-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#\n"
+"لا شيء\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"غير مذكور"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -1026,11 +1035,11 @@ msgstr "يبلغ الحدّ الأقصى لحجم الملفّ المسموح ب
 
 #: common/djangoapps/util/milestones_helpers.py
 msgid "Course {} requires {}"
-msgstr ""
+msgstr "المساق {} يتطلّب {}"
 
 #: common/djangoapps/util/milestones_helpers.py
 msgid "System defined milestone"
-msgstr ""
+msgstr "إنجاز مهمّ يحدّده النظام"
 
 #: common/djangoapps/util/password_policy_validators.py
 msgid "Invalid Length ({0})"
@@ -1192,11 +1201,11 @@ msgstr "يُرجى الاطّلاع على السطر الأصلي بلغة XML 
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "JavaScript Input"
-msgstr ""
+msgstr "مُدخل بلغة جافاسكريبت"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Execution of unsafe Javascript code is not allowed."
-msgstr "لا يُسمح بتنفيذ رموز غير آمنة بلغة جافا سكريبت."
+msgstr "لا يُسمح بتنفيذ رموز غير آمنة بلغة جافاسكريبت."
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
@@ -1236,7 +1245,7 @@ msgstr ""
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "True/False Choice"
-msgstr ""
+msgstr "صح أم خطأ"
 
 #: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
@@ -1330,7 +1339,7 @@ msgstr "أو"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Custom Evaluated Script"
-msgstr ""
+msgstr "نصّ مقيّم حسب الطلب"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error getting student answer from {student_answers}"
@@ -1346,7 +1355,7 @@ msgstr "CustomResponse: عادت وظيفة التحقّق بقاموس غير �
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Symbolic Math Input"
-msgstr ""
+msgstr "مُدخل رياضي رمزي"
 
 #. Translators: 'SymbolicResponse' is a problem type and should not be
 #. translated.
@@ -1356,7 +1365,7 @@ msgstr "حدث خطأ في SymbolicResponse. وكان الخطأ: {error_msg}"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Code Input"
-msgstr ""
+msgstr "مُدخل الرمز"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "No answer provided."
@@ -1386,11 +1395,11 @@ msgstr "إجابة غير صحيحة من المسؤول عن التقييم. ي
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "External Grader"
-msgstr ""
+msgstr "مسؤول خارجي عن التقييم"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Math Expression Input"
-msgstr ""
+msgstr "مُدخل تعبير رياضي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Invalid input: {bad_input} not permitted in answer."
@@ -1414,7 +1423,7 @@ msgstr "مُدخَل غير صحيح: لم يمكن تجزئة ’{bad_input}‘
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Circuit Schematic Builder"
-msgstr ""
+msgstr "باني مخطّطات الدارات"
 
 #. Translators: 'SchematicResponse' is a problem type and should not be
 #. translated.
@@ -1424,7 +1433,7 @@ msgstr "نأسف لحدوث خطأ في تقييم SchematicResponse. وكان �
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Image Mapped Input"
-msgstr ""
+msgstr "مُدخل مخطَّط بالصور"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "error grading {image_input_id} (input={user_input})"
@@ -1437,11 +1446,11 @@ msgstr "حدث خطأ في تحديد المسألة! لا يمكن تجزئة �
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Annotation Input"
-msgstr ""
+msgstr "مُدخل الملاحظات التوضيحية"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Checkboxes With Text Input"
-msgstr ""
+msgstr "مربّعات الاختبار مع مُدخل نصّي"
 
 #: common/lib/capa/capa/responsetypes.py
 msgid "Answer not provided for {input_type}"
@@ -2002,11 +2011,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Courses"
-msgstr ""
+msgstr "مساقات أساسية"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Requisite Course key if this course has a pre-requisite course"
-msgstr ""
+msgstr "مفتاح المساق الأساسي إذا كان لهذا المساق مساق أساسي."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Show Calculator"
@@ -2521,8 +2530,16 @@ msgid ""
 "on the Course Info page. Your course handouts appear in the right panel of "
 "the page."
 msgstr ""
-"يُرجى إدخال العنوان الذي ترغب في أن يراه الطلّاب في صفحة \"معلومات المساق\" "
-"فوق نشرات مساقك. وتَظهر هذه النشرات على اللّوحة اليمنى في الصفحة."
+"يُرجى إدخال العنوان الذي تودّ أن يراه الطلّاب في صفحة \"معلومات المساق\" فوق"
+" نشرات مساقك. وتَظهر هذه النشرات على اللّوحة اليمنى في الصفحة."
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+"تكون القيمة صحيحة إذا توجّب إظهار المناطق الزمنية في تواريخ محتويات المساق. "
+"تخفيض القيمة لصالح due_date_display_format."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
@@ -2701,6 +2718,10 @@ msgid "Invitation Only"
 msgstr "المدعوّون فقط"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr "سواء جعل التسجيل محصورًا بامتلاك دعوة موجَّهة من طاقم المساق"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr "اسم استبيان ما قبل المساق"
 
@@ -2752,31 +2773,39 @@ msgstr "لمحة عن"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Enabled"
-msgstr ""
+msgstr "تفعيل خاصية امتحان الدخول"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content."
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
 msgstr ""
+"يُرجى تحديد ما إذا يجب على الطلّاب استكمال امتحان دخول قبل أن يتمكّنوا من "
+"رؤية محتوى مساقك. كما يُرجى ملاحظة أنّه عليك تفعيل خاصية امتحانات الدخول "
+"ليسري مفعول هذا الإعداد."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Minimum Score (%)"
-msgstr ""
+msgstr "الدرجة الأدنى للنجاح في امتحان الدخول (%)"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content."
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
 msgstr ""
+"يُرجى تحديد النسبة المئوية الأدنى لدرجة النجاح في امتحان الدخول قبل أن "
+"يتمكّن الطلّاب من رؤية محتوى مساقك. كما يُرجى ملاحظة أنّه عليك تفعيل خاصية "
+"امتحانات الدخول ليسري مفعول هذا الإعداد."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam ID"
-msgstr ""
+msgstr "رقم امتحان الدخول"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Content module identifier (location) of entrance exam."
-msgstr ""
+msgstr "رقم (موقع) وحدة المحتوى الخاص بامتحان الدخول."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "General"
@@ -2971,7 +3000,7 @@ msgstr "أي نوع"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "\"{value}\" is not a valid library ID."
-msgstr ""
+msgstr "لا تشكِّل القيمة \"{value}\" رقم مكتبة صالحًا. "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: cms/templates/index.html
@@ -2981,19 +3010,19 @@ msgstr "المكتبات"
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid ""
 "Enter a library ID for each library from which you want to draw content."
-msgstr ""
+msgstr "يُرجى إدخال رقم مكتبة لكل مكتبة تودّ استخراج محتوىً منها. "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Mode"
-msgstr ""
+msgstr "الوضعية"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Determines how content is drawn from the library"
-msgstr ""
+msgstr "لتحديد كيفية استخراج المحتوى من المكتبة"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Choose n at random"
-msgstr ""
+msgstr "يُرجى اختيار العدد n عشوائيًّا "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Count"
@@ -3001,7 +3030,7 @@ msgstr "العدد"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Enter the number of components to display to each student."
-msgstr ""
+msgstr "يُرجى إدخال عدد المكوِّنات التي ستُعرض على كل طالب."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Problem Type"
@@ -3012,6 +3041,8 @@ msgid ""
 "Choose a problem type to fetch from the library. If \"Any Type\" is selected"
 " no filtering is applied."
 msgstr ""
+"يُرجى اختيار نوع مسألة معيّن لإحضاره من المكتبة. وإذا اخترت \"أي نوع\"، فلن "
+"تجرِ فلترة النتائج. "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -3023,40 +3054,42 @@ msgid ""
 "Set this value to True if this module is either a graded assignment or a "
 "practice problem."
 msgstr ""
+"يُرجى ضبط هذه القيمة على \"صحيح\" إذا كانت هذه الوحدة إمّا واجبًا مقيَّمًا "
+"أو تمرينًا.   "
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "This component is out of date. The library has new content."
-msgstr ""
+msgstr "انقضت مدّة هذا المكوِّن. وللمكتبة محتوى جديد الآن. "
 
 #. Translators: {refresh_icon} placeholder is substituted to "↻" (without
 #. double quotes)
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "{refresh_icon} Update now."
-msgstr ""
+msgstr "{refresh_icon} التحديث الآن."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Library is invalid, corrupt, or has been deleted."
-msgstr ""
+msgstr "هذه المكتبة إمّا غير صالحة، أو تشوبها شائبة، أو جرى حذفها."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit Library List."
-msgstr ""
+msgstr "تعديل قائمة المكتبة"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "A library has not yet been selected."
-msgstr ""
+msgstr "لم يجرِ انتقاء مكتبة معيّنة بعد."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Select a Library."
-msgstr ""
+msgstr "يُرجى انتقاء مكتبة."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "There are no matching problem types in the specified libraries."
-msgstr ""
+msgstr "ليس هناك من أنواع مسائل متطابقة في المكتبات المحدَّدة."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Select another problem type."
-msgstr ""
+msgstr "يُرجى اختيار نوع آخر من المسائل."
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "The specified libraries are configured to fetch {count} problem, "
@@ -3081,7 +3114,7 @@ msgstr[5] ""
 
 #: common/lib/xmodule/xmodule/library_content_module.py
 msgid "Edit the library configuration."
-msgstr ""
+msgstr "تعديل إعدادات المساق"
 
 #: common/lib/xmodule/xmodule/library_root_xblock.py
 msgid "Enter the name of the library as it should appear in Studio."
@@ -3253,6 +3286,17 @@ msgid ""
 msgstr "يُرجى إدخال نص الزر المستخدم لإطلاق تطبيق الطرف الثالث"
 
 #: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr "يمكن قبول الدرجات بعد تاريخ الاستحقاق"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
+msgstr ""
+"يُرجى اختيار \"صحيح\" للسماح لأنظمة أطراف ثالثة بنشر الدرجات بعد تاريخ "
+"الاستحقاق."
+
+#: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Could not parse custom parameter: {custom_parameter}. Should be \"x=y\" "
 "string."
@@ -3329,11 +3373,11 @@ msgstr "يُرجى إدخال تاريخ استحقاق حلّ المسائل."
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Is Entrance Exam"
-msgstr ""
+msgstr "هو امتحان الدخول"
 
 #: common/lib/xmodule/xmodule/seq_module.py
 msgid "Tag this course module as an Entrance Exam.  "
-msgstr ""
+msgstr "وسم هذه الوحدة للمساق على أنّها امتحان دخول."
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid "Group ID {group_id}"
@@ -3404,6 +3448,8 @@ msgid ""
 "The experiment uses a group configuration that is not supported for "
 "experiments. Select a valid group configuration or delete this experiment."
 msgstr ""
+"تستخدم التجربة إعداد مجموعة غير مدعوم للتجارب. لذا يُرجى انتقاء إعداد مجموعة"
+" صالح أو حذف هذه التجربة.  "
 
 #: common/lib/xmodule/xmodule/split_test_module.py
 msgid ""
@@ -3777,28 +3823,35 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enable Student Notes"
-msgstr ""
+msgstr "تفعيل خاصية ’ملاحظات الطلّاب‘"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, students can use the Student Notes feature."
 msgstr ""
+"ُيُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بأن يستخدم الطلّاب خاصية "
+"’ملاحظات الطلّاب‘. "
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Indicates whether Student Notes are visible in the course. Students can also"
 " show or hide their notes in the courseware."
 msgstr ""
+"لتحديد ما إذا كانت ملاحظات الطلّاب مرئيّة في المساق. ويمكن للطلّاب أيضًا "
+"إظهار ملاحظاتهم في محتويات المساق أو إخفاؤها."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Tag this module as part of an Entrance Exam section"
-msgstr ""
+msgstr "وسم هذه الوحدة على أنّها جزء من قسم خاص بامتحان الدخول."
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
 "Enter true or false. If true, answer submissions for problem modules will be"
 " considered in the Entrance Exam scoring/gating algorithm."
 msgstr ""
+"يُرجى إدخال صحيح أو خاطئ. ويسمح اختيارك لصحيح بأخذ تقديمات الأجوبة على وحدات"
+" المسائل بعين الاعتبار عند تقييم امتحان الدخول/إجراء خوارزمية الإمرار "
+"الانتقائي. "
 
 #. Translators: "Self" is used to denote an openended response that is self-
 #. graded
@@ -4405,7 +4458,7 @@ msgstr "تفضّل بزيارة إحدى صفحات الويكي الخاصة ب
 
 #: lms/djangoapps/courseware/tabs.py cms/templates/settings.html
 msgid "Entrance Exam"
-msgstr ""
+msgstr "امتحان الدخول"
 
 #. Translators: The join of three or more institution names (e.g., Harvard,
 #. MIT, and Dartmouth).
@@ -4839,14 +4892,15 @@ msgstr "جيّد"
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "EdxNotes Service is unavailable. Please try again in a few minutes."
 msgstr ""
+"خدمة EdxNotes غير متوفّرة حاليًّا. يُرجى إعادة المحاولة بعد بضع دقائق. "
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "Server error. Please try again in a few minutes."
-msgstr ""
+msgstr "نأسف لحدوث خطأ في الخادم. يُرجى إعادة المحاولة بعد بضع دقائق."
 
 #: lms/djangoapps/edxnotes/helpers.py
 msgid "No endpoint was provided for EdxNotes."
-msgstr ""
+msgstr "لم تُحدَّد نقطة نهاية لخدمة EdxNotes."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "User does not exist."
@@ -5010,12 +5064,12 @@ msgstr ""
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Unable to generate redeem codes because of course misconfiguration."
-msgstr ""
+msgstr "نأسف لتعذّر توليد رموز الاسترداد بسبب خطأ في ضبط إعدادات المساق. "
 
 #: lms/djangoapps/instructor/views/api.py
 #: lms/djangoapps/shoppingcart/models.py
 msgid "pdf download unavailable right now, please contact support."
-msgstr ""
+msgstr "عذرًا، لا يمكن حاليًّا تنزيل ملف pdf. يُرجى الاتصال بقسم الدعم."
 
 #: lms/djangoapps/instructor/views/api.py
 msgid "Module does not exist."
@@ -5618,15 +5672,21 @@ msgid ""
 "the block is considered visible to all. Note that this field is ignored if "
 "the block is visible_to_staff_only."
 msgstr ""
+"قاموس يقدِّم خطّة مفصّلة للمجموعات التي يمكن إظهارها في هذه الكتلة. "
+"والمفاتيح هي الأرقام التعريفية لإعدادات المجموعات، أمّا القيم فهي لائحة "
+"بالأرقام التعريفية للمجموعات. وفي حال لم يوجد مفتاح لإعدادات مجموعة ما، أو "
+"إذا كانت مجموعة أرقام المجموعات فارغة، فإنّ الكتلة تُعدّ مرئيّة للجميع. "
+"ويُرجى ملاحظة أنّ هذا الحقل يجري تجاهله إذا كانت الكتلة مرئية فقط لطاقم "
+"المساق. "
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid ""
 "This component refers to deleted or invalid content group configurations."
-msgstr ""
+msgstr "يشير هذا المكوِّن إلى إعدادات مجموعة محتوى محذوفة أو غير صالحة."
 
 #: lms/djangoapps/lms_xblock/mixin.py
 msgid "This component refers to deleted or invalid content groups."
-msgstr ""
+msgstr "يشير هذا المكوِّن إلى مجموعات محتوى محذوفة أو غير صالحة."
 
 #: lms/djangoapps/open_ended_grading/staff_grading_service.py
 msgid ""
@@ -5812,7 +5872,7 @@ msgstr "تبرّع لمنصّة {platform_name}"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Page {page_number} of {page_count}"
-msgstr ""
+msgstr "الصفحة {page_number} من أصل {page_count}"
 
 #: lms/djangoapps/shoppingcart/pdf.py lms/djangoapps/shoppingcart/pdf.py
 msgid "Invoice"
@@ -5820,7 +5880,7 @@ msgstr "الفاتورة"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Receipt"
-msgstr ""
+msgstr "الإيصال"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Order"
@@ -5828,7 +5888,7 @@ msgstr "الطلب"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "{id_label} # {item_id}"
-msgstr ""
+msgstr "{id_label} # {item_id}"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
@@ -5854,12 +5914,16 @@ msgid ""
 "List Price\n"
 "per item"
 msgstr ""
+"سعر القائمة\n"
+"لكل عنصر"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid ""
 "Discount\n"
 "per item"
 msgstr ""
+"الخصم\n"
+"لكل عنصر"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Amount"
@@ -5875,23 +5939,23 @@ msgstr "المجموع "
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Payment Received"
-msgstr ""
+msgstr "جرى تلقّي الدفعة"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Balance"
-msgstr ""
+msgstr "الموازنة"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Billing Address"
-msgstr ""
+msgstr "عنوان الفوترة"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "Disclaimer"
-msgstr ""
+msgstr "إخلاء مسؤولية"
 
 #: lms/djangoapps/shoppingcart/pdf.py
 msgid "TERMS AND CONDITIONS"
-msgstr ""
+msgstr "الأحكام والشروط"
 
 #: lms/djangoapps/shoppingcart/reports.py
 msgid "Order Number"
@@ -6658,11 +6722,15 @@ msgstr ""
 
 #: lms/djangoapps/student_account/views.py
 msgid "No user with the provided email address exists."
-msgstr ""
+msgstr "لا يوجد مستخدم يمتلك عنوان البريد الإلكتروني المحدَّد."
 
 #: lms/djangoapps/student_account/views.py
 msgid "No email address provided."
-msgstr ""
+msgstr "لم يُحدَّد عنوان بريد إلكتروني."
+
+#: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr "عذرًا، انتهت صلاحية عملية التحقّق الخاصة بمنصّتك {platform_name}."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
@@ -6682,8 +6750,8 @@ msgid "The image of your face was not clear."
 msgstr "لم تكن صورة وجهك واضحة."
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
-msgstr "لم يكن وجهك ظاهرًا في صورتك الذاتية"
+msgid "Your face was not visible in your self-photo."
+msgstr "لم يكن وجهك مرئيًّا في صورتك الذاتية."
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
@@ -7753,7 +7821,7 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Invalid prerequisite course key"
-msgstr ""
+msgstr "رقم المساق الأساسي غير صالح"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "invalid JSON"
@@ -8132,7 +8200,7 @@ msgstr "اللغة المفضلة"
 
 #: cms/templates/settings.html lms/templates/courseware/course_about.html
 msgid "Requirements"
-msgstr ""
+msgstr "المتطلّبات"
 
 #: cms/templates/studio_xblock_wrapper.html lms/templates/help_modal.html
 #: lms/templates/help_modal.html lms/templates/module-error.html
@@ -8963,7 +9031,7 @@ msgstr "الدخول إلى مساقاتي"
 #: lms/templates/login.html lms/templates/register-shib.html
 #: lms/templates/register.html
 msgid "Processing your account information"
-msgstr ""
+msgstr "جاري معالجة معلومات حسابك"
 
 #: lms/templates/login.html
 msgid "Please log in"
@@ -9071,7 +9139,7 @@ msgstr "(إعادة تحميل صفحتك لتحديثها)"
 
 #: lms/templates/manage_user_standing.html
 msgid "working"
-msgstr ""
+msgstr "جاري العمل"
 
 #: lms/templates/mathjax_accessible.html
 msgid ""
@@ -9999,7 +10067,7 @@ msgstr "أرقام"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Integers"
-msgstr ""
+msgstr "أعداد صحيحة"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Fractions"
@@ -10007,7 +10075,7 @@ msgstr ""
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Decimals"
-msgstr ""
+msgstr "أعداد عشرية"
 
 #: lms/templates/calculator/toggle_calculator.html
 msgid "Operators"
@@ -10282,6 +10350,7 @@ msgstr "تاريخ الاستحقاق {date}"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "نأسف لحدوث خطأ. يُرجى إعادة المحاولة لاحقًا. "
@@ -10345,6 +10414,16 @@ msgstr "لمحة عامة"
 msgid "Share with friends and family!"
 msgstr "شارِك ذلك مع الأصدقاء والعائلة!"
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -10358,6 +10437,10 @@ msgstr "التحِق بمساق على منصة {platform} عبر الإنترن
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr "سجّلتُ لتوّي في {number} {title} من خلال {platform} {url}"
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -11290,7 +11373,6 @@ msgstr "موافق عليها: "
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr "حالة عملية التحقّق من الهوية"
 
@@ -11308,16 +11390,18 @@ msgid ""
 msgstr "جرى تقديم صورك الخاصة بعملية التحقّق وستخضع للمعاينة قريبًا."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
-msgstr "يُرجى إعادة التأكيد على هويّتك"
+msgid "{platform_name} Verification Status"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
-"في حال لم تتمكّن من اجتياز محاولة التحقّق قبل نهاية مساقك، فإنّك لن تستلم "
-"شهادة موثّقة."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -12036,15 +12120,15 @@ msgstr "لقد تمت دعوتك لإجراء اختبار بيتا للمساق
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
-msgstr ""
+msgstr "مرحبًا {name}،"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Thank you for your purchase of "
-msgstr ""
+msgstr "شكرًا لشرائك"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Your payment was successful."
-msgstr ""
+msgstr "نجح إجراء دفعتك."
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -12093,11 +12177,11 @@ msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Company Name:"
-msgstr ""
+msgstr "اسم الشركة:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Purchase Order Number:"
-msgstr ""
+msgstr "رقم طلب الشراء:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Company Contact Name:"
@@ -12109,11 +12193,11 @@ msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Recipient Name:"
-msgstr ""
+msgstr "اسم المرسَل له:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Recipient Email:"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني للمرسَل له:"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 #: lms/templates/emails/order_confirmation_email.txt
@@ -12122,7 +12206,7 @@ msgstr "#:  "
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Order Number: {order_number}"
-msgstr ""
+msgstr "رقم الطلب: {order_number}"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
@@ -12133,15 +12217,15 @@ msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Warm regards,"
-msgstr ""
+msgstr "مع خالص تحيّاتنا،"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Warm regards,<br>The {platform_name} Team"
-msgstr ""
+msgstr "مع خالص تحيّاتنا،<br>فريق {platform_name} "
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid "Dear [[Name]]"
-msgstr ""
+msgstr "عزيزي/عزيزتي السيّد/السيّدة [[الاسم]]"
 
 #: lms/templates/emails/business_order_confirmation_email.txt
 msgid ""
@@ -12713,6 +12797,13 @@ msgstr "هل انتهى المساق؟"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
 msgstr "الدرجات المحدّدة لسلّم التقييم:"
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html
@@ -16052,6 +16143,8 @@ msgid ""
 "Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
 "image from a component, a course update, or a course handout."
 msgstr ""
+"يُرجى استخدام قيمة {em_start}رابط {studio_name}{em_end} لربط الملف أو الصورة"
+" من أحد المكوِّنات أو أحد تحديثات المساق أو نشراته."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -16059,12 +16152,17 @@ msgid ""
 "from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
 " Web URL no longer works for external access to a file."
 msgstr ""
+"يُرجى استخدام قيمة {em_start}رابط الويب{em_end} للإشارة إلى الملف أو الصورة "
+"من خارج مساقك فقط. {em_start}ملاحظة:{em_end} إذا أقفلتَ أحد الملفّات، فإنّ "
+"رابط الويب لن يعد صالحًا للوصول إلى الملف من الخارج."
 
 #: cms/templates/asset_index.html
 msgid ""
 "To copy a URL, double click the value in the URL column, then copy the "
 "selected text."
 msgstr ""
+"لتنسخ رابطًا، يُرجى النقر على القيمة الموجودة في عمود الرابط، ثمّ نسخ النصّ "
+"المُنتقى. "
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
@@ -16875,12 +16973,12 @@ msgstr "الرابط لبرنامج git الخاص بالمساق:"
 #: cms/templates/group_configurations.html
 #: cms/templates/visibility_editor.html
 msgid "Content Groups"
-msgstr ""
+msgstr "مجموعات المحتوى"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
 msgid "Experiment Group Configurations"
-msgstr ""
+msgstr "ضبط إعدادات المجموعة الخاصّة بالاختبار"
 
 #: cms/templates/group_configurations.html
 msgid "This module is disabled at the moment."
@@ -16895,6 +16993,12 @@ msgid ""
 " can customize the content that a particular cohort or cohorts sees in your "
 "course."
 msgstr ""
+"يُرجى استخدام مجموعات المحتوى لمنح مجموعات الطلّاب إمكانية الدخول إلى "
+"محتويات محدّدة في المساق، حيث بالإضافة إلى محتوى المساق الموجَّه للطلّاب "
+"جميعهم، فإنّ كل مجموعة محتوى تكشف عن المحتوى الذي تحدّده بعينه على أنّه مرئي"
+" في هذه المجموعة. ومن خلال ربط مجموعة محتوى بمجموعة طلّاب واحدة أو أكثر، "
+"يمكنك اختيار المحتوى الذي يمكن لمجموعة أو مجموعات معيّنة من الطلّاب أن تراه "
+"في مساقك."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -16902,6 +17006,10 @@ msgid ""
 "edit the name of a content group, hover over its box and click "
 "{em_start}Edit{em_end}. Content groups cannot be deleted."
 msgstr ""
+"يُرجى النقر على {em_start}مجموعة محتوى جديدة{em_end} لإضافة مجموعة محتوى. "
+"ولتعديل اسم هذه المجموعة، حرِّك الماوس فوق الخانة وانقر على "
+"{em_start}تعديل{em_end}. ويُرجى الانتباه إلى أنّه لا يمكن حذف مجموعات "
+"المحتوى."
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
@@ -16914,6 +17022,9 @@ msgid ""
 "are in a content experiment. When you create a content experiment for a "
 "course, you select the group configuration to use."
 msgstr ""
+"يُرجى استخدام إعدادات مجموعة التجربة لتحديد عدد مجموعات الطلّاب الموجودة في "
+"إحدى تجارب المساق. وعندما تنشئ تجربة محتوى معيّنة لمساق ما، يُرجى اختيار "
+"إعداد المجموعة الذي يجب استخدامه. "
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -18385,37 +18496,37 @@ msgstr "الوقت المبذول في كافة أعمال المساق"
 
 #: cms/templates/settings.html
 msgid "Prerequisite Course"
-msgstr ""
+msgstr "مساق أساسي"
 
 #: cms/templates/settings.html
 msgid "Course that students must complete before beginning this course"
-msgstr ""
+msgstr "المساق الذي يجب أن يكملوه الطلّاب قبل البدء بهذا المساق"
 
 #: cms/templates/settings.html
 msgid "set pre-requisite course"
-msgstr ""
+msgstr "تحديد المساق الأساسي"
 
 #: cms/templates/settings.html
 msgid "Require students to pass an exam before beginning the course."
-msgstr ""
+msgstr "يُطلَب من الطلّاب اجتياز اختبار معيّن قبل البدء بالمساق."
 
 #: cms/templates/settings.html
 msgid "You can now view and author your course entrance exam from the "
-msgstr ""
+msgstr "يمكنك الآن رؤية امتحان الدخول الخاص بمساقك وتأليفه من خلال"
 
 #: cms/templates/settings.html
 msgid "Grade Requirements"
-msgstr ""
+msgstr "متطلّبات التقييم"
 
 #: cms/templates/settings.html
 msgid " %"
-msgstr ""
+msgstr "%"
 
 #: cms/templates/settings.html
 msgid ""
 "The score student must meet in order to successfully complete the entrance "
 "exam. "
-msgstr ""
+msgstr "مجموع الدرجات الذي يجب على الطالب إحرازه لاجتياز امتحان الدخول."
 
 #: cms/templates/settings.html
 msgid "How are these settings used?"
@@ -18576,11 +18687,11 @@ msgstr "تكبير أو تصغير"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility Settings"
-msgstr ""
+msgstr "إعدادات قابلية الرؤية"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility"
-msgstr ""
+msgstr "قابلية الرؤية"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -18699,7 +18810,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
-msgstr ""
+msgstr "لا توجد أي مجموعات للمحتوى"
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -18707,10 +18818,13 @@ msgid ""
 "course content. Create one or more content groups, and make specific "
 "components visible to them."
 msgstr ""
+"يُرجى استخدام مجموعات المحتوى لمنح مجموعات الطلّاب إمكانية الدخول إلى "
+"محتويات محدّدة في المساق. أنشِئ مجموعة محتوى واحدة أو أكثر، وحدّد مكوٍّناتها"
+" التي تريد أن تجعلها مرئيّة لهم. "
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
-msgstr ""
+msgstr "إدارة مجموعات المحتوى"
 
 #. Translators: Any text between {screen_reader_start} and {screen_reader_end}
 #. is only read by screen readers and never shown in the browser.
@@ -18720,28 +18834,32 @@ msgid ""
 "contained in is hidden from students. Visibility settings here will be "
 "trumped by this."
 msgstr ""
+"{screen_reader_start}تحذير:{screen_reader_end} إنّ الوحدة التي تحتوي على هذا"
+" المكوِّن مخفيّة عن الطلّاب، وتُضبط إعدادات قابلية الرؤية على هذا الأساس."
 
 #: cms/templates/visibility_editor.html
 msgid "Make visible to:"
-msgstr ""
+msgstr "إتاحة الرؤية لـ: "
 
 #: cms/templates/visibility_editor.html
 msgid "All Students and Staff"
-msgstr ""
+msgstr "جميع الطلّاب وأفراد طاقم المساق"
 
 #: cms/templates/visibility_editor.html
 msgid "Specific Content Groups"
-msgstr ""
+msgstr "مجموعات محتوى معيّنة"
 
 #: cms/templates/visibility_editor.html
 msgid "Deleted Content Group"
-msgstr ""
+msgstr "مجموعة محتوى محذوفة"
 
 #: cms/templates/visibility_editor.html
 msgid ""
 "Content group no longer exists. Please choose another or allow access to All"
 " Students and staff"
 msgstr ""
+"لم تعد مجموعة المحتوى موجودة. يُرجى اختيار غيرها أو إتاحة إمكانية الدخول "
+"لجميع الطلّاب وأفراد طاقم المساق."
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
