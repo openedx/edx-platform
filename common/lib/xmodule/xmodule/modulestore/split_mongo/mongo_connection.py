@@ -8,11 +8,14 @@ import pymongo
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
-from contracts import check
+from contracts import check, new_contract
 from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo import BlockKey, BlockData
 import datetime
 import pytz
+
+
+new_contract('BlockData', BlockData)
 
 
 def structure_from_mongo(structure):
@@ -34,7 +37,7 @@ def structure_from_mongo(structure):
     for block in structure['blocks']:
         if 'children' in block['fields']:
             block['fields']['children'] = [BlockKey(*child) for child in block['fields']['children']]
-        new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = block
+        new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = BlockData(block)
     structure['blocks'] = new_blocks
 
     return structure
@@ -49,7 +52,7 @@ def structure_to_mongo(structure):
         directly into mongo.
     """
     check('BlockKey', structure['root'])
-    check('dict(BlockKey: dict)', structure['blocks'])
+    check('dict(BlockKey: BlockData)', structure['blocks'])
     for block in structure['blocks'].itervalues():
         if 'children' in block['fields']:
             check('list(BlockKey)', block['fields']['children'])
@@ -58,7 +61,7 @@ def structure_to_mongo(structure):
     new_structure['blocks'] = []
 
     for block_key, block in structure['blocks'].iteritems():
-        new_block = dict(block)
+        new_block = dict(block.to_storable())
         new_block.setdefault('block_type', block_key.type)
         new_block['block_id'] = block_key.id
         new_structure['blocks'].append(new_block)
