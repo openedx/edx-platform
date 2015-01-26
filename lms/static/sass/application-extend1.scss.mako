@@ -10,10 +10,11 @@
 // BASE  *default edX offerings*
 // ====================
 
-// base - utilities
-@import 'base/reset';
-@import 'base/variables';
-@import 'base/mixins';
+// utilities
+@import 'utilities/reset';
+@import 'utilities/variables';
+@import 'utilities/mixins';
+@import 'utilities/extends';
 
 ## THEMING
 ## -------
@@ -28,19 +29,17 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
+// assets
+@import 'assets/fonts';
+@import 'assets/animations';
 
-// base - assets
-@import 'base/font_face';
-@import 'base/extends';
-@import 'base/animations';
+// elements
+@import 'elements/typography';
+@import 'elements/controls';
+@import 'elements/system-feedback';
 
 // base - starter
 @import 'base/base';
-
-// base - elements
-@import 'elements/typography';
-@import 'elements/controls';
 
 // shared - platform
 @import 'multicourse/home';

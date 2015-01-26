@@ -1,10 +1,11 @@
 @import 'bourbon/bourbon';
 @import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
-@import 'base/reset';
-@import 'base/font_face';
-@import 'base/variables';
-@import 'base/mixins';
+// utilities
+@import 'utilities/reset';
+@import 'utilities/variables';
+@import 'utilities/mixins';
+@import 'utilities/extends';
 
 ## THEMING
 ## -------
@@ -19,16 +20,18 @@
   @import '${env.get('THEME_NAME')}';
 % endif
 
-@import 'base/base';
-@import 'base/extends';
-@import 'base/animations';
-@import 'shared/tooltips';
+// assets
+@import 'assets/fonts';
+@import 'assets/animations';
 
-// base - elements
+// elements
 @import 'elements/typography';
 @import 'elements/controls';
-@import 'elements/navigation'; // all archetypes of navigation
+@import 'elements/system-feedback';
+@import 'shared/tooltips';
 
+// base - starter
+@import 'base/base';
 
 // course - base
 @import 'course/layout/courseware_header';
@@ -47,6 +50,7 @@
 @import 'course/modules/calculator'; // calculator utility
 @import 'course/modules/timer'; // timer
 @import 'course/modules/chat'; // chat utility
+
 
 // course - specific courses
 @import "course/courseware/courses/_cs188.scss";

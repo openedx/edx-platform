@@ -150,7 +150,7 @@
       margin-bottom: ($baseline*1.5);
       text-align: center;
       > a {
-        @include button(simple, $button-color);
+        @include button-bourbon(simple, $button-color);
         @include box-sizing(border-box);
         border-radius: 3px;
         font: normal 15px/1.6rem $sans-serif;

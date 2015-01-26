@@ -3,7 +3,7 @@ $fg-column: $column;
 $fg-gutter: $gutter;
 $fg-max-columns: $grid-columns;
 $container-display-table: false !default;
-$layout-direction: nil !default;
+$layout-direction: LTR !default;
 
 @function flex-grid($columns, $container-columns: $fg-max-columns) {
   $width: $columns * $fg-column + ($columns - 1) * $fg-gutter;
@@ -31,13 +31,5 @@ $layout-direction: nil !default;
 }
 
 @function is-display-table($container-is-display-table, $display) {
-  $display-table: false;
-
-  @if $container-is-display-table == true {
-    $display-table: true;
-  } @else if $display == table {
-    $display-table: true;
-  }
-
-  @return $display-table;
+  @return $container-is-display-table == true or $display == table;
 }
