@@ -37,7 +37,6 @@ def wrap_draft(item):
 
 
 class DraftModuleStore(MongoModuleStore):
-
     """
     This mixin modifies a modulestore to give it draft semantics.
     Edits made to units are stored to locations that have the revision DRAFT.
@@ -47,7 +46,6 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
-
     def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
@@ -544,6 +542,8 @@ class DraftModuleStore(MongoModuleStore):
             )
         self._delete_subtree(location, as_functions)
 
+        # Remove this location from the courseware search index so that searches
+        # will refrain from showing it as a result
         self.do_index(location, delete=True)
 
     def _delete_subtree(self, location, as_functions, draft_only=False):
@@ -719,6 +719,7 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
 
+        # Now it's been published, add the object to the courseware search index so that it appears in search results
         self.do_index(location)
 
         return self.get_item(as_published(location))

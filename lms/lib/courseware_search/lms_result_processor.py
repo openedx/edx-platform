@@ -51,7 +51,7 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         Property to display the url for the given location, useful for allowing navigation
         """
         if "course" not in self._results_fields or "id" not in self._results_fields:
-            return None
+            raise ValueError("Must have course and id in order to build url")
 
         return reverse(
             'jump_to',
@@ -92,9 +92,9 @@ class LmsSearchResultProcessor(SearchResultProcessor):
 
     def should_remove(self, user):
         """ Test to see if this result should be removed due to access restriction """
-        return has_access(
+        return not has_access(
             user,
             'load',
             self.get_item(self.get_usage_key()),
             self.get_course_key()
-        ) is False
+        )

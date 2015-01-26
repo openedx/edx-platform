@@ -55,7 +55,6 @@ class HtmlModuleSubstitutionTestCase(unittest.TestCase):
 
 
 class HtmlDescriptorIndexingTestCase(unittest.TestCase):
-
     """
     Make sure that HtmlDescriptor can format data for indexing as expected.
     """

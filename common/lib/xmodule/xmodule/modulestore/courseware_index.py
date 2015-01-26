@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import logging
 
+from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
 
@@ -16,6 +17,14 @@ DOCUMENT_TYPE = "courseware_content"
 log = logging.getLogger('edx.modulestore')
 
 
+class SearchIndexingError(Exception):
+    """ Indicates some error(s) occured during indexing """
+
+    def __init__(self, message, error_list):
+        super(SearchIndexingError, self).__init__(message)
+        self.error_list = error_list
+
+
 class ModuleStoreCoursewareIndexMixin(object):
     """
     Mixin class to enable indexing for courseware search from different modulestores
@@ -25,13 +34,17 @@ class ModuleStoreCoursewareIndexMixin(object):
         """
         Add to courseware search index from given location and its children
         """
-        error = []
+        error_list = []
         # TODO - inline for now, need to move this out to a celery task
         searcher = SearchEngine.get_search_engine(INDEX_NAME)
         if not searcher:
             return
 
-        course_key = location if isinstance(location, CourseLocator) else location.course_key
+        if isinstance(location, CourseLocator):
+            course_key = location
+        else:
+            course_key = location.course_key
+
         location_info = {
             "course": unicode(course_key),
         }
@@ -84,7 +97,7 @@ class ModuleStoreCoursewareIndexMixin(object):
                 except Exception as err:  # pylint: disable=broad-except
                     # broad exception so that index operation does not fail on one item of many
                     log.warning('Could not index item: %s - %s', item_location, unicode(err))
-                    error.append('Could not index item: {} <br>'.format(item_location))
+                    error_list.append(_('Could not index item: {}').format(item_location))
 
         def remove_index_item_location(item_location):
             """ remove this item from the search index """
@@ -108,7 +121,10 @@ class ModuleStoreCoursewareIndexMixin(object):
                 course_key,
                 unicode(err)
             )
-        return error
+            error_list.append(_('General indexing error occurred'))
+
+        if error_list:
+            raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
 
     def do_course_reindex(self, course_key):
         """

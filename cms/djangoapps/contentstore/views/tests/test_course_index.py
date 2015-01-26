@@ -5,7 +5,6 @@ import json
 import lxml
 import datetime
 import os
-import pickle
 import mock
 
 from contentstore.tests.utils import CourseTestCase
@@ -376,7 +375,7 @@ class TestCourseReIndex(CourseTestCase):
 
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
-            pickle.dump({}, index_file)
+            json.dump({}, index_file)
 
     def test_reindex_course(self):
         """
@@ -390,7 +389,7 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(index_url, {}, HTTP_ACCEPT='application/json')
-        self.assertTrue(response.content is '')
+        self.assertEqual(response.content, '')
         self.assertEqual(response.status_code, 405)
 
         self.client.logout()

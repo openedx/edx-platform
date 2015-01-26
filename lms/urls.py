@@ -10,8 +10,9 @@ from microsite_configuration import microsite
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
-urlpatterns = (
-    '',  # nopep8
+# Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
+# pylint: disable=bad-continuation
+urlpatterns = ('',  # nopep8
     # certificate view
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
     url(r'^request_certificate$', 'certificates.views.request_certificate'),

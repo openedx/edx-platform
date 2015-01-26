@@ -1042,12 +1042,8 @@ courseware_js = (
         for pth in ['courseware', 'histogram', 'navigation', 'time']
     ] +
     ['js/' + pth + '.js' for pth in ['ajax-error']] +
+    ['js/search/main.js'] +
     sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/modules/**/*.js'))
-)
-
-# Include JS files needed for courseware search
-courseware_js += (
-    'js/search/main.js',
 )
 
 

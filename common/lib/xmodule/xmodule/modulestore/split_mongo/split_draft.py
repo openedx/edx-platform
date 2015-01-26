@@ -203,6 +203,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
                 if branch == ModuleStoreEnum.BranchName.draft and branched_location.block_type in DIRECT_ONLY_CATEGORIES:
                     self.publish(parent_loc.version_agnostic(), user_id, blacklist=EXCLUDE_ALL, **kwargs)
 
+        # Remove this location from the courseware search index so that searches
+        # will refrain from showing it as a result
         self.do_index(location, delete=True)
 
     def _map_revision_to_branch(self, key, revision=None):
@@ -348,6 +350,7 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             blacklist=blacklist
         )
 
+        # Now it's been published, add the object to the courseware search index so that it appears in search results
         self.do_index(location)
 
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)

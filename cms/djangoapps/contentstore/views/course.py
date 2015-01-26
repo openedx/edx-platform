@@ -22,6 +22,7 @@ from edxmako.shortcuts import render_to_response
 from xmodule.course_module import DEFAULT_START_DATE
 from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore.courseware_index import SearchIndexingError
 from xmodule.contentstore.content import StaticContent
 from xmodule.tabs import PDFTextbookTabs
 from xmodule.partitions.partitions import UserPartition
@@ -307,16 +308,12 @@ def course_index_handler(request, course_key_string):
         raise PermissionDenied()
     course_key = CourseKey.from_string(course_key_string)
     with modulestore().bulk_operations(course_key):
-        error = reindex_course_and_check_access(course_key, request.user)
-        if error:
-            return HttpResponse(
-                error,
-                status=500
-            )
-        return HttpResponse(
-            {},
-            status=200
-        )
+        try:
+            reindex_course_and_check_access(course_key, request.user)
+        except SearchIndexingError as search_err:
+            return HttpResponse(search_err.error_list, status=500)
+
+        return HttpResponse({}, status=200)
 
 
 def _course_outline_json(request, course_module):

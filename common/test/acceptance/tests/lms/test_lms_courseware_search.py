@@ -2,7 +2,7 @@
 Test courseware search
 """
 import os
-import pickle
+import json
 
 from ..helpers import UniqueCourseTest
 from ...pages.common.logout import LogoutPage
@@ -44,7 +44,7 @@ class CoursewareSearchTest(UniqueCourseTest):
         """
         # create test file in which index for this test will live
         with open(self.TEST_INDEX_FILENAME, "w+") as index_file:
-            pickle.dump({}, index_file)
+            json.dump({}, index_file)
 
         super(CoursewareSearchTest, self).setUp()
         self.courseware_search_page = CoursewareSearchPage(self.browser, self.course_id)

@@ -1813,50 +1813,22 @@ class MongoModuleStore(
 
     # Some overrides that still need to be implemented by subclasses
     def convert_to_draft(self, location, user_id):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def delete_item(self, location, user_id, **kwargs):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def has_changes(self, xblock):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def has_published_version(self, xblock):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def publish(self, location, user_id):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def revert_to_published(self, location, user_id):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
 
     def unpublish(self, location, user_id):
-        raise NotImplementedError(
-            "{function_name} needs to be implemented in subclass".format(
-                function_name=sys._getframe().f_code.co_name
-            )
-        )
+        raise NotImplementedError()
