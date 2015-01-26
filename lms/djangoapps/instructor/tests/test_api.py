@@ -3644,4 +3644,5 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
             'comments': 'testing comments'
         }
         response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
-        self.assertEqual(response.status_code, 200, response.content)
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Please pass the all required values.', response.content)
