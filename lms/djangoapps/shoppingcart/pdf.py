@@ -391,9 +391,9 @@ class PDFInvoice(object):
             # NOTE: since we are not printing the TaxID for Credit Card
             # based receipts, we need to change the cell range for
             # these formatting rules
-            ('RIGHTPADDING', (-1, 0), (-1, -2 if self.is_invoice else -1), 7 * mm),
-            ('GRID', (-1, 0), (-1, -2 if self.is_invoice else -1), 3.0, colors.white),
-            ('BACKGROUND', (-1, 0), (-1, -2 if self.is_invoice else -1), '#EEEEEE'),
+            ('RIGHTPADDING', (-1, 0), (-1, 2), 7 * mm),
+            ('GRID', (-1, 0), (-1, 2), 3.0, colors.white),
+            ('BACKGROUND', (-1, 0), (-1, 2), '#EEEEEE'),
         ]
 
         totals_table.setStyle(TableStyle(styles))
