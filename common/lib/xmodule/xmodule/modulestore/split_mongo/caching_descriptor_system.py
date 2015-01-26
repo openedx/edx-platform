@@ -53,7 +53,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if course_entry.course_key.course:
             root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run
         else:
-            root = modulestore.fs_root / course_entry.structure['_id']
+            root = modulestore.fs_root / str(course_entry.structure['_id'])
         root.makedirs_p()  # create directory if it doesn't exist
 
         id_manager = SplitMongoIdManager(self)
