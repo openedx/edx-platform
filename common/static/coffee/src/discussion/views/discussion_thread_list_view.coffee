@@ -243,13 +243,13 @@ if Backbone?
       @trigger("thread:removed", thread_id)
 
     setActiveThread: (thread_id) ->
-      @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
-      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active")
+      @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active").removeAttr('aria-label')
+      @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active").attr('aria-label', 'Current conversation')
 
     goHome: ->
       @template = _.template($("#discussion-home").html())
       $(".forum-content").html(@template)
-      $(".forum-nav-thread-list a").removeClass("is-active")
+      $(".forum-nav-thread-list a").removeClass("is-active").removeAttr('aria-label')
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
