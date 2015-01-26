@@ -8,13 +8,14 @@ import os
 import mock
 
 from contentstore.tests.utils import CourseTestCase
-from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor
+from contentstore.utils import reverse_course_url, reverse_library_url, add_instructor, reverse_usage_url
 from student.auth import has_course_author_access
 from contentstore.views.course import course_outline_initial_state, reindex_course_and_check_access
 from contentstore.views.item import create_xblock_info, VisibilityState
 from course_action_state.models import CourseRerunState
 from util.date_utils import get_default_time_display
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, LibraryFactory
 from opaque_keys.edx.locator import CourseLocator
@@ -422,6 +423,12 @@ class TestCourseReIndex(CourseTestCase):
         # Start manual reindex
         reindex_course_and_check_access(self.course.id, self.user)
 
+        self.html.display_name = "My expanded HTML"
+        modulestore().update_item(self.html, ModuleStoreEnum.UserID.test)
+
+        # Start manual reindex
+        reindex_course_and_check_access(self.course.id, self.user)
+
         # Check results indexed now
         response = perform_search(
             "unique",
@@ -432,9 +439,9 @@ class TestCourseReIndex(CourseTestCase):
         self.assertEqual(response['total'], 1)
 
     @mock.patch('xmodule.video_module.VideoDescriptor.index_dictionary')
-    def test_reindex_error_json_responses(self, mock_index_dictionary):
+    def test_reindex_video_error_json_responses(self, mock_index_dictionary):
         """
-        Test json response with rmocked error data for video
+        Test json response with mocked error data for video
         """
         # Check results not indexed
         response = perform_search(
@@ -452,6 +459,68 @@ class TestCourseReIndex(CourseTestCase):
         # Start manual reindex and check error in response
         response = reindex_course_and_check_access(self.course.id, self.user)
         self.assertIn('Could not index item: ', response[0])
+
+    @mock.patch('xmodule.html_module.HtmlDescriptor.index_dictionary')
+    def test_reindex_html_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with rmocked error data for html
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        #set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        response = reindex_course_and_check_access(self.course.id, self.user)
+        self.assertIn('Could not index item: ', response[0])
+
+    @mock.patch('xmodule.seq_module.SequenceDescriptor.index_dictionary')
+    def test_reindex_seq_error_json_responses(self, mock_index_dictionary):
+        """
+        Test json response with rmocked error data for sequence
+        """
+        # Check results not indexed
+        response = perform_search(
+            "unique",
+            user=self.user,
+            size=10,
+            from_=0,
+            course_id=unicode(self.course.id))
+        self.assertEqual(response['results'], [])
+
+        #set mocked exception response
+        err = Exception
+        mock_index_dictionary.return_value = err
+
+        # Start manual reindex and check error in response
+        response = reindex_course_and_check_access(self.course.id, self.user)
+        self.assertIn('Could not index item: ', response[0])
+
+    @mock.patch('xmodule.modulestore.mongo.base.MongoModuleStore.get_course')
+    def test_reindex_no_item(self, mock_get_course):
+        """
+        Test system logs an error if no item found.
+        """
+        new_course = CourseFactory.create(
+            org='test.org_1-2',
+            number='test-2.3_coursethisisnotarealid',
+            display_name='dotted.course.name-2',
+        )
+
+        #set mocked exception response
+        err = ItemNotFoundError
+        mock_get_course.return_value = err
+
+        # Start manual reindex and check error in response
+        response = reindex_course_and_check_access(self.course.id, self.user)
 
     def test_reindex_no_permissions(self):
         # register a non-staff member and try to delete the course branch
