@@ -41,7 +41,7 @@
                         </li>
                         <li class="field required text" id="make_invoice-modal-field-amount">
                             <label for="amount" class="required text">${_("Amount")}</label>
-                            <input class="field required" id="amount" type="text" name="amount" value="" maxlength="6"
+                            <input class="field required" id="amount" type="text" name="amount" value="" maxlength="8"
                                    aria-required="true"/>
                         </li>
 
@@ -82,8 +82,8 @@
     $(function () {
         $("#add_invoice_button").click(function (e) {
 
-            var invoice_id = $("#invoice_id").val();
-            var amount = $("#amount").val();
+            var invoice_id = $.trim($("#invoice_id").val());
+            var amount = $.trim($("#amount").val());
             if (!($.isNumeric(invoice_id))) {
                  $('h3#error-msgs-invoice').html('Please enter invoice id.').show();
                 return false

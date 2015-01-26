@@ -3640,9 +3640,30 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         Test to add invoice transaction with invalid invoice id
         """
         data = {
-            'invoice_id': self.sale_invoice_1.id, 'amount': None, 'amount_type': None,
+            'invoice_id': '', 'amount': '', 'amount_type': '',
             'comments': 'testing comments'
         }
         response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 400, response.content)
-        self.assertIn('Please pass the all required values.', response.content)
+        self.assertIn('Please enter the valid invoice id.', response.content)
+
+        data.update({'invoice_id': 100})
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Please select the amount type', response.content)
+
+        data.update({'amount_type': 'payment'})
+
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Please enter the amount.', response.content)
+
+        data.update({'amount': 'invalidamount'})
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Could not parse amount as a decimal', response.content)
+
+        data.update({'amount': 0.0})
+        response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 200, response.content)
+        self.assertIn('Amount must be greater than 0', response.content)
