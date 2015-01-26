@@ -84,6 +84,7 @@
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # Lionel Chen <chenlinchuan@me.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
+# viztor <viztor@outlook.com>, 2015
 # 张逸涵 <jeanzhang970128@gmail.com>, 2014
 # 汤和果 <hgtang93@163.com>, 2015
 # 胡超威 <chadennishu@gmail.com>, 2014
@@ -102,9 +103,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:22+0000\n"
-"PO-Revision-Date: 2015-01-20 14:31+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-23 01:41+0000\n"
+"Last-Translator: jsgang <jsgang9@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2188,7 +2189,7 @@ msgstr "生成学生档案信息时出现错误，请重试。"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading"
-msgstr ""
+msgstr "载入中..."
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -3045,7 +3046,7 @@ msgstr "上传文件并为学生分组"
 #: lms/static/js/groups/views/cohorts.js
 msgid ""
 "Your file '{file}' has been uploaded. Allow a few minutes for processing."
-msgstr ""
+msgstr "你的文件 '{file}'已经上传。需要几分钟时间进行处理。"
 
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
@@ -3437,6 +3438,10 @@ msgstr ""
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a name."
+msgstr ""
+
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a unique name."
 msgstr ""
 
 #: cms/static/js/models/uploads.js
@@ -4202,12 +4207,6 @@ msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid ""
-"Sorry, we're having some technical problems. Wait a few minutes and try "
-"again."
 msgstr ""
 
 #: lms/templates/student_account/account.underscore

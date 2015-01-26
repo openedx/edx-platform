@@ -5,7 +5,7 @@
 # 
 # Translators:
 # anaseha <anaselhadjamor@gmail.com>, 2014
-# Bertrand Marron <bertrand.marron@gmail.com>, 2014
+# Bertrand Marron <bertrand.marron@gmail.com>, 2014-2015
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Daniel Le Berre, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
@@ -95,6 +95,7 @@
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
+# Leslie Bordonné <leslie@bordonne.com>, 2015
 # madmarsu <madmarsu@gmail.com>, 2014
 # Maghjina <Maghjina@gmail.com>, 2014
 # mamby <mamby@live.com>, 2014
@@ -118,7 +119,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
-# Bertrand Marron <bertrand.marron@gmail.com>, 2013-2014
+# Bertrand Marron <bertrand.marron@gmail.com>, 2013-2015
 # Christopher Castermane <christopher.castermane@student.uclouvain.be>, 2014
 # Daniel Le Berre, 2014
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
@@ -161,7 +162,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:23+0000\n"
+"POT-Creation-Date: 2015-01-26 13:22+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Xavier Antoviaque <xavier@antoviaque.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
@@ -1210,15 +1211,17 @@ msgstr ""
 msgid "Execution of unsafe Javascript code is not allowed."
 msgstr "L'exécution de code Javascript dangereux n'est pas autorisée."
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Checkboxes"
-msgstr "Cases à cocher"
+msgstr "Question à choix multiple"
 
+#: common/lib/capa/capa/responsetypes.py
 #: cms/templates/widgets/problem-edit.html
 #: cms/templates/widgets/problem-edit.html
 msgid "Multiple Choice"
-msgstr "QCM"
+msgstr "Question à choix unique"
 
 #. Translators: 'unmask_name' is a method name and should not be translated.
 #: common/lib/capa/capa/responsetypes.py
@@ -2554,6 +2557,12 @@ msgstr ""
 "cours apparaissent dans le panneau de droite de la page."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
 msgstr "Format d'affichage de l'échéance"
 
@@ -2735,6 +2744,10 @@ msgid "Invitation Only"
 msgstr "Seulement sur invitation"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr ""
 
@@ -2782,7 +2795,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content."
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2792,7 +2806,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content."
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3264,6 +3279,15 @@ msgstr ""
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -6625,6 +6649,10 @@ msgid "No email address provided."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
 msgstr "Aucune photo d'identité n'a été fournie."
 
@@ -6645,8 +6673,8 @@ msgid "The image of your face was not clear."
 msgstr "La photo de votre visage n'est pas assez claire. "
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
-msgstr "Votre visage n'est pas visible sur votre photo de vous-même. "
+msgid "Your face was not visible in your self-photo."
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
@@ -10167,6 +10195,7 @@ msgstr "Echéance le {date}"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Une erreur s'est produite. Merci d'essayer de nouveau plus tard."
@@ -10230,6 +10259,16 @@ msgstr "Présentation"
 msgid "Share with friends and family!"
 msgstr "Partager avec ses amis et sa famille !"
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -10243,6 +10282,10 @@ msgstr "Suivez un cours en ligne avec {platform}"
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr "Je viens de m'inscrire pour {number} {title} via {platform} {url}"
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
+msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -11144,7 +11187,6 @@ msgstr "Approuvé :"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr "Etat de vérification d'identité"
 
@@ -11165,16 +11207,18 @@ msgstr ""
 "prochainement."
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
-msgstr "Vérifiez à nouveau vous-même"
+msgid "{platform_name} Verification Status"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
-"Si vous ne parvenez pas à terminer vos tentatives de vérification avant la "
-"fin de votre cours, vous ne recevrez pas un certificat vérifié."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -12575,6 +12619,13 @@ msgstr "Le cours est-il terminé ?"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
 msgstr "Seuils de notation:"
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

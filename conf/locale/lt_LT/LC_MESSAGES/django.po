@@ -67,7 +67,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:23+0000\n"
+"POT-Creation-Date: 2015-01-26 13:22+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Edukometrija <jolitad@mruni.eu>\n"
 "Language-Team: Lithuanian (Lithuania) (http://www.transifex.com/projects/p/edx-platform/language/lt_LT/)\n"
@@ -2388,6 +2388,12 @@ msgstr ""
 "dalijamoji medžiaga yra matoma dešiniajame puslapio skydelyje."
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
 msgstr "Pateikimo datos rodymo formatas"
 
@@ -2564,6 +2570,10 @@ msgid "Invitation Only"
 msgstr "Tik pakviestiesiems"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr "Prieš kursą pateikiamos apklausos pavadinimas"
 
@@ -2619,7 +2629,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content."
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2629,7 +2640,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content."
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -3114,6 +3126,15 @@ msgid ""
 msgstr ""
 "Įveskite tekstą ant mygtuko, kuriuo paleidžiama trečiosios šalies taikomoji "
 "programa."
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
+msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -6389,6 +6410,10 @@ msgid "No email address provided."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
 msgstr "Nepateikta asmens tapatybės dokumento nuotrauka."
 
@@ -6410,8 +6435,8 @@ msgid "The image of your face was not clear."
 msgstr "Jūsų veido atvaizdas neryškus."
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
-msgstr "Autonuotraukoje jūsų veido nematyti"
+msgid "Your face was not visible in your self-photo."
+msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
@@ -9781,6 +9806,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
@@ -9840,6 +9866,16 @@ msgstr ""
 msgid "Share with friends and family!"
 msgstr ""
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -9852,6 +9888,10 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -10713,7 +10753,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr ""
 
@@ -10731,16 +10770,18 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
+msgid "{platform_name} Verification Status"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
-"Jei nepraeisite asmens tapatybės patikros iki kurso pabaigos, tapatybe "
-"patvirtinto sertifikato negausite."
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -12046,6 +12087,13 @@ msgstr "Ar šis kursas jau baigėsi?"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
+msgstr ""
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
