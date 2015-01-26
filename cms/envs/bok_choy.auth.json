@@ -45,6 +45,7 @@
             "ENGINE": "xmodule.modulestore.mixed.MixedModuleStore",
             "OPTIONS": {
                 "mappings": {},
+                // TODO: should split be specified here?
                 "stores": [
                     {
                         "NAME": "draft",

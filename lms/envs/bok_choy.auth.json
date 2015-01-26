@@ -64,6 +64,7 @@
             "OPTIONS": {
                 "mappings": {},
                 "stores": [
+                    // TODO: should split be specified here?
                     {
                         "NAME": "draft",
                         "DOC_STORE_CONFIG": {
