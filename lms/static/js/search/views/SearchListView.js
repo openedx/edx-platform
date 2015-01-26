@@ -1,4 +1,6 @@
-RequireJS.define([
+;(function (define) {
+
+define([
     'jquery',
     'underscore',
     'backbone',
@@ -14,6 +16,7 @@ RequireJS.define([
         events: {
             'click .search-load-next': 'loadNext'
         },
+        spinner: '.icon',
 
         initialize: function () {
             this.courseName = this.$el.attr('data-course-name');
@@ -46,7 +49,7 @@ RequireJS.define([
             if (! this.collection.hasNextPage()) {
                 this.$el.find('.search-load-next').remove();
             }
-            this.$el.find('.icon-spin').hide();
+            this.$el.find(this.spinner).hide();
         },
 
         renderItems: function () {
@@ -76,10 +79,13 @@ RequireJS.define([
 
         loadNext: function (event) {
             event && event.preventDefault();
-            this.$el.find('.icon-spin').show();
+            this.$el.find(this.spinner).show();
             this.trigger('next');
         }
 
     });
 
 });
+
+
+})(define || RequireJS.define);

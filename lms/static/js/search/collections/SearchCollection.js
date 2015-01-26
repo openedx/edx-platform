@@ -1,4 +1,6 @@
-RequireJS.define([
+;(function (define) {
+
+define([
     'backbone',
     'js/search/models/SearchResult'
 ], function (Backbone, SearchResult) {
@@ -86,3 +88,5 @@ RequireJS.define([
 
 });
 
+
+})(define || RequireJS.define);

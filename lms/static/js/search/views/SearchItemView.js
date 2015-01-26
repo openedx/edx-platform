@@ -1,4 +1,6 @@
-RequireJS.define([
+;(function (define) {
+
+define([
     'jquery',
     'underscore',
     'backbone',
@@ -26,3 +28,5 @@ RequireJS.define([
     });
 
 });
+
+})(define || RequireJS.define);

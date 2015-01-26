@@ -1,4 +1,6 @@
-RequireJS.define(['backbone'], function (Backbone) {
+;(function (define) {
+
+define(['backbone'], function (Backbone) {
     'use strict';
 
     return Backbone.Router.extend({
@@ -8,3 +10,5 @@ RequireJS.define(['backbone'], function (Backbone) {
     });
 
 });
+
+})(define || RequireJS.define);

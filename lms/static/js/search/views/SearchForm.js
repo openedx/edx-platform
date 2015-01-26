@@ -1,4 +1,7 @@
-RequireJS.define(['jquery', 'backbone'], function ($, Backbone) {
+;(function (define) {
+
+
+define(['jquery', 'backbone'], function ($, Backbone) {
    'use strict';
 
     return Backbone.View.extend({
@@ -60,3 +63,6 @@ RequireJS.define(['jquery', 'backbone'], function ($, Backbone) {
     });
 
 });
+
+
+})(define || RequireJS.define);

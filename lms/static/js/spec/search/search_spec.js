@@ -1,6 +1,3 @@
-// See lms/static/js/RequireJS-namespace-undefine.js
-RequireJS.define = define;
-
 define([
     'jquery',
     'sinon',
@@ -117,10 +114,10 @@ define([
             var breadcrumbs = 'section ▸ subsection ▸ unit';
 
             this.item.render();
-            expect(this.item.$el).toContainText(this.model.attributes.content_type);
-            expect(this.item.$el).toContainText(this.model.attributes.excerpt);
+            expect(this.item.$el).toContainHtml(this.model.attributes.content_type);
+            expect(this.item.$el).toContainHtml(this.model.attributes.excerpt);
             expect(this.item.$el.find('a[href="'+href+'"]')).toHaveAttr('href', href);
-            expect(this.item.$el).toContainText(breadcrumbs);
+            expect(this.item.$el).toContainHtml(breadcrumbs);
         });
 
     });
@@ -281,12 +278,15 @@ define([
         beforeEach(function () {
             setFixtures(
                 '<section id="courseware-search-results" data-course-name="Test Course"></section>' +
-                '<section id="course-content"></section>');
+                '<section id="course-content"></section>'
+            );
 
-            TemplateHelpers.installTemplate('templates/courseware_search/search_item');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_list');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_loading');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_error');
+            TemplateHelpers.installTemplates([
+                'templates/courseware_search/search_item',
+                'templates/courseware_search/search_list',
+                'templates/courseware_search/search_loading',
+                'templates/courseware_search/search_error'
+            ]);
 
             var MockCollection = Backbone.Collection.extend({
                 hasNextPage: function (){}
@@ -335,7 +335,7 @@ define([
         it('renders a message when there are no results', function () {
             this.collection.reset();
             this.listView.render();
-            expect(this.listView.$el).toContainText('no results');
+            expect(this.listView.$el).toContainHtml('no results');
             expect(this.listView.$el.find('ol')).not.toExist();
         });
 
@@ -351,15 +351,15 @@ define([
 
             this.listView.render();
             expect(this.listView.$el.find('ol')[0]).toExist();
-            expect(this.listView.$el.find('li')).toHaveLength(1);
-            expect(this.listView.$el).toContainText('Test Course');
-            expect(this.listView.$el).toContainText('this is a short excerpt');
+            expect(this.listView.$el.find('li').length).toEqual(1);
+            expect(this.listView.$el).toContainHtml('Test Course');
+            expect(this.listView.$el).toContainHtml('this is a short excerpt');
 
             this.collection.set(searchResults);
             this.collection.totalCount = 2;
             this.listView.renderNext();
             expect(this.listView.$el.find('.search-count-total').text()).toEqual('2');
-            expect(this.listView.$el.find('li')).toHaveLength(2);
+            expect(this.listView.$el.find('li').length).toEqual(2);
         });
 
         it('shows a link to load more results', function () {
@@ -389,9 +389,9 @@ define([
             this.collection.hasNextPage = function () { return true; };
             this.listView.render();
             this.listView.loadNext();
-            expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeVisible();
+            expect(this.listView.$el.find('a.search-load-next .icon')[0]).toBeVisible();
             this.listView.renderNext();
-            expect(this.listView.$el.find('a.search-load-next .icon-spin')[0]).toBeHidden();
+            expect(this.listView.$el.find('a.search-load-next .icon')[0]).toBeHidden();
         });
 
     });
@@ -413,10 +413,12 @@ define([
     describe('SearchApp', function () {
 
         beforeEach(function () {
-            TemplateHelpers.installTemplate('templates/courseware_search/search_item');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_list');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_loading');
-            TemplateHelpers.installTemplate('templates/courseware_search/search_error');
+            TemplateHelpers.installTemplates([
+                'templates/courseware_search/search_item',
+                'templates/courseware_search/search_list',
+                'templates/courseware_search/search_loading',
+                'templates/courseware_search/search_error'
+            ], true);
 
             // spy on these methods before they are bound to events
             spyOn(SearchRouter.prototype, 'navigate').andCallThrough();

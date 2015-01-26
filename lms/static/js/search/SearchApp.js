@@ -1,4 +1,6 @@
-RequireJS.define([
+;(function (define) {
+
+define([
     'backbone',
     'js/search/SearchRouter',
     'js/search/views/SearchForm',
@@ -31,3 +33,5 @@ RequireJS.define([
     };
 
 });
+
+})(define || RequireJS.define);
