@@ -5,15 +5,22 @@
 # 
 # Translators:
 # annburdyliak <annburdyliak@ya.ru>, 2014
+# annburdyliak <annburdyliak@ya.ru>, 2014
 # Eugenia <sakovets93@gmail.com>, 2014
 # IvanPrimachenko <jastudent1@gmail.com>, 2014
+# IvanPrimachenko <jastudent1@gmail.com>, 2014
 # junnyml <junnyml@gmail.com>, 2014
+# junnyml <junnyml@gmail.com>, 2014
+# marichkafox <marichka.fox@gmail.com>, 2014
 # marichkafox <marichka.fox@gmail.com>, 2014
 # Maryna Holovnova <MGG-2008@yandex.ru>, 2014
 # olexiim <olexiim@gmail.com>, 2014-2015
 # Zapadenska <oruda@ymail.com>, 2014
 # Tetiana Korshun, 2014
+# Tetiana Korshun, 2014
 # Volodymyr Matskiv <xxwolfsilver@gmail.com>, 2014
+# Yuraantonov <yuraantonov11@gmail.com>, 2015
+# Zapadenska <oruda@ymail.com>, 2014
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
 # Copyright (C) 2015 EdX
@@ -45,8 +52,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:22+0000\n"
-"PO-Revision-Date: 2015-01-20 14:31+0000\n"
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-20 14:45+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/edx-platform/language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -3475,6 +3482,10 @@ msgstr ""
 msgid "All groups must have a name."
 msgstr ""
 
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a unique name."
+msgstr ""
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -4246,12 +4257,6 @@ msgid ""
 "To review student cohort assignments or see the results of uploading a CSV "
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
-msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid ""
-"Sorry, we're having some technical problems. Wait a few minutes and try "
-"again."
 msgstr ""
 
 #: lms/templates/student_account/account.underscore

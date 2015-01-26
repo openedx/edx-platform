@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:41+0000\n"
-"PO-Revision-Date: 2015-01-20 14:41:05.604386\n"
+"POT-Creation-Date: 2015-01-26 14:03+0000\n"
+"PO-Revision-Date: 2015-01-26 14:03:13.864767\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2481,6 +2481,14 @@ msgstr ""
 "thé pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+"Trüé ïf tïmézönés shöüld ßé shöwn ön dätés ïn thé çöürséwäré. Dépréçätéd ïn "
+"fävör öf düé_däté_dïspläý_förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕ#"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
 msgstr "Düé Däté Dïspläý Förmät Ⱡ'σяє#"
 
@@ -2670,6 +2678,12 @@ msgid "Invitation Only"
 msgstr "Ìnvïtätïön Önlý Ⱡ'#"
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr ""
+"Whéthér tö réstrïçt énröllmént tö ïnvïtätïön ßý thé çöürsé stäff. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr "Pré-Çöürsé Sürvéý Nämé Ⱡ'σяє#"
 
@@ -2730,10 +2744,13 @@ msgstr "Éntränçé Éxäm Énäßléd Ⱡ'σя#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content."
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
 msgstr ""
 "Spéçïfý whéthér stüdénts müst çömplété än éntränçé éxäm ßéföré théý çän vïéw"
-" ýöür çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+" ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs çöürsé "
+"séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
+" єł#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Minimum Score (%)"
@@ -2742,10 +2759,13 @@ msgstr "Éntränçé Éxäm Mïnïmüm Sçöré (%) Ⱡ'σяєм ι#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content."
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
 msgstr ""
 "Spéçïfý ä mïnïmüm pérçéntägé sçöré för än éntränçé éxäm ßéföré stüdénts çän "
-"vïéw ýöür çöürsé çöntént. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
+"vïéw ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs "
+"çöürsé séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg єłι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam ID"
@@ -3253,6 +3273,17 @@ msgid ""
 msgstr ""
 "Éntér thé téxt ön thé ßüttön üséd tö läünçh thé thïrd pärtý äpplïçätïön. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr "Àççépt grädés päst déädlïné Ⱡ'σяєм#"
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
+msgstr ""
+"Séléçt Trüé tö ällöw thïrd pärtý sýstéms tö pöst grädés päst thé déädlïné. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
@@ -6810,6 +6841,10 @@ msgid "No email address provided."
 msgstr "Nö émäïl äddréss prövïdéd. Ⱡ'σяєм#"
 
 #: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr "Ýöür {platform_name} vérïfïçätïön häs éxpïréd. Ⱡ'σяєм ιρ#"
+
+#: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
 msgstr "Nö phötö ÌD wäs prövïdéd. Ⱡ'σяєм#"
 
@@ -6829,8 +6864,8 @@ msgid "The image of your face was not clear."
 msgstr "Thé ïmägé öf ýöür fäçé wäs nöt çléär. Ⱡ'σяєм ιρѕ#"
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
-msgstr "Ýöür fäçé wäs nöt vïsïßlé ïn ýöür sélf-phötö Ⱡ'σяєм ιρѕυм#"
+msgid "Your face was not visible in your self-photo."
+msgstr "Ýöür fäçé wäs nöt vïsïßlé ïn ýöür sélf-phötö. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/djangoapps/verify_student/models.py
 msgid "There was an error verifying your ID photos."
@@ -10479,6 +10514,7 @@ msgstr "düé {date} #"
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr "Àn érrör öççürréd. Pléäsé trý ägäïn lätér. Ⱡ'σяєм ιρѕυ#"
@@ -10543,6 +10579,17 @@ msgstr "Övérvïéw #"
 msgid "Share with friends and family!"
 msgstr "Shäré wïth frïénds änd fämïlý! Ⱡ'σяєм #"
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr "Twéét thät ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+"Émäïl söméöné tö säý ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм ιρѕυм ∂σ#"
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -10560,6 +10607,12 @@ msgid "I just registered for {number} {title} through {platform} {url}"
 msgstr ""
 "Ì jüst régïstéréd för {number} {title} thröügh {platform} {url} Ⱡ'σяєм "
 "ιρѕυм#"
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
+msgstr ""
+"Pöst ä Fäçéßöök méssägé tö säý ýöü'vé régïstéréd för thïs çöürsé Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
 
 #: lms/templates/courseware/course_about.html
 msgid "Classes Start"
@@ -11510,7 +11563,6 @@ msgstr "Àpprövéd: #"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr "ÌD-Vérïfïçätïön Stätüs Ⱡ'σяє#"
 
@@ -11532,16 +11584,21 @@ msgstr ""
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
-msgstr "Ré-vérïfý Ýöürsélf Ⱡ'σ#"
+msgid "{platform_name} Verification Status"
+msgstr "{platform_name} Vérïfïçätïön Stätüs Ⱡ'σяє#"
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
+msgstr "Résüßmït Vérïfïçätïön Ⱡ'σя#"
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
-"Ìf ýöü fäïl tö päss ä vérïfïçätïön ättémpt ßéföré ýöür çöürsé énds, ýöü wïll"
-" nöt réçéïvé ä vérïfïéd çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+"Tö réçéïvé ä vérïfïéd çértïfïçäté, ýöü hävé tö süßmït ä néw phötö öf "
+"ýöürsélf änd ýöür gövérnmént-ïssüéd phötö ÌD ßéföré thé çöürsé énds. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
 msgid "Could Not Link Accounts"
@@ -13024,6 +13081,15 @@ msgstr "Häs thé çöürsé éndéd? Ⱡ'σя#"
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
 msgstr "Grädé Çütöffs: Ⱡ'#"
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
+msgstr ""
+"Vïéw détäïléd Gït ïmpört lögs för thïs çöürsé {link_start}ßý çlïçkïng "
+"héré{link_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 #: lms/templates/instructor/instructor_dashboard_2/data_download.html

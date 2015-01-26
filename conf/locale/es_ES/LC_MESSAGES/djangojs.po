@@ -22,6 +22,7 @@
 # mercefan <mercefan@gmail.com>, 2014
 # Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # Rosa Sanchez Hernandez <rosa@db.uc3m.es>, 2014
+# sandra bonillo <sandraboni13@gmail.com>, 2015
 # Susan Webster <susan@db.uc3m.es>, 2014
 # UAMx <uamx.dev@gmail.com>, 2014-2015
 # valenciaupv <valenciaupv@gmail.com>, 2014
@@ -34,7 +35,7 @@
 # 
 # Translators:
 # Antonio Huete Jimenez <tuxillo@quantumachine.net>, 2014
-# spentamanyu <i.delamo@gmail.com>, 2014
+# spentamanyu <i.delamo@gmail.com>, 2014-2015
 # i_cruzado <ignacio.cruzado@gmail.com>, 2015
 # Ignacio Piqueras <igpisa@upv.es>, 2014
 # Ignacio Piqueras <igpisa@upv.es>, 2014
@@ -48,6 +49,7 @@
 # Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # Raúl Aguilera Ortega <raguiler@db.uc3m.es>, 2014
 # Rosa Sanchez Hernandez <rosa@db.uc3m.es>, 2014
+# sandra bonillo <sandraboni13@gmail.com>, 2015
 # UAMx <uamx.dev@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -81,13 +83,14 @@
 # Mariangeles Fernandez <mariangelesfm@gmail.com>, 2015
 # Miguel Angel Cordova <miguel.angel.cordova.uned@gmail.com>, 2014
 # Óscar Arce Ruiz <oscararceruiz@hotmail.com>, 2014
+# sandra bonillo <sandraboni13@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:22+0000\n"
-"PO-Revision-Date: 2015-01-20 14:31+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-22 13:31+0000\n"
+"Last-Translator: sandra bonillo <sandraboni13@gmail.com>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1796,7 +1799,7 @@ msgstr "Desactivar subtítulos"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
-msgstr ""
+msgstr "Actualizando con el último contenido de la biblioteca."
 
 #: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
 msgid "Creating missing groups"
@@ -2323,7 +2326,7 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Loading"
-msgstr ""
+msgstr "Cargando"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -3104,43 +3107,49 @@ msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr ""
+"Ha ocurrido un error. Asegúrate de estar conectado a internet e inténtalo "
+"refrescando la página."
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
 "Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
 msgstr ""
+"Por favor, introduce un término en el %(anchor_start)s campo de búsqueda "
+"%(anchor_start)s."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
-msgstr ""
+msgstr "Pestaña actual"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Hide notes"
-msgstr ""
+msgstr "Ocultar notas"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Showing notes"
-msgstr ""
+msgstr "Mostrando notas"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Show notes"
-msgstr ""
+msgstr "Mostrar notas"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Hiding notes"
-msgstr ""
+msgstr "Ocultando notas"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
-msgstr ""
+msgstr "Ubicación en curso"
 
 #: lms/static/js/edxnotes/views/tabs/recent_activity.js
 msgid "Recent Activity"
-msgstr ""
+msgstr "Actividad reciente"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr ""
+"Ningún resultado encontrado para \"%(query_string)s\". Por favor intenta "
+"buscar otra vez."
 
 #: lms/static/js/groups/views/cohort_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -3601,6 +3610,8 @@ msgstr "Inténtalo otra vez"
 #: cms/static/js/factories/manage_users_lib.js
 msgid "You must enter a valid email address in order to add an instructor"
 msgstr ""
+"Debes introducir una cuenta de correo válida para poder añadir a un nuevo "
+"instructor"
 
 #: cms/static/js/factories/manage_users_lib.js
 msgid "Already a library team member"
@@ -3673,6 +3684,10 @@ msgstr "Debe haber al menos un grupo."
 msgid "All groups must have a name."
 msgstr "Todos los grupos deben tener un nombre."
 
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a unique name."
+msgstr ""
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -3724,7 +3739,7 @@ msgstr "La clave sólo puede contener letras, números, _ o -"
 
 #: cms/static/js/models/settings/course_details.js
 msgid "Please enter an integer between "
-msgstr ""
+msgstr "Por favor, introduce un número entero entre ellos"
 
 #: cms/static/js/models/settings/course_grader.js
 msgid "There's already another assignment type with this name."
@@ -3756,7 +3771,7 @@ msgstr "El período de gracia se ha de expresar en un formato HH:MM"
 #: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
 #: cms/templates/js/asset-library.underscore
 msgid "Type"
-msgstr ""
+msgstr "Teclea"
 
 #: cms/static/js/views/asset.js
 msgid "Delete File Confirmation"
@@ -3885,6 +3900,7 @@ msgstr ""
 "experimental a cualquier unidad a través de %(outlineAnchor)s."
 
 #: cms/static/js/views/group_configuration_details.js
+#: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Course Outline"
 msgstr "Estructura del curso"
 
@@ -3952,7 +3968,7 @@ msgstr "No calificado"
 
 #: cms/static/js/views/paged_container.js
 msgid "Date added"
-msgstr ""
+msgstr "Fecha añadida"
 
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added
@@ -4037,6 +4053,7 @@ msgid "Editor"
 msgstr "Editor"
 
 #: cms/static/js/views/xblock_editor.js
+#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Settings"
 msgstr "Ajustes"
 
@@ -4054,7 +4071,7 @@ msgstr "Aviso"
 #: cms/static/js/views/components/add_xblock.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Adding"
-msgstr ""
+msgstr "Añadiendo"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "%(display_name)s Settings"
@@ -4107,11 +4124,11 @@ msgstr ""
 
 #: cms/static/js/views/pages/container.js
 msgid "Duplicating"
-msgstr ""
+msgstr "Duplicando"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Publishing"
-msgstr ""
+msgstr "Publicando"
 
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
@@ -4129,11 +4146,11 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Discarding Changes"
-msgstr ""
+msgstr "Descartando cambios"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Hiding from Students"
-msgstr ""
+msgstr "Ocultándolo a los alumnos"
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Explicitly Hiding from Students"
@@ -4141,7 +4158,7 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Inheriting Student Visibility"
-msgstr ""
+msgstr "Heredando la visibilidad de los alumnos"
 
 #: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
@@ -4160,7 +4177,7 @@ msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Making Visible to Students"
-msgstr ""
+msgstr "Haciéndolo visible a los alumnos"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""
@@ -4312,31 +4329,31 @@ msgstr "Haz un donativo"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Highlighted text"
-msgstr ""
+msgstr "Texto resaltado"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Less"
-msgstr ""
+msgstr "Menos"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
-msgstr ""
+msgstr "Nota"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
-msgstr ""
+msgstr "Tú comentaste..."
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "References"
-msgstr ""
+msgstr "Referencias"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Noted in:"
-msgstr ""
+msgstr "Anotado en:"
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Last Edited:"
-msgstr ""
+msgstr "Editado por última vez:"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "name"
@@ -4344,7 +4361,7 @@ msgstr "nombre"
 
 #: lms/templates/edxnotes/tab-item.underscore
 msgid "Clear search results"
-msgstr ""
+msgstr "Borrar resultados de la búsqueda"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "(contains %(student_count)s student)"
@@ -4484,14 +4501,6 @@ msgid ""
 "file, download course profile information or cohort results on "
 "%(link_start)s the Data Download page. %(link_end)s"
 msgstr ""
-
-#: lms/templates/student_account/access.underscore
-msgid ""
-"Sorry, we're having some technical problems. Wait a few minutes and try "
-"again."
-msgstr ""
-"Lo sentimos. Estamos teniendo algún problema técnico. Espera unos pocos "
-"minutos y vuelve a intentarlo"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
@@ -4869,6 +4878,8 @@ msgid ""
 "Please confirm your contribution for this course (min. %(minPrice)s "
 "%(currency)s)"
 msgstr ""
+"Por favor, confirma tu contribución para este curso (mín. %(minPrice)s "
+"%(currency)s)"
 
 #: lms/templates/verify_student/make_payment_step.underscore
 msgid "Your Total Contribution"
@@ -5005,11 +5016,11 @@ msgstr ""
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Photo of %(fullName)s"
-msgstr ""
+msgstr "Foto de %(fullName)s"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Photo of %(fullName)s's ID"
-msgstr ""
+msgstr "Fotografía de %(fullName)s"
 
 #: lms/templates/verify_student/review_photos_step.underscore
 msgid "Photo requirements:"
@@ -5068,7 +5079,7 @@ msgstr ""
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Live view of webcam"
-msgstr ""
+msgstr "Vista en directo de la cámara web"
 
 #: lms/templates/verify_student/webcam_photo.underscore
 msgid "Retake Photo"
@@ -5109,7 +5120,7 @@ msgstr ""
 
 #: cms/templates/js/asset-library.underscore
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: cms/templates/js/asset-library.underscore
 #: cms/templates/js/basic-modal.underscore
@@ -5726,7 +5737,7 @@ msgstr "Bibliotecas"
 
 #: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Entrance Exam"
-msgstr ""
+msgstr "Examen de admisión"
 
 #: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Require students to pass an exam before beginning the course."

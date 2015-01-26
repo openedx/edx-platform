@@ -38,7 +38,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:23+0000\n"
+"POT-Creation-Date: 2015-01-26 13:22+0000\n"
 "PO-Revision-Date: 2014-02-06 03:04+0000\n"
 "Last-Translator: \n"
 "Language-Team: Marathi (http://www.transifex.com/projects/p/edx-platform/language/mr/)\n"
@@ -2209,6 +2209,12 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"True if timezones should be shown on dates in the courseware. Deprecated in "
+"favor of due_date_display_format."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Due Date Display Format"
 msgstr ""
 
@@ -2355,6 +2361,10 @@ msgid "Invitation Only"
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
+msgid "Whether to restrict enrollment to invitation by the course staff."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
 msgid "Pre-Course Survey Name"
 msgstr ""
 
@@ -2403,7 +2413,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content."
+" your course content.Note, you must enable Entrance Exams for this course "
+"setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2413,7 +2424,8 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content."
+"view your course content.Note, you must enable Entrance Exams for this "
+"course setting to take effect."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2838,6 +2850,15 @@ msgstr ""
 #: common/lib/xmodule/xmodule/lti_module.py
 msgid ""
 "Enter the text on the button used to launch the third party application."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid "Accept grades past deadline"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/lti_module.py
+msgid ""
+"Select True to allow third party systems to post grades past the deadline."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/lti_module.py
@@ -5825,6 +5846,10 @@ msgid "No email address provided."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
+msgid "Your {platform_name} verification has expired."
+msgstr ""
+
+#: lms/djangoapps/verify_student/models.py
 msgid "No photo ID was provided."
 msgstr ""
 
@@ -5842,7 +5867,7 @@ msgid "The image of your face was not clear."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
-msgid "Your face was not visible in your self-photo"
+msgid "Your face was not visible in your self-photo."
 msgstr ""
 
 #: lms/djangoapps/verify_student/models.py
@@ -9175,6 +9200,7 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
 #: lms/templates/courseware/mktg_course_about.html
 msgid "An error occurred. Please try again later."
 msgstr ""
@@ -9232,6 +9258,16 @@ msgstr ""
 msgid "Share with friends and family!"
 msgstr ""
 
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Tweet that you've registered for this course"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+#: lms/templates/courseware/course_about.html
+msgid "Email someone to say you've registered for this course"
+msgstr ""
+
 #. Translators: This text will be automatically posted to the student's
 #. Twitter account. {url} should appear at the end of the text.
 #: lms/templates/courseware/course_about.html
@@ -9244,6 +9280,10 @@ msgstr ""
 
 #: lms/templates/courseware/course_about.html
 msgid "I just registered for {number} {title} through {platform} {url}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "Post a Facebook message to say you've registered for this course"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
@@ -10096,7 +10136,6 @@ msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 #: lms/templates/dashboard/_dashboard_status_verification.html
-#: lms/templates/dashboard/_dashboard_status_verification.html
 msgid "ID-Verification Status"
 msgstr ""
 
@@ -10114,13 +10153,17 @@ msgid ""
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
-msgid "Re-verify Yourself"
+msgid "{platform_name} Verification Status"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_status_verification.html
+msgid "Resubmit Verification"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_status_verification.html
 msgid ""
-"If you fail to pass a verification attempt before your course ends, you will"
-" not receive a verified certificate."
+"To receive a verified certificate, you have to submit a new photo of "
+"yourself and your government-issued photo ID before the course ends."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_third_party_error.html
@@ -11407,6 +11450,13 @@ msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Grade Cutoffs:"
+msgstr ""
+
+#. Translators: git is a version-control system; see http://git-scm.com/about
+#: lms/templates/instructor/instructor_dashboard_2/course_info.html
+msgid ""
+"View detailed Git import logs for this course {link_start}by clicking "
+"here{link_end}."
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html

@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-20 14:40+0000\n"
-"PO-Revision-Date: 2015-01-20 14:41:05.964859\n"
+"POT-Creation-Date: 2015-01-26 14:02+0000\n"
+"PO-Revision-Date: 2015-01-26 14:03:14.240646\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -3668,6 +3668,10 @@ msgstr "Théré müst ßé ät léäst öné gröüp. Ⱡ'σяєм ι#"
 msgid "All groups must have a name."
 msgstr "Àll gröüps müst hävé ä nämé. Ⱡ'σяєм #"
 
+#: cms/static/js/models/group_configuration.js
+msgid "All groups must have a unique name."
+msgstr "Àll gröüps müst hävé ä ünïqüé nämé. Ⱡ'σяєм ιρ#"
+
 #: cms/static/js/models/uploads.js
 msgid ""
 "Only <%= fileTypes %> files can be uploaded. Please select a file ending in "
@@ -4502,14 +4506,6 @@ msgstr ""
 "fïlé, döwnlöäd çöürsé pröfïlé ïnförmätïön ör çöhört résülts ön "
 "%(link_start)s thé Dätä Döwnlöäd pägé. %(link_end)s Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
 "αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg #"
-
-#: lms/templates/student_account/access.underscore
-msgid ""
-"Sorry, we're having some technical problems. Wait a few minutes and try "
-"again."
-msgstr ""
-"Sörrý, wé'ré hävïng sömé téçhnïçäl prößléms. Wäït ä féw mïnütés änd trý "
-"ägäïn. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт #"
 
 #: lms/templates/student_account/account.underscore
 msgid "New Address"
