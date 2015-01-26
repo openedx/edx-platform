@@ -140,7 +140,19 @@ def update_user_cart(request):
         old_to_new_id_map = item.order.update_order_type()
         total_cost = item.order.total_cost
 
-        return JsonResponse({"total_cost": total_cost, "oldToNewIdMap": old_to_new_id_map}, 200)
+        callback_url = request.build_absolute_uri(
+            reverse("shoppingcart.views.postpay_callback")
+        )
+        cart = Order.get_cart_for_user(request.user)
+        form_html = render_purchase_form_html(cart, callback_url=callback_url)
+
+        return JsonResponse(
+            {
+                "total_cost": total_cost,
+                "oldToNewIdMap": old_to_new_id_map,
+                "form_html": form_html,
+            }
+        )
 
     return HttpResponseBadRequest('Order item not found in request.')
 

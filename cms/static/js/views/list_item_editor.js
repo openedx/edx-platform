@@ -17,11 +17,12 @@ define([
     var ListItemEditorView = BaseView.extend({
         initialize: function() {
             this.listenTo(this.model, 'invalid', this.render);
+            this.listenTo(this.getSaveableModel(), 'invalid', this.render);
         },
 
         render: function() {
             this.$el.html(this.template(_.extend({
-                error: this.model.validationError
+                error: this.model.validationError || this.getSaveableModel().validationError
             }, this.getTemplateOptions())));
         },
 
@@ -29,7 +30,7 @@ define([
             if (event && event.preventDefault) { event.preventDefault(); }
 
             this.setValues();
-            if (!this.model.isValid()) {
+            if (!this.model.isValid() || !this.getSaveableModel().isValid()) {
                 return false;
             }
 

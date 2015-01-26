@@ -18,7 +18,6 @@ from django.views.decorators.cache import cache_control
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.mail.message import EmailMessage
 from django.db import IntegrityError
-from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
@@ -67,11 +66,12 @@ from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
+    get_user_email_language,
     enroll_email,
     send_mail_to_student,
     get_email_params,
     send_beta_role_email,
-    unenroll_email
+    unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
@@ -507,12 +507,14 @@ def students_update_enrollment(request, course_id):
         # First try to get a user object from the identifer
         user = None
         email = None
+        language = None
         try:
             user = get_student_from_identifier(identifier)
         except User.DoesNotExist:
             email = identifier
         else:
             email = user.email
+            language = get_user_email_language(user)
 
         try:
             # Use django.core.validators.validate_email to check email address
@@ -521,9 +523,13 @@ def students_update_enrollment(request, course_id):
             validate_email(email)  # Raises ValidationError if invalid
 
             if action == 'enroll':
-                before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
+                before, after = enroll_email(
+                    course_id, email, auto_enroll, email_students, email_params, language=language
+                )
             elif action == 'unenroll':
-                before, after = unenroll_email(course_id, email, email_students, email_params)
+                before, after = unenroll_email(
+                    course_id, email, email_students, email_params, language=language
+                )
             else:
                 return HttpResponseBadRequest(strip_tags(
                     "Unrecognized action '{}'".format(action)
@@ -1057,16 +1063,12 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     Respond with csv which contains a summary of all Active Coupons.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    active_coupons = Coupon.objects.filter(
-        Q(course_id=course_id),
-        Q(is_active=True),
-        Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
-        Q(expiration_date__isnull=True)
-    )
+    coupons = Coupon.objects.filter(course_id=course_id)
+
     query_features = [
-        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date'
+        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date', 'is_active'
     ]
-    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, active_coupons)
+    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
     header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
@@ -1124,7 +1126,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     """
     # csv headers
     query_features = [
-        'code', 'course_id', 'company_name', 'created_by',
+        'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
         'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
     ]
 
@@ -1305,8 +1307,11 @@ def generate_registration_codes(request, course_id):
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
     for registration_code in registration_codes:
-        csv_writer.writerow([registration_code.code])
-
+        full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
+            base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+            redeem_code_url=reverse('register_code_redemption', kwargs={'registration_code': registration_code.code})
+        )
+        csv_writer.writerow([registration_code.code, full_redeem_code_url])
     finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
     if finance_email:
         # append the finance email into the recipient_list

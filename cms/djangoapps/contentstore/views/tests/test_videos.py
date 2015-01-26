@@ -16,7 +16,7 @@ from mock import Mock, patch
 from edxval.api import create_profile, create_video, get_video_info
 
 from contentstore.models import VideoUploadConfig
-from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, VIDEO_ASSET_TYPE, status_display_string
+from contentstore.views.videos import KEY_EXPIRATION_IN_SECONDS, VIDEO_ASSET_TYPE, StatusDisplayStrings
 from contentstore.tests.utils import CourseTestCase
 from contentstore.utils import reverse_course_url
 from xmodule.assetstore import AssetMetadata
@@ -171,7 +171,10 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
             dateutil.parser.parse(response_video["created"])
             for field in ["edx_video_id", "client_video_id", "duration"]:
                 self.assertEqual(response_video[field], original_video[field])
-            self.assertEqual(response_video["status"], status_display_string(original_video["status"]))
+            self.assertEqual(
+                response_video["status"],
+                StatusDisplayStrings.get(original_video["status"])
+            )
 
     def test_get_html(self):
         response = self.client.get(self.url)
@@ -313,18 +316,12 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
 
     def setUp(self):
         super(VideoUrlsCsvTestCase, self).setUp()
-        VideoUploadConfig(
-            profile_whitelist="profile1",
-            status_whitelist=(
-                status_display_string("file_complete") + "," +
-                status_display_string("transcode_active")
-            )
-        ).save()
+        VideoUploadConfig(profile_whitelist="profile1").save()
 
-    def _check_csv_response(self, expected_video_ids, expected_profiles):
+    def _check_csv_response(self, expected_profiles):
         """
         Check that the response is a valid CSV response containing rows
-        corresponding to expected_video_ids.
+        corresponding to previous_uploads and including the expected profiles.
         """
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -346,6 +343,7 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             response_video = {
                 key.decode("utf-8"): value.decode("utf-8") for key, value in row.items()
             }
+            self.assertNotIn(response_video["Video ID"], actual_video_ids)
             actual_video_ids.append(response_video["Video ID"])
             original_video = self._get_previous_upload(response_video["Video ID"])
             self.assertEqual(response_video["Name"], original_video["client_video_id"])
@@ -364,21 +362,14 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                     self.assertEqual(response_profile_url, original_encoded_for_profile["url"])
                 else:
                     self.assertEqual(response_profile_url, "")
-        self.assertEqual(set(actual_video_ids), set(expected_video_ids))
+        self.assertEqual(len(actual_video_ids), len(self.previous_uploads))
 
     def test_basic(self):
-        self._check_csv_response(["test2", "non-ascii"], ["profile1"])
+        self._check_csv_response(["profile1"])
 
-    def test_config(self):
-        VideoUploadConfig(
-            profile_whitelist="profile1,profile2",
-            status_whitelist=(
-                status_display_string("file_complete") + "," +
-                status_display_string("transcode_active") + "," +
-                status_display_string("upload")
-            )
-        ).save()
-        self._check_csv_response(["test1", "test2", "non-ascii"], ["profile1", "profile2"])
+    def test_profile_whitelist(self):
+        VideoUploadConfig(profile_whitelist="profile1,profile2").save()
+        self._check_csv_response(["profile1", "profile2"])
 
     def test_non_ascii_course(self):
         course = CourseFactory.create(

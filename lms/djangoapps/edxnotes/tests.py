@@ -142,7 +142,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Setup a dummy course content.
         """
         super(EdxNotesHelpersTest, self).setUp()
-        modulestore().request_cache.data = {}
         ClientFactory(name="edx-notes")
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
@@ -577,7 +576,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Tests the result if the unit does not exist.
         """
         store = MagicMock()
-        store.get_parent_location.return_value = None
+        store.get_item().get_parent.return_value = None
         mock_modulestore.return_value = store
         mock_has_access.return_value = True
         initial_collection = [{
@@ -590,17 +589,6 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         self.assertItemsEqual(
             [], helpers.preprocess_collection(self.user, self.course, initial_collection)
         )
-
-    def test_get_parent_xblock(self):
-        """
-        Tests `get_parent_xblock` method to return parent xblock or None
-        """
-        for _ in range(2):
-            # repeat the test twice to make sure caching does not interfere
-            self.assertEqual(helpers.get_parent_xblock(self.html_module_1).location, self.vertical.location)
-            self.assertEqual(helpers.get_parent_xblock(self.sequential).location, self.chapter.location)
-            self.assertEqual(helpers.get_parent_xblock(self.chapter).location, self.course.location)
-            self.assertIsNone(helpers.get_parent_xblock(self.course))
 
     def test_get_parent_unit(self):
         """

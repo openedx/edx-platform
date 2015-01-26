@@ -144,14 +144,14 @@ Get the HTML for the course about page.
                      <h2>Course Staff</h2>\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #1\">\n     
                      </div>\n\n     
                      <h3>Staff Member #1</h3>\n     
                      <p>Biography of instructor/staff member #1</p>\n   
                      </article>\n\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #2\">\n     
                      </div>\n\n     
                      <h3>Staff Member #2</h3>\n     
                      <p>Biography of instructor/staff member #2</p>\n   
@@ -161,8 +161,9 @@ Get the HTML for the course about page.
                      <section class=\"responses\">\n     
                      <h2>Frequently Asked Questions</h2>\n     
                      <article class=\"response\">\n       
-                     <h3>Do I need to buy a textbook?</h3>\n       
-                     <p>No, a free online version of Chemistry: Principles, Patterns, and Applications, First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase a printed version (published by FlatWorld Knowledge) if you\u2019d like.</p>\n     
+                     <h3>What web browser should I use?</h3>\n
+                     <p>The Open edX platform works best with current versions of Chrome, Firefox or Safari, or with Internet Explorer version 9 and above.</p>\n
+                     <p>See our <a href=\"http://edx.readthedocs.org/en/latest/browsers.html\">list of supported browsers</a> for the most up-to-date information.</p>\n     
                      </article>\n\n     
                      <article class=\"response\">\n       
                      <h3>Question #2</h3>\n       

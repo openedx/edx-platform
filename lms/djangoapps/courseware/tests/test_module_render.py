@@ -413,7 +413,7 @@ class TestTOC(ModuleStoreTestCase):
         factory = RequestFactory()
         self.request = factory.get(chapter_url)
         self.request.user = UserFactory()
-        self.modulestore = self.store._get_modulestore_for_courseid(self.course_key)
+        self.modulestore = self.store._get_modulestore_for_courselike(self.course_key)  # pylint: disable=protected-access, attribute-defined-outside-init
         with self.modulestore.bulk_operations(self.course_key):
             with check_mongo_calls(num_finds, num_sends):
                 self.toy_course = self.store.get_course(self.toy_loc, depth=2)

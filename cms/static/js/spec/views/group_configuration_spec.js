@@ -659,7 +659,7 @@ define([
                     id: 0,
                     name: 'Content Group Configuration',
                     groups: groups
-                });
+                }, {canBeEmpty: true});
             groupConfiguration.urlRoot = '/mock_url';
             return groups;
         };

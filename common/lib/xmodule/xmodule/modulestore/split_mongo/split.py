@@ -944,6 +944,21 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         course_index = self.get_course_index(course_id, ignore_case)
         return CourseLocator(course_index['org'], course_index['course'], course_index['run'], course_id.branch) if course_index else None
 
+    def has_library(self, library_id, ignore_case=False, **kwargs):
+        '''
+        Does this library exist in this modulestore. This method does not verify that the branch &/or
+        version in the library_id exists.
+
+        Returns the library_id of the course if it was found, else None.
+        '''
+        if not isinstance(library_id, LibraryLocator):
+            return None
+
+        index = self.get_course_index(library_id, ignore_case)
+        if index:
+            return LibraryLocator(index['org'], index['course'], library_id.branch)
+        return None
+
     def has_item(self, usage_key):
         """
         Returns True if usage_key exists in its course. Returns false if
