@@ -347,7 +347,10 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
             actual_video_ids.append(response_video["Video ID"])
             original_video = self._get_previous_upload(response_video["Video ID"])
             self.assertEqual(response_video["Name"], original_video["client_video_id"])
+            self.assertEqual(response_video["Duration"], str(original_video["duration"]))
+            dateutil.parser.parse(response_video["Date Added"])
             self.assertEqual(response_video["Video ID"], original_video["edx_video_id"])
+            self.assertEqual(response_video["Status"], StatusDisplayStrings.get(original_video["status"]))
             for profile in expected_profiles:
                 response_profile_url = response_video["{} URL".format(profile)]
                 original_encoded_for_profile = next(

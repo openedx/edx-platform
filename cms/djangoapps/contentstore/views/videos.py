@@ -153,7 +153,7 @@ def video_encodings_download(request, course_key_string):
                 (duration_col, duration_val),
                 (added_col, video["created"].isoformat()),
                 (video_id_col, video["edx_video_id"]),
-                (status_col, StatusDisplayStrings.get(video["status"])),
+                (status_col, video["status"]),
             ] +
             [
                 (get_profile_header(encoded_video["profile"]), encoded_video["url"])
@@ -177,7 +177,11 @@ def video_encodings_download(request, course_key_string):
     )
     writer = csv.DictWriter(
         response,
-        [name_col, duration_col, added_col, video_id_col, status_col] + profile_cols,
+        [
+            col_name.encode("utf-8")
+            for col_name
+            in [name_col, duration_col, added_col, video_id_col, status_col] + profile_cols
+        ],
         dialect=csv.excel
     )
     writer.writeheader()
