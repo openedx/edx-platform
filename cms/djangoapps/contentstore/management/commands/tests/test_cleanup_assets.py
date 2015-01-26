@@ -8,6 +8,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.contentstore.content import XASSET_LOCATION_TAG
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo.base import location_to_query
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -23,7 +24,7 @@ class ExportAllCourses(ModuleStoreTestCase):
     def setUp(self):
         """ Common setup. """
         self.content_store = contentstore()
-        self.module_store = modulestore()
+        self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
     def test_export_all_courses(self):
         """
