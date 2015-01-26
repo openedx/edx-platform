@@ -894,8 +894,14 @@ def sale_validation(request, course_id):
             course_id=course_id
         )
         obj_invoice = obj_invoice.invoice
-    except CourseRegistrationCodeInvoiceItem.DoesNotExist:
-        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+    except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
+        try:
+            obj_invoice = Invoice.objects.get(
+                id=invoice_number,
+                course_id=course_id
+            )
+        except Invoice.DoesNotExist:
+            return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
 
     if event_type == "invalidate":
         return invalidate_invoice(obj_invoice)
@@ -1153,7 +1159,12 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
 
     company_name = request.POST['download_company_name']
     if company_name:
-        registration_codes = registration_codes.filter(invoice__company_name=company_name)
+        if hasattr(CourseRegistrationCode, 'invoice'):
+            registration_codes = registration_codes.filter(
+                Q(invoice__company_name=company_name) | Q(invoice_item__invoice__company_name=company_name)
+            )
+        else:
+            registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)

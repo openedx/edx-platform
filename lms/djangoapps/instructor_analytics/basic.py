@@ -107,11 +107,16 @@ def sale_record_features(course_id, features):
         {'company_name': 'group_C', 'total_codes': '3', total_amount:'total_amount3 in decimal'.}
     ]
     """
-    sales = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').filter(course_id=course_id)
+    sales = list(CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').filter(course_id=course_id))
+    # if 'invoice' in CourseRegistrationCode._meta.fields:
+    if hasattr(CourseRegistrationCode, 'invoice'):
+        sales.extend(list(Invoice.objects.filter(course_id=course_id)))
 
     def sale_records_info(sale, features):
         """ convert sales records to dictionary """
-        invoice = sale.invoice
+        invoice = sale
+        if isinstance(sale, CourseRegistrationCodeInvoiceItem):
+            invoice = sale.invoice
         sale_features = [x for x in SALE_FEATURES if x in features]
         course_reg_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
@@ -257,9 +262,15 @@ def course_registration_features(features, registration_codes, csv_type):
         course_registration_dict['company_name'] = None
         if registration_code.invoice_item:
             course_registration_dict['company_name'] = getattr(registration_code.invoice_item.invoice, 'company_name')
+        elif hasattr(registration_code, 'invoice') and registration_code.invoice:
+            course_registration_dict['company_name'] = getattr(registration_code.invoice, 'company_name')
         course_registration_dict['redeemed_by'] = None
+        sale_invoice = None
         if registration_code.invoice_item:
             sale_invoice = registration_code.invoice_item.invoice
+        elif hasattr(registration_code, 'invoice') and registration_code.invoice:
+            sale_invoice = registration_code.invoice
+        if sale_invoice:
             course_registration_dict['invoice_id'] = sale_invoice.id
             course_registration_dict['purchaser'] = sale_invoice.recipient_name
             course_registration_dict['customer_reference_number'] = sale_invoice.customer_reference_number

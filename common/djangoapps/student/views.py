@@ -479,6 +479,14 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
                 log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
                 track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
                 break
+        elif hasattr(redeemed_registration, 'invoice') and redeemed_registration.invoice:
+            if not getattr(redeemed_registration.invoice, 'is_valid'):
+                blocked = True
+                # disabling email notifications for unpaid registration courses
+                Optout.objects.get_or_create(user=request.user, course_id=course_key)
+                log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
+                track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
+                break
 
     return blocked
 
