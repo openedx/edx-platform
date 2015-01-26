@@ -242,7 +242,6 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         self.assertEqual(self.register_page.current_form, "login")
 
 
-@skip('ECOM-956: Failing intermittently due to 500 errors when trying to hit the mode creation endpoint.')
 @attr('shard_1')
 class PayAndVerifyTest(UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
@@ -253,6 +252,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         create a user and log them in.
         """
         super(PayAndVerifyTest, self).setUp()
+
         self.track_selection_page = TrackSelectionPage(self.browser, self.course_id, separate_verified=True)
         self.payment_and_verification_flow = PaymentAndVerificationFlow(self.browser, self.course_id)
         self.immediate_verification_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='verify-now')
