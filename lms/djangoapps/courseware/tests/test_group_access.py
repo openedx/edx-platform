@@ -64,11 +64,20 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         """
         partition.scheme.set_group_for_user(user, partition, group)
 
-    def set_group_access(self, block, access_dict):
+    def set_group_access(self, block_location, access_dict):
         """
-        DRY helper.
+        Set group_access on block specified by location.
         """
+        block = modulestore().get_item(block_location)
         block.group_access = access_dict
+        modulestore().update_item(block, 1)
+
+    def set_user_partitions(self, block_location, partitions):
+        """
+        Sets the user_partitions on block specified by location.
+        """
+        block = modulestore().get_item(block_location)
+        block.user_partitions = partitions
         modulestore().update_item(block, 1)
 
     def setUp(self):
@@ -117,10 +126,15 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         self.course = CourseFactory.create(
             user_partitions=[self.animal_partition, self.color_partition],
         )
-        self.chapter = ItemFactory.create(category='chapter', parent=self.course)
-        self.section = ItemFactory.create(category='sequential', parent=self.chapter)
-        self.vertical = ItemFactory.create(category='vertical', parent=self.section)
-        self.component = ItemFactory.create(category='problem', parent=self.vertical)
+        chapter = ItemFactory.create(category='chapter', parent=self.course)
+        section = ItemFactory.create(category='sequential', parent=chapter)
+        vertical = ItemFactory.create(category='vertical', parent=section)
+        component = ItemFactory.create(category='problem', parent=vertical)
+
+        self.chapter_location = chapter.location
+        self.section_location = section.location
+        self.vertical_location = vertical.location
+        self.component_location = component.location
 
         self.red_cat = UserFactory()  # student in red and cat groups
         self.set_user_group(self.red_cat, self.animal_partition, self.cat_group)
@@ -145,15 +159,15 @@ class GroupAccessTestCase(ModuleStoreTestCase):
 
     # avoid repeatedly declaring the same sequence for ddt in all the test cases.
     PARENT_CHILD_PAIRS = (
-        ('chapter', 'chapter'),
-        ('chapter', 'section'),
-        ('chapter', 'vertical'),
-        ('chapter', 'component'),
-        ('section', 'section'),
-        ('section', 'vertical'),
-        ('section', 'component'),
-        ('vertical', 'vertical'),
-        ('vertical', 'component'),
+        ('chapter_location', 'chapter_location'),
+        ('chapter_location', 'section_location'),
+        ('chapter_location', 'vertical_location'),
+        ('chapter_location', 'component_location'),
+        ('section_location', 'section_location'),
+        ('section_location', 'vertical_location'),
+        ('section_location', 'component_location'),
+        ('vertical_location', 'vertical_location'),
+        ('vertical_location', 'component_location'),
     )
 
     def tearDown(self):
@@ -163,19 +177,20 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         """
         UserPartition.scheme_extensions = None
 
-    def check_access(self, user, block, is_accessible):
+    def check_access(self, user, block_location, is_accessible):
         """
         DRY helper.
         """
         self.assertIs(
-            access.has_access(user, 'load', block, self.course.id),
+            access.has_access(user, 'load', modulestore().get_item(block_location), self.course.id),
             is_accessible
         )
 
-    def ensure_staff_access(self, block):
+    def ensure_staff_access(self, block_location):
         """
         Another DRY helper.
         """
+        block = modulestore().get_item(block_location)
         self.assertTrue(access.has_access(self.staff, 'load', block, self.course.id))
 
     # NOTE: in all the tests that follow, `block_specified` and
@@ -396,12 +411,12 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         except user_partitions in use by the split_test module.
         """
         # Initially, "red_cat" user can't view the vertical.
-        self.set_group_access(self.chapter, {self.animal_partition.id: [self.dog_group.id]})
-        self.check_access(self.red_cat, self.vertical, False)
+        self.set_group_access(self.chapter_location, {self.animal_partition.id: [self.dog_group.id]})
+        self.check_access(self.red_cat, self.vertical_location, False)
 
         # Change the vertical's user_partitions value to the empty list. Now red_cat can view the vertical.
-        self.vertical.user_partitions = []
-        self.check_access(self.red_cat, self.vertical, True)
+        self.set_user_partitions(self.vertical_location, [])
+        self.check_access(self.red_cat, self.vertical_location, True)
 
         # Change the vertical's user_partitions value to include only "split_test" partitions.
         split_test_partition = UserPartition(
@@ -411,9 +426,9 @@ class GroupAccessTestCase(ModuleStoreTestCase):
             [Group(2, 'random group')],
             scheme=UserPartition.get_scheme("random"),
         )
-        self.vertical.user_partitions = [split_test_partition]
-        self.check_access(self.red_cat, self.vertical, True)
+        self.set_user_partitions(self.vertical_location, [split_test_partition])
+        self.check_access(self.red_cat, self.vertical_location, True)
 
         # Finally, add back in a cohort user_partition
-        self.vertical.user_partitions = [split_test_partition, self.animal_partition]
-        self.check_access(self.red_cat, self.vertical, False)
+        self.set_user_partitions(self.vertical_location, [split_test_partition, self.animal_partition])
+        self.check_access(self.red_cat, self.vertical_location, False)
