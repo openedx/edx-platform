@@ -235,8 +235,7 @@ define(["jquery", "underscore", "js/views/xblock_outline", "js/views/utils/view_
             onIndexSuccess: function() {
                 var msg = new AlertView.Announcement({
                         title: gettext('Course Index'),
-                        message: gettext('Course has been successfully reindexed.'),
-                        intent: 'announcement'
+                        message: gettext('Course has been successfully reindexed.')
                     });
                 msg.show();
             }
