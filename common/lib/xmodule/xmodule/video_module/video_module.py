@@ -641,6 +641,6 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             xblock_body["content"].update(video_body)
         else:
             xblock_body["content"] = video_body
-        xblock_body.update["content_type"] = "Video"
+        xblock_body["content_type"] = "Video"
 
         return xblock_body
