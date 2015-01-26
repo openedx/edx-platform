@@ -102,7 +102,7 @@
           </div>
         </form>
       </div>
-      
+
         %if libraries_enabled:
         <div class="wrapper-create-element wrapper-create-library">
           <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
@@ -464,7 +464,7 @@
           </li>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
                 ${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}
               </a>
             </li>
@@ -497,7 +497,7 @@
 from django.conf import settings
 
 if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="//{domain}/discussion/new" class="show-tender">'.format(
+  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender">'.format(
     domain=settings.TENDER_DOMAIN,
   )
   help_link_end = '</a>'
@@ -543,7 +543,7 @@ else:
         <ol class='list-actions'>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
                 ${_("Request help with your {studio_name} account").format(studio_name=settings.STUDIO_NAME)}
               </a>
             </li>
