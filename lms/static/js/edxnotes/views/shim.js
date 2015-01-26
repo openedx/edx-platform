@@ -125,6 +125,24 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
         Annotator.prototype._setupViewer
     );
 
+    Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
+
+    /**
+     * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
+     * editor is opened.
+     **/
+    Annotator.prototype.onHighlightMouseover = _.wrap(
+        Annotator.prototype.onHighlightMouseover,
+        function (func, event) {
+            // Do nothing if the editor is opened.
+            if (this.editor.isShown()) {
+                return false;
+            }
+            return func.call(this, event);
+        },
+        Annotator.prototype._setupViewer
+    );
+
     $.extend(true, Annotator.prototype, {
         events: {
             '.annotator-hl click': 'onHighlightClick',
