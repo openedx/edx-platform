@@ -8,6 +8,7 @@ This page describes how to use the mobile user API to:
 
 * `Get User Details`_
 * `Get a User's Course Enrollments`_
+* `Get or Change User Status in a Course`_
 
 .. _Get User Details:
 
@@ -28,7 +29,7 @@ Users are redirected to this endpoint after logging in.
 You can use the **course_enrollments** value in the response to get a list of
 courses the user is enrolled in.
 
-**Example request**:
+**Example request**
 
 ``GET /api/mobile/v0.5/users/{username}``
 
@@ -165,4 +166,62 @@ Get information about the courses the currently logged in user is enrolled in.
             "start": "2013-02-05T05:00:00Z", 
             "course_image": "/c4x/edX/DemoX/asset/images_course_image.jpg"
         }
+    }
+
+.. _Get or Change User Status in a Course:
+
+**************************************
+Get or Change User Status in a Course
+**************************************
+
+.. .. autoclass:: mobile_api.users.views.UserCourseStatus
+..    :members:
+
+**Use Case**
+
+Get or update the ID of the module that the specified user last visited in the
+specified course.
+
+**Example request**
+
+``GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}``
+
+.. code-block:: http
+  
+  PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
+      body:
+          last_visited_module_id={module_id}
+          modification_date={date}
+
+          The modification_date is optional. If it is present, the update will
+          only take effect if the modification_date is later than the
+          modification_date saved on the server.
+
+**Response Values**
+
+* last_visited_module_id: The ID of the last module visited by the user in the
+  course.
+
+* last_visited_module_path: The ID of the modules in the path from the last
+  visited module to the course module.
+
+**Example Response**
+
+.. code-block:: json
+
+    HTTP 200 OK  
+    Vary: Accept   
+    Content-Type: text/html; charset=utf-8   
+    Allow: GET, HEAD, OPTIONS 
+
+    {
+        "last_visited_module_id": "i4x://edX/DemoX/html/6018785795994726950614ce7d0f38c5",  
+
+        "last_visited_module_path": [
+            "i4x://edX/DemoX/html/6018785795994726950614ce7d0f38c5", 
+            "i4x://edX/DemoX/vertical/26d89b08f75d48829a63520ed8b0037d", 
+            "i4x://edX/DemoX/sequential/dbe8fc027bcb4fe9afb744d2e8415855", 
+            "i4x://edX/DemoX/chapter/social_integration", 
+            "i4x://edX/DemoX/course/Demo_Course"
+        ]
     }

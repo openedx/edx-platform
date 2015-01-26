@@ -7,6 +7,17 @@
 import os
 from path import path
 import sys
+import mock
+ 
+MOCK_MODULES = ['lxml', 'requests', 'xblock', 'fields', 'xblock.fields',
+'frament', 'xblock.fragment', 'webob', 'multidict', 'webob.multidict', 'core',
+'xblock.core', 'runtime', 'xblock.runtime', 'sortedcontainers', 'contracts',
+'plugin', 'xblock.plugin', 'opaque_keys.edx.asides', 'asides',
+'dogstats_wrapper', 'fs', 'fs.errors', 'edxmako', 'edxmako.shortcuts',
+'shortcuts', 'crum', 'opaque_keys.edx.locator', 'LibraryLocator', 'Location']
+
+for mod_name in MOCK_MODULES: 
+    sys.modules[mod_name] = mock.Mock()
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
@@ -35,6 +46,8 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 root = path('../../../..').abspath()
 sys.path.insert(0, root)
+sys.path.append(root / "common/lib/xmodule")
+sys.path.append(root / "lms/djangoapps")
 sys.path.append(root / "lms/djangoapps/mobile_api")
 sys.path.append(root / "lms/djangoapps/mobile_api/course_info")
 sys.path.append(root / "lms/djangoapps/mobile_api/users")
@@ -54,7 +67,7 @@ sys.path.append('.')
 if on_rtd:
     os.environ['DJANGO_SETTINGS_MODULE'] = 'lms'
 else:
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'lms.envs.test'
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'lms'
 
 
 # -- General configuration -----------------------------------------------------
@@ -66,164 +79,9 @@ extensions = [
     'sphinx.ext.todo', 'sphinx.ext.coverage', 'sphinx.ext.pngmath',
     'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinxcontrib.napoleon']
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-exclude_patterns = ['build']
-
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'edXDocs'
-
 project = u'edX Platform API Version 0.5 Alpha'
-copyright = u'2014, edX'
+copyright = u'2015, edX'
 
-# --- Mock modules ------------------------------------------------------------
-
-# Mock all the modules that the readthedocs build can't import
+exclude_patterns = ['build', 'links.rst']
 
 
-class Mock(object):
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __call__(self, *args, **kwargs):
-        return Mock()
-
-    @classmethod
-    def __getattr__(cls, name):
-        if name in ('__file__', '__path__'):
-            return '/dev/null'
-        elif name[0] == name[0].upper():
-            mockType = type(name, (), {})
-            mockType.__module__ = __name__
-            return mockType
-        else:
-            return Mock()
-
-# The list of modules and submodules that we know give RTD trouble.
-# Make sure you've tried including the relevant package in
-# docs/share/requirements.txt before adding to this list.
-MOCK_MODULES = [
-    'bson',
-    'bson.errors',
-    'bson.objectid',
-    'dateutil',
-    'dateutil.parser',
-    'fs',
-    'fs.errors',
-    'fs.osfs',
-    'lazy',
-    'mako',
-    'mako.template',
-    'matplotlib',
-    'matplotlib.pyplot',
-    'mock',
-    'numpy',
-    'oauthlib',
-    'oauthlib.oauth1',
-    'oauthlib.oauth1.rfc5849',
-    'PIL',
-    'pymongo',
-    'pyparsing',
-    'pysrt',
-    'requests',
-    'scipy.interpolate',
-    'scipy.constants',
-    'scipy.optimize',
-    'yaml',
-    'webob',
-    'webob.multidict',
-]
-
-if on_rtd:
-    for mod_name in MOCK_MODULES:
-        sys.modules[mod_name] = Mock()
-
-# -----------------------------------------------------------------------------
-
-# from http://djangosnippets.org/snippets/2533/
-# autogenerate models definitions
-
-import inspect
-import types
-from HTMLParser import HTMLParser
-
-
-def force_unicode(s, encoding='utf-8', strings_only=False, errors='strict'):
-    """
-    Similar to smart_unicode, except that lazy instances are resolved to
-    strings, rather than kept as lazy objects.
-
-    If strings_only is True, don't convert (some) non-string-like objects.
-    """
-    if strings_only and isinstance(s, (types.NoneType, int)):
-        return s
-    if not isinstance(s, basestring,):
-        if hasattr(s, '__unicode__'):
-            s = unicode(s)
-        else:
-            s = unicode(str(s), encoding, errors)
-    elif not isinstance(s, unicode):
-        s = unicode(s, encoding, errors)
-    return s
-
-
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.fed = []
-
-    def handle_data(self, d):
-        self.fed.append(d)
-
-    def get_data(self):
-        return ''.join(self.fed)
-
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
-
-
-def process_docstring(app, what, name, obj, options, lines):
-    """Autodoc django models"""
-
-    # This causes import errors if left outside the function
-    from django.db import models
-
-    # If you want extract docs from django forms:
-    # from django import forms
-    # from django.forms.models import BaseInlineFormSet
-
-    # Only look at objects that inherit from Django's base MODEL class
-    if inspect.isclass(obj) and issubclass(obj, models.Model):
-        # Grab the field list from the meta class
-        fields = obj._meta._fields()
-
-        for field in fields:
-            # Decode and strip any html out of the field's help text
-            help_text = strip_tags(force_unicode(field.help_text))
-
-            # Decode and capitalize the verbose name, for use if there isn't
-            # any help text
-            verbose_name = force_unicode(field.verbose_name).capitalize()
-
-            if help_text:
-                # Add the model field to the end of the docstring as a param
-                # using the help text as the description
-                lines.append(u':param %s: %s' % (field.attname, help_text))
-            else:
-                # Add the model field to the end of the docstring as a param
-                # using the verbose name as the description
-                lines.append(u':param %s: %s' % (field.attname, verbose_name))
-
-            # Add the field's type to the docstring
-            lines.append(u':type %s: %s' % (field.attname, type(field).__name__))
-    return lines
-
-
-def setup(app):
-    """Setup docsting processors"""
-    #Register the docstring processor with sphinx
-    app.connect('autodoc-process-docstring', process_docstring)
