@@ -37,7 +37,10 @@ define([
         });
 
         it('prevents default action on submit', function () {
-            expect(this.form.submitForm()).toEqual(false);
+            var submitEvent = new Event('submit');
+            spyOn(submitEvent, 'preventDefault');
+            this.form.submitForm(submitEvent);
+            expect(submitEvent.preventDefault).toHaveBeenCalled();
         });
 
         it('trims input string', function () {
