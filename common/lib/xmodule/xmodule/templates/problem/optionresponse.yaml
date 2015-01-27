@@ -4,33 +4,54 @@ metadata:
     markdown: |
         Dropdown problems give a limited set of options for students to respond with, and present those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.
 
-        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.
+        The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.  Feedback can be specified for each option.
 
         >>Translation between Dropdown and __________ is extremely straightforward:<<
 
         [[(Multiple Choice), Text Input, Numerical Input, External Response, Image Response]]
 
+        >>Numerical Input questions take numeric values while ___________ questions take text values:<<
+
+        [[
+          Multiple Choice {{Multiple Choice questions require the student to click buttons to select an answer}}
+          (Text Input) {{Students enter text values in a Text Input question}}
+          Numerical Input {{Numerical Input questions require the student to enter numeric values}}
+          External Response {{External Response questions require the student to enter code}}
+          Image Response {{Image Response questions require the student to click on an image}}
+        ]]
+
         [explanation]
         Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Dropdowns also differ slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.
         [explanation]
 data: |
-  <problem>
-  <p>Dropdown problems give a limited set of options for students to respond with, and present those options
-  in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
+    <problem>
+    <p>Dropdown problems give a limited set of options for students to respond with, and present those options in a format that encourages them to search for a specific answer rather than being immediately presented with options from which to recognize the correct answer.</p>
 
-  <p>
-  The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag. 
-  </p>
-  <p>Translation between Dropdown and __________ is extremely straightforward:
-      
-  <optionresponse>
-        <optioninput options="('Multiple Choice','Text Input','Numerical Input','External Response','Image Response')" correct="Multiple Choice" label="Translation between Dropdown and __________ is extremely straightforward"></optioninput>
-  </optionresponse>
-  </p>
-      <solution>
-          <div class="detailed-solution">
-              <p>Explanation</p>
-              <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Optionresponse also differs slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
-          </div>
-      </solution>
-  </problem>
+    <p>The answer options and the identification of the correct answer is defined in the <b>optioninput</b> tag.  Feedback can be specified for each option.</p>
+
+    <p>Translation between Dropdown and __________ is extremely straightforward:</p>
+    <optionresponse>
+      <optioninput label="Translation between Dropdown and __________ is extremely straightforward:" options="('Multiple Choice','Text Input','Numerical Input','External Response','Image Response')" correct="Multiple Choice"></optioninput>
+    </optionresponse>
+
+    <p>Numerical Input questions take numeric values while ___________ questions take text values:</p>
+    <optionresponse>
+      <optioninput label="Numerical Input questions take numeric values while ___________ questions take text values:">
+        <option correct="False">Multiple Choice <optionhint>Multiple Choice questions require the student to click buttons to select an answer</optionhint></option>
+        <option correct="True">Text Input <optionhint>Students enter text values in a Text Input question</optionhint></option>
+        <option correct="False">Numerical Input <optionhint>Numerical Input questions require the student to enter numeric values</optionhint></option>
+        <option correct="False">External Response <optionhint>External Response questions require the student to enter code</optionhint></option>
+        <option correct="False">Image Response <optionhint>Image Response questions require the student to click on an image</optionhint></option>
+      </optioninput>
+    </optionresponse>
+    <solution>
+    <div class="detailed-solution">
+    <p>Explanation</p>
+
+    <p>Multiple Choice also allows students to select from a variety of pre-written responses, although the format makes it easier for students to read very long response options. Dropdowns also differ slightly because students are more likely to think of an answer and then search for it rather than relying purely on recognition to answer the question.</p>
+
+    </div>
+    </solution>
+
+    </problem>
+

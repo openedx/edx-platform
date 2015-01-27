@@ -162,6 +162,8 @@ class LoncapaProblem(object):
         # parse problem XML file into an element tree
         self.tree = etree.XML(problem_text)
 
+        self.make_xml_compatible(self.tree)
+
         # handle any <include file="foo"> tags
         self._process_includes()
 
@@ -190,6 +192,48 @@ class LoncapaProblem(object):
                 response.late_transforms(self)
 
         self.extracted_tree = self._extract_html(self.tree)
+
+    def make_xml_compatible(self, tree):
+        """
+        Adjust tree xml in-place for compatibility, such as
+        supporting an old xml format by translating it to a new format.
+        """
+        # <additional_answer> compatibility translation:
+        # old:    <additional_answer>ANSWER</additional_answer>
+        # convert to
+        # new:    <additional_answer answer="ANSWER">OPTIONAL-HINT</addional_answer>
+        # the new format is the form used at runtime and by this conversion we support
+        # the old format
+        additionals = tree.xpath('//stringresponse/additional_answer')
+        for additional in additionals:
+            answer = additional.get('answer')
+            text = additional.text
+            if not answer and text:  # trigger of old->new conversion
+                additional.set('answer', text)
+                additional.text = ''
+
+        # <optioninput> compatibility translation:
+        # optioninput uses option= like this:
+        #   <optioninput options="('yellow','blue','green')" correct="blue" />
+        # With extended hints there is a new <option> tag, like this
+        #   <option correct="True">blue <optionhint>sky color</optionhint> </option>
+        # This translation takes in the new format and synthesizes the old option= attribute
+        # so all downstream logic works unchanged with the new <option> tag format.
+        for optioninput in tree.xpath('//optioninput'):
+            correct_option = None
+            child_options = []
+            for option_element in optioninput.findall('./option'):
+                option_name = option_element.text.strip()
+                if option_element.get('correct').upper() == 'TRUE':
+                    correct_option = option_name
+                child_options.append("'" + option_name + "'")
+
+            if len(child_options) > 0:
+                options_string = '(' + ','.join(child_options) + ')'
+                optioninput.attrib.update({'options': options_string})
+                if correct_option:
+                    optioninput.attrib.update({'correct': correct_option})
+
 
     def do_reset(self):
         """
