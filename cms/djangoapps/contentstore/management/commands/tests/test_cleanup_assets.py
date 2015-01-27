@@ -24,6 +24,7 @@ class ExportAllCourses(ModuleStoreTestCase):
     def setUp(self):
         """ Common setup. """
         self.content_store = contentstore()
+        # pylint: disable=protected-access
         self.module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
     def test_export_all_courses(self):
