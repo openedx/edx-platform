@@ -13,7 +13,9 @@ class DraftReorderTestCase(ModuleStoreTestCase):
 
     def test_order(self):
         store = modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['import_draft_order'])
+        course_items = import_from_xml(
+            store, self.user.id, TEST_DATA_DIR, ['import_draft_order'], create_course_if_not_present=True
+        )
         course_key = course_items[0].id
         sequential = store.get_item(course_key.make_usage_key('sequential', '0f4f7649b10141b0bdc9922dcf94515a'))
         verticals = sequential.children
