@@ -373,13 +373,13 @@
       }
       if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the sale price');
+        registration_code_error.text('Please enter the unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for sale price');
+        registration_code_error.text('Please enter the numeric value for unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
@@ -602,7 +602,7 @@
      $('input[name="country"]').val('');
      $('input[name="customer_reference_number"]').val('');
      $('input[name="recipient_name"]').val('');
-     $('input[name="sale_price"]').val('');
+     $('input[name="unit_price"]').val('');
      $('input[name="recipient_email"]').val('');
      $('input[name="company_contact_name"]').val('');
      $('input[name="company_contact_email"]').val('');
