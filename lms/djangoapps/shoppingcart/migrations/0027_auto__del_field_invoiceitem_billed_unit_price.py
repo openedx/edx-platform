@@ -1,44 +1,23 @@
 # -*- coding: utf-8 -*-
-from decimal import Decimal, ROUND_DOWN
-from south.v2 import DataMigration
+import datetime
+from south.db import db
+from south.v2 import SchemaMigration
+from django.db import models
 
 
-class Migration(DataMigration):
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        """
-        Write your forwards methods here.
-        """
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
+        # Deleting field 'InvoiceItem.billed_unit_price'
+        db.delete_column('shoppingcart_invoiceitem', 'billed_unit_price')
 
-        # Select all the invoices and number of registration codes(as qty) associated with every invoice
-        invoices = orm.Invoice.objects.extra(
-            select={
-                'qty': 'SELECT COUNT(*) FROM shoppingcart_courseregistrationcode '
-                       'WHERE shoppingcart_courseregistrationcode.invoice_id = shoppingcart_invoice.id'
-            }
-        ).all()
-        for invoice in invoices:
-            invoice_item = self._create_invoice_item(invoice, orm)
-            orm.CourseRegistrationCode.objects.filter(invoice=invoice).update(invoice_item=invoice_item)
 
     def backwards(self, orm):
-        """
-        We don't need the backward migration because the data is already there in old models and
-        schema rollback will automatically remove this new data.
-        """
-        pass
+        # Adding field 'InvoiceItem.billed_unit_price'
+        db.add_column('shoppingcart_invoiceitem', 'billed_unit_price',
+                      self.gf('django.db.models.fields.DecimalField')(default=0.0, max_digits=30, decimal_places=2),
+                      keep_default=False)
 
-    @staticmethod
-    def _create_invoice_item(invoice, orm):
-        unit_price = ((Decimal(invoice.total_amount))/invoice.qty).quantize(Decimal('.01'), rounding=ROUND_DOWN)
-        invoice_item = orm.CourseRegistrationCodeInvoiceItem.objects.create(
-            invoice=invoice,
-            qty=invoice.qty,
-            unit_price=unit_price,
-            course_id=invoice.course_id
-        )
-        return invoice_item
 
     models = {
         'auth.group': {
@@ -170,7 +149,6 @@ class Migration(DataMigration):
         },
         'shoppingcart.invoiceitem': {
             'Meta': {'object_name': 'InvoiceItem'},
-            'billed_unit_price': ('django.db.models.fields.DecimalField', [], {'default': '0.0', 'max_digits': '30', 'decimal_places': '2'}),
             'created': ('model_utils.fields.AutoCreatedField', [], {'default': 'datetime.datetime.now'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'invoice': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['shoppingcart.Invoice']"}),
@@ -269,4 +247,3 @@ class Migration(DataMigration):
     }
 
     complete_apps = ['shoppingcart']
-    symmetrical = True

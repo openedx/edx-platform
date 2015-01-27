@@ -835,9 +835,7 @@ INVOICE_TRANSACTION_STATUSES = (
 
     ('started', 'started'),
     ('completed', 'completed'),
-    ('cancelled', 'cancelled'),
-    ('payment', 'payment'),
-    ('refund', 'refund'),
+    ('cancelled', 'cancelled')
 )
 
 
@@ -877,7 +875,6 @@ class InvoiceItem(TimeStampedModel):
     invoice = models.ForeignKey(Invoice, db_index=True)
     qty = models.IntegerField(default=1)
     unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
-    billed_unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
 
 
 class CourseRegistrationCodeInvoiceItem(InvoiceItem):
