@@ -212,6 +212,7 @@ class XBlockVisibilityTestCase(TestCase):
         self.dummy_user = ModuleStoreEnum.UserID.test
         self.past = datetime(1970, 1, 1)
         self.future = datetime.now(UTC) + timedelta(days=1)
+        self.course = CourseFactory.create()
 
     def test_private_unreleased_xblock(self):
         """Verifies that a private unreleased xblock is not visible"""
@@ -263,10 +264,9 @@ class XBlockVisibilityTestCase(TestCase):
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
-        course_key = CourseLocator('edX', 'visibility', '2012_Fall')
 
         vertical = modulestore().create_item(
-            self.dummy_user, course_key, 'vertical', name,
+            self.dummy_user, self.course.location.course_key, 'vertical', name,
             fields={'start': start_date, 'visible_to_staff_only': visible_to_staff_only}
         )
 
