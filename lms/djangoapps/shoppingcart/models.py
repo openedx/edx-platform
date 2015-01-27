@@ -825,8 +825,11 @@ class Invoice(TimeStampedModel):
         return pdf_buffer
 
     def __unicode__(self):
-        return "company: {}".format(self.company_name)
-
+        return "company: {} , internal reference: {} , customer reference number: {}".format(
+            self.company_name,
+            self.internal_reference,
+            self.customer_reference_number
+        )
 
 INVOICE_TRANSACTION_STATUSES = (
 
@@ -849,12 +852,12 @@ class InvoiceTransaction(TimeStampedModel):
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
     status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
 
-
     @classmethod
-    def add_invoice_transaction(cls, invoice_id, amount, comments, user,status):
+    def add_invoice_transaction(cls, invoice_id, amount, comments, user, status):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
+        #from nose.tools import set_trace; set_trace()
         invoice = Invoice.objects.get(id=invoice_id)
         invoice_transaction = InvoiceTransaction(
             invoice=invoice, amount=amount, comments=comments,
@@ -877,18 +880,12 @@ class InvoiceItem(TimeStampedModel):
     unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
     billed_unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
 
-    def __unicode__(self):
-        return "company: {}".format(self.invoice.company_name)
-
 
 class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     """
     This is an inventory item for paying for a course registration
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
-
-    def __unicode__(self):
-        return "course: {}".format(self.course_id)
 
 
 class CourseRegistrationCode(models.Model):

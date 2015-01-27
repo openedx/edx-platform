@@ -2155,13 +2155,12 @@ def spoc_gradebook(request, course_id):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_sales_admin
 @require_POST
-def make_invoice_transaction(request, course_id):
+def make_invoice_transaction(request, course_id):  # pylint: disable=unused-argument
     """
     Adding invoice transaction  (payment or refund) for the Invoice.
     invoice id should be valid for making transaction.
     """
     try:
-        course_key = CourseKey.from_string(course_id)
         invoice_id = request.POST.get('invoice_id', None)
 
         if not invoice_id:
@@ -2183,8 +2182,6 @@ def make_invoice_transaction(request, course_id):
             return JsonResponse({'message': _("Amount must be greater than 0")})
 
         comments = request.POST.get('comments')
-        if amount_type == 'refund':
-            amount *= -1
         inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
         return JsonResponse({'message': _("Invoice added successfully.")})
 
@@ -2192,5 +2189,3 @@ def make_invoice_transaction(request, course_id):
         return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
     except decimal.InvalidOperation:
         return JsonResponse({'message': _("Could not parse amount as a decimal")}, status=400)
-    except:
-        return JsonResponse({'message': _("Internal server error.")}, status=400)
