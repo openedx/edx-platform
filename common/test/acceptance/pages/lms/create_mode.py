@@ -33,7 +33,7 @@ class ModeCreationPage(PageObject):
         """
         super(ModeCreationPage, self).__init__(browser)
 
-        self.course_id = course_id
+        self._course_id = course_id
         self._parameters = {}
 
         if mode_slug is not None:
@@ -54,9 +54,9 @@ class ModeCreationPage(PageObject):
     @property
     def url(self):
         """Construct the mode creation URL."""
-        url = '{base}/course_modes/create_mode/{course_id}'.format(
+        url = '{base}/course_modes/create_mode/{course_id}/'.format(
             base=BASE_URL,
-            course_id=self.course_id
+            course_id=self._course_id
         )
 
         query_string = urllib.urlencode(self._parameters)
@@ -67,5 +67,5 @@ class ModeCreationPage(PageObject):
 
     def is_browser_on_page(self):
         message = self.q(css='BODY').text[0]
-        match = re.search(r'Mode ([^$]+) created for course with ID ([^$]+).$', message)
+        match = re.search(r'Mode ([^$]+) created for ([^$]+).$', message)
         return True if match else False

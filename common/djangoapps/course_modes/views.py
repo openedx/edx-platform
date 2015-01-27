@@ -245,7 +245,7 @@ def create_mode(request, course_id):
 
     Args:
         request (`Request`): The Django Request object.
-        course_id (unicode): The slash-separated course key.
+        course_id (unicode): A course ID.
 
     Returns:
         Response
@@ -267,7 +267,7 @@ def create_mode(request, course_id):
     CourseMode.objects.get_or_create(course_id=course_key, **PARAMETERS)
 
     # Return a success message and a 200 response
-    return HttpResponse("Mode '{mode_slug}' created for course with ID '{course_id}'.".format(
+    return HttpResponse("Mode '{mode_slug}' created for '{course}'.".format(
         mode_slug=PARAMETERS['mode_slug'],
-        course_id=course_id
+        course=course_id
     ))

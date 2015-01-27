@@ -37,7 +37,7 @@ class TrackSelectionPage(PageObject):
     @property
     def url(self):
         """Return the URL corresponding to the track selection page."""
-        url = "{base}/course_modes/choose/{course_id}{querystring}".format(
+        url = "{base}/course_modes/choose/{course_id}/{querystring}".format(
             base=BASE_URL,
             course_id=self._course_id,
             querystring=self._querystring
