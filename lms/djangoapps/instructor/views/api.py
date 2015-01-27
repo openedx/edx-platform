@@ -2161,32 +2161,35 @@ def make_invoice_transaction(request, course_id):  # pylint: disable=unused-argu
     Adding invoice transaction  (payment or refund) for the Invoice.
     invoice id should be valid for making transaction.
     """
+    invoice_id = request.POST.get('invoice_id', None)
+
+    if not invoice_id:
+        return JsonResponse({'message': _("Please enter the valid invoice id.")}, status=400)
+    amount_type = request.POST.get('amount_type', None)
+    if not amount_type:
+        return JsonResponse({'message': _("Please select the amount type.")}, status=400)
+    amount = request.POST.get('amount', None)
+    if not amount:
+        return JsonResponse({'message': _("Please enter the amount.")}, status=400)
+
+    comments = request.POST.get('comments')
     try:
-        invoice_id = request.POST.get('invoice_id', None)
-
-        if not invoice_id:
-            return JsonResponse({'message': _("Please enter the valid invoice id.")}, status=400)
-        amount_type = request.POST.get('amount_type', None)
-        if not amount_type:
-            return JsonResponse({'message': _("Please select the amount type.")}, status=400)
-        amount = request.POST.get('amount', None)
-        if not amount:
-            return JsonResponse({'message': _("Please enter the amount.")}, status=400)
-
         amount = (
             decimal.Decimal(amount)
         ).quantize(
             decimal.Decimal('.01'),
             rounding=decimal.ROUND_DOWN
         )
-        if amount < decimal.Decimal('0.01'):
-            return JsonResponse({'message': _("Amount must be greater than 0")})
-
-        comments = request.POST.get('comments')
-        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
-        return JsonResponse({'message': _("Invoice added successfully.")})
-
-    except Invoice.DoesNotExist:
-        return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
     except decimal.InvalidOperation:
         return JsonResponse({'message': _("Could not parse amount as a decimal")}, status=400)
+
+    if amount < decimal.Decimal('0.01'):
+        return JsonResponse({'message': _("Amount must be greater than 0")})
+
+    try:
+        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+    except Invoice.DoesNotExist:
+        return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
+
+    return JsonResponse({'message': _("Invoice added successfully.")})
+

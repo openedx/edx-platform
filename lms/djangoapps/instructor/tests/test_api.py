@@ -3653,9 +3653,6 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_add_new_invoice_transaction_payment_with_invalid_invoice_id(self):
-        """
-        Test to add invoice transaction with invalid invoice id
-        """
         data = {
             'invoice_id': 100, 'amount': 110, 'amount_type': 'payment',
             'comments': 'testing comments'
@@ -3665,9 +3662,6 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         self.assertIn('Invoice id not valid', response.content)
 
     def test_add_new_invoice_transaction_refund_with_valid_invoice_id(self):
-        """
-        Test to add invoice transaction with invalid invoice id
-        """
         data = {
             'invoice_id': self.sale_invoice_1.id, 'amount': 200, 'amount_type': 'refund',
             'comments': 'testing comments'
@@ -3676,9 +3670,6 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 200, response.content)
 
     def test_add_new_invoice_transaction_refund_with_missing_required_data(self):
-        """
-        Test to add invoice transaction with invalid invoice id
-        """
         data = {
             'invoice_id': '', 'amount': '', 'amount_type': '',
             'comments': 'testing comments'
