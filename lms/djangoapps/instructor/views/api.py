@@ -10,7 +10,6 @@ import json
 import logging
 import re
 import time
-from django.db.models.query_utils import Q
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
@@ -23,7 +22,6 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
-from django.shortcuts import redirect
 from django.utils.html import strip_tags
 import string  # pylint: disable=deprecated-module
 import random
@@ -902,13 +900,7 @@ def sale_validation(request, course_id):
         )
         obj_invoice = obj_invoice.invoice
     except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
-        try:
-            obj_invoice = Invoice.objects.get(
-                id=invoice_number,
-                course_id=course_id
-            )
-        except Invoice.DoesNotExist:
-            return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
 
     if event_type == "invalidate":
         return invalidate_invoice(obj_invoice)
@@ -1074,7 +1066,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, mode_slug, order=None, invoice_item=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -1097,13 +1089,14 @@ def save_registration_code(user, course_id, mode_slug, order=None, invoice_item=
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
         return save_registration_code(
-            user, course_id, mode_slug, order=order, invoice_item=invoice_item
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
         )
 
     course_registration = CourseRegistrationCode(
         code=code,
         course_id=unicode(course_id),
         created_by=user,
+        invoice=invoice,
         order=order,
         mode_slug=mode_slug,
         invoice_item=invoice_item
@@ -1113,7 +1106,7 @@ def save_registration_code(user, course_id, mode_slug, order=None, invoice_item=
         return course_registration
     except IntegrityError:
         return save_registration_code(
-            user, course_id, mode_slug, order=order, invoice_item=invoice_item
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
         )
 
 
@@ -1162,12 +1155,7 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
 
     company_name = request.POST['download_company_name']
     if company_name:
-        if hasattr(CourseRegistrationCode, 'invoice'):
-            registration_codes = registration_codes.filter(
-                Q(invoice__company_name=company_name) | Q(invoice_item__invoice__company_name=company_name)
-            )
-        else:
-            registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
+        registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
@@ -1216,6 +1204,7 @@ def generate_registration_codes(request, course_id):
         company_name=company_name,
         company_contact_email=company_contact_email,
         company_contact_name=company_contact_name,
+        course_id=course_id,
         recipient_name=recipient_name,
         recipient_email=recipient_email,
         address_line_1=address_line_1,
@@ -1256,7 +1245,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, order=None, invoice_item=invoice_item
+            request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
         registration_codes.append(generated_registration_code)
 
@@ -1357,7 +1346,7 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
         registration_codes_list = registration_codes_list.filter(invoice_item__invoice__company_name=company_name)
     # find the redeemed registration codes if any exist in the db
     code_redemption_set = RegistrationCodeRedemption.objects.select_related(
-        'registration_code', 'invoice_item__invoice'
+        'registration_code', 'registration_code__invoice_item__invoice'
     ).filter(registration_code__course_id=course_id)
     if code_redemption_set.exists():
         redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
@@ -1389,7 +1378,7 @@ def spent_registration_codes(request, course_id):  # pylint: disable=unused-argu
         # you will get a list of all the spent(Redeemed) Registration Codes
         spent_codes_list = CourseRegistrationCode.objects.filter(
             course_id=course_id, code__in=redeemed_registration_codes
-        ).order_by('invoice_item__invoice__company_name').select_related('registration_code', 'invoice_item__invoice')
+        ).order_by('invoice_item__invoice__company_name').select_related('invoice_item__invoice')
 
         company_name = request.POST['spent_company_name']
         if company_name:

@@ -1709,9 +1709,9 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
 
         #create testing invoice 1
         self.sale_invoice_1 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
-            company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
-            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
+            recipient_name='Testw', recipient_email='test1@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="A", course_id=self.course.id, is_valid=True
         )
         self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
             invoice=self.sale_invoice_1,
@@ -1731,7 +1731,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
+                created_by=self.instructor, invoice=self.sale_invoice_1, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1851,7 +1851,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(2):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
+                created_by=self.instructor, invoice=self.sale_invoice_1, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1866,7 +1866,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='sale_invoice{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
+                created_by=self.instructor, invoice=self.sale_invoice_1, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -1891,15 +1891,15 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='qwerty{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=self.invoice_item, mode_slug='honor'
+                created_by=self.instructor, invoice=self.sale_invoice_1, invoice_item=self.invoice_item, mode_slug='honor'
             )
             course_registration_code.save()
 
         #create test invoice 2
         sale_invoice_2 = Invoice.objects.create(
-            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
-            company_contact_email='Test@company.com', recipient_name='Testw_2', recipient_email='test2@test.com',
-            customer_reference_number='2Fwe23S', internal_reference="B"
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName', company_contact_email='Test@company.com',
+            recipient_name='Testw_2', recipient_email='test2@test.com', customer_reference_number='2Fwe23S',
+            internal_reference="B", course_id=self.course.id
         )
 
         invoice_item_2 = CourseRegistrationCodeInvoiceItem.objects.create(
@@ -1912,7 +1912,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         for i in range(5):
             course_registration_code = CourseRegistrationCode(
                 code='xyzmn{}'.format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=invoice_item_2, mode_slug='honor'
+                created_by=self.instructor, invoice=sale_invoice_2, invoice_item=invoice_item_2, mode_slug='honor'
             )
             course_registration_code.save()
 
@@ -3633,7 +3633,7 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         self.sale_invoice_1 = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
             company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
-            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True
+            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True, course_id=self.course.id
         )
         self.generate_code_url = reverse(
             'make_invoice_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()}

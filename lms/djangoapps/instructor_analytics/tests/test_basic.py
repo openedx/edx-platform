@@ -145,7 +145,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         sale_invoice = Invoice.objects.create(
             total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
             company_contact_email='test@company.com', recipient_name='Testw_1', recipient_email='test2@test.com',
-            customer_reference_number='2Fwe23S', internal_reference="ABC"
+            customer_reference_number='2Fwe23S', internal_reference="ABC", course_id=self.course.id
         )
         invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
             invoice=sale_invoice,
@@ -156,7 +156,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice_item=invoice_item, mode_slug='honor'
+                created_by=self.instructor, invoice=sale_invoice, invoice_item=invoice_item, mode_slug='honor'
             )
             course_code.save()
 
