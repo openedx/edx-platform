@@ -15,7 +15,7 @@
 
     a {
       display: block;
-      float: left;
+      @include float(left);
       padding: 3px ($baseline/2) 7px;
       margin-left: 7px;
       border-radius: 2px;
@@ -29,14 +29,16 @@
   .editor-tabs {
     position: absolute;
     top: 10px;
-    right: 10px;
+    @include right(10px);
+    @include text-align(left);
+    @include direction();
 
     li {
-      float: left;
-      margin-right: ($baseline/4);
+      @include float(left);
+      @include margin-right($baseline/4);
 
       &:last-child {
-        margin-right: 0;
+        @include margin-right(0);
       }
     }
 
