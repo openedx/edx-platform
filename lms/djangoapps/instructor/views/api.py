@@ -11,6 +11,7 @@ import logging
 import re
 import time
 import requests
+from decimal import Decimal, ROUND_DOWN
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
@@ -1217,11 +1218,11 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
     )
-
+    unit_price = (Decimal(sale_price)/course_code_number).quantize(Decimal('.01'), rounding=ROUND_DOWN)
     invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
         invoice=sale_invoice,
         qty=course_code_number,
-        unit_price=sale_price,
+        unit_price=unit_price,
         course_id=course_id
     )
 
