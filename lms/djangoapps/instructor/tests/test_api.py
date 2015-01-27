@@ -3042,7 +3042,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
             'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3074,7 +3074,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 121.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 121.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
@@ -3096,7 +3096,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 5, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 121.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 121.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': 'True'
@@ -3138,7 +3138,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3160,7 +3160,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 15, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3196,7 +3196,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         coupon.save()
         data = {
             'total_registration_codes': 3, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3220,7 +3220,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 2, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3256,7 +3256,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'sale_price': 122.45, 'company_contact_email': 'Test@company.com', 'recipient_name': 'Test123',
+            'unit_price': 122.45, 'company_contact_email': 'Test@company.com', 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3307,7 +3307,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3346,7 +3346,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3373,7 +3373,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         )
         data = {
             'total_registration_codes': 9, 'company_name': 'Group Alpha', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -3392,7 +3392,7 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 5.5, 'company_name': 'Group Invoice', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': True
@@ -3409,6 +3409,26 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertEqual(response['Content-Type'], 'text/csv')
         body = response.content.replace('\r', '')
         self.assertTrue(body.startswith(EXPECTED_CSV_HEADER))
+
+    def test_with_invalid_unit_price(self):
+        """
+        Test to generate a response of all the course registration codes
+        """
+        generate_code_url = reverse(
+            'generate_registration_codes', kwargs={'course_id': self.course.id.to_deprecated_string()}
+        )
+
+        data = {
+            'total_registration_codes': 10, 'company_name': 'Group Invoice', 'company_contact_name': 'Test@company.com',
+            'company_contact_email': 'Test@company.com', 'unit_price': 'invalid', 'recipient_name': 'Test123',
+            'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
+            'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
+            'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': True
+        }
+
+        response = self.client.post(generate_code_url, data, **{'HTTP_HOST': 'localhost'})
+        self.assertEqual(response.status_code, 400, response.content)
+        self.assertIn('Could not parse amount as', response.content)
 
     def test_get_historical_coupon_codes(self):
         """
