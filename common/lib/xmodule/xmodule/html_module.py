@@ -256,8 +256,11 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
     def index_dictionary(self):
         xblock_body = super(HtmlDescriptor, self).index_dictionary()
+        # Removing HTML-encoded non-breaking space characters
         html_content = re.sub(r"(\s|&nbsp;|//)+", " ", html_to_text(self.data))
+        # Removing HTML CDATA
         html_content = re.sub(r"<!\[CDATA\[.*\]\]>", "", html_content)
+        # Removing HTML comments
         html_content = re.sub(r"<!--.*-->", "", html_content)
         html_body = {
             "html_content": html_content,
