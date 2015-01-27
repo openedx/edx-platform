@@ -102,7 +102,7 @@ class CourseFactory(XModuleFactory):
         number = kwargs.pop('course', kwargs.pop('number', None))
         store = kwargs.pop('modulestore')
         name = kwargs.get('name', kwargs.get('run', Location.clean(kwargs.get('display_name'))))
-        run = kwargs.get('run', name)
+        run = kwargs.pop('run', name)
         user_id = kwargs.pop('user_id', ModuleStoreEnum.UserID.test)
 
         # Pass the metadata just as field=value pairs
