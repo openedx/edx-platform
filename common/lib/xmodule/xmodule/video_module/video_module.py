@@ -233,18 +233,20 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
         course = None
-        course_id = module_attr('course_id')
+        course_id = None
 
         licensable = False
         video_license = None
         if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
-            if course_id is not None and hasattr(self.runtime, 'modulestore'):
-                course = self.runtime.modulestore.get_course(course_id)
             video_license = self.license
-            if video_license is not None:
-                licensable = True
-            elif course is not None:
+            if hasattr(self.descriptor.runtime, 'modulestore'):
+                course_id = self.descriptor.runtime.course_id
+                if course_id:
+                    course = self.descriptor.runtime.modulestore.get_course(course_id)
+            if course:
                 licensable = course.licensable
+                if not video_license:
+                    video_license = course.license
 
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
@@ -389,7 +391,17 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
-        if not(hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False)):
+        licensable = False
+        course_id = None
+        course = None
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            if hasattr(self.runtime, 'modulestore'):
+                course_id = self.runtime.course_id
+                if course_id:
+                    course = self.runtime.modulestore.get_course(course_id)
+                    if course:
+                        licensable = course.licensable
+        if not licensable:
             editable_fields.pop('license', None)
             editable_fields.pop('license_version', None)
 
@@ -457,9 +469,17 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_video': json.dumps(self.download_video),
         }
 
-        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and self.license:
-            attrs['license'] = self.license.kind
-            attrs['license_version'] = self.license.version
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            if self.license:
+                attrs['license'] = self.license.kind
+                attrs['license_version'] = self.license.version
+            elif hasattr(self.descriptor.runtime, 'modulestore'):
+                course_id = self.descriptor.runtime.course_id
+                if course_id:
+                    course = self.descriptor.runtime.modulestore.get_course(course_id)
+                    if course and course.license:
+                        attrs['license'] = course.license.kind
+                        attrs['license_version'] = course.license.version
 
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
@@ -537,8 +557,8 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'video_url': video_url
         }
 
-        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
-            metadata['license'] = metadata_fields['license']
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
+            metadata['license'] = getattr(metadata_fields, 'license', None)
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context

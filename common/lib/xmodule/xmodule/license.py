@@ -94,35 +94,6 @@ class CCLicense(License):
             self.version = "4.0"
 
     @property
-    def html(self):
-        """
-        Return a piece of html that describes the license
-        """
-
-        license_html = ["<i class='icon-cc'></i>"]
-        if 'CC0' in self.kind:
-            license_html.append("<i class='icon-cc-zero'></i>")
-        if 'BY' in self.kind:
-            license_html.append("<i class='icon-cc-by'></i>")
-        if 'NC' in self.kind:
-            license_html.append("<i class='icon-cc-nc'></i>")
-        if 'SA' in self.kind:
-            license_html.append("<i class='icon-cc-sa'></i>")
-        if 'ND' in self.kind:
-            license_html.append("<i class='icon-cc-nd'></i>")
-
-        phrase = _("Some rights reserved")
-        return "<a rel='license' href='http://creativecommons.org/licenses/{license_link}/{version}/' " \
-            "data-tooltip='{description}' target='_blank' class='license'>" \
-            "{license_html}<span class='license-text'>{phrase}</span></a>".format(
-                description=self.description,
-                version=self.version,
-                license_link=self.kind.lower()[3:],
-                license_html=''.join(license_html),
-                phrase=phrase
-            )
-
-    @property
     def description(self):
         """
         Return a text that describes the license
@@ -151,7 +122,7 @@ def parse_license(kind_or_license, version=None):
     for the license parameter already being a license object.
     """
 
-    if kind_or_license is None or kind_or_license == "":
+    if not kind_or_license:
         return ARRLicense()
     elif isinstance(kind_or_license, License):
         return kind_or_license
@@ -162,7 +133,7 @@ def parse_license(kind_or_license, version=None):
     elif isinstance(kind_or_license, basestring):
         if kind_or_license == "ARR":
             return ARRLicense(kind_or_license, version)
-        elif kind_or_license.startswith("CC-BY") or kind_or_license == "CC0":
+        elif kind_or_license.startswith("CC"):
             return CCLicense(kind_or_license, version)
     # If we get to this line, we found an invalid license. Lets raise an error.
     raise ValueError('Invalid license.')

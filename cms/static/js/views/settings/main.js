@@ -50,7 +50,7 @@ var DetailsView = ValidatingView.extend({
     linkLicense: function() {
         this.licenseSelector = new LicenseSelector({
             model: this.model.get('license'),
-            el: document.getElementById("course-license-form")
+            el: document.getElementById("field-course-license")
         });
     },
 

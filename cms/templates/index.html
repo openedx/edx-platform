@@ -7,7 +7,7 @@
 
 <%block name="header_extras">
 % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
-  % for template_name in ["license-selector"]:
+  % for template_name in ["license-selector", "license-view"]:
     <script type="text/template" id="${template_name}-tpl">
         <%static:include path="js/${template_name}.underscore" />
     </script>

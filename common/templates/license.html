@@ -1,0 +1,23 @@
+<%! from xmodule.license import CCLicense %>
+<%! from django.utils.translation import ugettext as _ %>
+<%page args="context_license"/> 
+<div class="xmodule_licensable license">
+    % if context_license and isinstance(context_license, CCLicense):
+        <a rel='license' href='http://creativecommons.org/licenses/${context_license.kind.replace('CC-', '').lower()}/${context_license.version}/' data-tooltip='${context_license.description}' target='_blank' class='license'>
+            <i class='icon-cc'></i>
+            <i class='icon-cc-by'></i>
+            % if 'NC' in context_license.kind:
+                <i class='icon-cc-nc'></i>
+            % endif
+            % if 'ND' in context_license.kind:
+                <i class='icon-cc-nd'></i>
+            % endif
+            % if 'SA' in context_license.kind:
+                <i class='icon-cc-sa'></i>
+            % endif
+            <span class='license-text'>${_("Some rights reserved")}</span>
+        </a>
+    % else:
+        &copy; <span class='license-text'>${_("All rights reserved")}></span>
+    % endif
+</div>

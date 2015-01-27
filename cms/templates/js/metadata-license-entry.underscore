@@ -1,4 +1,4 @@
-<div class="wrapper-comp-setting metadata-license-entry">
+<div class="wrapper-comp-setting metadata-license-entry license-selector">
     <label class="label setting-label" for="<%= uniqueId %>"><%= model.get('display_name') %></label>
     <div class="wrapper-license-selector"></div>
 </div>

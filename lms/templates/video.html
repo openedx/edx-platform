@@ -155,9 +155,7 @@
     % endif
 
     % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and licensable and video_license:
-      <div class="xmodule_licensable license">
-        ${video_license.html}
-      </div>
+        <%include file="/license.html" args="context_license=video_license" />
     % endif
   </ul>
 </div>

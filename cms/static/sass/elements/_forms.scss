@@ -194,7 +194,7 @@ form {
 
     cursor: pointer;
 
-    &.selected {
+    &.is-selected {
       @include blue-button;
     }
   }
@@ -224,7 +224,7 @@ form {
       .fa-check-square-o.disabled {
         color: $gray;
       }
-      &.selected {
+      &.is-selected {
         .fa-check-square-o {
           display: inline-block;
         }

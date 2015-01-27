@@ -235,23 +235,6 @@ def get_course_about_section(course, section_key):
     raise KeyError("Invalid about key " + str(section_key))
 
 
-def get_course_license_section(course):
-    """
-    This returns the snippet of html to be rendered on the course about page under the license section,
-    given the course.
-    """
-    content = ""
-    if course.license:
-        content = course.license.html
-
-    html = "<h2>{title}</h2><div class='xmodule_licensable'>{content}</div>".format(
-        title=_("License"),
-        content=content
-    )
-
-    return html
-
-
 def get_course_info_section_module(request, course, section_key):
     """
     This returns the course info module for a given section_key.

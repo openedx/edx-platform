@@ -1,7 +1,5 @@
 <div class="container course-footer">
-  % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licensable and course.license:
-    <div class="xmodule_licensable">
-      ${course.license.html}
-    </div>
-  % endif
+    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licensable and course.license:
+        <%include file="/license.html" args="context_license=course.license" />
+    % endif
 </div>

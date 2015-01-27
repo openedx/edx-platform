@@ -52,7 +52,7 @@ define(["domReady", "jquery", "underscore", "js/utils/cancel_on_escape", "js/vie
             var number = $newCourseForm.find('.new-course-number').val();
             var run = $newCourseForm.find('.new-course-run').val();
             var license = {};
-            if(licenseSelector){
+            if (typeof licenseSelector != "undefined" && licenseSelector) {
                 // When the license selector is present (CREATIVE_COMMONS_LICENSING feature flag is set to true)
                 // we will take the value of the selector into account.
                 license = licenseSelector.model.toJSON();

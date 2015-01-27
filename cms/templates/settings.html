@@ -12,7 +12,7 @@
 %>
 
 <%block name="header_extras">
-% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector"]:
+% for template_name in ["basic-modal", "modal-button", "upload-dialog", "license-selector", "license-view"]:
   <script type="text/template" id="${template_name}-tpl">
     <%static:include path="js/${template_name}.underscore" />
   </script>
@@ -349,8 +349,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               </header>
 
               <ol class="list-input">
-                <li class="field text" id="field-course-license">
-                  <div id="course-license-form"></div>
+                <li class="field text license-selector" id="field-course-license">
                 </li>
               </ol>
             </section>

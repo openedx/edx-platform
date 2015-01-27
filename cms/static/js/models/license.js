@@ -11,11 +11,61 @@ define(["backbone", "backbone.associations"], function(Backbone) {
      * CC-*-ND  - Creative Commons NoDerivatives license
      * CC-*-NC  - Creative Commons NonCommercial license
      * CC-*-SA  - Creative Commons ShareAlike license
+     *
+     * For the CC license, a combination of these flags is allowed.
+     * Support is limited to ARR, CC0, and CC v4.0 licenses.
      */
     var License = Backbone.AssociatedModel.extend({
         defaults: {
             kind: "ARR",
             version: ""
+        },
+
+        toggleAttribute: function(attr) {
+          var attrNC, attrND, attrSA, newKind, newVersion;
+
+          if (attr === 'ARR') {
+            newKind = 'ARR';
+            newVersion = '';
+          } else {
+            // Determine which attributes are set
+            attrNC = /NC/.test(this.get('kind'));
+            attrND = /ND/.test(this.get('kind'));
+            attrSA = /SA/.test(this.get('kind'));
+
+            // Toggle the attribute accordingly
+            if (attr === 'NC') {
+              attrNC = !attrNC;
+            } else if (attr === 'ND') {
+              attrND = !attrND;
+              if (attrND) {
+                // The SA and ND attributes cannot be set at the same time
+                attrSA = false;
+              }
+            } else if (attr === 'SA') {
+              attrSA = !attrSA;
+              if (attrSA) {
+                // The SA and ND attributes cannot be set at the same time
+                attrND = false;
+              }
+            }
+
+            // Construct the new kind value
+            newKind = 'CC-BY';
+            if (attrNC) {
+              newKind += '-NC';
+            }
+            if (attrND) {
+              newKind += '-ND';
+            }
+            if (attrSA) {
+              newKind += '-SA';
+            }
+            newVersion = '4.0';
+          }
+
+          // Save the new kind
+          this.set({kind: newKind, version: newVersion});
         },
 
         validate: function(newattrs) {
@@ -34,17 +84,19 @@ define(["backbone", "backbone.associations"], function(Backbone) {
                         validKind = attr.join("-");
                     }
                     else {
-                        validKind = "NONE";
+                        validKind = null;
                     }
                 }
 
                 newattrs.kind = validKind;
             }
             else {
-                newattrs.kind = "NONE";
+                newattrs.kind = null;
             }
-            if (!_.isEmpty(errors)) return errors;
-            // NOTE don't return empty errors as that will be interpreted as an error state
+            if (!_.isEmpty(errors)) {
+                // NOTE don't return empty errors as that will be interpreted as an error state
+                return errors;
+            }
         },
     });
     return License;

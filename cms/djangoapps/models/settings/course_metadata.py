@@ -88,7 +88,7 @@ class CourseMetadata(object):
                 continue
 
             # The licensable field should only be in the course settings if licensing is enabled globally.
-            if field.name is 'licensable' and not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            if field.name == 'licensable' and not settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
                 continue
 
             result[field.name] = {
