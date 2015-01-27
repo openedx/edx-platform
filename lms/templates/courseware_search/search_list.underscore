@@ -1,8 +1,6 @@
 <div class="search-info">
-    <%- gettext("Searching") %> <%= courseName %>
-    <div class="search-count">
-        <span class="search-count-total"><%- totalCount %></span>  <%- ngettext("result", "results", totalCount) %>
-    </div>
+    <%- interpolate(gettext("Searching %s"), [courseName]) %>
+    <div class="search-count"><%- totalCountMsg %></div>
 </div>
 
 <% if (totalCount > 0 ) { %>
@@ -11,7 +9,7 @@
 
     <% if (hasMoreResults) { %>
         <a class="search-load-next" href="javascript:void(0);">
-            <%- interpolate(gettext("Load next %s results"), [pageSize], false) %>
+            <%- interpolate(gettext("Load next %s results"), [pageSize]) %>
             <i class="icon fa-spinner fa-spin"></i>
         </a>
     <% } %>
@@ -21,4 +19,3 @@
     <p><%- gettext("Sorry, no results were found.") %></p>
 
 <% } %>
-
