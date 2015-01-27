@@ -1182,7 +1182,21 @@ def generate_registration_codes(request, course_id):
     company_name = request.POST['company_name']
     company_contact_name = request.POST['company_contact_name']
     company_contact_email = request.POST['company_contact_email']
-    sale_price = request.POST['sale_price']
+    unit_price = request.POST['unit_price']
+
+    try:
+        unit_price = (
+            decimal.Decimal(unit_price)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return HttpResponse(
+            status=400,
+            content=_(u"Could not parse amount as a decimal")
+        )
+
     recipient_name = request.POST['recipient_name']
     recipient_email = request.POST['recipient_email']
     address_line_1 = request.POST['address_line_1']
@@ -1199,6 +1213,7 @@ def generate_registration_codes(request, course_id):
         recipient_list.append(request.user.email)
         invoice_copy = True
 
+    sale_price = unit_price * course_code_number
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price,
@@ -1218,7 +1233,7 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
     )
-    unit_price = (Decimal(sale_price)/course_code_number).quantize(Decimal('.01'), rounding=ROUND_DOWN)
+
     invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
         invoice=sale_invoice,
         qty=course_code_number,
