@@ -44,6 +44,7 @@
         // NOTE: baseUrl has been previously set in lms/static/templates/main.html
         waitSeconds: 60,
         paths: {
+            "domReady": "js/vendor/domReady",
             "annotator_1.2.9": "js/vendor/edxnotes/annotator-full.min",
             "date": "js/vendor/date",
             "backbone": "js/vendor/backbone-min",
@@ -67,6 +68,7 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "mathjax": "//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full&delayStartupUntil=configured",
             // end of files needed by OVA
         },
         shim: {
