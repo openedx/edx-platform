@@ -296,7 +296,7 @@
       var total_registration_codes = $('input[name="total_registration_codes"]').val();
       var recipient_name = $('input[name="recipient_name"]').val();
       var recipient_email = $('input[name="recipient_email"]').val();
-      var sale_price = $('input[name="sale_price"]').val();
+      var unit_price = $('input[name="unit_price"]').val();
       var company_name = $('input[name="company_name"]').val();
       var company_contact_name = $('input[name="company_contact_name"]').val();
       var company_contact_email = $('input[name="company_contact_email"]').val();
@@ -369,13 +369,13 @@
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (sale_price == '') {
+      if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please enter the sale price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
-      if (!($.isNumeric(sale_price))) {
+      if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
         registration_code_error.text('Please enter the numeric value for sale price');
         generate_registration_button.removeAttr('disabled');
