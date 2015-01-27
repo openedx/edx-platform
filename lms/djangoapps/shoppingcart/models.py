@@ -857,7 +857,6 @@ class InvoiceTransaction(TimeStampedModel):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
-        #from nose.tools import set_trace; set_trace()
         invoice = Invoice.objects.get(id=invoice_id)
         invoice_transaction = InvoiceTransaction(
             invoice=invoice, amount=amount, comments=comments,
@@ -883,7 +882,7 @@ class InvoiceItem(TimeStampedModel):
 
 class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     """
-    This is an inventory item for paying for a course registration
+    This is an invoice item for paying for a course registration
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
 

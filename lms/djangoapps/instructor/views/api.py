@@ -2161,14 +2161,14 @@ def make_invoice_transaction(request, course_id):  # pylint: disable=unused-argu
     Adding invoice transaction  (payment or refund) for the Invoice.
     invoice id should be valid for making transaction.
     """
-    invoice_id = request.POST.get('invoice_id', None)
+    invoice_id = request.POST.get('invoice_id')
 
     if not invoice_id:
         return JsonResponse({'message': _("Please enter the valid invoice id.")}, status=400)
-    amount_type = request.POST.get('amount_type', None)
+    amount_type = request.POST.get('amount_type')
     if not amount_type:
         return JsonResponse({'message': _("Please select the amount type.")}, status=400)
-    amount = request.POST.get('amount', None)
+    amount = request.POST.get('amount')
     if not amount:
         return JsonResponse({'message': _("Please enter the amount.")}, status=400)
 
