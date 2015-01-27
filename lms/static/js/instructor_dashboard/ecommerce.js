@@ -55,7 +55,7 @@ var edx = edx || {};
                "amount_type": $('input[name="amount_type"]:checked').val(),
                "comments": $("#comments").val()
              },
-             url: "${ section_data['make_invoice_transaction_url'] }",
+             url: $('#form_url').val(),
              success: function (data) {
                  location.reload(true);
                },

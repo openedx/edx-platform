@@ -2201,8 +2201,10 @@ def make_invoice_transaction(request, course_id):  # pylint: disable=unused-argu
     if amount < decimal.Decimal('0.01'):
         return JsonResponse({'message': _("Amount must be greater than 0")})
 
+    if amount_type == 'refund':
+            amount *= -1
     try:
-        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user, amount_type)
+        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user)
     except Invoice.DoesNotExist:
         return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
 

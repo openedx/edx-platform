@@ -22,9 +22,10 @@
                     ${_("Please enter valid credentials")}</p>
             </div>
 
-            <form action="${ section_data['make_invoice_transaction_url'] }" id="frm_make_invoice_transaction"
+            <form action="" id="frm_make_invoice_transaction"
                   method="post">
 
+                <input type="hidden" id="form_url" name="form_url" value="${ section_data['make_invoice_transaction_url'] }">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
                 <div id="make_invoice_form_error" class="modal-form-error"></div>
 

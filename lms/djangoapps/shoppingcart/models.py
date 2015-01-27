@@ -851,14 +851,14 @@ class InvoiceTransaction(TimeStampedModel):
     status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
 
     @classmethod
-    def add_invoice_transaction(cls, invoice_id, amount, comments, user, status):
+    def add_invoice_transaction(cls, invoice_id, amount, comments, user):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
         invoice = Invoice.objects.get(id=invoice_id)
         invoice_transaction = InvoiceTransaction(
             invoice=invoice, amount=amount, comments=comments,
-            created_by=user, status=status, last_modified_by=user)
+            created_by=user, last_modified_by=user)
         invoice_transaction.save()
         return invoice_transaction
 
