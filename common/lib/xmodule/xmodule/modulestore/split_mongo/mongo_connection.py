@@ -8,13 +8,17 @@ import pymongo
 # Import this just to export it
 from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
-from contracts import check
+from contracts import check, contract, new_contract
 from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore.split_mongo import BlockKey
+from xmodule.modulestore.split_mongo import BlockKey, CourseStructure
 import datetime
 import pytz
 
 
+new_contract('CourseStructure', CourseStructure)
+
+
+@contract(returns='CourseStructure')
 def structure_from_mongo(structure):
     """
     Converts the 'blocks' key from a list [block_data] to a map
@@ -37,9 +41,10 @@ def structure_from_mongo(structure):
         new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = block
     structure['blocks'] = new_blocks
 
-    return structure
+    return CourseStructure(structure)
 
 
+@contract(structure='CourseStructure')
 def structure_to_mongo(structure):
     """
     Converts the 'blocks' key from a map {BlockKey: block_data} to
@@ -165,6 +170,7 @@ class MongoConnection(object):
             })
         ]
 
+    @contract(structure='CourseStructure')
     def insert_structure(self, structure):
         """
         Insert a new structure into the database.

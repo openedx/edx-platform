@@ -21,3 +21,27 @@ class BlockKey(namedtuple('BlockKey', 'type id')):
 
 
 CourseEnvelope = namedtuple('CourseEnvelope', 'course_key structure')
+
+
+class CourseStructure(dict):
+    """
+    Wrap the course structure in an object instead of using a straight Python dictionary.
+    Allows the storing of meta-information about a structure that doesn't persist along with
+    the structure itself.
+    """
+    def __init__(self, *args, **kwargs):
+        super(CourseStructure, self).__init__(*args, **kwargs)
+        # Set of all the loaded definitions.
+        self.definitions_loaded = set()
+
+    def is_definition_loaded(self, block):
+        """
+        Returns True if the block definition has been loaded.
+        """
+        return block in self.definitions_loaded
+
+    def mark_definition_loaded(self, block):
+        """
+        Marks the block definition as loaded.
+        """
+        self.definitions_loaded.add(block)
