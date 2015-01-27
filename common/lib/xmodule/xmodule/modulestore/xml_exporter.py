@@ -113,7 +113,7 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
         export_extra_content(export_fs, modulestore, course_key, xml_centric_course_key, 'about', 'about', '.html')
 
         # export the grading policy
-        course_run_policy_dir = policies_dir.makeopendir(course.location.name)
+        course_run_policy_dir = policies_dir.makeopendir(course.location.run)
         with course_run_policy_dir.open('grading_policy.json', 'w') as grading_policy:
             grading_policy.write(dumps(course.grading_policy, cls=EdxJSONEncoder, sort_keys=True, indent=4))
 
