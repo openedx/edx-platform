@@ -39,23 +39,23 @@ class TestImport(ModuleStoreTestCase):
         self.content_dir = path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.content_dir)
 
-        self.BASE_COURSE_KEY = self.store.make_course_key(u'edX', u'test_import_course', u'2013_Spring')
-        self.TRUNCATED_KEY = self.store.make_course_key(u'edX', u'test_import', u'2014_Spring')
+        self.base_course_key = self.store.make_course_key(u'edX', u'test_import_course', u'2013_Spring')
+        self.truncated_key = self.store.make_course_key(u'edX', u'test_import', u'2014_Spring')
 
         # Create good course xml
-        self.good_dir = self.create_course_xml(self.content_dir, self.BASE_COURSE_KEY)
+        self.good_dir = self.create_course_xml(self.content_dir, self.base_course_key)
 
         # Create course XML where TRUNCATED_COURSE.org == BASE_COURSE_ID.org
         # and BASE_COURSE_ID.startswith(TRUNCATED_COURSE.course)
-        self.course_dir = self.create_course_xml(self.content_dir, self.TRUNCATED_KEY)
+        self.course_dir = self.create_course_xml(self.content_dir, self.truncated_key)
 
     def test_forum_seed(self):
         """
         Tests that forum roles were created with import.
         """
-        self.assertFalse(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
+        self.assertFalse(are_permissions_roles_seeded(self.base_course_key))
         call_command('import', self.content_dir, self.good_dir)
-        self.assertTrue(are_permissions_roles_seeded(self.BASE_COURSE_KEY))
+        self.assertTrue(are_permissions_roles_seeded(self.base_course_key))
 
     def test_truncated_course_with_url(self):
         """
@@ -67,8 +67,8 @@ class TestImport(ModuleStoreTestCase):
         # Load up base course and verify it is available
         call_command('import', self.content_dir, self.good_dir)
         store = modulestore()
-        self.assertIsNotNone(store.get_course(self.BASE_COURSE_KEY))
+        self.assertIsNotNone(store.get_course(self.base_course_key))
 
         # Now load up the course with a similar course_id and verify it loads
         call_command('import', self.content_dir, self.course_dir)
-        self.assertIsNotNone(store.get_course(self.TRUNCATED_KEY))
+        self.assertIsNotNone(store.get_course(self.truncated_key))
