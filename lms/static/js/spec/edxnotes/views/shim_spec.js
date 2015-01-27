@@ -29,15 +29,15 @@ define([
             loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             highlights = [];
             annotators = [
-                NotesFactory.factory($('div#edx-notes-wrapper-123').get(0), {
+                NotesFactory.factory($('#edx-notes-wrapper-123').get(0), {
                     endpoint: 'http://example.com/'
                 }),
-                NotesFactory.factory($('div#edx-notes-wrapper-456').get(0), {
+                NotesFactory.factory($('#edx-notes-wrapper-456').get(0), {
                     endpoint: 'http://example.com/'
                 })
             ];
-            _.each(annotators, function(annotator, index) {
-                highlights.push($('<span class="annotator-hl" />').appendTo(annotators[index].element));
+            _.each(annotators, function(annotator) {
+                highlights.push($('<span class="annotator-hl" />').appendTo(annotator.element));
                 spyOn(annotator, 'onHighlightClick').andCallThrough();
                 spyOn(annotator, 'onHighlightMouseover').andCallThrough();
                 spyOn(annotator, 'startViewerHideTimer').andCallThrough();
@@ -54,6 +54,14 @@ define([
             highlights[0].mouseover();
             expect($('#edx-notes-wrapper-123 .annotator-editor')).not.toHaveClass('annotator-hide');
             expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
+
+        it('clicking on highlights does not open the viewer when the editor is opened', function() {
+            spyOn(annotators[1].editor, 'isShown').andReturn(false);
+            highlights[0].click();
+            annotators[1].editor.isShown.andReturn(true);
+            highlights[1].click();
+            expect($('#edx-notes-wrapper-123 .annotator-viewer')).not.toHaveClass('annotator-hide');
+            expect($('#edx-notes-wrapper-456 .annotator-viewer')).toHaveClass('annotator-hide');
         });
 
         it('clicking a highlight freezes mouseover and mouseout in all highlighted text', function() {
@@ -65,10 +73,7 @@ define([
             // in turn calls onHighlightMouseover.
             // To test if onHighlightMouseover is called or not on
             // mouseover, we'll have to reset onHighlightMouseover.
-            expect(annotators[0].onHighlightClick).toHaveBeenCalled();
-            expect(annotators[0].onHighlightMouseover).toHaveBeenCalled();
             annotators[0].onHighlightMouseover.reset();
-
             // Check that both instances of annotator are frozen
             _.invoke(highlights, 'mouseover');
             _.invoke(highlights, 'mouseout');
@@ -121,11 +126,13 @@ define([
             checkClickEventsNotBound('edxnotes:freeze' + annotators[1].uid);
         });
 
-        it('should unbind onNotesLoaded on destruction', function() {
+        it('should unbind events on destruction', function() {
             annotators[0].destroy();
             expect($.fn.off).toHaveBeenCalledWith(
-                'click',
-                annotators[0].onNoteClick
+                'click', annotators[0].onNoteClick
+            );
+            expect($.fn.off).toHaveBeenCalledWith(
+                'click', '.annotator-hl'
             );
         });
     });

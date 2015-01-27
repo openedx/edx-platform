@@ -699,9 +699,7 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
         And I move mouse out of the note
         Then I see that the note is still shown
         When I click on highlighted text in the second component
-        Then I do not see any notes
-        When I click again on highlighted text in the second component
-        Then I see appropriate note
+        Then I see that the new note is shown
         """
         note_1 = self.note_unit_page.notes[0]
         note_2 = self.note_unit_page.notes[1]
@@ -712,9 +710,6 @@ class EdxNotesToggleSingleNoteTest(EdxNotesTestMixin):
 
         note_2.click_on_highlight()
         self.assertFalse(note_1.is_visible)
-        self.assertFalse(note_2.is_visible)
-
-        note_2.click_on_highlight()
         self.assertTrue(note_2.is_visible)
 
 
