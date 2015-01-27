@@ -53,7 +53,8 @@ class TestCourseListing(ModuleStoreTestCase):
         course = CourseFactory.create(
             org=course_location.org,
             number=course_location.course,
-            run=course_location.run
+            run=course_location.run,
+            default_store=ModuleStoreEnum.Type.mongo
         )
 
         if user is not None:
