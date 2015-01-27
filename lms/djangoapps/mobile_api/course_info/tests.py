@@ -120,6 +120,11 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseA
     def setUp(self):
         super(TestHandouts, self).setUp()
 
+        # Deleting handouts fails with split modulestore because the handout has no parent.
+        # This needs further investigation to determine if it is a bug in the split modulestore.
+        # pylint: disable=protected-access
+        self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
+
         # use toy course with handouts, and make it mobile_available
         course_items = import_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
         self.course = course_items[0]
