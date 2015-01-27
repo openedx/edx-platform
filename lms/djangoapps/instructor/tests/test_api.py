@@ -3613,7 +3613,6 @@ class TestBulkCohorting(ModuleStoreTestCase):
         )
 
 
-
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
     """

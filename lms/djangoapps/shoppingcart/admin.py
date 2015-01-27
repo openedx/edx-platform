@@ -3,8 +3,7 @@ Allows django admin site to add PaidCourseRegistrationAnnotations
 """
 from ratelimitbackend import admin
 from shoppingcart.models import (
-    PaidCourseRegistrationAnnotation, Coupon, DonationConfiguration,
-    InvoiceTransaction, Invoice, CourseRegistrationCodeInvoiceItem
+    PaidCourseRegistrationAnnotation, Coupon, DonationConfiguration
 )
 
 
@@ -50,36 +49,6 @@ class SoftDeleteCouponAdmin(admin.ModelAdmin):
 
     really_delete_selected.short_description = "Delete s selected entries"
 
-
-class InvoiceAdmin(admin.ModelAdmin):
-    """
-    Admin for the Invoice transactions table.
-    """
-    list_display = ('company_name', 'company_contact_name', 'company_contact_email',
-                    'total_amount', 'created', 'is_valid')
-    readonly_fields = ('created',)
-
-
-class InvoiceTransactionAdmin(admin.ModelAdmin):
-    """
-    Admin for the Invoice transactions table.
-    """
-    list_display = ('amount', 'comments', 'created_by', 'last_modified_by', 'status', 'created')
-    raw_id_fields = ("created_by",)
-    readonly_fields = ('created',)
-
-
-class CourseRegistrationCodeInvoiceItemAdmin(admin.ModelAdmin):
-    """
-    Admin for the Invoice transactions table.
-    """
-    list_display = ('id','course_id', 'qty', 'unit_price', 'billed_unit_price')
-    readonly_fields = ('created',)
-
-
 admin.site.register(PaidCourseRegistrationAnnotation)
 admin.site.register(Coupon, SoftDeleteCouponAdmin)
 admin.site.register(DonationConfiguration)
-admin.site.register(InvoiceTransaction, InvoiceTransactionAdmin)
-admin.site.register(Invoice, InvoiceAdmin)
-admin.site.register(CourseRegistrationCodeInvoiceItem, CourseRegistrationCodeInvoiceItemAdmin)

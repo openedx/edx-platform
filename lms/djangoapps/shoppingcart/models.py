@@ -852,9 +852,8 @@ class InvoiceTransaction(TimeStampedModel):
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
     status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
 
-
     @classmethod
-    def add_invoice_transaction(cls, invoice_id, amount, comments, user,status):
+    def add_invoice_transaction(cls, invoice_id, amount, comments, user, status):
         """
         This function creates a Invoice Transaction entry with payment or refund.
         """
@@ -887,7 +886,6 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     This is an inventory item for paying for a course registration
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
-
 
 
 class CourseRegistrationCode(models.Model):
