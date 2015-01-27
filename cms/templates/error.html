@@ -14,7 +14,7 @@
 from django.conf import settings
 
 if settings.TENDER_DOMAIN:
-  help_link_start = '<a href="//{domain}/discussion/new" class="show-tender" title="{title}">'.format(
+  help_link_start = '<a href="http://{domain}/discussion/new" class="show-tender" title="{title}">'.format(
     domain=settings.TENDER_DOMAIN,
     title=_("Use our feedback tool, Tender, to share your feedback")
   ),

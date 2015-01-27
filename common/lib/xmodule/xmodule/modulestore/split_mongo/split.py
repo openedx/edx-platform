@@ -53,7 +53,6 @@ Representation:
         definition. Acts as a pseudo-object identifier.
 """
 import copy
-import threading
 import datetime
 import hashlib
 import logging
@@ -79,7 +78,7 @@ from xmodule.modulestore import (
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
-from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope
+from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope, BlockData
 from xmodule.error_module import ErrorDescriptor
 from collections import defaultdict
 from types import NoneType
@@ -618,10 +617,6 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         self.db_connection = MongoConnection(**doc_store_config)
         self.db = self.db_connection.database
 
-        # Code review question: How should I expire entries?
-        # _add_cache could use a lru mechanism to control the cache size?
-        self.thread_cache = threading.local()
-
         if default_class is not None:
             module_path, __, class_name = default_class.rpartition('.')
             class_ = getattr(import_module(module_path), class_name)
@@ -681,8 +676,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             new_module_data = {}
             for block_id in base_block_ids:
                 new_module_data = self.descendants(
-                    # copy or our changes like setting 'definition_loaded' will affect the active bulk operation data
-                    copy.deepcopy(system.course_entry.structure['blocks']),
+                    system.course_entry.structure['blocks'],
                     block_id,
                     depth,
                     new_module_data
@@ -732,10 +726,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Find the descriptor cache for this course if it exists
         :param course_version_guid:
         """
-        if not hasattr(self.thread_cache, 'course_cache'):
-            self.thread_cache.course_cache = {}
-        system = self.thread_cache.course_cache
-        return system.get(course_version_guid)
+        if self.request_cache is None:
+            return None
+
+        return self.request_cache.data.setdefault('course_cache', {}).get(course_version_guid)
 
     def _add_cache(self, course_version_guid, system):
         """
@@ -743,9 +737,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         :param course_version_guid:
         :param system:
         """
-        if not hasattr(self.thread_cache, 'course_cache'):
-            self.thread_cache.course_cache = {}
-        self.thread_cache.course_cache[course_version_guid] = system
+        if self.request_cache is not None:
+            self.request_cache.data.setdefault('course_cache', {})[course_version_guid] = system
         return system
 
     def _clear_cache(self, course_version_guid=None):
@@ -753,15 +746,16 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         Should only be used by testing or something which implements transactional boundary semantics.
         :param course_version_guid: if provided, clear only this entry
         """
+        if self.request_cache is None:
+            return
+
         if course_version_guid:
-            if not hasattr(self.thread_cache, 'course_cache'):
-                self.thread_cache.course_cache = {}
             try:
-                del self.thread_cache.course_cache[course_version_guid]
+                del self.request_cache.data.setdefault('course_cache', {})[course_version_guid]
             except KeyError:
                 pass
         else:
-            self.thread_cache.course_cache = {}
+            self.request_cache.data['course_cache'] = {}
 
     def _lookup_course(self, course_key):
         '''
@@ -2337,7 +2331,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
             return result
 
-    @contract(block_key=BlockKey, blocks='dict(BlockKey: dict)')
+    @contract(block_key=BlockKey, blocks='dict(BlockKey: BlockData)')
     def _remove_subtree(self, block_key, blocks):
         """
         Remove the subtree rooted at block_key
@@ -2917,6 +2911,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 self._delete_if_true_orphan(BlockKey(*child), structure)
             del structure['blocks'][orphan]
 
+    @contract(returns=BlockData)
     def _new_block(self, user_id, category, block_fields, definition_id, new_id, raw=False, block_defaults=None):
         """
         Create the core document structure for a block.
@@ -2941,20 +2936,20 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         }
         if block_defaults:
             document['defaults'] = block_defaults
-        return document
+        return BlockData(document)
 
-    @contract(block_key=BlockKey)
+    @contract(block_key=BlockKey, returns='BlockData | None')
     def _get_block_from_structure(self, structure, block_key):
         """
-        Encodes the block id before retrieving it from the structure to ensure it can
+        Encodes the block key before retrieving it from the structure to ensure it can
         be a json dict key.
         """
         return structure['blocks'].get(block_key)
 
-    @contract(block_key=BlockKey)
+    @contract(block_key=BlockKey, content=BlockData)
     def _update_block_in_structure(self, structure, block_key, content):
         """
-        Encodes the block id before accessing it in the structure to ensure it can
+        Encodes the block key before accessing it in the structure to ensure it can
         be a json dict key.
         """
         structure['blocks'][block_key] = content

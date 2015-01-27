@@ -17,7 +17,7 @@
         </li>
         % if settings.TENDER_DOMAIN and user.is_authenticated():
         <li class="nav-item nav-peripheral-feedback">
-          <a href="//${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
+          <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
         </li>
         % endif
       </ol>

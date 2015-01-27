@@ -53,7 +53,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if course_entry.course_key.course:
             root = modulestore.fs_root / course_entry.course_key.org / course_entry.course_key.course / course_entry.course_key.run
         else:
-            root = modulestore.fs_root / course_entry.structure['_id']
+            root = modulestore.fs_root / str(course_entry.structure['_id'])
         root.makedirs_p()  # create directory if it doesn't exist
 
         id_manager = SplitMongoIdManager(self)
@@ -117,10 +117,10 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         if cached_module:
             return cached_module
 
-        json_data = self.get_module_data(block_key, course_key)
+        block_data = self.get_module_data(block_key, course_key)
 
-        class_ = self.load_block_type(json_data.get('block_type'))
-        block = self.xblock_from_json(class_, course_key, block_key, json_data, course_entry_override, **kwargs)
+        class_ = self.load_block_type(block_data.get('block_type'))
+        block = self.xblock_from_json(class_, course_key, block_key, block_data, course_entry_override, **kwargs)
         self.modulestore.cache_block(course_key, version_guid, block_key, block)
         return block
 
@@ -154,26 +154,27 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     # pointing to the same structure, the access is likely to be chunky enough that the last known container
     # is the intended one when not given a course_entry_override; thus, the caching of the last branch/course id.
     @contract(block_key="BlockKey | None")
-    def xblock_from_json(
-        self, class_, course_key, block_key, json_data, course_entry_override=None, **kwargs
-    ):
+    def xblock_from_json(self, class_, course_key, block_key, block_data, course_entry_override=None, **kwargs):
+        """
+        Load and return block info.
+        """
         if course_entry_override is None:
             course_entry_override = self.course_entry
         else:
             # most recent retrieval is most likely the right one for next caller (see comment above fn)
             self.course_entry = CourseEnvelope(course_entry_override.course_key, self.course_entry.structure)
 
-        definition_id = json_data.get('definition')
+        definition_id = block_data.get('definition')
 
         # If no usage id is provided, generate an in-memory id
         if block_key is None:
-            block_key = BlockKey(json_data['block_type'], LocalId())
+            block_key = BlockKey(block_data['block_type'], LocalId())
 
         convert_fields = lambda field: self.modulestore.convert_references_to_keys(
             course_key, class_, field, self.course_entry.structure['blocks'],
         )
 
-        if definition_id is not None and not json_data.get('definition_loaded', False):
+        if definition_id is not None and not block_data['definition_loaded']:
             definition_loader = DefinitionLazyLoader(
                 self.modulestore,
                 course_key,
@@ -194,8 +195,8 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
             block_id=block_key.id,
         )
 
-        converted_fields = convert_fields(json_data.get('fields', {}))
-        converted_defaults = convert_fields(json_data.get('defaults', {}))
+        converted_fields = convert_fields(block_data.get('fields', {}))
+        converted_defaults = convert_fields(block_data.get('defaults', {}))
         if block_key in self._parent_map:
             parent_key = self._parent_map[block_key]
             parent = course_key.make_usage_key(parent_key.type, parent_key.id)
@@ -223,7 +224,7 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
         except Exception:
             log.warning("Failed to load descriptor", exc_info=True)
             return ErrorDescriptor.from_json(
-                json_data,
+                block_data,
                 self,
                 course_entry_override.course_key.make_usage_key(
                     block_type='error',
@@ -232,9 +233,9 @@ class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
                 error_msg=exc_info_to_str(sys.exc_info())
             )
 
-        edit_info = json_data.get('edit_info', {})
-        module._edited_by = edit_info.get('edited_by')
-        module._edited_on = edit_info.get('edited_on')
+        edit_info = block_data.get('edit_info', {})
+        module._edited_by = edit_info.get('edited_by')  # pylint: disable=protected-access
+        module._edited_on = edit_info.get('edited_on')  # pylint: disable=protected-access
         module.previous_version = edit_info.get('previous_version')
         module.update_version = edit_info.get('update_version')
         module.source_version = edit_info.get('source_version', None)
