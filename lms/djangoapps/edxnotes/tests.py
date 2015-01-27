@@ -19,6 +19,7 @@ from provider.oauth2.models import Client
 from xmodule.tabs import EdxNotesTab
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
@@ -65,7 +66,9 @@ class EdxNotesDecoratorTest(ModuleStoreTestCase):
         super(EdxNotesDecoratorTest, self).setUp()
 
         ClientFactory(name="edx-notes")
-        self.course = CourseFactory.create(edxnotes=True)
+        # Using old mongo because of locator comparison issues (see longer
+        # note below in EdxNotesHelpersTest setUp.
+        self.course = CourseFactory.create(edxnotes=True, default_store=ModuleStoreEnum.Type.mongo)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
         self.client.login(username=self.user.username, password="edx")
         self.problem = TestProblem(self.course)
@@ -144,34 +147,42 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
         Setup a dummy course content.
         """
         super(EdxNotesHelpersTest, self).setUp()
-        ClientFactory(name="edx-notes")
-        self.course = CourseFactory.create()
-        self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
-        self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
-        self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
-        self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
-        self.vertical_with_container = ItemFactory.create(category='vertical', parent_location=self.sequential.location)
-        self.child_container = ItemFactory.create(
-            category='split_test', parent_location=self.vertical_with_container.location)
-        self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
-        self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
-        # Read again so that children lists are accurate
-        self.course = self.store.get_item(self.course.location)
-        self.chapter = self.store.get_item(self.chapter.location)
-        self.chapter_2 = self.store.get_item(self.chapter_2.location)
-        self.sequential = self.store.get_item(self.sequential.location)
-        self.vertical = self.store.get_item(self.vertical.location)
+        # There are many tests that are comparing locators as returned from helper methods. When using
+        # the split modulestore, some of those locators have version and branch information, but the
+        # comparison values do not. This needs further investigation in order to enable these tests
+        # with the split modulestore.
+        with self.store.default_store(ModuleStoreEnum.Type.mongo):
+            ClientFactory(name="edx-notes")
+            self.course = CourseFactory.create()
+            self.chapter = ItemFactory.create(category="chapter", parent_location=self.course.location)
+            self.chapter_2 = ItemFactory.create(category="chapter", parent_location=self.course.location)
+            self.sequential = ItemFactory.create(category="sequential", parent_location=self.chapter.location)
+            self.vertical = ItemFactory.create(category="vertical", parent_location=self.sequential.location)
+            self.html_module_1 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.html_module_2 = ItemFactory.create(category="html", parent_location=self.vertical.location)
+            self.vertical_with_container = ItemFactory.create(
+                category='vertical', parent_location=self.sequential.location
+            )
+            self.child_container = ItemFactory.create(
+                category='split_test', parent_location=self.vertical_with_container.location)
+            self.child_vertical = ItemFactory.create(category='vertical', parent_location=self.child_container.location)
+            self.child_html_module = ItemFactory.create(category="html", parent_location=self.child_vertical.location)
 
-        self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
-        self.child_container = self.store.get_item(self.child_container.location)
-        self.child_vertical = self.store.get_item(self.child_vertical.location)
-        self.child_html_module = self.store.get_item(self.child_html_module.location)
+            # Read again so that children lists are accurate
+            self.course = self.store.get_item(self.course.location)
+            self.chapter = self.store.get_item(self.chapter.location)
+            self.chapter_2 = self.store.get_item(self.chapter_2.location)
+            self.sequential = self.store.get_item(self.sequential.location)
+            self.vertical = self.store.get_item(self.vertical.location)
 
-        self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
-        self.client.login(username=self.user.username, password="edx")
+            self.vertical_with_container = self.store.get_item(self.vertical_with_container.location)
+            self.child_container = self.store.get_item(self.child_container.location)
+            self.child_vertical = self.store.get_item(self.child_vertical.location)
+            self.child_html_module = self.store.get_item(self.child_html_module.location)
+
+            self.user = UserFactory.create(username="Joe", email="joe@example.com", password="edx")
+            self.client.login(username=self.user.username, password="edx")
 
     def _get_unit_url(self, course, chapter, section, position=1):
         """
