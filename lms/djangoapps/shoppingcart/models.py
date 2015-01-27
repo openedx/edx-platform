@@ -833,8 +833,12 @@ class Invoice(TimeStampedModel):
 
 INVOICE_TRANSACTION_STATUSES = (
 
+    #receiving a check from customer or edx sending the refund back to customer
     ('started', 'started'),
+    # received and deposited a check from customer or edx refund and they deposited it
     ('completed', 'completed'),
+    # customer commit they are sending a cheque but never arrived / bounces / made it to wrong person
+    # edx refund but voided the check before it was deposited.
     ('cancelled', 'cancelled')
 )
 

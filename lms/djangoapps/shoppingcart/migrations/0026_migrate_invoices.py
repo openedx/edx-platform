@@ -6,11 +6,6 @@ from south.v2 import DataMigration
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        """
-        Write your forwards methods here.
-        """
-        # Note: Remember to use orm['appname.ModelName'] rather than "from appname.models..."
-
         # Select all the invoices and number of registration codes(as qty) associated with every invoice
         invoices = orm.Invoice.objects.extra(
             select={
