@@ -13,13 +13,15 @@ default_tolerance = '0.001%'
 
 
 def decimal_places(value):
-    # count the "decimal_places" of "number". e.g, for
-    # "number" with value "152.3667" the "decimal_places" will be
-    # 4 as there are 4 digits "3667" after decimal
-    decimal_places = -1
+    """
+    count the "decimal_places" of "number". e.g, for
+    "number" with value "152.3667" the "decimal_places" will be
+    4 as there are 4 digits "3667" after decimal
+    """
+    decimal_places_count = -1
     if isinstance(value, float):
-        decimal_places = Decimal(str(value)).as_tuple().exponent * -1   # pylint: disable=E110
-    return decimal_places
+        decimal_places_count = Decimal(str(value)).as_tuple().exponent * -1   # pylint: disable=E1101
+    return decimal_places_count
 
 
 def compare_with_tolerance(student_complex, instructor_complex, tolerance=default_tolerance, relative_tolerance=False):
