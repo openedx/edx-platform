@@ -104,6 +104,7 @@ class VideoStudentViewHandlers(object):
 
         Raises:
             NotFoundError if for 'en' subtitles no asset is uploaded.
+            NotFoundError if youtube_id does not exist / invalid youtube_id
         """
         if youtube_id:
             # Youtube case:
@@ -111,7 +112,9 @@ class VideoStudentViewHandlers(object):
                 return Transcript.asset(self.location, youtube_id).data
 
             youtube_ids = youtube_speed_dict(self)
-            assert youtube_id in youtube_ids
+            if youtube_id not in youtube_ids:
+                log.info("Youtube_id %s does not exist", youtube_id)
+                raise NotFoundError
 
             try:
                 sjson_transcript = Transcript.asset(self.location, youtube_id, self.transcript_language).data
