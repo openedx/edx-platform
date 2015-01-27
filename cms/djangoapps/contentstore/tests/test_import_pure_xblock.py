@@ -5,6 +5,8 @@ Integration tests for importing courses containing pure XBlocks.
 from xblock.core import XBlock
 from xblock.fields import String
 
+from xmodule.modulestore.django import modulestore
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.mongo.draft import as_draft
@@ -60,8 +62,9 @@ class XBlockImportTest(ModuleStoreTestCase):
                 the expected field value set.
 
         """
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         courses = import_from_xml(
-            self.store, self.user.id, TEST_DATA_DIR, [course_dir]
+            store, self.user.id, TEST_DATA_DIR, [course_dir], create_course_if_not_present=True
         )
 
         xblock_location = courses[0].id.make_usage_key('stubxblock', 'xblock_test')
@@ -69,12 +72,12 @@ class XBlockImportTest(ModuleStoreTestCase):
         if has_draft:
             xblock_location = as_draft(xblock_location)
 
-        xblock = self.store.get_item(xblock_location)
+        xblock = store.get_item(xblock_location)
         self.assertTrue(isinstance(xblock, StubXBlock))
         self.assertEqual(xblock.test_field, expected_field_val)
 
         if has_draft:
-            draft_xblock = self.store.get_item(xblock_location)
+            draft_xblock = store.get_item(xblock_location)
             self.assertTrue(getattr(draft_xblock, 'is_draft', False))
             self.assertTrue(isinstance(draft_xblock, StubXBlock))
             self.assertEqual(draft_xblock.test_field, expected_field_val)
