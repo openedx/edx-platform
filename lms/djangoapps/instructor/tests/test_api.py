@@ -3635,6 +3635,12 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
             company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
             customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True, course_id=self.course.id
         )
+        self.invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.sale_invoice_1,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
         self.generate_code_url = reverse(
             'make_invoice_transaction', kwargs={'course_id': self.course.id.to_deprecated_string()}
         )
