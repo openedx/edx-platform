@@ -224,12 +224,6 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
   .annotator-hl {
     background: $student-notes-highlight-color-focus;
 
-    &.is-focused {
-      outline: none;
-      color: $white;
-      background: #1d9dd9;
-    }
-
     // CASE: a highlight contains a link
     a {
       color: $link-color;
