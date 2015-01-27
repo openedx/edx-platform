@@ -29,9 +29,10 @@ define([
         },
 
         getContext: function () {
-            return $.extend({
-                message: this.model.getNoteText()
-            }, this.model.toJSON());
+            return $.extend({}, this.model.toJSON(), {
+                message: this.model.getQuote(),
+                text: this.model.getText()
+            });
         },
 
         toggleNote: function () {
