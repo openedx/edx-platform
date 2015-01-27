@@ -311,13 +311,15 @@ class DiscussionSortPreferencePage(CoursePage):
 
 
 class DiscussionTabSingleThreadPage(CoursePage):
-    def __init__(self, browser, course_id, thread_id):
+    def __init__(self, browser, course_id, discussion_id, thread_id):
         super(DiscussionTabSingleThreadPage, self).__init__(browser, course_id)
         self.thread_page = DiscussionThreadPage(
             browser,
             "body.discussion .discussion-article[data-id='{thread_id}']".format(thread_id=thread_id)
         )
-        self.url_path = "discussion/forum/dummy/threads/" + thread_id
+        self.url_path = "discussion/forum/{discussion_id}/threads/{thread_id}".format(
+            discussion_id=discussion_id, thread_id=thread_id
+        )
 
     def is_browser_on_page(self):
         return self.thread_page.is_browser_on_page()

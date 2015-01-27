@@ -13,7 +13,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
-from django_comment_client.tests.utils import CohortedContentTestCase
+from django_comment_client.tests.utils import CohortedTestCase
 from django_comment_client.tests.unicode import UnicodeTestMixin
 from django_comment_common.models import Role
 from django_comment_common.utils import seed_permissions_roles
@@ -41,7 +41,7 @@ class MockRequestSetupMixin(object):
 @patch('lms.lib.comment_client.utils.requests.request')
 class CreateThreadGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedContentTestCase,
+        CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
@@ -76,7 +76,7 @@ class CreateThreadGroupIdTestCase(
 @patch('lms.lib.comment_client.utils.requests.request')
 class ThreadActionGroupIdTestCase(
         MockRequestSetupMixin,
-        CohortedContentTestCase,
+        CohortedTestCase,
         GroupIdAssertionMixin
 ):
     def call_view(
