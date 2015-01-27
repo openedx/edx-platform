@@ -120,7 +120,7 @@ def create_thread(request, course_id, commentable_id):
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
     data = thread.to_dict()
-    add_courseware_context([data], course)
+    add_courseware_context([data], course, request.user)
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:
@@ -149,7 +149,7 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course)
+        commentable_ids = get_discussion_categories_ids(course, request.user)
         if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:
