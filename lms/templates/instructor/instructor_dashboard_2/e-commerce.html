@@ -13,32 +13,32 @@
          <h2>${_('Registration Codes')}</h2>
          <div>
             %if section_data['sales_admin']:
-            <span class="code_tip">${_('Click to generate Registration Codes')}
-            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
+            <span class="code_tip">${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}
+            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
             </span>
             %endif
-            <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
+            <p>${_('Download a .csv file of all enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="download_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="list-registration-codes-csv" value="${_("Download Registration Codes")}" data-csv="true">
+               <input type="text" name="download_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="list-registration-codes-csv" value="${_("Download All Enrollment Codes")}" data-csv="true">
             </form>
             </p>
-            <p>${_('Click to generate a CSV file of all Active Course Registrations Codes:')}</p>
+            <p>${_('Download a .csv file of all unused enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['active_registration_code_csv_url'] }" id="active_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="active_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="active-registration-codes-csv" value="${_("Active Registration Codes")}" data-csv="true">
+               <input type="text" name="active_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="active-registration-codes-csv" value="${_("Download Unused Enrollment Codes")}" data-csv="true">
             </form>
             </p>
-            <p>${_('Click to generate a CSV file of all Spent Course Registrations Codes:')}</p>
+            <p>${_('Download a .csv file of all used enrollment codes for this course')}</p>
             <p>
             <form action="${ section_data['spent_registration_code_csv_url'] }" id="spent_registration_codes" method="post">
                <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
-               <input type="text" name="spent_company_name" placeholder="Company Name (Optional)"/>
-               <input type="submit" name="spent-registration-codes-csv" value="${_("Spent Registration Codes")}" data-csv="true">
+               <input type="text" name="spent_company_name" placeholder="Company Name (optional)"/>
+               <input type="submit" name="spent-registration-codes-csv" value="${_("Download Used Enrollment Codes")}" data-csv="true">
             </form>
             </p>
            <a id="registration_code_generation_link-trigger" href="#registration_code_generation_modal" rel="leanModal"></a>
@@ -63,21 +63,21 @@
          <h2>${_("Sales")}</h2>
          <div>
             %if section_data['total_amount'] is not None:
-              <span><strong>${_("Total CC Amount: ")}</strong></span><span>$${section_data['total_amount']}</span>
+              <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>$${section_data['total_amount']}</span>
             %endif
             <span class="csv_tip">
               <div >
-              ${_("Click to generate a CSV file for all sales records in this course")}
-                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoice Sales")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
-                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All CC Sales")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
+              ${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status")}
+                <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoices")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
+                <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Credit Card Purchases")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
               </div>
             </span>
              <hr>
-             <p>${_("Enter the invoice number to invalidate or re-validate sale")}</p>
+             <p>${_("To cancel or resubmit an invoice, enter the invoice number below.")}</p>
             <span class="invalid_sale">
-               <input type="number" id="invoice_number" placeholder= "${_("Enter Invoice Number")}"/>
-               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Invalidate Sale")}">
-               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Revalidate Sale")}">
+               <input type="number" id="invoice_number" placeholder= "${_("Invoice Number")}"/>
+               <input type="button" class="add blue-button" id="invalidate_invoice" value="${_("Cancel Invoice")}">
+               <input type="button" class="add blue-button" id="re_validate_invoice" value="${_("Resubmit Invoice")}">
             </span>
 
          </div>
