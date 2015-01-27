@@ -13,8 +13,8 @@ from django.test.utils import override_settings
 
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.xml_importer import import_from_xml
 
 from contentserver.middleware import parse_range_header
@@ -45,22 +45,23 @@ class ContentStoreToyCourseTest(ModuleStoreTestCase):
 
         self.client = Client()
         self.contentstore = contentstore()
+        store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # pylint: disable=protected-access
 
-        self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        self.course_key = store.make_course_key('edX', 'toy', '2012_Fall')
 
         import_from_xml(
-            modulestore(), self.user.id, TEST_DATA_DIR, ['toy'],
+            store, self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=self.contentstore, verbose=True
         )
 
         # A locked asset
         self.locked_asset = self.course_key.make_asset_key('asset', 'sample_static.txt')
-        self.url_locked = self.locked_asset.to_deprecated_string()
+        self.url_locked = unicode(self.locked_asset)
         self.contentstore.set_attr(self.locked_asset, 'locked', True)
 
         # An unlocked asset
         self.unlocked_asset = self.course_key.make_asset_key('asset', 'another_static.txt')
-        self.url_unlocked = self.unlocked_asset.to_deprecated_string()
+        self.url_unlocked = unicode(self.unlocked_asset)
         self.length_unlocked = self.contentstore.get_attr(self.unlocked_asset, 'length')
 
     def test_unlocked_asset(self):
