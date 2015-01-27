@@ -115,7 +115,7 @@ class OrganizationsViewSet(viewsets.ModelViewSet):
                         enrollments = CourseEnrollment.enrollments_for_user(user).count()
                         user_data['course_count'] = enrollments
                     if str2bool(include_grades) and course_key:
-                        user_grades = {'grade': 0, 'proforma_grade': 0}
+                        user_grades = {'grade': 0, 'proforma_grade': 0, 'complete_status': False}
                         gradebook = user.studentgradebook_set.filter(course_id=course_key)
                         if gradebook:
                             user_grades['grade'] = gradebook[0].grade
