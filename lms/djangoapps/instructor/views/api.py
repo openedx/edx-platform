@@ -10,6 +10,7 @@ import json
 import logging
 import re
 import time
+from django.db.models.query_utils import Q
 import requests
 from django.conf import settings
 from django_future.csrf import ensure_csrf_cookie
