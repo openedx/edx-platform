@@ -3,7 +3,7 @@ Tests related to the cohorting feature.
 """
 from uuid import uuid4
 
-from .helpers import BaseDiscussionMixin
+from .helpers import BaseDiscussionMixin, BaseDiscussionTestCase
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest
 from ...pages.lms.auto_auth import AutoAuthPage
@@ -57,20 +57,17 @@ class CohortedDiscussionTestMixin(BaseDiscussionMixin, CohortTestMixin):
         self.assertEquals(self.thread_page.get_group_visibility_label(), "This post is visible to everyone.")
 
 
-class DiscussionTabSingleThreadTest(UniqueCourseTest):
+class DiscussionTabSingleThreadTest(BaseDiscussionTestCase):
     """
     Tests for the discussion page displaying a single thread.
     """
     def setUp(self):
         super(DiscussionTabSingleThreadTest, self).setUp()
-        self.discussion_id = "test_discussion_{}".format(uuid4().hex)
-        # Create a course to register for
-        self.course_fixture = CourseFixture(**self.course_info).install()
         self.setup_cohorts()
         AutoAuthPage(self.browser, course_id=self.course_id).visit()
 
     def setup_thread_page(self, thread_id):
-        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, thread_id)  # pylint: disable=attribute-defined-outside-init
+        self.thread_page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.discussion_id, thread_id)  # pylint: disable=attribute-defined-outside-init
         self.thread_page.visit()
 
     # pylint: disable=unused-argument

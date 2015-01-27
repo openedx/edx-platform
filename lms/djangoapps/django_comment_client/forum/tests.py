@@ -2,6 +2,7 @@ import json
 import logging
 
 import ddt
+from django.core import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client, RequestFactory
@@ -14,7 +15,7 @@ from django_comment_client.tests.group_id import (
     NonCohortedTopicGroupIdTestMixin
 )
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import CohortedContentTestCase
+from django_comment_client.tests.utils import CohortedTestCase, ContentGroupTestCase
 from django_comment_client.utils import strip_none
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from util.testing import UrlResetMixin
@@ -104,13 +105,15 @@ class ViewsExceptionTestCase(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(self.response.status_code, 404)
 
 
-def make_mock_thread_data(text, thread_id, num_children, group_id=None, group_name=None, commentable_id=None):
+def make_mock_thread_data(course, text, thread_id, num_children, group_id=None, group_name=None, commentable_id=None):
     thread_data = {
         "id": thread_id,
         "type": "thread",
         "title": text,
         "body": text,
-        "commentable_id": commentable_id or "dummy_commentable_id",
+        "commentable_id": (
+            commentable_id or course.discussion_topics.get('General', {}).get('id') or "dummy_commentable_id"
+        ),
         "resp_total": 42,
         "resp_skip": 25,
         "resp_limit": 5,
@@ -128,21 +131,33 @@ def make_mock_thread_data(text, thread_id, num_children, group_id=None, group_na
 
 
 def make_mock_request_impl(
-    text,
-    thread_id="dummy_thread_id",
-    group_id=None,
-    commentable_id=None,
-    num_thread_responses=1,
+        course,
+        text,
+        thread_id="dummy_thread_id",
+        group_id=None,
+        commentable_id=None,
+        num_thread_responses=1
 ):
     def mock_request_impl(*args, **kwargs):
         url = args[1]
         data = None
         if url.endswith("threads") or url.endswith("user_profile"):
             data = {
-                "collection": [make_mock_thread_data(text, thread_id, None, group_id=group_id, commentable_id=commentable_id)]
+                "collection": [
+                    make_mock_thread_data(
+                        course=course,
+                        text=text,
+                        thread_id=thread_id,
+                        num_children=None,
+                        group_id=group_id,
+                        commentable_id=commentable_id
+                    )
+                ]
             }
         elif thread_id and url.endswith(thread_id):
-            data = make_mock_thread_data(text, thread_id, num_thread_responses, group_id=group_id)
+            data = make_mock_thread_data(
+                course=course, text=text, thread_id=thread_id, num_children=num_thread_responses, group_id=group_id
+            )
         elif "/users/" in url:
             data = {
                 "default_sort_key": "date",
@@ -186,14 +201,14 @@ class SingleThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
         super(SingleThreadTestCase, self).setUp(create_user=False)
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
 
     def test_ajax(self, mock_request):
         text = "dummy content"
         thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
 
         request = RequestFactory().get(
             "dummy_url",
@@ -213,7 +228,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(text, thread_id, 1))
+            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
         mock_request.assert_called_with(
             "get",
@@ -229,7 +244,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         thread_id = "test_thread_id"
         response_skip = "45"
         response_limit = "15"
-        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
 
         request = RequestFactory().get(
             "dummy_url",
@@ -249,7 +264,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         # django view performs prior to writing thread data to the response
         self.assertEquals(
             response_data["content"],
-            strip_none(make_mock_thread_data(text, thread_id, 1))
+            strip_none(make_mock_thread_data(course=self.course, text=text, thread_id=thread_id, num_children=1))
         )
         mock_request.assert_called_with(
             "get",
@@ -280,7 +295,7 @@ class SingleThreadTestCase(ModuleStoreTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         # Mock request to return 404 for thread request
-        mock_request.side_effect = make_mock_request_impl("dummy", thread_id=None)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy", thread_id=None)
         self.assertRaises(
             Http404,
             views.single_thread,
@@ -301,34 +316,42 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-        # old mongo: number of responses plus 16.  TODO: O(n)!
-        (ModuleStoreEnum.Type.mongo, 1, 17),
-        (ModuleStoreEnum.Type.mongo, 50, 66),
+        # old mongo with cache: number of responses plus 17.  TODO: O(n)!
+        (ModuleStoreEnum.Type.mongo, 1, 23, 18),
+        (ModuleStoreEnum.Type.mongo, 50, 366, 67),
         # split mongo: 3 queries, regardless of thread response size.
-        (ModuleStoreEnum.Type.split, 1, 3),
-        (ModuleStoreEnum.Type.split, 50, 3),
+        (ModuleStoreEnum.Type.split, 1, 3, 3),
+        (ModuleStoreEnum.Type.split, 50, 3, 3),
     )
     @ddt.unpack
-    def test_number_of_mongo_queries(self, default_store, num_thread_responses, num_mongo_calls, mock_request):
-
+    def test_number_of_mongo_queries(
+            self,
+            default_store,
+            num_thread_responses,
+            num_uncached_mongo_calls,
+            num_cached_mongo_calls,
+            mock_request
+    ):
         with modulestore().default_store(default_store):
-            course = CourseFactory.create()
+            course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
 
         student = UserFactory.create()
         CourseEnrollmentFactory.create(user=student, course_id=course.id)
 
         test_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            "dummy content",
-            test_thread_id,
-            num_thread_responses=num_thread_responses,
+            course=course, text="dummy content", thread_id=test_thread_id, num_thread_responses=num_thread_responses
         )
         request = RequestFactory().get(
             "dummy_url",
             HTTP_X_REQUESTED_WITH="XMLHttpRequest"
         )
         request.user = student
-        with check_mongo_calls(num_mongo_calls):
+
+        def call_single_thread():
+            """
+            Call single_thread and assert that it returns what we expect.
+            """
             response = views.single_thread(
                 request,
                 course.id.to_deprecated_string(),
@@ -338,15 +361,35 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
             self.assertEquals(response.status_code, 200)
             self.assertEquals(len(json.loads(response.content)["content"]["children"]), num_thread_responses)
 
+        # TODO: update this once django cache is disabled in tests
+        # Test with and without cache, clearing before and after use.
+        single_thread_local_cache = cache.get_cache(
+            backend='default',
+            LOCATION='single_thread_local_cache'
+        )
+        single_thread_dummy_cache = cache.get_cache(
+            backend='django.core.cache.backends.dummy.DummyCache',
+            LOCATION='single_thread_local_cache'
+        )
+        cached_calls = {
+            single_thread_dummy_cache: num_uncached_mongo_calls,
+            single_thread_local_cache: num_cached_mongo_calls
+        }
+        for single_thread_cache, expected_calls in cached_calls.items():
+            single_thread_cache.clear()
+            with patch("django_comment_client.permissions.CACHE", single_thread_cache):
+                with check_mongo_calls(expected_calls):
+                    call_single_thread()
+            single_thread_cache.clear()
+
 
 @patch('requests.request')
-class SingleCohortedThreadTestCase(CohortedContentTestCase):
+class SingleCohortedThreadTestCase(CohortedTestCase):
     def _create_mock_cohorted_thread(self, mock_request):
         self.mock_text = "dummy content"
         self.mock_thread_id = "test_thread_id"
         mock_request.side_effect = make_mock_request_impl(
-            self.mock_text, self.mock_thread_id,
-            group_id=self.student_cohort.id
+            course=self.course, text=self.mock_text, thread_id=self.mock_thread_id, group_id=self.student_cohort.id
         )
 
     def test_ajax(self, mock_request):
@@ -360,7 +403,7 @@ class SingleCohortedThreadTestCase(CohortedContentTestCase):
         response = views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            "cohorted_topic",
             self.mock_thread_id
         )
 
@@ -369,9 +412,12 @@ class SingleCohortedThreadTestCase(CohortedContentTestCase):
         self.assertEquals(
             response_data["content"],
             make_mock_thread_data(
-                self.mock_text, self.mock_thread_id, 1,
+                course=self.course,
+                text=self.mock_text,
+                thread_id=self.mock_thread_id,
+                num_children=1,
                 group_id=self.student_cohort.id,
-                group_name=self.student_cohort.name,
+                group_name=self.student_cohort.name
             )
         )
 
@@ -384,7 +430,7 @@ class SingleCohortedThreadTestCase(CohortedContentTestCase):
         response = views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            "cohorted_topic",
             self.mock_thread_id
         )
 
@@ -397,10 +443,12 @@ class SingleCohortedThreadTestCase(CohortedContentTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class SingleThreadAccessTestCase(CohortedContentTestCase):
+class SingleThreadAccessTestCase(CohortedTestCase):
     def call_view(self, mock_request, commentable_id, user, group_id, thread_group_id=None, pass_group_id=True):
         thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl("dummy context", thread_id, group_id=thread_group_id)
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy context", thread_id=thread_id, group_id=thread_group_id
+        )
 
         request_data = {}
         if pass_group_id:
@@ -482,11 +530,13 @@ class SingleThreadAccessTestCase(CohortedContentTestCase):
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class SingleThreadGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
-        mock_request.side_effect = make_mock_request_impl("dummy context", group_id=self.student_cohort.id)
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy context", group_id=self.student_cohort.id
+        )
 
         request_data = {}
         if pass_group_id:
@@ -504,7 +554,7 @@ class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdT
         return views.single_thread(
             request,
             self.course.id.to_deprecated_string(),
-            "dummy_discussion_id",
+            commentable_id,
             "dummy_thread_id"
         )
 
@@ -531,16 +581,98 @@ class SingleThreadGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdT
         )
 
 
+@patch('requests.request')
+class SingleThreadContentGroupTestCase(ContentGroupTestCase):
+    def assert_can_access(self, user, discussion_id, thread_id, should_have_access):
+        """
+        Verify that a user has access to a thread within a given
+        discussion_id when should_have_access is True, otherwise
+        verify that the user does not have access to that thread.
+        """
+        request = RequestFactory().get("dummy_url")
+        request.user = user
+        mako_middleware_process_request(request)
+
+        def call_single_thread():
+            return views.single_thread(
+                request,
+                unicode(self.course.id),
+                discussion_id,
+                thread_id
+            )
+
+        if should_have_access:
+            self.assertEqual(call_single_thread().status_code, 200)
+        else:
+            with self.assertRaises(Http404):
+                call_single_thread()
+
+    def test_staff_user(self, mock_request):
+        """
+        Verify that the staff user can access threads in the alpha,
+        beta, and global discussion modules.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_module in [self.alpha_module, self.beta_module, self.global_module]:
+            self.assert_can_access(self.staff_user, discussion_module.discussion_id, thread_id, True)
+
+    def test_alpha_user(self, mock_request):
+        """
+        Verify that the alpha user can access threads in the alpha and
+        global discussion modules.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_module in [self.alpha_module, self.global_module]:
+            self.assert_can_access(self.alpha_user, discussion_module.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.alpha_user, self.beta_module.discussion_id, thread_id, False)
+
+    def test_beta_user(self, mock_request):
+        """
+        Verify that the beta user can access threads in the beta and
+        global discussion modules.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
+
+        for discussion_module in [self.beta_module, self.global_module]:
+            self.assert_can_access(self.beta_user, discussion_module.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.beta_user, self.alpha_module.discussion_id, thread_id, False)
+
+    def test_non_cohorted_user(self, mock_request):
+        """
+        Verify that the non-cohorted user can access threads in just the
+        global discussion module.
+        """
+        thread_id = "test_thread_id"
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy content", thread_id=thread_id)
+
+        self.assert_can_access(self.non_cohorted_user, self.global_module.discussion_id, thread_id, True)
+
+        self.assert_can_access(self.non_cohorted_user, self.alpha_module.discussion_id, thread_id, False)
+
+        self.assert_can_access(self.non_cohorted_user, self.beta_module.discussion_id, thread_id, False)
+
+
 @patch('lms.lib.comment_client.utils.requests.request')
 class InlineDiscussionGroupIdTestCase(
-        CohortedContentTestCase,
+        CohortedTestCase,
         CohortedTopicGroupIdTestMixin,
         NonCohortedTopicGroupIdTestMixin
 ):
     cs_endpoint = "/threads"
 
+    def setUp(self):
+        super(InlineDiscussionGroupIdTestCase, self).setUp()
+        self.cohorted_commentable_id = 'cohorted_topic'
+
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
-        kwargs = {}
+        kwargs = {'commentable_id': self.cohorted_commentable_id}
         if group_id:
             # avoid causing a server error when the LMS chokes attempting
             # to find a group name for the group_id, when we're testing with
@@ -550,7 +682,7 @@ class InlineDiscussionGroupIdTestCase(
                 kwargs['group_id'] = group_id
             except CourseUserGroup.DoesNotExist:
                 pass
-        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -569,7 +701,7 @@ class InlineDiscussionGroupIdTestCase(
     def test_group_info_in_ajax_response(self, mock_request):
         response = self.call_view(
             mock_request,
-            "cohorted_topic",
+            self.cohorted_commentable_id,
             self.student,
             self.student_cohort.id
         )
@@ -579,14 +711,14 @@ class InlineDiscussionGroupIdTestCase(
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class ForumFormDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True, is_ajax=False):
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -629,7 +761,7 @@ class ForumFormDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicG
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class UserProfileDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/active_threads"
 
     def call_view_for_profiled_user(
@@ -642,7 +774,7 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -795,14 +927,14 @@ class UserProfileDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopi
 
 
 @patch('lms.lib.comment_client.utils.requests.request')
-class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, CohortedTopicGroupIdTestMixin):
+class FollowedThreadsDiscussionGroupIdTestCase(CohortedTestCase, CohortedTopicGroupIdTestMixin):
     cs_endpoint = "/subscribed_threads"
 
     def call_view(self, mock_request, commentable_id, user, group_id, pass_group_id=True):
         kwargs = {}
         if group_id:
             kwargs['group_id'] = group_id
-        mock_request.side_effect = make_mock_request_impl("dummy content", **kwargs)
+        mock_request.side_effect = make_mock_request_impl(self.course, "dummy content", **kwargs)
 
         request_data = {}
         if pass_group_id:
@@ -851,9 +983,13 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
     def test_courseware_data(self, mock_request):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
-        mock_request.side_effect = make_mock_request_impl("dummy content", commentable_id=self.discussion1.discussion_id)
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text="dummy content", commentable_id=self.discussion1.discussion_id
+        )
 
-        response = views.inline_discussion(request, self.course.id.to_deprecated_string(), "dummy_discussion_id")
+        response = views.inline_discussion(
+            request, self.course.id.to_deprecated_string(), self.discussion1.discussion_id
+        )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
@@ -877,7 +1013,9 @@ class UserProfileTestCase(ModuleStoreTestCase):
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
 
     def get_response(self, mock_request, params, **headers):
-        mock_request.side_effect = make_mock_request_impl(self.TEST_THREAD_TEXT, self.TEST_THREAD_ID)
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
+        )
         request = RequestFactory().get("dummy_url", data=params, **headers)
         request.user = self.student
 
@@ -964,7 +1102,9 @@ class UserProfileTestCase(ModuleStoreTestCase):
             )
 
     def test_post(self, mock_request):
-        mock_request.side_effect = make_mock_request_impl(self.TEST_THREAD_TEXT, self.TEST_THREAD_ID)
+        mock_request.side_effect = make_mock_request_impl(
+            course=self.course, text=self.TEST_THREAD_TEXT, thread_id=self.TEST_THREAD_ID
+        )
         request = RequestFactory().post("dummy_url")
         request.user = self.student
         response = views.user_profile(
@@ -986,7 +1126,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 
         # Invoke UrlResetMixin
         super(CommentsServiceRequestHeadersTestCase, self).setUp(create_user=False)
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(discussion_topics={'dummy discussion': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create(username=username, password=password)
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
         self.assertTrue(
@@ -1009,14 +1149,14 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
         lang = "eo"
         text = "dummy content"
         thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
 
         self.client.get(
             reverse(
                 "django_comment_client.forum.views.single_thread",
                 kwargs={
                     "course_id": self.course.id.to_deprecated_string(),
-                    "discussion_id": "dummy",
+                    "discussion_id": "dummy_discussion_id",
                     "thread_id": thread_id,
                 }
             ),
@@ -1026,7 +1166,7 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 
     @override_settings(COMMENTS_SERVICE_KEY="test_api_key")
     def test_api_key(self, mock_request):
-        mock_request.side_effect = make_mock_request_impl("dummy", "dummy")
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text="dummy", thread_id="dummy")
 
         self.client.get(
             reverse(
@@ -1047,11 +1187,13 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.side_effect = make_mock_request_impl(text)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
 
-        response = views.inline_discussion(request, self.course.id.to_deprecated_string(), "dummy_discussion_id")
+        response = views.inline_discussion(
+            request, self.course.id.to_deprecated_string(), self.course.discussion_topics['General']['id']
+        )
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data["discussion_data"][0]["title"], text)
@@ -1068,7 +1210,7 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.side_effect = make_mock_request_impl(text)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
@@ -1090,7 +1232,7 @@ class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.side_effect = make_mock_request_impl(text)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         data = {
             "ajax": 1,
             "text": text,
@@ -1110,14 +1252,14 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
         super(SingleThreadUnicodeTestCase, self).setUp()
 
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(discussion_topics={'dummy_discussion_id': {'id': 'dummy_discussion_id'}})
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
         thread_id = "test_thread_id"
-        mock_request.side_effect = make_mock_request_impl(text, thread_id)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text, thread_id=thread_id)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
@@ -1139,7 +1281,7 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.side_effect = make_mock_request_impl(text)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
@@ -1161,7 +1303,7 @@ class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 
     @patch('lms.lib.comment_client.utils.requests.request')
     def _test_unicode_data(self, text, mock_request):
-        mock_request.side_effect = make_mock_request_impl(text)
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text=text)
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         request.META["HTTP_X_REQUESTED_WITH"] = "XMLHttpRequest"  # so request.is_ajax() == True
@@ -1188,7 +1330,7 @@ class EnrollmentTestCase(ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     @patch('lms.lib.comment_client.utils.requests.request')
     def test_unenrolled(self, mock_request):
-        mock_request.side_effect = make_mock_request_impl('dummy')
+        mock_request.side_effect = make_mock_request_impl(course=self.course, text='dummy')
         request = RequestFactory().get('dummy_url')
         request.user = self.student
         with self.assertRaises(UserNotEnrolled):
