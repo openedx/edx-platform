@@ -3702,3 +3702,14 @@ class TestAddInvoiceTransactionPaymentAndRefund(ModuleStoreTestCase):
         response = self.client.post(self.generate_code_url, data, **{'HTTP_HOST': 'localhost'})
         self.assertEqual(response.status_code, 200, response.content)
         self.assertIn('Amount must be greater than 0', response.content)
+
+    def test_unicode_values_for_invoice_models(self):
+
+        sale_invoice = Invoice.objects.create(
+            total_amount=1234.32, company_name='Test1', company_contact_name='TestName',
+            company_contact_email='Test@company.com', recipient_name='Testw', recipient_email='test1@test.com',
+            customer_reference_number='2Fwe23S', internal_reference="A", is_valid=True, course_id=self.course.id
+        )
+        self.assertEqual(
+            unicode(sale_invoice), u"company: Test1 , internal reference: A , customer reference number: 2Fwe23S"
+        )
