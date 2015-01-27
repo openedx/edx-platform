@@ -11,7 +11,7 @@ from student.tests.factories import UserFactory, CourseModeFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
-    Invoice, Coupon, CourseRegCodeItem, CouponRedemption
+    Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
 )
 from course_modes.models import CourseMode
 from instructor_analytics.basic import (
@@ -147,10 +147,16 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
             company_contact_email='test@company.com', recipient_name='Testw_1', recipient_email='test2@test.com',
             customer_reference_number='2Fwe23S', internal_reference="ABC", course_id=self.course.id
         )
+        invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=sale_invoice,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice, mode_slug='honor'
+                created_by=self.instructor, invoice=sale_invoice, invoice_item=invoice_item, mode_slug='honor'
             )
             course_code.save()
 
@@ -272,7 +278,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
 
         data = {
-            'total_registration_codes': 12, 'company_name': 'Test Group', 'sale_price': 122.45,
+            'total_registration_codes': 12, 'company_name': 'Test Group', 'unit_price': 122.45,
             'company_contact_name': 'TestName', 'company_contact_email': 'test@company.com', 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street', 'address_line_2': '',
             'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
@@ -306,11 +312,17 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
             )
             self.assertIn(
                 course_registration['company_name'],
-                [getattr(registration_code.invoice, 'company_name') for registration_code in registration_codes]
+                [
+                    getattr(registration_code.invoice_item.invoice, 'company_name')
+                    for registration_code in registration_codes
+                ]
             )
             self.assertIn(
                 course_registration['invoice_id'],
-                [registration_code.invoice_id for registration_code in registration_codes]
+                [
+                    registration_code.invoice_item.invoice_id
+                    for registration_code in registration_codes
+                ]
             )
 
     def test_coupon_codes_features(self):
