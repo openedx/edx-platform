@@ -168,28 +168,38 @@ class ExtraPanelTabTestCase(TestCase):
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
+    def verify_url(self, expected_url, actual_url):
+        """
+        Helper method for verifying the URL is as expected.
+        """
+        if not expected_url.startswith("/"):
+            expected_url = "/" + expected_url
+        self.assertEquals(expected_url, actual_url)
+
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create()
-        url = utils.course_image_url(course)
-        self.assertEquals(url, unicode(course.id.make_asset_key('asset', course.course_image)))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course.course_image)),
+            utils.course_image_url(course)
+        )
 
     def test_non_ascii_image_name(self):
         """ Verify that non-ascii image names are cleaned """
         course_image = u'before_\N{SNOWMAN}_after.jpg'
         course = CourseFactory.create(course_image=course_image)
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_')))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
+            utils.course_image_url(course)
         )
 
     def test_spaces_in_image_name(self):
         """ Verify that image names with spaces in them are cleaned """
         course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_")))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
+            utils.course_image_url(course)
         )
 
 
