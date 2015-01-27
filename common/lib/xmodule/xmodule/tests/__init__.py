@@ -11,6 +11,7 @@ import json
 import os
 import pprint
 import unittest
+import inspect
 
 from contextlib import contextmanager
 from lazy import lazy
@@ -222,19 +223,12 @@ class BulkAssertionManager(object):
     the failures at once, rather than only seeing single failures.
     """
     def __init__(self, test_case):
-        self._equal_expected = []
-        self._equal_actual = []
+        self._equal_assertions = []
         self._test_case = test_case
 
-    def assertEqual(self, expected, actual, description=None):
-        if description is None:
-            description = u"{!r} does not equal {!r}".format(expected, actual)
-        if expected != actual:
-            self._equal_expected.append((description, expected))
-            self._equal_actual.append((description, actual))
-
     def run_assertions(self):
-        super(BulkAssertionTest, self._test_case).assertEqual(self._equal_expected, self._equal_actual)
+        if len(self._equal_assertions) > 0:
+            raise AssertionError(self._equal_assertions)
 
 
 class BulkAssertionTest(unittest.TestCase):
@@ -262,7 +256,15 @@ class BulkAssertionTest(unittest.TestCase):
 
     def assertEqual(self, expected, actual, message=None):
         if self._manager is not None:
-            self._manager.assertEqual(expected, actual, message)
+            try:
+                super(BulkAssertionTest, self).assertEqual(expected, actual, message)
+            except Exception as error:  # pylint: disable=broad-except
+                exc_stack = inspect.stack()[1]
+                if message is not None:
+                    msg = '{} -> {}:{} -> {}'.format(message, exc_stack[1], exc_stack[2], unicode(error))
+                else:
+                    msg = '{}:{} -> {}'.format(exc_stack[1], exc_stack[2], unicode(error))
+                self._manager._equal_assertions.append(msg)  # pylint: disable=protected-access
         else:
             super(BulkAssertionTest, self).assertEqual(expected, actual, message)
     assertEquals = assertEqual

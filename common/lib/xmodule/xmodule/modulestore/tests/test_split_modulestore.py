@@ -1580,7 +1580,7 @@ class TestCourseCreation(SplitModuleTest):
         self.assertIsNotNone(db_structure, "Didn't find course")
         self.assertNotIn(BlockKey('course', 'course'), db_structure['blocks'])
         self.assertIn(BlockKey('chapter', 'top'), db_structure['blocks'])
-        self.assertEqual(db_structure['blocks'][BlockKey('chapter', 'top')]['block_type'], 'chapter')
+        self.assertEqual(db_structure['blocks'][BlockKey('chapter', 'top')].block_type, 'chapter')
 
     def test_create_id_dupe(self):
         """
