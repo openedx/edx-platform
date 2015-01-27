@@ -13,8 +13,9 @@
          <h2>${_('Registration Codes')}</h2>
          <div>
             %if section_data['sales_admin']:
-            <span class="code_tip">${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}
-            <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
+            <span class="code_tip">
+                <p>${_('Create one or more pre-paid course enrollment codes. Students can use these codes to enroll in the course.')}</p>
+                <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Create Enrollment Codes')}</a>
             </span>
             %endif
             <p>${_('Download a .csv file of all enrollment codes for this course')}</p>
@@ -66,8 +67,8 @@
               <span><strong>${_("Total Credit Card Purchases: ")}</strong></span><span>$${section_data['total_amount']}</span>
             %endif
             <span class="csv_tip">
-              <div >
-              ${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status")}
+              <div>
+                <p>${_("Download a .csv file for all credit card purchases or for all invoices, regardless of status")}</p>
                 <input type="button" class="add blue-button" name="list-sale-csv" value="${_("Download All Invoices")}" data-endpoint="${ section_data['get_sale_records_url'] }" data-csv="true">
                 <input type="button" class="add blue-button" name="list-order-sale-csv" value="${_("Download All Credit Card Purchases")}" data-endpoint="${ section_data['get_sale_order_records_url'] }" data-csv="true">
               </div>
