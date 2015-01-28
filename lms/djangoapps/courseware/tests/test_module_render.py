@@ -14,7 +14,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
 from mock import MagicMock, patch, Mock
-from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
@@ -922,7 +922,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 # This value is set by observation, so that later changes to the student
                 # id computation don't break old data
                 '5afe5d9bb03796557ee2614f5c9611fb',
-                self._get_anonymous_id(SlashSeparatedCourseKey.from_deprecated_string(course_id), descriptor_class)
+                self._get_anonymous_id(CourseKey.from_string(course_id), descriptor_class)
             )
 
     @ddt.data(*PER_COURSE_ANONYMIZED_DESCRIPTORS)
