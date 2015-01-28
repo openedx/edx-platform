@@ -21,7 +21,7 @@
 git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a0c695#egg=django-cas
 
 # Our libraries:
--e git+https://github.com/edx/XBlock.git@3682847a91acac6640a330fbe797ef56ce988517#egg=XBlock
+-e git+https://github.com/edx/XBlock.git@0b865f62f2deaa81b77f819b9b7df0303cb0f70c#egg=XBlock
 -e git+https://github.com/edx/codejail.git@2b095e820ff752a108653bb39d518b122f7154db#egg=codejail
 -e git+https://github.com/edx/js-test-tool.git@v0.1.6#egg=js_test_tool
 -e git+https://github.com/edx/event-tracking.git@0.1.0#egg=event-tracking
