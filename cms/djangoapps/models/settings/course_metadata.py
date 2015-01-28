@@ -15,8 +15,8 @@ class CourseMetadata(object):
     editable metadata.
     '''
     # The list of fields that wouldn't be shown in Advanced Settings.
-    # Should not be used directly. Instead the filtered_list method should be used if the field needs to be filtered
-    # depending on the feature flag.
+    # Should not be used directly. Instead the filtered_list method should
+    # be used if the field needs to be filtered depending on the feature flag.
     FILTERED_LIST = [
         'xml_attributes',
         'start',
@@ -40,6 +40,8 @@ class CourseMetadata(object):
         'entrance_exam_enabled',
         'entrance_exam_minimum_score_pct',
         'entrance_exam_id',
+        'is_entrance_exam',
+        'in_entrance_exam',
     ]
 
     @classmethod

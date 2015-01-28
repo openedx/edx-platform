@@ -290,3 +290,19 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
                 "Course Announcement Date": '"string"',
             }
         )
+
+    def test_only_expected_fields_are_displayed(self):
+        """
+        Scenario: The Advanced Settings screen displays settings/fields not specifically hidden from
+        view by a developer.
+        Given I have a set of CourseMetadata fields defined for the course
+        When I view the Advanced Settings screen for the course
+        The total number of fields displayed matches the number I expect
+        And the actual fields displayed match the fields I expect to see
+        """
+        expected_fields = self.advanced_settings.expected_settings_names
+        displayed_fields = self.advanced_settings.displayed_settings_names
+        self.assertEqual(len(expected_fields), len(displayed_fields))
+        for field in displayed_fields:
+            if field not in expected_fields:
+                self.fail("Field '{}' not expected for Advanced Settings display.".format(field))
