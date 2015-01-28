@@ -8,7 +8,7 @@
 ## common/static/coffee/spec/discussion_spec_helper.coffee is changed and regenerated, whenever this one changes.
 <script aria-hidden="true" type="text/template" id="thread-template">
     <article class="discussion-article" data-id="${'<%- id %>'}">
-        <div class="thread-wrapper">
+        <div class="thread-wrapper" tabindex="-1">
             <div class="forum-thread-main-wrapper">
                 <div class="thread-content-wrapper"></div>
                 <div class="post-extended-content">
@@ -392,13 +392,13 @@
                 <span class="field-label-text">
                     ## Translators: This labels the selector for which group of students can view a post
                     ${_("Visible To:")}
-                </span><select class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
+                </span><select aria-describedby="field_help_visible_to" class="field-input js-group-select" name="group_id" ${'<% if (!is_commentable_cohorted) { %>'}disabled${'<% } %>'}>
                     <option value="">${_("All Groups")}</option>
                     ${'<% _.each(cohort_options, function(opt) { %>'}
                     <option value="${'<%= opt.value %>'}" ${'<% if (opt.selected) { %>selected<% } %>'}>${'<%- opt.text %>'}</option>
                     ${'<% }); %>'}
                  </select>
-            </label><div class="field-help">
+            </label><div class="field-help" id="field_help_visible_to">
                 ${_("Discussion admins, moderators, and TAs can make their posts visible to all students or specify a single cohort.")}
             </div>
         </div>
@@ -406,8 +406,8 @@
         <div class="post-field">
             <label class="field-label">
                 <span class="sr">${_("Title:")}</span>
-                <input type="text" class="field-input js-post-title" name="title" placeholder="${_('Title')}">
-            </label><span class="field-help">
+                <input aria-describedby="field_help_title" type="text" class="field-input js-post-title" name="title" placeholder="${_('Title')}">
+            </label><span class="field-help" id="field_help_title">
                 ${_("Add a clear and descriptive title to encourage participation.")}
             </span>
         </div>
@@ -444,21 +444,21 @@
                 ## Translators: This is the label for a control to
                 ## select a forum post type
                 ${_("Post type:")}
-            </span><fieldset class="field-input">
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
+            </span><fieldset class="field-input"><legend class="sr">${_("Post type:")}</legend>
+                <input aria-describedby="field_help_post_type" type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-question" value="question">
                 <label for="${"<%= form_id %>"}-post-type-question" class="post-type-label">
                     <i class="icon fa fa-question"></i>
                     ## Translators: This is a forum post type
                     ${_("Question")}
                 </label>
-                <input type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
+                <input aria-describedby="field_help_post_type" type="radio" name="${"<%= form_id %>"}-post-type" class="post-type-input" id="${"<%= form_id %>"}-post-type-discussion" value="discussion" checked>
                 <label for="${"<%= form_id %>"}-post-type-discussion" class="post-type-label">
                     <i class="icon fa fa-comments"></i>
                     ## Translators: This is a forum post type
                     ${_("Discussion")}
                 </label>
             </fieldset>
-        </div><span class="field-help">
+        </div><span class="field-help" id="field_help_post_type">
             ${_("Questions raise issues that need answers. Discussions share ideas and start conversations.")}
         </span>
     </div>
@@ -489,12 +489,12 @@
             <div class="topic-menu-wrapper">
                 <label class="topic-filter-label">
                     <span class="sr">${_("Filter topics")}</span>
-                    <input type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
+                    <input aria-describedby="field_help_topic_area" type="text" class="topic-filter-input" placeholder="${_('Filter topics')}">
                 </label>
                 <ul class="topic-menu" role="menu">${'<%= topics_html %>'}</ul>
            </div>
        </div>
-    </div><span class="field-help">
+    </div><span class="field-help" id="field_help_topic_area">
         ${_("Add your post to a relevant topic to help others find it.")}
     </span>
 </script>
