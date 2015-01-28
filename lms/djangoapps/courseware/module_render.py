@@ -99,6 +99,27 @@ def make_track_function(request):
     return function
 
 
+def override_with_required_content(course_module, course, user, active_chapter, active_section):
+    """
+    Check to see if the course is gated on required content (such as an Entrance Exam)
+    Override the chapter and section in order to show its content.
+    """
+    required_content = _get_required_content(course, user)
+    if len(required_content):
+        for _chapter in course_module.get_display_items():
+            # If the chapter is in required_content e.g. entrance exam. then show its content.
+
+            if unicode(_chapter.location) in required_content and not _chapter.hide_from_toc \
+                    and _chapter.is_entrance_exam:
+                # Entrance exam always contains one hidden subsection.
+                # that's why we are explicitly indexing subsection.
+                active_chapter = _chapter.url_name
+                if len(_chapter.get_display_items()):
+                    active_section = _chapter.get_display_items()[0].url_name
+
+    return active_chapter, active_section
+
+
 def _get_required_content(course, user):
     """
     Queries milestones subsystem to see if the specified course is gated on one or more milestones,

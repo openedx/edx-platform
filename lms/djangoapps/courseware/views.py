@@ -36,7 +36,7 @@ from courseware.courses import get_courses, get_course, get_studio_url, get_cour
 from courseware.courses import sort_by_start_date
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
-from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .module_render import toc_for_course, get_module_for_descriptor, get_module, override_with_required_content
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
@@ -394,6 +394,10 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             'xqa_server': settings.FEATURES.get('USE_XQA_SERVER', 'http://xqa:server@content-qa.mitx.mit.edu/xqa'),
             'reverifications': fetch_reverify_banner_info(request, course_key),
         }
+
+        # Check for course required content (such as an Entrance Exam)
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False) and getattr(course, 'entrance_exam_enabled', False):
+            chapter, section = override_with_required_content(course_module, course, request.user, chapter, section)
 
         now = datetime.now(UTC())
         effective_start = _adjust_start_date_for_beta_testers(user, course, course_key)
