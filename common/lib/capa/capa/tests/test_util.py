@@ -90,6 +90,10 @@ class UtilTest(unittest.TestCase):
         self.assertTrue(result)
         result = compare_with_tolerance(100.002, 100.0, 0.001, False)
         self.assertFalse(result)
+        result = compare_with_tolerance(0.4, 0.44, 0.01, False)
+        self.assertFalse(result)
+        result = compare_with_tolerance(100.01, 100.0, 0.010, False)
+        self.assertTrue(result)
 
     def test_sanitize_html(self):
         """

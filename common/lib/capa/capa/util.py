@@ -12,6 +12,18 @@ from decimal import Decimal
 default_tolerance = '0.001%'
 
 
+def decimal_places(value):
+    """
+    count the "decimal_places" of "number". e.g, for
+    "number" with value "152.3667" the "decimal_places" will be
+    4 as there are 4 digits "3667" after decimal
+    """
+    decimal_places_count = None
+    if isinstance(value, float):
+        decimal_places_count = Decimal(str(value)).as_tuple().exponent * -1   # pylint: disable=E1101
+    return decimal_places_count
+
+
 def compare_with_tolerance(student_complex, instructor_complex, tolerance=default_tolerance, relative_tolerance=False):
     """
     Compare student_complex to instructor_complex with maximum tolerance tolerance.
@@ -68,20 +80,19 @@ def compare_with_tolerance(student_complex, instructor_complex, tolerance=defaul
     else:
         # v1 and v2 are, in general, complex numbers:
         # there are some notes about backward compatibility issue: see responsetypes.get_staff_ans()).
-        decimal_places = None
-        # count the "decimal_places" for "student_complex". e.g, for
-        # "student_complex" value "152.3667" the "decimal_places" will be
-        # 4 as there are 4 digits "3667" after decimal
-        if isinstance(student_complex, float):
-            decimal_places = Decimal(str(student_complex)).as_tuple().exponent * -1   # pylint: disable=E1103
-
         abs_value = abs(student_complex - instructor_complex)
 
-        # decimal_places could be NaN in some cases
-        if decimal_places and isinstance(decimal_places, int):
+        decimal_places_student_complex = decimal_places(student_complex)
+        decimal_places_tolerance = decimal_places(tolerance)
+        decimal_places_count = max(decimal_places_student_complex, decimal_places_tolerance)
+
+        # decimal_places_count could be NaN in some cases
+        if decimal_places_count and isinstance(decimal_places_count, int):
             # abs_value contains 17 digits exponent value so
-            # round it up to "decimal_places"
-            abs_value = round(abs_value, decimal_places)
+            # truncate it up to "decimal_places_count"
+            if decimal_places_count > 0:
+                truncate_format = '%' + str(decimal_places_count) + 'f'
+                abs_value = float(truncate_format % (abs_value)) or abs_value
         return abs_value <= tolerance
 
 
