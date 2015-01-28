@@ -63,6 +63,9 @@ def i18n_dummy():
     """
     cmd = "i18n_tool dummy"
     sh(cmd)
+    # Need to then compile the new dummy strings
+    cmd = "i18n_tool generate"
+    sh(cmd)
 
 
 @task
