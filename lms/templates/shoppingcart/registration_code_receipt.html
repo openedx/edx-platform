@@ -51,18 +51,18 @@ from courseware.courses import course_image_url, get_course_about_section
           % elif registered_for_course:
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
-            ${_("You're already registered for this course."
+            ${_("You're already enrolled for this course."
             " Visit your <a href={dashboard_url}>dashboard</a> to see the course.").format(dashboard_url=dashboard_url)}
           </p>
           % elif course_full:
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
-            ${_("The course you are registering for is full.")}
+            ${_("The course you are enrolling for is full.")}
           </p>
           % elif enrollment_closed:
           <% dashboard_url = reverse('dashboard')%>
           <p class="enrollment-text">
-            ${_("The course you are registering for is closed.")}
+            ${_("The course you are enrolling for is closed.")}
           </p>
           % elif redeem_code_error:
           <% dashboard_url = reverse('dashboard')%>
