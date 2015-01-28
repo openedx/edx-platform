@@ -62,7 +62,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             event.preventDefault();
         },
 
-        getViewerTabControls: function (event) {
+        getViewerTabControls: function () {
             var viewer, viewerControls, editButtons, delButtons, tabControls = [], i;
 
             // Viewer elements
@@ -76,6 +76,24 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 tabControls.push($(editButtons.get(i)));
                 tabControls.push($(delButtons.get(i)));
             }
+
+            return tabControls;
+        },
+
+        getEditorTabControls: function () {
+            var editor, editorControls, textArea, save, cancel, tabControls = [];
+
+            // Editor elements
+            editor = this.annotator.element.find('.annotator-editor');
+            editorControls = editor.find('.annotator-controls');
+            textArea = editor.find('.annotator-listing')
+                             .find('.annotator-item')
+                             .first()
+                             .children('textarea');
+            save  = editorControls.find('.annotator-save');
+            cancel = editorControls.find('.annotator-cancel');
+
+            tabControls.push($(textArea.get(0)), $(save.get(0)), $(cancel.get(0)));
 
             return tabControls;
         },
@@ -166,28 +184,24 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.target),
-                editor, editorControls, listing, items, firstItem, save, cancel;
+                editor, editorControls, save, cancel,
+                tabControls;
 
-            // Editor elements
             editor = this.annotator.element.find('.annotator-editor');
-            listing = editor.find('.annotator-listing');
             editorControls = editor.find('.annotator-controls');
-            items = listing.find('.annotator-item');
-            firstItem = items.first();
             save  = editorControls.find('.annotator-save');
             cancel = editorControls.find('.annotator-cancel');
 
             switch (keyCode) {
                 case KEY.TAB:
-                    if (target.is(firstItem.children('textarea')) && event.shiftKey) {
-                        cancel.focus();
-                        event.preventDefault();
-                        event.stopPropagation();
-                    } else if (target.is(cancel) && !event.shiftKey) {
-                        firstItem.children('textarea').focus();
-                        event.preventDefault();
-                        event.stopPropagation();
+                    tabControls = this.getEditorTabControls();
+                    if (event.shiftKey) { // Tabbing backwards
+                        this.focusOnPreviousTabControl(tabControls, target);
+                    } else { // Tabbing forward
+                        this.focusOnNextTabControl(tabControls, target);
                     }
+                    event.preventDefault();
+                    event.stopPropagation();
                     break;
                 case KEY.ENTER:
                     if (target.is(save) || event.metaKey || event.ctrlKey) {
