@@ -24,7 +24,6 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys import InvalidKeyError
 from courseware.courses import get_course_by_id
-from courseware.views import registered_for_course
 from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
@@ -345,7 +344,7 @@ def register_code_redemption(request, registration_code):
             'reg_code': registration_code,
             'site_name': site_name,
             'course': course,
-            'registered_for_course': registered_for_course(course, request.user)
+            'registered_for_course': not _is_enrollment_code_an_update(course, request.user, course_registration)
         }
         return render_to_response(template_to_render, context)
     elif request.method == "POST":
@@ -399,6 +398,29 @@ def register_code_redemption(request, registration_code):
         else:
             context['redemption_success'] = False
         return render_to_response(template_to_render, context)
+
+
+def _is_enrollment_code_an_update(course, user, redemption_code):
+    """Checks to see if the user's enrollment can be updated by the code.
+
+    Check to see if the enrollment code and the user's enrollment match. If they are different, the code
+    may be used to alter the enrollment of the user. If the enrollment is inactive, will return True, since
+    the user may use the code to re-activate an enrollment as well.
+
+    Enrollment redemption codes must be associated with a paid course mode. If the current enrollment is a
+    different mode then the mode associated with the code, use of the code can be considered an upgrade.
+
+    Args:
+        course (CourseDescriptor): The course to check for enrollment.
+        user (User): The user that will be using the redemption code.
+        redemption_code (CourseRegistrationCode): The redemption code that will be used to update the user's enrollment.
+
+    Returns:
+        True if the redemption code can be used to upgrade the enrollment, or re-activate it.
+
+    """
+    enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(user, course.id)
+    return not is_active or enrollment_mode != redemption_code.mode_slug
 
 
 def use_registration_code(course_reg, user):
