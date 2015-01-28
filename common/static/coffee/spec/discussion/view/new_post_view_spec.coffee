@@ -10,8 +10,8 @@ describe "NewPostView", ->
         )
         @discussion = new Discussion([], {pages: 1})
 
-    checkVisibility = (view, expectedVisible, expectedDisabled, noRender) =>
-      if !noRender
+    checkVisibility = (view, expectedVisible, expectedDisabled, render) =>
+      if render
         view.render()
       # Can also be undefined if the element does not exist.
       expect(view.$('.group-selector-wrapper').is(":visible") or false).toEqual(expectedVisible)
@@ -51,28 +51,28 @@ describe "NewPostView", ->
         )
 
       it "is not visible to students", ->
-        checkVisibility(@view, false)
+        checkVisibility(@view, false, false, true)
 
       it "allows TAs to see the cohort selector", ->
         DiscussionSpecHelper.makeTA()
-        checkVisibility(@view, true)
+        checkVisibility(@view, true, false, true)
 
       it "allows moderators to see the cohort selector", ->
         DiscussionSpecHelper.makeModerator()
-        checkVisibility(@view, true)
+        checkVisibility(@view, true, false, true)
 
       it "only enables the cohort selector when applicable", ->
         DiscussionSpecHelper.makeModerator()
         # We start on the cohorted discussion
-        checkVisibility(@view, true)
+        checkVisibility(@view, true, false, true)
         # Select the uncohorted topic
         $('.topic-title:contains(General)').click()
         # The menu should now be visible but disabled.
-        checkVisibility(@view, true, true, true)
+        checkVisibility(@view, true, true, false)
         # Select the cohorted topic again
         $('.topic-title:contains(Topic)').click()
         # It should be visible and enabled once more.
-        checkVisibility(@view, true, false, true)
+        checkVisibility(@view, true, false, false)
 
       it "allows the user to make a cohort selection", ->
         DiscussionSpecHelper.makeModerator()
@@ -119,20 +119,20 @@ describe "NewPostView", ->
       it "disables the cohort menu if it is set false", ->
         DiscussionSpecHelper.makeModerator()
         @view.is_commentable_cohorted = false
-        checkVisibility(@view, true, true)
+        checkVisibility(@view, true, true, true)
 
       it "enables the cohort menu if it is set true", ->
         DiscussionSpecHelper.makeModerator()
         @view.is_commentable_cohorted = true
-        checkVisibility(@view, true)
+        checkVisibility(@view, true, false, true)
 
       it "is not visible to students when set false", ->
         @view.is_commentable_cohorted = false
-        checkVisibility(@view, false)
+        checkVisibility(@view, false, false, true)
 
       it "is not visible to students when set true", ->
         @view.is_commentable_cohorted = true
-        checkVisibility(@view, false)
+        checkVisibility(@view, false, false, true)
 
     describe "cancel post resets form ", ->
       beforeEach ->
