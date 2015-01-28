@@ -66,7 +66,7 @@ from courseware.courses import course_image_url, get_course_about_section
           % elif registered_for_course:
           <p class="enrollment-text">
             ${_(
-              "You're already registered for this course. "
+              "You're already enrolled for this course. "
               "Visit your {link_start}dashboard{link_end} to see the course."
             ).format(
               link_start='<a href="{url}">'.format(url=reverse('dashboard')),
