@@ -76,9 +76,6 @@ DEBUG_TOOLBAR_CONFIG = {
 
 PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
 
-# Skip RequireJS optimizer in development
-STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
-
 ########################### VERIFIED CERTIFICATES #################################
 
 FEATURES['AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING'] = True
@@ -115,10 +112,6 @@ FEATURES['MILESTONES_APP'] = True
 ########################### Entrance Exams #################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
-################################# DJANGO-REQUIRE ###############################
-
-# Whether to run django-require in debug mode.
-REQUIRE_DEBUG = DEBUG
 
 #####################################################################
 # See if the developer has any local overrides.

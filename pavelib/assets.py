@@ -165,13 +165,7 @@ def collect_assets(systems, settings):
     `settings` is the Django settings module to use.
     """
     for sys in systems:
-        options = "--noinput"
-        # Force clear the static assets directory on LMS. This shouldn't be necessary, but there
-        # were repeatable scenarios where RequireJS optimized files were not installed once they
-        # were generated if an older version was found.
-        if sys == 'lms':
-            options += " --clear"
-        sh(django_cmd(sys, settings, "collectstatic {options} > /dev/null".format(options=options)))
+        sh(django_cmd(sys, settings, "collectstatic --noinput > /dev/null"))
 
 
 @task
