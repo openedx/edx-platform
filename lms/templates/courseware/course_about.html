@@ -320,12 +320,19 @@ from edxmako.shortcuts import marketing_link
           % endif
 
           % if pre_requisite_courses:
+          <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
           <li class="prerequisite-course important-dates-item">
             <i class="icon fa fa-list-ul"></i>
             <p class="important-dates-item-title">${_("Prerequisites")}</p>
             ## Multiple pre-requisite courses are not supported on frontend that's why we are pulling first element
-            <span class="important-dates-item-text pre-requisite">${pre_requisite_courses[0]}</span>
-            <p class="tip">${_("You must successfully complete {course} before you begin this course").format(course=pre_requisite_courses[0])}.</p>
+            <span class="important-dates-item-text pre-requisite"><a href="${prc_target}">${pre_requisite_courses[0]['display']}</a></span>
+            <p class="tip">
+            ${_("You must successfully complete {link_start}{prc_display}{link_end} before you begin this course.").format(
+              link_start='<a href="{}">'.format(prc_target),
+              link_end='</a>',
+              prc_display=pre_requisite_courses[0]['display'],
+            )}
+            </p>
           </li>
           % endif
           % if get_course_about_section(course, "prerequisites"):
