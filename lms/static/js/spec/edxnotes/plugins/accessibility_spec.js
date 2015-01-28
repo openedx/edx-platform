@@ -204,8 +204,7 @@ define([
                 spyOn(this.annotator.editor, 'hide').andCallThrough();
             });
 
-            // TODO: Fix the following two tests
-            xit('should cycle forward through texarea, save, and cancel on TAB keydown', function () {
+            it('should cycle forward through texarea, save, and cancel on TAB keydown', function () {
                 expect(textArea).toBeFocused();
                 textArea.trigger(tabForwardEvent());
                 expect(save).toBeFocused();
@@ -215,7 +214,7 @@ define([
                 expect(textArea).toBeFocused();
             });
 
-            xit('should cycle back through texarea, save, and cancel on SHIFT + TAB keydown', function () {
+            it('should cycle back through texarea, save, and cancel on SHIFT + TAB keydown', function () {
                 expect(textArea).toBeFocused();
                 textArea.trigger(tabBackwardEvent());
                 expect(cancel).toBeFocused();
@@ -224,7 +223,6 @@ define([
                 save.trigger(tabBackwardEvent());
                 expect(textArea).toBeFocused();
             });
-            // END TODO
 
             it('should submit if target is Save on ENTER or SPACE keydown', function () {
                 save.focus();
