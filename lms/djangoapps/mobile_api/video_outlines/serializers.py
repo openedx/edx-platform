@@ -3,6 +3,7 @@ Serializer for video outline
 """
 from rest_framework.reverse import reverse
 
+from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
 from courseware.access import has_access
 
 from edxval.api import (
@@ -14,10 +15,10 @@ class BlockOutline(object):
     """
     Serializes course videos, pulling data from VAL and the video modules.
     """
-    def __init__(self, course_id, start_block, categories_to_outliner, request):
+    def __init__(self, course_id, start_block, block_types, request):
         """Create a BlockOutline using `start_block` as a starting point."""
         self.start_block = start_block
-        self.categories_to_outliner = categories_to_outliner
+        self.block_types = block_types
         self.course_id = course_id
         self.request = request  # needed for making full URLS
         self.local_cache = {}
@@ -143,11 +144,11 @@ class BlockOutline(object):
                 # from the table-of-contents.
                 continue
 
-            if curr_block.category in self.categories_to_outliner:
+            if curr_block.location.block_type in self.block_types:
                 if not has_access(user, 'load', curr_block, course_key=self.course_id):
                     continue
 
-                summary_fn = self.categories_to_outliner[curr_block.category]
+                summary_fn = self.block_types[curr_block.category]
                 block_path = list(path(curr_block))
                 unit_url, section_url = find_urls(curr_block)
 
@@ -159,8 +160,17 @@ class BlockOutline(object):
                     "summary": summary_fn(self.course_id, curr_block, self.request, self.local_cache)
                 }
 
+            def parent_or_requested_block_type(usage_key):
+                """
+                Returns whether the usage_key's block_type is one of self.block_types or a parent type.
+                """
+                return (
+                    usage_key.block_type in self.block_types or
+                    usage_key.block_type in BLOCK_TYPES_WITH_CHILDREN
+                )
+
             if curr_block.has_children:
-                for block in reversed(curr_block.get_children()):
+                for block in reversed(curr_block.get_children(usage_key_filter=parent_or_requested_block_type)):
                     stack.append(block)
                     child_to_parent[block] = curr_block
 

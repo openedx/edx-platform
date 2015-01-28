@@ -20,42 +20,42 @@ class TestVideoAPITestCase(MobileAPITestCase):
     def setUp(self):
         super(TestVideoAPITestCase, self).setUp()
         self.section = ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category="chapter",
             display_name=u"test factory section omega \u03a9",
         )
         self.sub_section = ItemFactory.create(
-            parent_location=self.section.location,
+            parent=self.section,
             category="sequential",
             display_name=u"test subsection omega \u03a9",
         )
 
         self.unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
             display_name=u"test unit omega \u03a9",
         )
         self.other_unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
             display_name=u"test unit omega 2 \u03a9",
         )
         self.nameless_unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
             display_name=None,
         )
         self.split_unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="vertical",
             display_name=u"split test vertical\u03a9",
         )
 
         self.split_test = ItemFactory.create(
-            parent_location=self.split_unit.location,
+            parent=self.split_unit,
             category="split_test",
             display_name=u"split test unit"
         )
@@ -120,7 +120,7 @@ class TestVideoAPITestCase(MobileAPITestCase):
             subid,
             self.course)
         return ItemFactory.create(
-            parent_location=self.unit.location,
+            parent=self.unit,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"test video omega \u03a9",
@@ -156,27 +156,27 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
     def setUp(self):
         super(TestNonStandardCourseStructure, self).setUp()
         self.chapter_under_course = ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category="chapter",
             display_name=u"test factory chapter under course omega \u03a9",
         )
         self.section_under_course = ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category="sequential",
             display_name=u"test factory section under course omega \u03a9",
         )
         self.section_under_chapter = ItemFactory.create(
-            parent_location=self.chapter_under_course.location,
+            parent=self.chapter_under_course,
             category="sequential",
             display_name=u"test factory section under chapter omega \u03a9",
         )
         self.vertical_under_course = ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category="vertical",
             display_name=u"test factory vertical under course omega \u03a9",
         )
         self.vertical_under_section = ItemFactory.create(
-            parent_location=self.section_under_chapter.location,
+            parent=self.section_under_chapter,
             category="vertical",
             display_name=u"test factory vertical under section omega \u03a9",
         )
@@ -187,7 +187,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         """
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.course.location,
+            parent=self.course,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -206,7 +206,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         """
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.vertical_under_course.location,
+            parent=self.vertical_under_course,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -234,7 +234,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         self.login_and_enroll()
 
         ItemFactory.create(
-            parent_location=self.chapter_under_course.location,
+            parent=self.chapter_under_course,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -262,7 +262,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         """
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.section_under_course.location,
+            parent=self.section_under_course,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -291,7 +291,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         self.login_and_enroll()
 
         ItemFactory.create(
-            parent_location=self.section_under_chapter.location,
+            parent=self.section_under_chapter,
             category="video",
             display_name=u"meow factory video omega \u03a9",
         )
@@ -323,7 +323,7 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         """
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.vertical_under_section.location,
+            parent=self.vertical_under_section,
             category="video",
             display_name=u"test factory video omega \u03a9",
         )
@@ -366,19 +366,19 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         self.login_and_enroll()
         self._create_video_with_subs()
         ItemFactory.create(
-            parent_location=self.other_unit.location,
+            parent=self.other_unit,
             category="video",
             display_name=u"test video omega 2 \u03a9",
             html5_sources=[self.html5_video_url]
         )
         ItemFactory.create(
-            parent_location=self.other_unit.location,
+            parent=self.other_unit,
             category="video",
             display_name=u"test video omega 3 \u03a9",
             source=self.html5_video_url
         )
         ItemFactory.create(
-            parent_location=self.unit.location,
+            parent=self.unit,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"test draft video omega \u03a9",
@@ -405,7 +405,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
     def test_with_nameless_unit(self):
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.nameless_unit.location,
+            parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"test draft video omega 2 \u03a9"
@@ -423,7 +423,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         """
         self.login_and_enroll()
         ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"video in the sub section"
@@ -446,12 +446,12 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         self.login_and_enroll()
 
         ItemFactory.create(
-            parent_location=self.split_test.location,
+            parent=self.split_test,
             category="video",
             display_name=u"split test video a",
         )
         ItemFactory.create(
-            parent_location=self.split_test.location,
+            parent=self.split_test,
             category="video",
             display_name=u"split test video b",
         )
@@ -465,26 +465,26 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
     def test_with_hidden_blocks(self):
         self.login_and_enroll()
         hidden_subsection = ItemFactory.create(
-            parent_location=self.section.location,
+            parent=self.section,
             category="sequential",
             hide_from_toc=True,
         )
         unit_within_hidden_subsection = ItemFactory.create(
-            parent_location=hidden_subsection.location,
+            parent=hidden_subsection,
             category="vertical",
         )
         hidden_unit = ItemFactory.create(
-            parent_location=self.sub_section.location,
+            parent=self.sub_section,
             category="vertical",
             hide_from_toc=True,
         )
         ItemFactory.create(
-            parent_location=unit_within_hidden_subsection.location,
+            parent=unit_within_hidden_subsection,
             category="video",
             edx_video_id=self.edx_video_id,
         )
         ItemFactory.create(
-            parent_location=hidden_unit.location,
+            parent=hidden_unit,
             category="video",
             edx_video_id=self.edx_video_id,
         )
@@ -494,7 +494,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
     def test_language(self):
         self.login_and_enroll()
         video = ItemFactory.create(
-            parent_location=self.nameless_unit.location,
+            parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"test draft video omega 2 \u03a9"
@@ -523,7 +523,7 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
     def test_transcripts(self):
         self.login_and_enroll()
         video = ItemFactory.create(
-            parent_location=self.nameless_unit.location,
+            parent=self.nameless_unit,
             category="video",
             edx_video_id=self.edx_video_id,
             display_name=u"test draft video omega 2 \u03a9"
