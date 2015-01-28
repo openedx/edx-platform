@@ -4,7 +4,15 @@
 <div class="wrapper-footer wrapper">
   <footer class="primary" role="contentinfo">
     <div class="colophon">
-      <p>&copy; ${settings.COPYRIGHT_YEAR} <a href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>. ${ _("All rights reserved.")}</p>
+      <p>&copy; ${settings.COPYRIGHT_YEAR} <a href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+      ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+      <p>
+	## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+	${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+	  link_start=u"<a href='https://www.edx.org/'>",
+	  link_end=u"</a>"
+	)}
+      </p>
     </div>
 
     <nav class="nav-peripheral">
