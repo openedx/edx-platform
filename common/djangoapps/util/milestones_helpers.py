@@ -111,14 +111,19 @@ def get_pre_requisite_courses_not_completed(user, enrolled_courses):
 def get_prerequisite_courses_display(course_descriptor):
     """
     It would retrieve pre-requisite courses, make display strings
-    and return them as list
+    and return list of dictionary with course key as 'key' field
+    and course display name as `display` field.
     """
     pre_requisite_courses = []
     if settings.FEATURES.get('ENABLE_PREREQUISITE_COURSES', False) and course_descriptor.pre_requisite_courses:
         for course_id in course_descriptor.pre_requisite_courses:
             course_key = CourseKey.from_string(course_id)
             required_course_descriptor = modulestore().get_course(course_key)
-            pre_requisite_courses.append(get_course_display_name(required_course_descriptor))
+            prc = {
+                'key': course_key,
+                'display': get_course_display_name(required_course_descriptor)
+            }
+            pre_requisite_courses.append(prc)
     return pre_requisite_courses
 
 

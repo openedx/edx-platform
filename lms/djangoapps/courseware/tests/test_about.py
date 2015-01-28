@@ -23,6 +23,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import (
     set_prerequisite_courses,
     seed_milestone_relationship_types,
+    get_prerequisite_courses_display,
 )
 
 from .helpers import LoginEnrollmentTestCase
@@ -132,9 +133,10 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('about_course', args=[unicode(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("<span class=\"important-dates-item-text pre-requisite\">{} {}</span>"
-                      .format(pre_requisite_course.display_org_with_default,
-                              pre_requisite_course.display_number_with_default),
+        pre_requisite_courses = get_prerequisite_courses_display(course)
+        pre_requisite_course_about_url = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])])
+        self.assertIn("<span class=\"important-dates-item-text pre-requisite\"><a href=\"{}\">{}</a></span>"
+                      .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
@@ -168,9 +170,10 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         url = reverse('about_course', args=[unicode(course.id)])
         resp = self.client.get(url)
         self.assertEqual(resp.status_code, 200)
-        self.assertIn("<span class=\"important-dates-item-text pre-requisite\">{} {}</span>"
-                      .format(pre_requisite_course.display_org_with_default,
-                              pre_requisite_course.display_number_with_default),
+        pre_requisite_courses = get_prerequisite_courses_display(course)
+        pre_requisite_course_about_url = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])])
+        self.assertIn("<span class=\"important-dates-item-text pre-requisite\"><a href=\"{}\">{}</a></span>"
+                      .format(pre_requisite_course_about_url, pre_requisite_courses[0]['display']),
                       resp.content.strip('\n'))
 
         url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
