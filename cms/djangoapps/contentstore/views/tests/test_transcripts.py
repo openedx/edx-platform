@@ -302,7 +302,7 @@ class TestUploadtranscripts(Basetranscripts):
         """
         Test uploading subs containing BOM(Byte Order Mark), e.g. U+FEFF
         """
-        filedate = textwrap.dedent("""
+        filedata = textwrap.dedent("""
             1
             00:00:10,500 --> 00:00:13,000
             Test ufeff characters
@@ -313,8 +313,8 @@ class TestUploadtranscripts(Basetranscripts):
         """).encode('utf-8-sig')
 
         # Verify that ufeff character is in filedata.
-        self.assertIn("ufeff", filedate)
-        self.ufeff_srt_file.write(filedate)
+        self.assertIn("ufeff", filedata)
+        self.ufeff_srt_file.write(filedata)
         self.ufeff_srt_file.seek(0)
 
         link = reverse('upload_transcripts')
