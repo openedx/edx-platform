@@ -107,15 +107,14 @@ class UserCourseStatus(views.APIView):
             course.id, request.user, course, depth=2)
 
         course_module = get_module_for_descriptor(request.user, request, course, field_data_cache, course.id)
-        current = course_module
 
-        path = []
-        child = current
-        while child:
-            path.append(child)
-            child = get_current_child(current)
-            if child:
-                current = child
+        path = [course_module]
+        chapter = get_current_child(course_module, min_depth=2)
+        if chapter is not None:
+            path.append(chapter)
+            section = get_current_child(chapter, min_depth=1)
+            if section is not None:
+                path.append(section)
 
         path.reverse()
         return path
@@ -160,7 +159,7 @@ class UserCourseStatus(views.APIView):
         save_positions_recursively_up(request.user, request, field_data_cache, module)
         return self._get_course_info(request, course)
 
-    @mobile_course_access()
+    @mobile_course_access(depth=2)
     def get(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
         """
         Get the ID of the module that the specified user last visited in the specified course.
@@ -168,7 +167,7 @@ class UserCourseStatus(views.APIView):
 
         return self._get_course_info(request, course)
 
-    @mobile_course_access()
+    @mobile_course_access(depth=2)
     def patch(self, request, course, *args, **kwargs):  # pylint: disable=unused-argument
         """
         Update the ID of the module that the specified user last visited in the specified course.

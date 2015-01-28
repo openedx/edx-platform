@@ -90,23 +90,32 @@ class CourseStatusAPITestCase(MobileAPITestCase):
     """
     REVERSE_INFO = {'name': 'user-course-status', 'params': ['username', 'course_id']}
 
-    def _setup_course_skeleton(self):
+    def setUp(self):
         """
         Creates a basic course structure for our course
         """
-        section = ItemFactory.create(
-            parent_location=self.course.location,
+        super(CourseStatusAPITestCase, self).setUp()
+
+        self.section = ItemFactory.create(
+            parent=self.course,
+            category='chapter',
         )
-        sub_section = ItemFactory.create(
-            parent_location=section.location,
+        self.sub_section = ItemFactory.create(
+            parent=self.section,
+            category='sequential',
         )
-        unit = ItemFactory.create(
-            parent_location=sub_section.location,
+        self.unit = ItemFactory.create(
+            parent=self.sub_section,
+            category='vertical',
         )
-        other_unit = ItemFactory.create(
-            parent_location=sub_section.location,
+        self.other_sub_section = ItemFactory.create(
+            parent=self.section,
+            category='sequential',
         )
-        return section, sub_section, unit, other_unit
+        self.other_unit = ItemFactory.create(
+            parent=self.other_sub_section,
+            category='vertical',
+        )
 
 
 class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin):
@@ -115,13 +124,15 @@ class TestCourseStatusGET(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mobi
     """
     def test_success(self):
         self.login_and_enroll()
-        (section, sub_section, unit, __) = self._setup_course_skeleton()
 
         response = self.api_response()
-        self.assertEqual(response.data["last_visited_module_id"], unicode(unit.location))
         self.assertEqual(
-            response.data["last_visited_module_path"],
-            [unicode(module.location) for module in [unit, sub_section, section, self.course]]
+            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            unicode(self.sub_section.location)
+        )
+        self.assertEqual(
+            response.data["last_visited_module_path"],  # pylint: disable=no-member
+            [unicode(module.location) for module in [self.sub_section, self.section, self.course]]
         )
 
 
@@ -135,37 +146,45 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
 
     def test_success(self):
         self.login_and_enroll()
-        (__, __, __, other_unit) = self._setup_course_skeleton()
-
-        response = self.api_response(data={"last_visited_module_id": unicode(other_unit.location)})
-        self.assertEqual(response.data["last_visited_module_id"], unicode(other_unit.location))
+        response = self.api_response(data={"last_visited_module_id": unicode(self.other_unit.location)})
+        self.assertEqual(
+            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            unicode(self.other_sub_section.location)
+        )
 
     def test_invalid_module(self):
         self.login_and_enroll()
         response = self.api_response(data={"last_visited_module_id": "abc"}, expected_response_code=400)
-        self.assertEqual(response.data, errors.ERROR_INVALID_MODULE_ID)
+        self.assertEqual(
+            response.data,  # pylint: disable=no-member
+            errors.ERROR_INVALID_MODULE_ID
+        )
 
     def test_nonexistent_module(self):
         self.login_and_enroll()
         non_existent_key = self.course.id.make_usage_key('video', 'non-existent')
         response = self.api_response(data={"last_visited_module_id": non_existent_key}, expected_response_code=400)
-        self.assertEqual(response.data, errors.ERROR_INVALID_MODULE_ID)
+        self.assertEqual(
+            response.data,  # pylint: disable=no-member
+            errors.ERROR_INVALID_MODULE_ID
+        )
 
     def test_no_timezone(self):
         self.login_and_enroll()
-        (__, __, __, other_unit) = self._setup_course_skeleton()
-
         past_date = datetime.datetime.now()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(other_unit.location),
+                "last_visited_module_id": unicode(self.other_unit.location),
                 "modification_date": past_date.isoformat()  # pylint: disable=maybe-no-member
             },
             expected_response_code=400
         )
-        self.assertEqual(response.data, errors.ERROR_INVALID_MODIFICATION_DATE)
+        self.assertEqual(
+            response.data,  # pylint: disable=no-member
+            errors.ERROR_INVALID_MODIFICATION_DATE
+        )
 
-    def _date_sync(self, date, initial_unit, update_unit, expected_unit):
+    def _date_sync(self, date, initial_unit, update_unit, expected_subsection):
         """
         Helper for test cases that use a modification to decide whether
         to update the course status
@@ -182,36 +201,41 @@ class TestCourseStatusPATCH(CourseStatusAPITestCase, MobileAuthUserTestMixin, Mo
                 "modification_date": date.isoformat()
             }
         )
-        self.assertEqual(response.data["last_visited_module_id"], unicode(expected_unit.location))
+        self.assertEqual(
+            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            unicode(expected_subsection.location)
+        )
 
     def test_old_date(self):
         self.login_and_enroll()
-        (__, __, unit, other_unit) = self._setup_course_skeleton()
         date = timezone.now() + datetime.timedelta(days=-100)
-        self._date_sync(date, unit, other_unit, unit)
+        self._date_sync(date, self.unit, self.other_unit, self.sub_section)
 
     def test_new_date(self):
         self.login_and_enroll()
-        (__, __, unit, other_unit) = self._setup_course_skeleton()
-
         date = timezone.now() + datetime.timedelta(days=100)
-        self._date_sync(date, unit, other_unit, other_unit)
+        self._date_sync(date, self.unit, self.other_unit, self.other_sub_section)
 
     def test_no_initial_date(self):
         self.login_and_enroll()
-        (__, __, _, other_unit) = self._setup_course_skeleton()
         response = self.api_response(
             data={
-                "last_visited_module_id": unicode(other_unit.location),
+                "last_visited_module_id": unicode(self.other_unit.location),
                 "modification_date": timezone.now().isoformat()
             }
         )
-        self.assertEqual(response.data["last_visited_module_id"], unicode(other_unit.location))
+        self.assertEqual(
+            response.data["last_visited_module_id"],  # pylint: disable=no-member
+            unicode(self.other_sub_section.location)
+        )
 
     def test_invalid_date(self):
         self.login_and_enroll()
         response = self.api_response(data={"modification_date": "abc"}, expected_response_code=400)
-        self.assertEqual(response.data, errors.ERROR_INVALID_MODIFICATION_DATE)
+        self.assertEqual(
+            response.data,  # pylint: disable=no-member
+            errors.ERROR_INVALID_MODIFICATION_DATE
+        )
 
 
 class TestCourseEnrollmentSerializer(MobileAPITestCase):
