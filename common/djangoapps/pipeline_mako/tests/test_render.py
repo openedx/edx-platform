@@ -28,6 +28,7 @@ class RequireJSPathOverridesTest(TestCase):
         result = render_require_js_path_overrides(self.OVERRIDES)
         self.assertEqual(result, self.OVERRIDES_JS)
 
+
 class RequireJSPathTest(TestCase):
     """Test `require_js_path` method. """
 
