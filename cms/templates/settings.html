@@ -110,14 +110,8 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <p>${_(
                 'Your course summary page will not be viewable until your course '
                 'has been announced. To provide content for the page and preview '
-                'it, follow the instructions provided by your {manager}.').format(
-                  manager='<abbr title="{program_manager}">{pm}</abbr>'.format(
-                    ## Translators: This is a job title
-                    program_manager=_("Program Manager"),
-                    ## Translators: This is an abbreviation for "Program Manager", which is a job title
-                    pm=_("PM"),
-                  )
-              )}</p>
+                'it, follow the instructions provided by your Program Manager.')
+              }</p>
             </div>
           </div>
           % endif
