@@ -134,8 +134,8 @@ define([
                         $(field).html(Utils.nl2br(Annotator.Util.escape(annotation.text)));
                     } else {
                         $(field).html('<i>' + _t('No Comment') + '</i>');
-                        self.publish('annotationViewerTextField', [field, annotation]);
                     }
+                    return self.publish('annotationViewerTextField', [field, annotation]);
                 }
             })
             .element.appendTo(this.wrapper).bind({
