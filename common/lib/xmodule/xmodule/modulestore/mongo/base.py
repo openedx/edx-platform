@@ -71,6 +71,9 @@ BLOCK_TYPES_WITH_CHILDREN = list(set(
 # Allow us to call _from_deprecated_(son|string) throughout the file
 # pylint: disable=protected-access
 
+# at module level, cache one instance of OSFS per filesystem root.
+_OSFS_INSTANCE = {}
+
 
 class MongoRevisionKey(object):
     """
@@ -836,10 +839,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         location = Location._from_deprecated_son(item['location'], course_key.run)
         data_dir = getattr(item, 'data_dir', location.course)
         root = self.fs_root / data_dir
-
-        root.makedirs_p()  # create directory if it doesn't exist
-
-        resource_fs = OSFS(root)
+        resource_fs = _OSFS_INSTANCE.setdefault(root, OSFS(root, create=True))
 
         cached_metadata = {}
         if apply_cached_metadata:
