@@ -27,6 +27,7 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
+import decimal
 from student import auth
 from student.roles import CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
@@ -49,7 +50,15 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    RegistrationCodeRedemption,
+    Invoice,
+    CourseMode,
+    CourseRegistrationCodeInvoiceItem,
+    InvoiceTransaction
+)
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -885,8 +894,12 @@ def sale_validation(request, course_id):
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
-    except Invoice.DoesNotExist:
+        obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
+            invoice_id=invoice_number,
+            course_id=course_id
+        )
+        obj_invoice = obj_invoice.invoice
+    except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
         return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
 
     if event_type == "invalidate":
@@ -1053,7 +1066,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -1064,6 +1077,7 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
         invoice (Invoice): (Optional) The associated invoice for this code.
         order (Order): (Optional) The associated order for this code.
+        invoice_item (CourseRegistrationCodeInvoiceItem) : (Optional) The associated CourseRegistrationCodeInvoiceItem
 
     Returns:
         The newly created CourseRegistrationCode.
@@ -1074,7 +1088,9 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
     course_registration = CourseRegistrationCode(
         code=code,
@@ -1082,13 +1098,16 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         created_by=user,
         invoice=invoice,
         order=order,
-        mode_slug=mode_slug
+        mode_slug=mode_slug,
+        invoice_item=invoice_item
     )
     try:
         course_registration.save()
         return course_registration
     except IntegrityError:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -1130,11 +1149,13 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     #filter all the  course registration codes
-    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['download_company_name']
     if company_name:
-        registration_codes = registration_codes.filter(invoice__company_name=company_name)
+        registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
@@ -1160,7 +1181,21 @@ def generate_registration_codes(request, course_id):
     company_name = request.POST['company_name']
     company_contact_name = request.POST['company_contact_name']
     company_contact_email = request.POST['company_contact_email']
-    sale_price = request.POST['sale_price']
+    unit_price = request.POST['unit_price']
+
+    try:
+        unit_price = (
+            decimal.Decimal(unit_price)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return HttpResponse(
+            status=400,
+            content=_(u"Could not parse amount as a decimal")
+        )
+
     recipient_name = request.POST['recipient_name']
     recipient_email = request.POST['recipient_email']
     address_line_1 = request.POST['address_line_1']
@@ -1177,6 +1212,7 @@ def generate_registration_codes(request, course_id):
         recipient_list.append(request.user.email)
         invoice_copy = True
 
+    sale_price = unit_price * course_code_number
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price,
@@ -1195,6 +1231,13 @@ def generate_registration_codes(request, course_id):
         country=country,
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
+    )
+
+    invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+        invoice=sale_invoice,
+        qty=course_code_number,
+        unit_price=unit_price,
+        course_id=course_id
     )
 
     course = get_course_by_id(course_id, depth=0)
@@ -1217,7 +1260,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, sale_invoice, order=None
+            request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
         registration_codes.append(generated_registration_code)
 
@@ -1309,13 +1352,17 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # find all the registration codes in this course
-    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes_list = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['active_company_name']
     if company_name:
-        registration_codes_list = registration_codes_list.filter(invoice__company_name=company_name)
+        registration_codes_list = registration_codes_list.filter(invoice_item__invoice__company_name=company_name)
     # find the redeemed registration codes if any exist in the db
-    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related(
+        'registration_code', 'registration_code__invoice_item__invoice'
+    ).filter(registration_code__course_id=course_id)
     if code_redemption_set.exists():
         redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
         # exclude the redeemed registration codes from the registration codes list and you will get
@@ -1346,11 +1393,11 @@ def spent_registration_codes(request, course_id):  # pylint: disable=unused-argu
         # you will get a list of all the spent(Redeemed) Registration Codes
         spent_codes_list = CourseRegistrationCode.objects.filter(
             course_id=course_id, code__in=redeemed_registration_codes
-        ).order_by('invoice__company_name')
+        ).order_by('invoice_item__invoice__company_name').select_related('invoice_item__invoice')
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
+            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -2117,3 +2164,48 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_sales_admin
+@require_POST
+def make_invoice_transaction(request, course_id):  # pylint: disable=unused-argument
+    """
+    Adding invoice transaction  (payment or refund) for the Invoice.
+    invoice id should be valid for making transaction.
+    """
+    invoice_id = request.POST.get('invoice_id')
+
+    if not invoice_id:
+        return JsonResponse({'message': _("Please enter the valid invoice id.")}, status=400)
+    amount_type = request.POST.get('amount_type')
+    if not amount_type:
+        return JsonResponse({'message': _("Please select the amount type.")}, status=400)
+    amount = request.POST.get('amount')
+    if not amount:
+        return JsonResponse({'message': _("Please enter the amount.")}, status=400)
+
+    comments = request.POST.get('comments')
+    try:
+        amount = (
+            decimal.Decimal(amount)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return JsonResponse({'message': _("Could not parse amount as a decimal")}, status=400)
+
+    if amount < decimal.Decimal('0.01'):
+        return JsonResponse({'message': _("Amount must be greater than 0")})
+
+    if amount_type == 'refund':
+            amount *= -1
+    try:
+        inv = InvoiceTransaction.add_invoice_transaction(invoice_id, amount, comments, request.user)
+    except Invoice.DoesNotExist:
+        return JsonResponse({'message': _("Invoice id not valid.")}, status=400)
+
+    return JsonResponse({'message': _("Invoice added successfully.")})
+

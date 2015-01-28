@@ -1553,7 +1553,8 @@ input[name="subject"] {
       width: 930px;
     }
   // coupon edit and add modals
-  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal, #registration_code_generation_modal{
+  #add-coupon-modal, #edit-coupon-modal, #set-course-mode-price-modal,
+  #registration_code_generation_modal, #make_invoice_transaction_modal{
     .inner-wrapper {
       background: $white;
     }
@@ -1591,6 +1592,10 @@ input[name="subject"] {
       border: none;
       border-bottom: 3px solid #a0050e;
       background: #fbf2f3;
+    }
+    .radio-custom {
+      width: auto;
+      margin-right: 10px;
     }
     ol.list-input{
       li{
@@ -1664,7 +1669,7 @@ input[name="subject"] {
           height: auto;
         }
       }
-      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-total-price,
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-unit-price,
       li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
         @include margin-left(0px !important);
         @include margin-right(15px !important);
@@ -1692,7 +1697,7 @@ input[name="subject"] {
           height: 40px;
           border-radius: 3px;
         }
-    #coupon-content, #course-content, #registration-content {
+    #coupon-content, #course-content, #registration-content,#invoice-content {
       padding: $baseline;
       header {
         margin: 0;
@@ -1898,4 +1903,8 @@ input[name="subject"] {
 .rtl .instructor-dashboard-wrapper-2 .studio-edit-link {
   @include left(2em);
   @include right(auto);
+}
+.radio-custom {
+  width: auto;
+  margin-right: 10px;
 }

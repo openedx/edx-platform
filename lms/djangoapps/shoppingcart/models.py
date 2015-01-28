@@ -773,7 +773,7 @@ class OrderItem(TimeStampedModel):
         self.save()
 
 
-class Invoice(models.Model):
+class Invoice(TimeStampedModel):
     """
          This table capture all the information needed to support "invoicing"
          which is when a user wants to purchase Registration Codes,
@@ -824,6 +824,69 @@ class Invoice(models.Model):
 
         return pdf_buffer
 
+    def __unicode__(self):
+        return "company: {} , internal reference: {} , customer reference number: {}".format(
+            self.company_name,
+            self.internal_reference,
+            self.customer_reference_number
+        )
+
+INVOICE_TRANSACTION_STATUSES = (
+
+    #receiving a check from customer or edx sending the refund back to customer
+    ('started', 'started'),
+    # received and deposited a check from customer or edx refund and they deposited it
+    ('completed', 'completed'),
+    # customer commit they are sending a cheque but never arrived / bounces / made it to wrong person
+    # edx refund but voided the check before it was deposited.
+    ('cancelled', 'cancelled')
+)
+
+
+class InvoiceTransaction(TimeStampedModel):
+    """
+         This table capture all the information needed to support "InvoicingTransactions"
+    """
+    invoice = models.ForeignKey(Invoice)
+    amount = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+    comments = models.TextField(null=True)
+    created_by = models.ForeignKey(User)
+    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
+    status = models.CharField(max_length=32, default='started', choices=INVOICE_TRANSACTION_STATUSES)
+
+    @classmethod
+    def add_invoice_transaction(cls, invoice_id, amount, comments, user):
+        """
+        This function creates a Invoice Transaction entry with payment or refund.
+        """
+        invoice = Invoice.objects.get(id=invoice_id)
+        invoice_transaction = InvoiceTransaction(
+            invoice=invoice, amount=amount, comments=comments,
+            created_by=user, last_modified_by=user)
+        invoice_transaction.save()
+        return invoice_transaction
+
+
+class InvoiceItem(TimeStampedModel):
+    """
+    This is the basic interface for invoice items.
+    invoice items are line items that fill up the invoices.
+
+    Each implementation of InvoiceItem should provide its own purchased_callback as
+    a method.
+    """
+    objects = InheritanceManager()
+    invoice = models.ForeignKey(Invoice, db_index=True)
+    qty = models.IntegerField(default=1)
+    unit_price = models.DecimalField(default=0.0, decimal_places=2, max_digits=30)
+
+
+class CourseRegistrationCodeInvoiceItem(InvoiceItem):
+    """
+    This is an invoice item for paying for a course registration
+    """
+    course_id = CourseKeyField(max_length=128, db_index=True)
+
 
 class CourseRegistrationCode(models.Model):
     """
@@ -836,6 +899,7 @@ class CourseRegistrationCode(models.Model):
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
     order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
     invoice = models.ForeignKey(Invoice, null=True)
+    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
     mode_slug = models.CharField(max_length=100, null=True)
 
 
@@ -1227,7 +1291,7 @@ class CourseRegCodeItem(OrderItem):
         # is in another PR (for another feature)
         from instructor.views.api import save_registration_code
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
-            save_registration_code(self.user, self.course_id, self.mode, invoice=None, order=self.order)
+            save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member

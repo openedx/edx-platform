@@ -6,6 +6,7 @@
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
 <%include file="set_course_mode_price_modal.html" args="section_data=section_data" />
 <%include file="generate_registarion_codes_modal.html" args="section_data=section_data" />
+<%include file="make_invoice_transaction_modal.html" args="section_data=section_data" />
 <div class="ecommerce-wrapper">
    <h3 class="error-msgs" id="error-msg"></h3>
    <div id = "accordion">
@@ -16,6 +17,8 @@
             <span class="code_tip">${_('Click to generate Registration Codes')}
             <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
             </span>
+            <span class="tip">${_("Click to add invoice payments and refunds'")} <a id="make_invoice_transaction_link" href="#make_invoice_transaction_modal" rel="leanModal"
+                   class="add blue-button">${_("Add invoice payments and refunds")}</a></span>
             %endif
             <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>
@@ -295,7 +298,7 @@
       var total_registration_codes = $('input[name="total_registration_codes"]').val();
       var recipient_name = $('input[name="recipient_name"]').val();
       var recipient_email = $('input[name="recipient_email"]').val();
-      var sale_price = $('input[name="sale_price"]').val();
+      var unit_price = $('input[name="unit_price"]').val();
       var company_name = $('input[name="company_name"]').val();
       var company_contact_name = $('input[name="company_contact_name"]').val();
       var company_contact_email = $('input[name="company_contact_email"]').val();
@@ -368,15 +371,15 @@
         generate_registration_button.removeAttr('disabled');
         return false;
       }
-      if (sale_price == '') {
+      if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the sale price');
+        registration_code_error.text('Please enter the unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
-      if (!($.isNumeric(sale_price))) {
+      if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for sale price');
+        registration_code_error.text('Please enter the numeric value for unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
@@ -599,7 +602,7 @@
      $('input[name="country"]').val('');
      $('input[name="customer_reference_number"]').val('');
      $('input[name="recipient_name"]').val('');
-     $('input[name="sale_price"]').val('');
+     $('input[name="unit_price"]').val('');
      $('input[name="recipient_email"]').val('');
      $('input[name="company_contact_name"]').val('');
      $('input[name="company_contact_email"]').val('');
