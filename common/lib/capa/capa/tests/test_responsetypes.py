@@ -37,6 +37,7 @@ class ResponseTest(unittest.TestCase):
     maxDiff = None
 
     def setUp(self):
+        super(ResponseTest, self).setUp()
         if self.xml_factory_class:
             self.xml_factory = self.xml_factory_class()
 

@@ -91,6 +91,8 @@ class HasEndedMayCertifyTestCase(unittest.TestCase):
     """Double check the semantics around when to finalize courses."""
 
     def setUp(self):
+        super(HasEndedMayCertifyTestCase, self).setUp()
+
         system = DummySystem(load_error_modules=True)
         #sample_xml = """
         # <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
@@ -139,6 +141,8 @@ class IsNewCourseTestCase(unittest.TestCase):
     """Make sure the property is_new works on courses"""
 
     def setUp(self):
+        super(IsNewCourseTestCase, self).setUp()
+
         # Needed for test_is_newish
         datetime_patcher = patch.object(
             xmodule.course_module, 'datetime',

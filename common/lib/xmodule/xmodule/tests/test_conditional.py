@@ -116,6 +116,7 @@ class ConditionalModuleBasicTest(unittest.TestCase):
     """
 
     def setUp(self):
+        super(ConditionalModuleBasicTest, self).setUp()
         self.test_system = get_test_system()
 
     def test_icon_class(self):
@@ -178,6 +179,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         return DummySystem(load_error_modules)
 
     def setUp(self):
+        super(ConditionalModuleXmlTest, self).setUp()
         self.test_system = get_test_system()
 
     def get_course(self, name):

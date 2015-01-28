@@ -22,6 +22,8 @@ class ExportAllCourses(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ExportAllCourses, self).setUp()
+
         self.content_store = contentstore()
         self.module_store = modulestore()
 

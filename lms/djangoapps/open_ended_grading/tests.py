@@ -113,6 +113,7 @@ class TestStaffGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
+        super(TestStaffGradingService, self).setUp()
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -266,6 +267,7 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
     '''
 
     def setUp(self):
+        super(TestPeerGradingService, self).setUp()
         self.student = 'view@test.com'
         self.instructor = 'view2@test.com'
         self.password = 'foo'
@@ -450,6 +452,7 @@ class TestPanel(ModuleStoreTestCase):
     Run tests on the open ended panel
     """
     def setUp(self):
+        super(TestPanel, self).setUp()
         self.user = factories.UserFactory()
         store = modulestore()
         course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
@@ -494,6 +497,7 @@ class TestPeerGradingFound(ModuleStoreTestCase):
     Test to see if peer grading modules can be found properly.
     """
     def setUp(self):
+        super(TestPeerGradingFound, self).setUp()
         self.user = factories.UserFactory()
         store = modulestore()
         course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended_nopath'])  # pylint: disable=maybe-no-member
@@ -516,6 +520,8 @@ class TestStudentProblemList(ModuleStoreTestCase):
     Test if the student problem list correctly fetches and parses problems.
     """
     def setUp(self):
+        super(TestStudentProblemList, self).setUp()
+
         # Load an open ended course with several problems.
         self.user = factories.UserFactory()
         store = modulestore()

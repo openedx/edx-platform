@@ -50,6 +50,8 @@ class InstructorTaskTestCase(TestCase):
     Tests API and view methods that involve the reporting of status for background tasks.
     """
     def setUp(self):
+        super(InstructorTaskTestCase, self).setUp()
+
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
         self.problem_url = InstructorTaskTestCase.problem_location("test_urlname")

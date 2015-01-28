@@ -23,6 +23,8 @@ class HintManagerTest(ModuleStoreTestCase):
         Makes a course, which will be the same for all tests.
         Set up mako middleware, which is necessary for template rendering to happen.
         """
+        super(HintManagerTest, self).setUp()
+
         self.course = CourseFactory.create(org='Me', number='19.002', display_name='test_course')
         self.url = '/courses/Me/19.002/test_course/hint_manager'
         self.user = UserFactory.create(username='robot', email='robot@edx.org', password='test', is_staff=True)

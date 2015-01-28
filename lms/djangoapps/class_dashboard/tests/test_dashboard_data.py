@@ -34,6 +34,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestGetProblemGradeDistribution, self).setUp()
 
         self.request_factory = RequestFactory()
         self.instructor = AdminFactory.create()

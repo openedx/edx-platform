@@ -50,6 +50,7 @@ class LoginFormTest(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
         super(LoginFormTest, self).setUp('lms.urls')
+
         self.url = reverse("signin_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)
@@ -162,6 +163,7 @@ class RegisterFormTest(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
         super(RegisterFormTest, self).setUp('lms.urls')
+
         self.url = reverse("register_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)

@@ -21,6 +21,7 @@ class TestViews(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestViews, self).setUp()
 
         self.request_factory = RequestFactory()
         self.request = self.request_factory.get('')

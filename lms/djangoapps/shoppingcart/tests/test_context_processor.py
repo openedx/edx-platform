@@ -22,6 +22,8 @@ class UserCartContextProcessorUnitTest(ModuleStoreTestCase):
     Unit test for shoppingcart context_processor
     """
     def setUp(self):
+        super(UserCartContextProcessorUnitTest, self).setUp()
+
         self.user = UserFactory.create()
         self.request = Mock()
 

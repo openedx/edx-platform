@@ -14,11 +14,9 @@ class WikiRedirectTestCase(LoginEnrollmentTestCase):
     Tests for wiki course redirection.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        cls.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
-
     def setUp(self):
+        super(WikiRedirectTestCase, self).setUp()
+        self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
         self.student = 'view@test.com'

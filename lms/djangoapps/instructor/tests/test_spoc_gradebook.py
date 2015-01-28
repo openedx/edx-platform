@@ -26,6 +26,8 @@ class TestGradebook(ModuleStoreTestCase):
     grading_policy = None
 
     def setUp(self):
+        super(TestGradebook, self).setUp()
+
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 

@@ -11,9 +11,8 @@ from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from bulk_email.models import CourseAuthorization
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, ModuleStoreTestCase
 from student.tests.factories import AdminFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
@@ -24,6 +23,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
     for Mongo-backed courses
     """
     def setUp(self):
+        super(TestNewInstructorDashboardEmailViewMongoBacked, self).setUp()
         self.course = CourseFactory.create()
 
         # Create instructor account
@@ -111,7 +111,11 @@ class TestNewInstructorDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on the new instructor dashboard
     """
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
+        super(TestNewInstructorDashboardEmailViewXMLBacked, self).setUp()
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
         # Create instructor account

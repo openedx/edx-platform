@@ -22,6 +22,8 @@ class TestInstructorAPIEnrollmentEmailLocalization(TestCase):
     """
 
     def setUp(self):
+        super(TestInstructorAPIEnrollmentEmailLocalization, self).setUp()
+
         # Platform language is English, instructor's language is Chinese,
         # student's language is French, so the emails should all be sent in
         # French.

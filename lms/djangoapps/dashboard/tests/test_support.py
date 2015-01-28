@@ -22,6 +22,8 @@ class RefundTests(ModuleStoreTestCase):
     Tests for the manual refund page
     """
     def setUp(self):
+        super(RefundTests, self).setUp()
+
         self.course = CourseFactory.create(
             org='testorg', number='run1', display_name='refundable course'
         )

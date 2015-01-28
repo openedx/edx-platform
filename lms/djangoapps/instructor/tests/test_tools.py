@@ -70,6 +70,7 @@ class TestRequireStudentIdentifier(unittest.TestCase):
         """
         Fixtures
         """
+        super(TestRequireStudentIdentifier, self).setUp()
         self.student = UserFactory.create()
 
     def test_valid_student_id(self):
@@ -107,6 +108,8 @@ class TestFindUnit(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestFindUnit, self).setUp()
+
         course = CourseFactory.create()
         week1 = ItemFactory.create(parent=course)
         homework = ItemFactory.create(parent=week1)
@@ -140,6 +143,8 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestGetUnitsWithDueDate, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
@@ -188,6 +193,8 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestSetDueDateExtension, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
@@ -263,6 +270,8 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestDataDumps, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)

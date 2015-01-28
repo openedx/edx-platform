@@ -51,6 +51,8 @@ class EmailOptInListTest(ModuleStoreTestCase):
     DEFAULT_DATETIME_STR = "2014-12-01 00:00:00"
 
     def setUp(self):
+        super(EmailOptInListTest, self).setUp()
+
         self.user = UserFactory.create(
             username=self.USER_USERNAME,
             first_name=self.USER_FIRST_NAME,

@@ -42,6 +42,8 @@ class TestCohortPartitionScheme(django.test.TestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
+        super(TestCohortPartitionScheme, self).setUp()
+
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         config_course_cohorts(self.course, [], cohorted=True)
@@ -282,6 +284,7 @@ class TestGetCohortedUserPartition(django.test.TestCase):
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
+        super(TestGetCohortedUserPartition, self).setUp()
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()

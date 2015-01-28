@@ -29,6 +29,7 @@ class SplitTestBase(ModuleStoreTestCase):
     VISIBLE_CONTENT = None
 
     def setUp(self):
+        super(SplitTestBase, self).setUp()
         self.partition = UserPartition(
             0,
             'first_partition',
@@ -276,6 +277,8 @@ class SplitTestPosition(ModuleStoreTestCase):
     Check that we can change positions in a course with partitions defined
     """
     def setUp(self):
+        super(SplitTestPosition, self).setUp()
+
         self.partition = UserPartition(
             0,
             'first_partition',

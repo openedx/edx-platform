@@ -34,6 +34,7 @@ class TemplateTestCase(unittest.TestCase):
         """
         Load the template under test.
         """
+        super(TemplateTestCase, self).setUp()
         capa_path = capa.__path__[0]
         self.template_path = os.path.join(capa_path,
                                           'templates',

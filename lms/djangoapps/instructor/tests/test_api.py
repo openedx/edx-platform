@@ -109,6 +109,7 @@ class TestCommonExceptions400(TestCase):
     """
 
     def setUp(self):
+        super(TestCommonExceptions400, self).setUp()
         self.request = Mock(spec=HttpRequest)
         self.request.META = {}
 
@@ -152,6 +153,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorAPIDenyLevels, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -306,6 +308,8 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
     Test Bulk account creation and enrollment from csv file
     """
     def setUp(self):
+        super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
+
         self.request = RequestFactory().request()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -557,6 +561,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorAPIEnrollment, self).setUp()
+
         self.request = RequestFactory().request()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -1140,6 +1146,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
     """
 
     def setUp(self):
+        super(TestInstructorAPIBulkBetaEnrollment, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -1460,6 +1468,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     """
 
     def setUp(self):
+        super(TestInstructorAPILevelsAccess, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2158,6 +2168,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     """
 
     def setUp(self):
+        super(TestInstructorAPIRegradeTask, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2298,6 +2309,8 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorSendEmail, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2420,6 +2433,8 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             return attr_dict
 
     def setUp(self):
+        super(TestInstructorAPITaskLists, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2540,6 +2555,8 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
     """
 
     def setUp(self):
+        super(TestInstructorEmailContentList, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2691,6 +2708,8 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.content = '{"test_content": "robot test content"}'
 
     def setUp(self):
+        super(TestInstructorAPIAnalyticsProxy, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -3050,6 +3069,8 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestCourseRegistrationCodes, self).setUp()
+
         self.course = CourseFactory.create()
         CourseModeFactory.create(course_id=self.course.id, min_price=50)
         self.instructor = InstructorFactory(course_key=self.course.id)

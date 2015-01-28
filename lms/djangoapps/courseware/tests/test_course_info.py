@@ -21,6 +21,7 @@ class CourseInfoTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests for the Course Info page
     """
     def setUp(self):
+        super(CourseInfoTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.page = ItemFactory.create(
             category="course_info", parent_location=self.course.location,

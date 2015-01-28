@@ -21,6 +21,8 @@ from instructor.views import legacy
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestXss(ModuleStoreTestCase):
     def setUp(self):
+        super(TestXss, self).setUp()
+
         self._request_factory = RequestFactory()
         self._course = CourseFactory.create()
         self._evil_student = UserFactory.create(

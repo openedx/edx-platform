@@ -26,6 +26,8 @@ class MasqueradeTestCase(ModuleStoreTestCase, LoginEnrollmentTestCase):
     Base class for masquerade tests that sets up a test course and enrolls a user in the course.
     """
     def setUp(self):
+        super(MasqueradeTestCase, self).setUp()
+
         # By default, tests run with DISABLE_START_DATES=True. To test that masquerading as a student is
         # working properly, we must use start dates and set a start date in the past (otherwise the access
         # checks exist prematurely).

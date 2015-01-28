@@ -22,6 +22,8 @@ log = logging.getLogger(__name__)
 class FolditTestCase(TestCase):
     """Tests for various responses of the FoldIt module"""
     def setUp(self):
+        super(FolditTestCase, self).setUp()
+
         self.factory = RequestFactory()
         self.url = reverse('foldit_ops')
 

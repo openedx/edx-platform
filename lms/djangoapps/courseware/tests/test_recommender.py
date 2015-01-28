@@ -35,6 +35,8 @@ class TestRecommender(ModuleStoreTestCase, LoginEnrollmentTestCase):
     XBLOCK_NAMES = ['recommender', 'recommender_second']
 
     def setUp(self):
+        super(TestRecommender, self).setUp()
+
         self.course = CourseFactory.create(
             display_name='Recommender_Test_Course'
         )

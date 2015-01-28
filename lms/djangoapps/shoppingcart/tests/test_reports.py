@@ -30,6 +30,7 @@ class ReportTypeTests(ModuleStoreTestCase):
     FIVE_MINS = datetime.timedelta(minutes=5)
 
     def setUp(self):
+        super(ReportTypeTests, self).setUp()
         # Need to make a *lot* of users for this one
         self.first_verified_user = UserFactory.create()
         self.first_verified_user.profile.name = "John Doe"
@@ -188,6 +189,8 @@ class ItemizedPurchaseReportTest(ModuleStoreTestCase):
     TEST_ANNOTATION = u'Ba\xfc\u5305'
 
     def setUp(self):
+        super(ItemizedPurchaseReportTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         self.course = CourseFactory.create(org='MITx', number='999', display_name=u'Robot Super Course')

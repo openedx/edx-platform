@@ -16,6 +16,8 @@ class RoleClassTestCase(ModuleStoreTestCase):
     Tests for roles of the comment client service integration
     """
     def setUp(self):
+        super(RoleClassTestCase, self).setUp()
+
         # For course ID, syntax edx/classname/classdate is important
         # because xmodel.course_module.id_to_location looks for a string to split
 
@@ -57,6 +59,7 @@ class PermissionClassTestCase(TestCase):
     Tests for permissions of the comment client service integration
     """
     def setUp(self):
+        super(PermissionClassTestCase, self).setUp()
         self.permission = models.Permission.objects.get_or_create(name="test")[0]
 
     def test_unicode(self):

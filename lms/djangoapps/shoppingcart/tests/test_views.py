@@ -72,6 +72,8 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 @ddt.ddt
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
+        super(ShoppingCartViewsTests, self).setUp()
+
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.user = UserFactory.create()
@@ -1436,6 +1438,8 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
     def setUp(self, **kwargs):
+        super(RegistrationCodeRedemptionCourseEnrollment, self).setUp()
+
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -1722,6 +1726,8 @@ class CSVReportViewsTest(ModuleStoreTestCase):
     Test suite for CSV Purchase Reporting
     """
     def setUp(self):
+        super(CSVReportViewsTest, self).setUp()
+
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -1834,6 +1840,8 @@ class UtilFnsTest(TestCase):
     Tests for utility functions in views.py
     """
     def setUp(self):
+        super(UtilFnsTest, self).setUp()
+
         self.user = UserFactory.create()
 
     def test_can_download_report_no_group(self):

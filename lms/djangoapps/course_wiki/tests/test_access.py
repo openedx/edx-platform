@@ -21,6 +21,7 @@ from course_wiki import settings
 class TestWikiAccessBase(ModuleStoreTestCase):
     """Base class for testing wiki access."""
     def setUp(self):
+        super(TestWikiAccessBase, self).setUp()
 
         self.wiki = get_or_create_root()
 

@@ -48,6 +48,7 @@ class PeerGradingModuleTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
+        super(PeerGradingModuleTest, self).setUp()
         self.setup_modulestore(self.course_id.course)
         self.peer_grading = self.get_module_from_location(self.problem_location)
         self.coe = self.get_module_from_location(self.coe_location)
@@ -264,6 +265,7 @@ class PeerGradingModuleScoredTest(unittest.TestCase, DummyModulestore):
         Create a peer grading module from a test system
         @return:
         """
+        super(PeerGradingModuleScoredTest, self).setUp()
         self.setup_modulestore(self.course_id.course)
 
     def test_metadata_load(self):
@@ -305,6 +307,7 @@ class PeerGradingModuleLinkedTest(unittest.TestCase, DummyModulestore):
         """
         Create a peer grading module from a test system.
         """
+        super(PeerGradingModuleLinkedTest, self).setUp()
         self.setup_modulestore(self.course_id.course)
 
     @property

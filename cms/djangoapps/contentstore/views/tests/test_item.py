@@ -1188,6 +1188,8 @@ class TestEditSplitModule(ItemTest):
 @ddt.ddt
 class TestComponentHandler(TestCase):
     def setUp(self):
+        super(TestComponentHandler, self).setUp()
+
         self.request_factory = RequestFactory()
 
         patcher = patch('contentstore.views.component.modulestore')

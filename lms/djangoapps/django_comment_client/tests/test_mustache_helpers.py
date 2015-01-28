@@ -4,6 +4,7 @@ import django_comment_client.mustache_helpers as mustache_helpers
 
 class PluralizeTest(TestCase):
     def setUp(self):
+        super(PluralizeTest, self).setUp()
         self.text1 = '0 goat'
         self.text2 = '1 goat'
         self.text3 = '7 goat'
@@ -17,6 +18,7 @@ class PluralizeTest(TestCase):
 
 class CloseThreadTextTest(TestCase):
     def setUp(self):
+        super(CloseThreadTextTest, self).setUp()
         self.contentClosed = {'closed': True}
         self.contentOpen = {'closed': False}
 

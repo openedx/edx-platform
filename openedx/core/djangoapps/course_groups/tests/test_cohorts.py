@@ -28,6 +28,7 @@ TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
     def setUp(self):
+        super(TestCohortSignals, self).setUp()
         self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
@@ -131,7 +132,7 @@ class TestCohorts(TestCase):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        clear_existing_modulestores()
+        super(TestCohorts, self).setUp()
         self.toy_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
 
     def test_is_course_cohorted(self):
@@ -601,6 +602,8 @@ class TestCohortsAndPartitionGroups(TestCase):
         """
         Regenerate a test course and cohorts for each test
         """
+        super(TestCohortsAndPartitionGroups, self).setUp()
+
         self.test_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.test_course_key)
 

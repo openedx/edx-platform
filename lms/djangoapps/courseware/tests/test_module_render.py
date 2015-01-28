@@ -506,6 +506,7 @@ class TestHtmlModifiers(ModuleStoreTestCase):
     student_view are taking place
     """
     def setUp(self):
+        super(TestHtmlModifiers, self).setUp()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
@@ -637,6 +638,7 @@ class ViewInStudioTest(ModuleStoreTestCase):
 
     def setUp(self):
         """ Set up the user and request that will be used. """
+        super(ViewInStudioTest, self).setUp()
         self.staff_user = GlobalStaffFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.staff_user
@@ -696,9 +698,6 @@ class ViewInStudioTest(ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class MongoViewInStudioTest(ViewInStudioTest):
     """Test the 'View in Studio' link visibility in a mongo backed course."""
-
-    def setUp(self):
-        super(MongoViewInStudioTest, self).setUp()
 
     def test_view_in_studio_link_studio_course(self):
         """Regular Studio courses should see 'View in Studio' links."""
@@ -772,6 +771,7 @@ class TestStaffDebugInfo(ModuleStoreTestCase):
     """Tests to verify that Staff Debug Info panel and histograms are displayed to staff."""
 
     def setUp(self):
+        super(TestStaffDebugInfo, self).setUp()
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.user
@@ -893,6 +893,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestAnonymousStudentId, self).setUp(create_user=False)
         self.user = UserFactory()
 
     @patch('courseware.module_render.has_access', Mock(return_value=True))
@@ -961,6 +962,8 @@ class TestModuleTrackingContext(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestModuleTrackingContext, self).setUp()
+
         self.user = UserFactory.create()
         self.request = RequestFactory().get('/')
         self.request.user = self.user

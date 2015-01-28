@@ -186,6 +186,8 @@ class PartialDictMatcher(object):
 @patch('requests.request')
 class SingleThreadTestCase(ModuleStoreTestCase):
     def setUp(self):
+        super(SingleThreadTestCase, self).setUp(create_user=False)
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
@@ -835,6 +837,8 @@ class FollowedThreadsDiscussionGroupIdTestCase(CohortedContentTestCase, Cohorted
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InlineDiscussionTestCase(ModuleStoreTestCase):
     def setUp(self):
+        super(InlineDiscussionTestCase, self).setUp()
+
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -870,6 +874,8 @@ class UserProfileTestCase(ModuleStoreTestCase):
     TEST_THREAD_ID = 'userprofile-test-thread-id'
 
     def setUp(self):
+        super(UserProfileTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         self.profiled_user = UserFactory.create()
@@ -979,6 +985,8 @@ class UserProfileTestCase(ModuleStoreTestCase):
 class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
+        super(CommentsServiceRequestHeadersTestCase, self).setUp()
+
         username = "foo"
         password = "bar"
 
@@ -1038,6 +1046,8 @@ class CommentsServiceRequestHeadersTestCase(UrlResetMixin, ModuleStoreTestCase):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(InlineDiscussionUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -1058,6 +1068,8 @@ class InlineDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(ForumFormDiscussionUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -1079,6 +1091,8 @@ class ForumFormDiscussionUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(ForumDiscussionSearchUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -1104,6 +1118,8 @@ class ForumDiscussionSearchUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(SingleThreadUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -1126,6 +1142,8 @@ class SingleThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(UserProfileUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)
@@ -1147,6 +1165,8 @@ class UserProfileUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class FollowedThreadsUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin):
     def setUp(self):
+        super(FollowedThreadsUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.student = UserFactory.create()
         CourseEnrollmentFactory(user=self.student, course_id=self.course.id)

@@ -70,6 +70,7 @@ class RoundTripTestCase(unittest.TestCase):
     """
 
     def setUp(self):
+        super(RoundTripTestCase, self).setUp()
         self.maxDiff = None
         self.temp_dir = mkdtemp()
         self.addCleanup(shutil.rmtree, self.temp_dir)
@@ -158,6 +159,8 @@ class TestEdxJsonEncoder(unittest.TestCase):
     Tests for xml_exporter.EdxJSONEncoder
     """
     def setUp(self):
+        super(TestEdxJsonEncoder, self).setUp()
+
         self.encoder = EdxJSONEncoder()
 
         class OffsetTZ(tzinfo):
@@ -220,6 +223,7 @@ class ConvertExportFormat(unittest.TestCase):
     """
     def setUp(self):
         """ Common setup. """
+        super(ConvertExportFormat, self).setUp()
 
         # Directory for expanding all the test archives
         self.temp_dir = mkdtemp()

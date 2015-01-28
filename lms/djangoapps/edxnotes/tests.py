@@ -62,6 +62,8 @@ class EdxNotesDecoratorTest(TestCase):
     """
 
     def setUp(self):
+        super(EdxNotesDecoratorTest, self).setUp()
+
         ClientFactory(name="edx-notes")
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")

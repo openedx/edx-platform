@@ -31,6 +31,8 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
     Check for email view displayed with flag
     """
     def setUp(self):
+        super(TestStudentDashboardEmailView, self).setUp()
+
         self.course = CourseFactory.create()
 
         # Create student account

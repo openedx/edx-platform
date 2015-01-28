@@ -53,6 +53,8 @@ class TestOrderHistoryOnMicrositeDashboard(ModuleStoreTestCase):
     Test for microsite dashboard order history
     """
     def setUp(self):
+        super(TestOrderHistoryOnMicrositeDashboard, self).setUp()
+
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.user = UserFactory.create()

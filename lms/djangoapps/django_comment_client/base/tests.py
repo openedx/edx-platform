@@ -847,6 +847,8 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateThreadUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -869,6 +871,8 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(UpdateThreadUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -897,6 +901,8 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -920,6 +926,8 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(UpdateCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -944,6 +952,8 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateSubCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -978,6 +988,8 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         })
 
     def setUp(self):
+        super(UsersEndpointTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()

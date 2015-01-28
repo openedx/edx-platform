@@ -23,6 +23,8 @@ from instructor.access import (allow_access,
 class TestInstructorAccessList(ModuleStoreTestCase):
     """ Test access listings. """
     def setUp(self):
+        super(TestInstructorAccessList, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.instructors = [UserFactory.create() for _ in xrange(4)]
@@ -45,6 +47,8 @@ class TestInstructorAccessList(ModuleStoreTestCase):
 class TestInstructorAccessAllow(ModuleStoreTestCase):
     """ Test access allow. """
     def setUp(self):
+        super(TestInstructorAccessAllow, self).setUp()
+
         self.course = CourseFactory.create()
 
     def test_allow(self):
@@ -79,6 +83,8 @@ class TestInstructorAccessAllow(ModuleStoreTestCase):
 class TestInstructorAccessRevoke(ModuleStoreTestCase):
     """ Test access revoke. """
     def setUp(self):
+        super(TestInstructorAccessRevoke, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.staff = [UserFactory.create() for _ in xrange(4)]
@@ -115,6 +121,8 @@ class TestInstructorAccessForum(ModuleStoreTestCase):
     Test forum access control.
     """
     def setUp(self):
+        super(TestInstructorAccessForum, self).setUp()
+
         self.course = CourseFactory.create()
 
         self.mod_role = Role.objects.create(

@@ -27,6 +27,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestOptoutCourseEmails, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()

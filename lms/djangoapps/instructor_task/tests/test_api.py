@@ -73,6 +73,8 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
     """Tests API methods that involve the submission of module-based background tasks."""
 
     def setUp(self):
+        super(InstructorTaskModuleSubmitTest, self).setUp()
+
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")
@@ -164,6 +166,8 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
     """Tests API methods that involve the submission of course-based background tasks."""
 
     def setUp(self):
+        super(InstructorTaskCourseSubmitTest, self).setUp()
+
         self.initialize_course()
         self.student = UserFactory.create(username="student", email="student@edx.org")
         self.instructor = UserFactory.create(username="instructor", email="instructor@edx.org")

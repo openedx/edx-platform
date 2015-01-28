@@ -23,6 +23,7 @@ class ActivateLoginTest(LoginEnrollmentTestCase):
     Test logging in and logging out.
     """
     def setUp(self):
+        super(ActivateLoginTest, self).setUp()
         self.setup_user()
 
     def test_activate_login(self):

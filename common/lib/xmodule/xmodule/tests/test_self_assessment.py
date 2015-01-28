@@ -35,6 +35,8 @@ class SelfAssessmentTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
+        super(SelfAssessmentTest, self).setUp()
+
         self.static_data = {
             'max_attempts': 10,
             'rubric': etree.XML(self.rubric),

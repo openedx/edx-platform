@@ -39,6 +39,7 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Tests about xblock.
     """
     def setUp(self):
+        super(AboutTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.about = ItemFactory.create(
             category="about", parent_location=self.course.location,
@@ -220,6 +221,7 @@ class AboutWithCappedEnrollmentsTestCase(LoginEnrollmentTestCase, ModuleStoreTes
         """
         Set up the tests
         """
+        super(AboutWithCappedEnrollmentsTestCase, self).setUp()
         self.course = CourseFactory.create(metadata={"max_student_enrollments_allowed": 1})
 
         self.about = ItemFactory.create(
@@ -267,6 +269,7 @@ class AboutWithInvitationOnly(ModuleStoreTestCase):
     This test case will check the About page when a course is invitation only.
     """
     def setUp(self):
+        super(AboutWithInvitationOnly, self).setUp()
 
         self.course = CourseFactory.create(metadata={"invitation_only": True})
 
@@ -314,6 +317,7 @@ class AboutTestCaseShibCourse(LoginEnrollmentTestCase, ModuleStoreTestCase):
     Test cases covering about page behavior for courses that use shib enrollment domain ("shib courses")
     """
     def setUp(self):
+        super(AboutTestCaseShibCourse, self).setUp()
         self.course = CourseFactory.create(enrollment_domain="shib:https://idp.stanford.edu/")
 
         self.about = ItemFactory.create(

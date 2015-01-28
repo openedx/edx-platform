@@ -36,12 +36,13 @@ from util.views import ensure_valid_course_key
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
-class TestJumpTo(TestCase):
+class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
 
     def setUp(self):
+        super(TestJumpTo, self).setUp()
         # Use toy course from XML
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
@@ -82,6 +83,7 @@ class ViewsTestCase(TestCase):
     Tests for views.py methods.
     """
     def setUp(self):
+        super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
@@ -493,6 +495,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         return course
 
     def setUp(self):
+        super(BaseDueDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -588,6 +591,7 @@ class StartDateTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(StartDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -642,6 +646,7 @@ class ProgressPageTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(ProgressPageTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -676,6 +681,8 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     """
 
     def setUp(self):
+        super(VerifyCourseKeyDecoratorTests, self).setUp()
+
         self.request = RequestFactory().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"

@@ -20,6 +20,8 @@ class CoursewareMiddlewareTestCase(ModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 
     def setUp(self):
+        super(CoursewareMiddlewareTestCase, self).setUp()
+
         self.course = CourseFactory.create()
 
     def check_user_not_enrolled_redirect(self):

@@ -123,6 +123,8 @@ class PreRequisiteCourseCatalog(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
     def setUp(self):
+        super(PreRequisiteCourseCatalog, self).setUp()
+
         seed_milestone_relationship_types()
 
     @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})

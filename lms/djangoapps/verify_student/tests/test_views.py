@@ -776,6 +776,8 @@ class TestCreateOrder(ModuleStoreTestCase):
     """
     def setUp(self):
         """ Create a user and course. """
+        super(TestCreateOrder, self).setUp()
+
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
         for mode in ('audit', 'honor', 'verified'):
@@ -861,6 +863,8 @@ class TestCreateOrderView(ModuleStoreTestCase):
     IMAGE_DATA = ','
 
     def setUp(self):
+        super(TestCreateOrderView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'
@@ -1128,6 +1132,8 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     Tests for the results_callback view.
     """
     def setUp(self):
+        super(TestPhotoVerificationResultsCallback, self).setUp()
+
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
         self.user = UserFactory.create()
@@ -1343,6 +1349,8 @@ class TestReverifyView(ModuleStoreTestCase):
     Tests for the reverification views
     """
     def setUp(self):
+        super(TestReverifyView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.user.profile.name = u"Røøsty Bøøgins"
         self.user.profile.save()
@@ -1390,6 +1398,8 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
     Tests for the midcourse reverification views.
     """
     def setUp(self):
+        super(TestMidCourseReverifyView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
@@ -1513,6 +1523,8 @@ class TestReverificationBanner(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def setUp(self):
+        super(TestReverificationBanner, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'

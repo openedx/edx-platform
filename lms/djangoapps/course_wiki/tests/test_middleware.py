@@ -20,6 +20,8 @@ class TestWikiAccessMiddleware(ModuleStoreTestCase):
 
     def setUp(self):
         """Test setup."""
+        super(TestWikiAccessMiddleware, self).setUp()
+
         self.wiki = get_or_create_root()
 
         self.course_math101 = CourseFactory.create(org='edx', number='math101', display_name='2014', metadata={'use_unique_wiki_id': 'false'})

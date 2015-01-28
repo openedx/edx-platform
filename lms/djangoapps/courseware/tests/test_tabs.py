@@ -31,6 +31,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """Test cases for Static Tab Dates."""
 
     def setUp(self):
+        super(StaticTabDateTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.page = ItemFactory.create(
             category="static_tab", parent_location=self.course.location,
@@ -117,6 +118,8 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             """
             Test case scaffolding
             """
+            super(EntranceExamsTabsTestCase, self).setUp()
+
             self.course = CourseFactory.create()
             self.instructor_tab = ItemFactory.create(
                 category="instructor", parent_location=self.course.location,

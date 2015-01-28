@@ -395,6 +395,7 @@ class TestBetatesterAccess(ModuleStoreTestCase):
     Tests for the beta tester feature
     """
     def setUp(self):
+        super(TestBetatesterAccess, self).setUp()
 
         now = datetime.datetime.now(pytz.UTC)
         tomorrow = now + datetime.timedelta(days=1)

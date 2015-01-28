@@ -49,6 +49,8 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
+        super(AccessUtilsTestCase, self).setUp(create_user=False)
+
         self.course = CourseFactory.create()
         self.course_id = self.course.id
         self.student_role = RoleFactory(name='Student', course_id=self.course_id)
@@ -90,6 +92,8 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
+        super(CoursewareContextTestCase, self).setUp()
+
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
             parent_location=self.course.location,
@@ -151,6 +155,8 @@ class CategoryMapTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
+        super(CategoryMapTestCase, self).setUp()
+
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",
             # This test needs to use a course that has already started --

@@ -23,6 +23,8 @@ class TestMicrosites(ModuleStoreTestCase, LoginEnrollmentTestCase):
     STUDENT_INFO = [('view@test.com', 'foo'), ('view2@test.com', 'foo')]
 
     def setUp(self):
+        super(TestMicrosites, self).setUp()
+
         # use a different hostname to test Microsites since they are
         # triggered on subdomain mappings
         #

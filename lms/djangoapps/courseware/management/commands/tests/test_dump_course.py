@@ -46,6 +46,7 @@ class CommandsTestBase(TestCase):
     """
 
     def setUp(self):
+        super(CommandsTestBase, self).setUp()
         self.loaded_courses = self.load_courses()
 
     def load_courses(self):

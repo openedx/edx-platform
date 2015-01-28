@@ -135,6 +135,7 @@ class TestLTIModuleListing(ModuleStoreTestCase):
 
     def setUp(self):
         """Create course, 2 chapters, 2 sections"""
+        super(TestLTIModuleListing, self).setUp()
         self.course = CourseFactory.create(display_name=self.COURSE_NAME, number=self.COURSE_SLUG)
         self.chapter1 = ItemFactory.create(
             parent_location=self.course.location,

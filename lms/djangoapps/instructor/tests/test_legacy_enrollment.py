@@ -29,6 +29,7 @@ class TestInstructorEnrollsStudent(ModuleStoreTestCase, LoginEnrollmentTestCase)
     """
 
     def setUp(self):
+        super(TestInstructorEnrollsStudent, self).setUp()
 
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')

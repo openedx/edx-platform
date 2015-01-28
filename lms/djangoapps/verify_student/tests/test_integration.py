@@ -29,6 +29,8 @@ class TestProfEdVerification(ModuleStoreTestCase):
     MIN_PRICE = 1438
 
     def setUp(self):
+        super(TestProfEdVerification, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')

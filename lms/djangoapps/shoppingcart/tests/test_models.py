@@ -378,6 +378,8 @@ class OrderTest(ModuleStoreTestCase):
 
 class OrderItemTest(TestCase):
     def setUp(self):
+        super(OrderItemTest, self).setUp()
+
         self.user = UserFactory.create()
 
     def test_order_item_purchased_callback(self):
@@ -405,6 +407,8 @@ class OrderItemTest(TestCase):
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
+        super(PaidCourseRegistrationTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         self.course = CourseFactory.create()
@@ -547,6 +551,8 @@ class CertificateItemTest(ModuleStoreTestCase):
     Tests for verifying specific CertificateItem functionality
     """
     def setUp(self):
+        super(CertificateItemTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         course = CourseFactory.create()

@@ -46,6 +46,7 @@ class TemplateLookupTests(TestCase):
 class HelpModalTests(TestCase):
     """Tests for the help modal"""
     def setUp(self):
+        super(HelpModalTests, self).setUp()
         self.course = CourseFactory.create()
 
     def test_simple_test(self):

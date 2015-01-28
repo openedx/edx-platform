@@ -37,6 +37,8 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
     Tests of EmbargoMiddleware
     """
     def setUp(self):
+        super(EmbargoMiddlewareTests, self).setUp()
+
         self.user = UserFactory(username='fred', password='secret')
         self.client.login(username='fred', password='secret')
         self.embargo_course = CourseFactory.create()
