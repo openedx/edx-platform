@@ -147,7 +147,7 @@ define([
 
     Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
 
-     * Modifies Annotator.Editor.html template to reverse order of Save and
+    /* Modifies Annotator.Editor.html template to reverse order of Save and
      * Cancel buttons.
      **/
     Annotator.Editor.prototype.html = [
