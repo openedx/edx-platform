@@ -1664,7 +1664,7 @@ input[name="subject"] {
           height: auto;
         }
       }
-      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-total-price,
+      li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-unit-price,
       li#generate-registration-modal-field-country ~  li#generate-registration-modal-field-internal-reference {
         @include margin-left(0px !important);
         @include margin-right(15px !important);
