@@ -73,7 +73,7 @@ small size, and usually don't require a broad knowledge of the edX platform.
 It makes them good candidates for a first task, allowing you to focus on getting
 familiar with the development environment and the contribution process.
 
-.. _byte-sized bugs and tasks: https://openedx.atlassian.net/issues/?jql=labels%3Dbyte-sized%20and%20status%3D%22In%20Backlog%22
+.. _byte-sized bugs and tasks: https://openedx.atlassian.net/issues/?filter=12810
 
 Once you have identified a bug or task, `create an account on the tracker`_ and
 then comment on the ticket to indicate that you are working on it. Don't hesitate
