@@ -54,6 +54,7 @@ define([
             highlights[0].mouseover();
             expect($('#edx-notes-wrapper-123 .annotator-editor')).not.toHaveClass('annotator-hide');
             expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
+        });
 
         it('clicking on highlights does not open the viewer when the editor is opened', function() {
             spyOn(annotators[1].editor, 'isShown').andReturn(false);
