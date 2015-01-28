@@ -1,5 +1,11 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%! import json %>
+
+<%!
+from pipeline_mako import require_js_path
+%>
+
+
 <%namespace name='static' file='/static_content.html'/>
 <%inherit file="/main.html" />
 
@@ -103,7 +109,7 @@
 % if notes:
 <script type="text/javascript">
   (function (require) {
-      require(['js/edxnotes/views/page_factory'], function (NotesPageFactory) {
+      require(["${require_js_path('js/edxnotes/views/page_factory')}"], function (NotesPageFactory) {
           var pageView = new NotesPageFactory({
               notesList: ${notes},
               debugMode: ${debug}

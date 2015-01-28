@@ -47,6 +47,7 @@ def edxnotes(request, course_id):
         "notes": notes,
         "debug": json.dumps(settings.DEBUG),
         'position': None,
+        "enable_require_js": True,
     }
 
     if not notes:

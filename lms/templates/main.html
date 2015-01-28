@@ -76,9 +76,15 @@ from microsite_configuration import page_title_breadcrumbs
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
+  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    require = require || {};
+    require.baseUrl = window.baseUrl;
+  </script>
   % if enable_require_js:
-    <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
   % else:
     % if disable_courseware_js:
       <%static:js group='base_vendor'/>
@@ -86,6 +92,7 @@ from microsite_configuration import page_title_breadcrumbs
       <%static:js group='main_vendor'/>
     % endif
   % endif
+  <script type="text/javascript" src="${static.url("require-config-lms-overrides.js")}"></script>
 
   <%block name="headextra"/>
 
