@@ -21,6 +21,7 @@ from util.milestones_helpers import generate_milestone_namespace, NAMESPACE_CHOI
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 __all__ = ['entrance_exam', ]
 
@@ -116,6 +117,14 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         category='chapter',
         display_name='Entrance Exam',
         is_entrance_exam=True
+    )
+
+    # Create the entrance exam section item.
+    create_xblock(
+        parent_locator=unicode(created_block.location),
+        user=request.user,
+        category='sequential',
+        display_name=_('Entrance Exam - Subsection')
     )
 
     # Set the entrance exam metadata flags for this course

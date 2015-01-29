@@ -784,7 +784,15 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
     #instead of adding a new feature directly into xblock-info, we should add them into override_type.
     override_type = {}
     if getattr(xblock, "is_entrance_exam", None):
-        override_type['is_entrance_exam'] = xblock.is_entrance_exam
+        override_type['is_entrance_exam_section'] = xblock.is_entrance_exam
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
+        override_type['exam_min_score'] = int(parent_xblock.entrance_exam_minimum_score_pct * 100)
+
+    # If the xblock is a subsection of an entrance exam then we set 'is_entrance_exam_subsection' true for over_type.
+    # we need to hide the subsection content in case of entrance exam.
+    if xblock.category == 'sequential' and getattr(parent_xblock, "is_entrance_exam", False):
+        override_type['is_entrance_exam_subsection'] = True
 
     xblock_info = {
         "id": unicode(xblock.location),

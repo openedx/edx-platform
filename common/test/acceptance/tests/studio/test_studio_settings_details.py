@@ -161,3 +161,32 @@ class SettingsMilestonesTest(StudioCourseTest):
             css_selector='span.section-title',
             text='Entrance Exam'
         ))
+
+    def test_entrance_exam_has_unit_button(self):
+        """
+        Test that entrance exam should be created after checking the 'enable entrance exam' checkbox.
+        And user has option to add units only instead of any Subsection.
+        """
+        self.settings_detail.require_entrance_exam(required=True)
+        self.settings_detail.save_changes()
+
+        # getting the course outline page.
+        course_outline_page = CourseOutlinePage(
+            self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
+        course_outline_page.visit()
+        course_outline_page.wait_for_ajax()
+
+        # button with text 'New Unit' should be present.
+        self.assertTrue(element_has_text(
+            page=course_outline_page,
+            css_selector='.add-item a.button-new',
+            text='New Unit'
+        ))
+
+        # button with text 'New Subsection' should not be present.
+        self.assertFalse(element_has_text(
+            page=course_outline_page,
+            css_selector='.add-item a.button-new',
+            text='New Subsection'
+        ))

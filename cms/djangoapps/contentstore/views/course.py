@@ -899,8 +899,7 @@ def settings_handler(request, course_key_string):
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
 
                     # If the entrance exam box on the settings screen has been checked,
-                    # and the course does not already have an entrance exam attached...
-                    if entrance_exam_enabled and not course_entrance_exam_present:
+                    if entrance_exam_enabled:
                         # Load the default minimum score threshold from settings, then try to override it
                         entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
                         if ee_min_score_pct and ee_min_score_pct != '':
