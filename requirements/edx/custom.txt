@@ -8,5 +8,5 @@
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@ac49b30452aff0cc34cace6a34b788e100490f24#egg=xblock-ooyala
 -e git+https://github.com/edx-solutions/xblock-group-project.git@c3c6b81cd1be30f674ea6641554852a330846316#egg=xblock-group-project
 -e git+https://github.com/edx-solutions/xblock-adventure.git@30894de41ee7efe7d5b6400086463d12995893f7#egg=xblock-adventure
--e git+https://github.com/mckinseyacademy/xblock-poll.git@cb450d50f2de5d1f077c9a749161c26ce462a783#egg=xblock-poll
+-e git+https://github.com/mckinseyacademy/xblock-poll.git@eeb2ba85311300291aca20a4a28cb7bf90de4728#egg=xblock-poll
 -e git+https://github.com/OfficeDev/xblock-officemix/@86238f5968a08db005717dbddc346808f1ed3716#egg=xblock_officemix-master
