@@ -106,6 +106,7 @@ window.InlineAnalytics = (function() {
         var valueIdArray;
         var arrayLength;
         var lastRow = $('#' + partId + '_table tr:last');
+        var currentResult;
 
         // Build the array of choice texts
         var choiceText = getChoiceTexts(partId);
@@ -133,8 +134,9 @@ window.InlineAnalytics = (function() {
                 	    choiceNameArray,
                 	    trs);
                 } else {
-                    correct = result[index]['correct'];
-                    count = result[index]['count'];
+                    currentResult = result[valueIdArray.indexOf(choiceNameArray[index])]
+                    correct = currentResult['correct'];
+                    count = currentResult['count'];
                     percent = Math.round(count * 1000 / (totalAttemptCount * 10));
 
                     if (correct) {
