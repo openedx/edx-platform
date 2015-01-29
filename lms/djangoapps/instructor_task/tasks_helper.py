@@ -25,7 +25,7 @@ from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
 from instructor.utils import collect_ora2_data
-from instructor_analytics.basic import student_submission_rows, enrolled_students_features
+from instructor_analytics.basic import student_response_rows, enrolled_students_features
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
@@ -597,9 +597,9 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     return task_progress.update_task_state(extra_meta=current_step)
 
 
-def push_student_submissions_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
-    For a given `course_id`, generate a submissions CSV file for students that
+    For a given `course_id`, generate a responses CSV file for students that
     have submitted problem responses, and store using a `ReportStore`. Once
     created, the files can be accessed by instantiating another `ReportStore` (via
     `ReportStore.from_config()`) and calling `link_for()` on it. Writes are
@@ -614,7 +614,7 @@ def push_student_submissions_to_s3(_xmodule_instance_args, _entry_id, course_id,
         TASK_LOG.error(e.message)
         return "failed"
 
-    rows = student_submission_rows(course)
+    rows = student_response_rows(course)
 
     # Generate parts of the file name
     timestamp_str = start_time.strftime("%Y-%m-%d-%H%M")
@@ -624,7 +624,7 @@ def push_student_submissions_to_s3(_xmodule_instance_args, _entry_id, course_id,
     report_store = ReportStore.from_config()
     report_store.store_rows(
         course_id,
-        u"{}_submissions_report_{}.csv".format(course_id_prefix, timestamp_str),
+        u"{}_responses_report_{}.csv".format(course_id_prefix, timestamp_str),
         rows
     )
 

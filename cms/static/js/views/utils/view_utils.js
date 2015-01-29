@@ -173,6 +173,31 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             return false;
         };
 
+        var keywordValidator = (function () {
+            var regexp = /%%[^%\s]+%%/g;
+            var keywordsSupported = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'];
+            function validate(string) {
+                var keywordsFound = string.match(regexp) || [];
+                var keywordsInvalid = $.map(keywordsFound, function (keyword) {
+                    if ($.inArray(keyword, keywordsSupported) === -1) {
+                        return keyword;
+                    } else {
+                        // return `null` or `undefined` to remove an element
+                        return undefined;
+                    }
+                });
+
+                return {
+                    'isValid': keywordsInvalid.length === 0,
+                    'keywordsInvalid': keywordsInvalid
+                }
+
+            }
+            return {
+                'validateString': validate
+            };
+        }());
+
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
             'showLoadingIndicator': showLoadingIndicator,
@@ -186,6 +211,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'setScrollOffset': setScrollOffset,
             'redirect': redirect,
             'reload': reload,
+            'keywordValidator': keywordValidator,
             'hasChangedAttributes': hasChangedAttributes
         };
     });

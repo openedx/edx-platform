@@ -48,6 +48,7 @@ from models.settings.course_details import CourseDetails, CourseSettingsEncoder
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from util.json_request import expect_json
+from util.keyword_substitution import substitute_keywords_with_data
 from util.string_utils import _has_non_ascii_characters
 from .access import has_course_access
 from .component import (
@@ -728,15 +729,17 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
 
 
 @require_http_methods("POST")
-def send_test_enrollment_email(request):
+def send_test_enrollment_email(request, course_key_string):
     """
     Handles ajax request for sending test enrollment emails to the instructor
     """
+    course_key = CourseKey.from_string(course_key_string)
     user = request.user
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     subject = request.POST.get('subject')
     subject = ''.join(subject.splitlines())
     message = request.POST.get('message')
+    message = substitute_keywords_with_data(message, user.id, course_key)
 
     try:
         user.email_user(subject, message, from_address)
@@ -786,6 +789,7 @@ def settings_handler(request, course_key_string):
                 'about_page_editable': about_page_editable,
                 'short_description_editable': short_description_editable,
                 'upload_asset_url': upload_asset_url,
+                'test_email_url': reverse_course_url('send_test_enrollment_email', course_key),
                 'default_pre_template': default_enroll_email_template_pre,
                 'default_post_template': default_enroll_email_template_post,
             })

@@ -7,10 +7,9 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 
 from courseware.views import get_analytics_answer_dist, process_analytics_answer_dist
-from courseware.tests.factories import UserFactory, InstructorFactory
+from courseware.tests.factories import UserFactory, InstructorFactory, StaffFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 
 class InlineAnalyticsTest(ModuleStoreTestCase):
@@ -24,8 +23,8 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
             number="B",
             run="C",
         )
-        course_key = SlashSeparatedCourseKey.from_deprecated_string("A/B/C")
-        self.instructor = InstructorFactory(course_key=course_key)
+        self.staff = StaffFactory(course_key=self.course.id)
+        self.instructor = InstructorFactory(course_key=self.course.id)
 
         analytics_data = {
             "module_id": "123",
@@ -52,6 +51,24 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
 
         response = get_analytics_answer_dist(request)
         self.assertEquals(response.content, 'A problem has occurred retrieving the data, please report the problem.')
+
+    @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
+    @patch('urllib2.urlopen')
+    @patch('courseware.views.process_analytics_answer_dist')
+    def test_staff_and_url(self, mock_process_analytics, mock_requests):
+
+        mock_resp = MagicMock()
+        mock_read = MagicMock(return_value="{}")
+        mock_resp.read = mock_read
+        mock_requests.return_value = mock_resp
+
+        factory = self.factory
+        request = factory.post('', self.data)
+        request.user = self.staff
+
+        mock_process_analytics.return_value = [{'dummy': 'dummy'}]
+        response = get_analytics_answer_dist(request)
+        self.assertEquals(response, [{'dummy': 'dummy'}])
 
     @override_settings(ANALYTICS_ANSWER_DIST_URL='dummy_url')
     @patch('urllib2.urlopen')

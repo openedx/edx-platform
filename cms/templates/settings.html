@@ -304,7 +304,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <section class="group-settings">
                 <p>
                   ${_("Message for students who enroll {strong_start}before the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
-                  <a class="send-test-email" id='test_email_pre' title="${_('Send me a copy of this via email')}" href="#">${_("Send me a test email")}</a>
+                  <a class="send-test-email" id='test_email_pre' title="${_('Send me a copy of this via email')}" href="#" data-endpoint="${test_email_url}">${_("Send me a test email")}</a>
                   <a class="fill-default-email" id='fill_default_email_pre' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
                 </p>
                 <ol class="list-input">
@@ -324,7 +324,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
               <section class="group-settings">
                 <p>
                   ${_("Message for students who enroll {strong_start}on or after the start date{strong_end}").format(strong_start="<strong>", strong_end="</strong>")}
-                  <a class="send-test-email" id='test_email_post' title="${_('Send me a copy of this via email')}" href="#">${_("Send me a test email")}</a>
+                  <a class="send-test-email" id='test_email_post' title="${_('Send me a copy of this via email')}" href="#" data-endpoint="${test_email_url}">${_("Send me a test email")}</a>
                   <a class="fill-default-email" id='fill_default_email_post' title="${_('Reset to default content')}" href="#">${_("Reset to default content")}</a>
                 </p>
                 <ol class="list-input">

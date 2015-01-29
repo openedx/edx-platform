@@ -1602,17 +1602,17 @@ def calculate_grades_csv(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
-def get_student_submissions(request, course_id):
+def get_student_responses(request, course_id):
     """
     AlreadyRunningError is raised if the student response CSV is still being generated.
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        instructor_task.api.submit_get_student_submissions(request, course_key)
-        success_status = _("Your student submissions report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
+        instructor_task.api.submit_get_student_responses(request, course_key)
+        success_status = _("Your student responses report is being generated! You can view the status of the generation task in the 'Pending Instructor Tasks' section.")
         return JsonResponse({"status": success_status})
     except AlreadyRunningError:
-        already_running_status = _("A student submissions report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
+        already_running_status = _("A student responses report generation task is already in progress. Check the 'Pending Instructor Tasks' table for the status of the task. When completed, the report will be available for download in the table below.")
         return JsonResponse({
             "status": already_running_status
         })
