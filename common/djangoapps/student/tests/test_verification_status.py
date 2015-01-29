@@ -28,10 +28,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
-@patch.dict(settings.FEATURES, {
-    'SEPARATE_VERIFICATION_FROM_PAYMENT': True,
-    'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True
-})
+@patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 @ddt.ddt
 class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
@@ -40,7 +37,6 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
     PAST = datetime.now(UTC) - timedelta(days=5)
     FUTURE = datetime.now(UTC) + timedelta(days=5)
 
-    @patch.dict(settings.FEATURES, {'SEPARATE_VERIFICATION_FROM_PAYMENT': True})
     def setUp(self):
         # Invoke UrlResetMixin
         super(TestCourseVerificationStatus, self).setUp('verify_student.urls')

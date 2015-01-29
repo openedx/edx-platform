@@ -1444,7 +1444,7 @@ class CertificateItem(OrderItem):
             "dashboard_url": reverse('dashboard'),
         }
 
-    def additional_instruction_text(self, **kwargs):
+    def additional_instruction_text(self):
         refund_reminder = _(
             "You have up to two weeks into the course to unenroll from the Verified Certificate option "
             "and receive a full refund. To receive your refund, contact {billing_email}. "
@@ -1452,32 +1452,18 @@ class CertificateItem(OrderItem):
             "Please do NOT include your credit card information."
         ).format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)
 
-        # TODO (ECOM-188): When running the A/B test for
-        # separating the verified / payment flow, we want to add some extra instructions
-        # for users in the experimental group.  In order to know the user is in the experimental
-        # group, we need to check a session variable.  But at this point in the code,
-        # we're so deep into the request handling stack that we don't have access to the request.
-        # The approach taken here is to have the email template check the request session
-        # and pass in a kwarg to this function if it's set.  The template already has
-        # access to the request (via edxmako middleware), so we don't need to change
-        # too much to make this work.  Once the A/B test completes, though, we should
-        # clean this up by removing the `**kwargs` param and skipping the check
-        # for the session variable.
-        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and kwargs.get('separate_verification'):
-            domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
-            verification_url = "http://{domain}{path}".format(domain=domain, path=path)
+        domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+        path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
+        verification_url = "http://{domain}{path}".format(domain=domain, path=path)
 
-            verification_reminder = _(
-                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
-            ).format(verification_url=verification_url)
+        verification_reminder = _(
+            "If you haven't verified your identity yet, please start the verification process ({verification_url})."
+        ).format(verification_url=verification_url)
 
-            return "{verification_reminder} {refund_reminder}".format(
-                verification_reminder=verification_reminder,
-                refund_reminder=refund_reminder
-            )
-        else:
-            return refund_reminder
+        return "{verification_reminder} {refund_reminder}".format(
+            verification_reminder=verification_reminder,
+            refund_reminder=refund_reminder
+        )
 
     @classmethod
     def verified_certificates_count(cls, course_id, status):

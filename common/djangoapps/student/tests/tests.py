@@ -35,6 +35,7 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from bulk_email.models import Optout  # pylint: disable=import-error
 from certificates.models import CertificateStatuses  # pylint: disable=import-error
 from certificates.tests.factories import GeneratedCertificateFactory  # pylint: disable=import-error
+from verify_student.models import SoftwareSecurePhotoVerification
 import shoppingcart  # pylint: disable=import-error
 
 
@@ -192,11 +193,20 @@ class DashboardTest(ModuleStoreTestCase):
         self.client = Client()
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def check_verification_status_on(self, mode, value):
+    def _check_verification_status_on(self, mode, value):
         """
         Check that the css class and the status message are in the dashboard html.
         """
+        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
+
+        if mode == 'verified':
+            # Simulate a successful verification attempt
+            attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+            attempt.mark_ready()
+            attempt.submit()
+            attempt.approve()
+
         response = self.client.get(reverse('dashboard'))
         self.assertContains(response, "class=\"course {0}\"".format(mode))
         self.assertContains(response, value)
@@ -207,16 +217,25 @@ class DashboardTest(ModuleStoreTestCase):
         Test that the certificate verification status for courses is visible on the dashboard.
         """
         self.client.login(username="jack", password="test")
-        self.check_verification_status_on('verified', 'You\'re enrolled as a verified student')
-        self.check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
-        self.check_verification_status_on('audit', 'You\'re auditing this course')
+        self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
+        self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
+        self._check_verification_status_on('audit', 'You\'re auditing this course')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-    def check_verification_status_off(self, mode, value):
+    def _check_verification_status_off(self, mode, value):
         """
         Check that the css class and the status message are not in the dashboard html.
         """
+        CourseModeFactory(mode_slug=mode, course_id=self.course.id)
         CourseEnrollment.enroll(self.user, self.course.location.course_key, mode=mode)
+
+        if mode == 'verified':
+            # Simulate a successful verification attempt
+            attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+            attempt.mark_ready()
+            attempt.submit()
+            attempt.approve()
+
         response = self.client.get(reverse('dashboard'))
         self.assertNotContains(response, "class=\"course {0}\"".format(mode))
         self.assertNotContains(response, value)
@@ -228,9 +247,9 @@ class DashboardTest(ModuleStoreTestCase):
         if the verified certificates setting is off.
         """
         self.client.login(username="jack", password="test")
-        self.check_verification_status_off('verified', 'You\'re enrolled as a verified student')
-        self.check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
-        self.check_verification_status_off('audit', 'You\'re auditing this course')
+        self._check_verification_status_off('verified', 'You\'re enrolled as a verified student')
+        self._check_verification_status_off('honor', 'You\'re enrolled as an honor code student')
+        self._check_verification_status_off('audit', 'You\'re auditing this course')
 
     def test_course_mode_info(self):
         verified_mode = CourseModeFactory.create(

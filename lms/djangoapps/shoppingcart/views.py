@@ -830,28 +830,28 @@ def _show_receipt_html(request, order):
         'reg_code_info_list': reg_code_info_list,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
-    # we want to have the ability to override the default receipt page when
-    # there is only one item in the order
+    # We want to have the ability to override the default receipt page when
+    # there is only one item in the order.
     if order_items.count() == 1:
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
 
-        # TODO (ECOM-188): Once the A/B test of separate verified / payment flow
-        # completes, implement this in a more general way.  For now,
-        # we simply redirect to the new receipt page (in verify_student).
-        if settings.FEATURES.get('SEPARATE_VERIFICATION_FROM_PAYMENT') and request.session.get('separate-verified', False):
-            if receipt_template == 'shoppingcart/verified_cert_receipt.html':
-                url = reverse(
-                    'verify_student_payment_confirmation',
-                    kwargs={'course_id': unicode(order_items[0].course_id)}
-                )
+        # Ideally, the shoppingcart app would own the receipt view. However,
+        # as a result of changes made to the payment and verification flows as
+        # part of an A/B test, the verify_student app owns it instead. This is
+        # left over, and will be made more general in the future.
+        if receipt_template == 'shoppingcart/verified_cert_receipt.html':
+            url = reverse(
+                'verify_student_payment_confirmation',
+                kwargs={'course_id': unicode(order_items[0].course_id)}
+            )
 
-                # Add a query string param for the order ID
-                # This allows the view to query for the receipt information later.
-                url += '?payment-order-num={order_num}'.format(
-                    order_num=order_items[0].order.id
-                )
-                return HttpResponseRedirect(url)
+            # Add a query string param for the order ID
+            # This allows the view to query for the receipt information later.
+            url += '?payment-order-num={order_num}'.format(
+                order_num=order_items[0].order.id
+            )
+            return HttpResponseRedirect(url)
 
     return render_to_response(receipt_template, context)
 
