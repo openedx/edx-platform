@@ -67,15 +67,17 @@ The following sections cover some best practices and tips to keep in mind as you
 develop user interfaces that are WCAG 2.0 compliant.
 
 * :ref:`Use semantic markup`
+* :ref:`Make images accessible`
 * :ref:`Avoid using CSS to add content`
 * :ref:`Include title attributes for all iframe elements`
 * :ref:`Make sure form elements have labels`
-* :ref:`Include labels for links and interactive controls`
+  
+* :ref:`Include link and control labels that make sense out of context`
+
 * :ref:`Use WAI ARIA to create accessible widgets`
 * :ref:`Manage focus for popups`
 * :ref:`Inform users when content changes dynamically`
 * :ref:`Hide or expose content to targeted audiences`
-* :ref:`Make images accessible`
 * :ref:`Choose colors that meet minimum contrast ratios`
 * :ref:`Test your code for accessibility`
 
@@ -138,6 +140,101 @@ with semantic importance. It can be confusing or cumbersome when this feedback i
 inaccurately reported.
 
 
+.. _Make images accessible:
+
+**********************
+Make images accessible
+**********************
+
+You can make images accessible by using the ``alt`` attribute for each image, or
+by providing a text alternative for an image.
+
+---------------------
+Text alternatives
+---------------------
+
+A text alternative is text that users who are unable to view or use non-text
+content can access in place of the non-text content (such as images, charts,
+applets, audio files, and so on).
+
+Text alternatives must be "programmatically determinable". This means that the
+text must be able to be read and used by the assistive technologies (and the
+accessibility features in browsers) that people with disabilities use.
+
+Text alternatives must also be "programmatically associated" with the non-text
+content. This means that users must be able to use assistive technology to find
+the alternative text (that they can use) when they land on the non-text content
+(that they cannot use).
+
+All images require a `text alternative <http://www.w3.org/TR/WCAG20/#text-
+altdef>`_ . The only exceptions to this rule are purely decorative images or
+images that have text alternatives adjacent to them.
+
+--------------
+Alt attributes
+--------------
+
+Regardless of whether or not an image requires a text alternative, *all*
+``<img>`` elements require an ``alt`` attribute, even if the value of that
+attribute is ``""`` (NULL). If your image is purely decorative, or has a text
+alternative immediately adjacent to it, use a NULL alt attribute: ``alt=""``.
+
+If an ``<img>`` element does not have a NULL alt attribute, you should make sure
+that the value you use in its alt attribute provides useful information to users
+who rely on screen readers. Screen readers will expose the path to the image as
+a last resort, if an alt attribute value does not exist.
+
+
+------------------------------------
+Best practices for non-text elements
+------------------------------------
+
+Providing *useful* text alternatives or alt attribute values is more difficult
+than it sounds. Ask yourself questions about the purpose of your image to
+determine what would be most useful to the user.
+
+* Is your image the only content of a link or form control?
+
+    Your ``alt`` attribute should describe the destination of the link, or the
+    action that will be performed. For example, a "Play" icon should have a text
+    alternative such as "Play the 'Introduction to Linux' course video", rather
+    than "Right-pointing triangle".
+    
+* Does your image contain text? The vast majority of images of text should
+  include the verbatim text as the value of the ``alt`` attribute. Here are some
+  examples of exceptions.
+  
+    * If yes, and if the same text appears adjacent to or near the image in the
+      DOM, use a "NULL" value in the alt attribute, otherwise a screen reader is
+      exposed to the same content twice.
+    
+    * If yes, and if the text within the image is there simply for visual effect
+      (such as a skewed screenshot of computer code), use a "NULL" value in the
+      alt attribute.
+    
+* Does your image contribute meaning to the current page or context?
+  
+    * If yes, and if the image is a simple graphic or photograph, the alt
+      attribute should briefly describe the image in a way that conveys the same
+      meaning that a sighted person would obtain from viewing the image. Context
+      is important. A detailed description of a photograph is rarely useful to
+      the user, unless it is in the context of a photography or art class.
+    
+    * If yes, and if the image is a graph or complex piece of information,
+      include the information contained in the image elsewhere on the page. The
+      alt attribute value should give a general description of the complex image. You
+      can programmatically link the image with the detailed information using ``aria-
+      describedby``.
+  
+A very pragmatic guide on providing useful text alternatives is included in the
+`HTML5 specification (4.7.1.1) <http://www.w3.org/TR/html5/embedded-
+content-0.html#alt>`_, and provides a variety of example images and appropriate
+text alternatives.
+
+A more comprehensive decision tree is available in the `Web Accessibility
+Initiatives Images Tutorial <http://www.w3.org/WAI/tutorials/images>`_.
+
+
 .. _Avoid using CSS to add content:
 
 ******************************
@@ -176,11 +273,11 @@ a list within a dialog box), so choose title text that will make sense when it
 is exposed out of context.
 
 
-.. _Include labels for links and interactive controls:
+.. _Include link and control labels that make sense out of context:
 
-***********************************************************************
-Include labels for all links and interactive controls that make sense out of context
-************************************************************************
+**************************************************************
+Include link and control labels that make sense out of context
+**************************************************************
 
 Label text for all links and interactive controls should make sense out of
 context. Screen reader users have the option of listing and navigating links and
@@ -206,15 +303,16 @@ them what the purpose is of a given form field, based on physical proximity of
 descriptive text or other visual cues. However, to a user with a vision
 impairment, who does not have the benefit of visual context, these relationships
 are not obvious. Users who rely on speech to interact with their computers also
-need a label for addressing form elements. If you correct use the ``<label>``
+need a label for addressing form elements. If you correctly use the ``<label>``
 element, text is programmatically associated with a given form element, and can
-then be read to the user upon focus, or used to address the form element.
+then be read to the user upon focus, or used to address the form element using
+speech input.
 
 
 .. note:: Screen readers often enter "forms processing mode" when they
    encounter a form. This mode temporarily disables all keyboard shortcuts
    available to users so that key presses are passed through to the control,
-   with the exception of ``TAB`` which, moves focus from one form field to the
+   with the exception of ``TAB``, which moves focus from one form field to the
    next. This means that context-sensitive help provided for form fields (such
    as UI help text adjacent to the form field) is not likely to be encountered
    by screen reader users. To remedy this situation, add an `aria-describedby
@@ -235,9 +333,10 @@ options that you want. If you develop custom HTML or JavaScript widgets, make
 sure you add all necessary role, state, and property information for each
 widget, so that it can be used by users of assistive technology. 
 
-WAI-ARIA (Web Accessibility Initiative - Accessible Rich Internet Applications)
-is a technical specification published by the World Wide Web Consortium (W3C)
-that specifies how to increase the accessibility of web pages. 
+`WAI-ARIA <http://www.w3.org/TR/wai-aria>`_ (Web Accessibility Initiative -
+Accessible Rich Internet Applications) is a technical specification published by
+the World Wide Web Consortium (W3C) that specifies how to increase the
+accessibility of web pages.
 
 When you develop custom widgets, use WAI-ARIA to ensure that your custom
 controls are accessible, and consider the following points.
@@ -333,7 +432,7 @@ WAI-ARIA.
 
 Additional considerations for developing custom widgets are covered in `General
 steps for building an accessible widget <http://www.w3.org/TR/wai-aria-
-practices/#accessiblewidget>`_. 
+practices/#accessiblewidget>`_.
 
 Specific considerations for common widgets are covered in `WAI-ARIA 1.0
 Authoring Practices - Design Patterns <http://www.w3.org/TR/2013/WD-wai-aria-
@@ -341,7 +440,7 @@ practices-20130307/#aria_ex>`_.
 
 A quick reference list of Required and Supported ARIA attributes by role is
 available in the `ARIA Role, State, and Property Quick Reference
-<http://www.w3.org/TR/aria-in-html/#aria-role-state-and- property-quick-
+<http://www.w3.org/TR/aria-in-html/#aria-role-state-and-property-quick-
 reference>`_
 
 .. _Manage focus for popups:
@@ -396,101 +495,9 @@ hears only "Close".
 ::
 
   <a href="#">
-  <span aria- hidden="true">X</span> 
+  <span aria-hidden="true">X</span> 
   <span class="sr">Close</span>
   </a>
-
-
-.. _Make images accessible:
-
-**********************
-Make images accessible
-**********************
-
-You can make images accessible by using the ``alt`` attribute for each image, or
-by providing a text alternative for an image.
-
----------------------
-Text alternatives
----------------------
-
-A text alternative is text that users who are unable to view or use non-text
-content can access in place of the non-text content (such as images, charts,
-applets, audio files, and so on).
-
-Text alternatives must be "programmatically determinable". This means that the
-text must be able to be read and used by the assistive technologies (and the
-accessibility features in browsers) that people with disabilities use.
-
-Text alternatives must also be "programmatically associated" with the non-text
-content. This means that users must be able to use assistive technology to find
-the alternative text (that they can use) when they land on the non-text content
-(that they cannot use).
-
-All images require a `text alternative <http://www.w3.org/TR/WCAG20/#text-
-altdef>`_ . The only exceptions to this rule are purely decorative images or
-images that have text alternatives adjacent to them.
-
---------------
-Alt attributes
---------------
-
-Regardless of whether or not an image requires a text alternative, *all*
-``<img>`` elements require an ``alt`` attribute, even if the value of that
-attribute is ``""`` (NULL). If your image is purely decorative, or has a text
-alternative immediately adjacent to it, use a NULL alt attribute: ``alt=""``.
-
-If an ``<img>`` element does not have a NULL alt attribute, you should make sure
-that the value you use in its alt attribute provides useful information to users
-who rely on screen readers. Screen readers will expose the path to the image as
-a last resort, if an alt attribute value does not exist.
-
-
-------------------------------------
-Best practices for non-text elements
-------------------------------------
-
-Providing *useful* text alternatives or alt attribute values is more difficult
-than it sounds. Ask yourself questions about the purpose of your image to
-determine what would be most useful to the user.
-
-* Is your image the only content of a link or form control?
-
-    Your ``alt`` attribute should describe the destination of the link, or the
-    action that will be performed. For example, a "Play" icon should have a text
-    alternative such as "Play the 'Introduction to Linux' course video", rather
-    than "Right-pointing triangle".
-    
-* Does your image contain text? The vast majority of images of text should
-  include the verbatim text as the value of the ``alt`` attribute. Here are some
-  examples of exceptions.
-  
-    * If yes, and if the same text appears adjacent to or near the image in the
-      DOM, use a "NULL" value in the alt attribute, otherwise a screen reader is
-      exposed to the same content twice.
-    
-    * If yes, and if the text within the image is there simply for visual effect
-      (such as a skewed screenshot of computer code), use a "NULL" value in the
-      alt attribute.
-	  
-* Does your image contribute meaning to the current page or context?
-  
-    * If yes, and if the image is a simple graphic or photograph, the alt
-      attribute should briefly describe the image in a way that conveys the same
-      meaning that a sighted person would obtain from viewing the image. Context
-      is important. A detailed description of a photograph is rarely useful to
-      the user, unless it is in the context of a photography or art class.
-	  
-    * If yes, and if the image is a graph or complex piece of information,
-      include the information contained in the image elsewhere on the page. The
-      alt attribute value should give a general description of the complex image. You
-      can programmatically link the image with the detailed information using ``aria-
-      describedby``.
-	
-A very pragmatic guide on providing useful text alternatives is included in the
-`HTML5 specification (4.7.1.1) <http://www.w3.org/TR/html5/embedded-
-content-0.html#alt>`_ and includes a variety of example images and appropriate
-text alternatives.
 
 
 .. _Choose colors that meet minimum contrast ratios:
@@ -529,13 +536,14 @@ These are some automated tools for accessibility testing.
   <https://chrome.google.com/webstore/detail /accessibility-
   developer-t/fpkknkljclfencbdbgkenhalefipecmb>`_
 
-* Your keyboard
-
+* Your keyboard (For more information about keyboard accessibility, see
+  `<http://webaim.org/techniques/keyboard/>`_)
 
 To test your feature using a screen reader, you can use the following free
 options.
 
-* Voiceover (Command + F5 on Mac)
+* `Voiceover <https://www.apple.com/accessibility/osx/voiceover>`_ (Screen
+  Reader for Mac - Command + F5 on Mac)
   
 * `ChromeVox <http://www.chromevox.com>`_ (Screen reader for Chrome)
   
