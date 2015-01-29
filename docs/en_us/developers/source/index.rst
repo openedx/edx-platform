@@ -23,6 +23,7 @@ Contents:
     analytics.rst
     process/index
     testing/index
+    accessibility
     code-considerations
     deploy-new-service
 
