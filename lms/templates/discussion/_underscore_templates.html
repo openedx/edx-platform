@@ -387,7 +387,7 @@
         <ul class="post-errors" style="display: none"></ul>
         <div class="forum-new-post-form-wrapper"></div>
         ${'<% if (cohort_options) { %>'}
-        <div class="post-field">
+        <div class="post-field group-selector-wrapper${'<% if (!is_commentable_cohorted) { %>'} disabled${'<% } %>'}" >
             <label class="field-label">
                 <span class="field-label-text">
                     ## Translators: This labels the selector for which group of students can view a post

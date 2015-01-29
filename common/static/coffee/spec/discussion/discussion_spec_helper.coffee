@@ -317,7 +317,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <ul class="post-errors" style="display: none"></ul>
         <div class="forum-new-post-form-wrapper"></div>
         <% if (cohort_options) { %>
-        <div class="post-field">
+        <div class="post-field group-selector-wrapper<% if (!is_commentable_cohorted) { %> disabled<% } %>">
             <label class="field-label">
                 <span class="field-label-text">
                     Visible To:
