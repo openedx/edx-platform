@@ -9,6 +9,7 @@ from pymongo import MongoClient
 
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
+from nose.plugins.attrib import attr
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest, create_user_partition_json
 from xmodule.partitions.partitions import Group
@@ -21,6 +22,7 @@ from ...pages.studio.settings_group_configurations import GroupConfigurationsPag
 import uuid
 
 
+@attr('shard_3')
 class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for cohort management on the LMS Instructor Dashboard
@@ -464,6 +466,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         self.assertEquals(expected_message, messages[0])
 
 
+@attr('shard_3')
 class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
     """
     Tests for linking between content groups and cohort in the instructor dashboard.
