@@ -41,9 +41,11 @@ this document.
   equivalent visual cue, for any audible content.
 
 * Many people with disabilities use "`Assistive Technology
-  <http://www.w3.org/TR/WCAG20/#atdef>`_" (such as screen readers) to interact with their computers, web browsers, and web applications. Users may customize
+  <http://www.w3.org/TR/WCAG20/#atdef>`_" (such as screen readers) to interact
+  with their computers, web browsers, and web applications. Users may customize
   their operating system, browser or web page display properties to make web
-  applications easier for them to use. For example, they might increase the font size in their displays, reverse or increase contrast, or remove images. 
+  applications easier for them to use. For example, they might increase the font
+  size in their displays, reverse or increase contrast, or remove images.
 
 * In order that assistive technologies can provide the maximum information to
   users, anything in a user interface that is conveyed visually (such as the
