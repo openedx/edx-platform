@@ -33,7 +33,6 @@ from ...pages.studio.settings import SettingsPage
 from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
-from ...pages.studio.settings import SettingsPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
 
 
@@ -274,6 +273,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Add a verified mode to the course
         ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
 
+    @skip('flaky ECOM-1007')
     def test_immediate_verification_enrollment(self):
         # Create a user and log them in
         AutoAuthPage(self.browser).visit()
