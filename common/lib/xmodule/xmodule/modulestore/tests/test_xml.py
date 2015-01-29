@@ -11,6 +11,7 @@ from xmodule.modulestore.xml import XMLModuleStore
 from xmodule.modulestore import ModuleStoreEnum
 
 from xmodule.tests import DATA_DIR
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 
@@ -138,3 +139,12 @@ class TestXMLModuleStore(unittest.TestCase):
         other_parent = store.get_item(other_parent_loc)
         # children rather than get_children b/c the instance returned by get_children != shared_item
         self.assertIn(shared_item_loc, other_parent.children)
+
+    def test_get_course_structure(self):
+        """
+        Tests the implementation of ModuleStoreRead.get_course_structure.
+        """
+        # The XML modulestore does not support this method and should raise an exception when called.
+        store = XMLModuleStore(DATA_DIR, course_dirs=[])
+        course_key = CourseKey.from_string('edX/DemoX/Demo_Course')
+        self.assertRaises(NotImplementedError, store.get_course_structure, [course_key])

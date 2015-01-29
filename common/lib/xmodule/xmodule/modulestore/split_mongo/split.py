@@ -77,6 +77,7 @@ from xmodule.modulestore import (
 
 from ..exceptions import ItemNotFoundError
 from .caching_descriptor_system import CachingDescriptorSystem
+from xmodule.modulestore.models import Block, CourseStructure
 from xmodule.modulestore.split_mongo.mongo_connection import MongoConnection, DuplicateKeyError
 from xmodule.modulestore.split_mongo import BlockKey, CourseEnvelope, BlockData
 from xmodule.error_module import ErrorDescriptor
@@ -3013,6 +3014,39 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         to be run during server startup.
         """
         self.db_connection.ensure_indexes()
+
+    def _get_block_usage_locator(self, course_key, block_key):
+        return BlockUsageLocator(course_key, block_key.type, block_key.id)
+
+    def _format_course_structure(self, course_key, structure, version):
+        # Convert the root key to a locator string
+        root = unicode(self._get_block_usage_locator(course_key, structure[u'root']))
+        blocks = {}
+
+        for key, block in structure[u'blocks'].iteritems():
+            locator = unicode(self._get_block_usage_locator(course_key, key))
+            fields = block.get(u'fields', {})
+            children = fields.get(u'children', [])
+            children = [unicode(self._get_block_usage_locator(course_key, child)) for child in children]
+
+            blocks[locator] = Block(locator,
+                                    block[u'block_type'],
+                                    display_name=fields.get(u'display_name', None),
+                                    format=fields.get(u'format', None),
+                                    graded=fields.get(u'graded', False),
+                                    children=children)
+
+        return CourseStructure(root, blocks, version=version)
+
+    def get_course_structure(self, course_id, version=None):
+        if not version:
+            course_index = self.get_course_index(course_id)
+            versions = course_index[u'versions']
+            version = versions.get(ModuleStoreEnum.BranchName.published) or versions.get(
+                ModuleStoreEnum.BranchName.draft)
+
+        structure = self.get_structure(course_id, version)
+        return self._format_course_structure(course_id, structure, version)
 
 
 class SparseList(list):
