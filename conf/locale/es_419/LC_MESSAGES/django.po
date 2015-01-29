@@ -451,7 +451,7 @@ msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
+msgstr "Ya existe una cuenta con el correo electrónico '{username}'."
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
@@ -9768,7 +9768,7 @@ msgid ""
 "{platform_name}, please email {email}."
 msgstr ""
 "Si usted es una universidad que deseen colaborar o si tiene preguntas sobre "
-"{platform_name} , envíe un correo electrónico {email}."
+"{PLATFORM_NAME} , envíe un correo electrónico {email}."
 
 #: lms/templates/static_templates/contact.html
 msgid "Accessibility"
@@ -14826,7 +14826,7 @@ msgstr "Configuraciones de Grupo"
 #: cms/templates/group_configurations.html
 #: cms/templates/visibility_editor.html
 msgid "Content Groups"
-msgstr ""
+msgstr "Grupos de Contenido"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
@@ -14846,6 +14846,13 @@ msgid ""
 " can customize the content that a particular cohort or cohorts sees in your "
 "course."
 msgstr ""
+"Use grupos de contenido para dar acceso a grupos de estudiantes para una "
+"configuración especifica del contenido del curso. Además de los contenidos "
+"del curso que está dirigido a todos los alumnos, cada grupo de contenido "
+"muestra específicamente lo que usted designa como visible para dicho grupo. "
+"Al asociar un grupo de contenido con una o más conjuntos, se puede "
+"personalizar el contenido que una cohorte o cohortes particulares, ver en el"
+" curso."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -14853,6 +14860,10 @@ msgid ""
 "edit the name of a content group, hover over its box and click "
 "{em_start}Edit{em_end}. Content groups cannot be deleted."
 msgstr ""
+"Haga clic en {em_start}Nuevo Grupo de Contenido{em_end} para añadir un nuevo"
+" grupo de contenido. Para editar el nombre de un grupo de contenido, coloque"
+" el curso sobre el cuadro y haga clic en {em_start} Editar {em_end}. Grupos "
+"de contenido no pueden ser borrados"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
@@ -15670,11 +15681,11 @@ msgstr "Expandir o Colapsar"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility Settings"
-msgstr ""
+msgstr "Configuración de visibilidad"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilidad"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -15765,7 +15776,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
-msgstr ""
+msgstr "No existe contenido de grupos"
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -15776,7 +15787,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
-msgstr ""
+msgstr "Administrador de contenido  de grupo"
 
 #. Translators: Any text between {screen_reader_start} and {screen_reader_end}
 #. is only read by screen readers and never shown in the browser.
@@ -15789,21 +15800,23 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "All Students and Staff"
-msgstr ""
+msgstr "Todos los estudiantes y personal"
 
 #: cms/templates/visibility_editor.html
 msgid "Specific Content Groups"
-msgstr ""
+msgstr "Contenido de grupo específico"
 
 #: cms/templates/visibility_editor.html
 msgid "Deleted Content Group"
-msgstr ""
+msgstr "Contenido de grupo eliminado"
 
 #: cms/templates/visibility_editor.html
 msgid ""
 "Content group no longer exists. Please choose another or allow access to All"
 " Students and staff"
 msgstr ""
+"El contenido del curso ya no existe. Por favor seleccione otro o conceda "
+"acceso a todos los estudiantes y al personal"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -15880,15 +15893,15 @@ msgstr ""
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Navigation for {course_name}"
-msgstr ""
+msgstr "Navegando por {course_name}"
 
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
-msgstr ""
+msgstr "Librería actual"
 
 #: cms/templates/widgets/header.html
 msgid "Library"
-msgstr ""
+msgstr "Librería"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Contextual Online Help"
