@@ -80,7 +80,9 @@ class LibraryTestCase(ModuleStoreTestCase):
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            lib_content_block.runtime._services['user'] = Mock(user_id=self.user.id)  # pylint: disable=protected-access
+            mocked_user_service = Mock(user_id=self.user.id).get_current_user.return_value = {}
+            lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
+
         handler_url = reverse_usage_url(
             'component_handler',
             lib_content_block.location,
