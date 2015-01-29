@@ -7,6 +7,8 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
+
+from courseware.models import StudentModule
 from xmodule.modulestore.django import modulestore
 
 from milestones.api import (
@@ -146,6 +148,35 @@ def fulfill_course_milestone(course_key, user):
         course_milestones = get_course_milestones(course_key=course_key, relationship="fulfills")
         for milestone in course_milestones:
             add_user_milestone({'id': user.id}, milestone)
+
+
+def calculate_entrance_exam_score(user, course_descriptor, exam_modules):
+    """
+    Calculates the score (percent) of the entrance exam using the provided modules
+    """
+    exam_module_ids = [exam_module.location for exam_module in exam_modules]
+    student_modules = StudentModule.objects.filter(
+        student=user,
+        course_id=course_descriptor.id,
+        module_state_key__in=exam_module_ids,
+    )
+    exam_pct = 0
+    if student_modules:
+        module_pcts = []
+        ignore_categories = ['course', 'chapter', 'sequential', 'vertical']
+        for module in exam_modules:
+            if module.graded and module.category not in ignore_categories:
+                module_pct = 0
+                try:
+                    student_module = student_modules.get(module_state_key=module.location)
+                    if student_module.max_grade:
+                        module_pct = student_module.grade / student_module.max_grade
+                    module_pcts.append(module_pct)
+                except StudentModule.DoesNotExist:
+                    pass
+        if module_pcts:
+            exam_pct = sum(module_pcts) / float(len(module_pcts))
+    return exam_pct
 
 
 def milestones_achieved_by_user(user, namespace):
