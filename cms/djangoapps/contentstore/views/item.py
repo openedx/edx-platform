@@ -42,7 +42,7 @@ from student.auth import has_studio_write_access, has_studio_read_access
 from contentstore.utils import find_release_date_source, find_staff_lock_source, is_currently_visible_to_students, \
     ancestor_has_staff_lock, has_children_visible_to_specific_content_groups
 from contentstore.views.helpers import is_unit, xblock_studio_url, xblock_primary_child_category, \
-    xblock_type_display_name, get_parent_xblock
+    xblock_type_display_name, get_parent_xblock, create_xblock, usage_key_with_run
 from contentstore.views.preview import get_preview_fragment
 from edxmako.shortcuts import render_to_string
 from models.settings.course_grading import CourseGradingModel
@@ -77,15 +77,6 @@ def hash_resource(resource):
     md5 = hashlib.md5()
     md5.update(repr(resource))
     return md5.hexdigest()
-
-
-def usage_key_with_run(usage_key_string):
-    """
-    Converts usage_key_string to a UsageKey, adding a course run if necessary
-    """
-    usage_key = UsageKey.from_string(usage_key_string)
-    usage_key = usage_key.replace(course_key=modulestore().fill_in_run(usage_key.course_key))
-    return usage_key
 
 
 def _filter_entrance_exam_grader(graders):
@@ -536,13 +527,12 @@ def create_item(request):
 @expect_json
 def _create_item(request):
     """View for create items."""
-    usage_key = usage_key_with_run(request.json['parent_locator'])
+    parent_locator = request.json['parent_locator']
+    usage_key = usage_key_with_run(parent_locator)
     if not has_studio_write_access(request.user, usage_key.course_key):
         raise PermissionDenied()
 
     category = request.json['category']
-    display_name = request.json.get('display_name')
-
     if isinstance(usage_key, LibraryUsageLocator):
         # Only these categories are supported at this time.
         if category not in ['html', 'problem', 'video']:
@@ -550,91 +540,17 @@ def _create_item(request):
                 "Category '%s' not supported for Libraries" % category, content_type='text/plain'
             )
 
-    store = modulestore()
-    with store.bulk_operations(usage_key.course_key):
-        parent = store.get_item(usage_key)
-        dest_usage_key = usage_key.replace(category=category, name=uuid4().hex)
+    created_block = create_xblock(
+        parent_locator=parent_locator,
+        user=request.user,
+        category=category,
+        display_name=request.json.get('display_name'),
+        boilerplate=request.json.get('boilerplate')
+    )
 
-        # get the metadata, display_name, and definition from the request
-        metadata = {}
-        data = None
-        template_id = request.json.get('boilerplate')
-        if template_id:
-            clz = parent.runtime.load_block_type(category)
-            if clz is not None:
-                template = clz.get_template(template_id)
-                if template is not None:
-                    metadata = template.get('metadata', {})
-                    data = template.get('data')
-
-        if display_name is not None:
-            metadata['display_name'] = display_name
-
-        # Entrance Exams: Chapter module positioning
-        child_position = None
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
-            is_entrance_exam = request.json.get('is_entrance_exam', False)
-            if category == 'chapter' and is_entrance_exam:
-                metadata['is_entrance_exam'] = is_entrance_exam
-                metadata['in_entrance_exam'] = True  # Inherited metadata, all children will have it
-                child_position = 0
-
-        # TODO need to fix components that are sending definition_data as strings, instead of as dicts
-        # For now, migrate them into dicts here.
-        if isinstance(data, basestring):
-            data = {'data': data}
-
-        created_block = store.create_child(
-            request.user.id,
-            usage_key,
-            dest_usage_key.block_type,
-            block_id=dest_usage_key.block_id,
-            definition_data=data,
-            metadata=metadata,
-            runtime=parent.runtime,
-            position=child_position
-        )
-
-        # Entrance Exams: Grader assignment
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False):
-            course = store.get_course(usage_key.course_key)
-            if hasattr(course, 'entrance_exam_enabled') and course.entrance_exam_enabled:
-                if category == 'sequential' and request.json.get('parent_locator') == course.entrance_exam_id:
-                    grader = {
-                        "type": "Entrance Exam",
-                        "min_count": 0,
-                        "drop_count": 0,
-                        "short_label": "Entrance",
-                        "weight": 0
-                    }
-                    grading_model = CourseGradingModel.update_grader_from_json(
-                        course.id,
-                        grader,
-                        request.user
-                    )
-                    CourseGradingModel.update_section_grader_type(
-                        created_block,
-                        grading_model['type'],
-                        request.user
-                    )
-
-        # VS[compat] cdodge: This is a hack because static_tabs also have references from the course module, so
-        # if we add one then we need to also add it to the policy information (i.e. metadata)
-        # we should remove this once we can break this reference from the course to static tabs
-        if category == 'static_tab':
-            display_name = display_name or _("Empty")  # Prevent name being None
-            course = store.get_course(dest_usage_key.course_key)
-            course.tabs.append(
-                StaticTab(
-                    name=display_name,
-                    url_slug=dest_usage_key.name,
-                )
-            )
-            store.update_item(course, request.user.id)
-
-        return JsonResponse(
-            {"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)}
-        )
+    return JsonResponse(
+        {"locator": unicode(created_block.location), "courseKey": unicode(created_block.location.course_key)}
+    )
 
 
 def _duplicate_item(parent_usage_key, duplicate_source_usage_key, user, display_name=None):
