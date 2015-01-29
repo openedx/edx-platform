@@ -50,6 +50,9 @@ lazy==1.1
 lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
+--allow-external meliae
+--allow-unverified meliae
+meliae==0.4.0
 mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
