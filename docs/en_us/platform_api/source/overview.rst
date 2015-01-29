@@ -35,6 +35,9 @@ With the edX Platform API, you can:
 * Get :ref:`user details<Get User Details>` and :ref:`course enrollments<Get a
   User's Course Enrollments>` for a user.
 
+* :ref:`Get or change user status in a course <Get or Change User Status in a
+  Course>`
+
 * Get :ref:`course information<Get the Course About Page>`, :ref:`updates<Get
   Course Updates>`, and :ref:`handouts<Get Course Handouts>` for courses the
   user is enrolled in.
