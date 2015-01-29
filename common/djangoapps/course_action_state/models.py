@@ -83,13 +83,17 @@ class CourseActionUIState(CourseActionState):
         """
         abstract = True
 
+    # WARNING - when you edit this value, you're also modifying the max_length
+    # of the `message` column (see below)
+    MAX_MESSAGE_LENGTH = 1000
+
     # FIELDS
 
     # Whether or not the status should be displayed to users
     should_display = models.BooleanField()
 
     # Message related to the status
-    message = models.CharField(max_length=1000)
+    message = models.CharField(max_length=MAX_MESSAGE_LENGTH)
 
 
 # Rerun courses also need these fields. All rerun course actions will have a row here as well.

@@ -1721,6 +1721,26 @@ class RerunCourseTest(ContentStoreTestCase):
             self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
             self.assertIn(error_message, rerun_state.message)
 
+    def test_rerun_error_trunc_message(self):
+        """
+        CourseActionUIState.message is sometimes populated with the contents
+        of Python tracebacks. This test ensures we don't crash when attempting
+        to insert a value exceeding its max_length (note that sqlite does not
+        complain if this happens, but MySQL throws an error).
+        """
+        with mock.patch(
+            'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
+            mock.Mock(side_effect=Exception()),
+        ):
+            source_course = CourseFactory.create()
+            message_too_long = "traceback".rjust(CourseRerunState.MAX_MESSAGE_LENGTH * 2, '-')
+            with mock.patch('traceback.format_exc', return_value=message_too_long):
+                destination_course_key = self.post_rerun_request(source_course.id)
+            rerun_state = CourseRerunState.objects.find_first(course_key=destination_course_key)
+            self.assertEquals(rerun_state.state, CourseRerunUIStateManager.State.FAILED)
+            self.assertTrue(rerun_state.message.endswith("traceback"))
+            self.assertEqual(len(rerun_state.message), CourseRerunState.MAX_MESSAGE_LENGTH)
+
 
 class EntryPageTestCase(TestCase):
     """
