@@ -162,8 +162,9 @@ class VideosHandlerTestCase(VideoUploadTestMixin, CourseTestCase):
         self.assertEqual(response.status_code, 200)
         response_videos = json.loads(response.content)["videos"]
         self.assertEqual(len(response_videos), len(self.previous_uploads))
-        for response_video in response_videos:
-            original_video = self._get_previous_upload(response_video["edx_video_id"])
+        for i, response_video in enumerate(response_videos):
+            # Videos should be returned by creation date descending
+            original_video = self.previous_uploads[-(i + 1)]
             self.assertEqual(
                 set(response_video.keys()),
                 set(["edx_video_id", "client_video_id", "created", "duration", "status"])
@@ -338,14 +339,14 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                 ["{} URL".format(profile) for profile in expected_profiles]
             )
         )
-        actual_video_ids = []
-        for row in reader:
+        rows = list(reader)
+        self.assertEqual(len(rows), len(self.previous_uploads))
+        for i, row in enumerate(rows):
             response_video = {
                 key.decode("utf-8"): value.decode("utf-8") for key, value in row.items()
             }
-            self.assertNotIn(response_video["Video ID"], actual_video_ids)
-            actual_video_ids.append(response_video["Video ID"])
-            original_video = self._get_previous_upload(response_video["Video ID"])
+            # Videos should be returned by creation date descending
+            original_video = self.previous_uploads[-(i + 1)]
             self.assertEqual(response_video["Name"], original_video["client_video_id"])
             self.assertEqual(response_video["Duration"], str(original_video["duration"]))
             dateutil.parser.parse(response_video["Date Added"])
@@ -365,7 +366,6 @@ class VideoUrlsCsvTestCase(VideoUploadTestMixin, CourseTestCase):
                     self.assertEqual(response_profile_url, original_encoded_for_profile["url"])
                 else:
                     self.assertEqual(response_profile_url, "")
-        self.assertEqual(len(actual_video_ids), len(self.previous_uploads))
 
     def test_basic(self):
         self._check_csv_response(["profile1"])
