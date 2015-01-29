@@ -58,10 +58,9 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         self.assertTrue(self.e_commerce_link in response.content)
 
         # Order/Invoice sales csv button text should render in e-commerce page
-        self.assertTrue('Total CC Amount' in response.content)
-        self.assertTrue('Download All CC Sales' in response.content)
-        self.assertTrue('Download All Invoice Sales' in response.content)
-        self.assertTrue('Enter the invoice number to invalidate or re-validate sale' in response.content)
+        self.assertTrue('Total Credit Card Purchases' in response.content)
+        self.assertTrue('Download All Credit Card Purchases' in response.content)
+        self.assertTrue('Download All Invoices' in response.content)
 
         # removing the course finance_admin role of login user
         CourseFinanceAdminRole(self.course.id).remove_users(self.instructor)
@@ -69,9 +68,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         # Order/Invoice sales csv button text should not be visible in e-commerce page if the user is not finance admin
         url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url)
-        self.assertFalse('Download All Order Sales' in response.content)
-        self.assertFalse('Download All Invoice Sales' in response.content)
-        self.assertFalse('Enter the invoice number to invalidate or re-validate sale' in response.content)
+        self.assertFalse('Download All Invoices' in response.content)
 
     def test_user_view_course_price(self):
         """

@@ -1854,17 +1854,13 @@ input[name="subject"] {
   }
   span.code_tip {
     display: block;
-    margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) $baseline);
-    background: none repeat scroll 0 0 #F8F4EC;
-    border-bottom: 1px solid #DDDDDD;
-    border-top: 1px solid #DDDDDD;
+    margin-bottom: 30px;
+    @include padding(($baseline/2) 15px ($baseline/2) 0);
     color: #3C3C3C;
     line-height: 30px;
     .add{
       @include button(simple, $blue);
       @extend .button-reset;
-      @include float(right);
       font-size: em(13);
     }
   }
@@ -1875,7 +1871,6 @@ input[name="subject"] {
     @include padding(($baseline/2) 15px ($baseline/2) 1px);
     .add{
       font-size: em(13);
-      @include float(right);
     }
   }
    span.invalid_sale {
