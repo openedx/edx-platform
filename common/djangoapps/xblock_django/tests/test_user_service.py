@@ -10,7 +10,7 @@ from xblock_django.user_service import (
 )
 from student.models import anonymous_id_for_user
 from student.tests.factories import UserFactory, AnonymousUserFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 
 
 class UserServiceTestCase(TestCase):
@@ -80,9 +80,10 @@ class UserServiceTestCase(TestCase):
         """
         Tests for anonymous_user_id method returns anonymous user id for a user.
         """
+        course_key = CourseKey.from_string('edX/toy/2012_Fall')
         anon_user_id = anonymous_id_for_user(
             user=self.user,
-            course_id=SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'),
+            course_id=course_key,
             save=True
         )
 
