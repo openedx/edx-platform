@@ -7,3 +7,6 @@
 # Numpy and scipy can't be installed in the same pip run.
 # Install numpy before other things to help resolve the problem.
 numpy==1.6.2
+
+# Needed for meliae
+Cython==0.21.2
