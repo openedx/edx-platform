@@ -156,7 +156,9 @@ icon, or the screen reader text.
 
 Content injected into the DOM using JavaScript is more accessible than content added using CSS.
 
-When adding images that represent important navigational or information elements, use ``<img>`` elements with appropriate ``alt`` attributes. For more information about making images accessible, see :ref:`Make images accessible`.
+When adding images that represent important navigational or information
+elements, use ``<img>`` elements with appropriate ``alt`` attributes. For more
+information about making images accessible, see :ref:`Make images accessible`.
    
 
 .. _Include title attributes for all iframe elements:
@@ -245,18 +247,6 @@ controls are accessible, and consider the following points.
 * When the state or some other property of your widget changes, are those
   changes conveyed to users of assistive technology using aria-attributes?
 
-Additional considerations for developing custom widgets are covered in `General
-steps for building an accessible widget <http://www.w3.org/TR/wai-aria-
-practices/#accessiblewidget>`_. 
-
-Specific considerations for common widgets are covered in `WAI-ARIA 1.0
-Authoring Practices - Design Patterns <http://www.w3.org/TR/2013/WD-wai-aria-
-practices-20130307/#aria_ex>`_. 
-
-A quick reference list of Required and Supported ARIA attributes by role is
-available in the `ARIA Role, State, and Property Quick Reference
-<http://www.w3.org/TR/aria-in-html/#aria-role-state-and- property-quick-
-reference>`_
 
 .. _note:: Adding an ARIA ``role`` overrides the native role semantics reported
    to the user from the Accessibility API. ARIA indirectly affects what is
@@ -303,7 +293,8 @@ Example: Adding descriptive labels to HTML5 structural elements
 Some cautions for using WAI-ARIA
 --------------------------------
 
-The following sections outline specific cases in which you have to be careful using WAI-ARIA.
+The following sections outline specific cases in which you have to be careful
+using WAI-ARIA.
 
 * Setting ``role="presentation"`` strips away all of the semantics from a native
   element.
@@ -333,6 +324,19 @@ The following sections outline specific cases in which you have to be careful us
   information is available in an accessible format as well as a less than
   accessible format.
 
+
+Additional considerations for developing custom widgets are covered in `General
+steps for building an accessible widget <http://www.w3.org/TR/wai-aria-
+practices/#accessiblewidget>`_. 
+
+Specific considerations for common widgets are covered in `WAI-ARIA 1.0
+Authoring Practices - Design Patterns <http://www.w3.org/TR/2013/WD-wai-aria-
+practices-20130307/#aria_ex>`_. 
+
+A quick reference list of Required and Supported ARIA attributes by role is
+available in the `ARIA Role, State, and Property Quick Reference
+<http://www.w3.org/TR/aria-in-html/#aria-role-state-and- property-quick-
+reference>`_
 
 .. _Manage focus for popups:
 
@@ -426,11 +430,13 @@ Alt attributes
 
 Regardless of whether or not an image requires a text alternative, *all*
 ``<img>`` elements require an ``alt`` attribute, even if the value of that
-attribute is ``""`` (NULL). If your image is purely decorative, or has a text alternative immediately adjacent to it, use a NULL alt attribute: ``alt=""``.
+attribute is ``""`` (NULL). If your image is purely decorative, or has a text
+alternative immediately adjacent to it, use a NULL alt attribute: ``alt=""``.
 
 If an ``<img>`` element does not have a NULL alt attribute, you should make sure
 that the value you use in its alt attribute provides useful information to users
-who rely on screen readers. Screen readers will expose the path to the image as a last resort, if an alt attribute value does not exist.
+who rely on screen readers. Screen readers will expose the path to the image as
+a last resort, if an alt attribute value does not exist.
 
 
 ------------------------------------
@@ -456,9 +462,9 @@ determine what would be most useful to the user.
       DOM, use a "NULL" value in the alt attribute, otherwise a screen reader is
       exposed to the same content twice.
     
-	* If yes, and if the text within the image is there simply for visual effect
-	  (such as a skewed screenshot of computer code), use a "NULL" value in the
-	  alt attribute.		  
+    * If yes, and if the text within the image is there simply for visual effect
+      (such as a skewed screenshot of computer code), use a "NULL" value in the
+      alt attribute.
 	  
 * Does your image contribute meaning to the current page or context?
   
@@ -506,11 +512,16 @@ and easy way to detect the most common mistakes.
 
 These are some automated tools for accessibility testing.
 
-* `WAVE Accessibility Toolbar <http://wave.webaim.org/toolbar/>`_ (Chrome/Firefox)
+* `WAVE Accessibility Toolbar <http://wave.webaim.org/toolbar/>`_
+  (Chrome/Firefox)
   
-* `Web Developer Toolbar <https://addons.mozilla.org/en-US/firefox/addon/web-developer/>`_ (Firefox)
+* `Web Developer Toolbar <https://addons.mozilla.org/en-US/firefox/addon/web-
+  developer/>`_ (Firefox)
   
-* `Chrome Accessibility Developer Tools <https://chrome.google.com/webstore/detail/accessibility-developer-t/fpkknkljclfencbdbgkenhalefipecmb>`_ 
+* `Chrome Accessibility Developer Tools
+  <https://chrome.google.com/webstore/detail /accessibility-
+  developer-t/fpkknkljclfencbdbgkenhalefipecmb>`_
+
 * Your keyboard
 
 
@@ -526,5 +537,4 @@ options.
 * `JAWS <http://www.freedomscientific.com/Downloads/ProductDemos>`_ (Screen
   Reader for Windows - Commercial but free to use in 40 minute demo mode)
   
-For more information about meeting web accessibility guidelines, refer to   
-  
+
