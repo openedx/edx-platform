@@ -137,8 +137,18 @@ END
                 paver test_acceptance -s lms --extra_args="-v 3"
                 ;;
 
+            "2")
+                mkdir -p reports
+                mkdir -p reports/acceptance
+                cat > reports/acceptance/xunit.xml <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
+<testcase classname="lettuce.tests" name="shard_placeholder" time="0.001"></testcase>
+</testsuite>
+END
+                ;;
             *)
-                paver test_acceptance -s lms --extra_args="-v 3 --tag shard_${SHARD}"
+                paver test_acceptance -s lms --extra_args="-v 3"
                 ;;
         esac
         ;;
