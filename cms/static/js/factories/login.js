@@ -8,7 +8,6 @@ define(['jquery.cookie', 'utility'], function() {
                 dataType: 'json',
                 data: data,
                 success: callback,
-                headers : {'X-CSRFToken':$.cookie('csrftoken')}
             });
         }
 
