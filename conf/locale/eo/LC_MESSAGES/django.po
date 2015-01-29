@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-29 19:25+0000\n"
-"PO-Revision-Date: 2015-01-29 19:25:10.668248\n"
+"POT-Creation-Date: 2015-01-05 10:10-0500\n"
+"PO-Revision-Date: 2015-01-05 15:10:55.806837\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -98,36 +98,6 @@ msgstr "Süßséçtïön Ⱡ#"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Unit"
 msgstr "Ûnït Ⱡ'σяєм#"
-
-#: common/djangoapps/cities/models.py common/djangoapps/cities/models.py
-#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
-msgid "Code"
-msgstr "Çödé Ⱡ'σяєм#"
-
-#: common/djangoapps/cities/models.py lms/templates/shoppingcart/receipt.html
-msgid "State"
-msgstr "Stäté Ⱡ'σяєм ι#"
-
-#: common/djangoapps/cities/models.py
-msgid "States"
-msgstr "Stätés Ⱡ'σяєм ιρѕ#"
-
-#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
-#. Translators: This label appears above a field on the registration form
-#. which allows the user to input the city in which they live.
-#: common/djangoapps/cities/models.py
-#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
-#: lms/templates/register.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-#: lms/templates/shoppingcart/receipt.html
-msgid "City"
-msgstr "Çïtý Ⱡ'σяєм#"
-
-#: common/djangoapps/cities/models.py
-msgid "Cities"
-msgstr "Çïtïés Ⱡ'σяєм ιρѕ#"
 
 #: common/djangoapps/course_modes/models.py
 msgid "Honor Code Certificate"
@@ -225,15 +195,6 @@ msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "None"
 msgstr "Nöné Ⱡ'σяєм#"
-
-#: common/djangoapps/student/validators.py
-msgid "Identificador no debe contener caracteres."
-msgstr "Ìdéntïfïçädör nö déßé çönténér çäräçtérés. Ⱡ'σяєм ιρѕυ#"
-
-#: common/djangoapps/student/validators.py common/djangoapps/student/views.py
-#: common/djangoapps/student/views.py
-msgid "Invalid ID"
-msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -432,10 +393,6 @@ msgid "You are missing one or more required fields"
 msgstr "Ýöü äré mïssïng öné ör möré réqüïréd fïélds Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
-msgid "A valid ID is required."
-msgstr "À välïd ÌD ïs réqüïréd. Ⱡ'σяє#"
-
-#: common/djangoapps/student/views.py
 msgid "Username cannot be more than {num} characters long"
 msgstr "Ûsérnämé çännöt ßé möré thän {num} çhäräçtérs löng Ⱡ'σяєм ιρѕυм #"
 
@@ -540,6 +497,10 @@ msgstr ""
 #: common/djangoapps/student/views.py
 msgid "Name required"
 msgstr "Nämé réqüïréd Ⱡ'#"
+
+#: common/djangoapps/student/views.py common/djangoapps/student/views.py
+msgid "Invalid ID"
+msgstr "Ìnvälïd ÌD Ⱡ#"
 
 #. Translators: the translation for "LONG_DATE_FORMAT" must be a format
 #. string for formatting dates in a long form.  For example, the
@@ -3225,7 +3186,7 @@ msgstr "Péér grädïng Ⱡ#"
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: "Syllabus" appears on a tab that, when clicked, opens the
 #. syllabus of the course.
-#: common/lib/xmodule/xmodule/tabs.py cms/templates/syllabuses.html
+#: common/lib/xmodule/xmodule/tabs.py lms/templates/courseware/syllabus.html
 msgid "Syllabus"
 msgstr "Sýlläßüs #"
 
@@ -7308,6 +7269,15 @@ msgstr ""
 " ∂#"
 
 #. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
+#. Translators: This label appears above a field on the registration form
+#. which allows the user to input the city in which they live.
+#: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+#: lms/templates/shoppingcart/receipt.html
+msgid "City"
+msgstr "Çïtý Ⱡ'σяєм#"
+
+#. #-#-#-#-#  django-partial.po (0.1a)  #-#-#-#-#
 #. Translators: This label appears above a dropdown menu on the registration
 #. form used to select the country in which the user lives.
 #: openedx/core/djangoapps/user_api/views.py lms/templates/register.html
@@ -7715,9 +7685,13 @@ msgstr "Péndïng #"
 msgid "E-mail"
 msgstr "É-mäïl Ⱡ'σяєм ιρѕ#"
 
+#. Translators: This is the placeholder text for a field that requests an
+#. email
+#. address.
 #: cms/templates/login.html cms/templates/manage_users.html
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid "example: username@domain.com"
 msgstr "éxämplé: üsérnämé@dömäïn.çöm Ⱡ'σяєм #"
 
@@ -7740,15 +7714,18 @@ msgstr "Stäff Ⱡ'σяєм ι#"
 msgid "Sign Up"
 msgstr "Sïgn Ûp #"
 
+#. Translators: This is the placeholder text for a field that requests the
+#. user's full name.
+#: cms/templates/register.html lms/templates/register.html
+#: lms/templates/verify_student/face_upload.html
+msgid "example: Jane Doe"
+msgstr "éxämplé: Jäné Döé Ⱡ'σ#"
+
 #: cms/templates/register.html lms/templates/register-shib.html
 #: lms/templates/register.html lms/templates/signup_modal.html
 #: lms/templates/signup_modal.html
 msgid "Public Username"
 msgstr "Püßlïç Ûsérnämé Ⱡ'#"
-
-#: cms/templates/register.html lms/templates/register.html
-msgid "TYPE ID"
-msgstr "TÝPÉ ÌD #"
 
 #: cms/templates/register.html
 #: lms/templates/dashboard/_dashboard_info_language.html
@@ -9151,10 +9128,6 @@ msgstr ""
 "Pléäsé çömplété thé föllöwïng fïélds tö régïstér för än äççöünt.  Ⱡ'σяєм "
 "ιρѕυм ∂σłσя #"
 
-#: lms/templates/register.html lms/templates/verify_student/face_upload.html
-msgid "example: Jane Doe"
-msgstr "éxämplé: Jäné Döé Ⱡ'σ#"
-
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяєм ιρѕυ#"
@@ -9162,10 +9135,6 @@ msgstr "Néédéd för äný çértïfïçätés ýöü mäý éärn Ⱡ'σяє�
 #: lms/templates/register.html lms/templates/register.html
 msgid "cannot be changed later"
 msgstr "çännöt ßé çhängéd lätér Ⱡ'σяє#"
-
-#: lms/templates/register.html
-msgid "Ejemplo: Quito, Pichincha, Ecuador"
-msgstr "Éjémplö: Qüïtö, Pïçhïnçhä, Éçüädör Ⱡ'σяєм ιρ#"
 
 #: lms/templates/register.html
 msgid "Welcome {username}"
@@ -10562,6 +10531,10 @@ msgstr "Vïéw Grädïng ïn stüdïö Ⱡ'σяє#"
 #: lms/templates/courseware/progress.html
 msgid "Course Progress for Student '{username}' ({email})"
 msgstr "Çöürsé Prögréss för Stüdént '{username}' ({email}) Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/courseware/progress.html
+msgid "Download your certificate"
+msgstr "Döwnlöäd ýöür çértïfïçäté Ⱡ'σяєм#"
 
 #: lms/templates/courseware/progress.html
 msgid "{earned:.3n} of {total:.3n} possible points"
@@ -12342,6 +12315,12 @@ msgid "Please enter Coupon detail below"
 msgstr "Pléäsé éntér Çöüpön détäïl ßélöw Ⱡ'σяєм ι#"
 
 #: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+#: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
+msgid "Code"
+msgstr "Çödé Ⱡ'σяєм#"
+
+#: lms/templates/instructor/instructor_dashboard_2/add_coupon_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/edit_coupon_modal.html
 msgid "Percentage Discount"
 msgstr "Pérçéntägé Dïsçöünt Ⱡ'σя#"
@@ -14103,6 +14082,10 @@ msgid "Address 2"
 msgstr "Àddréss 2 #"
 
 #: lms/templates/shoppingcart/receipt.html
+msgid "State"
+msgstr "Stäté Ⱡ'σяєм ι#"
+
+#: lms/templates/shoppingcart/receipt.html
 msgid "Registration for"
 msgstr "Régïsträtïön för Ⱡ'σ#"
 
@@ -15833,8 +15816,8 @@ msgstr "Fïlés &amp; Ûplöäds Ⱡ'σ#"
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/syllabuses.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html cms/templates/widgets/header.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html
 msgid "Content"
 msgstr "Çöntént #"
 
@@ -15842,8 +15825,7 @@ msgstr "Çöntént #"
 #: cms/templates/course_info.html cms/templates/course_outline.html
 #: cms/templates/edit-tabs.html cms/templates/group_configurations.html
 #: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/syllabuses.html cms/templates/textbooks.html
-#: cms/templates/videos_index.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
 msgid "Page Actions"
 msgstr "Pägé Àçtïöns Ⱡ#"
 
@@ -16764,28 +16746,39 @@ msgid "What can I do on this page?"
 msgstr "Whät çän Ì dö ön thïs pägé? Ⱡ'σяєм#"
 
 #: cms/templates/group_configurations.html
-msgid "You can create and edit group configurations."
-msgstr "Ýöü çän çréäté änd édït gröüp çönfïgürätïöns. Ⱡ'σяєм ιρѕυм#"
+msgid "You can create, edit, and delete group configurations."
+msgstr ""
+"Ýöü çän çréäté, édït, änd délété gröüp çönfïgürätïöns. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "A group configuration defines how many groups of students are in an "
-"experiment. When you create a content experiment, you select the group "
+"experiment. When you create an experiment, you select the group "
 "configuration to use."
 msgstr ""
 "À gröüp çönfïgürätïön défïnés höw mäný gröüps öf stüdénts äré ïn än "
-"éxpérïmént. Whén ýöü çréäté ä çöntént éxpérïmént, ýöü séléçt thé gröüp "
-"çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ι#"
+"éxpérïmént. Whén ýöü çréäté än éxpérïmént, ýöü séléçt thé gröüp "
+"çönfïgürätïön tö üsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
 
 #: cms/templates/group_configurations.html
 msgid ""
 "Click {em_start}New Group Configuration{em_end} to add a new configuration. "
-"To edit an existing configuration, hover over its box and click "
+"To edit a configuration, hover over its box and click "
 "{em_start}Edit{em_end}."
 msgstr ""
 "Çlïçk {em_start}Néw Gröüp Çönfïgürätïön{em_end} tö ädd ä néw çönfïgürätïön. "
-"Tö édït än éxïstïng çönfïgürätïön, hövér övér ïts ßöx änd çlïçk "
-"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂#"
+"Tö édït ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk "
+"{em_start}Édït{em_end}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя#"
+
+#: cms/templates/group_configurations.html
+msgid ""
+"You can delete a group configuration only if it is not in use in an "
+"experiment. To delete a configuration, hover over its box and click the "
+"delete icon."
+msgstr ""
+"Ýöü çän délété ä gröüp çönfïgürätïön önlý ïf ït ïs nöt ïn üsé ïn än "
+"éxpérïmént. Tö délété ä çönfïgürätïön, hövér övér ïts ßöx änd çlïçk thé "
+"délété ïçön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι#"
 
 #: cms/templates/group_configurations.html
 msgid "Learn More"
@@ -17333,10 +17326,6 @@ msgid "The term in which your course will run."
 msgstr "Thé térm ïn whïçh ýöür çöürsé wïll rün. Ⱡ'σяєм ιρѕ#"
 
 #: cms/templates/index.html
-msgid "Highest Level of Education Required"
-msgstr "Hïghést Lévél öf Édüçätïön Réqüïréd Ⱡ'σяєм ιρ#"
-
-#: cms/templates/index.html
 msgid "Create"
 msgstr "Çréäté Ⱡ'σяєм ιρѕ#"
 
@@ -17759,16 +17748,8 @@ msgstr ""
 "süppört förüms Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
 
 #: cms/templates/register.html
-msgid "Cedula / Pasaporte"
-msgstr "Çédülä / Päsäpörté Ⱡ'σ#"
-
-#: cms/templates/register.html
-msgid "example: 0102030405"
-msgstr "éxämplé: 0102030405 Ⱡ'σя#"
-
-#: cms/templates/register.html
-msgid "Don't input special characters in your ID"
-msgstr "Dön't ïnpüt spéçïäl çhäräçtérs ïn ýöür ÌD Ⱡ'σяєм ιρѕυ#"
+msgid "Your Location"
+msgstr "Ýöür Löçätïön Ⱡ'#"
 
 #: cms/templates/register.html
 msgid "I agree to the {a_start} Terms of Service {a_end}"
@@ -18048,6 +18029,12 @@ msgstr ""
 " förmät, änd mïnïmüm süggéstéd dïménsïöns äré 375px wïdé ßý 200px täll) "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
 
+#. Translators: This is the placeholder text for a field that requests the URL
+#. for a course image
+#: cms/templates/settings.html
+msgid "Your course image URL"
+msgstr "Ýöür çöürsé ïmägé ÛRL Ⱡ'σя#"
+
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
@@ -18067,6 +18054,12 @@ msgstr "Çöürsé Ìntrödüçtïön Vïdéö Ⱡ'σяєм#"
 #: cms/templates/settings.html
 msgid "Delete Current Video"
 msgstr "Délété Çürrént Vïdéö Ⱡ'σя#"
+
+#. Translators: This is the placeholder text for a field that requests a
+#. YouTube video ID for a course video
+#: cms/templates/settings.html
+msgid "your YouTube video's ID"
+msgstr "ýöür ÝöüTüßé vïdéö's ÌD Ⱡ'σяє#"
 
 #: cms/templates/settings.html
 msgid "Enter your YouTube video's ID (along with any restriction parameters)"
@@ -18258,43 +18251,6 @@ msgstr "Éxpänd ör Çölläpsé Ⱡ'σ#"
 msgid "This block contains multiple components."
 msgstr "Thïs ßlöçk çöntäïns mültïplé çömpönénts. Ⱡ'σяєм ιρѕυ#"
 
-#: cms/templates/syllabuses.html
-msgid "Syllabuses"
-msgstr "Sýlläßüsés Ⱡ#"
-
-#: cms/templates/syllabuses.html
-msgid "New Syllabus"
-msgstr "Néw Sýlläßüs Ⱡ#"
-
-#: cms/templates/syllabuses.html
-msgid "Why should I break my text into chapters?"
-msgstr "Whý shöüld Ì ßréäk mý téxt ïntö çhäptérs? Ⱡ'σяєм ιρѕυ#"
-
-#: cms/templates/syllabuses.html
-msgid ""
-"It's best practice to break your course's textbook into multiple chapters to"
-" reduce loading times for students. Breaking up textbooks into chapters can "
-"also help students more easily find topic-based information."
-msgstr ""
-"Ìt's ßést präçtïçé tö ßréäk ýöür çöürsé's téxtßöök ïntö mültïplé çhäptérs tö"
-" rédüçé löädïng tïmés för stüdénts. Bréäkïng üp téxtßööks ïntö çhäptérs çän "
-"älsö hélp stüdénts möré éäsïlý fïnd töpïç-ßäséd ïnförmätïön. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ є#"
-
-#: cms/templates/syllabuses.html cms/templates/textbooks.html
-msgid "What if my book isn't divided into chapters?"
-msgstr "Whät ïf mý ßöök ïsn't dïvïdéd ïntö çhäptérs? Ⱡ'σяєм ιρѕυм#"
-
-#: cms/templates/syllabuses.html
-msgid ""
-"If you haven't broken your text into chapters, you can upload the entire "
-"text as a single chapter and enter a name of your choice in the Chapter Name"
-" field."
-msgstr ""
-"Ìf ýöü hävén't ßrökén ýöür téxt ïntö çhäptérs, ýöü çän üplöäd thé éntïré "
-"téxt äs ä sïnglé çhäptér änd éntér ä nämé öf ýöür çhöïçé ïn thé Çhäptér Nämé"
-" fïéld. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢#"
-
 #: cms/templates/temp-course-landing.html
 msgid "{platform_name} edge"
 msgstr "{platform_name} édgé #"
@@ -18319,6 +18275,10 @@ msgstr ""
 "téxtßööks ïntö çhäptérs çän älsö hélp stüdénts möré éäsïlý fïnd töpïç-ßäséd "
 "ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ "
 "∂σ єιυѕмσ∂ #"
+
+#: cms/templates/textbooks.html
+msgid "What if my book isn't divided into chapters?"
+msgstr "Whät ïf mý ßöök ïsn't dïvïdéd ïntö çhäptérs? Ⱡ'σяєм ιρѕυм#"
 
 #: cms/templates/textbooks.html
 msgid ""

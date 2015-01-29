@@ -1,40 +1,17 @@
-<header class="js-login-register-header header">
-    <h1 class="headline"><%- gettext("Welcome!") %></h1>
-    <p class="tagline"><%- gettext("Log in or register to take courses from the world's best universities.") %></p>
-</header>
-
-<section id="form-load-fail" class="form-type hidden" aria-hidden="true">
+<section id="form-load-fail" class="form-type hidden">
     <div class="status submission-error">
         <p class="message-copy"><%- gettext("Sorry, we're having some technical problems. Wait a few minutes and try again.") %></p>
     </div>
 </section>
 
-<% if ( mode === 'login' ) { %>
-    <section id="register-anchor" class="form-type">
-        <span>
-            <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
-            <label for="register-option" class="form-label"><%- gettext("I am a new user") %></label>
-        </span>
-        <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden" aria-hidden="true<% } %>"></div>
-    </section>
-<% } %>
-
 <section id="login-anchor" class="form-type">
-    <span>
-        <input type="radio" name="form" id="login-option" value="login" class="form-toggle" <% if ( mode === 'login' ) { %>checked<% } %>>
-        <label for="login-option" class="form-label"><%- gettext("I am a returning user") %></label>
-    </span>
-    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden" aria-hidden="true<% } %>"></div>
+    <div id="login-form" class="form-wrapper <% if ( mode !== 'login' ) { %>hidden<% } %>"></div>
 </section>
 
-<% if ( mode === 'register' ) { %>
-    <section id="register-anchor" class="form-type">
-        <span>
-            <input type="radio" name="form" id="register-option" value="register" class="form-toggle" <% if ( mode === 'register' ) { %>checked<% } %> >
-            <label for="register-option" class="form-label"><%- gettext("I am a new user") %></label>
-        </span>
-        <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden" aria-hidden="true<% } %>"></div>
-    </section>
-<% } %>
+<section id="register-anchor" class="form-type">
+    <div id="register-form" class="form-wrapper <% if ( mode !== 'register' ) { %>hidden<% } %>"></div>
+</section>
 
-<div id="password-reset-wrapper"></div>
+<section id="password-reset-anchor" class="form-type">
+    <div id="password-reset-form" class="form-wrapper hidden" aria-hidden="true"></div>
+</section>

@@ -2,7 +2,7 @@
   <div class="idphoto view">
     <h3 class="title"><%- gettext( "Take a Photo of Your ID" ) %></h3>
     <div class="instruction">
-      <p><%- gettext("Use your webcam to take a picture of your ID so we can match it with your photo and the name on your account.") %></p>
+      <p><%- gettext("Use your webcam to take a photo of your ID. We will match this photo with the photo of your face and the name on your account.") %></p>
     </div>
 
     <div class="wrapper-task">
@@ -27,19 +27,19 @@
         </div>
 
         <div class="help help-faq facefaq">
-          <h4 class="sr title"><%- gettext( "Common Questions" ) %></h4>
+          <h4 class="sr title"><%- gettext( "Frequently Asked Questions" ) %></h4>
 
           <div class="copy">
             <dl class="list-faq">
               <dt class="faq-question">
                 <%- _.sprintf( gettext( "Why does %(platformName)s need my photo?" ), { platformName: platformName } ) %>
               </dt>
-              <dd class="faq-answer"><%- gettext( "We need to match your ID with your photo and name to confirm your identity." ) %></dd>
+              <dd class="faq-answer"><%- gettext( "As part of the verification process, you take a photo of both your face and a government-issued photo ID. Our authorization service confirms your identity by comparing the photo you take with the photo on your ID." ) %></dd>
 
               <dt class="faq-question">
-                <%- _.sprintf( gettext( "What does %(platformName)s do with this picture?" ), { platformName: platformName } ) %>
+                <%- _.sprintf( gettext( "What does %(platformName)s do with this photo?" ), { platformName: platformName } ) %>
               </dt>
-              <dd class="faq-answer"><%- gettext( "We encrypt it and send it to our secure authorization service for review. We use the highest levels of security and do not save the photo or information anywhere once the match has been completed." ) %></dd>
+              <dd class="faq-answer"><%- _.sprintf( gettext( "We use the highest levels of security available to encrypt your photo and send it to our authorization service for review. Your photo and information are not saved or visible anywhere on %(platformName)s after the verification process is complete." ), { platformName: platformName } ) %></dd>
             </dl>
           </div>
         </div>

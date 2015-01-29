@@ -1,24 +1,24 @@
 # #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2014 EdX
+# Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 # #-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2014 EdX
+# Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2014 edX
+# Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2014 edX
+# Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-15 18:24+0000\n"
-"PO-Revision-Date: 2014-10-08 18:08+0000\n"
+"POT-Creation-Date: 2015-01-05 14:57+0000\n"
+"PO-Revision-Date: 2014-12-30 16:00+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Spanish (Peru) (http://www.transifex.com/projects/p/edx-platform/language/es_PE/)\n"
 "MIME-Version: 1.0\n"
@@ -75,7 +75,10 @@ msgstr ""
 msgid "This link will open in a new browser window/tab"
 msgstr ""
 
+#. Translators: This is the status for a video that is in an unknown
+#. state
 #: cms/static/js/factories/manage_users.js
+#: cms/static/js/views/previous_video_upload.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
@@ -106,11 +109,21 @@ msgstr ""
 #: cms/static/js/views/assets.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/asset-library.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
 msgid "Name"
 msgstr ""
 
 #: cms/static/js/views/metadata.js lms/static/js/views/file_uploader.js
 msgid "Upload File"
+msgstr ""
+
+#. Translators: This message will be added to the front of messages of type
+#. error,
+#. e.g. "Error: required field is missing".
+#: cms/static/js/views/xblock_validation.js
+#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
+#: lms/static/js/verify_student/views/step_view.js
+msgid "Error"
 msgstr ""
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
@@ -620,6 +633,8 @@ msgstr ""
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/group-configuration-edit.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
 msgid "Description"
 msgstr ""
 
@@ -2905,6 +2920,64 @@ msgstr ""
 msgid "Saved"
 msgstr ""
 
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "An unexpected error occurred.  Please try again."
+msgstr ""
+
+#: lms/static/js/verify_student/views/make_payment_step_view.js
+msgid "Could not submit order"
+msgstr ""
+
+#: lms/static/js/verify_student/views/payment_confirmation_step_view.js
+msgid "Could not retrieve payment information"
+msgstr ""
+
+#: lms/static/js/verify_student/views/review_photos_step_view.js
+msgid "An unexpected error occurred. Please try again later."
+msgstr ""
+
+#: lms/static/js/verify_student/views/review_photos_step_view.js
+msgid "Could not submit photos"
+msgstr ""
+
+#: lms/static/js/verify_student/views/step_view.js
+msgid "An unexpected error occurred.  Please reload the page to try again."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "Video capture error"
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid ""
+"Please check that your webcam is connected and you have allowed access to "
+"your webcam."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "No Webcam Detected"
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "You don't seem to have a webcam connected."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "Double-check that your webcam is connected and working to continue."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "No Flash Detected"
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "You don't seem to have Flash installed."
+msgstr ""
+
+#: lms/static/js/verify_student/views/webcam_photo_view.js
+msgid "%(a_start)s Get Flash %(a_end)s to continue your enrollment."
+msgstr ""
+
 #: lms/static/js/views/cohort_editor.js
 msgid "Error adding students."
 msgstr ""
@@ -3067,14 +3140,6 @@ msgstr ""
 msgid "This link will open in a modal window"
 msgstr ""
 
-#: cms/static/js/sock.js
-msgid "Hide Studio Help"
-msgstr ""
-
-#: cms/static/js/sock.js
-msgid "Looking for Help with Studio?"
-msgstr ""
-
 #: cms/static/js/collections/group.js
 msgid "Group %s"
 msgstr ""
@@ -3215,6 +3280,30 @@ msgstr ""
 msgid "You have unsaved changes. Do you really want to leave this page?"
 msgstr ""
 
+#. Translators: This is the status of a video upload that is queued
+#. waiting for other uploads to complete
+#: cms/static/js/models/active_video_upload.js
+msgid "Queued"
+msgstr ""
+
+#. Translators: This is the status of an active video upload
+#. Translators: This is the status of an active video upload
+#: cms/static/js/models/active_video_upload.js cms/static/js/views/assets.js
+#: cms/static/js/views/previous_video_upload.js
+msgid "Uploading"
+msgstr ""
+
+#. Translators: This is the status of a video upload that has
+#. completed successfully
+#: cms/static/js/models/active_video_upload.js
+msgid "Upload completed"
+msgstr ""
+
+#. Translators: This is the status of a video upload that has failed
+#: cms/static/js/models/active_video_upload.js
+msgid "Upload failed"
+msgstr ""
+
 #: cms/static/js/models/course.js cms/static/js/models/section.js
 msgid "You must specify a name"
 msgstr ""
@@ -3321,6 +3410,7 @@ msgid "Your file has been deleted."
 msgstr ""
 
 #: cms/static/js/views/assets.js cms/templates/js/asset-library.underscore
+#: cms/templates/js/previous-video-upload-list.underscore
 msgid "Date Added"
 msgstr ""
 
@@ -3340,10 +3430,6 @@ msgstr ""
 
 #: cms/static/js/views/assets.js
 msgid "Max file size exceeded"
-msgstr ""
-
-#: cms/static/js/views/assets.js
-msgid "Uploading"
 msgstr ""
 
 #: cms/static/js/views/assets.js
@@ -3497,6 +3583,37 @@ msgstr ""
 msgid "%(total_items)s total"
 msgstr ""
 
+#. Translators: This is the status for a video that the servers
+#. are currently processing
+#: cms/static/js/views/previous_video_upload.js
+msgid "In Progress"
+msgstr ""
+
+#. Translators: This is the status for a video that the servers
+#. have successfully processed
+#: cms/static/js/views/previous_video_upload.js
+msgid "Complete"
+msgstr ""
+
+#. Translators: This is the status for a video that the servers
+#. have failed to process
+#: cms/static/js/views/previous_video_upload.js
+msgid "Failed"
+msgstr ""
+
+#. Translators: This is the status for a video for which an invalid
+#. processing token was provided in the course settings
+#: cms/static/js/views/previous_video_upload.js
+msgid "Invalid Token"
+msgstr ""
+
+#. Translators: This is listed as the duration for a video
+#. that has not yet reached the point in its processing by
+#. the servers where its duration is determined.
+#: cms/static/js/views/previous_video_upload.js
+msgid "Pending"
+msgstr ""
+
 #: cms/static/js/views/show_textbook.js
 msgid "Delete “<%= name %>”?"
 msgstr ""
@@ -3560,13 +3677,6 @@ msgstr ""
 #. e.g. "Warning: this component has not been configured yet".
 #: cms/static/js/views/xblock_validation.js
 msgid "Warning"
-msgstr ""
-
-#. Translators: This message will be added to the front of messages of type
-#. error,
-#. e.g. "Error: required field is missing".
-#: cms/static/js/views/xblock_validation.js
-msgid "Error"
 msgstr ""
 
 #: cms/static/js/views/components/add_xblock.js
@@ -3752,6 +3862,11 @@ msgstr ""
 
 #: cms/static/js/views/video/translations_editor.js
 msgid "Upload translation"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Status"
 msgstr ""
 
 #: common/templates/js/image-modal.underscore
@@ -4028,6 +4143,399 @@ msgstr ""
 
 #: lms/templates/student_profile/profile.underscore
 msgid "Update Profile"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Congratulations! You are now verified on %(platformName)s!"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "You are now enrolled as a verified student for:"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "A list of courses you have just enrolled in as a verified student"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Course"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Starts: %(start)s"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Explore your course!"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Go to your Dashboard"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid "Verified Status"
+msgstr ""
+
+#: lms/templates/verify_student/enrollment_confirmation_step.underscore
+msgid ""
+"Thank you for submitting your identification photos, we will review them "
+"soon. If there is a problem with any of the items, we will contact you to "
+"resubmit. You can now enroll in any of the verified certificate courses for "
+"one year without having to re-verify."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Take Your Photo"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"Use your webcam to take a picture of your face so we can match it with the "
+"picture on your ID."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Tips on taking a successful photo"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Make sure your face is well-lit"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Be sure your entire face is inside the frame"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"Once in position, use the camera button %(icon)s to capture your picture"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid "Can we match the photo you took with the one on your ID?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Use the retake photo button if you are not pleased with your photo"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Common Questions"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Why does %(platformName)s need my photo?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+msgid ""
+"As part of the verification process, we need your photo to confirm your "
+"identity."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "What does %(platformName)s do with this picture?"
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"We encrypt it and send it to our secure authorization service for review. We"
+" use the highest levels of security and do not save the photo or information"
+" anywhere once the match has been completed."
+msgstr ""
+
+#: lms/templates/verify_student/face_photo_step.underscore
+#: lms/templates/verify_student/id_photo_step.underscore
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Next: %(nextStepTitle)s"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Take a Photo of Your ID"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"Use your webcam to take a picture of your ID so we can match it with your "
+"photo and the name on your account."
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"You need an ID with your name and photo. A driver's license, passport, or "
+"other government-issued IDs are all acceptable."
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Ensure that you can see your photo and read your name"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Make sure your ID is well-lit"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid "Once in position, use the camera button %(icon)s to capture your ID"
+msgstr ""
+
+#: lms/templates/verify_student/id_photo_step.underscore
+msgid ""
+"We need to match your ID with your photo and name to confirm your identity."
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+msgid "Thanks for returning to verify your ID in: %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Activate Your Account"
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Check your email"
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+msgid ""
+"You need to activate your account before you can register for courses. Check"
+" your inbox for an activation email."
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Photo ID"
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+msgid ""
+"A driver's license, passport, or government-issued ID with your name and "
+"picture"
+msgstr ""
+
+#: lms/templates/verify_student/intro_step.underscore
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Webcam"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "You are enrolling in: %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "You are upgrading your enrollment for: %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"We've already verified your identity through the photos of you and your ID "
+"you provided earlier. You can now pay and complete registration."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Choose your contribution for your Verified Track upgrade"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Enter Your Contribution Level"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"Please confirm your contribution for this course (min. $ %(minPrice)s "
+"%(currency)s)"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Your Course Total"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "To complete your enrollment, you will need to pay:"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these by %(date)s to qualify to earn a Verified "
+"Certificate."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid ""
+"You can pay now even if you don't have the following items available, but "
+"you will need to have these to qualify to earn a Verified Certificate."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"You need to activate your account before you can enroll in courses. Check "
+"your inbox for an activation email."
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Government-issued Photo ID"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Next: Make payment"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Continue to payment"
+msgstr ""
+
+#: lms/templates/verify_student/make_payment_step.underscore
+msgid "Activate your account"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Thank you! We have received your payment for %(courseName)s"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"Please print this page for your records; it serves as your receipt. You will"
+" also receive an email with the same information."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Order No."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Date"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Total"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Please Note"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Items with strikethough have been refunded."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Billed To"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "No receipt available."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Next Step: Confirm your identity"
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Check your email."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"A driver's license, passport, or government-issued ID with your name and "
+"picture."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid ""
+"If you don't confirm your identity now, you can go to the dashboard to "
+"explore your course and %(platformName)s will remind you later."
+msgstr ""
+
+#: lms/templates/verify_student/payment_confirmation_step.underscore
+msgid "Want to confirm your identity later?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Review your photos"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Make sure we can verify your identity from the photos below."
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Photo requirements:"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Does the photo of you show your whole face?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Does the photo of you match your ID photo?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Is your name on your ID readable?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Does the name on your ID match your account name: %(fullName)s?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Edit your name"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "You should change the name on your account to match your ID."
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Photos don't meet the requirements?"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Retake your photos"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Before proceeding, please confirm that your details match"
+msgstr ""
+
+#: lms/templates/verify_student/review_photos_step.underscore
+msgid "Confirm"
+msgstr ""
+
+#: lms/templates/verify_student/webcam_photo.underscore
+msgid ""
+"Don't see your picture? Make sure to allow your browser to use your camera "
+"when it asks for permission."
+msgstr ""
+
+#: lms/templates/verify_student/webcam_photo.underscore
+msgid "Retake photo"
+msgstr ""
+
+#: lms/templates/verify_student/webcam_photo.underscore
+msgid "Take photo"
+msgstr ""
+
+#: cms/templates/js/active-video-upload-list.underscore
+msgid "Drag and drop or click here to upload video files."
+msgstr ""
+
+#: cms/templates/js/active-video-upload.underscore
+msgid "status"
 msgstr ""
 
 #: cms/templates/js/add-xblock-component-menu-problem.underscore
@@ -4432,6 +4940,18 @@ msgstr ""
 
 #: cms/templates/js/paging-footer.underscore
 msgid "Page number"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Previous Uploads"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Duration"
+msgstr ""
+
+#: cms/templates/js/previous-video-upload-list.underscore
+msgid "Video ID"
 msgstr ""
 
 #: cms/templates/js/publish-history.underscore

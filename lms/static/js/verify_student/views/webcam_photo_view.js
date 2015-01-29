@@ -85,8 +85,8 @@
                 handleVideoFailure: function() {
                     this.trigger(
                         'error',
-                        gettext( 'Video capture error' ),
-                        gettext( 'Please check that your webcam is connected and you have allowed access to your webcam.' )
+                        gettext( 'Video Capture Error' ),
+                        gettext( 'Please verify that your webcam is connected and that you have allowed your browser to access it.' )
                     );
                 }
             },
@@ -211,7 +211,7 @@
 
             if ( !this.backend ) {
                 this.handleError(
-                    gettext( "No Flash Detected" ),
+                    gettext( "Flash Not Detected" ),
                     gettext( "You don't seem to have Flash installed." ) + "  " +
                     _.sprintf(
                         gettext( "%(a_start)s Get Flash %(a_end)s to continue your enrollment." ),

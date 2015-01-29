@@ -604,14 +604,25 @@ def orphan_handler(request, course_key_string):
             raise PermissionDenied()
     if request.method == 'DELETE':
         if request.user.is_staff:
-            store = modulestore()
-            items = store.get_orphans(course_usage_key)
-            for itemloc in items:
-                # need to delete all versions
-                store.delete_item(itemloc, request.user.id, revision=ModuleStoreEnum.RevisionOption.all)
-            return JsonResponse({'deleted': [unicode(item) for item in items]})
+            deleted_items = _delete_orphans(course_usage_key, request.user.id, commit=True)
+            return JsonResponse({'deleted': deleted_items})
         else:
             raise PermissionDenied()
+
+
+def _delete_orphans(course_usage_key, user_id, commit=False):
+    """
+    Helper function to delete orphans for a given course.
+    If `commit` is False, this function does not actually remove
+    the orphans.
+    """
+    store = modulestore()
+    items = store.get_orphans(course_usage_key)
+    if commit:
+        for itemloc in items:
+            # need to delete all versions
+            store.delete_item(itemloc, user_id, revision=ModuleStoreEnum.RevisionOption.all)
+    return [unicode(item) for item in items]
 
 
 def _get_xblock(usage_key, user):

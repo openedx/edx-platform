@@ -98,8 +98,7 @@ var edx = edx || {};
         element: {
             hide: function( $el ) {
                 if ( $el ) {
-                    $el.addClass('hidden')
-                       .attr('aria-hidden', true);
+                    $el.addClass('hidden');
                 }
             },
 
@@ -112,8 +111,7 @@ var edx = edx || {};
 
             show: function( $el ) {
                 if ( $el ) {
-                    $el.removeClass('hidden')
-                       .attr('aria-hidden', false);
+                    $el.removeClass('hidden');
                 }
             }
         },
@@ -148,7 +146,6 @@ var edx = edx || {};
         },
 
         getFormData: function() {
-
             var obj = {},
                 $form = this.$form,
                 elements = $form[0].elements,
@@ -229,6 +226,15 @@ var edx = edx || {};
             } else {
                 this.toggleErrorMsg( true );
             }
+
+            this.postFormSubmission();
+        },
+
+        /* Allows extended views to add custom
+         * code after form submission
+         */
+        postFormSubmission: function() {
+            return true;
         },
 
         toggleErrorMsg: function( show ) {

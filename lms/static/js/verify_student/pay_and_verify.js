@@ -55,7 +55,7 @@ var edx = edx || {};
                 minPrice: el.data('course-mode-min-price'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(
-                    (el.data('course-mode-suggested-prices') || "").split(","),
+                    (el.data('course-mode-suggested-prices').toString()).split(","),
                     function( price ) { return Boolean( price ); }
                 ),
                 currency: el.data('course-mode-currency'),

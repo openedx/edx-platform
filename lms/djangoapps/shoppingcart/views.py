@@ -818,7 +818,7 @@ def _show_receipt_html(request, order):
                 # Add a query string param for the order ID
                 # This allows the view to query for the receipt information later.
                 url += '?payment-order-num={order_num}'.format(
-                    order_num=order_items[0].id
+                    order_num=order_items[0].order.id
                 )
                 return HttpResponseRedirect(url)
 

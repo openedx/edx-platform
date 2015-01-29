@@ -1,6 +1,6 @@
 # #-#-#-#-#  django-partial.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2014 EdX
+# Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -8,7 +8,7 @@
 # tyby94 <tyby04@gmail.com>, 2014
 # #-#-#-#-#  django-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file.
-# Copyright (C) 2014 EdX
+# Copyright (C) 2015 EdX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -16,7 +16,7 @@
 # tyby94 <tyby04@gmail.com>, 2014
 # #-#-#-#-#  mako.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2014 edX
+# Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -25,7 +25,7 @@
 # tyby94 <tyby04@gmail.com>, 2014
 # #-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2014 edX
+# Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -39,7 +39,7 @@
 # Pinman <bogdan.stefan@outlook.com>, 2014
 # #-#-#-#-#  wiki.po (edx-platform)  #-#-#-#-#
 # edX translation file
-# Copyright (C) 2014 edX
+# Copyright (C) 2015 edX
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
@@ -49,8 +49,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2014-12-15 18:26+0000\n"
-"PO-Revision-Date: 2014-09-24 08:01+0000\n"
+"POT-Creation-Date: 2015-01-05 14:58+0000\n"
+"PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Dragos Ardeleanu <office@itc-media.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/edx-platform/language/ro/)\n"
 "MIME-Version: 1.0\n"
@@ -1715,7 +1715,8 @@ msgid ""
 "Enter discussion categories in the following format: \"CategoryName\": "
 "{\"id\": \"i4x-InstitutionName-CourseNumber-course-CourseRun\"}. For "
 "example, one discussion category may be \"Lydian Mode\": {\"id\": \"i4x-"
-"UniversityX-MUS101-course-2014_T1\"}."
+"UniversityX-MUS101-course-2014_T1\"}. The \"id\" value for each category "
+"must be unique."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -1765,6 +1766,15 @@ msgstr ""
 msgid ""
 "Enter true or false. If true, the course will be available to mobile "
 "devices."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid "Video Upload Credentials"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/course_module.py
+msgid ""
+"Enter the unique identifier for your course's video files provided by edX."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/course_module.py
@@ -2275,6 +2285,14 @@ msgstr ""
 #. does not yet have an announced start date.
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "TBD"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "Discussion Id"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/discussion_module.py
+msgid "The id is a unique identifier for the discussion. It is non editable."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/discussion_module.py
@@ -3223,6 +3241,10 @@ msgstr ""
 msgid "{exception_message}: Can't find uploaded transcripts: {user_filename}"
 msgstr ""
 
+#: common/lib/xmodule/xmodule/video_module/video_handlers.py
+msgid "Invalid encoding type, transcripts should be UTF-8 encoded."
+msgstr ""
+
 #: common/lib/xmodule/xmodule/video_module/video_module.py
 msgid "Basic"
 msgstr ""
@@ -3440,11 +3462,11 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
 msgid ""
-"Optional. Use this for videos where download and streaming URLs for the "
-"videos are completely managed by edX. This will override the settings for "
-"\"Default Video URL\", \"Video File URLs\", and all YouTube IDs. If you do "
-"not know what this setting is, you can leave it blank and continue to use "
-"these other settings."
+"If you were assigned a Video ID by edX for the video to play in this "
+"component, enter the ID here. In this case, do not enter values in the "
+"Default Video URL, the Video File URLs, and the YouTube ID fields. If you "
+"were not assigned an edX Video ID, enter values in those other fields and "
+"ignore this field."
 msgstr ""
 
 #: common/lib/xmodule/xmodule/video_module/video_xfields.py
@@ -4769,8 +4791,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"Please visit your <a href=\"{dashboard_link}\">dashboard</a>  to see your "
-"new course."
+"Please visit your {link_start}dashboard{link_end} to see your new course."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -4779,10 +4800,6 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid "[Refund] User-Requested Refund"
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Mode {mode} does not exist for {course_id}"
 msgstr ""
 
 #. Translators: In this particular case, mode_name refers to a
@@ -4794,10 +4811,16 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
 msgid ""
-"Note - you have up to 2 weeks into the course to unenroll from the Verified "
+"You have up to two weeks into the course to unenroll from the Verified "
 "Certificate option and receive a full refund. To receive your refund, "
-"contact {billing_email}. Please include your order number in your e-mail. "
+"contact {billing_email}. Please include your order number in your email. "
 "Please do NOT include your credit card information."
+msgstr ""
+
+#: lms/djangoapps/shoppingcart/models.py
+msgid ""
+"If you haven't verified your identity yet, please start the verification "
+"process ({verification_url})."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -4806,10 +4829,6 @@ msgid ""
 "{platform_name} mission.  This receipt was prepared to support charitable "
 "contributions for tax purposes.  We confirm that neither goods nor services "
 "were provided in exchange for this gift."
-msgstr ""
-
-#: lms/djangoapps/shoppingcart/models.py
-msgid "Could not find a course with the ID '{course_id}'"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/models.py
@@ -4855,6 +4874,7 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/reports.py
 #: lms/templates/open_ended_problems/open_ended_problems.html
+#: lms/templates/shoppingcart/receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 msgid "Status"
 msgstr ""
@@ -4980,11 +5000,11 @@ msgid "The course you requested does not exist."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "The course {0} is already in your cart."
+msgid "The course {course_id} is already in your cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "You are already registered in course {0}."
+msgid "You are already registered in course {course_id}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -4992,15 +5012,18 @@ msgid "Course added to cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Discount does not exist against code '{0}'."
+msgid "Discount does not exist against code '{code}'."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Oops! The code '{0}' you entered is either invalid or expired"
+msgid ""
+"Oops! The code '{registration_code}' you entered is either invalid or "
+"expired"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Code '{0}' is not valid for any course in the shopping cart."
+msgid ""
+"Code '{registration_code}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -5014,7 +5037,7 @@ msgid "Only one coupon redemption is allowed against an order"
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
-msgid "Coupon '{0}' is not valid for any course in the shopping cart."
+msgid "Coupon '{code}' is not valid for any course in the shopping cart."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/views.py
@@ -5048,51 +5071,37 @@ msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
-"\n"
-"        <p class=\"error_msg\">\n"
-"        Sorry! Our payment processor did not accept your payment.\n"
-"        The decision they returned was <span class=\"decision\">{decision}</span>,\n"
-"        and the reason was <span class=\"reason\">{reason_code}:{reason_msg}</span>.\n"
-"        You were not charged. Please try a different form of payment.\n"
-"        Contact us with payment-related questions at {email}.\n"
-"        </p>\n"
-"        "
+"Sorry! Our payment processor did not accept your payment. The decision they "
+"returned was {decision_text}, and the reason was {reason_text}. You were not"
+" charged. Please try a different form of payment. Contact us with payment-"
+"related questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
-"\n"
-"            <p class=\"error_msg\">\n"
-"            Sorry! Our payment processor sent us back a payment confirmation that had inconsistent data!\n"
-"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"            </p>\n"
-"            "
+"Sorry! Our payment processor sent us back a payment confirmation that had "
+"inconsistent data!We apologize that we cannot verify whether the charge went"
+" through and take further action on your order.The specific error message "
+"is: {error_message}. Your credit card may possibly have been charged. "
+"Contact us with payment-specific questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
-"\n"
-"            <p class=\"error_msg\">\n"
-"            Sorry! Due to an error your purchase was charged for a different amount than the order total!\n"
-"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"            Your credit card has probably been charged. Contact us with payment-specific questions at {email}.\n"
-"            </p>\n"
-"            "
+"Sorry! Due to an error your purchase was charged for a different amount than"
+" the order total! The specific error message is: {error_message}. Your "
+"credit card has probably been charged. Contact us with payment-specific "
+"questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
 msgid ""
-"\n"
-"            <p class=\"error_msg\">\n"
-"            Sorry! Our payment processor sent us back a corrupted message regarding your charge, so we are\n"
-"            unable to validate that the message actually came from the payment processor.\n"
-"            The specific error message is: <span class=\"exception_msg\">{msg}</span>.\n"
-"            We apologize that we cannot verify whether the charge went through and take further action on your order.\n"
-"            Your credit card may possibly have been charged.  Contact us with payment-specific questions at {email}.\n"
-"            </p>\n"
-"            "
+"Sorry! Our payment processor sent us back a corrupted message regarding your"
+" charge, so we are unable to validate that the message actually came from "
+"the payment processor. The specific error message is: {error_message}. We "
+"apologize that we cannot verify whether the charge went through and take "
+"further action on your order. Your credit card may possibly have been "
+"charged. Contact us with payment-specific questions at {email}."
 msgstr ""
 
 #: lms/djangoapps/shoppingcart/processors/CyberSource.py
@@ -5489,6 +5498,42 @@ msgid "There was an error verifying your ID photos."
 msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
+#: lms/templates/shoppingcart/verified_cert_receipt.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/show_requirements.html
+msgid "Intro"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Make payment"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Payment confirmation"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+#: lms/templates/verify_student/midcourse_photo_reverification.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_reverification.html
+#: lms/templates/verify_student/photo_verification.html
+#: lms/templates/verify_student/photo_verification.html
+msgid "Take photo"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Take a photo of your ID"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Review your info"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Enrollment confirmation"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
 msgid "Selected price is not valid number."
 msgstr ""
 
@@ -5498,6 +5543,30 @@ msgstr ""
 
 #: lms/djangoapps/verify_student/views.py
 msgid "No selected price or selected price is below minimum."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Missing required parameters: {missing}"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "You already have a valid or pending verification."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "No profile found for user"
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Name must be at least {min_length} characters long."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Image data is not valid."
+msgstr ""
+
+#: lms/djangoapps/verify_student/views.py
+msgid "Verification photos received"
 msgstr ""
 
 #: lms/envs/common.py
@@ -6527,6 +6596,7 @@ msgstr ""
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
+#: lms/templates/modal/accessible_confirm.html
 #: lms/templates/verify_student/face_upload.html
 msgid "Cancel"
 msgstr ""
@@ -6577,9 +6647,13 @@ msgstr ""
 msgid "E-mail"
 msgstr ""
 
+#. Translators: This is the placeholder text for a field that requests an
+#. email
+#. address.
 #: cms/templates/login.html cms/templates/manage_users.html
-#: lms/templates/login.html lms/templates/register-shib.html
-#: lms/templates/register.html lms/templates/register.html
+#: cms/templates/register.html lms/templates/login.html
+#: lms/templates/register-shib.html lms/templates/register.html
+#: lms/templates/register.html
 msgid "example: username@domain.com"
 msgstr ""
 
@@ -6600,6 +6674,13 @@ msgstr ""
 #: cms/templates/register.html cms/templates/widgets/header.html
 #: lms/templates/index.html
 msgid "Sign Up"
+msgstr ""
+
+#. Translators: This is the placeholder text for a field that requests the
+#. user's full name.
+#: cms/templates/register.html lms/templates/register.html
+#: lms/templates/verify_student/face_upload.html
+msgid "example: Jane Doe"
 msgstr ""
 
 #: cms/templates/register.html lms/templates/register-shib.html
@@ -6868,6 +6949,10 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
+#: lms/templates/dashboard.html
+msgid "Order History"
+msgstr ""
+
 #: lms/templates/dashboard.html lms/templates/dashboard.html
 msgid "Reset Password"
 msgstr ""
@@ -6957,12 +7042,6 @@ msgstr ""
 
 #: lms/templates/dashboard.html
 msgid "Change My Name"
-msgstr ""
-
-#: lms/templates/dashboard.html
-msgid ""
-"<span id='track-info'></span> {course_number}?  <span id='refund-"
-"info'></span>"
 msgstr ""
 
 #: lms/templates/dashboard.html
@@ -7851,10 +7930,6 @@ msgstr ""
 msgid "Please complete the following fields to register for an account. "
 msgstr ""
 
-#: lms/templates/register.html lms/templates/verify_student/face_upload.html
-msgid "example: Jane Doe"
-msgstr ""
-
 #: lms/templates/register.html lms/templates/register.html
 msgid "Needed for any certificates you may earn"
 msgstr ""
@@ -8599,6 +8674,14 @@ msgid "Estimated Effort"
 msgstr ""
 
 #: lms/templates/courseware/course_about.html
+msgid "Price"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
+msgid "{currency_symbol}{cost}"
+msgstr ""
+
+#: lms/templates/courseware/course_about.html
 msgid "Prerequisites"
 msgstr ""
 
@@ -8682,11 +8765,9 @@ msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid ""
-"For detailed information, see <a href='http://edx-guide-for-"
-"students.readthedocs.org/en/latest/SFD_mathformatting.html'>Entering "
-"Mathematical and Scientific Expressions</a> in the <a href='http://edx-"
-"guide-for-students.readthedocs.org/en/latest/index.html'>edX Guide for "
-"Students</a>."
+"For detailed information, see {math_link_start}Entering Mathematical and "
+"Scientific Expressions{math_link_end} in the {guide_link_start}edX Guide for"
+" Students{guide_link_end}."
 msgstr ""
 
 #: lms/templates/courseware/courseware.html
@@ -9268,13 +9349,27 @@ msgstr ""
 msgid "Enrolled as: "
 msgstr ""
 
+#. Translators: This text describes that the student has enrolled for a
+#. Verified Certificate, but verification of identity is pending.
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "Verified Pending"
+msgid "ID verification pending"
+msgstr ""
+
+#. Translators: The student is enrolled for a Verified Certificate, but
+#. verification of identity is pending.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Verified: Pending Verification"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as a verified student"
+msgstr ""
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "ID Verified Ribbon/Badge"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -9325,8 +9420,11 @@ msgid "Verification not yet complete."
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-msgid "You only have {days} days left to verify for this course."
-msgstr ""
+msgid "You only have {days} day left to verify for this course."
+msgid_plural "You only have {days} days left to verify for this course."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Almost there!"
@@ -9376,9 +9474,9 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid ""
 "You can no longer access this course because payment has not yet been "
-"received. You can {link_start}contact the account holder{link_end} to "
-"request payment, or you can {unenroll_link_start}unenroll{unenroll_link_end}"
-" from this course"
+"received. You can {contact_link_start}contact the account "
+"holder{contact_link_end} to request payment, or you can "
+"{unenroll_link_start}unenroll{unenroll_link_end} from this course"
 msgstr ""
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
@@ -9546,6 +9644,10 @@ msgstr ""
 
 #: lms/templates/discussion/_discussion_module_studio.html
 msgid "To view live discussions, click Preview or View Live in Unit Settings."
+msgstr ""
+
+#: lms/templates/discussion/_discussion_module_studio.html
+msgid "Discussion ID: {discussion_id}"
 msgstr ""
 
 #: lms/templates/discussion/_filter_dropdown.html
@@ -10124,6 +10226,7 @@ msgid "You have been invited to a beta test for {course_name}"
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
+#: lms/templates/emails/order_confirmation_email.txt
 msgid "Hi {name},"
 msgstr ""
 
@@ -10215,7 +10318,6 @@ msgid ""
 msgstr ""
 
 #: lms/templates/emails/business_order_confirmation_email.txt
-#: lms/templates/emails/order_confirmation_email.txt
 msgid "Warm regards,"
 msgstr ""
 
@@ -10367,23 +10469,36 @@ msgid "You have been enrolled in {course_name}"
 msgstr ""
 
 #: lms/templates/emails/order_confirmation_email.txt
-msgid "Hi {name}"
-msgstr ""
-
-#: lms/templates/emails/order_confirmation_email.txt
 msgid ""
 "Your payment was successful. You will see the charge below on your next "
-"credit or debit card statement."
+"credit or debit card statement under the company name {merchant_name}."
 msgstr ""
 
 #: lms/templates/emails/order_confirmation_email.txt
-msgid ""
-"The charge will show up on your statement under the company name "
-"{merchant_name}."
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thank you,"
 msgstr ""
 
 #: lms/templates/emails/order_confirmation_email.txt
 msgid "Your order number is: {order_number}"
+msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Hi {full_name},"
+msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "Thanks for submitting your photos!"
+msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid ""
+"We've received your information and the verification process has begun. You "
+"can check the status of the verification process on your dashboard."
+msgstr ""
+
+#: lms/templates/emails/photo_submission_confirmation.txt
+msgid "The {platform_name} team"
 msgstr ""
 
 #: lms/templates/emails/registration_codes_sale_email.txt
@@ -10946,19 +11061,7 @@ msgid "Discount (%)"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Count"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "{code}"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "{description}"
-msgstr ""
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "{discount}"
+msgid "Redeem Count"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
@@ -11734,6 +11837,14 @@ msgstr ""
 msgid "modal open"
 msgstr ""
 
+#: lms/templates/modal/accessible_confirm.html
+msgid "OK"
+msgstr ""
+
+#: lms/templates/modal/accessible_confirm.html
+msgid "open"
+msgstr ""
+
 #: lms/templates/open_ended_problems/combined_notifications.html
 msgid "{course_number} Combined Notifications"
 msgstr ""
@@ -11830,6 +11941,7 @@ msgid "Due date"
 msgstr ""
 
 #: lms/templates/peer_grading/peer_grading.html
+#: lms/templates/shoppingcart/receipt.html
 msgid "Available"
 msgstr ""
 
@@ -12077,7 +12189,7 @@ msgid "There was an error processing your order!"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "Thank you for your Purchase!"
+msgid "Thank you for your purchase!"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12086,16 +12198,23 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid ""
-"You have successfully been enrolled for <b>{appended_course_names}</b>. The "
-"following receipt has been emailed to "
-"<strong>{appended_recipient_emails}</strong></span>"
+"You have successfully been enrolled for {course_names}. The following "
+"receipt has been emailed to {receipient_emails}"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid ""
-"You have successfully purchased <b>{total_registration_codes} course "
-"registration codes</b> for <b>{appended_course_names}. </b>The following "
-"receipt has been emailed to <strong>{appended_recipient_emails}</strong>"
+"You have successfully purchased <b>{number} course registration code</b> for"
+" {course_names}."
+msgid_plural ""
+"You have successfully purchased <b>{number} course registration codes</b> "
+"for {course_names}."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: lms/templates/shoppingcart/receipt.html
+msgid "The following receipt has been emailed to {receipient_emails}"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12114,8 +12233,7 @@ msgid "Enrollment Link"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "{course_name}"
+msgid "Used"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12139,23 +12257,11 @@ msgid "Company Name"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "{company_name}"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
 msgid "Purchase Order Number"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
-msgid "{customer_reference_number}"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
 msgid "Company Contact Name"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "{company_contact_name}"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12164,10 +12270,6 @@ msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
 msgid "Recipient Name"
-msgstr ""
-
-#: lms/templates/shoppingcart/receipt.html
-msgid "{recipient_name}"
 msgstr ""
 
 #: lms/templates/shoppingcart/receipt.html
@@ -12228,58 +12330,62 @@ msgstr ""
 msgid "Note: items with strikethough like <del>this</del> have been refunded."
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm Enrollment"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "{site_name} -  Confirm Enrollment"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "Confirm your enrollment for:"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "course dates"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "{course_name}"
+msgstr ""
+
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "{start_date}"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid "{end_date}"
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You've clicked a link for an enrollment code that has already been used. "
 "Check your <a href={dashboard_url}>course dashboard</a> to see if you're "
 "enrolled in the course, or contact your company's administrator."
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You have successfully enrolled in {course_name}. This course has now been "
 "added to your dashboard."
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You're already registered for this course. Visit your <a "
 "href={dashboard_url}>dashboard</a> to see the course."
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
+#: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
 "You're about to activate an enrollment code for {course_name} by "
 "{site_name}. This code can only be used one time, so you should only "
 "activate this code if you're its intended recipient."
 msgstr ""
 
-#: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "View Course &nbsp; &nbsp; &#x25b8;"
+#: lms/templates/shoppingcart/registration_code_redemption.html
+msgid "View Dashboard &nbsp; &nbsp; &#x25b8;"
 msgstr ""
 
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -12390,12 +12496,6 @@ msgstr ""
 #: lms/templates/verify_student/show_requirements.html
 #: lms/templates/verify_student/verified.html
 msgid "Current Step: "
-msgstr ""
-
-#: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/show_requirements.html
-msgid "Intro"
 msgstr ""
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
@@ -12701,11 +12801,13 @@ msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/pay_and_verify.html
 msgid "Have questions?"
 msgstr ""
 
 #: lms/templates/verify_student/_reverification_support.html
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/pay_and_verify.html
 msgid ""
 "Please read {a_start}our FAQs to view common questions about our "
 "certificates{a_end}."
@@ -12744,10 +12846,12 @@ msgid "{span_start}Enrolling as:{span_end} Verified"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/pay_and_verify.html
 msgid "Technical Requirements"
 msgstr ""
 
 #: lms/templates/verify_student/_verification_support.html
+#: lms/templates/verify_student/pay_and_verify.html
 msgid ""
 "Please make sure your browser is updated to the {a_start}most recent version"
 " possible{a_end}. Also, please make sure your <strong>webcam is plugged in, "
@@ -12827,14 +12931,6 @@ msgstr ""
 #: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/photo_verification.html
 msgid "Retake"
-msgstr ""
-
-#: lms/templates/verify_student/midcourse_photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "Take photo"
 msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
@@ -13094,6 +13190,22 @@ msgid ""
 "Because of the short time that re-verification is open, you <strong>will not"
 " be able to correct a failed verification</strong>. If you think there was "
 "an error in the review, please contact us at {email}"
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Upgrade Your Enrollment For {course_name}."
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Receipt For {course_name}"
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Verify For {course_name}"
+msgstr ""
+
+#: lms/templates/verify_student/pay_and_verify.html
+msgid "Enroll In {course_name}"
 msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
@@ -13583,17 +13695,17 @@ msgid ""
 msgstr ""
 
 #: cms/templates/500.html
-msgid "Studio Server Error"
+msgid "{studio_name} Server Error"
 msgstr ""
 
 #: cms/templates/500.html
-msgid "The <em>Studio</em> servers encountered an error"
+msgid "The {studio_name} servers encountered an error"
 msgstr ""
 
 #: cms/templates/500.html
 msgid ""
-"An error occurred in Studio and the page could not be loaded. Please try "
-"again in a few moments."
+"An error occurred in {studio_name} and the page could not be loaded. Please "
+"try again in a few moments."
 msgstr ""
 
 #: cms/templates/500.html
@@ -13608,7 +13720,7 @@ msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
 #: cms/templates/activation_invalid.html
-msgid "Studio Account Activation"
+msgid "{studio_name} Account Activation"
 msgstr ""
 
 #: cms/templates/activation_active.html
@@ -13617,12 +13729,12 @@ msgstr ""
 
 #: cms/templates/activation_active.html
 msgid ""
-"This account, set up using {0}, has already been activated. Please sign in "
-"to start working within edX Studio."
+"This account, set up using {email}, has already been activated. Please sign "
+"in to start working within {studio_name}."
 msgstr ""
 
 #: cms/templates/activation_active.html cms/templates/activation_complete.html
-msgid "Sign into Studio"
+msgid "Sign into {studio_name}"
 msgstr ""
 
 #: cms/templates/activation_complete.html
@@ -13632,7 +13744,7 @@ msgstr ""
 #: cms/templates/activation_complete.html
 msgid ""
 "Thank you for activating your account. You may now sign in and start using "
-"edX Studio to author courses."
+"{studio_name} to author courses."
 msgstr ""
 
 #: cms/templates/activation_invalid.html
@@ -13648,8 +13760,8 @@ msgstr ""
 
 #: cms/templates/activation_invalid.html
 msgid ""
-"If you still have issues, contact edX Support. In the meantime, you can also"
-" return to {link_start}the Studio homepage.{link_end}"
+"If you still have issues, contact {platform_name} Support. In the meantime, "
+"you can also return to {link_start}the {studio_name} homepage.{link_end}"
 msgstr ""
 
 #: cms/templates/activation_invalid.html
@@ -13663,7 +13775,8 @@ msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/course_info.html
 #: cms/templates/course_outline.html cms/templates/edit-tabs.html
-#: cms/templates/textbooks.html cms/templates/widgets/header.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html
 msgid "Content"
 msgstr ""
 
@@ -13671,11 +13784,12 @@ msgstr ""
 #: cms/templates/course_info.html cms/templates/course_outline.html
 #: cms/templates/edit-tabs.html cms/templates/group_configurations.html
 #: cms/templates/index.html cms/templates/manage_users.html
-#: cms/templates/textbooks.html
+#: cms/templates/textbooks.html cms/templates/videos_index.html
 msgid "Page Actions"
 msgstr ""
 
 #: cms/templates/asset_index.html cms/templates/asset_index.html
+#: cms/templates/videos_index.html
 msgid "Upload New File"
 msgstr ""
 
@@ -13695,9 +13809,9 @@ msgstr ""
 
 #: cms/templates/asset_index.html
 msgid ""
-"{em_start}Caution{em_end}: edX recommends that you limit the file size to "
-"{em_start}10 MB{em_end}. In addition, do not upload video or audio files. "
-"You should use a third party service to host multimedia files."
+"{em_start}Caution{em_end}: {platform_name} recommends that you limit the "
+"file size to {em_start}10 MB{em_end}. In addition, do not upload video or "
+"audio files. You should use a third party service to host multimedia files."
 msgstr ""
 
 #: cms/templates/asset_index.html
@@ -13779,7 +13893,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/checklists.html
-msgid "Studio checklists"
+msgid "{studio_name} checklists"
 msgstr ""
 
 #: cms/templates/component.html cms/templates/studio_xblock_wrapper.html
@@ -14222,10 +14336,10 @@ msgstr ""
 
 #: cms/templates/error.html
 msgid ""
-"We're sorry. We couldn't find the Studio page you're looking for. You may "
-"want to return to the Studio Dashboard and try again. If you are still "
-"having problems accessing things, please feel free to {link_start}contact "
-"Studio support{link_end} for further help."
+"We're sorry. We couldn't find the {studio_name} page you're looking for. You"
+" may want to return to the {studio_name} Dashboard and try again. If you are"
+" still having problems accessing things, please feel free to "
+"{link_start}contact {studio_name} support{link_end} for further help."
 msgstr ""
 
 #: cms/templates/error.html cms/templates/error.html
@@ -14240,10 +14354,10 @@ msgstr ""
 #: cms/templates/error.html
 msgid ""
 "We're sorry. There was a problem with the server while trying to process "
-"your last request. You may want to return to the Studio Dashboard or try "
-"this request again. If you are still having problems accessing things, "
-"please feel free to {link_start}contact Studio support{link_end} for further"
-" help."
+"your last request. You may want to return to the {studio_name} Dashboard or "
+"try this request again. If you are still having problems accessing things, "
+"please feel free to {link_start}contact {studio_name} support{link_end} for "
+"further help."
 msgstr ""
 
 #: cms/templates/error.html
@@ -14261,10 +14375,10 @@ msgstr ""
 #. Translators: ".tar.gz" is a file extension, and should not be translated
 #: cms/templates/export.html
 msgid ""
-"You can export courses and edit them outside of Studio. The exported file is"
-" a .tar.gz file (that is, a .tar file compressed with GNU Zip) that contains"
-" the course structure and content. You can also re-import courses that "
-"you've exported."
+"You can export courses and edit them outside of {studio_name}. The exported "
+"file is a .tar.gz file (that is, a .tar file compressed with GNU Zip) that "
+"contains the course structure and content. You can also re-import courses "
+"that you've exported."
 msgstr ""
 
 #: cms/templates/export.html
@@ -14339,10 +14453,10 @@ msgstr ""
 
 #: cms/templates/export.html
 msgid ""
-"You may want to edit the XML in your course directly, outside of Studio. You"
-" may want to create a backup copy of your course. Or, you may want to create"
-" a copy of your course that you can later import into another course "
-"instance and customize."
+"You may want to edit the XML in your course directly, outside of "
+"{studio_name}. You may want to create a backup copy of your course. Or, you "
+"may want to create a copy of your course that you can later import into "
+"another course instance and customize."
 msgstr ""
 
 #: cms/templates/export.html
@@ -14501,20 +14615,21 @@ msgid "Welcome"
 msgstr ""
 
 #: cms/templates/howitworks.html
-msgid "Welcome to"
+msgid "Welcome to {studio_name}"
 msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio helps manage your online courses, so you can focus on teaching them"
+"{studio_name} helps manage your online courses, so you can focus on teaching"
+" them"
 msgstr ""
 
 #: cms/templates/howitworks.html
-msgid "Studio's Many Features"
+msgid "{studio_name}'s Many Features"
 msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
-msgid "Studio Helps You Keep Your Courses Organized"
+msgid "{studio_name} Helps You Keep Your Courses Organized"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -14523,7 +14638,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"The backbone of your course is how it is organized. Studio offers an "
+"The backbone of your course is how it is organized. {studio_name} offers an "
 "<strong>Outline</strong> editor, providing a simple hierarchy and easy drag "
 "and drop to help you and your students stay organized."
 msgstr ""
@@ -14534,7 +14649,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio uses a simple hierarchy of <strong>sections</strong> and "
+"{studio_name} uses a simple hierarchy of <strong>sections</strong> and "
 "<strong>subsections</strong> to organize your content."
 msgstr ""
 
@@ -14565,7 +14680,7 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio lets you weave your content together in a way that reinforces "
+"{studio_name} lets you weave your content together in a way that reinforces "
 "learning. Insert videos, discussions, and a wide variety of exercises with "
 "just a few clicks."
 msgstr ""
@@ -14602,7 +14717,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html cms/templates/howitworks.html
 msgid ""
-"Studio Gives You Simple, Fast, and Incremental Publishing. With Friends."
+"{studio_name} Gives You Simple, Fast, and Incremental Publishing. With "
+"Friends."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -14611,8 +14727,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Studio works like web applications you already know, yet understands how you"
-" build curriculum. Instant publishing to the web when you want it, "
+"{studio_name} works like web applications you already know, yet understands "
+"how you build curriculum. Instant publishing to the web when you want it, "
 "incremental release when it makes sense. And with co-authors, you can have a"
 " whole team building a course, together."
 msgstr ""
@@ -14634,7 +14750,8 @@ msgstr ""
 #: cms/templates/howitworks.html
 msgid ""
 "When you've finished a <strong>section</strong>, pick when you want it to go"
-" live and Studio takes care of the rest. Build your course incrementally."
+" live and {studio_name} takes care of the rest. Build your course "
+"incrementally."
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -14648,15 +14765,15 @@ msgid ""
 msgstr ""
 
 #: cms/templates/howitworks.html
-msgid "Sign Up for Studio Today!"
+msgid "Sign Up for {studio_name} Today!"
 msgstr ""
 
 #: cms/templates/howitworks.html
-msgid "Sign Up &amp; Start Making an edX Course"
+msgid "Sign Up &amp; Start Making an {platform_name} Course"
 msgstr ""
 
 #: cms/templates/howitworks.html
-msgid "Already have a Studio Account? Sign In"
+msgid "Already have a {studio_name} Account? Sign In"
 msgstr ""
 
 #: cms/templates/howitworks.html
@@ -14685,8 +14802,8 @@ msgstr ""
 
 #: cms/templates/howitworks.html
 msgid ""
-"Simply set the date of a section or subsection, and Studio will publish it "
-"to your students for you."
+"Simply set the date of a section or subsection, and {studio_name} will "
+"publish it to your students for you."
 msgstr ""
 
 #: cms/templates/html_error.html
@@ -14807,7 +14924,7 @@ msgstr ""
 msgid ""
 "You may want to run a new version of an existing course, or replace an "
 "existing course altogether. Or, you may have developed a course outside "
-"Studio."
+"{studio_name}."
 msgstr ""
 
 #: cms/templates/import.html
@@ -14852,11 +14969,12 @@ msgid "Welcome, {0}!"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Here are all of the courses you currently have access to in Studio:"
+msgid ""
+"Here are all of the courses you currently have access to in {studio_name}:"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "You currently aren't associated with any Studio Courses."
+msgid "You currently aren't associated with any {studio_name} Courses."
 msgstr ""
 
 #: cms/templates/index.html
@@ -14951,14 +15069,14 @@ msgid "Re-run Course"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Are you staff on an existing Studio course?"
+msgid "Are you staff on an existing {studio_name} course?"
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"You will need to be added to the course in Studio by the course creator. "
-"Please get in touch with the course creator or administrator for the "
-"specific course you are helping to author."
+"You will need to be added to the course in {studio_name} by the course "
+"creator. Please get in touch with the course creator or administrator for "
+"the specific course you are helping to author."
 msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
@@ -14970,16 +15088,16 @@ msgid "Your new course is just a click away!"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Becoming a Course Creator in Studio"
+msgid "Becoming a Course Creator in {studio_name}"
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"edX Studio is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
-"edit, while course creator privileges are granted by edX. Our team will "
-"evaluate your request and provide you feedback within 24 hours during the "
-"work week."
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
+"edit, while course creator privileges are granted by {platform_name}. Our "
+"team will evaluate your request and provide you feedback within 24 hours "
+"during the work week."
 msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
@@ -14996,10 +15114,10 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"edX Studio is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
-"edit, while course creator privileges are granted by edX. Our team is has "
-"completed evaluating your request."
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
+"edit, while course creator privileges are granted by {platform_name}. Our "
+"team is has completed evaluating your request."
 msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
@@ -15012,37 +15130,38 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"Your request did not meet the criteria/guidelines specified by edX Staff."
+"Your request did not meet the criteria/guidelines specified by "
+"{platform_name} Staff."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"edX Studio is a hosted solution for our xConsortium partners and selected "
-"guests. Courses for which you are a team member appear above for you to "
-"edit, while course creator privileges are granted by edX. Our team is "
-"currently  evaluating your request."
+"{studio_name} is a hosted solution for our xConsortium partners and selected"
+" guests. Courses for which you are a team member appear above for you to "
+"edit, while course creator privileges are granted by {platform_name}. Our "
+"team is currently  evaluating your request."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"Your request is currently being reviewed by edX staff and should be updated "
-"shortly."
+"Your request is currently being reviewed by {platform_name} staff and should"
+" be updated shortly."
 msgstr ""
 
 #: cms/templates/index.html
-msgid "New to edX Studio?"
+msgid "New to {studio_name}?"
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
-"Studio page you are viewing. You can also use the links at the bottom of the"
-" page to access our continously updated documentation and other Studio "
-"resources."
+"{studio_name} page you are viewing. You can also use the links at the bottom"
+" of the page to access our continously updated documentation and other "
+"{studio_name} resources."
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Getting Started with edX Studio"
+msgid "Getting Started with {studio_name}"
 msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html
@@ -15050,29 +15169,29 @@ msgid "Use our feedback tool, Tender, to request help"
 msgstr ""
 
 #: cms/templates/index.html cms/templates/widgets/sock.html
-msgid "Request help with edX Studio"
+msgid "Request help with {studio_name}"
 msgstr ""
 
 #: cms/templates/index.html cms/templates/index.html cms/templates/index.html
-msgid "Can I create courses in Studio?"
+msgid "Can I create courses in {studio_name}?"
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"In order to create courses in Studio, you must {link_start}contact edX staff"
-" to help you create a course{link_end}."
+"In order to create courses in {studio_name}, you must {link_start}contact "
+"{platform_name} staff to help you create a course{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"In order to create courses in Studio, you must have course creator "
+"In order to create courses in {studio_name}, you must have course creator "
 "privileges to create your own course."
 msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"Your request to author courses in Studio has been denied. Please "
-"{link_start}contact edX Staff with further questions{link_end}."
+"Your request to author courses in {studio_name} has been denied. Please "
+"{link_start}contact {platform_name} Staff with further questions{link_end}."
 msgstr ""
 
 #: cms/templates/index.html
@@ -15102,7 +15221,7 @@ msgid ""
 msgstr ""
 
 #: cms/templates/index.html
-msgid "Request help with your Studio account"
+msgid "Request help with your {studio_name} account"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/widgets/header.html
@@ -15110,19 +15229,19 @@ msgid "Sign In"
 msgstr ""
 
 #: cms/templates/login.html cms/templates/login.html
-msgid "Sign In to edX Studio"
+msgid "Sign In to {studio_name}"
 msgstr ""
 
 #: cms/templates/login.html
-msgid "Don't have a Studio Account? Sign up!"
+msgid "Don't have a {studio_name} Account? Sign up!"
 msgstr ""
 
 #: cms/templates/login.html
-msgid "Required Information to Sign In to edX Studio"
+msgid "Required Information to Sign In to {studio_name}"
 msgstr ""
 
 #: cms/templates/login.html
-msgid "Studio Support"
+msgid "{studio_name} Support"
 msgstr ""
 
 #: cms/templates/login.html
@@ -15197,7 +15316,7 @@ msgstr ""
 #: cms/templates/manage_users.html
 msgid ""
 "Adding team members makes course authoring collaborative. Users must be "
-"signed up for Studio and have an active account. "
+"signed up for {studio_name} and have an active account."
 msgstr ""
 
 #: cms/templates/manage_users.html
@@ -15232,21 +15351,21 @@ msgid ""
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Sign Up for edX Studio"
+msgid "Sign Up for {studio_name}"
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Already have a Studio Account? Sign in"
+msgid "Already have a {studio_name} Account? Sign in"
 msgstr ""
 
 #: cms/templates/register.html
 msgid ""
 "Ready to start creating online courses? Sign up below and start creating "
-"your first edX course today."
+"your first {platform_name} course today."
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Required Information to Sign Up for edX Studio"
+msgid "Required Information to Sign Up for {studio_name}"
 msgstr ""
 
 #: cms/templates/register.html
@@ -15268,31 +15387,33 @@ msgid "Create My Account &amp; Start Authoring Courses"
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Common Studio Questions"
+msgid "Common {studio_name} Questions"
 msgstr ""
 
 #: cms/templates/register.html
-msgid "Who is Studio for?"
-msgstr ""
-
-#: cms/templates/register.html
-msgid ""
-"Studio is for anyone that wants to create online courses that leverage the "
-"global edX platform. Our users are often faculty members, teaching "
-"assistants and course staff, and members of instructional technology groups."
-msgstr ""
-
-#: cms/templates/register.html
-msgid "How technically savvy do I need to be to create courses in Studio?"
+msgid "Who is {studio_name} for?"
 msgstr ""
 
 #: cms/templates/register.html
 msgid ""
-"Studio is designed to be easy to use by almost anyone familiar with common "
-"web-based authoring environments (Wordpress, Moodle, etc.). No programming "
-"knowledge is required, but for some of the more advanced features, a "
-"technical background would be helpful. As always, we are here to help, so "
-"don't hesitate to dive right in."
+"{studio_name} is for anyone that wants to create online courses that "
+"leverage the global {platform_name} platform. Our users are often faculty "
+"members, teaching assistants and course staff, and members of instructional "
+"technology groups."
+msgstr ""
+
+#: cms/templates/register.html
+msgid ""
+"How technically savvy do I need to be to create courses in {studio_name}?"
+msgstr ""
+
+#: cms/templates/register.html
+msgid ""
+"{studio_name} is designed to be easy to use by almost anyone familiar with "
+"common web-based authoring environments (Wordpress, Moodle, etc.). No "
+"programming knowledge is required, but for some of the more advanced "
+"features, a technical background would be helpful. As always, we are here to"
+" help, so don't hesitate to dive right in."
 msgstr ""
 
 #: cms/templates/register.html
@@ -15356,14 +15477,22 @@ msgid "Invite your students"
 msgstr ""
 
 #: cms/templates/settings.html
-msgid "Promoting Your Course with edX"
+msgid "Promoting Your Course with {platform_name}"
 msgstr ""
 
 #: cms/templates/settings.html
 msgid ""
 "Your course summary page will not be viewable until your course has been "
 "announced. To provide content for the page and preview it, follow the "
-"instructions provided by your <abbr title=\"Program Manager\">PM</abbr>."
+"instructions provided by your {manager}."
+msgstr ""
+
+#: cms/templates/settings.html cms/templates/settings.html
+msgid "Program Manager"
+msgstr ""
+
+#: cms/templates/settings.html cms/templates/settings.html
+msgid "PM"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -15430,10 +15559,9 @@ msgstr ""
 #: cms/templates/settings.html
 msgid ""
 "These dates impact <strong>when your courseware can be viewed</strong>, but "
-"they are <strong>not the dates shown on your course summary page</strong>.  "
+"they are <strong>not the dates shown on your course summary page</strong>. "
 "To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your <abbr title=\"Program"
-" Manager\">PM</abbr>."
+"summary page, follow the instructions provided by your {manager}."
 msgstr ""
 
 #: cms/templates/settings.html
@@ -15484,6 +15612,12 @@ msgid ""
 " format, and minimum suggested dimensions are 375px wide by 200px tall)"
 msgstr ""
 
+#. Translators: This is the placeholder text for a field that requests the URL
+#. for a course image
+#: cms/templates/settings.html
+msgid "Your course image URL"
+msgstr ""
+
 #: cms/templates/settings.html
 msgid ""
 "Please provide a valid path and name to your course image (Note: only JPEG "
@@ -15500,6 +15634,12 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Delete Current Video"
+msgstr ""
+
+#. Translators: This is the placeholder text for a field that requests a
+#. YouTube video ID for a course video
+#: cms/templates/settings.html
+msgid "your YouTube video's ID"
 msgstr ""
 
 #: cms/templates/settings.html
@@ -15576,8 +15716,8 @@ msgstr ""
 #: cms/templates/settings_advanced.html
 msgid ""
 "Any policies you modify here override all other information you've defined "
-"elsewhere in Studio. Do not edit policies unless you are familiar with both "
-"their purpose and syntax."
+"elsewhere in {studio_name}. Do not edit policies unless you are familiar "
+"with both their purpose and syntax."
 msgstr ""
 
 #: cms/templates/settings_advanced.html
@@ -15656,6 +15796,10 @@ msgstr ""
 msgid "This block contains multiple components."
 msgstr ""
 
+#: cms/templates/temp-course-landing.html
+msgid "{platform_name} edge"
+msgstr ""
+
 #: cms/templates/textbooks.html
 msgid "New Textbook"
 msgstr ""
@@ -15687,31 +15831,86 @@ msgstr ""
 msgid "Learn more about textbooks"
 msgstr ""
 
+#: cms/templates/videos_index.html cms/templates/videos_index.html
+#: cms/templates/widgets/header.html
+msgid "Video Uploads"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid "Why upload video files?"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"For a video to play on different devices, it needs to be available in "
+"multiple formats. After you upload an original video file in .mp4 or .mov "
+"format on this page, an automated process creates those additional formats "
+"and stores them for you."
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid "Monitoring files as they upload"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"Each video file that you upload needs to reach the video processing servers "
+"successfully before additional work can begin. You can monitor the progress "
+"of files as they upload, and try again if the upload fails."
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid "Managing uploaded files"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"After a file uploads successfully, automated processing begins. After "
+"automated processing begins for a file it is listed under Previous Uploads "
+"as {em_start}In Progress{em_end}. When the status is "
+"{em_start}Complete{em_end}, edX assigns a unique video ID to the video file "
+"and you can add it to your course. If something goes wrong, the "
+"{em_start}Failed{em_end} status message appears. Check for problems in the "
+"file and upload a replacement."
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid "How do I get the videos into my course?"
+msgstr ""
+
+#: cms/templates/videos_index.html
+msgid ""
+"After processing is complete for the video file, you copy its unique video "
+"ID. On the Course Outline page, you create or locate a video component to "
+"play this video. Edit the video component to paste the ID into the Advanced "
+"{em_start}EdX Video ID{em_end} field."
+msgstr ""
+
 #: cms/templates/emails/activation_email.txt
 msgid ""
-"Thank you for signing up for edX Studio! To activate your account, please "
-"copy and paste this address into your web browser's address bar:"
+"Thank you for signing up for {studio_name}! To activate your account, please"
+" copy and paste this address into your web browser's address bar:"
 msgstr ""
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
 "If you didn't request this, you don't need to do anything; you won't receive"
 " any more email from us. Please do not reply to this e-mail; if you require "
-"assistance, check the help section of the edX web site."
+"assistance, check the help section of the {studio_name} web site."
 msgstr ""
 
 #: cms/templates/emails/activation_email_subject.txt
-msgid "Your account for edX Studio"
+msgid "Your account for {studio_name}"
 msgstr ""
 
 #: cms/templates/emails/course_creator_admin_subject.txt
-msgid "{email} has requested Studio course creator privileges on edge"
+msgid "{email} has requested {studio_name} course creator privileges on edge"
 msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
 msgid ""
-"User '{user}' with e-mail {email} has requested Studio course creator "
-"privileges on edge."
+"User '{user}' with e-mail {email} has requested {studio_name} course creator"
+" privileges on edge."
 msgstr ""
 
 #: cms/templates/emails/course_creator_admin_user_pending.txt
@@ -15720,24 +15919,25 @@ msgstr ""
 
 #: cms/templates/emails/course_creator_denied.txt
 msgid ""
-"Your request for course creation rights to edX Studio have been denied. If "
-"you believe this was in error, please contact: "
+"Your request for course creation rights to {studio_name} have been denied. "
+"If you believe this was in error, please contact {email}"
 msgstr ""
 
 #: cms/templates/emails/course_creator_granted.txt
 msgid ""
-"Your request for course creation rights to edX Studio have been granted. To "
-"create your first course, visit:"
+"Your request for course creation rights to {studio_name} have been granted. To create your first course, visit\n"
+"\n"
+"{url}"
 msgstr ""
 
 #: cms/templates/emails/course_creator_revoked.txt
 msgid ""
-"Your course creation rights to edX Studio have been revoked. If you believe "
-"this was in error, please contact: "
+"Your course creation rights to {studio_name} have been revoked. If you "
+"believe this was in error, please contact {email}"
 msgstr ""
 
 #: cms/templates/emails/course_creator_subject.txt
-msgid "Your course creator status for edX Studio"
+msgid "Your course creator status for {studio_name}"
 msgstr ""
 
 #: cms/templates/registration/activation_complete.html
@@ -15862,27 +16062,31 @@ msgid "Label"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Looking for help with Studio?"
+msgid "Looking for help with {studio_name}?"
+msgstr ""
+
+#: cms/templates/widgets/sock.html
+msgid "Hide {studio_name} Help"
 msgstr ""
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "edX Studio Documentation"
+msgid "{studio_name} Documentation"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
 msgid ""
 "You can click Help in the upper right corner of any page to get more "
 "information about the page you're on. You can also use the links below to "
-"download the Building and Running an edX Course PDF file, to go to the edX "
-"Author Support site, or to enroll in edX101."
+"download the Building and Running an {platform_name} Course PDF file, to go "
+"to the {platform_name} Author Support site, or to enroll in edX101."
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Building and Running an edX Course PDF"
+msgid "Building and Running an {platform_name} Course PDF"
 msgstr ""
 
 #: cms/templates/widgets/sock.html cms/templates/widgets/sock.html
-msgid "edX Studio Author Support"
+msgid "{studio_name} Author Support"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
@@ -15890,11 +16094,11 @@ msgid "Enroll in edX101"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "How to use edX Studio to build your course"
+msgid "How to use {studio_name} to build your course"
 msgstr ""
 
 #: cms/templates/widgets/sock.html
-msgid "Have problems, questions, or suggestions about edX Studio?"
+msgid "Have problems, questions, or suggestions about {studio_name}?"
 msgstr ""
 
 #: cms/templates/widgets/tabs-aggregator.html

@@ -112,19 +112,6 @@ class LoginSessionView(APIView):
             }
         )
 
-        # Translators: This phrase appears next to a checkbox on the login form
-        # which the user can check in order to remain logged in after their
-        # session ends.
-        remember_label = _(u"Remember me")
-
-        form_desc.add_field(
-            "remember",
-            field_type="checkbox",
-            label=remember_label,
-            default=False,
-            required=False,
-        )
-
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
     @method_decorator(require_post_params(["email", "password"]))
@@ -171,9 +158,15 @@ class RegistrationView(APIView):
     DEFAULT_FIELDS = ["email", "name", "username", "password"]
 
     EXTRA_FIELDS = [
-        "city", "country", "level_of_education", "gender",
-        "year_of_birth", "mailing_address", "goals",
-        "honor_code", "terms_of_service",
+        "city",
+        "country",
+        "gender",
+        "year_of_birth",
+        "level_of_education",
+        "mailing_address",
+        "goals",
+        "honor_code",
+        "terms_of_service",
     ]
 
     # This end-point is available to anonymous users,
@@ -348,7 +341,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's full name.
-        name_label = _(u"Full Name")
+        name_label = _(u"Full name")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
@@ -376,7 +369,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's public username.
-        username_label = _(u"Username")
+        username_label = _(u"Public username")
 
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.
@@ -432,7 +425,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's highest completed level of education.
-        education_level_label = _(u"Highest Level of Education Completed")
+        education_level_label = _(u"Highest level of education completed")
 
         form_desc.add_field(
             "level_of_education",
@@ -478,7 +471,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a dropdown menu on the registration
         # form used to select the user's year of birth.
-        yob_label = _(u"Year of Birth")
+        yob_label = _(u"Year of birth")
 
         options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
         form_desc.add_field(
@@ -502,7 +495,7 @@ class RegistrationView(APIView):
         """
         # Translators: This label appears above a field on the registration form
         # meant to hold the user's mailing address.
-        mailing_address_label = _(u"Mailing Address")
+        mailing_address_label = _(u"Mailing address")
 
         form_desc.add_field(
             "mailing_address",
@@ -524,7 +517,7 @@ class RegistrationView(APIView):
         # Translators: This phrase appears above a field on the registration form
         # meant to hold the user's reasons for registering with edX.
         goals_label = _(
-            u"If you'd like, tell us why you're interested in {platform_name}"
+            u"Tell us why you're interested in {platform_name}"
         ).format(platform_name=settings.PLATFORM_NAME)
 
         form_desc.add_field(
@@ -575,13 +568,19 @@ class RegistrationView(APIView):
             (country_code, unicode(country_name))
             for country_code, country_name in sorted_countries
         ]
+
+        error_msg = _(u"Please select your Country.")
+
         form_desc.add_field(
             "country",
             label=country_label,
             field_type="select",
             options=options,
             include_default_option=True,
-            required=required
+            required=required,
+            error_messages={
+                "required": error_msg
+            }
         )
 
     def _add_honor_code_field(self, form_desc, required=True):

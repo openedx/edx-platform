@@ -158,7 +158,7 @@ define([
                     view = createView( backends );
 
                 // Expect an error
-                expect( view.errorModel.get( 'errorTitle' ) ).toEqual( 'No Flash Detected' );
+                expect( view.errorModel.get( 'errorTitle' ) ).toEqual( 'Flash Not Detected' );
                 expect( view.errorModel.get( 'errorMsg' ) ).toContain( 'Get Flash' );
                 expect( view.errorModel.get( 'shown' ) ).toBe( true );
 

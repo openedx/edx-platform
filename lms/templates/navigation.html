@@ -75,7 +75,7 @@ site_status_msg = get_site_status_msg(course_id)
               <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
             % endif
           </%block>
-          <li><a href="${reverse('logout')}" role="menuitem">${_("Log Out")}</a></li>
+          <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>
         </ul>
       </li>
     </ol>
@@ -120,9 +120,9 @@ site_status_msg = get_site_status_msg(course_id)
     <li class="nav-courseware-01">
       % if not settings.FEATURES['DISABLE_LOGIN_BUTTON']:
           % if course and settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD') and course.enrollment_domain:
-          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Log in")}</a>
+          <a class="cta cta-login" href="${reverse('course-specific-login', args=[course.id.to_deprecated_string()])}${login_query()}">${_("Sign in")}</a>
           % else:
-          <a class="cta cta-login" href="/login${login_query()}">${_("Log in")}</a>
+          <a class="cta cta-login" href="/login${login_query()}">${_("Sign in")}</a>
           % endif
       % endif
     </li>

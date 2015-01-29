@@ -1486,9 +1486,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         # Using the course_key, find or insert the course asset metadata document.
         # A single document exists per course to store the course asset metadata.
         course_key = self.fill_in_run(course_key)
-        course_assets = self.asset_collection.find_one(
-            {'course_id': unicode(course_key)},
-        )
+        if course_key.run is None:
+            log.warning(u'No run found for combo org "{}" course "{}" on asset request.'.format(
+                course_key.org, course_key.course
+            ))
+            course_assets = None
+        else:
+            # Complete course key, so query for asset metadata.
+            course_assets = self.asset_collection.find_one(
+                {'course_id': unicode(course_key)},
+            )
 
         doc_id = None if course_assets is None else course_assets['_id']
         if course_assets is None:
@@ -1607,9 +1614,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             dest_course_key (CourseKey): identifier of course to copy to
         """
         source_assets = self._find_course_assets(source_course_key)
-        dest_assets = {'assets': source_assets.asset_md.copy()}
-        dest_assets['course_id'] = unicode(dest_course_key)
-
+        dest_assets = {'assets': source_assets.asset_md.copy(), 'course_id': unicode(dest_course_key)}
         self.asset_collection.remove({'course_id': unicode(dest_course_key)})
         # Update the document.
         self.asset_collection.insert(dest_assets)
