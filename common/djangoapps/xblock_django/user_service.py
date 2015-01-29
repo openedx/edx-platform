@@ -4,6 +4,7 @@ Support for converting a django user to an XBlock user
 from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey
 from xblock.reference.user_service import XBlockUser, UserService
+from student.models import anonymous_id_for_user, get_user_by_username_or_email
 
 ATTR_KEY_IS_AUTHENTICATED = 'edx-platform.is_authenticated'
 ATTR_KEY_USER_ID = 'edx-platform.user_id'
@@ -41,9 +42,6 @@ class DjangoXBlockUserService(UserService):
         """
         if not self.get_current_user().opt_attrs.get(ATTR_KEY_USER_IS_STAFF):
             return None
-
-        # If we import these in start, it causes the contentstore library tests failed.
-        from student.models import anonymous_id_for_user, get_user_by_username_or_email
 
         try:
             user = get_user_by_username_or_email(username_or_email=username)
