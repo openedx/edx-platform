@@ -55,7 +55,7 @@ class PaymentAndVerificationFlow(PageObject):
     @property
     def url(self):
         """Return the URL corresponding to the initial position in the flow."""
-        url = "{base}/verify_student/{entry_point}/{course}".format(
+        url = "{base}/verify_student/{entry_point}/{course}/".format(
             base=BASE_URL,
             entry_point=self._entry_point,
             course=self._course_id
