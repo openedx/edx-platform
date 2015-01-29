@@ -1037,7 +1037,7 @@ class EntranceExamTest(UniqueCourseTest):
             self.course_info['run'], self.course_info['display_name']
         ).install()
 
-        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.settings_page = SettingsPage(
             self.browser,
             self.course_info['org'],
@@ -1050,19 +1050,19 @@ class EntranceExamTest(UniqueCourseTest):
 
     def test_entrance_exam_section(self):
         """
-         Scenario: Any course that is enabled for an entrance exam, should have entrance exam section at course info
+         Scenario: Any course that is enabled for an entrance exam, should have entrance exam chapter at courseware
          page.
-            Given that I am on the course info page
-            When I view the course info that has an entrance exam
-            Then there should be an "Entrance Exam" section.'
+            Given that I am on the courseware page
+            When I view the courseware that has an entrance exam
+            Then there should be an "Entrance Exam" chapter.'
         """
-
-        # visit course info page and make sure there is not entrance exam section.
-        self.course_info_page.visit()
-        self.course_info_page.wait_for_page()
+        entrance_exam_link_selector = 'div#accordion nav div h3 a'
+        # visit courseware page and make sure there is not entrance exam chapter.
+        self.courseware_page.visit()
+        self.courseware_page.wait_for_page()
         self.assertFalse(element_has_text(
-            page=self.course_info_page,
-            css_selector='div ol li a',
+            page=self.courseware_page,
+            css_selector=entrance_exam_link_selector,
             text='Entrance Exam'
         ))
 
@@ -1082,10 +1082,10 @@ class EntranceExamTest(UniqueCourseTest):
         AutoAuthPage(self.browser, course_id=self.course_id, staff=False).visit()
 
         # visit course info page and make sure there is an "Entrance Exam" section.
-        self.course_info_page.visit()
-        self.course_info_page.wait_for_page()
+        self.courseware_page.visit()
+        self.courseware_page.wait_for_page()
         self.assertTrue(element_has_text(
-            page=self.course_info_page,
-            css_selector='div ol li a',
+            page=self.courseware_page,
+            css_selector=entrance_exam_link_selector,
             text='Entrance Exam'
         ))

@@ -32,12 +32,22 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
-from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement,\
-    get_entrance_exam_content_info
-from courseware.courses import sort_by_start_date, get_entrance_exam_score
+from courseware.courses import (
+    get_courses, get_course,
+    get_studio_url, get_course_with_access,
+    sort_by_announcement,
+    sort_by_start_date,
+)
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
+from .entrance_exams import (
+    course_has_entrance_exam,
+    get_entrance_exam_content,
+    get_entrance_exam_score,
+    user_must_complete_entrance_exam,
+    user_has_passed_entrance_exam
+)
 from courseware.models import StudentModule, StudentModuleHistory
 from course_modes.models import CourseMode
 
@@ -366,6 +376,15 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             user.id, unicode(course.id))
         return redirect(reverse('dashboard'))
 
+    # Entrance Exam Check
+    # If the course has an entrance exam and the requested chapter is NOT the entrance exam, and
+    # the user hasn't yet met the criteria to bypass the entrance exam, redirect them to the exam.
+    if chapter and course_has_entrance_exam(course):
+        chapter_descriptor = course.get_child_by(lambda m: m.location.name == chapter)
+        if chapter_descriptor and not getattr(chapter_descriptor, 'is_entrance_exam', False) \
+                and user_must_complete_entrance_exam(request, user, course):
+            log.info(u'User %d tried to view course %s without passing entrance exam', user.id, unicode(course.id))
+            return redirect(reverse('courseware', args=[unicode(course.id)]))
     # check to see if there is a required survey that must be taken before
     # the user can access the course.
     if survey.utils.must_answer_survey(course, user):
@@ -412,9 +431,9 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             return render_to_response('courseware/courseware.html', context)
         elif chapter is None:
             # Check first to see if we should instead redirect the user to an Entrance Exam
-            if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
-                exam_chapter, __ = get_entrance_exam_content_info(request, course)
-                if exam_chapter is not None:
+            if course_has_entrance_exam(course):
+                exam_chapter = get_entrance_exam_content(request, course)
+                if exam_chapter:
                     exam_section = None
                     if exam_chapter.get_children():
                         exam_section = exam_chapter.get_children()[0]
@@ -454,13 +473,12 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             raise Http404
 
-        if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
+        if course_has_entrance_exam(course):
             # Message should not appear outside the context of entrance exam subsection.
             # if section is none then we don't need to show message on welcome back screen also.
             if getattr(chapter_module, 'is_entrance_exam', False) and section is not None:
-                __, is_exam_passed = get_entrance_exam_content_info(request, course)
                 context['entrance_exam_current_score'] = get_entrance_exam_score(request, course)
-                context['entrance_exam_passed'] = is_exam_passed
+                context['entrance_exam_passed'] = user_has_passed_entrance_exam(request, course)
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
@@ -669,6 +687,11 @@ def course_info(request, course_id):
 
     with modulestore().bulk_operations(course_key):
         course = get_course_with_access(request.user, 'load', course_key)
+
+        # If the user needs to take an entrance exam to access this course, then we'll need
+        # to send them to that specific course module before allowing them into other areas
+        if user_must_complete_entrance_exam(request, request.user, course):
+            return redirect(reverse('courseware', args=[unicode(course.id)]))
 
         # check to see if there is a required survey that must be taken before
         # the user can access the course.
