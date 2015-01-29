@@ -2,7 +2,6 @@
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 <%namespace name='static' file='static_content.html'/>
-
 ## WARNING: These files are specific to edx.org and are not used in installations outside of that domain. Open edX users will want to use the file "footer.html" for any changes or overrides.
 <div class="wrapper wrapper-footer edx-footer edx-footer-new">
   <footer id="footer-global" class="footer-global" role="contentinfo" aria-label="Footer">
@@ -65,31 +64,31 @@
       <div class="footer-follow-links">
         ## Translators: This is the website name of www.twitter.com. Please
         ## translate this the way that Twitter advertises in your language.
-        <a href="${settings.PLATFORM_TWITTER_URL}" title="${_("Twitter")}">
+        <a href="${settings.PLATFORM_TWITTER_URL}" title="${_("Twitter")}" rel="noreferrer">
           <i class="icon fa fa-twitter element-invisible"></i>
           <span class="copy">${_("Twitter")}</span>
         </a>
         ## Translators: This is the website name of www.facebook.com. Please
         ## translate this the way that Facebook advertises in your language.
-        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="${_("Facebook")}">
+        <a href="${settings.PLATFORM_FACEBOOK_ACCOUNT}" title="${_("Facebook")}" rel="noreferrer">
           <i class="icon fa fa-facebook element-invisible"></i>
           <span class="copy">${_("Facebook")}</span>
         </a>
         ## Translators: This is the website name of www.meetup.com. Please
         ## translate this the way that Meetup advertises in your language.
-        <a href="${settings.PLATFORM_MEETUP_URL}" title="${_("Meetup")}">
+        <a href="${settings.PLATFORM_MEETUP_URL}" title="${_("Meetup")}" rel="noreferrer">
           <i class="icon fa fa-calendar element-invisible"></i>
           <span class="copy">${_("Meetup")}</span>
         </a>
         ## Translators: This is the website name of www.linked.com. Please
         ## translate this the way that LinkedIn advertises in your language.
-        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="${_("LinkedIn")}">
+        <a href="${settings.PLATFORM_LINKEDIN_URL}" title="${_("LinkedIn")}" rel="noreferrer">
           <i class="icon fa fa-linkedin element-invisible"></i>
           <span class="copy">${_("LinkedIn")}</span>
         </a>
         ## Translators: This is the website name of plus.google.com. Please
         ## translate this the way that Google+ advertises in your language.
-        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="${_("Google+")}">
+        <a href="${settings.PLATFORM_GOOGLE_PLUS_URL}" title="${_("Google+")}" rel="noreferrer">
           <i class="icon fa fa-google-plus element-invisible"></i>
           <span class="copy">${_("Google+")}</span>
         </a>
@@ -113,3 +112,6 @@
     </div>
   </footer>
 </div>
+
+<script type="text/javascript" src="/static/js/vendor/noreferrer.js" charset="utf-8"></script>
+
