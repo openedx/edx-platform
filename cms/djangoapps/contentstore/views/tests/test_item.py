@@ -1405,7 +1405,7 @@ class TestXBlockInfo(ItemTest):
         json_response = json.loads(resp.content)
         self.validate_course_xblock_info(json_response, course_outline=True)
 
-    def test_chapter_entrance_exam_xblock_info(self):
+    def test_entrance_exam_chapter_xblock_info(self):
         chapter = ItemFactory.create(
             parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
             user_id=self.user.id, is_entrance_exam=True
@@ -1416,8 +1416,68 @@ class TestXBlockInfo(ItemTest):
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        self.assertEqual(xblock_info['override_type'], {'is_entrance_exam': True})
+        # entrance exam chapter should not be deletable, draggable and childAddable.
+        actions = xblock_info['actions']
+        self.assertEqual(actions['deletable'], False)
+        self.assertEqual(actions['draggable'], False)
+        self.assertEqual(actions['childAddable'], False)
         self.assertEqual(xblock_info['display_name'], 'Entrance Exam')
+        self.assertIsNone(xblock_info.get('is_header_visible', None))
+
+    def test_none_entrance_exam_chapter_xblock_info(self):
+        chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Test Chapter",
+            user_id=self.user.id
+        )
+        chapter = modulestore().get_item(chapter.location)
+        xblock_info = create_xblock_info(
+            chapter,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+        )
+
+        # chapter should be deletable, draggable and childAddable if not an entrance exam.
+        actions = xblock_info['actions']
+        self.assertEqual(actions['deletable'], True)
+        self.assertEqual(actions['draggable'], True)
+        self.assertEqual(actions['childAddable'], True)
+        # chapter xblock info should not contains the key of 'is_header_visible'.
+        self.assertIsNone(xblock_info.get('is_header_visible', None))
+
+    def test_entrance_exam_sequential_xblock_info(self):
+        chapter = ItemFactory.create(
+            parent_location=self.course.location, category='chapter', display_name="Entrance Exam",
+            user_id=self.user.id, is_entrance_exam=True, in_entrance_exam=True
+        )
+
+        subsection = ItemFactory.create(
+            parent_location=chapter.location, category='sequential', display_name="Subsection - Entrance Exam",
+            user_id=self.user.id, in_entrance_exam=True
+        )
+        subsection = modulestore().get_item(subsection.location)
+        xblock_info = create_xblock_info(
+            subsection,
+            include_child_info=True,
+            include_children_predicate=ALWAYS
+        )
+        # in case of entrance exam subsection, header should be hidden.
+        self.assertEqual(xblock_info['is_header_visible'], False)
+        self.assertEqual(xblock_info['display_name'], 'Subsection - Entrance Exam')
+
+    def test_none_entrance_exam_sequential_xblock_info(self):
+        subsection = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Subsection - Exam",
+            user_id=self.user.id
+        )
+        subsection = modulestore().get_item(subsection.location)
+        xblock_info = create_xblock_info(
+            subsection,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            parent_xblock=self.chapter
+        )
+        # sequential xblock info should not contains the key of 'is_header_visible'.
+        self.assertIsNone(xblock_info.get('is_header_visible', None))
 
     def test_chapter_xblock_info(self):
         chapter = modulestore().get_item(self.chapter.location)
