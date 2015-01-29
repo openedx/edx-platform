@@ -79,7 +79,7 @@ class UserCourseStatus(views.APIView):
         GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
 
         PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
-            
+
             body:
                 last_visited_module_id={module_id}
                 modification_date={date}
