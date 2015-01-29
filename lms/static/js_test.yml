@@ -78,6 +78,7 @@ spec_paths:
 #   loadFixtures('path/to/fixture/fixture.html');
 #
 fixture_paths:
+    - js/fixtures
     - templates/instructor/instructor_dashboard_2
     - templates/dashboard
     - templates/edxnotes
@@ -86,6 +87,7 @@ fixture_paths:
     - templates/verify_student
     - templates/file-upload.underscore
     - js/fixtures/edxnotes
+    - templates/courseware_search
 
 requirejs:
   paths:

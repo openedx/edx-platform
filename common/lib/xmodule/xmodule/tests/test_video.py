@@ -14,6 +14,7 @@ the course, section, subsection, unit, etc.
 """
 import unittest
 import datetime
+from uuid import uuid4
 from mock import Mock, patch
 
 from . import LogicTest
@@ -25,6 +26,63 @@ from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
 
 from xmodule.tests import get_test_descriptor_system
+from xmodule.video_module.transcripts_utils import download_youtube_subs, save_to_store
+
+from django.conf import settings
+from django.test.utils import override_settings
+
+SRT_FILEDATA = '''
+0
+00:00:00,270 --> 00:00:02,720
+sprechen sie deutsch?
+
+1
+00:00:02,720 --> 00:00:05,430
+Ja, ich spreche Deutsch
+'''
+
+CRO_SRT_FILEDATA = '''
+0
+00:00:00,270 --> 00:00:02,720
+Dobar dan!
+
+1
+00:00:02,720 --> 00:00:05,430
+Kako ste danas?
+'''
+
+
+TEST_YOU_TUBE_SETTINGS = {
+    # YouTube JavaScript API
+    'API': 'www.youtube.com/iframe_api',
+
+    # URL to test YouTube availability
+    'TEST_URL': 'gdata.youtube.com/feeds/api/videos/',
+
+    # Current youtube api for requesting transcripts.
+    # For example: http://video.google.com/timedtext?lang=en&v=j_jEn79vS3g.
+    'TEXT_API': {
+        'url': 'video.google.com/timedtext',
+        'params': {
+            'lang': 'en',
+            'v': 'set_youtube_id_of_11_symbols_here',
+        },
+    },
+}
+
+TEST_DATA_CONTENTSTORE = {
+    'ENGINE': 'xmodule.contentstore.mongo.MongoContentStore',
+    'DOC_STORE_CONFIG': {
+        'host': 'localhost',
+        'db': 'test_xcontent_%s' % uuid4().hex,
+    },
+    # allow for additional options that can be keyed on a name, e.g. 'trashcan'
+    'ADDITIONAL_OPTIONS': {
+        'trashcan': {
+            'bucket': 'trash_fs'
+        }
+    }
+}
 
 
 def instantiate_descriptor(**field_data):
@@ -505,7 +563,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.transcripts = {'ua': 'ukrainian_translation.srt', 'ge': 'german_translation.srt'}
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
-        expected = etree.fromstring('''\
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:01" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" end_time="0:01:00" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
@@ -514,7 +573,8 @@ class VideoExportTestCase(VideoDescriptorTestBase):
            <transcript language="ge" src="german_translation.srt" />
            <transcript language="ua" src="ukrainian_translation.srt" />
          </video>
-        ''')
+        '''
+        expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_end_time(self):
@@ -534,14 +594,15 @@ class VideoExportTestCase(VideoDescriptorTestBase):
         self.descriptor.download_video = True
 
         xml = self.descriptor.definition_to_xml(None)  # We don't use the `resource_fs` parameter
-        expected = etree.fromstring('''\
+        parser = etree.XMLParser(remove_blank_text=True)
+        xml_string = '''\
          <video url_name="SampleProblem" start_time="0:00:05" youtube="0.75:izygArpw-Qo,1.00:p2Q6BrNhdh8,1.25:1EeWXzPdhSA,1.50:rABDYkeK0x8" show_captions="false" download_video="true" download_track="true">
            <source src="http://www.example.com/source.mp4"/>
            <source src="http://www.example.com/source.ogg"/>
            <track src="http://www.example.com/track"/>
          </video>
-        ''')
-
+        '''
+        expected = etree.XML(xml_string, parser=parser)
         self.assertXmlEqual(expected, xml)
 
     def test_export_to_xml_empty_parameters(self):
@@ -582,3 +643,155 @@ class VideoCdnTest(unittest.TestCase):
         cdn_response.return_value = Mock(status_code=404)
         fake_cdn_url = 'http://fake_cdn.com/'
         self.assertIsNone(get_video_from_cdn(fake_cdn_url, original_video_url))
+
+
+@override_settings(CONTENTSTORE=TEST_DATA_CONTENTSTORE)
+@override_settings(YOUTUBE=TEST_YOU_TUBE_SETTINGS)
+class VideoDescriptorIndexingTestCase(unittest.TestCase):
+    """
+    Make sure that VideoDescriptor can format data for indexing as expected.
+    """
+
+    def test_index_dictionary(self):
+        xml_data = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+            </video>
+        '''
+        descriptor = instantiate_descriptor(data=xml_data)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {"display_name": "Test Video"},
+            "content_type": "Video"
+        })
+
+        xml_data_sub = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   sub="OEoXaMPEzfM"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+            </video>
+        '''
+
+        descriptor = instantiate_descriptor(data=xml_data_sub)
+        download_youtube_subs('OEoXaMPEzfM', descriptor, settings)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {
+                "display_name": "Test Video",
+                "transcript_en": (
+                    "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these"
+                    "courses. As you know, our courses are entirely online. So before we start learning about the"
+                    "subjects that brought you here, let's learn about the tools that you will use to navigate through"
+                    "the course material. Let's start with what is on your screen right now. You are watching a video"
+                    "of me talking. You have several tools associated with these videos. Some of them are standard"
+                    "video buttons, like the play Pause Button on the bottom left. Like most video players, you can see"
+                    "how far you are into this particular video segment and how long the entire video segment is."
+                    "Something that you might not be used to is the speed option. While you are going through the"
+                    "videos, you can speed up or slow down the video player with these buttons. Go ahead and try that"
+                    "now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can"
+                    "adjust it this way. Another great feature is the transcript on the side. This will follow along"
+                    "with everything that I am saying as I am saying it, so you can read along if you like. You can"
+                    "also click on any of the words, and you will notice that the video jumps to that word. The video"
+                    "slider at the bottom of the video will let you navigate through the video quickly. If you ever"
+                    "find the transcript distracting, you can toggle the captioning button in order to make it go away"
+                    "or reappear. Now that you know about the video player, I want to point out the sequence navigator."
+                    "Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You"
+                    "can see how far you are in a particular sequence by observing which tab you're on. You can"
+                    "navigate directly to any video or exercise by clicking on the appropriate tab. You can also"
+                    "progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try"
+                    "that now. The tutorial will continue in the next video."
+                )
+            },
+            "content_type": "Video"
+        })
+
+        xml_data_sub_transcript = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   sub="OEoXaMPEzfM"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+              <transcript language="ge" src="subs_grmtran1.srt" />
+            </video>
+        '''
+
+        descriptor = instantiate_descriptor(data=xml_data_sub_transcript)
+        save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {
+                "display_name": "Test Video",
+                "transcript_en": (
+                    "LILA FISHER: Hi, welcome to Edx. I'm Lila Fisher, an Edx fellow helping to put together these"
+                    "courses. As you know, our courses are entirely online. So before we start learning about the"
+                    "subjects that brought you here, let's learn about the tools that you will use to navigate through"
+                    "the course material. Let's start with what is on your screen right now. You are watching a video"
+                    "of me talking. You have several tools associated with these videos. Some of them are standard"
+                    "video buttons, like the play Pause Button on the bottom left. Like most video players, you can see"
+                    "how far you are into this particular video segment and how long the entire video segment is."
+                    "Something that you might not be used to is the speed option. While you are going through the"
+                    "videos, you can speed up or slow down the video player with these buttons. Go ahead and try that"
+                    "now. Make me talk faster and slower. If you ever get frustrated by the pace of speech, you can"
+                    "adjust it this way. Another great feature is the transcript on the side. This will follow along"
+                    "with everything that I am saying as I am saying it, so you can read along if you like. You can"
+                    "also click on any of the words, and you will notice that the video jumps to that word. The video"
+                    "slider at the bottom of the video will let you navigate through the video quickly. If you ever"
+                    "find the transcript distracting, you can toggle the captioning button in order to make it go away"
+                    "or reappear. Now that you know about the video player, I want to point out the sequence navigator."
+                    "Right now you're in a lecture sequence, which interweaves many videos and practice exercises. You"
+                    "can see how far you are in a particular sequence by observing which tab you're on. You can"
+                    "navigate directly to any video or exercise by clicking on the appropriate tab. You can also"
+                    "progress to the next element by pressing the Arrow button, or by clicking on the next tab. Try"
+                    "that now. The tutorial will continue in the next video."
+                ),
+                "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch"
+            },
+            "content_type": "Video"
+        })
+
+        xml_data_transcripts = '''
+            <video display_name="Test Video"
+                   youtube="1.0:p2Q6BrNhdh8,0.75:izygArpw-Qo,1.25:1EeWXzPdhSA,1.5:rABDYkeK0x8"
+                   show_captions="false"
+                   download_track="false"
+                   start_time="00:00:01"
+                   download_video="false"
+                   end_time="00:01:00">
+              <source src="http://www.example.com/source.mp4"/>
+              <track src="http://www.example.com/track"/>
+              <handout src="http://www.example.com/handout"/>
+              <transcript language="ge" src="subs_grmtran1.srt" />
+              <transcript language="hr" src="subs_croatian1.srt" />
+            </video>
+        '''
+
+        descriptor = instantiate_descriptor(data=xml_data_transcripts)
+        save_to_store(SRT_FILEDATA, "subs_grmtran1.srt", 'text/srt', descriptor.location)
+        save_to_store(CRO_SRT_FILEDATA, "subs_croatian1.srt", 'text/srt', descriptor.location)
+        self.assertEqual(descriptor.index_dictionary(), {
+            "content": {
+                "display_name": "Test Video",
+                "transcript_ge": "sprechen sie deutsch? Ja, ich spreche Deutsch",
+                "transcript_hr": "Dobar dan! Kako ste danas?"
+            },
+            "content_type": "Video"
+        })

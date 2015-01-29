@@ -12,6 +12,7 @@ import logging
 from opaque_keys.edx.locations import Location
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
 )
@@ -509,7 +510,8 @@ class DraftModuleStore(MongoModuleStore):
                 parent_locations = [draft_parent.location]
         # there could be 2 parents if
         #   Case 1: the draft item moved from one parent to another
-        #   Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single parent has 2 versions: draft and published
+        # Case 2: revision==ModuleStoreEnum.RevisionOption.all and the single
+        # parent has 2 versions: draft and published
         for parent_location in parent_locations:
             # don't remove from direct_only parent if other versions of this still exists (this code
             # assumes that there's only one parent_location in this case)
@@ -540,6 +542,10 @@ class DraftModuleStore(MongoModuleStore):
                 ]
             )
         self._delete_subtree(location, as_functions)
+
+        # Remove this location from the courseware search index so that searches
+        # will refrain from showing it as a result
+        CoursewareSearchIndexer.add_to_search_index(self, location, delete=True)
 
     def _delete_subtree(self, location, as_functions, draft_only=False):
         """
@@ -713,6 +719,10 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
+
+        # Now it's been published, add the object to the courseware search index so that it appears in search results
+        CoursewareSearchIndexer.add_to_search_index(self, location)
+
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):

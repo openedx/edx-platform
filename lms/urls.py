@@ -10,6 +10,8 @@ from microsite_configuration import microsite
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
     admin.autodiscover()
 
+# Use urlpatterns formatted as within the Django docs with first parameter "stuck" to the open parenthesis
+# pylint: disable=bad-continuation
 urlpatterns = ('',  # nopep8
     # certificate view
     url(r'^update_certificate$', 'certificates.views.update_certificate'),
@@ -78,6 +80,9 @@ urlpatterns = ('',  # nopep8
 
     # CourseInfo API RESTful endpoints
     url(r'^api/course/details/v0/', include('course_about.urls')),
+
+    # Courseware search endpoints
+    url(r'^search/', include('search.urls')),
 
 )
 

@@ -455,3 +455,8 @@ FEATURES['MILESTONES_APP'] = True
 
 # ENTRANCE EXAMS
 FEATURES['ENTRANCE_EXAMS'] = True
+
+# Enable courseware search for tests
+FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
+# Use MockSearchEngine as the search engine for test scenario
+SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
