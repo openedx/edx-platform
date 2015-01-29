@@ -65,6 +65,7 @@
 # diegobe <diegobe@iadb.org>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2013
+# Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
@@ -75,6 +76,7 @@
 # Natalia, 2013
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
+# paul ochoa <palichis@solid-ec.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2015
 # #-#-#-#-#  messages.po (upex-platform)  #-#-#-#-#
@@ -95,7 +97,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-21 20:06+0000\n"
+"POT-Creation-Date: 2015-01-26 13:22+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -178,13 +180,8 @@ msgstr "No se encontró el archivo course.xml en el paquete."
 
 #: cms/djangoapps/contentstore/views/tabs.py
 #: lms/templates/courseware/courseware-error.html
-#, fuzzy
 msgid "Courseware"
-msgstr ""
-"#-#-#-#-#  django-partial.po (upex-platform)  #-#-#-#-#\n"
-"Courseware\n"
-"#-#-#-#-#  mako.po (upex-platform)  #-#-#-#-#\n"
-"Contenidos"
+msgstr "Contenidos"
 
 #: cms/djangoapps/contentstore/views/tabs.py
 #: lms/djangoapps/instructor/views/instructor_dashboard.py
@@ -454,7 +451,7 @@ msgstr "Ya existe una cuenta con el nombre de usuario '{username}'."
 
 #: common/djangoapps/student/views.py
 msgid "An account with the Email '{email}' already exists."
-msgstr "Ya existe una cuenta con el correo electrónico '{username}'."
+msgstr "Ya existe una cuenta con el correo electrónico '{email}'."
 
 #: common/djangoapps/student/views.py
 msgid "Error (401 {field}). E-mail us."
@@ -3542,20 +3539,28 @@ msgid "Updating Course"
 msgstr "Actualizando el curso"
 
 #: cms/templates/import.html cms/templates/import.html
+#, fuzzy
 msgid ""
 "Integrating your imported content into this course. This may take a while "
 "with larger courses."
 msgstr ""
-"Integrando su contenido importando con el curso. Esto puede tardar un "
-"tiempo, sobre todo en cursos grandes."
+"#-#-#-#-#  mako.po (upex-platform)  #-#-#-#-#\n"
+"Integrando su contenido importando con el curso. Esto puede tardar un tiempo, sobre todo en cursos grandes.\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"Integrando su contenido importado con el curso. Esto puede tardar un tiempo, sobre todo en cursos grandes."
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "Success"
 msgstr "Terminación exitosa"
 
 #: cms/templates/import.html cms/templates/import.html
+#, fuzzy
 msgid "Your imported content has now been integrated into this course"
-msgstr "Su curso importdo ahora ha sido integrado en este curso"
+msgstr ""
+"#-#-#-#-#  mako.po (upex-platform)  #-#-#-#-#\n"
+"Su curso importdo ahora ha sido integrado en este curso\n"
+"#-#-#-#-#  mako-studio.po (edx-platform)  #-#-#-#-#\n"
+"Su curso importado ahora ha sido integrado en este curso"
 
 #: cms/templates/import.html cms/templates/import.html
 msgid "View Updated Outline"
@@ -9763,7 +9768,7 @@ msgid ""
 "{platform_name}, please email {email}."
 msgstr ""
 "Si usted es una universidad que deseen colaborar o si tiene preguntas sobre "
-"{PLATFORM_NAME} , envíe un correo electrónico {email}."
+"{platform_name} , envíe un correo electrónico {email}."
 
 #: lms/templates/static_templates/contact.html
 msgid "Accessibility"
@@ -14205,6 +14210,9 @@ msgid ""
 "Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
 "image from a component, a course update, or a course handout."
 msgstr ""
+"Use el valor {em_start}{studio_name} URL{em_end} para enlazarce con el "
+"archivo o imagen desde un componente, o desde una actualización de curso o "
+"desde un documento de curso."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -14212,12 +14220,18 @@ msgid ""
 "from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
 " Web URL no longer works for external access to a file."
 msgstr ""
+"Use el valor {em_start}Web URL{em_end} para referenciar un archivo o imagen "
+"exclusivamente desde fuera del curso. {em_start}Note:{em_end} Si usted "
+"bloquea un un archivo, la url de la Web ya no tendrá acceso a un archivo "
+"externo."
 
 #: cms/templates/asset_index.html
 msgid ""
 "To copy a URL, double click the value in the URL column, then copy the "
 "selected text."
 msgstr ""
+"Para copiar una dirección URL, realice un doble clic en la columna de la "
+"URL, luego copie el texto seleccionado."
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
@@ -15600,11 +15614,11 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid "Entrance Exam"
-msgstr ""
+msgstr "Exámen de Admisión"
 
 #: cms/templates/settings.html
 msgid "Require students to pass an exam before beginning the course."
-msgstr ""
+msgstr "El estudiante require pasar un exámen antes de empezar el curso."
 
 #: cms/templates/settings.html
 msgid "You can now view and author your course entrance exam from the "

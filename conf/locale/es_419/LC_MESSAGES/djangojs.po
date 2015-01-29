@@ -55,6 +55,7 @@
 # 
 # Translators:
 # Cristian Salamea <ovnicraft@gmail.com>, 2014-2015
+# Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Jonathan Amaya <jonathan.amaya88@yahoo.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2015
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2014
@@ -77,8 +78,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-21 20:05+0000\n"
-"PO-Revision-Date: 2015-01-22 04:01+0000\n"
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-29 16:04+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -3682,7 +3683,7 @@ msgstr "Todos los grupos deben tener nombre."
 
 #: cms/static/js/models/group_configuration.js
 msgid "All groups must have a unique name."
-msgstr ""
+msgstr "Todos los equipos deben tener un nombre único."
 
 #: cms/static/js/models/uploads.js
 msgid ""
@@ -3929,7 +3930,6 @@ msgstr "Eliminar %(item_display_name)s?"
 #: cms/static/js/views/list_item.js
 msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr ""
-"Borrar esta %(xblock_type)s es una acción permanente y no se puede revertir."
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -4369,6 +4369,8 @@ msgid ""
 "Students are added to this cohort only when you provide their email "
 "addresses or usernames on this page."
 msgstr ""
+"Los estudiantes son agregados a esta categoria o cohorte solamente si se "
+"provee la dirección de correos o el nombre de usuario en esta página."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
@@ -4378,6 +4380,7 @@ msgstr "¿Qué significa esto?"
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Students are added to this cohort automatically."
 msgstr ""
+"Los estudiantes son agregados automáticamente a esta categoria o cohorte."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Edit settings in Studio"
@@ -4385,17 +4388,20 @@ msgstr "Editar la configuración en Studio"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Manage Students"
-msgstr ""
+msgstr "Administrar estudiantes"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Add students to this cohort"
-msgstr ""
+msgstr "Agregar estudiantes a esta categoria o cohorte"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
 "Note: Students can be in only one cohort. Adding students to this group "
 "overrides any previous group assignment."
 msgstr ""
+"Nota: Los estudiantes pueden pertenecer solo a una categoria o cohorte a la "
+"vez. Agregar estudiantes a este grupo o cohorte anula cualquier asignación "
+"previa."
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""
@@ -5737,7 +5743,7 @@ msgstr "Librerías"
 
 #: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Entrance Exam"
-msgstr ""
+msgstr "Exámen de Admisión"
 
 #: cms/templates/js/mock/mock-settings-page.underscore
 msgid "Require students to pass an exam before beginning the course."
