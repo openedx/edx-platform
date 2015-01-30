@@ -8,6 +8,11 @@ from contentstore.utils import reverse_course_url, reverse_usage_url
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.django import modulestore
 
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
+from edx_notifications.lib.consumer import get_notifications_count_for_user
+from lms import startup
+from mock import patch
+
 
 class CourseUpdateTest(CourseTestCase):
 
@@ -33,6 +38,9 @@ class CourseUpdateTest(CourseTestCase):
             self.assertContains(resp, '', status_code=200)
 
             return json.loads(resp.content)
+
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
 
         resp = self.client.get_html(
             reverse_course_url('course_info_handler', self.course.id)
@@ -122,11 +130,38 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == before_delete - 1)
 
+    @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
+    def test_notifications_enabled_when_new_updates_in_course(self):
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
+
+        # create new users and enroll them in the course.
+        test_user_1 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
+        test_user_2 = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=test_user_2, course_id=self.course.id)
+
+        content = 'Test update'
+        payload = {'content': content, 'date': 'Feb 19, 2015'}
+        url = self.create_update_url()
+
+        resp = self.client.ajax_post(
+            url, payload, REQUEST_METHOD="POST"
+        )
+        self.assertHTMLEqual(content, json.loads(resp.content)['content'])
+
+        # now the enrolled users should get notification about the
+        # course update where they are enrolled as student.
+        self.assertTrue(get_notifications_count_for_user(test_user_1.id), 1)
+        self.assertTrue(get_notifications_count_for_user(test_user_2.id), 1)
+
     def test_course_updates_compatibility(self):
         '''
         Test that course updates doesn't break on old data (content in 'data' field).
         Note: new data will save as list in 'items' field.
         '''
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
         # get the updates and populate 'data' field with some data.
         location = self.course.id.make_usage_key('course_info', 'updates')
         course_updates = modulestore().create_item(
@@ -206,6 +241,8 @@ class CourseUpdateTest(CourseTestCase):
 
     def test_no_ol_course_update(self):
         '''Test trying to add to a saved course_update which is not an ol.'''
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
         # get the updates and set to something wrong
         location = self.course.id.make_usage_key('course_info', 'updates')
         modulestore().create_item(

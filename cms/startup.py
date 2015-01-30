@@ -8,6 +8,7 @@ from django.conf import settings
 settings.INSTALLED_APPS  # pylint: disable=pointless-statement
 
 from django_startup import autostartup
+from edx_notifications import startup
 from monkey_patch import django_utils_translation
 
 
@@ -20,6 +21,9 @@ def run():
     autostartup()
 
     add_mimetypes()
+
+    if settings.FEATURES.get('NOTIFICATIONS_ENABLED', False):
+        startup_notification_subsystem()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
@@ -68,3 +72,10 @@ def enable_theme():
     settings.STATICFILES_DIRS.append(
         (u'themes/{}'.format(settings.THEME_NAME), theme_root / 'static')
     )
+
+
+def startup_notification_subsystem():
+    """
+    Initialize the Notification subsystem
+    """
+    startup.initialize()

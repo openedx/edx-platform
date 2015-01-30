@@ -12,6 +12,7 @@ from xmodule.course_module import CourseFields
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
 from contentstore.utils import initialize_permissions
+from edx_notifications.lib.publisher import bulk_publish_notification_to_users
 from opaque_keys.edx.keys import CourseKey
 
 
@@ -66,3 +67,12 @@ def deserialize_fields(json_fields):
     for field_name, value in fields.iteritems():
         fields[field_name] = getattr(CourseFields, field_name).from_json(value)
     return fields
+
+
+@task()
+def publish_bulk_notifications_task(user_ids_list, notification_msg):
+    """
+    This function will call the edx_notifications api method "bulk_publish_notification_to_users"
+    and run as a new Celery task.
+    """
+    bulk_publish_notification_to_users(user_ids_list, notification_msg)
