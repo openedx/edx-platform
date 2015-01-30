@@ -175,7 +175,7 @@ class CourseDetails(object):
                 and sorted(jsondict['pre_requisite_courses']) != sorted(descriptor.pre_requisite_courses):
             descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
 
-        if 'license' in jsondict:
+        if 'license' in jsondict and parse_license(jsondict['license']) != descriptor.license:
             descriptor.license = parse_license(jsondict['license'])
             dirty = True
 
