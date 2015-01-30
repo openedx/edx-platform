@@ -5,6 +5,7 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_group_views.py]
 """
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from random import randint
 import uuid
 import json
@@ -14,6 +15,7 @@ from urllib import urlencode
 from django.core.cache import cache
 from django.test import Client
 from django.test.utils import override_settings
+from django.utils import timezone
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from api_manager.models import GroupRelationship, GroupProfile
@@ -55,11 +57,12 @@ class GroupsApiTests(ModuleStoreTestCase):
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
         self.course = CourseFactory.create()
         self.test_course_id = unicode(self.course.id)
+        self.course_end_date = timezone.now() + relativedelta(days=60)
         self.course_content = ItemFactory.create(
             category="videosequence",
             parent_location=self.course.location,
             data=self.test_course_data,
-            due=datetime(2016, 5, 16, 14, 30),
+            due=self.course_end_date,
             display_name="View_Sequence"
         )
 

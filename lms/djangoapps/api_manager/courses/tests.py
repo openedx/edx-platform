@@ -104,9 +104,11 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.test_group_name = 'Alpha Group'
         self.attempts = 3
 
+        self.course_start_date = timezone.now() + relativedelta(days=-1)
+        self.course_end_date = timezone.now() + relativedelta(days=60)
         self.course = CourseFactory.create(
-            start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            start=self.course_start_date,
+            end=self.course_end_date
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -114,7 +116,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             category="chapter",
             parent_location=self.course.location,
             data=self.test_data,
-            due=datetime(2014, 5, 16, 14, 30),
+            due=self.course_end_date,
             display_name="Overview"
         )
 
@@ -195,8 +197,8 @@ class CoursesApiTests(ModuleStoreTestCase):
         )
 
         self.empty_course = CourseFactory.create(
-            start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16),
+            start=self.course_start_date,
+            end=self.course_end_date,
             org="MTD"
         )
 
@@ -2020,28 +2022,35 @@ class CoursesApiTests(ModuleStoreTestCase):
         course = CourseFactory.create(
             number='3033',
             name='metrics_in_timeseries',
-            start=datetime(2014, 9, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            start=self.course_start_date,
+            end=self.course_end_date
+        )
+
+        second_course = CourseFactory.create(
+            number='3034',
+            name='metrics_in_timeseries',
+            start=self.course_start_date,
+            end=self.course_end_date
         )
 
         chapter = ItemFactory.create(
             category="chapter",
             parent_location=course.location,
             data=self.test_data,
-            due=datetime(2015, 5, 16, 14, 30),
-            display_name="Overview"
+            due=self.course_end_date,
+            display_name=u"3033 Overview"
         )
 
         sub_section = ItemFactory.create(
             parent_location=chapter.location,
             category="sequential",
-            display_name=u"test subsection",
+            display_name="3033 test subsection",
         )
         unit = ItemFactory.create(
             parent_location=sub_section.location,
             category="vertical",
             metadata={'graded': True, 'format': 'Homework'},
-            display_name=u"test unit",
+            display_name=u"3033 test unit",
         )
 
         item = ItemFactory.create(
@@ -2080,6 +2089,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         with freeze_time(enrolled_time):
             for user in users:
                 CourseEnrollmentFactory.create(user=user, course_id=course.id)
+                CourseEnrollmentFactory.create(user=user, course_id=second_course.id)
 
         points_scored = .25
         points_possible = 1
@@ -2095,6 +2105,8 @@ class CoursesApiTests(ModuleStoreTestCase):
 
                 # Last 2 users as those who have completed
                 if j >= USER_COUNT - 2:
+                    second_module = self.get_module_for_user(user, course, item2)
+                    module.system.publish(second_module, 'grade', grade_dict)
                     try:
                         sg_entry = StudentGradebook.objects.get(user=user, course_id=course.id)
                         sg_entry.grade = 0.9
@@ -2135,7 +2147,7 @@ class CoursesApiTests(ModuleStoreTestCase):
         self.assertEqual(total_completed, 2)
         self.assertEqual(len(response.data['modules_completed']), 5)
         total_modules_completed = sum([completed[1] for completed in response.data['modules_completed']])
-        self.assertEqual(total_modules_completed, 4)
+        self.assertEqual(total_modules_completed, 6)
         self.assertEqual(len(response.data['active_users']), 5)
         total_active = sum([active[1] for active in response.data['active_users']])
         self.assertEqual(total_active, 5)
