@@ -391,17 +391,32 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        # By default, the video is not licensable.
+        # Unless the CREATIVE_COMMONS_LICENSING feature flag is set,
+        # a course is found, and the course is licensable.
         licensable = False
         course_id = None
         course = None
-        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+
+        # Is the CREATIVE_COMMONS_LICENSING feature flag enabled?
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
+            # We need to have a modulestore to lookup the course,
+            # only proceed if there is one.
             if hasattr(self.runtime, 'modulestore'):
+                # Look-up the course_id of the course where this video is located
                 course_id = self.runtime.course_id
                 if course_id:
+                    # Retrieve the course from the modulestore
                     course = self.runtime.modulestore.get_course(course_id)
                     if course:
+                        # The video can only be licensable, if the course is
+                        # licensable. Otherwise it should hide the license and
+                        # the license editor.
                         licensable = course.licensable
+
         if not licensable:
+            # We need to remove the license editor fields, as this video is not
+            # licensable (either no course is found or the course is not licensable).
             editable_fields.pop('license', None)
             editable_fields.pop('license_version', None)
 
@@ -469,15 +484,22 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_video': json.dumps(self.download_video),
         }
 
-        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+        # Only proceed if the CREATIVE_COMMONS_LICENSING feature is enabled.
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
             if self.license:
+                # Set the license attributes if the video has a license
                 attrs['license'] = self.license.kind
                 attrs['license_version'] = self.license.version
             elif hasattr(self.runtime, 'modulestore'):
+                # Otherwise, if we have a modulestore, we can look-up the default
+                # license that is set by the course and display that instead.
                 course_id = self.runtime.course_id
                 if course_id:
                     course = self.runtime.modulestore.get_course(course_id)
                     if course and course.license:
+                        # If the course is found, and it has a license set,
+                        # lets use the course license to display the license
+                        # attribute for this video instead.
                         attrs['license'] = course.license.kind
                         attrs['license_version'] = course.license.version
 
