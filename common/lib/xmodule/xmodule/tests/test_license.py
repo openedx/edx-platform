@@ -3,10 +3,12 @@
 import unittest
 from xmodule.license import parse_license, License, ARRLicense, CCLicense
 
+
 def assert_equal_license(self, left, right):
     self.assertEqual(left.kind, right.kind)
     if (not left.kind == "ARR" or not right.kind == "ARR"):
         self.assertEqual(left.version, right.version)
+
 
 class LicenseTest(unittest.TestCase):
     """Tests for License class."""
@@ -34,6 +36,7 @@ class LicenseTest(unittest.TestCase):
         assert_equal_license(self, License().from_json(None), self.defaultLicense)
         assert_equal_license(self, License().from_json(""), self.defaultLicense)
 
+
 class ARRLicenseTest(unittest.TestCase):
     """Tests for All Rights Reserved License class."""
 
@@ -45,6 +48,7 @@ class ARRLicenseTest(unittest.TestCase):
 
     def test_from_json(self):
         assert_equal_license(self, License().from_json("ARR"), self.arrLicense)
+
 
 class CCLicenseTest(unittest.TestCase):
     """Tests for Creative Commons License class."""
@@ -120,6 +124,7 @@ class CCLicenseTest(unittest.TestCase):
         # ND text should be there
         self.assertTrue("NonDerivatives" in self.ccByNdLicense.description)
         self.assertTrue("NonDerivatives" in self.ccByNcNdLicense.description)
+
 
 class ParseLicenseTest(unittest.TestCase):
     """Tests for license parser."""

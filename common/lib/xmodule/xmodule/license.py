@@ -113,6 +113,7 @@ class CCLicense(License):
             version=self.version
         )
 
+
 def parse_license(kind_or_license, version=None):
     """
     Return a license object appropriate to the license
