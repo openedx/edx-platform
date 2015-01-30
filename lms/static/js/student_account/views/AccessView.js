@@ -6,13 +6,21 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
+    // Bind to StateChange Event
+    History.Adapter.bind( window, 'statechange', function() {
+        /* Note: We are using History.getState() for legacy browser (IE) support
+         * using History.js plugin instead of the native event.state
+         */
+        var State = History.getState();
+    });
+
     edx.student.account.AccessView = Backbone.View.extend({
         el: '#login-and-registration-container',
 
         tpl: '#access-tpl',
 
         events: {
-            'change .form-toggle': 'toggleForm'
+            'click .form-toggle': 'toggleForm'
         },
 
         subview: {
@@ -32,12 +40,27 @@ var edx = edx || {};
             _.mixin( _s.exports() );
 
             this.tpl = $(this.tpl).html();
+
             this.activeForm = obj.mode || 'login';
+
             this.thirdPartyAuth = obj.thirdPartyAuth || {
                 currentProvider: null,
                 providers: []
             };
+
+            this.formDescriptions = {
+                login: obj.loginFormDesc,
+                register: obj.registrationFormDesc,
+                reset: obj.passwordResetFormDesc
+            };
+
             this.platformName = obj.platformName;
+
+            // The login view listens for 'sync' events from the reset model
+            this.resetModel = new edx.student.account.PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
 
             this.render();
         },
@@ -55,82 +78,71 @@ var edx = edx || {};
         postRender: function() {
             // Load the default form
             this.loadForm( this.activeForm );
-            this.$header = $(this.el).find('.js-login-register-header');
         },
 
         loadForm: function( type ) {
-            this.getFormData( type, this );
+            var loadFunc = _.bind( this.load[type], this );
+            loadFunc( this.formDescriptions[type] );
         },
 
         load: {
-            login: function( data, context ) {
+            login: function( data ) {
                 var model = new edx.student.account.LoginModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.login =  new edx.student.account.LoginView({
+                this.subview.login =  new edx.student.account.LoginView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    resetModel: this.resetModel,
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'password-help' event to toggle sub-views
-                context.listenTo( context.subview.login, 'password-help', context.resetPassword );
+                this.listenTo( this.subview.login, 'password-help', this.resetPassword );
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.login, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.login, 'auth-complete', this.authComplete );
 
             },
 
-            reset: function( data, context ) {
-                var model = new edx.student.account.PasswordResetModel({}, {
-                    method: data.method,
-                    url: data.submit_url
-                });
+            reset: function( data ) {
+                this.resetModel.ajaxType = data.method;
+                this.resetModel.urlRoot = data.submit_url;
 
-                context.subview.passwordHelp = new edx.student.account.PasswordResetView({
+                this.subview.passwordHelp = new edx.student.account.PasswordResetView({
                     fields: data.fields,
-                    model: model
+                    model: this.resetModel
                 });
+
+                // Listen for 'password-email-sent' event to toggle sub-views
+                this.listenTo( this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent );
             },
 
-            register: function( data, context ) {
+            register: function( data ) {
                 var model = new edx.student.account.RegisterModel({}, {
                     method: data.method,
                     url: data.submit_url
                 });
 
-                context.subview.register =  new edx.student.account.RegisterView({
+                this.subview.register =  new edx.student.account.RegisterView({
                     fields: data.fields,
                     model: model,
-                    thirdPartyAuth: context.thirdPartyAuth,
-                    platformName: context.platformName
+                    thirdPartyAuth: this.thirdPartyAuth,
+                    platformName: this.platformName
                 });
 
                 // Listen for 'auth-complete' event so we can enroll/redirect the user appropriately.
-                context.listenTo( context.subview.register, 'auth-complete', context.authComplete );
+                this.listenTo( this.subview.register, 'auth-complete', this.authComplete );
             }
         },
 
-        getFormData: function( type, context ) {
-            var urls = {
-                login: 'login_session',
-                register: 'registration',
-                reset: 'password_reset'
-            };
-
-            $.ajax({
-                url: '/user_api/v1/account/' + urls[type] + '/',
-                type: 'GET',
-                dataType: 'json',
-                context: this,
-                success: function( data ) {
-                    this.load[type]( data, context );
-                },
-                error: this.showFormError
-            });
+        passwordEmailSent: function() {
+            this.element.hide( $(this.el).find('#password-reset-anchor') );
+            this.element.show( $('#login-anchor') );
+            this.element.scrollTop( $('#login-anchor') );
         },
 
         resetPassword: function() {
@@ -138,20 +150,19 @@ var edx = edx || {};
                 category: 'user-engagement'
             });
 
-            this.element.hide( this.$header );
-            this.element.hide( $(this.el).find('.form-type') );
+            this.element.hide( $(this.el).find('#login-anchor') );
             this.loadForm('reset');
-            this.element.scrollTop( $('#password-reset-wrapper') );
-        },
-
-        showFormError: function() {
-            this.element.show( $('#form-load-fail') );
+            this.element.scrollTop( $('#password-reset-anchor') );
         },
 
         toggleForm: function( e ) {
-            var type = $(e.currentTarget).val(),
+            var type = $(e.currentTarget).data('type'),
                 $form = $('#' + type + '-form'),
-                $anchor = $('#' + type + '-anchor');
+                $anchor = $('#' + type + '-anchor'),
+                queryParams = url('?'),
+                queryStr = queryParams.length > 0 ? '?' + queryParams : '';
+
+            e.preventDefault();
 
             window.analytics.track('edx.bi.' + type + '_form.toggled', {
                 category: 'user-engagement'
@@ -161,9 +172,14 @@ var edx = edx || {};
                 this.loadForm( type );
             }
 
+            this.element.hide( $(this.el).find('.submission-success') );
             this.element.hide( $(this.el).find('.form-wrapper') );
             this.element.show( $form );
             this.element.scrollTop( $anchor );
+
+            // Update url without reloading page
+            History.pushState( null, document.title, '/account/' + type + '/' + queryStr );
+            analytics.page( 'login_and_registration', type );
         },
 
         /**
@@ -291,8 +307,7 @@ var edx = edx || {};
          */
         element: {
             hide: function( $el ) {
-                $el.addClass('hidden')
-                   .attr('aria-hidden', true);
+                $el.addClass('hidden');
             },
 
             scrollTop: function( $el ) {
@@ -303,8 +318,7 @@ var edx = edx || {};
             },
 
             show: function( $el ) {
-                $el.removeClass('hidden')
-                   .attr('aria-hidden', false);
+                $el.removeClass('hidden');
             }
         }
     });

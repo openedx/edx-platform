@@ -1,4 +1,4 @@
-AjaxPrefix.addAjaxPrefix(jQuery, -> Courseware.prefix)
+AjaxPrefix.addAjaxPrefix(jQuery, -> $("meta[name='path_prefix']").attr('content'))
 
 $ ->
   $.ajaxSetup

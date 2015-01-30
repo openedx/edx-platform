@@ -142,6 +142,11 @@ def verify_signatures(params):
     if params.get('decision') == u'CANCEL':
         raise CCProcessorUserCancelled()
 
+    #  if the user decline the transaction
+    # if so, then auth_amount will not be passed back so we can't yet verify signatures
+    if params.get('decision') == u'DECLINE':
+        raise CCProcessorUserDeclined()
+
     # Validate the signature to ensure that the message is from CyberSource
     # and has not been tampered with.
     signed_fields = params.get('signed_field_names', '').split(',')
@@ -516,6 +521,15 @@ def _get_processor_exception_html(exception):
                 u"Sorry! Our payment processor sent us back a message saying that you have cancelled this transaction. "
                 u"The items in your shopping cart will exist for future purchase. "
                 u"If you feel that this is in error, please contact us with payment-specific questions at {email}."
+            ).format(
+                email=payment_support_email
+            )
+        )
+    elif isinstance(exception, CCProcessorUserDeclined):
+        return _format_error_html(
+            _(
+                u"We're sorry, but this payment was declined. The items in your shopping cart have been saved. "
+                u"If you have any questions about this transaction, please contact us at {email}."
             ).format(
                 email=payment_support_email
             )

@@ -65,26 +65,11 @@ define(
                 expect($el.find(".video-id-col").text()).toEqual(testId);
             });
 
-            _.each(
-                [
-                    {status: "upload", expected: "Uploading"},
-                    {status: "ingest", expected: "In Progress"},
-                    {status: "transcode_queue", expected: "In Progress"},
-                    {status: "transcode_active", expected: "In Progress"},
-                    {status: "file_delivered", expected: "Complete"},
-                    {status: "file_complete", expected: "Complete"},
-                    {status: "file_corrupt", expected: "Failed"},
-                    {status: "pipeline_error", expected: "Failed"},
-                    {status: "invalid_token", expected: "Invalid Token"},
-                    {status: "unexpected_status_string", expected: "Unknown"}
-                ],
-                function(caseInfo) {
-                    it("should render " + caseInfo.status + " status correctly", function() {
-                        var $el = render({status: caseInfo.status});
-                        expect($el.find(".status-col").text()).toEqual(caseInfo.expected);
-                    });
-                }
-            );
+            it("should render status correctly", function() {
+                var testStatus = "Test Status";
+                var $el = render({status: testStatus});
+                expect($el.find(".status-col").text()).toEqual(testStatus);
+            });
         });
     }
 );

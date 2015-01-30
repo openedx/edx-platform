@@ -1,6 +1,9 @@
 ## -*- coding: utf-8 -*-
-<%! from django.utils.translation import ugettext as _ %>
-<%! from django.template.defaultfilters import escapejs %>
+<%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escapejs
+import json
+%>
 <%namespace name='static' file='static_content.html'/>
 
 <!doctype html>
@@ -21,6 +24,8 @@
         % if context_course:
         <% ctx_loc = context_course.location %>
         ${context_course.display_name_with_default | h} |
+        % elif context_library:
+        ${context_library.display_name_with_default | h} |
         % endif
         ${settings.STUDIO_NAME}
     </title>
@@ -46,7 +51,8 @@
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
 
     <script type="text/javascript">
-      window.baseUrl = "${settings.STATIC_URL}";
+      window.baseUrl = ${json.dumps(settings.STATIC_URL)};
+      window.TENDER_DOMAIN = ${json.dumps(settings.TENDER_DOMAIN)};
       var require = {baseUrl: window.baseUrl};
     </script>
     <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
@@ -80,6 +86,9 @@
     </div>
 
     <div id="page-prompt"></div>
+
+    <%block name="modal_placeholder"></%block>
+
     <%block name="jsextra"></%block>
     <script type="text/javascript">
       require(['js/factories/common_deps'], function () {

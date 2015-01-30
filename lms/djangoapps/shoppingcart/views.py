@@ -2,6 +2,7 @@ import logging
 import datetime
 import decimal
 import pytz
+from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.http import (
@@ -9,6 +10,7 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, Http404
 )
 from django.utils.translation import ugettext as _
+from course_modes.models import CourseMode
 from util.json_request import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
@@ -25,12 +27,13 @@ from courseware.courses import get_course_by_id
 from courseware.views import registered_for_course
 from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
-from student.models import CourseEnrollment
+from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
+    AlreadyEnrolledError
 from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
     MultipleCouponsNotAllowedException, InvalidCartItem,
-    ItemNotFoundInCartException
+    ItemNotFoundInCartException, RedemptionCodeError
 )
 from .models import (
     Order, OrderTypes,
@@ -137,7 +140,19 @@ def update_user_cart(request):
         old_to_new_id_map = item.order.update_order_type()
         total_cost = item.order.total_cost
 
-        return JsonResponse({"total_cost": total_cost, "oldToNewIdMap": old_to_new_id_map}, 200)
+        callback_url = request.build_absolute_uri(
+            reverse("shoppingcart.views.postpay_callback")
+        )
+        cart = Order.get_cart_for_user(request.user)
+        form_html = render_purchase_form_html(cart, callback_url=callback_url)
+
+        return JsonResponse(
+            {
+                "total_cost": total_cost,
+                "oldToNewIdMap": old_to_new_id_map,
+                "form_html": form_html,
+            }
+        )
 
     return HttpResponseBadRequest('Order item not found in request.')
 
@@ -258,7 +273,12 @@ def use_code(request):
     Registration Code Redemption page.
     """
     code = request.POST["code"]
-    coupons = Coupon.objects.filter(code=code, is_active=True)
+    coupons = Coupon.objects.filter(
+        Q(code=code),
+        Q(is_active=True),
+        Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
+        Q(expiration_date__isnull=True)
+    )
     if not coupons:
         # If no coupons then we check that code against course registration code
         try:
@@ -301,7 +321,6 @@ def get_reg_code_validity(registration_code, request, limiter):
 
 @require_http_methods(["GET", "POST"])
 @login_required
-@enforce_shopping_cart_enabled
 def register_code_redemption(request, registration_code):
     """
     This view allows the student to redeem the registration code
@@ -332,8 +351,14 @@ def register_code_redemption(request, registration_code):
     elif request.method == "POST":
         reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
                                                                                                   request, limiter)
-
         course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+        context = {
+            'reg_code': registration_code,
+            'site_name': site_name,
+            'course': course,
+            'reg_code_is_valid': reg_code_is_valid,
+            'reg_code_already_redeemed': reg_code_already_redeemed,
+        }
         if reg_code_is_valid and not reg_code_already_redeemed:
             # remove the course from the cart if it was added there.
             cart = Order.get_cart_for_user(request.user)
@@ -349,23 +374,30 @@ def register_code_redemption(request, registration_code):
 
             #now redeem the reg code.
             redemption = RegistrationCodeRedemption.create_invoice_generated_registration_redemption(course_registration, request.user)
-            redemption.course_enrollment = CourseEnrollment.enroll(request.user, course.id)
-            redemption.save()
-            context = {
-                'redemption_success': True,
-                'reg_code': registration_code,
-                'site_name': site_name,
-                'course': course,
-            }
+            try:
+                kwargs = {}
+                if course_registration.mode_slug is not None:
+                    if CourseMode.mode_for_course(course.id, course_registration.mode_slug):
+                        kwargs['mode'] = course_registration.mode_slug
+                    else:
+                        raise RedemptionCodeError()
+                redemption.course_enrollment = CourseEnrollment.enroll(request.user, course.id, **kwargs)
+                redemption.save()
+                context['redemption_success'] = True
+            except RedemptionCodeError:
+                context['redeem_code_error'] = True
+                context['redemption_success'] = False
+            except EnrollmentClosedError:
+                context['enrollment_closed'] = True
+                context['redemption_success'] = False
+            except CourseFullError:
+                context['course_full'] = True
+                context['redemption_success'] = False
+            except AlreadyEnrolledError:
+                context['registered_for_course'] = True
+                context['redemption_success'] = False
         else:
-            context = {
-                'reg_code_is_valid': reg_code_is_valid,
-                'reg_code_already_redeemed': reg_code_already_redeemed,
-                'redemption_success': False,
-                'reg_code': registration_code,
-                'site_name': site_name,
-                'course': course,
-            }
+            context['redemption_success'] = False
         return render_to_response(template_to_render, context)
 
 
@@ -423,9 +455,8 @@ def use_coupon_code(coupons, user):
             return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
 
     if not is_redemption_applied:
-        log.warning("Course item does not exist for coupon '{code}'".format(code=coupons[0].code))
-        return HttpResponseNotFound(
-            _("Coupon '{code}' is not valid for any course in the shopping cart.".format(code=coupons[0].code)))
+        log.warning("Discount does not exist against code '{code}'.".format(code=coupons[0].code))
+        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.".format(code=coupons[0].code)))
 
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': True}),
@@ -818,7 +849,7 @@ def _show_receipt_html(request, order):
                 # Add a query string param for the order ID
                 # This allows the view to query for the receipt information later.
                 url += '?payment-order-num={order_num}'.format(
-                    order_num=order_items[0].id
+                    order_num=order_items[0].order.id
                 )
                 return HttpResponseRedirect(url)
 

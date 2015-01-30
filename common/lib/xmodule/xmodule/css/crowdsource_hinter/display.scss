@@ -2,8 +2,8 @@
   box-shadow: inset 0 1px 2px 1px rgba(0,0,0,0.1);
   border-radius: 2px;
   display: none;
-  margin-top: 20px;
-  padding: (15px);
+  margin-top: $baseline;
+  padding: ($baseline*0.75);
   background: rgb(253, 248, 235);
 }
 
@@ -14,23 +14,23 @@
 }
 
 .vote {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .wizard-view {
   float: left;
   width: 790px;
-  margin-right: 10px;
+  margin-right: ($baseline/2);
 }
 
 .wizard-container {
   width: 3000px;
 
-  -webkit-transition:all 1.0s ease-in-out;
-  -moz-transition:all 1.0s ease-in-out;
-  -o-transition:all 1.0s ease-in-out;
-  transition:all 1.0s ease-in-out;
+  -webkit-transition:all $tmg-s1 ease-in-out;
+  -moz-transition:all $tmg-s1 ease-in-out;
+  -o-transition:all $tmg-s1 ease-in-out;
+  transition:all $tmg-s1 ease-in-out;
 }
 
 .wizard-viewbox {

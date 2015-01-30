@@ -89,8 +89,7 @@ class ViewsTestCase(TestCase):
         self.component = ItemFactory.create(category='problem', parent_location=self.vertical.location)
 
         self.course_key = self.course.id
-        self.user = User.objects.create(username='dummy', password='123456',
-                                        email='test@mit.edu')
+        self.user = UserFactory(username='dummy', password='123456', email='test@mit.edu')
         self.date = datetime(2013, 1, 22, tzinfo=UTC)
         self.enrollment = CourseEnrollment.enroll(self.user, self.course_key)
         self.enrollment.created = self.date
@@ -164,10 +163,12 @@ class ViewsTestCase(TestCase):
         request_url = '/'.join([
             '/courses',
             self.course.id.to_deprecated_string(),
+            'courseware',
             self.chapter.location.name,
             self.section.location.name,
             'f'
         ])
+        self.client.login(username=self.user.username, password="123456")
         response = self.client.get(request_url)
         self.assertEqual(response.status_code, 404)
 
@@ -176,11 +177,12 @@ class ViewsTestCase(TestCase):
         url_parts = [
             '/courses',
             self.course.id.to_deprecated_string(),
+            'courseware',
             self.chapter.location.name,
             self.section.location.name,
             '1'
         ]
-
+        self.client.login(username=self.user.username, password="123456")
         for idx, val in enumerate(url_parts):
             url_parts_copy = url_parts[:]
             url_parts_copy[idx] = val + u'χ'

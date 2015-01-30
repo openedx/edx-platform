@@ -6,7 +6,6 @@
 <%namespace name='static' file='static_content.html'/>
 <%!
   from contentstore import utils
-  from contentstore.views.course import should_show_group_configurations_page
   from django.utils.translation import ugettext as _
 %>
 
@@ -50,7 +49,7 @@
           <ol class="list-input">
             <li class="field" id="field-course-grading-range">
               <div class="grade-controls course-grading-range well">
-                <a href="#" class="new-grade-button"><span class="plus-icon icon-plus"></span></a>
+                <a href="#" class="new-grade-button"><span class="icon fa fa-plus"></span></a>
                 <div class="grade-slider" dir="ltr">
                   <div class="grade-bar">
                     <ol class="increments">
@@ -106,7 +105,7 @@
 
           <div class="actions">
             <a href="#" class="new-button new-course-grading-item add-grading-data">
-              <i class="icon-plus"></i> ${_("New Assignment Type")}
+              <i class="icon fa fa-plus"></i> ${_("New Assignment Type")}
             </a>
           </div>
         </section>
@@ -135,9 +134,7 @@
           <ul>
             <li class="nav-item"><a href="${detailed_settings_url}">${_("Details &amp; Schedule")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
-            % if should_show_group_configurations_page(context_course):
-              <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
-            % endif
+            <li class="nav-item"><a href="${utils.reverse_course_url('group_configurations_list_handler', context_course.id)}">${_("Group Configurations")}</a></li>
             <li class="nav-item"><a href="${advanced_settings_url}">${_("Advanced Settings")}</a></li>
           </ul>
         </nav>

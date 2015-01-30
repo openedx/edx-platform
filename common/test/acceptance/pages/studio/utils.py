@@ -103,6 +103,33 @@ def add_advanced_component(page, menu_index, name):
     click_css(page, component_css, 0)
 
 
+def add_component(page, item_type, specific_type):
+    """
+    Click one of the "Add New Component" buttons.
+
+    item_type should be "advanced", "html", "problem", or "video"
+
+    specific_type is required for some types and should be something like
+    "Blank Common Problem".
+    """
+    btn = page.q(css='.add-xblock-component .add-xblock-component-button[data-type={}]'.format(item_type))
+    multiple_templates = btn.filter(lambda el: 'multiple-templates' in el.get_attribute('class')).present
+    btn.click()
+    if multiple_templates:
+        sub_template_menu_div_selector = '.new-component-{}'.format(item_type)
+        page.wait_for_element_visibility(sub_template_menu_div_selector, 'Wait for the templates sub-menu to appear')
+        page.wait_for_element_invisibility(
+            '.add-xblock-component .new-component',
+            'Wait for the add component menu to disappear'
+        )
+
+        all_options = page.q(css='.new-component-{} ul.new-component-template li a span'.format(item_type))
+        chosen_option = all_options.filter(lambda el: el.text == specific_type).first
+        chosen_option.click()
+    wait_for_notification(page)
+    page.wait_for_ajax()
+
+
 @js_defined('window.jQuery')
 def type_in_codemirror(page, index, text, find_prefix="$"):
     script = """

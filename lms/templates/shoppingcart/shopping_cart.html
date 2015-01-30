@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 
 %>
 
+
 <%block name="custom_content">
 
 <div class="container">
@@ -65,14 +66,14 @@ from django.utils.translation import ugettext as _
                 <div class="counter">
                     <input maxlength="3" title="Input qty and press enter." max="999" type="text" name="students" value="${item.qty}" id="${item.id}" data-unit-cost="${item.unit_cost}" data-qty="${item.qty}">
                 </div>
-                <div class="inc button"><i class="icon-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon-caret-down"></i></div>
+                <div class="inc button"><i class="icon fa fa-caret-up"><span>+</span></i></div><div class="dec button"><i class="icon fa fa-caret-down"></i></div>
                     <!--<a name="updateBtn" class="updateBtn hidden" id="updateBtn-${item.id}" href="#">update</a>-->
                 <span class="error-text hidden" id="students-${item.id}"></span>
             </div>
               </div>
 
             <div class="col-3">
-               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon-remove-sign"></i></a>
+               <a href="#" class="btn-remove" data-item-id="${item.id}"><i class="icon fa fa-times-circle"></i></a>
             </div>
         </div>
       </div>
@@ -91,7 +92,7 @@ from django.utils.translation import ugettext as _
            </div>
            % else:
            <div class="code-applied">
-              <span class="green"><i class="icon-ok"></i>${_('code has been applied')}</span>
+              <span class="green"><i class="icon fa fa-check-square-o"></i>${_('code has been applied')}</span>
               <input type="submit" value="Reset" class="blue-border" id="submit-reset-redemption">
            </div>
             %endif
@@ -102,13 +103,15 @@ from django.utils.translation import ugettext as _
           <div class="col-2 relative">
              % if order_type == 'business':
               <div name="billing">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
                     <p>
                         ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
                     </p>
               </div>
                <div name="payment" class="hidden">
-                ${form_html}
+                <div id="processor_form">
+                  ${form_html}
+                </div>
                 <p>
                     ${_('After this purchase is complete,')}<br/><b>${order.user.username}</b>
                     ${_('will be enrolled in this course.')}
@@ -123,7 +126,7 @@ from django.utils.translation import ugettext as _
                 </p>
               </div>
               <div name="billing" class="hidden">
-                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon-caret-right"></i>
+                  <input type="submit" value = "Billing Details" name="billing-details"><i class="icon fa fa-caret-right"></i>
                     <p>
                         ${_('After this purchase is complete, a receipt is generated with relative billing details and registration codes for students.')}
                     </p>
@@ -141,13 +144,31 @@ from django.utils.translation import ugettext as _
         <a href="${marketing_link('COURSES')}" class="blue">${_('View Courses')}</a>
       </div>
     % endif
-
 </div>
+<form id='refresh_tracker'>
+   <input id="reloadValue" type="hidden" name="reloadValue" value="" />
+</form>
 </%block>
 <script>
     $(function() {
         var isSpinnerBtnEnabled = true;
         var prevQty = 0;
+
+        // This snipnet of code is to detect when and
+        // end-user has clicked the back button to the
+        // page. We want to force refresh to make
+        // sure there is no cached data happening
+        var d = new Date();
+        d = d.getTime();
+        if (jQuery('#reloadValue').val().length == 0)
+        {
+          jQuery('#reloadValue').val(d);
+        } else
+        {
+          jQuery('body').hide();
+          jQuery('#reloadValue').val('');
+          location.reload(true);
+        }
 
       $('a.btn-remove').click(function(event) {
       event.preventDefault();
@@ -208,7 +229,7 @@ from django.utils.translation import ugettext as _
        // before going to billing details page
        // if exists then trigger click event of the apply code button
        var code = $('div.code-input input#input_code').val();
-       if (code!= ''){
+       if (typeof(code) != 'undefined' && code != ''){
           $('div.code-input #submit-code').trigger('click');
           return false;
        }
@@ -317,6 +338,7 @@ from django.utils.translation import ugettext as _
                   var prevTotal = data['total_cost'];
                   $('html').css({'cursor':'default'});
                   $(".button").css({'cursor':'default'});
+                  $("#processor_form").html(data['form_html']);
                   if(typeChanged){
                       var submit_button = $('.col-2.relative').find("input[type='submit']")
                       submit_button.removeAttr('disabled');
@@ -410,4 +432,5 @@ from django.utils.translation import ugettext as _
 
 	});
 });
+
 </script>

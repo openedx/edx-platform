@@ -11,7 +11,7 @@ from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.db import DatabaseError
 import json
-from mock import patch
+from mock import patch, Mock
 from smtplib import SMTPDataError, SMTPServerDisconnected, SMTPConnectError
 
 from bulk_email.models import CourseEmail, SEND_TO_ALL
@@ -37,6 +37,7 @@ class EmailTestException(Exception):
     pass
 
 
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestEmailErrors(ModuleStoreTestCase):

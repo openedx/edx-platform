@@ -27,8 +27,8 @@ define(["underscore", "js/views/baseview"], function(_, BaseView) {
                 current_page: collection.currentPage,
                 total_pages: collection.totalPages
             }));
-            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);;
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
             return this;
         },
 
@@ -38,6 +38,14 @@ define(["underscore", "js/views/baseview"], function(_, BaseView) {
                 currentPage = collection.currentPage + 1,
                 pageInput = this.$("#page-number-input"),
                 pageNumber = parseInt(pageInput.val(), 10);
+            if (pageNumber > collection.totalPages) {
+                pageNumber = false;
+            }
+            if (pageNumber <= 0) {
+                pageNumber = false;
+            }
+            // If we still have a page number by this point,
+            // and it's not the current page, load it.
             if (pageNumber && pageNumber !== currentPage) {
                 view.setPage(pageNumber - 1);
             }

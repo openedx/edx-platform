@@ -133,7 +133,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             var dict = $.extend(true, {}, this.model.get('value'));
             dict[''] = '';
             this.setValueInEditor(dict);
-            this.$el.find('.create-setting').addClass('is-disabled');
+            this.$el.find('.create-setting').addClass('is-disabled').attr('aria-disabled', true);
         },
 
         removeEntry: function(event) {
@@ -142,7 +142,7 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
             var entry = $(event.currentTarget).data('lang');
             this.setValueInEditor(_.omit(this.model.get('value'), entry));
             this.updateModel();
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         upload: function (event) {
@@ -173,13 +173,13 @@ function($, _, AbstractEditor, FileUpload, UploadDialog) {
         },
 
         enableAdd: function() {
-            this.$el.find('.create-setting').removeClass('is-disabled');
+            this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
         },
 
         clear: function() {
             AbstractEditor.prototype.clear.apply(this, arguments);
             if (_.isNull(this.model.getValue())) {
-                this.$el.find('.create-setting').removeClass('is-disabled');
+                this.$el.find('.create-setting').removeClass('is-disabled').attr('aria-disabled', false);
             }
         },
 

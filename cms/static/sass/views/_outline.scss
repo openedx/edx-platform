@@ -311,6 +311,15 @@
           width: flex-grid(5, 6);
           line-height: 0;
         }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include margin-right(0);
+            @include transform(none);
+            vertical-align: middle;
+          }
+        }
       }
 
       .section-header-actions {
@@ -399,6 +408,15 @@
           width: flex-grid(5, 6);
           margin-top: -($baseline/10);
           line-height: 0;
+        }
+
+        .action-edit.action-inline {
+
+          .icon {
+            @include transform(none);
+            margin-right: 0;
+            vertical-align: middle;
+          }
         }
       }
 
@@ -575,7 +593,7 @@
       border-top: 1px solid $blue-l1;
       opacity: 0.0;
 
-      *[class^="icon-caret"] {
+      .fa-caret-right {
         @extend %t-icon5;
         position: absolute;
         top: -12px;

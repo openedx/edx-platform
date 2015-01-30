@@ -5,6 +5,7 @@ from django.utils.translation import ungettext
 from django.core.urlresolvers import reverse
 from courseware.courses import course_image_url, get_course_about_section, get_course_by_id
 %>
+<%! from microsite_configuration import microsite %>
 
 <%block name="billing_details_highlight">
 % if order_type == 'business':
@@ -29,7 +30,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
            ## in case of multiple courses in single self purchase scenario,
            ## we will show the button View Dashboard
           <% dashboard_url = reverse('dashboard') %>
-          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon-caret-right"></i></a>
+          <a href="${dashboard_url}" class="blue pull-right">${_("View Dashboard")} <i class="icon fa fa-caret-right"></i></a>
           <span class="mt-7">
             ${_(u"You have successfully been enrolled for {course_names}. "
                 u"The following receipt has been emailed to {receipient_emails}").format(
@@ -94,7 +95,7 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
     %endif
     <div class="bordered-bar">
       <h2>${_('Invoice')} #${order.id}<span>${_('Date of purchase')}: ${order_purchase_date} </span><span
-          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon-print"></i> ${_('Print Receipt')}</a></span>
+          class="pull-right"><a href="" onclick="window.print();" class="blue-link"><i class="icon fa fa-print"></i> ${_('Print Receipt')}</a></span>
       </h2>
     </div>
     % if order.total_cost > 0:
@@ -371,6 +372,8 @@ from courseware.courses import course_image_url, get_course_about_section, get_c
         <span class="pull-right">${_("Total")}: <b> ${currency_symbol}${"{0:0.2f}".format(order.total_cost)}  ${currency.upper()}</b></span>
       </div>
     </div>
+    ## Allow for a microsite to be able to insert additional text at the bottom of the page
+    <%include file="${microsite.get_template_path('receipt_custom_pane.html')}" />
   </section>
 </div>
 </%block>

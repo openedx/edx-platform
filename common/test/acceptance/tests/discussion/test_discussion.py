@@ -112,6 +112,33 @@ class DiscussionResponsePaginationTestMixin(BaseDiscussionMixin):
 
 
 @attr('shard_1')
+class DiscussionHomePageTest(UniqueCourseTest):
+    """
+    Tests for the discussion home page.
+    """
+
+    SEARCHED_USERNAME = "gizmo"
+
+    def setUp(self):
+        super(DiscussionHomePageTest, self).setUp()
+        CourseFixture(**self.course_info).install()
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        self.page = DiscussionTabHomePage(self.browser, self.course_id)
+        self.page.visit()
+
+    def test_new_post_button(self):
+        """
+        Scenario: I can create new posts from the Discussion home page.
+            Given that I am on the Discussion home page
+            When I click on the 'New Post' button
+            Then I should be shown the new post form
+        """
+        self.assertIsNotNone(self.page.new_post_button)
+        self.page.click_new_post_button()
+        self.assertIsNotNone(self.page.new_post_form)
+
+
+@attr('shard_1')
 class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginationTestMixin):
     """
     Tests for the discussion page displaying a single thread
@@ -150,6 +177,56 @@ class DiscussionTabSingleThreadTest(UniqueCourseTest, DiscussionResponsePaginati
         self.assertTrue(self.thread_page.is_comment_visible(comment_id))
         self.assertTrue(self.thread_page.is_add_comment_visible(response_id))
         self.assertFalse(self.thread_page.is_show_comments_visible(response_id))
+
+
+@attr('shard_1')
+class DiscussionOpenClosedThreadTest(UniqueCourseTest):
+    """
+    Tests for checking the display of attributes on open and closed threads
+    """
+
+    def setUp(self):
+        super(DiscussionOpenClosedThreadTest, self).setUp()
+
+        # Create a course to register for
+        CourseFixture(**self.course_info).install()
+        self.thread_id = "test_thread_{}".format(uuid4().hex)
+
+    def setup_user(self, roles=[]):
+        roles_str = ','.join(roles)
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
+
+    def setup_view(self, **thread_kwargs):
+        view = SingleThreadViewFixture(
+            Thread(id=self.thread_id, **thread_kwargs)
+        )
+        view.addResponse(Response(id="response1"))
+        view.push()
+
+    def setup_openclosed_thread_page(self, closed=False):
+        self.setup_user(roles=['Moderator'])
+        if closed:
+            self.setup_view(closed=True)
+        else:
+            self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, self.thread_id)
+        page.visit()
+        page.close_open_thread()
+        return page
+
+    def test_originally_open_thread_vote_display(self):
+        page = self.setup_openclosed_thread_page()
+        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
+        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertFalse(page._is_element_visible('.response_response1 .action-vote'))
+        self.assertTrue(page._is_element_visible('.response_response1 .display-vote'))
+
+    def test_originally_closed_thread_vote_display(self):
+        page = self.setup_openclosed_thread_page(True)
+        self.assertTrue(page._is_element_visible('.forum-thread-main-wrapper .action-vote'))
+        self.assertFalse(page._is_element_visible('.forum-thread-main-wrapper .display-vote'))
+        self.assertTrue(page._is_element_visible('.response_response1 .action-vote'))
+        self.assertFalse(page._is_element_visible('.response_response1 .display-vote'))
 
 
 @attr('shard_1')
@@ -194,6 +271,107 @@ class DiscussionCommentDeletionTest(UniqueCourseTest):
         self.assertTrue(page.is_comment_deletable("comment_other_author"))
         page.delete_comment("comment_self_author")
         page.delete_comment("comment_other_author")
+
+
+@attr('shard_1')
+class DiscussionResponseEditTest(UniqueCourseTest):
+    """
+    Tests for editing responses displayed beneath thread in the single thread view.
+    """
+
+    def setUp(self):
+        super(DiscussionResponseEditTest, self).setUp()
+
+        # Create a course to register for
+        CourseFixture(**self.course_info).install()
+
+    def setup_user(self, roles=[]):
+        roles_str = ','.join(roles)
+        self.user_id = AutoAuthPage(self.browser, course_id=self.course_id, roles=roles_str).visit().get_user_id()
+
+    def setup_view(self):
+        view = SingleThreadViewFixture(Thread(id="response_edit_test_thread"))
+        view.addResponse(
+            Response(id="response_other_author", user_id="other", thread_id="response_edit_test_thread"),
+        )
+        view.addResponse(
+            Response(id="response_self_author", user_id=self.user_id, thread_id="response_edit_test_thread"),
+        )
+        view.push()
+
+    def edit_response(self, page, response_id):
+        self.assertTrue(page.is_response_editable(response_id))
+        page.start_response_edit(response_id)
+        new_response = "edited body"
+        page.set_response_editor_value(response_id, new_response)
+        page.submit_response_edit(response_id, new_response)
+
+    def test_edit_response_as_student(self):
+        """
+        Scenario: Students should be able to edit the response they created not responses of other users
+            Given that I am on discussion page with student logged in
+            When I try to edit the response created by student
+            Then the response should be edited and rendered successfully
+            And responses from other users should be shown over there
+            And the student should be able to edit the response of other people
+        """
+        self.setup_user()
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.assertTrue(page.is_response_visible("response_other_author"))
+        self.assertFalse(page.is_response_editable("response_other_author"))
+        self.edit_response(page, "response_self_author")
+
+    def test_edit_response_as_moderator(self):
+        """
+        Scenario: Moderator should be able to edit the response they created and responses of other users
+            Given that I am on discussion page with moderator logged in
+            When I try to edit the response created by moderator
+            Then the response should be edited and rendered successfully
+            And I try to edit the response created by other users
+            Then the response should be edited and rendered successfully
+        """
+        self.setup_user(roles=["Moderator"])
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.edit_response(page, "response_self_author")
+        self.edit_response(page, "response_other_author")
+
+    def test_vote_report_endorse_after_edit(self):
+        """
+        Scenario: Moderator should be able to vote, report or endorse after editing the response.
+            Given that I am on discussion page with moderator logged in
+            When I try to edit the response created by moderator
+            Then the response should be edited and rendered successfully
+            And I try to edit the response created by other users
+            Then the response should be edited and rendered successfully
+            And I try to vote the response created by moderator
+            Then the response should be voted successfully
+            And I try to vote the response created by other users
+            Then the response should be voted successfully
+            And I try to report the response created by moderator
+            Then the response should be reported successfully
+            And I try to report the response created by other users
+            Then the response should be reported successfully
+            And I try to endorse the response created by moderator
+            Then the response should be endorsed successfully
+            And I try to endorse the response created by other users
+            Then the response should be endorsed successfully
+        """
+        self.setup_user(roles=["Moderator"])
+        self.setup_view()
+        page = DiscussionTabSingleThreadPage(self.browser, self.course_id, "response_edit_test_thread")
+        page.visit()
+        self.edit_response(page, "response_self_author")
+        self.edit_response(page, "response_other_author")
+        page.vote_response('response_self_author')
+        page.vote_response('response_other_author')
+        page.report_response('response_self_author')
+        page.report_response('response_other_author')
+        page.endorse_response('response_self_author')
+        page.endorse_response('response_other_author')
 
 
 @attr('shard_1')
@@ -295,6 +473,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
     def setUp(self):
         super(InlineDiscussionTest, self).setUp()
         self.discussion_id = "test_discussion_{}".format(uuid4().hex)
+        self.additional_discussion_id = "test_discussion_{}".format(uuid4().hex)
         self.course_fix = CourseFixture(**self.course_info).add_children(
             XBlockFixtureDesc("chapter", "Test Section").add_children(
                 XBlockFixtureDesc("sequential", "Test Subsection").add_children(
@@ -303,6 +482,11 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
                             "discussion",
                             "Test Discussion",
                             metadata={"discussion_id": self.discussion_id}
+                        ),
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion 1",
+                            metadata={"discussion_id": self.additional_discussion_id}
                         )
                     )
                 )
@@ -314,6 +498,7 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.courseware_page = CoursewarePage(self.browser, self.course_id)
         self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self.discussion_id)
+        self.additional_discussion_page = InlineDiscussionPage(self.browser, self.additional_discussion_id)
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
@@ -374,6 +559,35 @@ class InlineDiscussionTest(UniqueCourseTest, DiscussionResponsePaginationTestMix
         self.assertFalse(self.thread_page.is_comment_editable("comment2"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment1"))
         self.assertFalse(self.thread_page.is_comment_deletable("comment2"))
+
+    def test_dual_discussion_module(self):
+        """
+        Scenario: Two discussion module in one unit shouldn't override their actions
+        Given that I'm on courseware page where there are two inline discussion
+        When I click on one discussion module new post button
+        Then it should add new post form of that module in DOM
+        And I should be shown new post form of that module
+        And I shouldn't be shown second discussion module new post form
+        And I click on second discussion module new post button
+        Then it should add new post form of second module in DOM
+        And I should be shown second discussion new post form
+        And I shouldn't be shown first discussion module new post form
+        And I have two new post form in the DOM
+        When I click back on first module new post button
+        And I should be shown new post form of that module
+        And I shouldn't be shown second discussion module new post form
+        """
+        self.discussion_page.wait_for_page()
+        self.additional_discussion_page.wait_for_page()
+        self.discussion_page.click_new_post_button()
+        with self.discussion_page.handle_alert():
+            self.discussion_page.click_cancel_new_post()
+        self.additional_discussion_page.click_new_post_button()
+        self.assertFalse(self.discussion_page._is_element_visible(".new-post-article"))
+        with self.additional_discussion_page.handle_alert():
+            self.additional_discussion_page.click_cancel_new_post()
+        self.discussion_page.click_new_post_button()
+        self.assertFalse(self.additional_discussion_page._is_element_visible(".new-post-article"))
 
 
 @attr('shard_1')

@@ -7,8 +7,12 @@ import functools
 import requests
 import os
 from path import path
+from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.partitions.partitions import UserPartition
+from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
+from selenium.webdriver.support.select import Select
 
 
 def skip_if_browser(browser):
@@ -90,6 +94,7 @@ def enable_animations(page):
     enable_css_animations(page)
 
 
+@js_defined('window.jQuery')
 def disable_jquery_animations(page):
     """
     Disable jQuery animations.
@@ -97,6 +102,7 @@ def disable_jquery_animations(page):
     page.browser.execute_script("jQuery.fx.off = true;")
 
 
+@js_defined('window.jQuery')
 def enable_jquery_animations(page):
     """
     Enable jQuery animations.
@@ -165,6 +171,67 @@ def enable_css_animations(page):
 
         head.removeChild(styles)
     """)
+
+
+def select_option_by_text(select_browser_query, option_text):
+    """
+    Chooses an option within a select by text (helper method for Select's select_by_visible_text method).
+    """
+    select = Select(select_browser_query.first.results[0])
+    select.select_by_visible_text(option_text)
+
+
+def get_selected_option_text(select_browser_query):
+    """
+    Returns the text value for the first selected option within a select.
+    """
+    select = Select(select_browser_query.first.results[0])
+    return select.first_selected_option.text
+
+
+def get_options(select_browser_query):
+    """
+    Returns all the options for the given select.
+    """
+    return Select(select_browser_query.first.results[0]).options
+
+
+def generate_course_key(org, number, run):
+    """
+    Makes a CourseLocator from org, number and run
+    """
+    default_store = os.environ.get('DEFAULT_STORE', 'draft')
+    return CourseLocator(org, number, run, deprecated=(default_store == 'draft'))
+
+
+def select_option_by_value(browser_query, value):
+    """
+    Selects a html select element by matching value attribute
+    """
+    select = Select(browser_query.first.results[0])
+    select.select_by_value(value)
+
+
+def is_option_value_selected(browser_query, value):
+    """
+    return true if given value is selected in html select element, else return false.
+    """
+    select = Select(browser_query.first.results[0])
+    ddl_selected_value = select.first_selected_option.get_attribute('value')
+    return ddl_selected_value == value
+
+
+def element_has_text(page, css_selector, text):
+    """
+    Return true if the given text is present in the list.
+    """
+    text_present = False
+    text_list = page.q(css=css_selector).text
+
+    if len(text_list) > 0 and (text in text_list):
+        text_present = True
+
+    return text_present
 
 
 class UniqueCourseTest(WebAppTest):
@@ -276,3 +343,12 @@ class YouTubeStubConfig(object):
             return json.loads(response.content)
         else:
             return {}
+
+
+def create_user_partition_json(partition_id, name, description, groups, scheme="random"):
+    """
+    Helper method to create user partition JSON. If scheme is not supplied, "random" is used.
+    """
+    return UserPartition(
+        partition_id, name, description, groups, MockUserPartitionScheme(scheme)
+    ).to_json()

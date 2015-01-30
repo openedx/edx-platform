@@ -86,16 +86,10 @@ define([
             };
 
             var expectPaymentDisabledBecauseInactive = function() {
-                var payButton = $( '#pay_button'),
-                    activateButton = $( '#activate_button' );
+                var payButton = $( '#pay_button' );
 
                 // Payment button should be hidden
                 expect( payButton.length ).toEqual(0);
-
-                // Activate button should be displayed and disabled
-                expect( activateButton.length ).toEqual(1);
-                expect( activateButton.hasClass( 'is-disabled' ) ).toBe( true );
-                expect( activateButton.prop( 'disabled' ) ).toBe( true );
             };
 
             var goToPayment = function( requests, kwargs ) {
@@ -142,7 +136,6 @@ define([
 
                 setFixtures( '<div id="current-step-container"></div>' );
                 TemplateHelpers.installTemplate( 'templates/verify_student/make_payment_step' );
-                TemplateHelpers.installTemplate( 'templates/verify_student/requirements' );
             });
 
             it( 'allows users to choose a suggested price', function() {

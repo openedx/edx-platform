@@ -55,7 +55,7 @@ var edx = edx || {};
                 minPrice: el.data('course-mode-min-price'),
                 contributionAmount: el.data('contribution-amount'),
                 suggestedPrices: _.filter(
-                    (el.data('course-mode-suggested-prices') || "").split(","),
+                    (el.data('course-mode-suggested-prices').toString()).split(","),
                     function( price ) { return Boolean( price ); }
                 ),
                 currency: el.data('course-mode-currency'),
@@ -70,6 +70,12 @@ var edx = edx || {};
                 platformName: el.data('platform-name'),
                 requirements: el.data('requirements')
             },
+            'face-photo-step': {
+                platformName: el.data('platform-name')
+            },
+            'id-photo-step': {
+                platformName: el.data('platform-name')
+            },
             'review-photos-step': {
                 fullName: el.data('full-name'),
                 platformName: el.data('platform-name')
@@ -78,12 +84,6 @@ var edx = edx || {};
                 courseName: el.data('course-name'),
                 courseStartDate: el.data('course-start-date'),
                 coursewareUrl: el.data('courseware-url'),
-                platformName: el.data('platform-name')
-            },
-            'face-photo-step': {
-                platformName: el.data('platform-name')
-            },
-            'id-photo-step': {
                 platformName: el.data('platform-name')
             }
         }

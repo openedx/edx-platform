@@ -1,0 +1,15 @@
+<% if (length === 0) { %>
+    <div class="no-content">
+        <p>
+            <%- emptyMessage %>
+            <a href="#" class="button new-button"><i class="icon fa fa-plus"></i> <%= interpolate(gettext("Add your first %(item_type)s"), {item_type: itemCategoryDisplayName}, true) %></a>
+        </p>
+    </div>
+<% } else { %>
+    <div class="list-items"></div>
+    <% if (!isEditing) { %>
+        <button class="action action-add">
+            <i class="icon fa fa-plus"></i><%- interpolate(gettext('New %(item_type)s'), {item_type: itemCategoryDisplayName}, true) %>
+        </button>
+    <% } %>
+<% } %>

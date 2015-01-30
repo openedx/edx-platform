@@ -101,6 +101,7 @@
       if(enable) {
         $submitButton.
           removeClass('is-disabled').
+          attr('aria-disabled', false).
           removeProp('disabled').
           html("${_('Log into My {platform_name} Account').format(platform_name=platform_name)} <span class='orn-plus'>+</span> ${_('Access My Courses')}");
       }
@@ -108,7 +109,7 @@
         $submitButton.
           addClass('is-disabled').
           prop('disabled', true).
-          text("${_(u'Processing your account information…')}");
+          text("${_(u'Processing your account information')}");
       }
     }
 
@@ -219,7 +220,7 @@
 
     % for enabled in provider.Registry.enabled():
       ## Translators: provider_name is the name of an external, third-party user authentication provider (like Google or LinkedIn).
-      <button type="submit" class="button button-primary button-${enabled.NAME} login-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.NAME]}');"><span class="icon ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
+      <button type="submit" class="button button-primary button-${enabled.NAME} login-${enabled.NAME}" onclick="thirdPartySignin(event, '${pipeline_url[enabled.NAME]}');"><span class="icon fa ${enabled.ICON_CLASS}"></span>${_('Sign in with {provider_name}').format(provider_name=enabled.NAME)}</button>
     % endfor
 
     </div>

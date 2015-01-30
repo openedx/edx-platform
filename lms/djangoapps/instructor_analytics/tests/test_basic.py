@@ -6,7 +6,8 @@ import json
 from student.models import CourseEnrollment
 from django.core.urlresolvers import reverse
 from mock import patch
-from student.tests.factories import UserFactory
+from student.roles import CourseSalesAdminRole
+from student.tests.factories import UserFactory, CourseModeFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
@@ -21,6 +22,10 @@ from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+
+import datetime
+from django.db.models import Q
+import pytz
 
 
 class TestAnalyticsBasic(ModuleStoreTestCase):
@@ -145,7 +150,7 @@ class TestCourseSaleRecordsAnalyticsBasic(ModuleStoreTestCase):
         for i in range(5):
             course_code = CourseRegistrationCode(
                 code="test_code{}".format(i), course_id=self.course.id.to_deprecated_string(),
-                created_by=self.instructor, invoice=sale_invoice
+                created_by=self.instructor, invoice=sale_invoice, mode_slug='honor'
             )
             course_code.save()
 
@@ -255,6 +260,13 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
+        CourseSalesAdminRole(self.course.id).add_users(self.instructor)
+
+        # Create a paid course mode.
+        mode = CourseModeFactory.create()
+        mode.course_id = self.course.id
+        mode.min_price = 1
+        mode.save()
 
         url = reverse('generate_registration_codes',
                       kwargs={'course_id': self.course.id.to_deprecated_string()})
@@ -272,7 +284,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
     def test_course_registration_features(self):
         query_features = [
-            'code', 'course_id', 'company_name', 'created_by',
+            'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
             'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
         ]
         order = Order(user=self.instructor, status='purchased')
@@ -303,7 +315,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
     def test_coupon_codes_features(self):
         query_features = [
-            'course_id', 'percentage_discount', 'code_redeemed_count', 'description'
+            'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date'
         ]
         for i in range(10):
             coupon = Coupon(
@@ -314,13 +326,29 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
                 is_active=True
             )
             coupon.save()
-        active_coupons = Coupon.objects.filter(course_id=self.course.id, is_active=True)
+        #now create coupons with the expiration dates
+        for i in range(5):
+            coupon = Coupon(
+                code='coupon{0}'.format(i), description='test_description', course_id=self.course.id,
+                percentage_discount='{0}'.format(i), created_by=self.instructor, is_active=True,
+                expiration_date=datetime.datetime.now(pytz.UTC) + datetime.timedelta(days=2)
+            )
+            coupon.save()
+
+        active_coupons = Coupon.objects.filter(
+            Q(course_id=self.course.id),
+            Q(is_active=True),
+            Q(expiration_date__gt=datetime.datetime.now(pytz.UTC)) |
+            Q(expiration_date__isnull=True)
+        )
         active_coupons_list = coupon_codes_features(query_features, active_coupons)
         self.assertEqual(len(active_coupons_list), len(active_coupons))
         for active_coupon in active_coupons_list:
             self.assertEqual(set(active_coupon.keys()), set(query_features))
             self.assertIn(active_coupon['percentage_discount'], [coupon.percentage_discount for coupon in active_coupons])
             self.assertIn(active_coupon['description'], [coupon.description for coupon in active_coupons])
+            if active_coupon['expiration_date']:
+                self.assertIn(active_coupon['expiration_date'], [coupon.display_expiry_date for coupon in active_coupons])
             self.assertIn(
                 active_coupon['course_id'],
                 [coupon.course_id.to_deprecated_string() for coupon in active_coupons]

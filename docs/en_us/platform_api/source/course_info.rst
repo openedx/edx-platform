@@ -138,20 +138,20 @@ Get the HTML for the course about page.
                      <p>This is paragraph 2 of the long course description. Add more paragraphs as needed. Make sure to enclose them in paragraph tags.</p>
                      </section>\n\n 
                      <section class=\"prerequisites\">\n   
-                     <h2>Prerequisites</h2>\n   
-                     <p>Add information about course prerequisites here.</p>\n </section>\n\n 
+                     <h2>Requirements</h2>\n
+                     <p>Add information about the skills and knowledge students need to take this course.</p>\n </section>\n\n
                      <section class=\"course-staff\">\n   
                      <h2>Course Staff</h2>\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #1\">\n     
                      </div>\n\n     
                      <h3>Staff Member #1</h3>\n     
                      <p>Biography of instructor/staff member #1</p>\n   
                      </article>\n\n   
                      <article class=\"teacher\">\n     
                      <div class=\"teacher-image\">\n       
-                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\">\n     
+                     <img src=\"/static/images/placeholder-faculty.png\" align=\"left\" style=\"margin:0 20 px 0\" alt=\"Course Staff Image #2\">\n     
                      </div>\n\n     
                      <h3>Staff Member #2</h3>\n     
                      <p>Biography of instructor/staff member #2</p>\n   
@@ -161,8 +161,9 @@ Get the HTML for the course about page.
                      <section class=\"responses\">\n     
                      <h2>Frequently Asked Questions</h2>\n     
                      <article class=\"response\">\n       
-                     <h3>Do I need to buy a textbook?</h3>\n       
-                     <p>No, a free online version of Chemistry: Principles, Patterns, and Applications, First Edition by Bruce Averill and Patricia Eldredge will be available, though you can purchase a printed version (published by FlatWorld Knowledge) if you\u2019d like.</p>\n     
+                     <h3>What web browser should I use?</h3>\n
+                     <p>The Open edX platform works best with current versions of Chrome, Firefox or Safari, or with Internet Explorer version 9 and above.</p>\n
+                     <p>See our <a href=\"http://edx.readthedocs.org/en/latest/browsers.html\">list of supported browsers</a> for the most up-to-date information.</p>\n     
                      </article>\n\n     
                      <article class=\"response\">\n       
                      <h3>Question #2</h3>\n       

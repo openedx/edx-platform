@@ -27,8 +27,10 @@ var edx = edx || {};
             this.providers = data.thirdPartyAuth.providers || [];
             this.currentProvider = data.thirdPartyAuth.currentProvider || '';
             this.platformName = data.platformName;
+            this.resetModel = data.resetModel;
 
             this.listenTo( this.model, 'sync', this.saveSuccess );
+            this.listenTo( this.resetModel, 'sync', this.resetEmail );
         },
 
         render: function( html ) {
@@ -55,6 +57,7 @@ var edx = edx || {};
 
             this.$form = this.$container.find('form');
             this.$errors = this.$container.find('.submission-error');
+            this.$resetSuccess = this.$container.find('.js-reset-success');
             this.$authError = this.$container.find('.already-authenticated-msg');
             this.$submitButton = this.$container.find(this.submitButton);
 
@@ -71,6 +74,16 @@ var edx = edx || {};
             event.preventDefault();
 
             this.trigger('password-help');
+            this.element.hide( this.$resetSuccess );
+        },
+
+        postFormSubmission: function() {
+            this.element.hide( this.$resetSuccess );
+        },
+
+        resetEmail: function() {
+            this.element.hide( this.$errors );
+            this.element.show( this.$resetSuccess );
         },
 
         thirdPartyAuth: function( event ) {
@@ -81,13 +94,15 @@ var edx = edx || {};
             }
         },
 
-        saveSuccess: function () {
+        saveSuccess: function() {
             this.trigger('auth-complete');
+            this.element.hide( this.$resetSuccess );
         },
 
         saveError: function( error ) {
             this.errors = ['<li>' + error.responseText + '</li>'];
             this.setErrors();
+            this.element.hide( this.$resetSuccess );
 
             /* If we've gotten a 403 error, it means that we've successfully
              * authenticated with a third-party provider, but we haven't

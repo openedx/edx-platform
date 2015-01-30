@@ -11,6 +11,11 @@
             name="<%= name %>"
             class="input-inline"
             aria-describedby="<%= form %>-<%= name %>-desc"
+            <% if ( typeof errorMessages !== 'undefined' ) {
+                _.each(errorMessages, function( msg, type ) {%>
+                    data-errormsg-<%= type %>="<%= msg %>"
+            <%  });
+            } %>
             <% if ( required ) { %> aria-required="true" required<% } %>>
         <% _.each(options, function(el) { %>
             <option value="<%= el.value%>"<% if ( el.default ) { %> data-isdefault="true"<% } %>><%= el.name %></option>
@@ -49,7 +54,7 @@
     <% } %>
 
     <% if ( type === 'checkbox' ) { %>
-        <label for="<%= form %>-<%= name %>" class="inline">
+        <label for="<%= form %>-<%= name %>">
             <%= label %>
             <% if ( required && requiredStr ) { %> <%= requiredStr %><% } %>
         </label>
@@ -58,6 +63,4 @@
     <% if( form === 'login' && name === 'password' ) { %>
         <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
-
-    <span id="<%= form %>-<%= name %>-desc" class="desc"><%= instructions %></span>
 </p>

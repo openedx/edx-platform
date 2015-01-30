@@ -66,7 +66,7 @@ var edx = edx || {};
         },
 
         handleSubmissionError: function( xhr ) {
-            var errorMsg = gettext( 'An unexpected error occurred. Please try again later.' );
+            var errorMsg = gettext( 'An error has occurred. Please try again later.' );
 
             // Re-enable the submit button to allow the user to retry
             this.setSubmitButtonEnabled( true );
@@ -83,20 +83,22 @@ var edx = edx || {};
         },
 
         expandCallback: function( event ) {
-            var title;
+            var $link = $(this),
+                $title = $link.closest('.help-tip'),
+                expanded = $title.hasClass('is-expanded');
 
             event.preventDefault();
 
-            $(this).next('.expandable-area' ).slideToggle();
-            title = $( this ).parent();
-            title.toggleClass( 'is-expanded' );
-            title.attr( 'aria-expanded', !title.attr( 'aria-expanded' ) );
+            $link.attr( 'aria-expanded', !expanded );
+            $title.toggleClass('is-expanded')
+                  .find('.expandable-area').slideToggle();
         },
 
         setSubmitButtonEnabled: function( isEnabled ) {
             $( '#next_step_button' )
                 .toggleClass( 'is-disabled', !isEnabled )
-                .prop( 'disabled', !isEnabled );
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         }
     });
 

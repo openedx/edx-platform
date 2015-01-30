@@ -11,17 +11,17 @@
 
   <div class="attachment-options">
     <a class="btn" href="#" id="upload-file-btn">
-      <span class="icon-upload"></span>{% trans "Upload new file" %}
+      <span class="icon fa fa-arrow-circle-o-up"></span>{% trans "Upload new file" %}
     </a>
     <a class="btn" href="#" id="search-for-file-btn">
-      <span class="icon-plus-sign"></span>{% trans "Search and add file" %}
+      <span class="icon fa fa-plus-sign"></span>{% trans "Search and add file" %}
     </a>
   </div>
 
   <div class="modal upload-modal hide fade" id="upload-modal">
     <div class="modal-inner-wrapper">
       <h4>{% trans "Upload File" %}</h4>
-      <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">        
+      <form method="POST" class="form-vertical" id="attachment_form" enctype="multipart/form-data">
         {% wiki_form form %}
         <button type="submit" name="save" value="1" class="btn btn-primary">
           {% trans "Upload file" %}
@@ -56,7 +56,7 @@
       $('#search-file-modal').modal('show');
     });
   </script>
-  
+
   {% endif %}
 
 
@@ -95,7 +95,7 @@
                     {% endif %}
 
                     <a href="{% url 'wiki:attachments_replace' path=urlpath.path article_id=article.id attachment_id=attachment.id %}" class="btn">{% trans "Replace" %}</a>
-                    
+
                   {% else %}
                     {% if attachment.current_revision.previous_revision.id %}
                     <form method="POST" action="{% url 'wiki:attachments_revision_change' path=urlpath.path article_id=article.id attachment_id=attachment.id revision_id=attachment.current_revision.previous_revision.id %}">
@@ -106,7 +106,7 @@
                     </form>
                     {% endif %}
                   {% endif %}
-                {% endif %}                
+                {% endif %}
               </td>
             </tr>
             <tr>
@@ -118,7 +118,7 @@
 
               <td>
                 <a href="{% url 'wiki:attachments_history' path=urlpath.path article_id=article.id attachment_id=attachment.id %}">
-                  <span class="icon-time"></span>
+                  <span class="icon fa fa-clock-o"></span>
                   {% trans "File history" %} ({{ attachment.attachmentrevision_set.all.count }} {% trans "revisions" %})
                 </a>
               </td>
@@ -131,9 +131,9 @@
       {% endfor %}
     </ul>
   </div>
-  
-  
+
+
 </div>
-  
+
 {% endblock %}
 

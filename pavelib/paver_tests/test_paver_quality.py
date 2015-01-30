@@ -60,6 +60,8 @@ class TestPaverRunQuality(unittest.TestCase):
         self._mock_paver_needs = patch.object(pavelib.quality.run_quality, 'needs').start()
         self._mock_paver_needs.return_value = 0
         self._mock_paver_sh = patch('pavelib.quality.sh').start()
+        self.addCleanup(self._mock_paver_sh.stop())
+        self.addCleanup(self._mock_paver_needs.stop())
 
     def test_failure_on_diffquality_pep8(self):
         """

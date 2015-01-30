@@ -10,6 +10,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
 
@@ -26,7 +27,15 @@ def load_function(path):
 
 
 # pylint: disable=unused-argument
-def create_modulestore_instance(engine, contentstore, doc_store_config, options, i18n_service=None, fs_service=None):
+def create_modulestore_instance(
+        engine,
+        contentstore,
+        doc_store_config,
+        options,
+        i18n_service=None,
+        fs_service=None,
+        user_service=None
+):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -68,7 +77,7 @@ class MixedSplitTestCase(TestCase):
     Stripped-down version of ModuleStoreTestCase that can be used without Django
     (i.e. for testing in common/lib/ ). Sets up MixedModuleStore and Split.
     """
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': u'{}: {}, {}'.format(t_n, repr(d), repr(ctx))
     modulestore_options = {
         'default_class': 'xmodule.raw_module.RawDescriptor',
         'fs_root': DATA_DIR,
@@ -108,3 +117,18 @@ class MixedSplitTestCase(TestCase):
         )
         self.addCleanup(self.store.close_all_connections)
         self.addCleanup(self.store._drop_database)  # pylint: disable=protected-access
+
+    def make_block(self, category, parent_block, **kwargs):
+        """
+        Create a block of type `category` as a child of `parent_block`, in any
+        course or library. You can pass any field values as kwargs.
+        """
+        extra = {"publish_item": False, "user_id": self.user_id}
+        extra.update(kwargs)
+        return ItemFactory.create(
+            category=category,
+            parent=parent_block,
+            parent_location=parent_block.location,
+            modulestore=self.store,
+            **extra
+        )

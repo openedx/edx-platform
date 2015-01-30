@@ -27,7 +27,7 @@
       width: 21px;
       height: 21px;
       padding: 0;
-      margin: 0 5px 0 15px;
+      margin: 0 ($baseline/4) 0 ($baseline*0.75);
       border-radius: 22px;
       border: 1px solid #a5aaaf;
       background: #e5ecf3;
@@ -45,8 +45,8 @@
   left: 100%;
   width: 0;
   border-radius: 0 3px 3px 0;
-  @include linear-gradient(left, rgba(0, 0, 0, .1), rgba(0, 0, 0, 0) 4px);
-  background-color: #fff;
+  @include linear-gradient(left, $shadow-l1, $transparent 4px);
+  background-color: $white;
   overflow: hidden;
   @include transition(width .3s linear 0s);
 
@@ -67,7 +67,7 @@
   }
 
   .row {
-    @include clearfix;
+    @include clearfix();
     padding-bottom: 5px !important;
     margin-bottom: 10px !important;
     border-bottom: 1px solid #ddd !important;

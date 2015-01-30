@@ -25,23 +25,46 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
             this.$el.html(this.template({
                 messageHtml: messageHtml
             }));
-            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0);
-            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage);
+            this.$(".previous-page-link").toggleClass("is-disabled", currentPage === 0).attr('aria-disabled', currentPage === 0);
+            this.$(".next-page-link").toggleClass("is-disabled", currentPage === lastPage).attr('aria-disabled', currentPage === lastPage);
             return this;
         },
 
         messageHtml: function() {
-            var message;
-            if (this.view.collection.sortDirection === 'asc') {
-                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added ascending"
-                message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s ascending');
-            } else {
-                // Translators: sample result: "Showing 0-9 out of 25 total, sorted by Date Added descending"
-                message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, sorted by %(sort_name)s descending');
+            var message = '';
+            var asset_type = false;
+            if (this.view.collection.assetType) {
+                if (this.view.collection.sortDirection === 'asc') {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added ascending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'filtered by %(asset_type)s, sorted by %(sort_name)s ascending');
+                } else {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, filtered by Images, sorted by Date Added descending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'filtered by %(asset_type)s, sorted by %(sort_name)s descending');
+                }
+                asset_type = this.filterNameLabel();
             }
+            else {
+                if (this.view.collection.sortDirection === 'asc') {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added ascending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'sorted by %(sort_name)s ascending');
+                } else {
+                    // Translators: sample result:
+                    // "Showing 0-9 out of 25 total, sorted by Date Added descending"
+                    message = gettext('Showing %(current_item_range)s out of %(total_items_count)s, ' +
+                        'sorted by %(sort_name)s descending');
+                }
+            }
+
             return '<p>' + interpolate(message, {
                 current_item_range: this.currentItemRangeLabel(),
                 total_items_count: this.totalItemsCountLabel(),
+                asset_type: asset_type,
                 sort_name: this.sortNameLabel()
             }, true) + "</p>";
         },
@@ -72,6 +95,12 @@ define(["underscore", "gettext", "js/views/baseview"], function(_, gettext, Base
         sortNameLabel: function() {
             return interpolate('<span class="sort-order">%(sort_name)s</span>', {
                 sort_name: this.view.sortDisplayName()
+            }, true);
+        },
+
+        filterNameLabel: function() {
+            return interpolate('<span class="filter-column">%(filter_name)s</span>', {
+                filter_name: this.view.filterDisplayName()
             }, true);
         },
 

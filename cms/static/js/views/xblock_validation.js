@@ -29,10 +29,10 @@ define(["jquery", "underscore", "js/views/baseview", "gettext"],
              */
             getIcon: function (messageType) {
                 if (messageType === this.model.ERROR) {
-                    return 'icon-exclamation-sign';
+                    return 'fa-exclamation-circle';
                 }
                 else if (messageType === this.model.WARNING || messageType === this.model.NOT_CONFIGURED) {
-                    return 'icon-warning-sign';
+                    return 'fa-exclamation-triangle';
                 }
                 return null;
             },

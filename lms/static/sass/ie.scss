@@ -8,7 +8,7 @@
   .highlighted-courses .courses .course header.course-preview, .find-courses .courses .course header.course-preview,
   .home .highlighted-courses > h2, .home .highlighted-courses > section.outside-app h1, section.outside-app .home .highlighted-courses > h1,
   header.global {
-    background: #FFF;
+    background: $white;
   }
 
   // hide all actions
@@ -135,11 +135,11 @@
 
   // make overlay flat black since IE cant handle rgba
   #lean_overlay {
-    background: #000;
+    background: $black;
   }
 
   // active navigation
-  nav.course-material ol.course-tabs li a.active, nav.course-material .xmodule_SequenceModule nav.sequence-nav ol.course-tabs li a.seq_video.active, .xmodule_SequenceModule nav.sequence-nav nav.course-material ol.course-tabs li a.seq_video.active {
+  nav.wrapper-course-material ol.course-tabs li a.active, nav.wrapper-course-material .xmodule_SequenceModule nav.sequence-nav ol.course-tabs li a.seq_video.active, .xmodule_SequenceModule nav.sequence-nav nav.wrapper-course-material ol.course-tabs li a.seq_video.active {
     background-color: #333;
     background-color: rgba(0, 0, 0, .4);
   }

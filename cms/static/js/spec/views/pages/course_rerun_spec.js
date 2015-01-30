@@ -26,7 +26,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
                 },
                 mockCreateCourseRerunHTML = readFixtures('mock/mock-create-course-rerun.underscore');
 
-            var CreateCourseUtils = CreateCourseUtilsFactory(selectors, classes);
+            var CreateCourseUtils = new CreateCourseUtilsFactory(selectors, classes);
 
             var fillInFields = function (org, number, run, name) {
                 $(selectors.org).val(org);
@@ -49,12 +49,12 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
 
             describe("Field validation", function () {
                 it("returns a message for an empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('');
+                    var message = ViewUtils.validateRequiredField('');
                     expect(message).not.toBe('');
                 });
 
                 it("does not return a message for a non empty string", function () {
-                    var message = CreateCourseUtils.validateRequiredField('edX');
+                    var message = ViewUtils.validateRequiredField('edX');
                     expect(message).toBe('');
                 });
             });
@@ -62,7 +62,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/spec_helpers/view_helper
             describe("Error messages", function () {
                 var setErrorMessage = function(selector, message) {
                     var element = $(selector).parent();
-                    CreateCourseUtils.setNewCourseFieldInErr(element, message);
+                    CreateCourseUtils.setFieldInErr(element, message);
                     return element;
                 };
 

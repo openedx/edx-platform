@@ -35,9 +35,9 @@
             %>
             </p>
             <div class="post-labels">
-                <span class="post-label-pinned"><i class="icon icon-pushpin"></i><%- gettext("Pinned") %></span>
-                <span class="post-label-reported"><i class="icon icon-flag"></i><%- gettext("Reported") %></span>
-                <span class="post-label-closed"><i class="icon icon-lock"></i><%- gettext("Closed") %></span>
+                <span class="post-label-pinned"><i class="icon fa fa-thumb-tack"></i><%- gettext("Pinned") %></span>
+                <span class="post-label-reported"><i class="icon fa fa-flag"></i><%- gettext("Reported") %></span>
+                <span class="post-label-closed"><i class="icon fa fa-lock"></i><%- gettext("Closed") %></span>
             </div>
         </div>
         <div class="post-header-actions post-extended-content">

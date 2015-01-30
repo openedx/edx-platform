@@ -255,6 +255,14 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_APPROVED: ["You have already verified your ID!"],
     }
 
+    MODE_CLASSES = {
+        None: "honor",
+        VERIFY_STATUS_NEED_TO_VERIFY: "verified",
+        VERIFY_STATUS_SUBMITTED: "verified",
+        VERIFY_STATUS_APPROVED: "verified",
+        VERIFY_STATUS_MISSED_DEADLINE: "honor"
+    }
+
     def _assert_course_verification_status(self, status):
         """Check whether the specified verification status is shown on the dashboard.
 
@@ -273,6 +281,12 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
 
         # Verify that the correct banner is rendered on the dashboard
         self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
+
+        # Verify that the correct banner color is rendered
+        self.assertContains(
+            response,
+            "<article class=\"course {}\">".format(self.MODE_CLASSES[status])
+        )
 
         # Verify that the correct copy is rendered on the dashboard
         if status is not None:

@@ -1,4 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from datetime import datetime, timedelta %>
+<%! import pytz %>
 <%page args="section_data"/>
 <%include file="add_coupon_modal.html" args="section_data=section_data" />
 <%include file="edit_coupon_modal.html" args="section_data=section_data" />
@@ -10,9 +12,11 @@
       <div class="wrap">
          <h2>${_('Registration Codes')}</h2>
          <div>
+            %if section_data['sales_admin']:
             <span class="code_tip">${_('Click to generate Registration Codes')}
             <a id="registration_code_generation_link" href="#reg_code_generation_modal" class="add blue-button">${_('Generate Registration Codes')}</a>
             </span>
+            %endif
             <p>${_('Click to generate a CSV file of all Course Registrations Codes:')}</p>
             <p>
             <form action="${ section_data['get_registration_code_csv_url'] }" id="download_registration_codes" method="post">
@@ -41,6 +45,7 @@
          </div>
       </div>
       <!-- end wrap -->
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Course Price")}</h2>
          <div>
@@ -51,8 +56,9 @@
             </span>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
-      %if section_data['access']['finance_admin'] is True:
+      %if section_data['access']['finance_admin']:
       <div class="wrap">
          <h2>${_("Sales")}</h2>
          <div>
@@ -77,6 +83,7 @@
          </div>
       </div><!-- end wrap -->
       %endif
+      %if section_data['coupons_enabled']:
       <div class="wrap">
          <h2>${_("Coupons List")}</h2>
          <div>
@@ -95,6 +102,7 @@
                         <tr class="coupons-headings">
                            <th class="c_code">${_("Code")}</th>
                            <th class="c_dsc">${_("Description")}</th>
+                           <th class="c_expiry">${_("Expiry Date")}</th>
                            <th class="c_discount">${_("Discount (%)")}</th>
                            <th class="c_count">${_("Redeem Count")}</th>
                            <th class="c_action">${_("Actions")}</th>
@@ -102,14 +110,21 @@
                      </thead>
                      <tbody>
                         %for coupon in section_data['coupons']:
+                        <% current_date = datetime.now(pytz.UTC) %>
+                        <% coupon_expiry_date = coupon.expiration_date %>
                         %if coupon.is_active == False:
                         <tr class="coupons-items inactive_coupon">
-                           %else:
+                        %elif coupon_expiry_date is not None and current_date >= coupon_expiry_date:
+                        <tr class="coupons-items expired_coupon">
+                        %else:
                         <tr class="coupons-items">
                            %endif
-                            <td>${coupon.code}</td>
-                            <td>${coupon.description}</td>
-                            <td>${coupon.percentage_discount}</td>
+                            <td>${_('{code}').format(code=coupon.code)}</td>
+                            <td>${_('{description}').format(description=coupon.description)}</td>
+                            <td>
+                                ${coupon.display_expiry_date}
+                            </td>
+                            <td>${_('{discount}').format(discount=coupon.percentage_discount)}</td>
                            <td>${ coupon.couponredemption_set.filter(order__status='purchased').count() }</td>
                            <td><a data-item-id="${coupon.id}" class='remove_coupon' href='#'>[x]</a><a href="#edit-modal" data-item-id="${coupon.id}" class="edit-right">${_('Edit')}</a></td>
                         </tr>
@@ -122,6 +137,7 @@
             </div>
          </div>
       </div>
+      %endif
       <!-- end wrap -->
    </div>
 </div>
@@ -129,8 +145,8 @@
 
    $(function () {
        var icons = {
-           header: "ui-icon-circle-arrow-e",
-           activeHeader: "ui-icon-circle-arrow-s"
+           header: "ui-fa-circle-arrow-e",
+           activeHeader: "ui-fa-circle-arrow-s"
        };
        var act = 0;
        $("#accordion").accordion(
@@ -184,7 +200,7 @@
          }
          if($('#invoice_number').val() == "") {
                      $('#error-msg').attr('class','error-msgs')
-                     $('#error-msg').html("${_("Invoice number should not be empty.")}").show();
+                     $('#error-msg').html("${_('Invoice number should not be empty.')}").show();
                      return
          }
          $.ajax({
@@ -224,6 +240,12 @@
              $('input#edit_coupon_discount').val(data.coupon_discount);
              $('textarea#edit_coupon_description').val(data.coupon_description);
              $('input#edit_coupon_course_id').val(data.coupon_course_id);
+             if (data.expiry_date) {
+                 $('input#edit_coupon_expiration_date').val(data.expiry_date);
+             }
+             else {
+                $('input#edit_coupon_expiration_date').val("${_('Never Expires')}");
+             }
              $('#edit-modal-trigger').click();
            },
          error: function(jqXHR, textStatus, errorThrown) {
@@ -459,6 +481,7 @@
        var coupon_discount = $.trim($('#coupon_discount').val());
        var course_id = $.trim($('#coupon_course_id').val());
        var description = $.trim($('#coupon_description').val());
+       var expiration_date = $.trim($('#coupon_expiration_date').val());
 
        // Check if empty of not
        if (code === '') {
@@ -485,7 +508,8 @@
            "code"  : code,
            "discount": coupon_discount,
            "course_id": course_id,
-           "description": description
+           "description": description,
+           "expiration_date": expiration_date
          },
          url: "${section_data['ajax_add_coupon']}",
          success: function (data) {

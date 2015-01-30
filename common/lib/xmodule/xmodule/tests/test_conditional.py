@@ -30,7 +30,6 @@ class DummySystem(ImportSystem):
             course_id=SlashSeparatedCourseKey(ORG, COURSE, 'test_run'),
             course_dir='test_dir',
             error_tracker=Mock(),
-            parent_tracker=Mock(),
             load_error_modules=load_error_modules,
         )
 

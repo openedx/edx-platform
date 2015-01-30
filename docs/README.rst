@@ -6,6 +6,7 @@ The following documentation projects have been moved to the `edx-documentation`_
 
 * course_authors
 * data
+* developers
 * install_operations
 * mobile
 * OLX

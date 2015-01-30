@@ -77,8 +77,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2015-01-21 20:05+0000\n"
 "PO-Revision-Date: 2015-01-22 04:01+0000\n"
+=======
+"POT-Creation-Date: 2015-01-26 13:20+0000\n"
+"PO-Revision-Date: 2015-01-22 05:31+0000\n"
+>>>>>>> r20150127
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
 "MIME-Version: 1.0\n"
@@ -3929,7 +3934,10 @@ msgstr "Eliminar %(item_display_name)s?"
 #: cms/static/js/views/list_item.js
 msgid "Deleting this %(item_display_name)s is permanent and cannot be undone."
 msgstr ""
+<<<<<<< HEAD
 "Borrar esta %(xblock_type)s es una acción permanente y no se puede revertir."
+=======
+>>>>>>> r20150127
 
 #: cms/static/js/views/overview.js
 msgid "Collapse All Sections"
@@ -4333,6 +4341,7 @@ msgstr "Menos"
 #: lms/templates/edxnotes/note-item.underscore
 msgid "Note"
 msgstr "Nota"
+<<<<<<< HEAD
 
 #: lms/templates/edxnotes/note-item.underscore
 msgid "You commented..."
@@ -4347,6 +4356,22 @@ msgid "Noted in:"
 msgstr "Anotado en:"
 
 #: lms/templates/edxnotes/note-item.underscore
+=======
+
+#: lms/templates/edxnotes/note-item.underscore
+msgid "You commented..."
+msgstr "Usted comentó..."
+
+#: lms/templates/edxnotes/note-item.underscore
+msgid "References"
+msgstr "Referencias"
+
+#: lms/templates/edxnotes/note-item.underscore
+msgid "Noted in:"
+msgstr "Anotado en:"
+
+#: lms/templates/edxnotes/note-item.underscore
+>>>>>>> r20150127
 msgid "Last Edited:"
 msgstr "Última modificación:"
 

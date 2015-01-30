@@ -9,7 +9,7 @@
     border-bottom-color: rgb(200,200,200);
     border-top: none;
     @include border-bottom-radius(4px);
-    @include clearfix;
+    @include clearfix();
     height: 60px;
     padding: 12px 10px;
     position: relative;
@@ -25,7 +25,7 @@
 
     .dropdown {
       float: left;
-      margin-right: 15px;
+      margin-right: ($baseline*0.75);
       position: relative;
 
       .filter-heading {
@@ -49,7 +49,7 @@
         background: rgb(255,255,255);
         border-radius: 0px 4px 4px 4px;
         border: 1px solid rgb(200,200,200);
-        box-shadow: 0 2px 15px 0 rgba(0,0,0, 0.2);
+        box-shadow: 0 2px 15px 0 $shadow;
         padding: 20px 0px 5px 20px;
         position: absolute;
         visibility: hidden;
@@ -58,7 +58,7 @@
 
         li {
           list-style: none;
-          margin-bottom: 15px;
+          margin-bottom: ($baseline*0.75);
         }
       }
 

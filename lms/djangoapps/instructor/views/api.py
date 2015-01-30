@@ -27,7 +27,11 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
+from student import auth
+from student.roles import CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
+import datetime
+import pytz
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -52,11 +56,12 @@ from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
 import instructor.enrollment as enrollment
 from instructor.enrollment import (
+    get_user_email_language,
     enroll_email,
     send_mail_to_student,
     get_email_params,
     send_beta_role_email,
-    unenroll_email
+    unenroll_email,
 )
 from instructor.access import list_with_level, allow_access, revoke_access, update_forum_role
 from instructor.offline_gradecalc import student_grades
@@ -211,7 +216,7 @@ def require_level(level):
     def decorator(func):  # pylint: disable=missing-docstring
         def wrapped(*args, **kwargs):  # pylint: disable=missing-docstring
             request = args[0]
-            course = get_course_by_id(SlashSeparatedCourseKey.from_deprecated_string(kwargs['course_id']))
+            course = get_course_by_id(CourseKey.from_string(kwargs['course_id']))
 
             if has_access(request.user, level, course):
                 return func(*args, **kwargs)
@@ -219,6 +224,31 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
+
+
+def require_sales_admin(func):
+    """
+    Decorator for checking sales administrator access before executing an HTTP endpoint. This decorator
+    is designed to be used for a request based action on a course. It assumes that there will be a
+    request object as well as a course_id attribute to leverage to check course level privileges.
+
+    If the user does not have privileges for this operation, this will return HttpResponseForbidden (403).
+    """
+    def wrapped(request, course_id):  # pylint: disable=missing-docstring
+
+        try:
+            course_key = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            log.error(u"Unable to find course with course key %s", course_id)
+            return HttpResponseNotFound()
+
+        access = auth.has_access(request.user, CourseSalesAdminRole(course_key))
+
+        if access:
+            return func(request, course_id)
+        else:
+            return HttpResponseForbidden()
+    return wrapped
 
 
 EMAIL_INDEX = 0
@@ -467,12 +497,14 @@ def students_update_enrollment(request, course_id):
         # First try to get a user object from the identifer
         user = None
         email = None
+        language = None
         try:
             user = get_student_from_identifier(identifier)
         except User.DoesNotExist:
             email = identifier
         else:
             email = user.email
+            language = get_user_email_language(user)
 
         try:
             # Use django.core.validators.validate_email to check email address
@@ -481,9 +513,13 @@ def students_update_enrollment(request, course_id):
             validate_email(email)  # Raises ValidationError if invalid
 
             if action == 'enroll':
-                before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
+                before, after = enroll_email(
+                    course_id, email, auto_enroll, email_students, email_params, language=language
+                )
             elif action == 'unenroll':
-                before, after = unenroll_email(course_id, email, email_students, email_params)
+                before, after = unenroll_email(
+                    course_id, email, email_students, email_params, language=language
+                )
             else:
                 return HttpResponseBadRequest(strip_tags(
                     "Unrecognized action '{}'".format(action)
@@ -1007,19 +1043,31 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     Respond with csv which contains a summary of all Active Coupons.
     """
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
-    active_coupons = Coupon.objects.filter(course_id=course_id, is_active=True)
+    coupons = Coupon.objects.filter(course_id=course_id)
+
     query_features = [
-        'course_id', 'percentage_discount', 'code_redeemed_count', 'description'
+        'code', 'course_id', 'percentage_discount', 'code_redeemed_count', 'description', 'expiration_date', 'is_active'
     ]
-    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, active_coupons)
+    coupons_list = instructor_analytics.basic.coupon_codes_features(query_features, coupons)
     header, data_rows = instructor_analytics.csvs.format_dictlist(coupons_list, query_features)
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, invoice=None, order=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
+
+    Args:
+        user (User): The user creating the course registration codes.
+        course_id (str): The string representation of the course ID.
+        mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
+        invoice (Invoice): (Optional) The associated invoice for this code.
+        order (Order): (Optional) The associated order for this code.
+
+    Returns:
+        The newly created CourseRegistrationCode.
+
     """
     code = random_code_generator()
 
@@ -1030,10 +1078,11 @@ def save_registration_code(user, course_id, invoice=None, order=None):
 
     course_registration = CourseRegistrationCode(
         code=code,
-        course_id=course_id.to_deprecated_string(),
+        course_id=unicode(course_id),
         created_by=user,
         invoice=invoice,
-        order=order
+        order=order,
+        mode_slug=mode_slug
     )
     try:
         course_registration.save()
@@ -1052,7 +1101,7 @@ def registration_codes_csv(file_name, codes_list, csv_type=None):
     """
     # csv headers
     query_features = [
-        'code', 'course_id', 'company_name', 'created_by',
+        'code', 'redeem_code_url', 'course_id', 'company_name', 'created_by',
         'redeemed_by', 'invoice_id', 'purchaser', 'customer_reference_number', 'internal_reference'
     ]
 
@@ -1093,13 +1142,13 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
 
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_level('staff')
+@require_sales_admin
 @require_POST
 def generate_registration_codes(request, course_id):
     """
     Respond with csv which contains a summary of all Generated Codes.
     """
-    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_id = CourseKey.from_string(course_id)
     invoice_copy = False
 
     # covert the course registration code number into integer
@@ -1147,15 +1196,32 @@ def generate_registration_codes(request, course_id):
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
     )
+
+    course = get_course_by_id(course_id, depth=0)
+    paid_modes = CourseMode.paid_modes_for_course(course_id)
+
+    if len(paid_modes) != 1:
+        msg = (
+            u"Generating Code Redeem Codes for Course '{course_id}', which must have a single paid course mode. "
+            u"This is a configuration issue. Current course modes with payment options: {paid_modes}"
+        ).format(course_id=course_id, paid_modes=paid_modes)
+        log.error(msg)
+        return HttpResponse(
+            status=500,
+            content=_(u"Unable to generate redeem codes because of course misconfiguration.")
+        )
+
+    course_mode = paid_modes[0]
+    course_price = course_mode.min_price
+
     registration_codes = []
-    for _ in range(course_code_number):  # pylint: disable=redefined-outer-name
-        generated_registration_code = save_registration_code(request.user, course_id, sale_invoice, order=None)
+    for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
+        generated_registration_code = save_registration_code(
+            request.user, course_id, course_mode.slug, sale_invoice, order=None
+        )
         registration_codes.append(generated_registration_code)
 
-    site_name = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-    course = get_course_by_id(course_id, depth=None)
-    course_honor_mode = CourseMode.mode_for_course(course_id, 'honor')
-    course_price = course_honor_mode.min_price
+    site_name = microsite.get_value('SITE_NAME', 'localhost')
     quantity = course_code_number
     discount = (float(quantity * course_price) - float(sale_price))
     course_url = '{base_url}{course_about}'.format(
@@ -1166,6 +1232,12 @@ def generate_registration_codes(request, course_id):
         base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
         dashboard=reverse('dashboard')
     )
+
+    try:
+        pdf_file = sale_invoice.generate_pdf_invoice(course, course_price, int(quantity), float(sale_price))
+    except Exception:  # pylint: disable=broad-except
+        log.exception('Exception at creating pdf file.')
+        pdf_file = None
 
     from_address = microsite.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
     context = {
@@ -1197,8 +1269,11 @@ def generate_registration_codes(request, course_id):
     csv_file = StringIO.StringIO()
     csv_writer = csv.writer(csv_file)
     for registration_code in registration_codes:
-        csv_writer.writerow([registration_code.code])
-
+        full_redeem_code_url = 'http://{base_url}{redeem_code_url}'.format(
+            base_url=microsite.get_value('SITE_NAME', settings.SITE_NAME),
+            redeem_code_url=reverse('register_code_redemption', kwargs={'registration_code': registration_code.code})
+        )
+        csv_writer.writerow([registration_code.code, full_redeem_code_url])
     finance_email = microsite.get_value('finance_email', settings.FINANCE_EMAIL)
     if finance_email:
         # append the finance email into the recipient_list
@@ -1213,6 +1288,11 @@ def generate_registration_codes(request, course_id):
         email.to = [recipient]
         email.attach(u'RegistrationCodes.csv', csv_file.getvalue(), 'text/csv')
         email.attach(u'Invoice.txt', invoice_attachment, 'text/plain')
+        if pdf_file is not None:
+            email.attach(u'Invoice.pdf', pdf_file.getvalue(), 'application/pdf')
+        else:
+            file_buffer = StringIO.StringIO(_('pdf download unavailable right now, please contact support.'))
+            email.attach(u'pdf_unavailable.txt', file_buffer.getvalue(), 'text/plain')
         email.send()
 
     return registration_codes_csv("Registration_Codes.csv", registration_codes)

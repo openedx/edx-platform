@@ -25,7 +25,14 @@
 
                     // Start the capture
                     this.getUserMediaFunc()(
-                        { video: true },
+                        {
+                            video: true,
+
+                            // Specify the `fake` constraint if we detect we are running in a test
+                            // environment. In Chrome, this will do nothing, but in Firefox, it will
+                            // instruct the browser to use a fake video device.
+                            fake: window.location.hostname === 'localhost'
+                        },
                         _.bind( this.getUserMediaCallback, this ),
                         _.bind( this.handleVideoFailure, this )
                     );
@@ -85,8 +92,8 @@
                 handleVideoFailure: function() {
                     this.trigger(
                         'error',
-                        gettext( 'Video capture error' ),
-                        gettext( 'Please check that your webcam is connected and you have allowed access to your webcam.' )
+                        gettext( 'Video Capture Error' ),
+                        gettext( 'Please verify that your webcam is connected and that you have allowed your browser to access it.' )
                     );
                 }
             },
@@ -211,7 +218,7 @@
 
             if ( !this.backend ) {
                 this.handleError(
-                    gettext( "No Flash Detected" ),
+                    gettext( "Flash Not Detected" ),
                     gettext( "You don't seem to have Flash installed." ) + "  " +
                     _.sprintf(
                         gettext( "%(a_start)s Get Flash %(a_end)s to continue your enrollment." ),
@@ -313,7 +320,8 @@
         setSubmitButtonEnabled: function( isEnabled ) {
             $( this.submitButton )
                 .toggleClass( 'is-disabled', !isEnabled )
-                .prop( 'disabled', !isEnabled );
+                .prop( 'disabled', !isEnabled )
+                .attr('aria-disabled', !isEnabled);
         }
     });
 

@@ -141,7 +141,7 @@ function goto( mode)
     %if settings.FEATURES.get('IS_EDX_DOMAIN', False):
     ## Only show this banner on the edx.org website (other sites may choose to show this if they wish)
     <div class="wrapper-msg urgency-low msg-warning is-shown">
-        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon-double-angle-right"></i></a></p>
+        <p>${_("You are using the legacy instructor dashboard, which we will retire in the near future.")} <a href="${ standard_dashboard_url }">${_("Return to the Instructor Dashboard")} <i class="icon fa fa-double-angle-right"></i></a></p>
           <p class="note">${_("If the Instructor Dashboard is missing functionality, please contact your PM to let us know.")}</p>
     </div>
     %endif
@@ -202,17 +202,17 @@ function goto( mode)
     % endif
 
     <p>
-    <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump list of enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
     </p>
 
     <p>
-    <input type="submit" name="action" value="Dump all RAW grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="Download CSV of all RAW grades" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Dump all RAW grades for all students in this course" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
+    <input type="submit" name="action" value="Download CSV of all RAW grades" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
     </p>
 
     <p>
   %if not settings.FEATURES.get('ENABLE_ASYNC_ANSWER_DISTRIBUTION'):
-    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="Download CSV of answer distributions" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
   %endif
     <p  class="is-deprecated">
       ${_("To download student grades and view the grading configuration for your course, visit the Data Download section of the Instructor Dashboard.")}
@@ -329,8 +329,8 @@ function goto( mode)
     </div>
     % endif
 
-    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}">
-    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}">
+    <input type="submit" name="action" value="List enrolled students" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}">
+    <input type="submit" name="action" value="List students who may enroll but may not have yet signed up" class="${'is-disabled' if disable_buttons else ''}" aria-disabled="${'true' if disable_buttons else 'false'}" >
     <hr width="40%" style="align:left">
 
   %if settings.FEATURES.get('REMOTE_GRADEBOOK_URL','') and instructor_access:
@@ -373,7 +373,7 @@ function goto( mode)
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
     %if course.is_cohorted:
-      <p class="is-deprecated">${_("To manage beta tester roles and cohort groups, visit the Membership section of the Instructor Dashboard.")}</p>
+      <p class="is-deprecated">${_("To manage beta tester roles and cohorts, visit the Membership section of the Instructor Dashboard.")}</p>
     %else:
       <p class="is-deprecated">${_("To manage beta tester roles, visit the Membership section of the Instructor Dashboard.")}</p>
     %endif
@@ -477,14 +477,14 @@ function goto( mode)
           <div class="metrics-tooltip" id="metric_tooltip_${i}"></div>
           <div class="metrics-left" id="metric_opened_${i}">
             <h3>${_("Count of Students that Opened a Subsection")}</h3>
-            <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+            <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
           </div>
           <div class="metrics-right" id="metric_grade_${i}">
             <h3>${_("Grade Distribution per Problem")}</h3>
             %if not metrics_results['section_has_problem'][i]:
               <p>${_("There are no problems in this section.")}</p>
             %else:
-              <p class="loading"><i class="icon-spinner icon-spin icon-large"></i>${_("Loading...")}</p>
+              <p class="loading"><i class="icon fa fa-spinner fa-spin fa-large"></i>${_("Loading")}</p>
             %endif
           </div>
         </div>

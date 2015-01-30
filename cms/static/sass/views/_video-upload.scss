@@ -1,5 +1,5 @@
 .view-video-uploads {
-  
+
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
   }
@@ -14,7 +14,7 @@
 
   .nav-actions {
 
-    .icon-cloud-upload {
+    .fa-cloud-upload {
       @extend %t-copy;
       vertical-align: bottom;
       margin-right: ($baseline/5);
@@ -90,4 +90,17 @@
     @extend %ui-btn-non;
   }
 
+  .assets-library {
+    .assets-title {
+      display: inline-block;
+      width: flex-grid(5, 9);
+      @include margin-right(flex-gutter());
+    }
+
+    .wrapper-encodings-download {
+      display: inline-block;
+      width: flex-grid(4, 9);
+      text-align: right;
+    }
+  }
 }

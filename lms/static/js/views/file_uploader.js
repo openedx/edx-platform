@@ -60,7 +60,7 @@
                 replaceFileInput: false,
                 add: function (e, data) {
                     var file = data.files[0];
-                    submitButton.removeClass("is-disabled");
+                    submitButton.removeClass("is-disabled").attr('aria-disabled', false);
                     submitButton.unbind('click');
                     submitButton.click(function (event) {
                         event.preventDefault();

@@ -133,13 +133,14 @@ if Backbone?
 
     createEditView: () ->
       if @showView?
-        @showView.undelegateEvents()
         @showView.$el.empty()
-        @showView = null
 
-      @editView = new ThreadResponseEditView(model: @model)
-      @editView.bind "response:update", @update
-      @editView.bind "response:cancel_edit", @cancelEdit
+      if @editView?
+        @editView.model = @model
+      else
+        @editView = new ThreadResponseEditView(model: @model)
+        @editView.bind "response:update", @update
+        @editView.bind "response:cancel_edit", @cancelEdit
 
     renderSubView: (view) ->
       view.setElement(@$('.discussion-response'))
@@ -161,14 +162,15 @@ if Backbone?
     createShowView: () ->
 
       if @editView?
-        @editView.undelegateEvents()
         @editView.$el.empty()
-        @editView = null
 
-      @showView = new ThreadResponseShowView(model: @model)
-      @showView.bind "response:_delete", @_delete
-      @showView.bind "response:edit", @edit
-      @showView.on "comment:endorse", => @trigger("comment:endorse")
+      if @showView?
+        @showView.model = @model
+      else
+        @showView = new ThreadResponseShowView(model: @model)
+        @showView.bind "response:_delete", @_delete
+        @showView.bind "response:edit", @edit
+        @showView.on "comment:endorse", => @trigger("comment:endorse")
 
     renderShowView: () ->
       @renderSubView(@showView)

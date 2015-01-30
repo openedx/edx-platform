@@ -6,10 +6,12 @@ Test the partitions and partitions service
 from unittest import TestCase
 from mock import Mock
 
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from stevedore.extension import Extension, ExtensionManager
-from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError, USER_PARTITION_SCHEME_NAMESPACE
+from xmodule.partitions.partitions import (
+    Group, UserPartition, UserPartitionError, NoSuchUserPartitionGroupError, USER_PARTITION_SCHEME_NAMESPACE
+)
 from xmodule.partitions.partitions_service import PartitionService
-from xmodule.tests import get_test_system
 
 
 class TestGroup(TestCase):
@@ -91,7 +93,7 @@ class MockUserPartitionScheme(object):
         self.name = name
         self.current_group = current_group
 
-    def get_group_for_user(self, course_id, user, user_partition, track_function=None):  # pylint: disable=unused-argument
+    def get_group_for_user(self, course_id, user, user_partition, assign=True, track_function=None):  # pylint: disable=unused-argument
         """
         Returns the current group if set, else the first group from the specified user partition.
         """
@@ -113,13 +115,14 @@ class PartitionTestCase(TestCase):
 
     def setUp(self):
         # Set up two user partition schemes: mock and random
+        self.non_random_scheme = MockUserPartitionScheme(self.TEST_SCHEME_NAME)
+        self.random_scheme = MockUserPartitionScheme("random")
         extensions = [
             Extension(
-                self.TEST_SCHEME_NAME, USER_PARTITION_SCHEME_NAMESPACE,
-                MockUserPartitionScheme(self.TEST_SCHEME_NAME), None
+                self.non_random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.non_random_scheme, None
             ),
             Extension(
-                "random", USER_PARTITION_SCHEME_NAMESPACE, MockUserPartitionScheme("random"), None
+                self.random_scheme.name, USER_PARTITION_SCHEME_NAMESPACE, self.random_scheme, None
             ),
         ]
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
@@ -134,6 +137,10 @@ class PartitionTestCase(TestCase):
             self.TEST_GROUPS,
             extensions[0].plugin
         )
+
+        # Make sure the names are set on the schemes (which happens normally in code, but may not happen in tests).
+        self.user_partition.get_scheme(self.non_random_scheme.name)
+        self.user_partition.get_scheme(self.random_scheme.name)
 
 
 class TestUserPartition(PartitionTestCase):
@@ -259,6 +266,23 @@ class TestUserPartition(PartitionTestCase):
         user_partition = UserPartition.from_json(jsonified)
         self.assertNotIn("programmer", user_partition.to_json())
 
+    def test_get_group(self):
+        """
+        UserPartition.get_group correctly returns the group referenced by the
+        `group_id` parameter, or raises NoSuchUserPartitionGroupError when
+        the lookup fails.
+        """
+        self.assertEqual(
+            self.user_partition.get_group(self.TEST_GROUPS[0].id),  # pylint: disable=no-member
+            self.TEST_GROUPS[0]
+        )
+        self.assertEqual(
+            self.user_partition.get_group(self.TEST_GROUPS[1].id),  # pylint: disable=no-member
+            self.TEST_GROUPS[1]
+        )
+        with self.assertRaises(NoSuchUserPartitionGroupError):
+            self.user_partition.get_group(3)
+
 
 class StaticPartitionService(PartitionService):
     """
@@ -280,9 +304,11 @@ class TestPartitionService(PartitionTestCase):
 
     def setUp(self):
         super(TestPartitionService, self).setUp()
+        course = Mock(id=SlashSeparatedCourseKey('org_0', 'course_0', 'run_0'))
         self.partition_service = StaticPartitionService(
             [self.user_partition],
-            runtime=get_test_system(),
+            user=Mock(username='ma', email='ma@edx.org', is_staff=False, is_active=True),
+            course_id=course.id,
             track_function=Mock()
         )
 
@@ -300,3 +326,19 @@ class TestPartitionService(PartitionTestCase):
         self.user_partition.scheme.current_group = groups[1]    # pylint: disable=no-member
         group2_id = self.partition_service.get_user_group_id_for_partition(user_partition_id)
         self.assertEqual(group2_id, groups[1].id)    # pylint: disable=no-member
+
+    def test_get_group(self):
+        """
+        Test that a partition group is assigned to a user.
+        """
+        groups = self.user_partition.groups    # pylint: disable=no-member
+
+        # assign first group and verify that it is returned for the user
+        self.user_partition.scheme.current_group = groups[0]    # pylint: disable=no-member
+        group1 = self.partition_service.get_group(self.user_partition)
+        self.assertEqual(group1, groups[0])    # pylint: disable=no-member
+
+        # switch to the second group and verify that it is returned for the user
+        self.user_partition.scheme.current_group = groups[1]    # pylint: disable=no-member
+        group2 = self.partition_service.get_group(self.user_partition)
+        self.assertEqual(group2, groups[1])    # pylint: disable=no-member

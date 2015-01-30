@@ -40,7 +40,7 @@
                 burger: function() {
                     _fn.$nav.prepend([
                         '<a href="#" class="mobile-menu-button" aria-label="menu">',
-                            '<i class="icon-reorder" aria-hidden="true"></i>',
+                            '<i class="icon fa fa-reorder" aria-hidden="true"></i>',
                         '</a>'
                     ].join(''));
                 },

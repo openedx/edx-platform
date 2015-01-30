@@ -80,7 +80,8 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
             describe("PreviewActionController", function () {
                 var viewPublishedCss = '.button-view',
-                    previewCss = '.button-preview';
+                    previewCss = '.button-preview',
+                    visibilityNoteCss = '.note-visibility';
 
                 it('renders correctly for unscheduled unit', function () {
                     renderContainerPage(this, mockContainerXBlockHtml);
@@ -108,6 +109,18 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
                     // If published is false, preview is always enabled.
                     fetch({published: false, has_changes: false});
                     expect(containerPage.$(previewCss)).not.toHaveClass(disabledCss);
+                });
+
+                it('updates when has_content_group_components attribute changes', function () {
+                    renderContainerPage(this, mockContainerXBlockHtml);
+                    fetch({has_content_group_components: false});
+                    expect(containerPage.$(visibilityNoteCss).length).toBe(0);
+
+                    fetch({has_content_group_components: true});
+                    expect(containerPage.$(visibilityNoteCss).length).toBe(1);
+
+                    fetch({has_content_group_components: false});
+                    expect(containerPage.$(visibilityNoteCss).length).toBe(0);
                 });
             });
 
@@ -438,9 +451,9 @@ define(["jquery", "underscore", "underscore.string", "js/common_helpers/ajax_hel
 
                     verifyExplicitStaffOnly = function(isStaffOnly) {
                         if (isStaffOnly) {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check');
+                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-check-square-o');
                         } else {
-                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('icon-check-empty');
+                            expect(containerPage.$('.action-staff-lock i')).toHaveClass('fa-square-o');
                         }
                     };
 

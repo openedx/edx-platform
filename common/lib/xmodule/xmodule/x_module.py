@@ -200,10 +200,8 @@ class HTMLSnippet(object):
         coffee = cls.js.setdefault('coffee', [])
         js = cls.js.setdefault('js', [])
 
-        fragment = resource_string(__name__, 'js/src/xmodule.js')
-
-        if fragment not in js:
-            js.insert(0, fragment)
+        # Added xmodule.js separately to enforce 000 prefix for this only.
+        cls.js.setdefault('xmodule_js', resource_string(__name__, 'js/src/xmodule.js'))
 
         return cls.js
 
@@ -920,7 +918,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
 
     # =============================== BUILTIN METHODS ==========================
     def __eq__(self, other):
-        return (self.scope_ids == other.scope_ids and
+        return (hasattr(other, 'scope_ids') and
+                self.scope_ids == other.scope_ids and
                 self.fields.keys() == other.fields.keys() and
                 all(getattr(self, field.name) == getattr(other, field.name)
                     for field in self.fields.values()))
@@ -1252,6 +1251,7 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         :param xblock:
         :param field:
         """
+        # pylint: disable=protected-access
         # in runtime b/c runtime contains app-specific xblock behavior. Studio's the only app
         # which needs this level of introspection right now. runtime also is 'allowed' to know
         # about the kvs, dbmodel, etc.
@@ -1259,12 +1259,8 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         result = {}
         result['explicitly_set'] = xblock._field_data.has(xblock, field.name)
         try:
-            block_inherited = xblock.xblock_kvs.inherited_settings
-        except AttributeError:  # if inherited_settings doesn't exist on kvs
-            block_inherited = {}
-        if field.name in block_inherited:
-            result['default_value'] = block_inherited[field.name]
-        else:
+            result['default_value'] = xblock._field_data.default(xblock, field.name)
+        except KeyError:
             result['default_value'] = field.to_json(field.default)
         return result
 

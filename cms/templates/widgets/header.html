@@ -3,7 +3,6 @@
   from django.core.urlresolvers import reverse
   from django.utils.translation import ugettext as _
   from contentstore.context_processors import doc_url
-  from contentstore.views.course import should_show_group_configurations_page
 %>
 <%page args="online_help_token"/>
 
@@ -11,7 +10,13 @@
   <header class="primary" role="banner">
 
     <div class="wrapper wrapper-l">
-      <h1 class="branding"><a href="/"><img src="${static.url("images/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" /></a></h1>
+      <h1 class="branding"><a href="/">
+      % if settings.FEATURES.get('IS_EDX_DOMAIN', False):
+        <img src="${static.url("images/edx-theme/edx-studio-logo.png")}" alt="${settings.STUDIO_NAME}" />
+      % else:
+        <img src="${static.url("images/logo-placeholder.png")}" alt="${settings.STUDIO_NAME}" />
+      % endif
+      </a></h1>
 
       % if context_course:
       <%
@@ -39,10 +44,10 @@
       </h2>
 
       <nav class="nav-course nav-dd ui-left">
-        <h2 class="sr">${_("{course_name}'s Navigation:").format(course_name=context_course.display_name_with_default)}</h2>
+        <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Content")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
@@ -73,7 +78,7 @@
           </li>
 
           <li class="nav-item nav-course-settings">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Course")} </span>${_("Settings")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
@@ -87,11 +92,9 @@
                   <li class="nav-item nav-course-settings-team">
                     <a href="${course_team_url}">${_("Course Team")}</a>
                   </li>
-                  % if should_show_group_configurations_page(context_course):
-                    <li class="nav-item nav-course-settings-group-configurations">
-                      <a href="${reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
-                    </li>
-                  % endif
+                  <li class="nav-item nav-course-settings-group-configurations">
+                    <a href="${reverse('contentstore.views.group_configurations_list_handler', kwargs={'course_key_string': unicode(course_key)})}">${_("Group Configurations")}</a>
+                  </li>
                   <li class="nav-item nav-course-settings-advanced">
                     <a href="${advanced_settings_url}">${_("Advanced Settings")}</a>
                   </li>
@@ -101,8 +104,7 @@
           </li>
 
           <li class="nav-item nav-course-tools">
-            <h3 class="title"><span class="label">${_("Tools")}</span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
-
+            <h3 class="title"><span class="label">${_("Tools")}</span> <i class="icon fa fa-caret-down ui-toggle-dd" aria-hidden="true"></i></h3>
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
@@ -126,6 +128,38 @@
           </li>
         </ol>
       </nav>
+      % elif context_library:
+       <%
+            library_key = context_library.location.course_key
+            index_url = reverse('contentstore.views.library_handler', kwargs={'library_key_string': unicode(library_key)})
+      %>
+      <h2 class="info-course">
+        <span class="sr">${_("Current Library:")}</span>
+        <a class="course-link" href="${index_url}">
+          <span class="course-org">${context_library.display_org_with_default | h}</span><span class="course-number">${context_library.display_number_with_default | h}</span>
+          <span class="course-title" title="${context_library.display_name_with_default}">${context_library.display_name_with_default}</span>
+        </a>
+      </h2>
+
+      <nav class="nav-course nav-dd ui-left">
+        <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_library.display_name_with_default)}</h2>
+        <ol>
+
+          <li class="nav-item nav-library-settings">
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Library")} </span>${_("Settings")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-library-settings-team">
+                    <a href="${lib_users_url}">${_("User Access")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </nav>
       % endif
     </div>
 
@@ -139,13 +173,13 @@
           </li>
 
           <li class="nav-item nav-account-user">
-            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon-caret-down ui-toggle-dd"></i></h3>
+            <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Currently signed in as:")}</span><span class="account-username" title="${ user.username }">${ user.username }</span></span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
 
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-account-dashboard">
-                    <a href="/">${_("My Courses")}</a>
+                    <a href="/">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</a>
                   </li>
                   <li class="nav-item nav-account-signout">
                     <a class="action action-signout" href="${reverse('logout')}">${_("Sign Out")}</a>

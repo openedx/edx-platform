@@ -15,11 +15,11 @@
     <hr>
 
     <ul class = "error-list">
-        <% _.each(response, function(value, index, list) { %> 
+        <% _.each(response, function(value, index, list) { %>
 
             <li class = "error-item">
                 <span class='error-item-title'>
-                    <i class="icon-warning-sign"></i> 
+                    <i class="icon fa fa-warning"></i>
                     <strong><%= value.model.display_name %></strong>:
                 </span>
                 <textarea class = "error-item-message" disabled='disabled'><%=value.message%></textarea>

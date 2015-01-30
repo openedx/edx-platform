@@ -1,7 +1,23 @@
 // studio animations & keyframes
 // ====================
 
-// fade in
+// Table of Contents 
+// * +Fade In - Extend
+// * +Fade Out - Extend
+// * +Rotate Up - Extend
+// * +Rotate Down - Extend
+// * +Rotate Clockwise - Extend
+// * +Notifications - Slide -  Keyframes
+// * +Bounce In - Extend
+// * +Bounce Out - Extend
+// * +Flash - Once - Extend
+// * +Flash - Double - Extend
+// * +Pulse - Extend
+// * +Dropped - Extend
+
+// +Fade In - Extend
+// ==================== 
+// fade in keyframes
 @include keyframes(fadeIn) {
   0% {
     opacity: 0.0;
@@ -16,14 +32,15 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// fade in  animation
 %anim-fadeIn {
   @include animation(fadeIn $tmg-f2 linear 1);
 }
 
-
-// fade out
-@include keyframes(fadeOut) {
+// +Fade Out - Extend
+// ==================== 
+// fade out keyframes
+@include keyframes(fadeOut) { 
   0% {
     opacity: 1.0;
   }
@@ -37,16 +54,14 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// fade out animation
 %anim-fadeOut {
   @include animation(fadeOut $tmg-f2 linear 1);
 }
 
-
-// ====================
-
-
-// rotate up
+// +Rotate Up - Extend
+// ==================== 
+// rotate up keyframes
 @include keyframes(rotateUp) {
   0% {
     @include transform(rotate(0deg));
@@ -61,13 +76,15 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// rotate up animation
 %anim-rotateUp {
   @include animation(rotateUp $tmg-f2 ease-in-out 1);
 }
 
 
-// rotate up
+// +Rotate Down - Extend
+// ====================
+// rotate down keyframes
 @include keyframes(rotateDown) {
   0% {
     @include transform(rotate(0deg));
@@ -82,13 +99,15 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// rotate down animation
 %anim-rotateDown {
   @include animation(rotateDown $tmg-f2 ease-in-out 1);
 }
 
 
-// rotate clockwise
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
 @include keyframes(rotateCW) {
   0% {
     @include transform(rotate(0deg));
@@ -103,13 +122,14 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// rotate clockwise animation
 %anim-rotateCW {
   @include animation(rotateCW $tmg-s1 linear infinite);
 }
 
-
-// rotate counter-clockwise
+// +Rotate Clockwise - Extend
+// ====================
+// rotate clockwise keyframes
 @include keyframes(rotateCCW) {
   0% {
     @include transform(rotate(0deg));
@@ -124,16 +144,15 @@
   }
 }
 
-// canned  animation - use if you want out of the box/non-customized anim
+// rotate clockwise animation
 %anim-rotateCCW {
   @include animation(rotateCCW $tmg-s1 linear infinite);
 }
 
 
+// +Notifications - Slide - Keyframes
 // ====================
-
-
-// notifications slide up
+// notifications slide up keyframes
 @include keyframes(notificationSlideUp) {
   0% {
     @include transform(translateY(0));
@@ -148,7 +167,7 @@
   }
 }
 
-// notifications slide down
+// notifications slide down keyframes
 @include keyframes(notificationSlideDown) {
   0% {
     @include transform(translateY(-($ui-notification-height*0.99)));
@@ -164,10 +183,9 @@
 }
 
 
+// +Bounce In - Extend
 // ====================
-
-
-// bounce in
+// bounce in keyframes
 @include keyframes(bounceIn) {
   0% {
     opacity: 0.0;
@@ -184,13 +202,14 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// bounce in animation
 %anim-bounceIn {
   @include animation(bounceIn $tmg-f1 ease-in-out 1);
 }
 
-
-// bounce out
+// +Bounce Out - Extend
+// ====================
+// bounce out keyframes
 @include keyframes(bounceOut) {
   0% {
     @include transform(scale(1));
@@ -207,16 +226,14 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// bounce out animation
 %anim-bounceOut {
   @include animation(bounceOut $tmg-f1 ease-in-out 1);
 }
 
-
+// +Flash - Once - Extend
 // ====================
-
-
-// flash
+// flash keyframes
 @include keyframes(flash) {
   0%, 100% {
     opacity: 1.0;
@@ -227,32 +244,32 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// flash animation
 %anim-flash {
   @include animation(flash $tmg-f1 ease-in-out 1);
 }
 
-// flash - double
+// +Flash - Double - Extend
+// ====================
+// flash double keyframes
 @include keyframes(flashDouble) {
-0%, 50%, 100% {
-  opacity: 1.0;
+  0%, 50%, 100% {
+    opacity: 1.0;
+  }
+
+  25%, 75% {
+      opacity: 0.0;
+    }
 }
 
-25%, 75% {
-    opacity: 0.0;
-  }
-  }
-
-// canned animation - use if you want out of the box/non-customized anim
+// flash double animation 
 %anim-flashDouble {
   @include animation(flashDouble $tmg-f1 ease-in-out 1);
 }
 
-
+// +Pulse - Extend
 // ====================
-
-
-// pulse
+// pulse keyframes
 @include keyframes(pulse) {
   0% {
     opacity: 0.0;
@@ -267,15 +284,14 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// pulse animation
 %anim-pulse {
   @include animation(pulse $tmg-f1 ease-in-out 1);
 }
 
+// Dropped - Extend
 // ====================
-
-
-// was-dropped
+// was dropped keyframes
 @include keyframes(was-dropped) {
   0% {
     opacity: 1.0;
@@ -290,7 +306,7 @@
   }
 }
 
-// canned animation - use if you want out of the box/non-customized anim
+// was dropped animation
 %anim-was-dropped {
   @include animation(was-dropped $tmg-f1 ease-in-out 1);
 }

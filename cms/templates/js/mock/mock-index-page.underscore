@@ -1,12 +1,16 @@
 <div class="wrapper-mast wrapper">
   <header class="mast has-actions">
-    <h1 class="page-header">My Courses</h1>
+    <h1 class="page-header">Studio Home</h1>
     <nav class="nav-actions">
       <h3 class="sr">Page Actions</h3>
       <ul>
         <li class="nav-item">
-          <a href="#" class="button new-button new-course-button"><i class="icon-plus icon-inline"></i>
+          <a href="#" class="button new-button new-course-button"><i class="icon fa fa-plus icon-inline"></i>
               New Course</a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="button new-button new-library-button"><i class="icon fa fa-plus icon-inline"></i>
+              New Library</a>
         </li>
       </ul>
     </nav>
@@ -16,13 +20,6 @@
 <div class="wrapper-content wrapper">
   <section class="content">
     <article class="content-primary" role="main">
-
-      <div class="introduction">
-        <h2 class="title">Welcome, user!</h2>
-        <div class="copy">
-          <p>Here are all of the courses you currently have access to in Studio:</p>
-        </div>
-      </div>
 
       <div class="wrapper-create-element wrapper-create-course">
         <form class="form-create create-course course-info" id="create-course-form" name="create-course-form">
@@ -78,6 +75,53 @@
         </form>
       </div>
 
+      <div class="wrapper-create-element wrapper-create-library">
+        <form class="form-create create-library library-info" id="create-library-form" name="create-library-form">
+          <div class="wrap-error">
+            <div id="library_creation_error" name="library_creation_error" class="message message-status message-status error" role="alert">
+            <p>Please correct the highlighted fields below.</p>
+            </div>
+          </div>
+
+          <div class="wrapper-form">
+            <h3 class="title">Create a New Library</h3>
+
+            <fieldset>
+              <legend class="sr">Required Information to Create a New Library</legend>
+
+              <ol class="list-input">
+                <li class="field text required" id="field-library-name">
+                  <label for="new-library-name">Library Name</label>
+                  <input class="new-library-name" id="new-library-name" type="text" name="new-library-name" aria-required="true" placeholder="e.g. Computer Science Problems" />
+                  <span class="tip">The public display name for your library.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+                <li class="field text required" id="field-organization">
+                  <label for="new-library-org">Organization</label>
+                  <input class="new-library-org" id="new-library-org" type="text" name="new-library-org" aria-required="true" placeholder="e.g. UniversityX or OrganizationX" />
+                  <span class="tip">The public organization name for your library. This cannot be changed.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+
+                <li class="field text required" id="field-library-number">
+                  <label for="new-library-number">Major Version Number</label>
+                  <input class="new-library-number" id="new-library-number" type="text" name="new-library-number" aria-required="true" value="1" />
+                  <span class="tip">The <strong>major version number</strong> of your library. Minor revisions are tracked as edits happen within a library.</span>
+                  <span class="tip tip-error is-hiding"></span>
+                </li>
+              </ol>
+
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <input type="hidden" value="False" class="allow-unicode-course-id" />
+            <input type="submit" value="Create" class="action action-primary new-library-save" />
+            <input type="button" value="Cancel" class="action action-secondary action-cancel new-library-cancel" />
+          </div>
+        </form>
+      </div>
+
       <!-- STATE: processing courses -->
       <div class="courses courses-processing">
           <h3 class="title">Courses Being Processed</h3>
@@ -106,7 +150,7 @@
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
                   <dd class="value">
-                    <i class="icon icon-refresh icon-spin"></i>
+                    <i class="icon fa fa-refresh fa-spin"></i>
                     <span class="copy">Configuring as re-run</span>
                   </dd>
                 </dl>
@@ -142,7 +186,7 @@
                 <dl class="course-status">
                   <dt class="label sr">This re-run processing status:</dt>
                   <dd class="value">
-                    <i class="icon icon-warning-sign"></i>
+                    <i class="icon fa fa-warning"></i>
                     <span class="copy">Configuration Error</span>
                   </dd>
                 </dl>
@@ -154,7 +198,7 @@
                 <ul  class="status-actions">
                   <li class="action action-dismiss">
                     <a href="#" class="button dismiss-button" data-dismiss-link="dummy_dismiss_url">
-                      <i class="icon icon-remove-sign"></i>
+                      <i class="icon fa fa-times-circle"></i>
                       <span class="button-copy">Dismiss</span>
                     </a>
                   </li>
@@ -163,6 +207,15 @@
             </li>
           </ul>
       </div>
+
+      <ul id="course-index-tabs">
+        <li class="courses-tab active"><a>${_("Courses")}</a></li>
+        <li class="libraries-tab"><a>${_("Libraries")}</a></li>
+      </ul>
+
+      <div class="courses courses-tab active">
+      <div class="libraries libraries-tab"></div>
+
     </article>
   </section>
 </div>

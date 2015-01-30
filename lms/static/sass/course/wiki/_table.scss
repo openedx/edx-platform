@@ -7,7 +7,7 @@ table.wiki-history {
       height: 40px;
 
       th {
-        padding-top: 10px;
+        padding-top: ($baseline/2);
         padding-left: 15px;
 
         &#revision {
@@ -40,7 +40,7 @@ table.wiki-history {
 }
 
 div.history-controls {
-  margin-top: 20px;
+  margin-top: $baseline;
 
   input[type="submit"] {
     @extend .light-button;

@@ -1,6 +1,7 @@
 """
 Test for LMS instructor background task queue management
 """
+from mock import patch, Mock
 from bulk_email.models import CourseEmail, SEND_TO_ALL
 from courseware.tests.factories import UserFactory
 from xmodule.modulestore.exceptions import ItemNotFoundError
@@ -158,6 +159,7 @@ class InstructorTaskModuleSubmitTest(InstructorTaskModuleTestCase):
         self._test_submit_task(submit_delete_problem_state_for_all_students)
 
 
+@patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCase):
     """Tests API methods that involve the submission of course-based background tasks."""
 

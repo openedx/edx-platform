@@ -5,7 +5,7 @@ section.foldit {
         table {
             border: 1px solid lighten($leaderboard, 10%);
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: $baseline;
         }
         th {
             background: $leaderboard;
@@ -13,7 +13,7 @@ section.foldit {
         }
         td {
             background: lighten($leaderboard, 3%);
-            border-bottom: 1px solid  #fff;
+            border-bottom: 1px solid $white;
             padding: 8px;
         }
     }

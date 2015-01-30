@@ -14,7 +14,6 @@ from django.core.cache import get_cache, InvalidCacheBackendError
 import django.utils
 
 import re
-import threading
 
 from xmodule.util.django import get_current_request_hostname
 import xmodule.modulestore  # pylint: disable=unused-import
@@ -30,6 +29,14 @@ try:
 except ImportError:
     HAS_REQUEST_CACHE = False
 
+# We also may not always have the current request user (crum) module available
+try:
+    from xblock_django.user_service import DjangoXBlockUserService
+    from crum import get_current_user
+    HAS_USER_SERVICE = True
+except ImportError:
+    HAS_USER_SERVICE = False
+
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
 
@@ -44,7 +51,15 @@ def load_function(path):
     return getattr(import_module(module_path), name)
 
 
-def create_modulestore_instance(engine, content_store, doc_store_config, options, i18n_service=None, fs_service=None):
+def create_modulestore_instance(
+        engine,
+        content_store,
+        doc_store_config,
+        options,
+        i18n_service=None,
+        fs_service=None,
+        user_service=None,
+):
     """
     This will return a new instance of a modulestore given an engine and options
     """
@@ -74,6 +89,11 @@ def create_modulestore_instance(engine, content_store, doc_store_config, options
     if issubclass(class_, BranchSettingMixin):
         _options['branch_setting_func'] = _get_modulestore_branch_setting
 
+    if HAS_USER_SERVICE and not user_service:
+        xb_user_service = DjangoXBlockUserService(get_current_user())
+    else:
+        xb_user_service = None
+
     return class_(
         contentstore=content_store,
         metadata_inheritance_cache_subsystem=metadata_inheritance_cache,
@@ -83,6 +103,7 @@ def create_modulestore_instance(engine, content_store, doc_store_config, options
         doc_store_config=doc_store_config,
         i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
+        user_service=user_service or xb_user_service,
         **_options
     )
 

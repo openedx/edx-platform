@@ -14,13 +14,17 @@ from xmodule.x_module import PREVIEW_VIEWS, STUDENT_VIEW, AUTHOR_VIEW
 from xmodule.contentstore.django import contentstore
 from xmodule.error_module import ErrorDescriptor
 from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.library_tools import LibraryToolsService
 from xmodule.modulestore.django import modulestore, ModuleI18nService
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import LibraryUsageLocator
 from xmodule.x_module import ModuleSystem
 from xblock.runtime import KvsFieldData
 from xblock.django.request import webob_to_django_response, django_to_webob_request
 from xblock.exceptions import NoSuchHandlerError
 from xblock.fragment import Fragment
+from student.auth import has_studio_read_access, has_studio_write_access
+from xblock_django.user_service import DjangoXBlockUserService
 
 from lms.djangoapps.lms_xblock.field_data import LmsFieldData
 from cms.lib.xblock.field_data import CmsFieldData
@@ -109,18 +113,26 @@ class PreviewModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
         ]
 
 
-class StudioUserService(object):
+class StudioPermissionsService(object):
     """
-    Provides a Studio implementation of the XBlock user service.
+    Service that can provide information about a user's permissions.
+
+    Deprecated. To be replaced by a more general authorization service.
+
+    Only used by LibraryContentDescriptor (and library_tools.py).
     """
 
     def __init__(self, request):
-        super(StudioUserService, self).__init__()
+        super(StudioPermissionsService, self).__init__()
         self._request = request
 
-    @property
-    def user_id(self):
-        return self._request.user.id
+    def can_read(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_read_access(self._request.user, course_key)
+
+    def can_write(self, course_key):
+        """ Does the user have read access to the given course/library? """
+        return has_studio_write_access(self._request.user, course_key)
 
 
 def _preview_module_system(request, descriptor, field_data):
@@ -151,7 +163,7 @@ def _preview_module_system(request, descriptor, field_data):
         _studio_wrap_xblock,
     ]
 
-    descriptor.runtime._services['user'] = StudioUserService(request)  # pylint: disable=protected-access
+    descriptor.runtime._services['studio_user_permissions'] = StudioPermissionsService(request)  # pylint: disable=protected-access
 
     return PreviewModuleSystem(
         static_url=settings.STATIC_URL,
@@ -177,6 +189,8 @@ def _preview_module_system(request, descriptor, field_data):
         services={
             "i18n": ModuleI18nService(),
             "field-data": field_data,
+            "library_tools": LibraryToolsService(modulestore()),
+            "user": DjangoXBlockUserService(request.user),
         },
     )
 
@@ -216,6 +230,7 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
     # Only add the Studio wrapper when on the container page. The "Pages" page will remain as is for now.
     if not context.get('is_pages_view', None) and view in PREVIEW_VIEWS:
         root_xblock = context.get('root_xblock')
+        can_edit_visibility = not isinstance(xblock.location, LibraryUsageLocator)
         is_root = root_xblock and xblock.location == root_xblock.location
         is_reorderable = _is_xblock_reorderable(xblock, context)
         template_context = {
@@ -224,6 +239,8 @@ def _studio_wrap_xblock(xblock, view, frag, context, display_name_only=False):
             'content': frag.content,
             'is_root': is_root,
             'is_reorderable': is_reorderable,
+            'can_edit': context.get('can_edit', True),
+            'can_edit_visibility': can_edit_visibility,
         }
         html = render_to_string('studio_xblock_wrapper.html', template_context)
         frag = wrap_fragment(frag, html)

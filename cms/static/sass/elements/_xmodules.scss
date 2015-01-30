@@ -4,10 +4,16 @@
 // general - display mode (xblock-student_view or xmodule_display)
 .xmodule_display,
 .xblock-student_view {
+
   // font styling
   i,
   em {
     font-style: italic;
+  }
+
+
+  .icon {
+    font-style: normal;
   }
 }
 
@@ -52,7 +58,7 @@
           width: 100%;
           padding: ($baseline/2);
 
-          *[class^="icon-"] {
+          .icon {
             margin-right: ($baseline/4);
           }
         }
@@ -128,7 +134,7 @@
         display: inline-block;
         vertical-align: top;
         min-width: ($baseline*5);
-        margin-top: 10px;
+        margin-top: ($baseline/2);
 
         .transcripts-message {
           @extend %t-copy-sub2;
@@ -142,10 +148,10 @@
             color: $red;
           }
 
-          [class^="icon-"],
-          [class*=" icon-"] {
+          .icon,
+          [class*=" fa-"] {
             @extend %t-icon4;
-            margin-right: 5px;
+            margin-right: ($baseline/4);
           }
         }
 
@@ -189,7 +195,7 @@
       @extend %t-copy-lead1;
       display: block;
       height: 30px;
-      margin: 10px 0;
+      margin: ($baseline/2) 0;
       border: 1px solid $blue;
       text-align: center;
 
@@ -210,7 +216,7 @@
         width: 0%;
         height: 30px;
         background: $blue;
-        color: #fff;
+        color: $white;
         line-height: 28px;
       }
     }
@@ -281,7 +287,7 @@
           display: block;
           padding: ($baseline/2);
 
-          *[class^="icon-"] {
+          .icon {
             margin-right: ($baseline/4);
           }
         }

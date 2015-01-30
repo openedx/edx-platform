@@ -69,7 +69,7 @@ body.discussion, .discussion-module {
     }
 
     .comment-form {
-      @include clearfix;
+      @include clearfix();
 
       .comment-form-input {
         padding: ($baseline/4) ($baseline/2);

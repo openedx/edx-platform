@@ -8,46 +8,59 @@ from xmodule.modulestore.django import modulestore
 from contentstore.utils import reverse_course_url
 
 
-class TestOrphan(CourseTestCase):
+class TestOrphanBase(CourseTestCase):
+    """
+    Base class for Studio tests that require orphaned modules
+    """
+    def setUp(self):
+        super(TestOrphanBase, self).setUp()
+
+        # create chapters and add them to course tree
+        chapter1 = self.store.create_child(self.user.id, self.course.location, 'chapter', "Chapter1")
+        self.store.publish(chapter1.location, self.user.id)
+
+        chapter2 = self.store.create_child(self.user.id, self.course.location, 'chapter', "Chapter2")
+        self.store.publish(chapter2.location, self.user.id)
+
+        # orphan chapter
+        orphan_chapter = self.store.create_item(self.user.id, self.course.id, 'chapter', "OrphanChapter")
+        self.store.publish(orphan_chapter.location, self.user.id)
+
+        # create vertical and add it as child to chapter1
+        vertical1 = self.store.create_child(self.user.id, chapter1.location, 'vertical', "Vertical1")
+        self.store.publish(vertical1.location, self.user.id)
+
+        # create orphan vertical
+        orphan_vertical = self.store.create_item(self.user.id, self.course.id, 'vertical', "OrphanVert")
+        self.store.publish(orphan_vertical.location, self.user.id)
+
+        # create component and add it to vertical1
+        html1 = self.store.create_child(self.user.id, vertical1.location, 'html', "Html1")
+        self.store.publish(html1.location, self.user.id)
+
+        # create component and add it as a child to vertical1 and orphan_vertical
+        multi_parent_html = self.store.create_child(self.user.id, vertical1.location, 'html', "multi_parent_html")
+        self.store.publish(multi_parent_html.location, self.user.id)
+
+        orphan_vertical.children.append(multi_parent_html.location)
+        self.store.update_item(orphan_vertical, self.user.id)
+
+        # create an orphaned html module
+        orphan_html = self.store.create_item(self.user.id, self.course.id, 'html', "OrphanHtml")
+        self.store.publish(orphan_html.location, self.user.id)
+
+        self.store.create_child(self.user.id, self.course.location, 'static_tab', "staticuno")
+        self.store.create_child(self.user.id, self.course.location, 'about', "overview")
+        self.store.create_child(self.user.id, self.course.location, 'course_info', "updates")
+
+
+class TestOrphan(TestOrphanBase):
     """
     Test finding orphans via view and django config
     """
     def setUp(self):
         super(TestOrphan, self).setUp()
-
-        runtime = self.course.runtime
-
-        self._create_item('chapter', 'Chapter1', {}, {'display_name': 'Chapter 1'}, 'course', self.course.location.name, runtime)
-        self._create_item('chapter', 'Chapter2', {}, {'display_name': 'Chapter 2'}, 'course', self.course.location.name, runtime)
-        self._create_item('chapter', 'OrphanChapter', {}, {'display_name': 'Orphan Chapter'}, None, None, runtime)
-        self._create_item('vertical', 'Vert1', {}, {'display_name': 'Vertical 1'}, 'chapter', 'Chapter1', runtime)
-        self._create_item('vertical', 'OrphanVert', {}, {'display_name': 'Orphan Vertical'}, None, None, runtime)
-        self._create_item('html', 'Html1', "<p>Goodbye</p>", {'display_name': 'Parented Html'}, 'vertical', 'Vert1', runtime)
-        self._create_item('html', 'OrphanHtml', "<p>Hello</p>", {'display_name': 'Orphan html'}, None, None, runtime)
-        self._create_item('static_tab', 'staticuno', "<p>tab</p>", {'display_name': 'Tab uno'}, None, None, runtime)
-        self._create_item('about', 'overview', "<p>overview</p>", {}, None, None, runtime)
-        self._create_item('course_info', 'updates', "<ol><li><h2>Sep 22</h2><p>test</p></li></ol>", {}, None, None, runtime)
-
         self.orphan_url = reverse_course_url('orphan_handler', self.course.id)
-
-    def _create_item(self, category, name, data, metadata, parent_category, parent_name, runtime):
-        location = self.course.location.replace(category=category, name=name)
-        store = modulestore()
-        store.create_item(
-            self.user.id,
-            location.course_key,
-            location.block_type,
-            location.block_id,
-            definition_data=data,
-            metadata=metadata,
-            runtime=runtime
-        )
-        if parent_name:
-            # add child to parent in mongo
-            parent_location = self.course.location.replace(category=parent_category, name=parent_name)
-            parent = store.get_item(parent_location)
-            parent.children.append(location)
-            store.update_item(parent, self.user.id)
 
     def test_mongo_orphan(self):
         """
@@ -76,6 +89,10 @@ class TestOrphan(CourseTestCase):
             self.client.get(self.orphan_url, HTTP_ACCEPT='application/json').content
         )
         self.assertEqual(len(orphans), 0, "Orphans not deleted {}".format(orphans))
+
+        # make sure that any children with one orphan parent and one non-orphan
+        # parent are not deleted
+        self.assertTrue(self.store.has_item(self.course.id.make_usage_key('html', "multi_parent_html")))
 
     def test_not_permitted(self):
         """

@@ -41,7 +41,7 @@
             <h3 class="sr">${_("Page Actions")}</h3>
             <ul>
                 <li class="nav-item">
-                    <a href="#" class="button upload-button new-button"><i class="icon-plus"></i> ${_("Upload New File")}</a>
+                    <a href="#" class="button upload-button new-button"><i class="icon fa fa-plus"></i> ${_("Upload New File")}</a>
                 </li>
             </ul>
         </nav>
@@ -53,7 +53,7 @@
         <article class="content-primary" role="main">
             <div class="wrapper-assets" />
             <div class="ui-loading">
-                <p><span class="spin"><i class="icon-refresh"></i></span> <span class="copy">${_("Loading&hellip;")}</span></p>
+                <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy">${_("Loading")}</span></p>
             </div>
         </article>
 
@@ -70,10 +70,11 @@
             <div class="bit">
                 <h3 class="title-3">${_("Using File URLs")}</h3>
 
-                <p>${_("Use the {em_start}Embed URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(em_start='<strong>', em_end="</strong>")}</p>
+                <p>${_("Use the {em_start}{studio_name} URL{em_end} value to link to the file or image from a component, a course update, or a course handout.").format(studio_name=settings.STUDIO_SHORT_NAME, em_start="<strong>", em_end="</strong>")}</p>
 
-                <p>${_("Use the {em_start}External URL{em_end} value to reference the file or image only from outside of your course.").format(em_start='<strong>', em_end="</strong>")}</p>
-                <p>${_("Click in the Embed URL or External URL column to select the value, then copy it.")}</p>
+                <p>${_("Use the {em_start}Web URL{em_end} value to reference the file or image only from outside of your course. {em_start}Note:{em_end} If you lock a file, the Web URL no longer works for external access to a file.").format(em_start='<strong>', em_end="</strong>")}</p>
+
+                <p>${_("To copy a URL, double click the value in the URL column, then copy the selected text.")}</p>
             </div>
             <div class="bit external-help">
                 <a href="${get_online_help_info(online_help_token())['doc_url']}" target="_blank" class="button external-help-button">${_("Learn more about managing files")}</a>
@@ -84,7 +85,7 @@
 </div>
 
 <div class="upload-modal modal">
-    <a href="#" class="close-button"><i class="icon-remove-sign"></i> <span class="sr">${_('close')}</span></a>
+    <a href="#" class="close-button"><i class="icon fa fa-times-circle"></i> <span class="sr">${_('close')}</span></a>
     <div class="modal-body">
         <h1 class="title">${_("Upload New File")}</h1>
         <h2>${_("Max per-file size: {max_filesize}MB").format(max_filesize=max_file_size_in_mbs)}</h2>
@@ -111,14 +112,14 @@
 <!-- alert: save confirmed with close -->
 <div class="wrapper wrapper-alert wrapper-alert-confirmation" role="status">
     <div class="alert confirmation">
-        <i class="icon-ok"></i>
+        <i class="icon fa fa-check"></i>
 
         <div class="copy">
             <h2 class="title title-3">${_('Your file has been deleted.')}</h2>
         </div>
 
         <a href="" rel="view" class="action action-alert-close">
-            <i class="icon-remove-sign"></i>
+            <i class="icon fa fa-times-circle"></i>
             <span class="label">${_('close alert')}</span>
         </a>
     </div>

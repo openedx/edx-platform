@@ -21,8 +21,9 @@ class PartitionService(object):
         """
         raise NotImplementedError('Subclasses must implement course_partition')
 
-    def __init__(self, runtime, track_function):
-        self.runtime = runtime
+    def __init__(self, user, course_id, track_function=None):
+        self._user = user
+        self._course_id = course_id
         self._track_function = track_function
 
     def get_user_group_id_for_partition(self, user_partition_id):
@@ -50,10 +51,10 @@ class PartitionService(object):
         if user_partition is None:
             raise ValueError(
                 "Configuration problem!  No user_partition with id {0} "
-                "in course {1}".format(user_partition_id, self.runtime.course_id)
+                "in course {1}".format(user_partition_id, self._course_id)
             )
 
-        group = self._get_group(user_partition)
+        group = self.get_group(user_partition)
         return group.id if group else None
 
     def _get_user_partition(self, user_partition_id):
@@ -69,13 +70,12 @@ class PartitionService(object):
 
         return None
 
-    def _get_group(self, user_partition):
+    def get_group(self, user_partition, assign=True):
         """
         Returns the group from the specified user partition to which the user is assigned.
         If the user has not yet been assigned, a group will be chosen for them based upon
         the partition's scheme.
         """
-        user = self.runtime.get_real_user(self.runtime.anonymous_student_id)
         return user_partition.scheme.get_group_for_user(
-            self.runtime.course_id, user, user_partition, track_function=self._track_function
+            self._course_id, self._user, user_partition, assign=assign, track_function=self._track_function
         )

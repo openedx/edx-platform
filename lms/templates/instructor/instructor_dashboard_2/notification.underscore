@@ -1,4 +1,4 @@
-<div class="message message-<%= type %>">
+<div class="message message-<%= type %>" tabindex="-1">
     <h3 class="message-title">
         <%- title %>
     </h3>
@@ -22,7 +22,7 @@
         <div class="message-actions">
             <button class="action-primary <%- actionClass %>">
                 <% if (actionIconClass) { %>
-                    <i class="icon <%- actionIconClass %>"></i>
+                    <i class="icon fa <%- actionIconClass %>"></i>
                 <% } %>
                 <%- actionText %>
             </button>

@@ -4,7 +4,7 @@
 <section id="edit-coupon-modal" class="modal" role="dialog" tabindex="-1" aria-label="${_('Edit Coupon')}">
   <div class="inner-wrapper">
     <button class="close-modal">
-      <i class="icon-remove"></i>
+      <i class="icon fa fa-remove"></i>
       <span class="sr">
         ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
         ${_('Close')}
@@ -47,6 +47,12 @@
             <li class="field" id="edit-coupon-modal-field-course_id">
               <label for="edit_coupon_course_id">${_("Course ID")}</label>
               <input class="field readonly" id="edit_coupon_course_id" type="text" name="course_id" value=""
+                     readonly aria-required="true"/>
+            </li>
+
+            <li class="field" id="edit-coupon-modal-field-expiration-date">
+              <label for="edit_coupon_expiration_date">${_("Expiration Date")}</label>
+              <input class="field readonly" id="edit_coupon_expiration_date" type="text" name="expiration_date" value=""
                      readonly aria-required="true"/>
             </li>
           </ol>

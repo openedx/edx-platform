@@ -1,5 +1,10 @@
+"""
+Base classes used by studio tests.
+"""
+from bok_choy.web_app_test import WebAppTest
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...fixtures.course import CourseFixture
+from ...fixtures.library import LibraryFixture
 from ..helpers import UniqueCourseTest
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.utils import verify_ordering
@@ -53,12 +58,12 @@ class ContainerBase(StudioCourseTest):
     Base class for tests that do operations on the container page.
     """
 
-    def setUp(self):
+    def setUp(self, is_staff=False):
         """
         Create a unique identifier for the course used in this test.
         """
         # Ensure that the superclass sets up
-        super(ContainerBase, self).setUp()
+        super(ContainerBase, self).setUp(is_staff=is_staff)
 
         self.outline = CourseOutlinePage(
             self.browser,
@@ -98,3 +103,48 @@ class ContainerBase(StudioCourseTest):
         # Reload the page to see that the change was persisted.
         container = self.go_to_nested_container_page()
         verify_ordering(self, container, expected_ordering)
+
+
+class StudioLibraryTest(WebAppTest):
+    """
+    Base class for all Studio library tests.
+    """
+    as_staff = True
+
+    def setUp(self):  # pylint: disable=arguments-differ
+        """
+        Install a library with no content using a fixture.
+        """
+        super(StudioLibraryTest, self).setUp()
+        fixture = LibraryFixture(
+            'test_org',
+            self.unique_id,
+            'Test Library {}'.format(self.unique_id),
+        )
+        self.populate_library_fixture(fixture)
+        fixture.install()
+        self.library_fixture = fixture
+        self.library_info = fixture.library_info
+        self.library_key = fixture.library_key
+        self.user = fixture.user
+        self.log_in(self.user, self.as_staff)
+
+    def populate_library_fixture(self, library_fixture):
+        """
+        Populate the children of the test course fixture.
+        """
+        pass
+
+    def log_in(self, user, is_staff=False):
+        """
+        Log in as the user that created the library.
+        By default the user will not have staff access unless is_staff is passed as True.
+        """
+        auth_page = AutoAuthPage(
+            self.browser,
+            staff=is_staff,
+            username=user.get('username'),
+            email=user.get('email'),
+            password=user.get('password')
+        )
+        auth_page.visit()

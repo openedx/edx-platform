@@ -13,6 +13,13 @@ class CourseModeForm(forms.ModelForm):
     class Meta:
         model = CourseMode
 
+    COURSE_MODE_SLUG_CHOICES = (
+        [(CourseMode.DEFAULT_MODE_SLUG, CourseMode.DEFAULT_MODE_SLUG)] +
+        [(mode_slug, mode_slug) for mode_slug in CourseMode.VERIFIED_MODES]
+    )
+
+    mode_slug = forms.ChoiceField(choices=COURSE_MODE_SLUG_CHOICES)
+
     def clean_course_id(self):
         course_id = self.cleaned_data['course_id']
         try:
@@ -31,6 +38,10 @@ class CourseModeForm(forms.ModelForm):
 
 class CourseModeAdmin(admin.ModelAdmin):
     form = CourseModeForm
-
+    search_fields = ('course_id',)
+    list_display = (
+        'id', 'course_id', 'mode_slug', 'mode_display_name', 'min_price',
+        'suggested_prices', 'currency', 'expiration_date', 'expiration_datetime'
+    )
 
 admin.site.register(CourseMode, CourseModeAdmin)

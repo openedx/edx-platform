@@ -72,7 +72,7 @@ class @Calculator
       .attr
         'title': text
         'aria-expanded': isExpanded
-      .text text
+      .find('.utility-control-label').text text
 
     $calc.toggleClass 'closed'
 

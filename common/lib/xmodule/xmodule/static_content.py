@@ -122,9 +122,11 @@ def _write_js(output_root, classes):
     js_fragments = set()
     for class_ in classes:
         module_js = class_.get_javascript()
+        # It will enforce 000 prefix for xmodule.js.
+        js_fragments.add((0, 'js', module_js.get('xmodule_js')))
         for filetype in ('coffee', 'js'):
             for idx, fragment in enumerate(module_js.get(filetype, [])):
-                js_fragments.add((idx, filetype, fragment))
+                js_fragments.add((idx + 1, filetype, fragment))
 
     for idx, filetype, fragment in sorted(js_fragments):
         filename = "{idx:0=3d}-{hash}.{type}".format(

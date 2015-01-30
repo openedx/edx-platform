@@ -6,6 +6,11 @@ This is the default template for our main set of AWS servers.
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
+# Pylint gets confused by path.py instances, which report themselves as class
+# objects. As a result, pylint applies the wrong regex in validating names,
+# and throws spurious errors. Therefore, we disable invalid-name checking.
+# pylint: disable=invalid-name
+
 import json
 
 from .common import *
@@ -185,7 +190,9 @@ LOGGING = get_logger_config(LOG_DIR,
                             service_variant=SERVICE_VARIANT)
 
 #theming start:
-PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'MOOC UPEx')
+PLATFORM_NAME = ENV_TOKENS.get('PLATFORM_NAME', 'edX')
+STUDIO_NAME = ENV_TOKENS.get('STUDIO_NAME', 'edX Studio')
+TENDER_DOMAIN = ENV_TOKENS.get('TENDER_DOMAIN', TENDER_DOMAIN)
 
 # Event Tracking
 if "TRACKING_IGNORE_URL_PATTERNS" in ENV_TOKENS:
@@ -304,3 +311,7 @@ DEPRECATED_ADVANCED_COMPONENT_TYPES = ENV_TOKENS.get(
 ################ VIDEO UPLOAD PIPELINE ###############
 
 VIDEO_UPLOAD_PIPELINE = ENV_TOKENS.get('VIDEO_UPLOAD_PIPELINE', VIDEO_UPLOAD_PIPELINE)
+
+#date format the api will be formatting the datetime values
+API_DATE_FORMAT = '%Y-%m-%d'
+API_DATE_FORMAT = ENV_TOKENS.get('API_DATE_FORMAT', API_DATE_FORMAT)

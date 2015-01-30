@@ -20,6 +20,10 @@ from shoppingcart.models import Order, PaidCourseRegistration
 from xmodule.course_module import CATALOG_VISIBILITY_ABOUT, CATALOG_VISIBILITY_NONE
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from util.milestones_helpers import (
+    set_prerequisite_courses,
+    seed_milestone_relationship_types,
+)
 
 from .helpers import LoginEnrollmentTestCase
 
@@ -33,7 +37,6 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests about xblock.
     """
-
     def setUp(self):
         self.course = CourseFactory.create()
         self.about = ItemFactory.create(
@@ -119,6 +122,60 @@ class AboutTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         target_url = resp.redirect_chain[-1][0]
         info_url = reverse('info', args=[self.course.id.to_deprecated_string()])
         self.assertTrue(target_url.endswith(info_url))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    def test_pre_requisite_course(self):
+        seed_milestone_relationship_types()
+        pre_requisite_course = CourseFactory.create(org='edX', course='900', display_name='pre requisite course')
+        course = CourseFactory.create(pre_requisite_courses=[unicode(pre_requisite_course.id)])
+        self.setup_user()
+        url = reverse('about_course', args=[unicode(course.id)])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("<span class=\"important-dates-item-text pre-requisite\">{} {}</span>"
+                      .format(pre_requisite_course.display_org_with_default,
+                              pre_requisite_course.display_number_with_default),
+                      resp.content.strip('\n'))
+
+    @patch.dict(settings.FEATURES, {'ENABLE_PREREQUISITE_COURSES': True, 'MILESTONES_APP': True})
+    def test_about_page_unfulfilled_prereqs(self):
+        seed_milestone_relationship_types()
+        pre_requisite_course = CourseFactory.create(
+            org='edX',
+            course='900',
+            display_name='pre requisite course',
+        )
+
+        pre_requisite_courses = [unicode(pre_requisite_course.id)]
+
+        # for this failure to occur, the enrollment window needs to be in the past
+        course = CourseFactory.create(
+            org='edX',
+            course='1000',
+            # closed enrollment
+            enrollment_start=datetime.datetime(2013, 1, 1),
+            enrollment_end=datetime.datetime(2014, 1, 1),
+            start=datetime.datetime(2013, 1, 1),
+            end=datetime.datetime(2030, 1, 1),
+            pre_requisite_courses=pre_requisite_courses,
+        )
+        set_prerequisite_courses(course.id, pre_requisite_courses)
+
+        self.setup_user()
+        self.enroll(self.course, True)
+        self.enroll(pre_requisite_course, True)
+
+        url = reverse('about_course', args=[unicode(course.id)])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn("<span class=\"important-dates-item-text pre-requisite\">{} {}</span>"
+                      .format(pre_requisite_course.display_org_with_default,
+                              pre_requisite_course.display_number_with_default),
+                      resp.content.strip('\n'))
+
+        url = reverse('about_course', args=[unicode(pre_requisite_course.id)])
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_CLOSED_MODULESTORE)

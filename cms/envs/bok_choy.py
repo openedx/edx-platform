@@ -5,6 +5,11 @@ Settings for bok choy tests
 import os
 from path import path
 
+# Pylint gets confused by path.py instances, which report themselves as class
+# objects. As a result, pylint applies the wrong regex in validating names,
+# and throws spurious errors. Therefore, we disable invalid-name checking.
+# pylint: disable=invalid-name
+
 
 ########################## Prod-like settings ###################################
 # These should be as close as possible to the settings we use in production.
@@ -53,6 +58,15 @@ for log_name, log_level in LOG_OVERRIDES:
 
 # Use the auto_auth workflow for creating users and logging them in
 FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
+
+# Enable milestones app
+FEATURES['MILESTONES_APP'] = True
+
+# Enable pre-requisite course
+FEATURES['ENABLE_PREREQUISITE_COURSES'] = True
+
+########################### Entrance Exams #################################
+FEATURES['ENTRANCE_EXAMS'] = True
 
 # Unfortunately, we need to use debug mode to serve staticfiles
 DEBUG = True

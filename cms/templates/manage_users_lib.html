@@ -1,0 +1,170 @@
+<%! import json %>
+<%! from django.utils.translation import ugettext as _ %>
+<%! from django.core.urlresolvers import reverse %>
+<%inherit file="base.html" />
+<%def name="online_help_token()"><% return "team" %></%def>
+<%block name="title">${_("Library User Access")}</%block>
+<%block name="bodyclass">is-signedin course users view-team</%block>
+
+<%block name="content">
+
+<div class="wrapper-mast wrapper">
+  <header class="mast has-actions has-subtitle">
+    <h1 class="page-header">
+      <small class="subtitle">${_("Settings")}</small>
+      <span class="sr">&gt; </span>${_("User Access")}
+    </h1>
+
+    <nav class="nav-actions">
+      <h3 class="sr">${_("Page Actions")}</h3>
+      <ul>
+        %if allow_actions:
+        <li class="nav-item">
+          <a href="#" class="button new-button create-user-button"><i class="icon fa fa-plus"></i> ${_("New Team Member")}</a>
+        </li>
+        %endif
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="wrapper-content wrapper">
+  <section class="content">
+    <article class="content-primary" role="main">
+      %if allow_actions:
+      <div class="wrapper-create-element animate wrapper-create-user">
+        <form class="form-create create-user" id="create-user-form" name="create-user-form">
+          <div class="wrapper-form">
+            <h3 class="title">${_("Grant Access to This Library")}</h3>
+
+            <fieldset class="form-fields">
+              <legend class="sr">${_("New Team Member Information")}</legend>
+
+                <ol class="list-input">
+                  <li class="field text required create-user-email">
+                    <label for="user-email-input">${_("User's Email Address")}</label>
+                    <input id="user-email-input" class="user-email-input" name="user-email" type="text" placeholder="${_('example: username@domain.com')}" value="">
+                    <span class="tip tip-stacked">${_("Provide the email address of the user you want to add")}</span>
+                  </li>
+                </ol>
+            </fieldset>
+          </div>
+
+          <div class="actions">
+            <button class="action action-primary" type="submit">${_("Add User")}</button>
+            <button class="action action-secondary action-cancel">${_("Cancel")}</button>
+          </div>
+        </form>
+      </div>
+      %endif
+
+      <ol class="user-list">
+        % for user in all_users:
+          <%
+          is_instructor = user in instructors
+          is_staff = user in staff
+          role_id = 'admin' if is_instructor else ('staff' if is_staff else 'user')
+          role_desc = _("Admin") if is_instructor else (_("Staff") if is_staff else _("User"))
+          %>
+
+        <li class="user-item" data-email="${user.email}">
+
+          <span class="wrapper-ui-badge">
+            <span class="flag flag-role flag-role-${role_id} is-hanging">
+              <span class="label sr">${_("Current Role:")}</span>
+              <span class="value">
+                ${role_desc}
+                % if request.user.id == user.id:
+                    <span class="msg-you">${_("You!")}</span>
+                % endif
+              </span>
+            </span>
+          </span>
+
+          <div class="item-metadata">
+            <h3 class="user-name">
+              <span class="user-username">${user.username}</span>
+              <span class="user-email">
+                <a class="action action-email" href="mailto:${user.email}" title="${_("send an email message to {email}").format(email=user.email)}">${user.email}</a>
+              </span>
+            </h3>
+          </div>
+
+          % if allow_actions:
+          <ul class="item-actions user-actions">
+            % if is_instructor:
+              % if len(instructors) > 1:
+                <li class="action action-role">
+                  <a href="#" class="make-staff admin-role remove-admin-role">${_("Remove Admin Access")}</span></a>
+                </li>
+              % else:
+                <li class="action action-role">
+                  <span class="admin-role notoggleforyou">${_("Promote another member to Admin to remove your admin rights")}</span>
+                </li>
+              % endif
+            % elif is_staff:
+              <li class="action action-role">
+                <a href="#" class="make-instructor admin-role add-admin-role">${_("Add Admin Access")}</span></a>
+                <a href="#" class="make-user admin-role remove-admin-role">${_("Remove Staff Access")}</span></a>
+              </li>
+            % else:
+              <li class="action action-role">
+                <a href="#" class="make-staff admin-role add-admin-role">${_("Add Staff Access")}</span></a>
+              </li>
+            % endif
+            <li class="action action-delete ${"is-disabled" if request.user.id == user.id and is_instructor and len(instructors) == 1 else ""}">
+                <a href="#" class="delete remove-user action-icon" data-tooltip="${_("Remove this user")}"><i class="icon fa fa-trash-o"></i><span class="sr">${_("Delete the user, {username}").format(username=user.username)}</span></a>
+            </li>
+          </ul>
+          % elif request.user.id == user.id:
+          <ul class="item-actions user-actions">
+            <li class="action action-delete">
+                <a href="#" class="delete remove-user action-icon" data-tooltip="${_("Remove me")}"><i class="icon fa fa-trash-o"></i><span class="sr">${_("Remove me from this library")}</span></a>
+            </li>
+          </ul>
+          % endif
+
+        </li>
+        % endfor
+      </ol>
+
+      % if allow_actions and len(all_users) == 1:
+      <div class="notice notice-incontext notice-create has-actions">
+        <div class="msg">
+          <h3 class="title">${_('Add More Users to This Library')}</h3>
+          <div class="copy">
+            <p>${_('Grant other members of your course team access to this library. New library users must have an active {studio_name} account.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+          </div>
+        </div>
+
+        <ul class="list-actions">
+          <li class="action-item">
+            <a href="#" class="action action-primary button new-button create-user-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Add a New User')}</a>
+          </li>
+        </ul>
+      </div>
+      %endif
+    </article>
+
+    <aside class="content-supplementary" role="complimentary">
+      <div class="bit">
+        <h3 class="title-3">${_("Library Access Roles")}</h3>
+        <p>${_("There are three access roles for libraries: User, Staff, and Admin.")}</p>
+        <p>${_("Users can view library content and can reference or use library components in their courses, but they cannot edit the contents of a library.")}</p>
+        <p>${_("Staff are content co-authors. They have full editing privileges on the contents of a library.")}</p>
+        <p>${_("Admins have full editing privileges and can also add and remove other team members. There must be at least one user with Admin privileges in a library.")}</p>
+      </div>
+    </aside>
+  </section>
+</div>
+</%block>
+
+<%block name="requirejs">
+  require(["js/factories/manage_users_lib"], function(ManageUsersFactory) {
+      ManageUsersFactory(
+        "${context_library.display_name_with_default | h}",
+        ${json.dumps([user.email for user in all_users])},
+        "${reverse('contentstore.views.course_team_handler', kwargs={'course_key_string': library_key, 'email': '@@EMAIL@@'})}"
+      );
+  });
+</%block>

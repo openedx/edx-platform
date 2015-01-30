@@ -4,12 +4,14 @@ define([
     'js/common_helpers/template_helpers',
     'js/common_helpers/ajax_helpers',
     'js/student_account/models/LoginModel',
-    'js/student_account/views/LoginView'
-], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView) {
+    'js/student_account/views/LoginView',
+    'js/student_account/models/PasswordResetModel'
+], function($, _, TemplateHelpers, AjaxHelpers, LoginModel, LoginView, PasswordResetModel) {
     'use strict';
     describe('edx.student.account.LoginView', function() {
 
         var model = null,
+            resetModel = null,
             view = null,
             requests = null,
             authComplete = false,
@@ -24,13 +26,13 @@ define([
                 providers: [
                     {
                         name: 'Google',
-                        iconClass: 'icon-google-plus',
+                        iconClass: 'fa-google-plus',
                         loginUrl: '/auth/login/google-oauth2/?auth_entry=account_login',
                         registerUrl: '/auth/login/google-oauth2/?auth_entry=account_register'
                     },
                     {
                         name: 'Facebook',
-                        iconClass: 'icon-facebook',
+                        iconClass: 'fa-facebook',
                         loginUrl: '/auth/login/facebook/?auth_entry=account_login',
                         registerUrl: '/auth/login/facebook/?auth_entry=account_register'
                     }
@@ -79,10 +81,17 @@ define([
                 method: FORM_DESCRIPTION.method
             });
 
+            // Initialize the passwordReset model
+            resetModel = new PasswordResetModel({}, {
+                method: 'GET',
+                url: '#'
+            });
+
             // Initialize the login view
             view = new LoginView({
                 fields: FORM_DESCRIPTION.fields,
                 model: model,
+                resetModel: resetModel,
                 thirdPartyAuth: THIRD_PARTY_AUTH,
                 platformName: PLATFORM_NAME
             });

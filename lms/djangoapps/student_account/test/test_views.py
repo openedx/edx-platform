@@ -8,6 +8,7 @@ import json
 
 import mock
 import ddt
+import markupsafe
 from django.test import TestCase
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -289,7 +290,11 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
         # Send the view the email address tied to the inactive user
         response = self._change_password(email=self.NEW_EMAIL)
-        self.assertEqual(response.status_code, 400)
+
+        # Expect that the activation email is still sent,
+        # since the user may have lost the original activation email.
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
 
     def test_password_change_no_user(self):
         # Log out the user created during test setup
@@ -432,13 +437,13 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url("facebook", "account_login"),
                 "registerUrl": self._third_party_login_url("facebook", "account_register")
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url("google-oauth2", "account_login"),
                 "registerUrl": self._third_party_login_url("google-oauth2", "account_register")
             }
@@ -465,7 +470,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
                     "facebook", "account_login",
                     course_id=unicode(course.id),
@@ -479,7 +484,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
                     "google-oauth2", "account_login",
                     course_id=unicode(course.id),
@@ -513,7 +518,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
         expected_providers = [
             {
                 "name": "Facebook",
-                "iconClass": "icon-facebook",
+                "iconClass": "fa-facebook",
                 "loginUrl": self._third_party_login_url(
                     "facebook", "account_login",
                     course_id=unicode(course.id),
@@ -527,7 +532,7 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
             },
             {
                 "name": "Google",
-                "iconClass": "icon-google-plus",
+                "iconClass": "fa-google-plus",
                 "loginUrl": self._third_party_login_url(
                     "google-oauth2", "account_login",
                     course_id=unicode(course.id),
@@ -547,11 +552,15 @@ class StudentAccountLoginAndRegistrationTest(ModuleStoreTestCase):
 
     def _assert_third_party_auth_data(self, response, current_provider, providers):
         """Verify that third party auth info is rendered correctly in a DOM data attribute. """
-        expected_data = u"data-third-party-auth='{auth_info}'".format(
-            auth_info=json.dumps({
+        auth_info = markupsafe.escape(
+            json.dumps({
                 "currentProvider": current_provider,
                 "providers": providers
             })
+        )
+
+        expected_data = u"data-third-party-auth='{auth_info}'".format(
+            auth_info=auth_info
         )
         self.assertContains(response, expected_data)
 

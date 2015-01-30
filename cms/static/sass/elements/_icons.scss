@@ -1,11 +1,6 @@
 // studio - elements - icons & badges
 // ====================
-
 .icon {
-
-}
-
-[class^="icon-"] {
   font-style: normal;
 }
 
@@ -32,7 +27,7 @@
   padding: ($baseline/4) ($baseline/2) ($baseline/4) ($baseline/2);
   text-transform: uppercase;
 
-  * [class^="icon-"] {
+  .icon {
     margin-right: ($baseline/5);
   }
 
