@@ -911,6 +911,7 @@ class InvoiceTransaction(TimeStampedModel):
     )
     comments = models.TextField(
         null=True,
+        blank=True,
         help_text=ugettext_lazy("Optional: provide additional information for this transaction")
     )
     status = models.CharField(
