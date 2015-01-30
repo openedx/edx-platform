@@ -22,10 +22,6 @@ $sm-btn-google: #dd4b39;
 $sm-btn-facebook: #3b5998;
 $sm-btn-linkedin: #0077b5;
 
-.section-bkg-wrapper {
-    background: $m-gray-l4;
-}
-
 .login-register {
     @include box-sizing(border-box);
     @include outer-container;
@@ -178,10 +174,24 @@ $sm-btn-linkedin: #0077b5;
 
     .login-form {
         margin-bottom: $baseline;
+
+        &:focus {
+            outline: none;
+        }
     }
 
     .password-reset-form {
         padding-bottom: 25px;
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .register-form {
+        &:focus {
+            outline: none;
+        }
     }
 
     %bold-label {

@@ -20,7 +20,7 @@
     <ul class="message-copy"></ul>
 </div>
 
-<form id="login" class="login-form">
+<form id="login" class="login-form" tabindex="-1">
 
     <div class="section-title lines">
         <h2>

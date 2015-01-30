@@ -119,6 +119,9 @@ var edx = edx || {};
 
                 // Listen for 'password-email-sent' event to toggle sub-views
                 this.listenTo( this.subview.passwordHelp, 'password-email-sent', this.passwordEmailSent );
+
+                // Focus on the form
+                $('.password-reset-form').focus();
             },
 
             register: function( data ) {
@@ -180,6 +183,9 @@ var edx = edx || {};
             // Update url without reloading page
             History.pushState( null, document.title, '/account/' + type + '/' + queryStr );
             analytics.page( 'login_and_registration', type );
+
+            // Focus on the form
+            document.getElementById(type).focus();
         },
 
         /**

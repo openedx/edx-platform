@@ -3,7 +3,7 @@
     <ul class="message-copy"></ul>
 </div>
 
-<form id="register" autocomplete="off">
+<form id="register" class="register-form" autocomplete="off" tabindex="-1">
     <% if (context.currentProvider) { %>
         <div class="status" aria-hidden="false">
             <p class="message-copy">
