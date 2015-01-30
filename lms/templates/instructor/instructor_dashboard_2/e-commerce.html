@@ -305,91 +305,91 @@
 
       if (company_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company name');
+        registration_code_error.text("${_('Please enter the company name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for company name');
+        registration_code_error.text("${_('Please enter the non-numeric value for company name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company contact name');
+        registration_code_error.text("${_('Please enter the company contact name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(company_contact_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for company contact name');
+        registration_code_error.text("${_('Please enter the non-numeric value for company contact name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (company_contact_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the company contact email');
+        registration_code_error.text("${_('Please enter the company contact email')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(company_contact_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the valid email address');
+        registration_code_error.text("${_('Please enter the valid email address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_name == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the recipient name');
+        registration_code_error.text("${_('Please enter the recipient name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (($.isNumeric(recipient_name))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the non-numeric value for recipient name');
+        registration_code_error.text("${_('Please enter the non-numeric value for recipient name')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (recipient_email == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the recipient email');
+        registration_code_error.text("${_('Please enter the recipient email')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (!(validateEmail(recipient_email))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the valid email address');
+        registration_code_error.text("${_('Please enter the valid email address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (address_line == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the billing address');
+        registration_code_error.text("${_('Please enter the billing address')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
       if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the unit price');
+        registration_code_error.text("${_('Please enter the unit price')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for unit price');
+        registration_code_error.text("${_('Please enter the numeric value for unit price')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (total_registration_codes == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the number of enrollment codes');
+        registration_code_error.text("${_('Please enter the number of enrollment codes')}");
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(total_registration_codes))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for number of enrollment codes');
+        registration_code_error.text("${_('Please enter the numeric value for number of enrollment codes')}");
         generate_registration_button.removeAttr('disabled');
         return false;
       }
