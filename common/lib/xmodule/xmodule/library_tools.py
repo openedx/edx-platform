@@ -96,6 +96,12 @@ class LibraryToolsService(object):
         assert isinstance(descriptor, CapaDescriptor)
         return capa_type in descriptor.problem_types
 
+    def can_use_library_content(self, block):
+        """
+        Determines whether a modulestore holding a course_id supports libraries.
+        """
+        return self.store.check_supports(block.location.course_key, 'copy_from_template')
+
     def update_children(self, dest_block, user_id, user_perms=None):
         """
         This method is to be used when any of the libraries that a LibraryContentModule
