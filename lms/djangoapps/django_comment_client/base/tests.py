@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from lms import startup
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
@@ -22,6 +23,7 @@ from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from edx_notifications.lib.consumer import get_notifications_for_user
 
 log = logging.getLogger(__name__)
 
@@ -93,6 +95,9 @@ class ThreadActionGroupIdTestCase(
                 "user_id": str(self.student.id),
                 "group_id": self.student_cohort.id,
                 "closed": False,
+                "title": u'Test Thread',
+                'course_id': self.course.id.to_deprecated_string(),
+                "commentable_id": 'dummy_comment_id',
                 "type": "thread"
             }
         )
@@ -129,6 +134,78 @@ class ThreadActionGroupIdTestCase(
         self._assert_json_response_contains_group_info(response)
         response = self.call_view("undo_vote_for_thread", mock_request)
         self._assert_json_response_contains_group_info(response)
+
+        # since notifications are not enabled so
+        # user notifications are not in the database
+        notifications_for_user = get_notifications_for_user(self.student.id, filters={
+            'namespace': self.course.id.to_deprecated_string()})
+        self.assertEqual(len(notifications_for_user), 0)
+
+    @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
+    @patch('django_comment_client.base.views.permalink', return_value="fake_url_of_thread")
+    def test_save_notification_when_thread_upvoted(self, fake_thread_url, mock_request):
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
+        # create a new user and enroll in the course
+        # so that he can up_vote the thread
+        new_test_user = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=new_test_user, course_id=self.course.id)
+
+        response = self.call_view(
+            "vote_for_thread",
+            mock_request,
+            user=new_test_user,
+            view_args={"value": "up"}
+        )
+
+        self.assertTrue(response.status_code, 200)
+
+        # get the notifications for the user
+        notifications_for_user = get_notifications_for_user(self.student.id, filters={
+            'namespace': self.course.id.to_deprecated_string()})
+        self.assertTrue(len(notifications_for_user), 1)
+        self.assertTrue(notifications_for_user[0].msg.namespace, self.course.id.to_deprecated_string())
+        self.assertTrue(notifications_for_user[0].msg.msg_type.name, u'open-edx.lms.discussions.post-upvoted')
+        self.assertTrue(notifications_for_user[0].msg.payload['thread_title'], u'First Thread')
+        self.assertTrue(notifications_for_user[0].msg.payload['action_user_id'], new_test_user.id)
+        self.assertTrue(notifications_for_user[0].msg.payload['link_to_thread'], fake_thread_url.return_value)
+
+    def test_follow_thread_without_notifications_feature_enabled(self, mock_request):
+        response = self.call_view("follow_thread", mock_request)
+        self.assertTrue(response.status_code, 200)
+        # since notifications are not enabled so
+        # user notifications are not in the database
+        notifications_for_user = get_notifications_for_user(self.student.id, filters={
+            'namespace': self.course.id.to_deprecated_string()})
+        self.assertEqual(len(notifications_for_user), 0)
+
+    @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
+    @patch('django_comment_client.base.views.permalink', return_value="fake_url_of_thread")
+    def test_follow_thread_with_notifications_enabled(self, fake_thread_url, mock_request):
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
+
+        # create a new user and enroll in the course
+        # so that he can follow the thread
+        new_test_user = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=new_test_user, course_id=self.course.id)
+
+        response = self.call_view(
+            "follow_thread",
+            mock_request,
+            user=new_test_user,
+        )
+        self.assertTrue(response.status_code, 200)
+
+        # get the notifications for the user
+        notifications_for_user = get_notifications_for_user(self.student.id, filters={
+            'namespace': self.course.id.to_deprecated_string()})
+        self.assertTrue(len(notifications_for_user), 1)
+        self.assertTrue(notifications_for_user[0].msg.namespace, self.course.id.to_deprecated_string())
+        self.assertTrue(notifications_for_user[0].msg.msg_type.name, u'open-edx.lms.discussions.thread-followed')
+        self.assertTrue(notifications_for_user[0].msg.payload['thread_title'], u'First Thread')
+        self.assertTrue(notifications_for_user[0].msg.payload['action_user_id'], new_test_user.id)
+        self.assertTrue(notifications_for_user[0].msg.payload['link_to_thread'], fake_thread_url.return_value)
 
     def test_flag(self, mock_request):
         response = self.call_view("flag_abuse_for_thread", mock_request)
@@ -911,11 +988,50 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         request = RequestFactory().post("dummy_url", {"body": text})
         request.user = self.student
         request.view_name = "create_comment"
-        response = views.create_comment(request, course_id=self.course.id.to_deprecated_string(), thread_id="dummy_thread_id")
+        response = views.create_comment(
+            request,
+            course_id=self.course.id.to_deprecated_string(),
+            thread_id="dummy_thread_id"
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_request.called)
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
+
+    @patch('lms.lib.comment_client.utils.requests.request')
+    @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
+    @patch('django_comment_client.base.views.permalink', return_value="fake_url_of_thread")
+    def test_create_comment_on_thread_saves_notification_message(self, fake_thread_url, mock_request):
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
+        # create a new user and enroll in the course
+        # so that he can comment on the course thread.
+        new_test_user = UserFactory.create(password='test_pass')
+        CourseEnrollmentFactory(user=new_test_user, course_id=self.course.id)
+
+        self._set_mock_request_data(mock_request, {
+            "user_id": str(self.student.id),
+            "closed": False,
+            "title": 'Test Thread',
+        })
+        text = u'Test Comment on the Thread'
+        request = RequestFactory().post("dummy_url", {"body": text, "auto_subscribe": True})
+        request.user = new_test_user
+        request.view_name = "create_comment"
+        response = views.create_comment(request, course_id=self.course.id.to_deprecated_string(),
+                                        thread_id="dummy_thread_id")
+
+        self.assertEqual(response.status_code, 200)
+
+        # get the notifications for the user
+        notifications_for_user = get_notifications_for_user(self.student.id, filters={
+            'namespace': self.course.id.to_deprecated_string()})
+        self.assertTrue(len(notifications_for_user), 1)
+        self.assertTrue(notifications_for_user[0].msg.namespace, self.course.id.to_deprecated_string())
+        self.assertTrue(notifications_for_user[0].msg.msg_type.name, u'open-edx.lms.discussions.reply-to-thread')
+        self.assertTrue(notifications_for_user[0].msg.payload['thread_title'], u'First Thread')
+        self.assertTrue(notifications_for_user[0].msg.payload['action_user_id'], new_test_user.id)
+        self.assertTrue(notifications_for_user[0].msg.payload['link_to_thread'], fake_thread_url.return_value)
 
 
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
@@ -961,7 +1077,11 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         request = RequestFactory().post("dummy_url", {"body": text})
         request.user = self.student
         request.view_name = "create_sub_comment"
-        response = views.create_sub_comment(request, course_id=self.course.id.to_deprecated_string(), comment_id="dummy_comment_id")
+        response = views.create_sub_comment(
+            request,
+            course_id=self.course.id.to_deprecated_string(),
+            comment_id="dummy_comment_id"
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_request.called)
