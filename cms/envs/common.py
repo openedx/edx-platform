@@ -873,7 +873,7 @@ FILES_AND_UPLOAD_TYPE_FILTERS = {
 }
 
 # Default to no Search Engine
-SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+SEARCH_ENGINE = None
 ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
