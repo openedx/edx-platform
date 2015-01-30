@@ -3,6 +3,7 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
+from opaque_keys import InvalidKeyError
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication
 from rest_framework import permissions
@@ -302,5 +303,12 @@ class EnrollmentListView(APIView):
                         u"An error occurred while creating the new course enrollment for user "
                         u"'{user}' in course '{course_id}'"
                     ).format(user=user, course_id=course_id)
+                }
+            )
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
                 }
             )

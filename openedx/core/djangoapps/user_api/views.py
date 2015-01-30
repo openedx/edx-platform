@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+from opaque_keys import InvalidKeyError
 import third_party_auth
 
 from django.conf import settings
@@ -862,7 +863,14 @@ class UpdateEmailOptInPreference(APIView):
 
         """
         course_id = request.DATA['course_id']
-        org = locator.CourseLocator.from_string(course_id).org
+        try:
+            org = locator.CourseLocator.from_string(course_id).org
+        except InvalidKeyError:
+            return HttpResponse(
+                status=400,
+                content="No course '{course_id}' found".format(course_id=course_id),
+                content_type="text/plain"
+            )
         # Only check for true. All other values are False.
         email_opt_in = request.DATA['email_opt_in'].lower() == 'true'
         profile_api.update_email_opt_in(request.user, org, email_opt_in)
