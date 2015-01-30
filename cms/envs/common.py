@@ -41,7 +41,7 @@ from lms.envs.common import (
 from path import path
 from warnings import simplefilter
 
-from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin, LicenseMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -309,6 +309,7 @@ from xmodule.x_module import XModuleMixin
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
     LmsBlockMixin,
+    LicenseMixin,
     InheritanceMixin,
     XModuleMixin,
     EditInfoMixin,

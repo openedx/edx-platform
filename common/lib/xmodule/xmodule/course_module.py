@@ -15,13 +15,11 @@ from lazy import lazy
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
-from xmodule.license import License
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
 from .fields import Date
 from django.utils.timezone import UTC
-from django.conf import settings
 
 log = logging.getLogger(__name__)
 
@@ -743,20 +741,6 @@ class CourseFields(object):
         display_name=_("Invitation Only"),
         help=_("Whether to restrict enrollment to invitation by the course staff."),
         default=False,
-        scope=Scope.settings
-    )
-
-    license = License(
-        display_name=_("License"),
-        help=_("Select the license for this course. Reserve all rights, some rights, or no rights."),
-        default=None,
-        scope=Scope.settings
-    )
-
-    licensable = Boolean(
-        display_name=_("Licensable"),
-        help=_("Whether this course and its contents can be licensed using Creative Commons Licensing."),
-        default=hasattr(settings, 'FEATURES') and settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False),
         scope=Scope.settings
     )
 
