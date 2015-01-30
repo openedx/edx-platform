@@ -371,25 +371,25 @@
       }
       if (unit_price == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the sale price');
+        registration_code_error.text('Please enter the unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(unit_price))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for sale price');
+        registration_code_error.text('Please enter the numeric value for unit price');
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (total_registration_codes == '') {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the total registration codes');
+        registration_code_error.text('Please enter the number of enrollment codes');
         generate_registration_button.removeAttr('disabled');
         return false
       }
       if (!($.isNumeric(total_registration_codes))) {
         registration_code_error.attr('style', 'display: block !important');
-        registration_code_error.text('Please enter the numeric value for total registration codes');
+        registration_code_error.text('Please enter the numeric value for number of enrollment codes');
         generate_registration_button.removeAttr('disabled');
         return false;
       }
