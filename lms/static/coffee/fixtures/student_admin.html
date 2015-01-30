@@ -1,0 +1,112 @@
+<section id="student_admin" class="idash-section">
+<div class="student-specific-container action-type-container">
+  <h2>${_("Student-specific grade inspection")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-progress" placeholder="${_('Student Email or Username')}">
+  </p>
+  <br>
+
+  <div class="progress-link-wrapper">
+  <p>
+    ${_("Click this link to view the student's progress page:")}
+
+    <a href="" class="progress-link" data-endpoint="${ section_data['get_student_progress_url_url'] }"> ${_("Student Progress Page")} </a>
+  </p>
+  </div>
+
+  <hr>
+</div>
+
+<div class="student-grade-container action-type-container">
+  <h2>${_("Student-specific grade adjustment")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="student-select-grade" placeholder="${_('Student Email or Username')}">
+  </p>
+  <br>
+
+  <p> ${_("Specify a problem in the course here with its complete location:")}
+  <input type="text" name="problem-select-single" placeholder="${_('Problem location')}">
+  </p>
+
+  <p>${_("You must provide the complete location of the problem. In the Staff Debug viewer, the location looks like this:")}<br/>
+  </p>
+
+  <p>
+  ${_("Next, select an action to perform for the given user and problem:")}
+  </p>
+
+  <p>
+  <input type="button" name="reset-attempts-single" value="${_('Reset Student Attempts')}" data-endpoint="${ section_data['reset_student_attempts_url'] }">
+
+
+    <input type="button" name="rescore-problem-single" value="${_('Rescore Student Submission')}" data-endpoint="${ section_data['rescore_problem_url'] }">
+
+  </p>
+
+  <p>
+    <p> ${_('You may also delete the entire state of a student for the specified problem:')} </p>
+    <p><input type="button" class="molly-guard" name="delete-state-single" value="${_('Delete Student State for Problem')}" data-endpoint="${ section_data['reset_student_attempts_url'] }"></p>
+  </p>
+
+
+    <p>
+      ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+      "To see status for all tasks submitted for this problem and student, click on this button:")}
+    </p>
+
+    <p><input type="button" name="task-history-single" value="${_('Show Background Task History for Student')}" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></p>
+    <div class="task-history-single-table"></div>
+  <hr>
+</div>
+
+
+  <div class="entrance-exam-grade-container action-type-container">
+  <h2>${_("Entrance Exam grade adjustment")}</h2>
+  <div class="request-response-error"></div>
+  <p>
+  ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
+  <input type="text" name="entrance-exam-student-select-grade" placeholder="${_('Student Email or Username')}">
+  </p>
+  <br>
+
+  <p>
+  ${_("Next, select an action to perform for the given user's entrance exam grade:")}
+  </p>
+
+  <p>
+  <input type="button" name="reset-entrance-exam-attempts" value="${_('Reset Student Attempts')}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }">
+  <input type="button" name="rescore-entrance-exam" value="${_('Rescore Student Submission')}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
+  </p>
+
+  <p>
+    <p> ${_('You may also delete the entire state of a student for the entrance exam:')} </p>
+    <p><input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_('Delete Student State for entrance exam')}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }"></p>
+  </p>
+
+  <p>
+    ${_("Rescoring runs in the background, and status for active tasks will appear in the 'Pending Instructor Tasks' table. "
+    "To see status for all tasks submitted for this problem and student, click on this button:")}
+  </p>
+
+  <p><input type="button" name="entrance-exam-task-history" value="${_('Show Background Task History for Student')}" data-endpoint="${ section_data['list_entrace_exam_instructor_tasks_url'] }"></p>
+  <div class="entrance-exam-task-history-table"></div>
+  <hr>
+</div>
+
+  <div class="running-tasks-container action-type-container">
+    <hr>
+    <h2> ${_("Pending Instructor Tasks")} </h2>
+    <div class="running-tasks-section">
+      <p>${_("The status for any active tasks appears in a table below.")} </p>
+      <br />
+
+      <div class="running-tasks-table" data-endpoint="${ section_data['list_instructor_tasks_url'] }"></div>
+    </div>
+    <div class="no-pending-tasks-message"></div>
+  </div>
+
+</section>>

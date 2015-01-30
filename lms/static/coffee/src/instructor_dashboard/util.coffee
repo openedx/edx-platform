@@ -264,7 +264,7 @@ class IntervalManager
     @intervalID = null
 
 
-class PendingInstructorTasks
+class @PendingInstructorTasks
   ### Pending Instructor Tasks Section ####
   constructor: (@$section) ->
     # Currently running tasks
