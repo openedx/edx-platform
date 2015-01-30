@@ -633,7 +633,10 @@ def _create_or_rerun_course(request):
         fields = {'start': start}
 
         # Set course license if the licensing is enabled and the course is licensable
-        fields['licensable'] = settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False)
+        fields['licensable'] = (
+            settings.FEATURES.get("CREATIVE_COMMONS_LICENSING", False) and
+            settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False)
+        )
         if fields['licensable']:
             fields['license'] = License().from_json(request.json.get('license'))
 

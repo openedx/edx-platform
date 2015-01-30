@@ -4,7 +4,6 @@ import logging
 import inspect
 
 from path import path
-from django.utils.translation import ugettext as _
 from django.http import Http404
 from django.conf import settings
 

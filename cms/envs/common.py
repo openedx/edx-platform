@@ -155,7 +155,8 @@ FEATURES = {
     'CREATIVE_COMMONS_LICENSING': True,
 
     # The default value for the licensable field of the course module.
-    # This determines whether a course is licensable or not by default, and will do nothing unless CREATIVE_COMMONS_LICENSING is True
+    # This determines whether a course is licensable or not by default.
+    # This will do nothing unless CREATIVE_COMMONS_LICENSING is True
     'DEFAULT_COURSE_LICENSABLE': True,
 }
 

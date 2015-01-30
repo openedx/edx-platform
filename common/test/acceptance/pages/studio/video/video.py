@@ -345,7 +345,8 @@ class VideoComponentPage(VideoPage):
 
         # Clear button should be visible(active class is present) for
         # every setting that don't have 'metadata-videolist-enum' class
-        if 'metadata-videolist-enum' not in setting.get_attribute('class') and 'metadata-license-entry' not in setting.get_attribute('class'):
+        if 'metadata-videolist-enum' not in setting.get_attribute('class') and \
+           'metadata-license-entry' not in setting.get_attribute('class'):
             setting_clear_button = setting.find_elements_by_class_name('setting-clear')[0]
             if 'active' not in setting_clear_button.get_attribute('class'):
                 return False

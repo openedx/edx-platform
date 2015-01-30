@@ -9,9 +9,6 @@ The classes provide utility funcions for dealing with licensing, such as getting
 of a license, a url to a page describing the specifics of the license, converting licenses to and from json
 and storing some vital information about licenses, in particular the version.
 """
-import requests
-from cStringIO import StringIO
-from lxml import etree
 from django.utils.translation import ugettext as _
 
 from xblock.fields import JSONField
@@ -118,9 +115,10 @@ def parse_license(kind_or_license, version=None):
     """
     Return a license object appropriate to the license
 
-    This is a simple utility function to allow for easy conversion between license strings and license objects. It
-    accepts a license string and an optional license version and returns the corresponding license object. It also accounts
-    for the license parameter already being a license object.
+    This is a simple utility function to allow for easy conversion between
+    license strings and license objects. It accepts a license string and an
+    optional license version and returns the corresponding license object.
+    It also accounts for the license parameter already being a license object.
     """
 
     if not kind_or_license:
