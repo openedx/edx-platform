@@ -15,6 +15,7 @@ import logging
 from monkey_patch import django_utils_translation
 import analytics
 from util import keyword_substitution
+from edx_notifications import startup
 
 
 log = logging.getLogger(__name__)
@@ -29,6 +30,9 @@ def run():
     autostartup()
 
     add_mimetypes()
+
+    if settings.FEATURES.get('NOTIFICATIONS_ENABLED', False):
+        startup_notification_subsystem()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
@@ -149,6 +153,13 @@ def enable_third_party_auth():
 
     from third_party_auth import settings as auth_settings
     auth_settings.apply_settings(settings.THIRD_PARTY_AUTH, settings)
+
+
+def startup_notification_subsystem():
+    """
+    Initialize the Notification subsystem
+    """
+    startup.initialize()
 
 
 def get_keyword_function_map():
