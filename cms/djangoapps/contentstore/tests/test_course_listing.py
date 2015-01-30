@@ -18,7 +18,7 @@ from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, Or
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, check_mongo_calls
 from xmodule.modulestore import ModuleStoreEnum
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, CourseLocator
+from opaque_keys.edx.locations import CourseLocator
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
 from course_action_state.models import CourseRerunState
@@ -74,7 +74,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test getting courses with new access group format e.g. 'instructor_edx.course.run'
         """
-        course_location = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_location = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_location, self.user)
 
         # get courses through iterating all courses
@@ -93,7 +93,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         GlobalStaff().add_users(self.user)
 
-        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_key = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_key, self.user)
 
         with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
@@ -112,9 +112,9 @@ class TestCourseListing(ModuleStoreTestCase):
         Test the course list for regular staff when get_course returns an ErrorDescriptor
         """
         GlobalStaff().remove_users(self.user)
-        CourseStaffRole(SlashSeparatedCourseKey('Non', 'Existent', 'Course')).add_users(self.user)
+        CourseStaffRole(self.store.make_course_key('Non', 'Existent', 'Course')).add_users(self.user)
 
-        course_key = SlashSeparatedCourseKey('Org1', 'Course1', 'Run1')
+        course_key = self.store.make_course_key('Org1', 'Course1', 'Run1')
         self._create_course_with_access_groups(course_key, self.user)
 
         with patch('xmodule.modulestore.mongo.base.MongoKeyValueStore', Mock(side_effect=Exception)):
@@ -133,7 +133,7 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         Test getting courses with invalid course location (course deleted from modulestore).
         """
-        course_key = SlashSeparatedCourseKey('Org', 'Course', 'Run')
+        course_key = self.store.make_course_key('Org', 'Course', 'Run')
         self._create_course_with_access_groups(course_key, self.user)
 
         # get courses through iterating all courses
@@ -169,7 +169,7 @@ class TestCourseListing(ModuleStoreTestCase):
             org = 'Org{0}'.format(number)
             course = 'Course{0}'.format(number)
             run = 'Run{0}'.format(number)
-            course_location = SlashSeparatedCourseKey(org, course, run)
+            course_location = self.store.make_course_key(org, course, run)
             if number in user_course_ids:
                 self._create_course_with_access_groups(course_location, self.user)
             else:
@@ -218,14 +218,14 @@ class TestCourseListing(ModuleStoreTestCase):
         """
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
-        course_location = SlashSeparatedCourseKey('testOrg', 'testCourse', 'RunBabyRun')
+        course_location = self.store.make_course_key('testOrg', 'testCourse', 'RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)
 
-        course_location = SlashSeparatedCourseKey('testOrg', 'doomedCourse', 'RunBabyRun')
+        course_location = self.store.make_course_key('testOrg', 'doomedCourse', 'RunBabyRun')
         self._create_course_with_access_groups(course_location, self.user)
         store.delete_course(course_location, self.user.id)
 
-        course_location = SlashSeparatedCourseKey('testOrg', 'erroredCourse', 'RunBabyRun')
+        course_location = self.store.make_course_key('testOrg', 'erroredCourse', 'RunBabyRun')
         course = self._create_course_with_access_groups(course_location, self.user)
         course_db_record = store._find_one(course.location)
         course_db_record.setdefault('metadata', {}).get('tabs', []).append({"type": "wiko", "name": "Wiki"})
@@ -245,14 +245,14 @@ class TestCourseListing(ModuleStoreTestCase):
         Create multiple courses within the same org.  Verify that someone with org-wide permissions can access
         all of them.
         """
-        org_course_one = SlashSeparatedCourseKey('AwesomeOrg', 'Course1', 'RunBabyRun')
+        org_course_one = self.store.make_course_key('AwesomeOrg', 'Course1', 'RunBabyRun')
         CourseFactory.create(
             org=org_course_one.org,
             number=org_course_one.course,
             run=org_course_one.run
         )
 
-        org_course_two = SlashSeparatedCourseKey('AwesomeOrg', 'Course2', 'RunRunRun')
+        org_course_two = self.store.make_course_key('AwesomeOrg', 'Course2', 'RunRunRun')
         CourseFactory.create(
             org=org_course_two.org,
             number=org_course_two.course,

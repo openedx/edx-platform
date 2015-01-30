@@ -31,7 +31,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from xmodule.modulestore.inheritance import own_metadata
 from opaque_keys.edx.keys import UsageKey, CourseKey
-from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation, CourseLocator
+from opaque_keys.edx.locations import AssetLocation, CourseLocator
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory, check_mongo_calls
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -92,7 +92,9 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     Tests which legitimately need to import a course
     """
     def test_no_static_link_rewrites_on_import(self):
-        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_items = import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True
+        )
         course = course_items[0]
 
         handouts_usage_key = course.id.make_usage_key('course_info', 'handouts')
@@ -113,7 +115,9 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         e.g. /about/Fall_2012/effort.html
         while there is a base definition in /about/effort.html
         '''
-        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_items = import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True
+        )
         course_key = course_items[0].id
         effort = self.store.get_item(course_key.make_usage_key('about', 'effort'))
         self.assertEqual(effort.data, '6 hours')
@@ -129,9 +133,12 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         '''
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store, verbose=True)
+        import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store, verbose=True,
+            create_course_if_not_present=True
+        )
 
-        course = self.store.get_course(SlashSeparatedCourseKey('edX', 'toy', '2012_Fall'))
+        course = self.store.get_course(self.store.make_course_key('edX', 'toy', '2012_Fall'))
 
         self.assertIsNotNone(course)
 
@@ -159,7 +166,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         data_dir = TEST_DATA_DIR
         courses = import_from_xml(
             self.store, self.user.id, data_dir, ['course_info_updates'],
-            static_content_store=content_store, verbose=True,
+            static_content_store=content_store, verbose=True, create_course_if_not_present=True
         )
 
         course = courses[0]
@@ -207,10 +214,13 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_rewrite_nonportable_links_on_import(self):
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], static_content_store=content_store)
+        import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'],
+            static_content_store=content_store, create_course_if_not_present=True
+        )
 
         # first check a static asset link
-        course_key = SlashSeparatedCourseKey('edX', 'toy', 'run')
+        course_key = self.store.make_course_key('edX', 'toy', 'run')
         html_module_location = course_key.make_usage_key('html', 'nonportable')
         html_module = self.store.get_item(html_module_location)
         self.assertIn('/static/foo.jpg', html_module.data)
@@ -289,7 +299,7 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         self.check_import(root_dir, content_store, course_id)
 
         # import to different course id
-        new_course_id = SlashSeparatedCourseKey('anotherX', 'anotherToy', 'Someday')
+        new_course_id = self.store.make_course_key('anotherX', 'anotherToy', 'Someday')
         self.check_import(root_dir, content_store, new_course_id)
         self.assertCoursesEqual(course_id, new_course_id)
 
@@ -328,8 +338,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_export_course_with_metadata_only_video(self):
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True)
+        course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
 
         # create a new video module and add it as a child to a vertical
         # this re-creates a bug whereby since the video template doesn't have
@@ -357,8 +367,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['word_cloud'])
-        course_id = SlashSeparatedCourseKey('HarvardX', 'ER22x', '2013_Spring')
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['word_cloud'], create_course_if_not_present=True)
+        course_id = self.store.make_course_key('HarvardX', 'ER22x', '2013_Spring')
 
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
@@ -384,8 +394,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True)
+        course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
 
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
 
@@ -415,16 +425,16 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         """
         content_store = contentstore()
 
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True)
 
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
 
         # Export the course
         root_dir = path(mkdtemp_clean())
         export_to_xml(self.store, content_store, course_id, root_dir, 'test_roundtrip')
 
         # Reimport and get the video back
-        import_from_xml(self.store, self.user.id, root_dir)
+        import_from_xml(self.store, self.user.id, root_dir, create_course_if_not_present=True)
 
         # get the sample HTML with styling information
         html_module = self.store.get_item(course_id.make_usage_key('html', 'with_styling'))
@@ -437,7 +447,9 @@ class ImportRequiredTestCases(ContentStoreTestCase):
     def test_export_course_without_content_store(self):
         # Create toy course
 
-        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_items = import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True
+        )
         course_id = course_items[0].id
 
         root_dir = path(mkdtemp_clean())
@@ -472,8 +484,8 @@ class ImportRequiredTestCases(ContentStoreTestCase):
         exported successfully
         """
         content_store = contentstore()
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
-        course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True)
+        course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
         verticals = self.store.get_items(course_id, qualifiers={'category': 'vertical'})
         vertical = verticals[0]
 
@@ -545,7 +557,6 @@ class MiscCourseTests(ContentStoreTestCase):
             self.user.id, self.vert_loc, 'poll_question', fields={
                 "name": "T1_changemind_poll_foo_2",
                 "display_name": "Change your answer",
-                "reset": False,
                 "question": "Have you changed your mind?",
                 "answers": [{"id": "yes", "text": "Yes"}, {"id": "no", "text": "No"}],
             }
@@ -954,7 +965,7 @@ class ContentStoreTest(ContentStoreTestCase):
         test_course_data.update(self.course_data)
         if number_suffix:
             test_course_data['number'] = '{0}_{1}'.format(test_course_data['number'], number_suffix)
-        course_key = _get_course_id(test_course_data)
+        course_key = _get_course_id(self.store, test_course_data)
         _create_course(self, course_key, test_course_data)
         # Verify that the creator is now registered in the course.
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_key))
@@ -983,12 +994,12 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_create_course_check_forum_seeding(self):
         """Test new course creation and verify forum seeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        self.assertTrue(are_permissions_roles_seeded(_get_course_id(test_course_data)))
+        self.assertTrue(are_permissions_roles_seeded(_get_course_id(self.store, test_course_data)))
 
     def test_forum_unseeding_on_delete(self):
         """Test new course creation and verify forum unseeding """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        course_id = _get_course_id(test_course_data)
+        course_id = _get_course_id(self.store, test_course_data)
         self.assertTrue(are_permissions_roles_seeded(course_id))
         delete_course_and_groups(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
@@ -1001,13 +1012,13 @@ class ContentStoreTest(ContentStoreTestCase):
         second_course_data = self.assert_created_course(number_suffix=uuid4().hex)
 
         # unseed the forums for the first course
-        course_id = _get_course_id(test_course_data)
+        course_id = _get_course_id(self.store, test_course_data)
         delete_course_and_groups(course_id, self.user.id)
         # should raise an exception for checking permissions on deleted course
         with self.assertRaises(ItemNotFoundError):
             are_permissions_roles_seeded(course_id)
 
-        second_course_id = _get_course_id(second_course_data)
+        second_course_id = _get_course_id(self.store, second_course_data)
         # permissions should still be there for the other course
         self.assertTrue(are_permissions_roles_seeded(second_course_id))
 
@@ -1016,7 +1027,7 @@ class ContentStoreTest(ContentStoreTestCase):
         Test that course deletion doesn't remove course enrollments or user's roles
         """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        course_id = _get_course_id(test_course_data)
+        course_id = _get_course_id(self.store, test_course_data)
 
         # test that a user gets his enrollment and its 'student' role as default on creating a course
         self.assertTrue(CourseEnrollment.is_enrolled(self.user, course_id))
@@ -1034,7 +1045,7 @@ class ContentStoreTest(ContentStoreTestCase):
         of all format e.g, 'instructor_edX/Course/Run', 'instructor_edX.Course.Run', 'instructor_Course'
         """
         test_course_data = self.assert_created_course(number_suffix=uuid4().hex)
-        course_id = _get_course_id(test_course_data)
+        course_id = _get_course_id(self.store, test_course_data)
 
         # Add user in possible groups and check that user in instructor groups of this course
         instructor_role = CourseInstructorRole(course_id)
@@ -1063,7 +1074,7 @@ class ContentStoreTest(ContentStoreTestCase):
         """
         test_enrollment = False
         try:
-            course_id = _get_course_id(self.course_data)
+            course_id = _get_course_id(self.store, self.course_data)
             initially_enrolled = CourseEnrollment.is_enrolled(self.user, course_id)
             test_enrollment = True
         except InvalidKeyError:
@@ -1267,7 +1278,9 @@ class ContentStoreTest(ContentStoreTestCase):
             )
             self.assertEqual(resp.status_code, 200)
 
-        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'])
+        course_items = import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_course_if_not_present=True
+        )
         course_key = course_items[0].id
 
         resp = self._show_course_overview(course_key)
@@ -1311,7 +1324,7 @@ class ContentStoreTest(ContentStoreTestCase):
         delete_item(category='chapter', name='chapter_2')
 
     def test_import_into_new_course_id(self):
-        target_course_id = _get_course_id(self.course_data)
+        target_course_id = _get_course_id(self.store, self.course_data)
         _create_course(self, target_course_id, self.course_data)
 
         import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'], target_course_id=target_course_id)
@@ -1336,7 +1349,7 @@ class ContentStoreTest(ContentStoreTestCase):
 
     def test_import_into_new_course_id_wiki_slug_renamespacing(self):
         # If reimporting into the same course do not change the wiki_slug.
-        target_course_id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
+        target_course_id = self.store.make_course_key('edX', 'toy', '2012_Fall')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
@@ -1354,7 +1367,7 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'toy')
 
         # But change the wiki_slug if it is a different course.
-        target_course_id = SlashSeparatedCourseKey('MITx', '111', '2013_Spring')
+        target_course_id = self.store.make_course_key('MITx', '111', '2013_Spring')
         course_data = {
             'org': target_course_id.org,
             'number': target_course_id.course,
@@ -1374,10 +1387,10 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
 
     def test_import_metadata_with_attempts_empty_string(self):
-        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'])
+        import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['simple'], create_course_if_not_present=True)
         did_load_item = False
         try:
-            course_key = SlashSeparatedCourseKey('edX', 'simple', 'problem')
+            course_key = self.store.make_course_key('edX', 'simple', 'problem')
             usage_key = course_key.make_usage_key('problem', 'ps01-simple')
             self.store.get_item(usage_key)
             did_load_item = True
@@ -1396,7 +1409,9 @@ class ContentStoreTest(ContentStoreTestCase):
         self.assertNotEquals(new_discussion_item.discussion_id, '$$GUID$$')
 
     def test_metadata_inheritance(self):
-        course_items = import_from_xml(self.store, self.user.id, TEST_DATA_DIR, ['toy'])
+        course_items = import_from_xml(
+            self.store, self.user.id, TEST_DATA_DIR, ['toy'], create_course_if_not_present=True
+        )
 
         course = course_items[0]
         verticals = self.store.get_items(course.id, qualifiers={'category': 'vertical'})
@@ -1467,7 +1482,8 @@ class ContentStoreTest(ContentStoreTestCase):
             self.user.id,
             TEST_DATA_DIR,
             ['conditional_and_poll'],
-            static_content_store=content_store
+            static_content_store=content_store,
+            create_course_if_not_present=True
         )
 
         course = courses[0]
@@ -1489,7 +1505,7 @@ class ContentStoreTest(ContentStoreTestCase):
     def test_wiki_slug(self):
         """When creating a course a unique wiki_slug should be set."""
 
-        course_key = _get_course_id(self.course_data)
+        course_key = _get_course_id(self.store, self.course_data)
         _create_course(self, course_key, self.course_data)
         course_module = self.store.get_course(course_key)
         self.assertEquals(course_module.wiki_slug, 'MITx.111.2013_Spring')
@@ -1583,7 +1599,7 @@ class RerunCourseTest(ContentStoreTestCase):
         if not destination_course_data:
             destination_course_data = self.destination_course_data
         rerun_course_data.update(destination_course_data)
-        destination_course_key = _get_course_id(destination_course_data)
+        destination_course_key = _get_course_id(self.store, destination_course_data)
 
         # post the request
         course_url = get_url('course_handler', destination_course_key, 'course_key_string')
@@ -1809,6 +1825,6 @@ def _create_course(test, course_key, course_data):
     test.assertEqual(data['url'], course_url)
 
 
-def _get_course_id(course_data, key_class=SlashSeparatedCourseKey):
-    """Returns the course ID (org/number/run)."""
-    return key_class(course_data['org'], course_data['number'], course_data['run'])
+def _get_course_id(store, course_data):
+    """Returns the course ID."""
+    return store.make_course_key(course_data['org'], course_data['number'], course_data['run'])

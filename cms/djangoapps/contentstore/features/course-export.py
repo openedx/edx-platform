@@ -5,7 +5,6 @@
 from lettuce import world, step
 from component_settings_editor_helpers import enter_xml_in_advanced_problem
 from nose.tools import assert_true, assert_equal
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from contentstore.utils import reverse_usage_url
 
 
