@@ -591,6 +591,8 @@ def get_module_system_for_user(user, field_data_cache,
 
     field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
 
+    user_is_staff = has_access(user, u'staff', descriptor.location, course_id)
+
     system = LmsModuleSystem(
         track_function=track_function,
         render_template=render_to_string,
@@ -637,7 +639,7 @@ def get_module_system_for_user(user, field_data_cache,
             'i18n': ModuleI18nService(),
             'fs': xblock.reference.plugins.FSService(),
             'field-data': field_data,
-            'user': DjangoXBlockUserService(user),
+            'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
         },
         get_user_role=lambda: get_user_role(user, course_id),
         descriptor_runtime=descriptor.runtime,
@@ -661,7 +663,7 @@ def get_module_system_for_user(user, field_data_cache,
             make_psychometrics_data_update_handler(course_id, user, descriptor.location)
         )
 
-    system.set(u'user_is_staff', has_access(user, u'staff', descriptor.location, course_id))
+    system.set(u'user_is_staff', user_is_staff)
     system.set(u'user_is_admin', has_access(user, u'staff', 'global'))
 
     # make an ErrorDescriptor -- assuming that the descriptor's system is ok
