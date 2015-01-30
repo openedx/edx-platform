@@ -473,10 +473,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             if self.license:
                 attrs['license'] = self.license.kind
                 attrs['license_version'] = self.license.version
-            elif hasattr(self.descriptor.runtime, 'modulestore'):
-                course_id = self.descriptor.runtime.course_id
+            elif hasattr(self.runtime, 'modulestore'):
+                course_id = self.runtime.course_id
                 if course_id:
-                    course = self.descriptor.runtime.modulestore.get_course(course_id)
+                    course = self.runtime.modulestore.get_course(course_id)
                     if course and course.license:
                         attrs['license'] = course.license.kind
                         attrs['license_version'] = course.license.version
