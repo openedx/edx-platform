@@ -9,7 +9,6 @@ import pytz
 import io
 import json
 import os
-import random
 import requests
 import shutil
 import tempfile
