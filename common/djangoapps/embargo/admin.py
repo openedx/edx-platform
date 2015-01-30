@@ -5,8 +5,14 @@ from django.contrib import admin
 import textwrap
 
 from config_models.admin import ConfigurationModelAdmin
-from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
-from embargo.forms import EmbargoedCourseForm, EmbargoedStateForm, IPFilterForm
+from embargo.models import (
+    EmbargoedCourse, EmbargoedState, IPFilter,
+    CountryAccessRule, RestrictedCourse
+)
+from embargo.forms import (
+    EmbargoedCourseForm, EmbargoedStateForm, IPFilterForm,
+    RestrictedCourseForm
+)
 
 
 class EmbargoedCourseAdmin(admin.ModelAdmin):
@@ -59,6 +65,23 @@ class IPFilterAdmin(ConfigurationModelAdmin):
         }),
     )
 
+
+class CountryAccessRuleInline(admin.StackedInline):
+    """Inline editor for country access rules. """
+    model = CountryAccessRule
+    extra = 1
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+
+class RestrictedCourseAdmin(admin.ModelAdmin):
+    """Admin for configuring course restrictions. """
+    inlines = [CountryAccessRuleInline]
+    form = RestrictedCourseForm
+
+
 admin.site.register(EmbargoedCourse, EmbargoedCourseAdmin)
 admin.site.register(EmbargoedState, EmbargoedStateAdmin)
 admin.site.register(IPFilter, IPFilterAdmin)
+admin.site.register(RestrictedCourse, RestrictedCourseAdmin)

@@ -70,9 +70,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         msg = 'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
-        msg += 'Please recheck that you have supplied a valid course id.'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        self.assertIn(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The EmbargoedCourse could not be created because the data didn't validate."):
             form.save()
@@ -87,9 +85,7 @@ class EmbargoCourseFormTest(ModuleStoreTestCase):
         self.assertFalse(form.is_valid())
 
         msg = 'COURSE NOT FOUND'
-        msg += u' --- Entered course id was: "{0}". '.format(bad_id)
-        msg += 'Please recheck that you have supplied a valid course id.'
-        self.assertEquals(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
+        self.assertIn(msg, form._errors['course_id'][0])  # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(ValueError, "The EmbargoedCourse could not be created because the data didn't validate."):
             form.save()
