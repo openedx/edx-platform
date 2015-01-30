@@ -2,6 +2,8 @@
 // ====================
 
 .view-settings {
+  @include text-align(left);
+  @include direction();
 
   .content-primary, .content-supplementary {
     @include box-sizing(border-box);
@@ -906,6 +908,19 @@
 
         .CodeMirror-sizer {
           top: 4px; /* Vertical alignment for monospace font */
+        }
+
+        .CodeMirror-scroll {
+          @include margin-left(-30px);
+          @include margin-right(0);
+
+          @include padding-left(30px);
+          @include padding-right(0);
+        }
+
+        .CodeMirror-vscrollbar {
+          @include left(0);
+          @include right(auto);
         }
 
         // editor color changes just for JSON

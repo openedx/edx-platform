@@ -15,7 +15,8 @@
     border-radius: ($baseline/5);
     background-color: $gray-l4;
     padding: 7px;
-    text-align: left;
+    @include text-align(left);
+    @include direction();
 
     .modal-content {
       position: relative;
@@ -214,7 +215,7 @@
         .editor-modes {
           width: 48%;
           display: inline-block;
-          text-align: right;
+          @include text-align(right);
 
           .action-item {
             display: inline-block;
