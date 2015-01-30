@@ -76,6 +76,10 @@ from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
 import external_auth.views
+from external_auth.login_and_register import (
+    login as external_auth_login,
+    register as external_auth_register
+)
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
@@ -354,18 +358,10 @@ def _cert_info(user, course, cert_status):
 
 @ensure_csrf_cookie
 def signin_user(request):
-    """
-    This view will display the non-modal login form
-    """
-    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
-            external_auth.views.ssl_get_cert_from_request(request)):
-        # SSL login doesn't require a view, so redirect
-        # branding and allow that to process the login if it
-        # is enabled and the header is in the request.
-        return external_auth.views.redirect_with_get('root', request.GET)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        # If CAS is enabled, redirect auth handling to there
-        return redirect(reverse('cas-login'))
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+    external_auth_response = external_auth_login(request)
+    if external_auth_response is not None:
+        return external_auth_response
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
@@ -391,15 +387,13 @@ def signin_user(request):
 
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
-    """
-    This view will display the non-modal registration form
-    """
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
-        # Redirect to branding to process their certificate if SSL is enabled
-        # and registration is disabled.
-        return external_auth.views.redirect_with_get('root', request.GET)
+
+    external_auth_response = external_auth_register(request)
+    if external_auth_response is not None:
+        return external_auth_response
 
     course_id = request.GET.get('course_id')
     email_opt_in = request.GET.get('email_opt_in')
@@ -918,56 +912,15 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
-# pylint: disable=fixme
-# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
-# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
-# seems Probably Incorrect
-def _parse_course_id_from_string(input_str):
-    """
-    Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
-    @param input_str:
-    @return: the course_id if found, None if not
-    """
-    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
-    if m_obj:
-        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
-    return None
-
-
-def _get_course_enrollment_domain(course_id):
-    """
-    Helper function to get the enrollment domain set for a course with id course_id
-    @param course_id:
-    @return:
-    """
-    course = modulestore().get_course(course_id)
-    if course is None:
-        return None
-
-    return course.enrollment_domain
-
-
 @never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
-    """
-    This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
-    the login path linked from the homepage uses it.
-    """
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        return redirect(reverse('cas-login'))
-    if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so login
-        # directly here
-        return external_auth.views.ssl_login(request)
-    # see if the "next" parameter has been set, whether it has a course context, and if so, whether
-    # there is a course-specific place to redirect
-    redirect_to = request.GET.get('next')
-    if redirect_to:
-        course_id = _parse_course_id_from_string(redirect_to)
-        if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+    external_auth_response = external_auth_login(request)
+    if external_auth_response is not None:
+        return external_auth_response
 
+    redirect_to = request.GET.get('next')
     context = {
         'pipeline_running': 'false',
         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
@@ -1173,7 +1126,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
+    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your email for the activation instructions.")
     return JsonResponse({
         "success": False,
         "value": not_activated_msg,

@@ -2,11 +2,14 @@
 import urllib
 import unittest
 from collections import OrderedDict
+
+import ddt
 from mock import patch
 from django.conf import settings
 from django.core.urlresolvers import reverse
-import ddt
 from django.test.utils import override_settings
+
+from util.testing import UrlResetMixin
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import CourseModeFactory
 from xmodule.modulestore.tests.django_utils import (
@@ -42,10 +45,11 @@ def _third_party_login_url(backend_name, auth_entry, course_id=None, redirect_ur
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class LoginFormTest(ModuleStoreTestCase):
+class LoginFormTest(UrlResetMixin, ModuleStoreTestCase):
     """Test rendering of the login form. """
-
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
+        super(LoginFormTest, self).setUp('lms.urls')
         self.url = reverse("signin_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)
@@ -153,10 +157,11 @@ class LoginFormTest(ModuleStoreTestCase):
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class RegisterFormTest(ModuleStoreTestCase):
+class RegisterFormTest(UrlResetMixin, ModuleStoreTestCase):
     """Test rendering of the registration form. """
-
+    @patch.dict(settings.FEATURES, {"ENABLE_COMBINED_LOGIN_REGISTRATION": False})
     def setUp(self):
+        super(RegisterFormTest, self).setUp('lms.urls')
         self.url = reverse("register_user")
         self.course = CourseFactory.create()
         self.course_id = unicode(self.course.id)

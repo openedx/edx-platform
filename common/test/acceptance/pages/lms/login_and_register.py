@@ -70,7 +70,9 @@ class CombinedLoginAndRegisterPage(PageObject):
     in the bok choy settings.
 
     When enabled, the new page is available from either
-    `/account/login` or `/account/register`.
+    `/login` or `/register`; the new page is also served at
+    `/account/login/` or `/account/register/`, where it was
+    available for a time during an A/B test.
 
     Users can reach this page while attempting to enroll
     in a course, in which case users will be auto-enrolled
