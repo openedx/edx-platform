@@ -6,9 +6,14 @@ from __future__ import absolute_import
 from datetime import datetime
 from pytz import UTC
 from xmodule.partitions.partitions import UserPartition
-from xblock.fields import Scope, Boolean, String, Float, XBlockMixin, Dict, Integer, List
-from xblock.runtime import KeyValueStore, KvsFieldData
+from xblock.fields import (
+    Scope, Boolean, String, Float,
+    XBlockMixin, Dict, Integer, List
+)
 from xmodule.fields import Date, Timedelta
+from xmodule.license import License
+from xblock.runtime import KeyValueStore, KvsFieldData
+
 from django.conf import settings
 
 
@@ -183,6 +188,20 @@ class InheritanceMixin(XBlockMixin):
                "considered in the Entrance Exam scoring/gating algorithm."),
         scope=Scope.settings,
         default=False
+    )
+
+    license = License(
+        display_name=_("License"),
+        help=_("Select the license for this course. Reserve all rights, some rights, or no rights."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    licensable = Boolean(
+        display_name=_("Licensable"),
+        help=_("Whether this course and its contents can be licensed using Creative Commons Licensing."),
+        default=hasattr(settings, 'FEATURES') and settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False),
+        scope=Scope.settings
     )
 
 
