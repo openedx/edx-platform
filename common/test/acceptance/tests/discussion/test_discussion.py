@@ -471,7 +471,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
     def _get_xblock_fixture_desc(self):
         """ Returns Discussion XBlockFixtureDescriptor """
         raise NotImplementedError()
-    
+
     def _get_additional_xblock_fixture_desc(self):
         """ Returns additional Discussion XBlockFixtureDescriptor """
         raise NotImplementedError()
@@ -479,7 +479,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
     def _initial_discussion_id(self):
         """ Returns initial discussion_id for InlineDiscussionPage """
         raise NotImplementedError()
-    
+
     def _additional_discussion_id(self):
         """ Returns initial discussion_id for second discussion for InlineDiscussionPage """
         raise NotImplementedError()
@@ -488,7 +488,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
     def discussion_id(self):
         """ Returns selected discussion_id """
         raise NotImplementedError()
-    
+
     @property
     def additional_discussion_id(self):
         """ Returns additional discussion id for second discussion"""
@@ -517,7 +517,7 @@ class InlineDiscussionTestMixin(BaseDiscussionMixin):
         self.courseware_page.visit()
         self.discussion_page = InlineDiscussionPage(self.browser, self._initial_discussion_id())
         self.additional_discussion_page = InlineDiscussionPage(self.browser, self._additional_discussion_id())
-        
+
 
     def setup_thread_page(self, thread_id):
         self.discussion_page.expand_discussion()
@@ -590,7 +590,7 @@ class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, D
             "Test Discussion",
             metadata={"discussion_id": self.discussion_id}
         )
-    
+
     def _get_additional_xblock_fixture_desc(self):
         """ Returns Discussion XBlockFixtureDescriptor """
         return XBlockFixtureDesc(
@@ -613,7 +613,7 @@ class DiscussionXModuleInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, D
         if getattr(self, '_discussion_id', None) is None:
             self._discussion_id = "test_discussion_{}".format(uuid4().hex)
         return self._discussion_id
-    
+
     @property
     def additional_discussion_id(self):
         """ Returns selected discussion_id for second discussion"""
@@ -651,7 +651,7 @@ class DiscussionXBlockInlineTest(InlineDiscussionTestMixin, UniqueCourseTest, Di
     def discussion_id(self):
         """ Returns selected discussion_id """
         return self.discussion_page.get_discussion_id()
-    
+
     @property
     def additional_discussion_id(self):
         """ Returns additional discussion_id """

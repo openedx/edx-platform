@@ -1491,22 +1491,13 @@ class DiscussionService(object):
         """
         Returns the context to render inline discussion templates.
         """
-        # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
+        # for some reason pylint reports courseware.courses and django_comment_client.forum.views
         # pylint: disable=import-error
-        from django.conf import settings
         from courseware.courses import get_course_with_access
-        from django_comment_client.utils import get_discussion_category_map
 
-        course = get_course_with_access(self.runtime.user, 'load_forum', self.runtime.course_id)
-
-        context = {
-            'user': self.runtime.user,
-            'settings': settings,
-            'course': course,
-            'category_map': get_discussion_category_map(course)
+        return {
+            'course': get_course_with_access(self.runtime.user, 'load_forum', self.runtime.course_id),
         }
-
-        return context
 
 
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method

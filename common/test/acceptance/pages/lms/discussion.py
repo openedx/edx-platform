@@ -335,7 +335,7 @@ class InlineDiscussionPage(PageObject):
 
     def __init__(self, browser, discussion_id=None):
         super(InlineDiscussionPage, self).__init__(browser)
-        if not discussion_id is None:
+        if discussion_id is not None:
             self._discussion_selector = (
                 "body.courseware .discussion-module[data-discussion-id='{discussion_id}'] ".format(
                     discussion_id=discussion_id
