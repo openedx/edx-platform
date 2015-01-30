@@ -29,10 +29,11 @@ __test__ = False  # do not collect
     ("fasttest", "a", "Run without collectstatic"),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
+    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
+], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 def test_system(options):
     """
     Run tests on our djangoapps for lms and cms
@@ -47,6 +48,7 @@ def test_system(options):
         'verbosity': getattr(options, 'verbosity', 1),
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
+        'skip_clean': getattr(options, 'skip_clean', False),
     }
 
     if test_id:
@@ -79,10 +81,11 @@ def test_system(options):
     ("fail_fast", "x", "Run only failed tests"),
     ('extra_args=', 'e', 'adds as extra args to the test command'),
     ('cov_args=', 'c', 'adds as args to coverage for the test run'),
+    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
-])
+], share_with=['pavelib.utils.test.utils.clean_reports_dir'])
 def test_lib(options):
     """
     Run tests for common/lib/ and pavelib/ (paver-tests)
@@ -96,6 +99,7 @@ def test_lib(options):
         'verbosity': getattr(options, 'verbosity', 1),
         'extra_args': getattr(options, 'extra_args', ''),
         'cov_args': getattr(options, 'cov_args', ''),
+        'skip_clean': getattr(options, 'skip_clean', False),
     }
 
     if test_id:
@@ -151,6 +155,9 @@ def test_python(options):
     'pavelib.utils.test.utils.clean_reports_dir',
 )
 @cmdopts([
+    ("suites", "s", "List of unit test suites to run. (js, lib, cms, lms)"),
+    ('extra_args=', 'e', 'adds as extra args to the test command'),
+    ('cov_args=', 'c', 'adds as args to coverage for the test run'),
     make_option("--verbose", action="store_const", const=2, dest="verbosity"),
     make_option("-q", "--quiet", action="store_const", const=0, dest="verbosity"),
     make_option("-v", "--verbosity", action="count", dest="verbosity", default=1),
@@ -160,7 +167,9 @@ def test(options):
     Run all tests
     """
     opts = {
-        'verbosity': getattr(options, 'verbosity', 1)
+        'verbosity': getattr(options, 'verbosity', 1),
+        'extra_args': getattr(options, 'extra_args', ''),
+        'cov_args': getattr(options, 'cov_args', ''),
     }
     # Subsuites to be added to the main suite
     python_suite = suites.PythonTestSuite('Python Tests', **opts)

@@ -90,7 +90,8 @@ class AcceptanceTestSuite(TestSuite):
 
     def __enter__(self):
         super(AcceptanceTestSuite, self).__enter__()
-        test_utils.clean_test_files()
+        if not self.skip_clean:
+            test_utils.clean_test_files()
 
         if not self.fasttest:
             self._setup_acceptance_db()

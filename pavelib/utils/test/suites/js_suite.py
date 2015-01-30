@@ -32,7 +32,8 @@ class JsTestSuite(TestSuite):
     def __enter__(self):
         super(JsTestSuite, self).__enter__()
         self.report_dir.makedirs_p()
-        test_utils.clean_test_files()
+        if not self.skip_clean:
+            test_utils.clean_test_files()
 
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
