@@ -27,3 +27,11 @@ class RequireJSPathOverridesTest(TestCase):
     def test_requirejs_path_overrides(self):
         result = render_require_js_path_overrides(self.OVERRIDES)
         self.assertEqual(result, self.OVERRIDES_JS)
+
+
+class RequireJSPathTest(TestCase):
+    """Test `require_js_path` method. """
+
+    def test_require_js_path(self):
+        result = require_js_path('js/vendor/jquery.min.js')
+        self.assertEqual(result, 'js/vendor/jquery.min')

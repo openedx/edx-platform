@@ -1,45 +1,5 @@
-;(function (require, define) {
-    var paths = {}, config;
-
-    // jquery, underscore, gettext, URI, tinymce, or jquery.tinymce may already
-    // have been loaded and we do not want to load them a second time. Check if
-    // it is the case and use the global var instead.
-    if (window.jQuery) {
-        define("jquery", [], function() {return window.jQuery;});
-    } else {
-        paths.jquery = "js/vendor/jquery.min";
-    }
-    if (window._) {
-        define("underscore", [], function() {return window._;});
-    } else {
-        paths.jquery = "js/vendor/underscore-min";
-    }
-    if (window.gettext) {
-        define("gettext", [], function() {return window.gettext;});
-    } else {
-        paths.gettext = "/i18n";
-    }
-    if (window.Logger) {
-        define("logger", [], function() {return window.Logger;});
-    } else {
-        paths.logger = "js/src/logger";
-    }
-    if (window.URI) {
-        define("URI", [], function() {return window.URI;});
-    } else {
-        paths.URI = "js/vendor/URI.min";
-    }
-    if (window.tinymce) {
-        define('tinymce', [], function() {return window.tinymce;});
-    } else {
-        paths.tinymce = "js/vendor/tinymce/js/tinymce/tinymce.full.min";
-    }
-    if (window.jquery && window.jquery.tinymce) {
-        define("jquery.tinymce", [], function() {return window.jquery.tinymce;});
-    } else {
-        paths.tinymce = "js/vendor/tinymce/js/tinymce/jquery.tinymce.min";
-    }
-    config = {
+;(function () {
+    var config = {
         // NOTE: baseUrl has been previously set in lms/static/templates/main.html
         waitSeconds: 60,
         paths: {
@@ -47,9 +7,11 @@
             "date": "js/vendor/date",
             "backbone": "js/vendor/backbone-min",
             "gettext": "/i18n",
+            "logger": "js/src/logger",
             "jquery": "js/vendor/jquery.min",
             "jquery.cookie": "js/vendor/jquery.cookie",
             "jquery.url": "js/vendor/url.min",
+            "jquery.tinymce": "js/vendor/tinymce/js/tinymce/jquery.tinymce.min",
             "text": "js/vendor/text",
             "underscore": "js/vendor/underscore-min",
             "underscore.string": "js/vendor/underscore.string.min",
@@ -78,6 +40,8 @@
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
             // end of files needed by OVA
+            "URI": "js/vendor/URI.min",
+            "tinymce": "js/vendor/tinymce/js/tinymce/tinymce.full.min"
         },
         shim: {
             "annotator_1.2.9": {
@@ -169,10 +133,5 @@
         }
     };
 
-    for (var key in paths) {
-        if ({}.hasOwnProperty.call(paths, key)) {
-            config.paths[key] = paths[key];
-        }
-    }
-    require.config(config);
-}).call(this, require || RequireJS.require, define || RequireJS.define);
+    this.require = config;
+}).call(this);

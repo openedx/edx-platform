@@ -137,17 +137,8 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
     )
 
     for module, url_path in path_overrides.iteritems():
-        # Calculate the full URL, including any hashes added to the filename by the pipeline.
-        # This will also include the base static URL (for example, "/static/") and the
-        # ".js" extension.
-        actual_url = staticfiles_storage.url(url_path)
-
-        # RequireJS assumes that every file it tries to load has a ".js" extension, so
-        # we need to remove ".js" from the module path.
-        # RequireJS also already has a base URL set to the base static URL, so we can remove that.
-        path = actual_url.replace('.js', '').replace(django_settings.STATIC_URL, '')
-
         # Add the path override to the inline JavaScript.
+        path = require_js_path(url_path)
         html.append(
             "require.paths['{module}'] = '{path}';".format(
                 module=module,
@@ -156,3 +147,18 @@ def render_require_js_path_overrides(path_overrides):  # pylint: disable=invalid
         )
     html.append('</script>')
     return "\n".join(html)
+
+
+def require_js_path(path):
+    """
+    Returns hashed version of the `path (str)`.
+    """
+    # Calculate the full URL, including any hashes added to the filename by the pipeline.
+    # This will also include the base static URL (for example, "/static/") and the
+    # ".js" extension.
+    actual_url = staticfiles_storage.url(path)
+    # RequireJS assumes that every file it tries to load has a ".js" extension, so
+    # we need to remove ".js" from the module path.
+    # RequireJS also already has a base URL set to the base static URL, so we can remove that.
+    path = actual_url.replace('.js', '').replace(django_settings.STATIC_URL, '')
+    return path

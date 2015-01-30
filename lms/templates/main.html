@@ -64,7 +64,7 @@ from microsite_configuration import page_title_breadcrumbs
   ## RequireJS-enabled pages should include the "i18n" module as a requirement.
   ## If RequireJS is not enabled, then we will need to load i18n explicitly
   ## so that JavaScript on the page can use internationalization functions.
-  % if not enable_require_js:
+  % if not enable_require_js_for_page:
   <script type="text/javascript" src="/i18n.js"></script>
   % endif
 
@@ -76,9 +76,15 @@ from microsite_configuration import page_title_breadcrumbs
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  % if enable_require_js:
-    <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script>
+    window.baseUrl = "${settings.STATIC_URL}";
+    require = require || {};
+    require.baseUrl = window.baseUrl;
+  </script>
+  % if enable_require_js_for_page:
     ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
+    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
   % else:
     % if disable_courseware_js:
       <%static:js group='base_vendor'/>
@@ -86,23 +92,7 @@ from microsite_configuration import page_title_breadcrumbs
       <%static:js group='main_vendor'/>
     % endif
   % endif
-
-  <script>
-    window.baseUrl = "${settings.STATIC_URL}";
-    (function (require) {
-    % if settings.DEBUG is True:
-        ## Using what amounts to a random number in the Development environment for cache-busting
-        var urlArgs = "bust=" + (new Date()).getTime();
-    % else:
-        var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
-    % endif
-      require.config({
-          baseUrl: baseUrl,
-          urlArgs: urlArgs
-      });
-    }).call(this, require || RequireJS.require);
-  </script>
-  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
+  <script type="text/javascript" src="${static.url("require-config-lms-overrides.js")}"></script>
 
   <%block name="headextra"/>
 
@@ -178,7 +168,7 @@ from microsite_configuration import page_title_breadcrumbs
   </div>
 
   <script>window.baseUrl = "${settings.STATIC_URL}";</script>
-  % if not enable_require_js and not disable_courseware_js:
+  % if not enable_require_js_for_page and not disable_courseware_js:
     <%static:js group='application'/>
     <%static:js group='module-js'/>
   % endif
