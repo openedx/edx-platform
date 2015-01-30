@@ -1443,7 +1443,7 @@ class DiscussionService(object):
         from django_comment_client.forum.views import get_threads, make_course_settings
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
-        from course_groups.cohorts import get_cohort_id, get_cohorted_commentables
+        from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohorted_commentables
 
         escapedict = {'"': '&quot;'}
 
@@ -1496,30 +1496,15 @@ class DiscussionService(object):
         # pylint: disable=import-error
         from django.conf import settings
         from courseware.courses import get_course_with_access
-        from courseware.access import has_access
-        from django_comment_client.permissions import cached_has_permission
         from django_comment_client.utils import get_discussion_category_map
 
-        course_id = self.runtime.course_id
-        user = self.runtime.user
-
-        course = get_course_with_access(user, 'load_forum', course_id)
-        category_map = get_discussion_category_map(course)
-
-        is_moderator = cached_has_permission(user, "see_all_cohorts", course_id)
-        flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
+        course = get_course_with_access(self.runtime.user, 'load_forum', self.runtime.course_id)
 
         context = {
-            'user': user,
+            'user': self.runtime.user,
             'settings': settings,
             'course': course,
-            'category_map': category_map,
-            'is_moderator': is_moderator,
-            'flag_moderator': flag_moderator,
-            'has_permission_to_create_thread': cached_has_permission(user, "create_thread", course_id),
-            'has_permission_to_create_comment': cached_has_permission(user, "create_comment", course_id),
-            'has_permission_to_create_subcomment': cached_has_permission(user, "create_subcomment", course_id),
-            'has_permission_to_openclose_thread': cached_has_permission(user, "openclose_thread", course_id)
+            'category_map': get_discussion_category_map(course)
         }
 
         return context
