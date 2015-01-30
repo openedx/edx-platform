@@ -8,6 +8,7 @@ import shutil
 from StringIO import StringIO
 import tarfile
 from tempfile import mkdtemp
+import factory
 
 from django.conf import settings
 from django.core.management import call_command
@@ -53,15 +54,14 @@ class CommandsTestBase(TestCase):
         """Load test courses and return list of ids"""
         store = modulestore()
 
-        # Add a course with a unicode name, if the modulestore
-        # supports adding modules.
-        if hasattr(store, 'create_xmodule'):
-            CourseFactory.create(
-                org=u'ëḋẌ',
-                course=u'śíḿṕĺé',
-                display_name=u'2012_Fáĺĺ',
-                modulestore=store
-            )
+        # Add a course with a unicode name.
+        unique_org = factory.Sequence(lambda n: u'ëḋẌ.%d' % n)
+        CourseFactory.create(
+            org=unique_org,
+            course=u'śíḿṕĺé',
+            display_name=u'2012_Fáĺĺ',
+            modulestore=store
+        )
 
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
