@@ -78,6 +78,7 @@ CELERYD_PREFETCH_MULTIPLIER = 1
 # Skip djcelery migrations, since we don't use the database as the broker
 SOUTH_MIGRATION_MODULES = {
     'djcelery': 'ignore',
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
 }
 
 # Rename the exchange and queues for each variant
