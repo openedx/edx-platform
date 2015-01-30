@@ -45,17 +45,17 @@ class Migration(SchemaMigration):
         # Adding field 'CourseRegistrationCode.invoice_item'
         db.add_column('shoppingcart_courseregistrationcode', 'invoice_item',
                       self.gf('django.db.models.fields.related.ForeignKey')(to=orm['shoppingcart.CourseRegistrationCodeInvoiceItem'], null=True),
-                      keep_default=False)
+                      keep_default=True)
 
         # Adding field 'Invoice.created'
         db.add_column('shoppingcart_invoice', 'created',
                       self.gf('model_utils.fields.AutoCreatedField')(default=datetime.datetime.now),
-                      keep_default=False)
+                      keep_default=True)
 
         # Adding field 'Invoice.modified'
         db.add_column('shoppingcart_invoice', 'modified',
                       self.gf('model_utils.fields.AutoLastModifiedField')(default=datetime.datetime.now),
-                      keep_default=False)
+                      keep_default=True)
 
 
     def backwards(self, orm):
