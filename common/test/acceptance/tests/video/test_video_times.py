@@ -111,22 +111,15 @@ class VideoTimesTest(VideoBaseTest):
     def test_video_end_time_and_finish_time(self):
         """
         Scenario: Youtube video works after pausing at end time and then plays again from End Time to the end.
-        Given we have a video in "Youtube" mode with start time set to 00:01:41 and end_time set to 00:01:42
+        Given we have a video in "Youtube" mode with start time set to 00:02:14 and end_time set to 00:02:15
         And I click video button "play"
         And I wait until video stop playing
-        Then I see video slider at "1:42" position
+        Then I see video slider at "2:15" position
         And I click video button "play"
         And I wait until video stop playing
-        Then I see video slider at "1:54" position
-        # NOTE: The above video duration(1:54) is disputed because
-        # 1. Our Video Player first shows Video Duration equals to 1 minute and 56 sec and then 1 minute and 54 sec
-        # 2  YouTube first shows duration of 1 minute and 56 seconds and then changes duration to 1 minute and 55 sec
-        #
-        # The 1:56 time is the duration from metadata. 1:54 time is the duration reported by the video API once
-        # the video starts playing. BUT sometime video API gives duration equals 1 minute and 55 second.
-
+        Then I see video slider at "2:20" position
         """
-        data = {'start_time': '00:01:41', 'end_time': '00:01:42'}
+        data = {'start_time': '00:02:14', 'end_time': '00:02:15'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
 
         # go to video
@@ -137,14 +130,14 @@ class VideoTimesTest(VideoBaseTest):
         # wait until video stop playing
         self.video.wait_for_state('pause')
 
-        self.assertEqual(self.video.position, '1:42')
+        self.assertEqual(self.video.position, '2:15')
 
         self.video.click_player_button('play')
 
         # wait until video stop playing
         self.video.wait_for_state('finished')
 
-        self.assertIn(self.video.position, ['1:54', '1:55'])
+        self.assertEqual(self.video.position, '2:20')
 
     def test_video_end_time_with_seek(self):
         """
@@ -174,18 +167,11 @@ class VideoTimesTest(VideoBaseTest):
     def test_video_finish_time_with_seek(self):
         """
         Scenario: Finish Time works for Youtube video.
-        Given it has a video in "Youtube" mode with end-time at 1:00, the video starts playing from 1:42
-        And I seek video to "1:42" position
+        Given it has a video in "Youtube" mode with end-time at 1:00, the video starts playing from 2:15
+        And I seek video to "2:15" position
         And I click video button "play"
         And I wait until video stop playing
-        Then I see video slider at "1:54" position
-        # NOTE: The above video duration(1:54) is disputed because
-        # 1. Our Video Player first shows Video Duration equals to 1 minute and 56 sec and then 1 minute and 54 sec
-        # 2  YouTube first shows duration of 1 minute and 56 seconds and then changes duration to 1 minute and 55 sec
-        #
-        # The 1:56 time is the duration from metadata. 1:54 time is the duration reported by the video API once
-        # the video starts playing. BUT sometime video API gives duration equals 1 minute and 55 second.
-
+        Then I see video slider at "2:20" position
         """
         data = {'end_time': '00:01:00'}
         self.metadata = self.metadata_for_mode('youtube', additional_data=data)
@@ -193,11 +179,11 @@ class VideoTimesTest(VideoBaseTest):
         # go to video
         self.navigate_to_video()
 
-        self.video.seek('1:42')
+        self.video.seek('2:15')
 
         self.video.click_player_button('play')
 
         # wait until video stop playing
         self.video.wait_for_state('finished')
 
-        self.assertIn(self.video.position, ['1:54', '1:55'])
+        self.assertEqual(self.video.position, '2:20')
