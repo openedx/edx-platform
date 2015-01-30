@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -1428,6 +1429,10 @@ class DiscussionService(object):
     def __init__(self, runtime):
         self.runtime = runtime
 
+    @staticmethod
+    def _escape_json(value):
+        return saxutils.escape(json.dumps(value), {'"': '&quot;'})
+
     def get_course_template_context(self):
         """
         Returns the context to render the course-level discussion templates.
@@ -1435,7 +1440,6 @@ class DiscussionService(object):
         """
         # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
         # pylint: disable=import-error
-        import json
         from django.http import HttpRequest
         import lms.lib.comment_client as cc
         from courseware.access import has_access
@@ -1443,9 +1447,7 @@ class DiscussionService(object):
         from django_comment_client.forum.views import get_threads, make_course_settings
         from django_comment_client.permissions import cached_has_permission
         import django_comment_client.utils as utils
-        from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id, get_cohorted_commentables
-
-        escapedict = {'"': '&quot;'}
+        from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
 
         request = HttpRequest()
         user = self.runtime.user
@@ -1461,7 +1463,6 @@ class DiscussionService(object):
         flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
 
         annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
-        cohorted_commentables = get_cohorted_commentables(course_id)
 
         course_settings = make_course_settings(course)
 
@@ -1470,20 +1471,18 @@ class DiscussionService(object):
             'course': course,
             'course_id': course_id,
             'staff_access': has_access(user, 'staff', course),
-            'threads': saxutils.escape(json.dumps(threads), escapedict),
+            'threads': self._escape_json(threads),
             'thread_pages': query_params['num_pages'],
-            'user_info': saxutils.escape(json.dumps(user_info), escapedict),
+            'user_info': self._escape_json(user_info),
             'flag_moderator': flag_moderator,
-            'annotated_content_info': saxutils.escape(json.dumps(annotated_content_info), escapedict),
+            'annotated_content_info': self._escape_json(annotated_content_info),
             'category_map': course_settings['category_map'],
-            'roles': saxutils.escape(json.dumps(utils.get_role_ids(course_id)), escapedict),
+            'roles': self._escape_json(utils.get_role_ids(course_id)),
             'is_moderator': cached_has_permission(user, "see_all_cohorts", course_id),
             'cohorts': course_settings['cohorts'],
             'user_cohort': user_cohort_id,
             'sort_preference': user_info['default_sort_key'],
-            'cohorted_commentables': cohorted_commentables,
-            'is_course_cohorted': course_settings['is_cohorted'],
-            'course_settings': saxutils.escape(json.dumps(course_settings), escapedict)
+            'course_settings': self._escape_json(course_settings)
         }
 
         return context
