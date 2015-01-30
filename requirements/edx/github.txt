@@ -41,3 +41,6 @@
 -e git+https://github.com/mitodl/edx-sga@7e308cf676b6f41493d9cf7864296bc1c089b36b#egg=edx-sga
 -e git+https://github.com/edx-solutions/xblock-ooyala.git@32d52edaa820dbdbf846d8a84f6bccbf0b9c8218#egg=xblock_ooyala_player-master
 -e git+https://github.com/Stanford-Online/DoneXBlock.git@972d5e54a0422e9c6d822473c9bad14f16484d0f#egg=done-xblock
+-e git+https://github.com/edx-solutions/xblock-utils.git@0c636f244abf1161e915ed6d15f0ef589dcd2a4e#egg=xblock-utils
+-e git+https://github.com/edx-solutions/xblock-google-drive.git@31a811911612e87244f760f483998867e4883565#egg=xblock-google-drive
+-e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@3e832c783709695f2f28e92c2f22f53faa146069#egg=xblock-submit-and-compare

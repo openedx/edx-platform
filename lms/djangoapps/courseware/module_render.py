@@ -486,8 +486,7 @@ def get_module_system_for_user(user, field_data_cache,
     # Add button for in-line analytics answer distribution
     if getattr(settings, 'ANALYTICS_ANSWER_DIST_URL'):
         if has_access(user, 'staff', descriptor, course_id):
-            has_instructor_access = has_access(user, 'instructor', descriptor, course_id)
-            block_wrappers.append(partial(add_inline_analytics, user, has_instructor_access))
+            block_wrappers.append(partial(add_inline_analytics, user))
 
     # These modules store data using the anonymous_student_id as a key.
     # To prevent loss of data, we will continue to provide old modules with

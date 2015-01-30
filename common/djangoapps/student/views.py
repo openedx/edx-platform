@@ -96,6 +96,7 @@ import dogstats_wrapper as dog_stats_api
 from util.db import commit_on_success_with_read_committed
 from util.json_request import JsonResponse
 from util.bad_request_rate_limiter import BadRequestRateLimiter
+from util.keyword_substitution import substitute_keywords_with_data
 
 from microsite_configuration import microsite
 
@@ -952,6 +953,7 @@ def notify_enrollment_by_email(course, user, request):
                 message = get_course_about_section(course, 'pre_enrollment_email')
 
             subject = ''.join(subject.splitlines())
+            message = substitute_keywords_with_data(message, user.id, course.id)
             user.email_user(subject, message, from_address)
 
         except Exception:

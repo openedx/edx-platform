@@ -1151,13 +1151,22 @@ def get_analytics_answer_dist(request):
     module_id = all_data['module_id']
     question_types_by_part = all_data['question_types_by_part']
     num_options_by_part = all_data['num_options_by_part']
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(all_data['course_id'])
+
+    # Check user is enrolled as a staff member of this course
+    try:
+        course = get_course_with_access(request.user, 'staff', course_key, depth=None)
+    except Http404:
+        return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
+
+    having_access = has_access(request.user, 'staff', course)
 
     # Contruct API call
     url = getattr(settings, 'ANALYTICS_ANSWER_DIST_URL')
     if url:
         url = url.format(module_id=module_id)
 
-    if not request.user.is_staff or not url:
+    if not having_access or not url:
         return HttpResponseServerError(_('A problem has occurred retrieving the data, please report the problem.'))
 
     api_secret = getattr(settings, 'ANALYTICS_DATA_TOKEN')

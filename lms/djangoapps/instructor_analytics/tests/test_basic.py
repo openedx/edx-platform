@@ -16,7 +16,7 @@ from shoppingcart.models import CourseRegistrationCode, RegistrationCodeRedempti
 
 from instructor_analytics.basic import (
     sale_record_features, sale_order_record_features, enrolled_students_features, course_registration_features,
-    coupon_codes_features, student_submissions, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
+    coupon_codes_features, student_responses, AVAILABLE_FEATURES, STUDENT_FEATURES, PROFILE_FEATURES,
 )
 from course_groups.tests.helpers import CohortFactory
 from courseware.tests.factories import InstructorFactory
@@ -274,7 +274,7 @@ class TestCourseRegistrationCodeAnalyticsBasic(ModuleStoreTestCase):
 
 @override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
 class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
-    """ Test basic student submissions analytics function. """
+    """ Test basic student responses analytics function. """
     def load_course(self, course_id):
         course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
         self.course = get_course(course_key)
@@ -287,50 +287,14 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
         self.course = CourseFactory.create()
         self.create_student()
 
-        header, datarows = student_submissions(self.course, all_students=True)
-        self.assertEqual(header, ["Section","Subsection","Unit","Problem",self.student.username])
+        datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
 
     def test_full_course_no_students(self):
         self.load_course('edX/simple/2012_Fall')
 
-        header, datarows = student_submissions(self.course, all_students=True)
-        self.assertEqual(header, [])
+        datarows = list(student_responses(self.course))
         self.assertEqual(datarows, [])
-
-    def test_unicode_submissions(self):
-        self.load_course('edX/graded/2012_Fall')
-        self.problem_location = Location("edX", "graded", "2012_Fall", "problem", "H1P2")
-
-        self.create_student()
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_state_key=self.problem_location,
-            student=self.student,
-            grade=0,
-            state=u'{"student_answers":{"fake-problem":"caf\xe9"}}'
-        )
-
-        header, datarows = student_submissions(self.course)
-        #One data row means the answer was successfully encoded and appended
-        self.assertEqual(len(datarows), 1)
-
-    def test_unicode_course(self):
-        self.load_course('edX/unicode_graded/2012_Fall')
-        self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
-
-        self.create_student()
-        StudentModuleFactory.create(
-            course_id=self.course.id,
-            module_state_key=self.problem_location,
-            student=self.student,
-            grade=0,
-            state=u'{"student_answers":{"fake-problem":"No idea"}}'
-        )
-
-        header, datarows = student_submissions(self.course)
-        #One data row means the answer was successfully encoded and appended
-        self.assertEqual(len(datarows), 1)
 
     def test_invalid_module_state(self):
         self.load_course('edX/graded/2012_Fall')
@@ -345,6 +309,6 @@ class TestStudentSubmissionsAnalyticsBasic(ModuleStoreTestCase):
             state=u'{"student_answers":{"fake-problem":"No idea"}}}'
         )
 
-        header, datarows = student_submissions(self.course)
-        #Invalid module state submission will be skipped, so datarows should be empty
+        datarows = list(student_responses(self.course))
+        #Invalid module state response will be skipped, so datarows should be empty
         self.assertEqual(len(datarows), 0)

@@ -31,6 +31,17 @@ class Command(BaseCommand):
     """
 
     option_list = BaseCommand.option_list + (
+        make_option('-k', '--keep-existing',
+                    dest='keep_current',
+                    action='store_true',
+                    default=False,
+                    help='Preserve existing certs for users who fail to'
+                    'earn by revised standards (implies --regen-downloadable)'),
+        make_option('-d', '--regen-downloadable',
+                    dest='regen_downloadable',
+                    action='store_true',
+                    default=False,
+                    help='Re-grade users whose certificates are downloadable'),
         make_option('-n', '--noop',
                     action='store_true',
                     dest='noop',
@@ -63,10 +74,14 @@ class Command(BaseCommand):
         # status is in the unavailable state, can be set
         # to something else with the force flag
 
+        if options['keep_current']:
+            options['regen_downloadable'] = True
         if options['force']:
             valid_statuses = getattr(CertificateStatuses, options['force'])
         else:
             valid_statuses = [CertificateStatuses.unavailable]
+        if options['regen_downloadable']:
+            valid_statuses.append(CertificateStatuses.downloadable)
 
         # Print update after this many students
 
@@ -116,6 +131,6 @@ class Command(BaseCommand):
                         student, course_key)['status'] in valid_statuses:
                     if not options['noop']:
                         # Add the certificate request to the queue
-                        ret = xq.add_cert(student, course_key, course=course)
+                        ret = xq.add_cert(student, course_key, course=course, keep_current=options['keep_current'])
                         if ret == 'generating':
                             print '{0} - {1}'.format(student, ret)
