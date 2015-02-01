@@ -97,7 +97,7 @@ reviewing and merging your work.
 
 You'll also need to add yourself to the `AUTHORS` file when you submit your
 first pull request.  You should add your full name as well as the email address
-associated with your Github account.  Please update `AUTHORS` in an individual
+associated with your GitHub account.  Please update `AUTHORS` in an individual
 commit, distinct from other changes in the pull request (it's OK for a pull
 request to contain multiple commits, including a commit to `AUTHORS`).
 Alternatively, you can open up a separate PR just to have your name added to
@@ -105,7 +105,7 @@ the `AUTHORS` file, and link that PR to the PR with your changes.
 
 Step 2: Fork, Commit, and Pull Request
 ======================================
-Github has some great documentation on `how to fork a git repository`_. Once
+GitHub has some great documentation on `how to fork a git repository`_. Once
 you've done that, make your changes and `send us a pull request`_! Be sure to
 include a detailed description for your pull request, so that a community
 manager can understand *what* change you're making, *why* you're making it, *how*
@@ -184,7 +184,7 @@ By opening up a pull request, we expect the following things:
    will close it. You are welcome to re-open it when you are ready to engage.
 
 ############################
-Expections You Have of Us
+Expectations You Have of Us
 ############################
 
 1. Within a week of opening up a pull request, one of our community managers
