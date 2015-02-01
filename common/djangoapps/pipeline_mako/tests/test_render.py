@@ -1,7 +1,7 @@
 """Tests for rendering functions in the mako pipeline. """
 
 from django.test import TestCase
-from pipeline_mako import render_require_js_path_overrides
+from pipeline_mako import render_require_js_path_overrides, require_js_path
 
 
 class RequireJSPathOverridesTest(TestCase):
