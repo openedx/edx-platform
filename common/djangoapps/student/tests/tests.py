@@ -299,8 +299,14 @@ class DashboardTest(ModuleStoreTestCase):
             recipient_name='Testw_1', recipient_email='test2@test.com', internal_reference="A",
             course_id=self.course.id, is_valid=False
         )
+        invoice_item = shoppingcart.models.CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=sale_invoice_1,
+            qty=1,
+            unit_price=1234.32,
+            course_id=self.course.id
+        )
         course_reg_code = shoppingcart.models.CourseRegistrationCode(
-            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, mode_slug='honor'
+            code="abcde", course_id=self.course.id, created_by=self.user, invoice=sale_invoice_1, invoice_item=invoice_item, mode_slug='honor'
         )
         course_reg_code.save()
 

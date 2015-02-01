@@ -6,7 +6,7 @@ Serve miscellaneous course and student data
 import json
 from shoppingcart.models import (
     PaidCourseRegistration, CouponRedemption, Invoice, CourseRegCodeItem,
-    OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode
+    OrderTypes, RegistrationCodeRedemption, CourseRegistrationCode, CourseRegistrationCodeInvoiceItem
 )
 from django.db.models import Q
 from django.conf import settings
@@ -110,22 +110,25 @@ def sale_record_features(course_id, features):
         {'company_name': 'group_C', 'total_codes': '3', total_amount:'total_amount3 in decimal'.}
     ]
     """
-    sales = Invoice.objects.filter(course_id=course_id)
+    sales = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').filter(course_id=course_id)
 
     def sale_records_info(sale, features):
-        """ convert sales records to dictionary """
+        """
+        Convert sales records to dictionary
 
+        """
+        invoice = sale.invoice
         sale_features = [x for x in SALE_FEATURES if x in features]
         course_reg_features = [x for x in COURSE_REGISTRATION_FEATURES if x in features]
 
         # Extracting sale information
-        sale_dict = dict((feature, getattr(sale, feature))
+        sale_dict = dict((feature, getattr(invoice, feature))
                          for feature in sale_features)
 
         total_used_codes = RegistrationCodeRedemption.objects.filter(
             registration_code__in=sale.courseregistrationcode_set.all()
         ).count()
-        sale_dict.update({"invoice_number": getattr(sale, 'id')})
+        sale_dict.update({"invoice_number": getattr(invoice, 'id')})
         sale_dict.update({"total_codes": sale.courseregistrationcode_set.all().count()})
         sale_dict.update({'total_used_codes': total_used_codes})
 
@@ -261,11 +264,11 @@ def course_registration_features(features, registration_codes, csv_type):
 
         course_registration_dict = dict((feature, getattr(registration_code, feature)) for feature in registration_features)
         course_registration_dict['company_name'] = None
-        if registration_code.invoice:
-            course_registration_dict['company_name'] = getattr(registration_code.invoice, 'company_name')
+        if registration_code.invoice_item:
+            course_registration_dict['company_name'] = getattr(registration_code.invoice_item.invoice, 'company_name')
         course_registration_dict['redeemed_by'] = None
-        if registration_code.invoice:
-            sale_invoice = Invoice.objects.get(id=registration_code.invoice_id)
+        if registration_code.invoice_item:
+            sale_invoice = registration_code.invoice_item.invoice
             course_registration_dict['invoice_id'] = sale_invoice.id
             course_registration_dict['purchaser'] = sale_invoice.recipient_name
             course_registration_dict['customer_reference_number'] = sale_invoice.customer_reference_number
