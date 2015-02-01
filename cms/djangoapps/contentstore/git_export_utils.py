@@ -32,7 +32,7 @@ class GitExportError(Exception):
 
     NO_EXPORT_DIR = _("GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
-                      "GIT_REPO_EXPORT_DIR".format(GIT_REPO_EXPORT_DIR))
+                      "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
     URL_BAD = _('Non writable git url provided. Expecting something like:'
                 ' git@github.com:mitocw/edx4edx_lite.git')
     URL_NO_AUTH = _('If using http urls, you must provide the username '

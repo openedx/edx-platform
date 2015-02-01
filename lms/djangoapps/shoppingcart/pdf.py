@@ -239,7 +239,7 @@ class PDFInvoice(object):
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Order/Invoice No.
         self.pdf.drawString(horizontal_padding_from_border, y_pos,
-                            _(u'{id_label} # {item_id}'.format(id_label=id_label, item_id=self.item_id)))
+                            _(u'{id_label} # {item_id}').format(id_label=id_label, item_id=self.item_id))
         y_pos = y_pos - font_size / 2 - vertical_padding
         # Draw Date
         self.pdf.drawString(

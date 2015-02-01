@@ -374,7 +374,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     except Exception as ex:
                         log.exception(type(ex).__name__)
                         row_errors.append({
-                            'username': username, 'email': email, 'response': _(type(ex).__name__)})
+                            'username': username, 'email': email, 'response': type(ex).__name__})
                     else:
                         # It's a new user, an email will be sent to each newly created user.
                         email_params['message'] = 'account_creation_and_enrollment'
@@ -887,7 +887,7 @@ def sale_validation(request, course_id):
     try:
         obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
     except Invoice.DoesNotExist:
-        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
+        return HttpResponseNotFound(_("Invoice number '{0}' does not exist.").format(invoice_number))
 
     if event_type == "invalidate":
         return invalidate_invoice(obj_invoice)
