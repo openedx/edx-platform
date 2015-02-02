@@ -16,6 +16,8 @@ class Migration(DataMigration):
                 orm.CountryAccessRule.objects.get_or_create(
                     country=country_model,
                     rule_type='blacklist',
+                    enroll_msg_key='embargo',
+                    access_msg_key='embargo',
                     restricted_course=new_course
                 )
 
