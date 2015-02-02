@@ -16,7 +16,8 @@ from student.tests.factories import UserFactory
 
 from common import visit_scenario_item
 
-TEST_COURSE_NAME="test_course_a"
+TEST_COURSE_NAME = "test_course_a"
+
 
 @step('I view the LTI and error is shown$')
 def lti_is_not_rendered(_step):
@@ -271,10 +272,12 @@ def check_lti_popup(parent_window):
     # For verification, iterate through the window titles and make sure that
     # both are there.
     tabs = []
+    expected_tabs = [u'LTI | Test Section | {0} Courseware | edX'.format(TEST_COURSE_NAME), u'TEST TITLE']
+
     for window in windows:
         world.browser.switch_to_window(window)
         tabs.append(world.browser.title)
-    assert_equal(tabs, [u'LTI | Test Section | test_course_a Courseware | edX', u'TEST TITLE'])
+    assert_equal(tabs, expected_tabs)   # pylint: disable=no-value-for-parameter
 
     # Now verify the contents of the LTI window (which is the 2nd window/tab)
     # Note: The LTI opens in a new browser window, but Selenium sticks with the
