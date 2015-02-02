@@ -137,6 +137,7 @@ class CourseFixture(XBlockContainerFixture):
         self._updates = []
         self._handouts = []
         self._assets = []
+        self._textbooks = []
         self._advanced_settings = {}
         self._course_key = None
 
@@ -165,6 +166,12 @@ class CourseFixture(XBlockContainerFixture):
         """
         self._assets.extend(asset_name)
 
+    def add_textbook(self, book_title, chapters):
+        """
+        Add textbook to the list of textbooks to be added when the install method is called.
+        """
+        self._textbooks.append({"chapters": chapters, "tab_title": book_title})
+
     def add_advanced_settings(self, settings):
         """
         Adds advanced settings to be set on the course when the install method is called.
@@ -181,6 +188,7 @@ class CourseFixture(XBlockContainerFixture):
         self._create_course()
         self._install_course_updates()
         self._install_course_handouts()
+        self._install_course_textbooks()
         self._configure_course()
         self._upload_assets()
         self._add_advanced_settings()
@@ -351,6 +359,21 @@ class CourseFixture(XBlockContainerFixture):
             if not upload_response.ok:
                 raise FixtureError('Could not upload {asset_name} with {url}. Status code: {code}'.format(
                     asset_name=asset_name, url=url, code=upload_response.status_code))
+
+    def _install_course_textbooks(self):
+        """
+        Add textbooks to the course, if any are configured.
+        """
+        url = STUDIO_BASE_URL + '/textbooks/' + self._course_key
+
+        for book in self._textbooks:
+            payload = json.dumps(book)
+            response = self.session.post(url, headers=self.headers, data=payload)
+
+            if not response.ok:
+                raise FixtureError(
+                    "Could not add book to course: {0} with {1}.  Status was {2}".format(
+                        book, url, response.status_code))
 
     def _add_advanced_settings(self):
         """
