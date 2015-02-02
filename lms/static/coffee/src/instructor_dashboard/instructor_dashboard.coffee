@@ -91,7 +91,7 @@ $ =>
 # handles hiding and showing sections
 setup_instructor_dashboard = (idash_content) =>
   # clickable section titles
-  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a')
+  $links = idash_content.find(".#{CSS_INSTRUCTOR_NAV}").find('a.instructor-dashboard-link')
 
   # attach link click handlers
   $links.each (i, link) ->
