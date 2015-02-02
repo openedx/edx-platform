@@ -558,7 +558,9 @@ class TextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook.title,
                 tab_id='textbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('book', args=[course.id.to_deprecated_string(), index]),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'book', args=[course.id.to_deprecated_string(), index]
+                ),
             )
 
 
@@ -578,7 +580,9 @@ class PDFTextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook['tab_title'],
                 tab_id='pdftextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('pdf_book', args=[course.id.to_deprecated_string(), index]),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'pdf_book', args=[course.id.to_deprecated_string(), index]
+                ),
             )
 
 
@@ -598,7 +602,9 @@ class HtmlTextbookTabs(TextbookTabsBase):
             yield SingleTextbookTab(
                 name=textbook['tab_title'],
                 tab_id='htmltextbook/{0}'.format(index),
-                link_func=lambda course, reverse_func: reverse_func('html_book', args=[course.id.to_deprecated_string(), index]),
+                link_func=lambda course, reverse_func, index=index: reverse_func(
+                    'html_book', args=[course.id.to_deprecated_string(), index]
+                ),
             )
 
 
