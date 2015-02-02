@@ -229,6 +229,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Add a verified mode to the course
         ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
 
+    @skip("Flaky 02/02/2015")
     def test_immediate_verification_enrollment(self):
         # Create a user and log them in
         AutoAuthPage(self.browser).visit()
