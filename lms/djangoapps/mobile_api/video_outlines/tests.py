@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Tests for video outline API
 """
@@ -100,11 +101,11 @@ class TestVideoAPITestCase(MobileAPITestCase):
                 }
             ]})
 
-    def _create_video_with_subs(self):
+    def _create_video_with_subs(self, custom_subid=None):
         """
         Creates and returns a video with stored subtitles.
         """
-        subid = uuid4().hex
+        subid = custom_subid or uuid4().hex
         transcripts_utils.save_subs_to_store(
             {
                 'start': [100, 200, 240, 390, 1000],
@@ -578,3 +579,8 @@ class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnr
     def test_incorrect_language(self):
         self.login_and_enroll()
         self.api_response(expected_response_code=404, lang='pl')
+
+    def test_transcript_with_unicode_file_name(self):
+        self.video = self._create_video_with_subs(custom_subid=u'你好')
+        self.login_and_enroll()
+        self.api_response(expected_response_code=200, lang='en')
