@@ -20,6 +20,11 @@
 
     p, ol, ul {
       font-family: $sans-serif;
+
+      // override needed for poorly scoped font-family styling on p a:link {}
+      a {
+        font-family: $sans-serif;
+      }
     }
 
     a {
@@ -27,7 +32,6 @@
       border-bottom: none;
       color: $link-color;
       text-decoration: none !important;
-      font-family: $sans-serif;
 
       &:hover, &:focus, &:active {
         border-bottom: 1px dotted $link-color;
@@ -326,6 +330,12 @@ $edx-footer-bg-color: rgb(252,252,252);
     p {
       // NOTE: needed for poor LMS span styling
       color: inherit;
+    }
+
+    a {
+      @extend %edx-footer-link;
+      display: inline-block;
+      margin-bottom: ($edx-footer-spacing/2);
     }
   }
 
