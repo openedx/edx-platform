@@ -14,9 +14,14 @@ file and check it in at the same time as your model changes. To do that,
 import ipaddr
 
 from django.db import models
+from django.utils.translation import ugettext as _, ugettext_lazy
+
+from django_countries.fields import CountryField
 
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+
+from embargo.messages import ENROLL_MESSAGES, ACCESS_MESSAGES
 
 
 class EmbargoedCourse(models.Model):
@@ -70,6 +75,146 @@ class EmbargoedState(ConfigurationModel):
         if self.embargoed_countries == '':
             return []
         return [country.strip().upper() for country in self.embargoed_countries.split(',')]  # pylint: disable=no-member
+
+
+class RestrictedCourse(models.Model):
+    """Course with access restrictions.
+
+    Restricted courses can block users at two points:
+
+    1) When enrolling in a course.
+    2) When attempting to access a course the user is already enrolled in.
+
+    The second case can occur when new restrictions
+    are put into place; for example, when new countries
+    are embargoed.
+
+    Restricted courses can be configured to display
+    messages to users when they are blocked.
+    These displayed on pages served by the embargo app.
+
+    """
+    ENROLL_MSG_KEY_CHOICES = tuple([
+        (msg_key, msg.description)
+        for msg_key, msg in ENROLL_MESSAGES.iteritems()
+    ])
+
+    ACCESS_MSG_KEY_CHOICES = tuple([
+        (msg_key, msg.description)
+        for msg_key, msg in ACCESS_MESSAGES.iteritems()
+    ])
+
+    course_key = CourseKeyField(
+        max_length=255, db_index=True, unique=True,
+        help_text=ugettext_lazy(u"The course key for the restricted course.")
+    )
+
+    enroll_msg_key = models.CharField(
+        max_length=255,
+        choices=ENROLL_MSG_KEY_CHOICES,
+        default='default',
+        help_text=ugettext_lazy(u"The message to show when a user is blocked from enrollment.")
+    )
+
+    access_msg_key = models.CharField(
+        max_length=255,
+        choices=ACCESS_MSG_KEY_CHOICES,
+        default='default',
+        help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
+    )
+
+    def __unicode__(self):
+        return unicode(self.course_key)
+
+
+class Country(models.Model):
+    """Representation of a country.
+
+    This is used to define country-based access rules.
+    There is a data migration that creates entries for
+    each country code.
+
+    """
+    country = CountryField(
+        db_index=True, unique=True,
+        help_text=ugettext_lazy(u"Two character ISO country code.")
+    )
+
+    def __unicode__(self):
+        return u"{name} ({code})".format(
+            name=unicode(self.country.name),
+            code=unicode(self.country)
+        )
+
+    class Meta:
+        # Default ordering is ascending by country code
+        ordering = ['country']
+
+
+class CountryAccessRule(models.Model):
+    """Course access rule based on the user's country.
+
+    The rule applies to a particular course-country pair.
+    Countries can either be whitelisted or blacklisted,
+    but not both.
+
+    To determine whether a user has access to a course
+    based on the user's country:
+
+    1) Retrieve the list of whitelisted countries for the course.
+    (If there aren't any, then include every possible country.)
+
+    2) From the initial list, remove all blacklisted countries
+    for the course.
+
+    """
+
+    RULE_TYPE_CHOICES = (
+        ('whitelist', 'Whitelist (allow only these countries)'),
+        ('blacklist', 'Blacklist (block these countries)'),
+    )
+
+    rule_type = models.CharField(
+        max_length=255,
+        choices=RULE_TYPE_CHOICES,
+        default='blacklist',
+        help_text=ugettext_lazy(
+            u"Whether to include or exclude the given course. "
+            u"If whitelist countries are specified, then ONLY users from whitelisted countries "
+            u"will be able to access the course.  If blacklist countries are specified, then "
+            u"users from blacklisted countries will NOT be able to access the course."
+        )
+    )
+
+    restricted_course = models.ForeignKey(
+        "RestrictedCourse",
+        help_text=ugettext_lazy(u"The course to which this rule applies.")
+    )
+
+    country = models.ForeignKey(
+        "Country",
+        help_text=ugettext_lazy(u"The country to which this rule applies.")
+    )
+
+    def __unicode__(self):
+        if self.rule_type == 'whitelist':
+            return _(u"Whitelist {country} for {course}").format(
+                course=unicode(self.restricted_course.course_key),
+                country=unicode(self.country),
+            )
+        elif self.rule_type == 'blacklist':
+            return _(u"Blacklist {country} for {course}").format(
+                course=unicode(self.restricted_course.course_key),
+                country=unicode(self.country),
+            )
+
+    class Meta:
+        unique_together = (
+            # This restriction ensures that a country is on
+            # either the whitelist or the blacklist, but
+            # not both (for a particular course).
+            ("restricted_course", "country")
+        )
 
 
 class IPFilter(ConfigurationModel):
