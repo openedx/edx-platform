@@ -11,12 +11,12 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.courses import get_course_by_id
 from courseware.tests.helpers import get_request_for_user, LoginEnrollmentTestCase
+from xmodule import tabs
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
 from courseware.views import get_static_tab_contents, static_tab
 from student.tests.factories import UserFactory
-from xmodule.tabs import CourseTabList
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -59,7 +59,7 @@ class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     def test_get_static_tab_contents(self):
         course = get_course_by_id(self.toy_course_key)
         request = get_request_for_user(UserFactory.create())
-        tab = CourseTabList.get_tab_by_slug(course.tabs, 'resources')
+        tab = tabs.CourseTabList.get_tab_by_slug(course.tabs, 'resources')
 
         # Test render works okay
         tab_content = get_static_tab_contents(request, course, tab)
@@ -170,3 +170,55 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertEqual(course_tab_list[0]['tab_id'], 'courseware')
             self.assertEqual(course_tab_list[0]['name'], 'Entrance Exam')
             self.assertEqual(course_tab_list[1]['tab_id'], 'instructor')
+
+
+@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
+class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
+    """
+    Validate tab behavior when dealing with textbooks.
+    """
+
+    def setUp(self):
+        self.course = CourseFactory.create()
+        self.set_up_books(2)
+        self.course.tabs = [
+            tabs.CoursewareTab(),
+            tabs.CourseInfoTab(),
+            tabs.TextbookTabs(),
+            tabs.PDFTextbookTabs(),
+            tabs.HtmlTextbookTabs(),
+        ]
+        self.setup_user()
+        self.enroll(self.course)
+        self.num_textbook_tabs = sum(1 for tab in self.course.tabs if isinstance(tab, tabs.TextbookTabsBase))
+        self.num_textbooks = self.num_textbook_tabs * len(self.books)
+
+    def set_up_books(self, num_books):
+        """Initializes the textbooks in the course and adds the given number of books to each textbook"""
+        self.books = [MagicMock() for _ in range(num_books)]
+        for book_index, book in enumerate(self.books):
+            book.title = 'Book{0}'.format(book_index)
+        self.course.textbooks = self.books
+        self.course.pdf_textbooks = self.books
+        self.course.html_textbooks = self.books
+
+    def test_pdf_textbook_tabs(self):
+        """
+        Test that all textbooks tab links generating correctly.
+        """
+        type_to_reverse_name = {'textbook': 'book', 'pdftextbook': 'pdf_book', 'htmltextbook': 'html_book'}
+
+        course_tab_list = get_course_tab_list(self.course, self.user)
+        num_of_textbooks_found = 0
+        for tab in course_tab_list:
+            # Verify links of all textbook type tabs.
+            if isinstance(tab, tabs.SingleTextbookTab):
+                book_type, book_index = tab.tab_id.split("/", 1)
+                expected_link = reverse(
+                    type_to_reverse_name[book_type],
+                    args=[self.course.id.to_deprecated_string(), book_index]
+                )
+                tab_link = tab.link_func(self.course, reverse)
+                self.assertEqual(tab_link, expected_link)
+                num_of_textbooks_found += 1
+        self.assertEqual(num_of_textbooks_found, self.num_textbooks)
