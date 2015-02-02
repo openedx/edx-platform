@@ -327,6 +327,12 @@ $edx-footer-bg-color: rgb(252,252,252);
       // NOTE: needed for poor LMS span styling
       color: inherit;
     }
+
+    a {
+      @extend %edx-footer-link;
+      display: inline-block;
+      margin-bottom: ($edx-footer-spacing/2);
+    }
   }
 
   .footer-about-links {
