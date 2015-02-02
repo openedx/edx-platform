@@ -21,6 +21,7 @@ from milestones.api import (
     get_user_milestones,
 )
 from milestones.models import MilestoneRelationshipType
+from milestones.exceptions import InvalidMilestoneRelationshipTypeException
 
 NAMESPACE_CHOICES = {
     'ENTRANCE_EXAM': 'entrance_exams'
@@ -148,6 +149,31 @@ def fulfill_course_milestone(course_key, user):
         course_milestones = get_course_milestones(course_key=course_key, relationship="fulfills")
         for milestone in course_milestones:
             add_user_milestone({'id': user.id}, milestone)
+
+
+def get_required_content(course, user):
+    """
+    Queries milestones subsystem to see if the specified course is gated on one or more milestones,
+    and if those milestones can be fulfilled via completion of a particular course content module
+    """
+    required_content = []
+    if settings.FEATURES.get('MILESTONES_APP', False):
+        # Get all of the outstanding milestones for this course, for this user
+        try:
+            milestone_paths = get_course_milestones_fulfillment_paths(
+                unicode(course.id),
+                serialize_user(user)
+            )
+        except InvalidMilestoneRelationshipTypeException:
+            return required_content
+
+        # For each outstanding milestone, see if this content is one of its fulfillment paths
+        for path_key in milestone_paths:
+            milestone_path = milestone_paths[path_key]
+            if milestone_path.get('content') and len(milestone_path['content']):
+                for content in milestone_path['content']:
+                    required_content.append(content)
+    return required_content
 
 
 def calculate_entrance_exam_score(user, course_descriptor, exam_modules):

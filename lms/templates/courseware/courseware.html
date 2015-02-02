@@ -234,6 +234,25 @@ ${fragment.foot_html()}
     </div>
 % endif
     <section class="course-content" id="course-content">
+        % if entrance_exam_current_score is not UNDEFINED and \
+           course.entrance_exam_minimum_score_pct is not None:
+            % if not entrance_exam_passed:
+            <p class="sequential-status-message">
+                ${_('To access course materials, you must score {required_score}% or higher on this \
+                exam. Your current score is {current_score}%.').format(
+                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % else:
+              <p class="sequential-status-message">
+                ${_('You have successfully passed the exam. Your current score is {current_score}%.').format(
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % endif
+      % endif
+
       ${fragment.body_html()}
     </section>
     % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
