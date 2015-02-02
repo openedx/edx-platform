@@ -58,6 +58,8 @@ def user_track(request):
             "username": username,
             "session": context.get('session', ''),
             "ip": _get_request_header(request, 'REMOTE_ADDR'),
+            "referer": _get_request_header(request, 'HTTP_REFERER'),
+            "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
             "event_source": "browser",
             "event_type": _get_request_value(request, 'event_type'),
             "event": _get_request_value(request, 'event'),
@@ -95,6 +97,8 @@ def server_track(request, event_type, event, page=None):
     event = {
         "username": username,
         "ip": _get_request_header(request, 'REMOTE_ADDR'),
+        "referer": _get_request_header(request, 'HTTP_REFERER'),
+        "accept_language": _get_request_header(request, 'HTTP_ACCEPT_LANGUAGE'),
         "event_source": "server",
         "event_type": event_type,
         "event": event,

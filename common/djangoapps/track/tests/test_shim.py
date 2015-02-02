@@ -23,6 +23,8 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
         data = {sentinel.key: sentinel.value}
 
         context = {
+            'accept_language': sentinel.accept_language,
+            'referer': sentinel.referer,
             'username': sentinel.username,
             'session': sentinel.session,
             'ip': sentinel.ip,
@@ -40,6 +42,8 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
         emitted_event = self.get_event()
 
         expected_event = {
+            'accept_language': sentinel.accept_language,
+            'referer': sentinel.referer,
             'event_type': sentinel.name,
             'name': sentinel.name,
             'context': {
@@ -58,7 +62,7 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
             'page': None,
             'session': sentinel.session,
         }
-        self.assertEqual(expected_event, emitted_event)
+        self.assertEqualUnicode(expected_event, emitted_event)
 
     @override_settings(
         EVENT_TRACKING_PROCESSORS=LEGACY_SHIM_PROCESSOR,
@@ -69,6 +73,8 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
         emitted_event = self.get_event()
 
         expected_event = {
+            'accept_language': '',
+            'referer': '',
             'event_type': sentinel.name,
             'name': sentinel.name,
             'context': {},
@@ -82,4 +88,4 @@ class LegacyFieldMappingProcessorTestCase(EventTrackingTestCase):
             'page': None,
             'session': '',
         }
-        self.assertEqual(expected_event, emitted_event)
+        self.assertEqualUnicode(expected_event, emitted_event)
