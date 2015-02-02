@@ -484,6 +484,12 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
+# Country access (embargo)
+if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+    urlpatterns += (
+        url(r'^embargo/', include('embargo.urls')),
+    )
+
 # Survey Djangoapp
 urlpatterns += (
     url(r'^survey/', include('survey.urls')),

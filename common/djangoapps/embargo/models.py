@@ -21,7 +21,7 @@ from django_countries.fields import CountryField
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
-from embargo.messages import ENROLL_MESSAGES, ACCESS_MESSAGES
+from embargo.messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
 
 
 class EmbargoedCourse(models.Model):
@@ -99,9 +99,9 @@ class RestrictedCourse(models.Model):
         for msg_key, msg in ENROLL_MESSAGES.iteritems()
     ])
 
-    ACCESS_MSG_KEY_CHOICES = tuple([
+    COURSEWARE_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in ACCESS_MESSAGES.iteritems()
+        for msg_key, msg in COURSEWARE_MESSAGES.iteritems()
     ])
 
     course_key = CourseKeyField(
@@ -118,7 +118,7 @@ class RestrictedCourse(models.Model):
 
     access_msg_key = models.CharField(
         max_length=255,
-        choices=ACCESS_MSG_KEY_CHOICES,
+        choices=COURSEWARE_MSG_KEY_CHOICES,
         default='default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
     )
