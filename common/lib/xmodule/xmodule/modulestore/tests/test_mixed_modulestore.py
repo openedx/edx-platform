@@ -840,6 +840,27 @@ class TestMixedModuleStore(CourseComparisonTest):
             published_courses = self.store.get_courses(remove_branch=True)
         self.assertEquals([c.id for c in draft_courses], [c.id for c in published_courses])
 
+    @ddt.data('draft', 'split')
+    def test_create_child_detached_tabs(self, default_ms):
+        """
+        test 'create_child' method with a detached category ('static_tab')
+        to check that new static tab is not a direct child of the course
+        """
+        self.initdb(default_ms)
+        mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
+        self.assertEqual(len(mongo_course.children), 1)
+
+        # create a static tab of the course
+        self.store.create_child(
+            self.user_id,
+            self.course.location,
+            'static_tab'
+        )
+
+        # now check that the course has same number of children
+        mongo_course = self.store.get_course(self.course_locations[self.MONGO_COURSEID].course_key)
+        self.assertEqual(len(mongo_course.children), 1)
+
     def test_xml_get_courses(self):
         """
         Test that the xml modulestore only loaded the courses from the maps.

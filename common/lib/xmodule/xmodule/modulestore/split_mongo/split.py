@@ -1513,6 +1513,10 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 user_id, parent_usage_key.course_key, block_type, block_id=block_id, fields=fields,
                 **kwargs)
 
+            # skip attach to parent if xblock has 'detached' tag
+            if 'detached' in xblock._class_tags:    # pylint: disable=protected-access
+                return xblock
+
             # don't version the structure as create_item handled that already.
             new_structure = self._lookup_course(xblock.location.course_key).structure
 
