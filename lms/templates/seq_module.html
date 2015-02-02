@@ -1,13 +1,10 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <div id="sequence_${element_id}" class="sequence" data-id="${item_id}" data-position="${position}" data-ajax-url="${ajax_url}" >
-  <nav class="sequence-nav" aria-label="${_('Unit')}" >
-    <ul class="sequence-nav-buttons">
-      <li class="prev"><a role="button" href="#">${_('Previous')}</a></li>
-    </ul>
-
-    <div class="sequence-list-wrapper">
-      <ol role="tablist" id="sequence-list">
+  <div class="sequence-nav">
+    <button class="sequence-nav-button button-previous">${_('Previous')}</button>
+    <nav class="sequence-list-wrapper" aria-label="${_('Unit')}">
+      <ol id="sequence-list">
         % for idx, item in enumerate(items):
         ## TODO (vshnayder): add item.progress_detail either to the title or somewhere else.
         ## Make sure it gets updated after ajax calls.
@@ -29,12 +26,9 @@
         </li>
         % endfor
       </ol>
-    </div>
-
-    <ul class="sequence-nav-buttons">
-      <li class="next"><a role="button" href="#">${_("Next")}</a></li>
-    </ul>
-  </nav>
+    </nav>
+    <button class="sequence-nav-button button-next">${_('Next')}</button>
+  </div>
 
   % for idx, item in enumerate(items):
   <div id="seq_contents_${idx}"
@@ -44,14 +38,11 @@
      ${item['content'] | h}
   </div>
   % endfor
-  <div id="sr-is-focusable" tabindex="-1"></div>
   <div id="seq_content"></div>
 
   <nav class="sequence-bottom" aria-label="${_('Section')}">
-    <ul class="sequence-nav-buttons">
-      <li class="prev"><a role="button" href="#">${_("Previous")}</a></li>
-      <li class="next"><a role="button" href="#">${_("Next")}</a></li>
-    </ul>
+    <button class="sequence-nav-button button-previous">${_('Previous')}</button>
+    <button class="sequence-nav-button button-next">${_('Next')}</button>
   </nav>
 </div>
 

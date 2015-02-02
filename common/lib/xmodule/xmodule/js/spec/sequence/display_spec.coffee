@@ -40,11 +40,11 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'disable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-previous')).toHaveClass 'disabled'
 
       it 'enable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .next a')).toHandleWith 'click', @sequence.next
+        expect($('.sequence-nav-button.button-next')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-next')).toHandleWith 'click', @sequence.next
 
     describe 'when the middle tab is active', ->
       beforeEach ->
@@ -52,12 +52,12 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'enable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .prev a')).toHandleWith 'click', @sequence.previous
+        expect($('.sequence-nav-button.button-previous')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-previous')).toHandleWith 'click', @sequence.previous
 
       it 'enable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .next a')).toHandleWith 'click', @sequence.next
+        expect($('.sequence-nav-button.button-next')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-next')).toHandleWith 'click', @sequence.next
 
     describe 'when the last tab is active', ->
       beforeEach ->
@@ -65,11 +65,11 @@ xdescribe 'Sequence', ->
         @sequence.toggleArrows()
 
       it 'enable the previous button', ->
-        expect($('.sequence-nav-buttons .prev a')).not.toHaveClass 'disabled'
-        expect($('.sequence-nav-buttons .prev a')).toHandleWith 'click', @sequence.previous
+        expect($('.sequence-nav-button.button-previous')).not.toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-previous')).toHandleWith 'click', @sequence.previous
 
       it 'disable the next button', ->
-        expect($('.sequence-nav-buttons .next a')).toHaveClass 'disabled'
+        expect($('.sequence-nav-button.button-next')).toHaveClass 'disabled'
 
   describe 'render', ->
     beforeEach ->
@@ -135,7 +135,7 @@ xdescribe 'Sequence', ->
       jasmine.stubRequests()
       @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
       $.scrollTo 150
-      $('.sequence-nav-buttons .next a').click()
+      $('.sequence-nav-button.button-next').click()
 
     it 'log the next sequence event', ->
       expect(Logger.log).toHaveBeenCalledWith 'seq_next', old: 2, new: 3, id: '1'
@@ -151,7 +151,7 @@ xdescribe 'Sequence', ->
       jasmine.stubRequests()
       @sequence = new Sequence '1', 'sequence_1', @items, 'sequence', 2
       $.scrollTo 150
-      $('.sequence-nav-buttons .prev a').click()
+      $('.sequence-nav-button.button-previous').click()
 
     it 'log the previous sequence event', ->
       expect(Logger.log).toHaveBeenCalledWith 'seq_prev', old: 2, new: 1, id: '1'

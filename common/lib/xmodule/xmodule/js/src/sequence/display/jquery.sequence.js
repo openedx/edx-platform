@@ -3,7 +3,7 @@ var SequenceNav = function($element) {
 	var $element = $element;
 	var $wrapper = $element.find('.sequence-list-wrapper');
 	var $list = $element.find('#sequence-list');
-	var $arrows = $element.find('.sequence-nav-buttons');
+	var $arrows = $element.find('.sequence-nav-button');
 	var maxScroll = $list.width() - $wrapper.width() + 20;
 	var $leftShadow = $('<div class="left-shadow"></div>');
 	var $rightShadow = $('<div class="right-shadow"></div>');
