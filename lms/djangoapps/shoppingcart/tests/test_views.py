@@ -584,7 +584,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
                                 {'id': reg_item.id})
         debug_log.assert_called_with(
-            'Code redemption does not exist for order item id={0}.'.format(reg_item.id))
+            'Code redemption does not exist for order item id=%s.',
+            str(reg_item.id)
+        )
 
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
@@ -604,7 +606,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
         info_log.assert_called_with(
-            'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+            self.coupon_code,
+            self.user,
+            str(reg_item.id)
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_reset_redemption_for_coupon(self, info_log):
@@ -619,7 +625,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         info_log.assert_called_with(
-            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+            'Coupon redemption entry removed for user %s for order %s',
+            self.user,
+            reg_item.id
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_coupon_discount_for_multiple_courses_in_cart(self, info_log):
@@ -648,7 +657,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+            self.coupon_code,
+            self.user,
+            str(reg_item.id)
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_delete_certificate_item(self, info_log):
@@ -664,7 +677,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'order item {0} removed for user {1}'.format(cert_item.id, self.user))
+            'order item %s removed for user %s',
+            str(cert_item.id),
+            self.user
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_remove_coupon_redemption_on_clear_cart(self, info_log):
@@ -682,7 +698,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEquals(self.cart.orderitem_set.count(), 0)
 
         info_log.assert_called_with(
-            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+            'Coupon redemption entry removed for user %s for order %s',
+            self.user,
+            reg_item.id
+        )
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
@@ -773,13 +792,18 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                                  {'id': cert_item.id})
         self.assertEqual(resp2.status_code, 200)
         exception_log.assert_called_with(
-            'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(cert_item.id))
+            'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased', str(cert_item.id)
+        )
 
-        resp3 = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                 {'id': -1})
+        resp3 = self.client.post(
+            reverse('shoppingcart.views.remove_item', args=[]),
+            {'id': -1}
+        )
         self.assertEqual(resp3.status_code, 200)
         exception_log.assert_called_with(
-            'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(-1))
+            'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased',
+            '-1'
+        )
 
     @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
     def test_postpay_callback_success(self):
