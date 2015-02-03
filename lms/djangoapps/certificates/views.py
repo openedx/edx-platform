@@ -36,7 +36,8 @@ def request_certificate(request):
 
             status = certificate_status_for_student(student, course_key)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
-                logger.info('Grading and certification requested for user {} in course {} via /request_certificate call'.format(username, course_key))
+                log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
+                logger.info(log_msg, username, course_key)
                 status = xqci.add_cert(student, course_key, course=course)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')

@@ -929,7 +929,7 @@ def midcourse_reverify_dash(request):
         try:
             course_enrollment_pairs.append((modulestore().get_course(enrollment.course_id), enrollment))
         except ItemNotFoundError:
-            log.error("User {0} enrolled in non-existent course {1}".format(user.username, enrollment.course_id))
+            log.error(u"User %s enrolled in non-existent course %s", user.username, enrollment.course_id)
 
     statuses = ["approved", "pending", "must_reverify", "denied"]
 

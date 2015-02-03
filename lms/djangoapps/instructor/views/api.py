@@ -353,12 +353,20 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                             'username': username, 'email': email, 'response': warning_message})
                         log.warning('email {email} already exist'.format(email=email))
                     else:
-                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+                        log.info(
+                            u"user already exists with username '%s' and email '%s'",
+                            email=email,
+                            username=username,
+                        )
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
                         CourseEnrollment.enroll(user, course_id)
-                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        log.info(
+                            u'user %s enrolled in the course %s',
+                            username=username,
+                            course=course.id,
+                        )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
                 else:
                     # This email does not yet exist, so we need to create a new account

@@ -338,7 +338,7 @@ def _cert_info(user, course, cert_status):
 
     if status == 'ready':
         if 'download_url' not in cert_status:
-            log.warning("User %s has a downloadable cert for %s, but no download url",
+            log.warning(u"User %s has a downloadable cert for %s, but no download url",
                         user.username, course.id)
             return default_info
         else:
@@ -841,13 +841,11 @@ def change_enrollment(request, check_access=True):
     try:
         course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
     except InvalidKeyError:
-        log.warning(
-            "User {username} tried to {action} with invalid course id: {course_id}".format(
-                username=user.username,
-                action=action,
-                course_id=request.POST.get("course_id")
-            )
-        )
+        log.warning(u"User %(username)s tried to %(action)s with invalid course id: %(course_id)s", {
+            "username": user.username,
+            "action": action,
+            "course_id": request.POST.get("course_id"),
+        })
         return HttpResponseBadRequest(_("Invalid course id"))
 
     if action == "enroll":
@@ -1248,11 +1246,11 @@ def disable_account_ajax(request):
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
             context['message'] = _("Successfully disabled {}'s account").format(username)
-            log.info("{} disabled {}'s account".format(request.user, username))
+            log.info(u"%s disabled %s's account", request.user, username)
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
             context['message'] = _("Successfully reenabled {}'s account").format(username)
-            log.info("{} reenabled {}'s account".format(request.user, username))
+            log.info(u"%s reenabled %s's account", request.user, username)
         else:
             context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
