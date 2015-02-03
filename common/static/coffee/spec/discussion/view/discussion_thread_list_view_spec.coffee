@@ -274,6 +274,11 @@ describe "DiscussionThreadListView", ->
               $(@).html()
             ).get()).toEqual(expectedMessages)
 
+        getAlertMessagesAndClasses = () ->
+            $(".search-alert").map( ->
+              { text: $('.message', @).html(), 'css_class': $(@).attr('class') }
+            ).get()
+
         it "renders and removes search alerts", ->
             testAlertMessages []
             foo = @view.addSearchAlert("foo")
@@ -284,6 +289,23 @@ describe "DiscussionThreadListView", ->
             testAlertMessages ["bar"]
             @view.removeSearchAlert(bar.cid)
             testAlertMessages []
+
+        it "renders search alert with custom class", ->
+            testAlertMessages []
+            foo = @view.addSearchAlert("foo", "custom-class")
+            messages = getAlertMessagesAndClasses()
+            expect(messages.length).toEqual(1);
+            expect(messages[0].text).toEqual("foo")
+            expect(messages[0].css_class).toEqual("search-alert custom-class")
+
+            foo = @view.addSearchAlert("bar", "other-class")
+
+            messages = getAlertMessagesAndClasses()
+            expect(messages.length).toEqual(2);
+            expect(messages[0].text).toEqual("foo")
+            expect(messages[0].css_class).toEqual("search-alert custom-class")
+            expect(messages[1].text).toEqual("bar")
+            expect(messages[1].css_class).toEqual("search-alert other-class")
 
         it "clears all search alerts", ->
             @view.addSearchAlert("foo")
