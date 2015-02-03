@@ -21,6 +21,7 @@ from instructor_task.tasks import (
     calculate_grades_csv,
     calculate_students_features_csv,
     cohort_students,
+    get_student_responses,
 )
 
 from instructor_task.api_helper import (check_arguments_for_rescoring,
@@ -247,6 +248,18 @@ def submit_cohort_students(request, course_key, file_name):
     task_type = 'cohort_students'
     task_class = cohort_students
     task_input = {'file_name': file_name}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def submit_get_student_responses(request, course_key):
+    """
+    AlreadyRunningError is raised if the student responses report is already being generated.
+    """
+    task_type = 'student_responses'
+    task_class = get_student_responses
+    task_input = {}
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

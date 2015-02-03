@@ -7,19 +7,34 @@ Tests that CSV grade report generation works with unicode emails.
 
 """
 import ddt
+from django.conf import settings
+from django.test.utils import override_settings
 from mock import Mock, patch
 import tempfile
 import unicodecsv
 
-from xmodule.modulestore.tests.factories import CourseFactory
-from student.tests.factories import UserFactory
+from courseware.courses import get_course
+from courseware.tests.factories import StudentModuleFactory
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import Location
+from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from student.models import CourseEnrollment
+from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.partitions.partitions import Group, UserPartition
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, xml_store_config
 
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
 from instructor_task.models import ReportStore
-from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
+from instructor_task.tasks_helper import (
+    cohort_students_and_upload,
+    upload_grades_csv,
+    upload_students_csv,
+    push_student_responses_to_s3,
+)
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
+
+TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
+TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, course_dirs=['unicode_graded'])
 
 
 @ddt.ddt
@@ -434,3 +449,28 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
+
+
+@override_settings(MODULESTORE=TEST_DATA_XML_MODULESTORE)
+class TestResponsesReport(TestReportMixin, ModuleStoreTestCase):
+    """
+    Tests that CSV student responses report generation works.
+    """
+    def test_unicode(self):
+        course_key = CourseKey.from_string('edX/unicode_graded/2012_Fall')
+        self.course = get_course(course_key)
+        self.problem_location = Location("edX", "unicode_graded", "2012_Fall", "problem", "H1P1")
+
+        self.student = UserFactory(username=u'student\xec')
+        CourseEnrollmentFactory.create(user=self.student, course_id=self.course.id)
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            module_state_key=self.problem_location,
+            student=self.student,
+            grade=0,
+            state=u'{"student_answers":{"fake-problem":"caf\xe9"}}',
+        )
+
+        result = push_student_responses_to_s3(None, None, self.course.id, None, 'generated')
+        self.assertEqual(result, "succeeded")

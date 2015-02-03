@@ -32,7 +32,8 @@ from instructor_task.tasks_helper import (
     delete_problem_module_state,
     upload_grades_csv,
     upload_students_csv,
-    cohort_students_and_upload
+    cohort_students_and_upload,
+    push_student_responses_to_s3,
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -165,4 +166,14 @@ def cohort_students(entry_id, xmodule_instance_args):
     # An example of such a message is: "Progress: {action} {succeeded} of {attempted} so far"
     action_name = ugettext_noop('cohorted')
     task_fn = partial(cohort_students_and_upload, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.GRADES_DOWNLOAD_ROUTING_KEY)  # pylint: disable=E1102
+def get_student_responses(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV file of student responses to all course problems and store in S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(push_student_responses_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
