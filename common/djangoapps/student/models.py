@@ -122,13 +122,12 @@ def anonymous_id_for_user(user, course_id, save=True):
         )
         if anonymous_user_id.anonymous_user_id != digest:
             log.error(
-                "Stored anonymous user id {stored!r} for user {user!r} "
-                "in course {course!r} doesn't match computed id {digest!r}".format(
-                    user=user,
-                    course=course_id,
-                    stored=anonymous_user_id.anonymous_user_id,
-                    digest=digest
-                )
+                u"Stored anonymous user id %r for user %r "
+                u"in course %r doesn't match computed id %r",
+                user,
+                course_id,
+                anonymous_user_id.anonymous_user_id,
+                digest
             )
     except IntegrityError:
         # Another thread has already created this entry, so
@@ -1030,8 +1029,11 @@ class CourseEnrollment(models.Model):
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
 
         except cls.DoesNotExist:
-            err_msg = u"Tried to unenroll student %s from %s but they were not enrolled"
-            log.error(err_msg, user, course_id)
+            log.error(
+                u"Tried to unenroll student %s from %s but they were not enrolled",
+                user,
+                course_id
+            )
 
     @classmethod
     def unenroll_by_email(cls, email, course_id):
@@ -1047,8 +1049,11 @@ class CourseEnrollment(models.Model):
             user = User.objects.get(email=email)
             return cls.unenroll(user, course_id)
         except User.DoesNotExist:
-            err_msg = u"Tried to unenroll email %s from course %s, but user not found"
-            log.error(err_msg, user, course_id)
+            log.error(
+                u"Tried to unenroll email %s from course %s, but user not found",
+                email,
+                course_id
+            )
 
     @classmethod
     def is_enrolled(cls, user, course_key):
