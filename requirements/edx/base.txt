@@ -50,6 +50,9 @@ lazy==1.1
 lxml==3.3.6
 mako==0.9.1
 Markdown==2.2.1
+--allow-external meliae
+--allow-unverified meliae
+meliae==0.4.0
 mongoengine==0.7.10
 networkx==1.7
 nltk==2.0.4
@@ -58,7 +61,6 @@ oauthlib==0.6.3
 paramiko==1.9.0
 path.py==3.0.1
 Pillow==2.7.0
-pip>=1.4
 polib==1.0.3
 pycrypto>=2.6
 pygments==2.0.1
