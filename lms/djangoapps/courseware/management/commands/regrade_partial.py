@@ -53,7 +53,7 @@ class Command(BaseCommand):
         if module_state is None:
             # not likely, since we filter on it.  But in general...
             LOG.info(
-                u"No state found for %(type)s module %(id)s for student %(student)s in course %(course_id)s",
+                u"No state found for %s module %s for student %s in course %s",
                 module.module_type,
                 module.module_state_key,
                 module.student.username,
