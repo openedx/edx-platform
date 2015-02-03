@@ -469,7 +469,7 @@ class TestPanel(ModuleStoreTestCase):
         Mock(
             return_value=controller_query_service.MockControllerQueryService(
                 settings.OPEN_ENDED_GRADING_INTERFACE,
-                utils.SYSTEM
+                utils.render_to_string
             )
         )
     )
