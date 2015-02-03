@@ -2,6 +2,7 @@
 
 from django.http import Http404
 from django.views.generic.base import View
+from django.conf import settings
 
 from edxmako.shortcuts import render_to_response
 
@@ -55,14 +56,18 @@ class CourseAccessMessageView(View):
         """
         message_dict = dict()
 
+        # Backwards compatibility with themes created for
+        # earlier implementations of the embargo app.
+        if settings.FEATURES.get('USE_CUSTOM_THEME') and message_key in messages.CUSTOM_THEME_OVERRIDES:
+            message_dict = messages.CUSTOM_THEME_OVERRIDES
+
         # The access point determines which set of messages to use.
         # This allows us to show different messages to students who
         # are enrolling in a course than we show to students
         # who are enrolled and accessing courseware.
-        if access_point == self.ENROLLMENT_ACCESS_POINT:
+        elif access_point == self.ENROLLMENT_ACCESS_POINT:
             message_dict = messages.ENROLL_MESSAGES
         elif access_point == self.COURSEWARE_ACCESS_POINT:
             message_dict = messages.COURSEWARE_MESSAGES
 
-        # Return the message corresponding to the given key if one is available.
         return message_dict.get(message_key)
