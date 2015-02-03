@@ -1079,10 +1079,16 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             query['definition.children'] = qualifiers.pop('children')
 
         query.update(qualifiers)
-        items = self.collection.find(
-            query,
-            sort=[SORT_REVISION_FAVOR_DRAFT],
-        )
+        if kwargs.get('chronological'):
+            items = self.collection.find(
+                query,
+                sort=[('$natural', 1)],
+            )
+        else:
+            items = self.collection.find(
+                query,
+                sort=[SORT_REVISION_FAVOR_DRAFT],
+            )
 
         modules = self._load_items(course_id, list(items))
         return modules
