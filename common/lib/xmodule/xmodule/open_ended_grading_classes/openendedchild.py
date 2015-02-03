@@ -145,9 +145,9 @@ class OpenEndedChild(object):
         # Used for progress / grading.  Currently get credit just for
         # completion (doesn't matter if you self-assessed correct/incorrect).
         if system.open_ended_grading_interface:
-            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system.render_template)
             self.controller_qs = controller_query_service.ControllerQueryService(
-                system.open_ended_grading_interface, system
+                system.open_ended_grading_interface, system.render_template
             )
         else:
             self.peer_gs = MockPeerGradingService()
