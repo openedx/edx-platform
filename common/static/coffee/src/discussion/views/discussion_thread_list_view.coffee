@@ -42,8 +42,12 @@ if Backbone?
       @searchAlertCollection.on "add", (searchAlert) =>
         content = _.template(
           $("#search-alert-template").html(),
-          {'message': searchAlert.attributes.message, 'cid': searchAlert.cid}
-          )
+          {
+            'message': searchAlert.attributes.message,
+            'cid': searchAlert.cid,
+            'css_class': searchAlert.attributes.css_class
+          }
+        )
         @$(".search-alerts").append(content)
         @$("#search-alert-" + searchAlert.cid + " a.dismiss").bind "click", searchAlert, (event) =>
           @removeSearchAlert(event.data.cid)
@@ -54,8 +58,8 @@ if Backbone?
       @searchAlertCollection.on "reset", =>
         @$(".search-alerts").empty()
 
-    addSearchAlert: (message) =>
-      m = new Backbone.Model({"message": message})
+    addSearchAlert: (message, css_class="") =>
+      m = new Backbone.Model({"message": message, "css_class": css_class})
       @searchAlertCollection.add(m)
       m
 
@@ -500,7 +504,7 @@ if Backbone?
               },
               true
             )
-            @addSearchAlert(message)
+            @addSearchAlert(message, 'search-by-user')
 
     clearSearch: ->
       @$(".forum-nav-search-input").val("")
