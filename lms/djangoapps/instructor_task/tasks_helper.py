@@ -555,7 +555,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
 
     partition_service = LmsPartitionService(user=None, course_id=course_id)
     partitions = partition_service.course_partitions
-    group_configs_header = ['Group Configuration Group Name ({})'.format(partition.name) for partition in partitions]
+    group_configs_header = ['Experiment Group ({})'.format(partition.name) for partition in partitions]
 
     # Loop over all our students and build our CSV lists in memory
     header = None
