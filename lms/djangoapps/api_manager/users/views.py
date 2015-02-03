@@ -1308,7 +1308,8 @@ class UsersRolesList(SecureListAPIView):
         for current_role in current_roles:
             if current_role.role not in ignore_roles:
                 course_descriptor, course_key, course_content = get_course(request, user, unicode(current_role.course_id))  # pylint: disable=W0612
-                _manage_role(course_descriptor, user, current_role.role, 'revoke')
+                if course_descriptor:
+                    _manage_role(course_descriptor, user, current_role.role, 'revoke')
         for role in request.DATA['roles']:
             if role['role'] not in ignore_roles:
                 try:
