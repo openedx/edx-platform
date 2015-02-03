@@ -144,6 +144,7 @@ if Backbone?
           )
           @trigger "thread:responses:rendered"
           @loadedResponses = true
+          $(".thread-wrapper").focus() # Sends focus to the conversation once the thread finishes loading
         error: (xhr, textStatus) =>
           return if textStatus == 'abort'
 
