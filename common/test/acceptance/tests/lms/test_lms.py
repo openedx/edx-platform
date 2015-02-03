@@ -496,6 +496,46 @@ class HighLevelTabTest(UniqueCourseTest):
             self.assertIn(expected, actual_items)
 
 
+class PDFTextBooksTabTest(UniqueCourseTest):
+    """
+    Tests that verify each of the textbook tabs available within a course.
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(PDFTextBooksTabTest, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+        # Install a course with TextBooks
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        # Add PDF textbooks to course fixture.
+        for i in range(1, 3):
+            course_fix.add_textbook("PDF Book {}".format(i), [{"title": "Chapter Of Book {}".format(i), "url": ""}])
+
+        course_fix.install()
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_verify_textbook_tabs(self):
+        """
+        Test multiple pdf textbooks loads correctly in lms.
+        """
+        self.course_info_page.visit()
+
+        # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
+        for i in range(1, 3):
+            self.tab_nav.go_to_tab("PDF Book {}".format(i))
+
+
 class VideoTest(UniqueCourseTest):
     """
     Navigate to a video in the courseware and play it.
