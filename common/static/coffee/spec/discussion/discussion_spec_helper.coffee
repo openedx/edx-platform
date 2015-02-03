@@ -303,7 +303,7 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="search-alert-template">
-    <div class="search-alert" id="search-alert-<%- cid %>">
+    <div class="search-alert <%= css_class %>" id="search-alert-<%- cid %>">
         <div class="search-alert-content">
           <p class="message"><%= message %></p>
         </div>
