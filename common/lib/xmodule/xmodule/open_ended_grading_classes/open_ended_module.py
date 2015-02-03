@@ -484,7 +484,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
         feedback = self._convert_longform_feedback_to_html(response_items)
         rubric_scores = []
         if response_items['rubric_scores_complete'] is True:
-            rubric_renderer = CombinedOpenEndedRubric(system, True)
+            rubric_renderer = CombinedOpenEndedRubric(system.render_template, True)
             rubric_dict = rubric_renderer.render_rubric(response_items['rubric_xml'])
             success = rubric_dict['success']
             rubric_feedback = rubric_dict['html']
