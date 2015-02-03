@@ -157,7 +157,7 @@ from edxmako.shortcuts import marketing_link
         ## so that they can register and become a real user that can enroll.
         % elif not is_shib_course and not can_enroll:
           <span class="register disabled">${_("Enrollment is Closed")}</span>
-        %elif is_shopping_cart_enabled and registration_price:
+        %elif is_shopping_cart_enabled and course_price:
           <%
           if user.is_authenticated():
             reg_href = "#"
@@ -167,14 +167,13 @@ from edxmako.shortcuts import marketing_link
             reg_element_id = "reg_then_add_to_cart"
           %>
           <a href="${reg_href}" class="add-to-cart" id="${reg_element_id}">
-            ${_("Add {course.display_number_with_default} to Cart ({currency_symbol}{cost})")\
-              .format(course=course, currency_symbol=settings.PAID_COURSE_REGISTRATION_CURRENCY[1],
-                      cost=registration_price)}
+            ${_("Add {course_name} to Cart ({price})")\
+              .format(course_name=course.display_number_with_default, price=course_price)}
           </a>
           <div id="register_error"></div>
         %else:
           <a href="#" class="register">
-            ${_("Register for {course.display_number_with_default}").format(course=course) | h}
+            ${_("Register for {course_name}").format(course_name=course.display_number_with_default) | h}
           </a>
           <div id="register_error"></div>
         %endif
@@ -311,13 +310,13 @@ from edxmako.shortcuts import marketing_link
 
           ##<li class="important-dates-item"><i class="icon fa fa-clock-o"></i><p class="important-dates-item-title">${_('Course Length')}</p><span class="important-dates-item-text course-length">${_('{number} weeks').format(number=15)}</span></li>
 
-          %if is_shopping_cart_enabled and registration_price:
+          %if course_price and (is_shopping_cart_enabled or is_cosmetic_price_enabled):
             <li class="important-dates-item">
               <i class="icon fa fa-money"></i>
               <p class="important-dates-item-title">${_("Price")}</p>
-              <span class="important-dates-item-text">${_("{currency_symbol}{cost}").format(currency_symbol=currency_symbol, cost=registration_price)}</span>
+              <span class="important-dates-item-text">${course_price}</span>
             </li>
-          % endif
+          %endif
 
           % if pre_requisite_courses:
           <% prc_target = reverse('about_course', args=[unicode(pre_requisite_courses[0]['key'])]) %>
