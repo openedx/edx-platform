@@ -3,9 +3,11 @@
 End-to-end tests for the LMS.
 """
 
+from datetime import datetime
 from textwrap import dedent
 from unittest import skip
 from nose.plugins.attrib import attr
+from pymongo import MongoClient
 
 from bok_choy.promise import EmptyPromise
 from bok_choy.web_app_test import WebAppTest
@@ -14,7 +16,8 @@ from ..helpers import (
     load_data_str,
     generate_course_key,
     select_option_by_value,
-    element_has_text
+    element_has_text,
+    assert_event_emitted_num_times
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
@@ -214,6 +217,8 @@ class PayAndVerifyTest(UniqueCourseTest):
         self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
         self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
+        self.event_collection = MongoClient()["test"]["events"]
+        self.start_time = datetime.now()
 
         # Create a course
         CourseFixture(
@@ -232,7 +237,7 @@ class PayAndVerifyTest(UniqueCourseTest):
     @skip("Flaky 02/02/2015")
     def test_immediate_verification_enrollment(self):
         # Create a user and log them in
-        AutoAuthPage(self.browser).visit()
+        student_id = AutoAuthPage(self.browser).visit().get_user_id()
 
         # Navigate to the track selection page
         self.track_selection_page.visit()
@@ -245,6 +250,24 @@ class PayAndVerifyTest(UniqueCourseTest):
 
         # Submit payment
         self.fake_payment_page.submit_payment()
+
+        # Expect enrollment activated event
+        assert_event_emitted_num_times(
+            self.event_collection,
+            "edx.course.enrollment.activated",
+            self.start_time,
+            student_id,
+            1
+        )
+
+        # Expect that one mode_changed enrollment event fired as part of the upgrade
+        assert_event_emitted_num_times(
+            self.event_collection,
+            "edx.course.enrollment.mode_changed",
+            self.start_time,
+            student_id,
+            1
+        )
 
         # Proceed to verification
         self.payment_and_verification_flow.immediate_verification()
@@ -269,7 +292,7 @@ class PayAndVerifyTest(UniqueCourseTest):
 
     def test_deferred_verification_enrollment(self):
         # Create a user and log them in
-        AutoAuthPage(self.browser).visit()
+        student_id = AutoAuthPage(self.browser).visit().get_user_id()
 
         # Navigate to the track selection page
         self.track_selection_page.visit()
@@ -283,6 +306,15 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Submit payment
         self.fake_payment_page.submit_payment()
 
+        # Expect enrollment activated event
+        assert_event_emitted_num_times(
+            self.event_collection,
+            "edx.course.enrollment.activated",
+            self.start_time,
+            student_id,
+            1
+        )
+
         # Navigate to the dashboard
         self.dashboard_page.visit()
 
@@ -292,7 +324,7 @@ class PayAndVerifyTest(UniqueCourseTest):
 
     def test_enrollment_upgrade(self):
         # Create a user, log them in, and enroll them in the honor mode
-        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+        student_id = AutoAuthPage(self.browser, course_id=self.course_id).visit().get_user_id()
 
         # Navigate to the dashboard
         self.dashboard_page.visit()
@@ -312,6 +344,24 @@ class PayAndVerifyTest(UniqueCourseTest):
 
         # Submit payment
         self.fake_payment_page.submit_payment()
+
+        # Expect that one mode_changed enrollment event fired as part of the upgrade
+        assert_event_emitted_num_times(
+            self.event_collection,
+            "edx.course.enrollment.mode_changed",
+            self.start_time,
+            student_id,
+            1
+        )
+
+        # Expect no enrollment activated event
+        assert_event_emitted_num_times(
+            self.event_collection,
+            "edx.course.enrollment.activated",
+            self.start_time,
+            student_id,
+            0
+        )
 
         # Navigate to the dashboard
         self.dashboard_page.visit()
