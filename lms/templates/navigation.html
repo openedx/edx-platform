@@ -143,7 +143,7 @@ site_status_msg = get_site_status_msg(course_id)
 
 ## The forgot password modal JavaScript assumes that JQuery is loaded,
 ## which is not necessarily the case when using RequireJS.
-%if not enable_require_js_for_page and not user.is_authenticated():
+%if not enable_require_js_optimizer and not user.is_authenticated():
   <%include file="forgot_password_modal.html" />
 %endif
 
