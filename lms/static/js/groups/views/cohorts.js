@@ -12,6 +12,7 @@ var edx = edx || {};
     edx.groups.CohortsView = Backbone.View.extend({
         events : {
             'change .cohort-select': 'onCohortSelected',
+            'change .cohorts-state': 'onCohortStateChanged',
             'click .action-create': 'showAddCohortForm',
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
@@ -26,19 +27,21 @@ var edx = edx || {};
             this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
             this.context = options.context;
             this.contentGroups = options.contentGroups;
+            this.cohortsEnabled = options.cohortsEnabled;
             model.on('sync', this.onSync, this);
 
-            // Update cohort counts when the user clicks back on the membership tab
+            // Update cohort counts when the user clicks back on the cohort management tab
             // (for example, after uploading a csv file of cohort assignments and then
             // checking results on data download tab).
-            $(this.getSectionCss('membership')).click(function () {
+            $(this.getSectionCss('cohort_management')).click(function () {
                 model.fetch();
             });
         },
 
         render: function() {
             this.$el.html(this.template({
-                cohorts: this.model.models
+                cohorts: this.model.models,
+                cohortsEnabled: this.cohortsEnabled
             }));
             this.onSync();
             return this;
@@ -96,6 +99,12 @@ var edx = edx || {};
             var selectedCohort = this.getSelectedCohort();
             this.lastSelectedCohortId = selectedCohort.get('id');
             this.showCohortEditor(selectedCohort);
+        },
+
+        onCohortStateChanged: function(event) {
+            event.preventDefault();
+            this.cohortsEnabled = !this.cohortsEnabled;
+            this.render();
         },
 
         showCohortEditor: function(cohort) {
