@@ -200,8 +200,10 @@ def clear_cart(request):
     coupon_redemption = CouponRedemption.objects.filter(user=request.user, order=cart.id)
     if coupon_redemption:
         coupon_redemption.delete()
-        log.info('Coupon redemption entry removed for user {user} for order {order_id}'.format(user=request.user,
-                                                                                               order_id=cart.id))
+        log.info(u'Coupon redemption entry removed for user %(user)s for order %(order_id)s', {
+            "user": request.user,
+            "order_id": cart.id,
+        })
 
     return HttpResponse('Cleared')
 
@@ -224,7 +226,10 @@ def remove_item(request):
         if item.user == request.user:
             order_item_course_id = getattr(item, 'course_id')
             item.delete()
-            log.info('order item {item_id} removed for user {user}'.format(item_id=item_id, user=request.user))
+            log.info(u'order item %(item_id)s removed for user %(user)s', {
+                "item_id": item_id,
+                "user": request.user,
+            })
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
             item.order.update_order_type()
 
@@ -244,8 +249,11 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
             order=item.order_id
         )
         coupon_redemption.delete()
-        log.info('Coupon "{code}" redemption entry removed for user "{user}" for order item "{item_id}"'
-                 .format(code=coupon_redemption.coupon.code, user=user, item_id=item_id))
+        log.info(u'Coupon "%(code)s" redemption entry removed for user "%(user)s" for order item "%(item_id)s"', {
+            "code": coupon_redemption.coupon.code,
+            "user": user,
+            "item_id": item_id,
+        })
     except CouponRedemption.DoesNotExist:
         log.debug('Code redemption does not exist for order item id={item_id}.'.format(item_id=item_id))
 

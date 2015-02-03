@@ -927,7 +927,7 @@ class CouponRedemption(models.Model):
         coupon_redemption = cls.objects.filter(user=user, order=cart)
         if coupon_redemption:
             coupon_redemption.delete()
-            log.info('Coupon redemption entry removed for user {0} for order {1}'.format(user, cart.id))
+            log.info(u'Coupon redemption entry removed for user %s for order %s', user, cart.id)
 
     @classmethod
     def get_discount_price(cls, percentage_discount, value):
@@ -946,8 +946,11 @@ class CouponRedemption(models.Model):
         coupon_redemptions = cls.objects.filter(order=order, user=order.user)
         for coupon_redemption in coupon_redemptions:
             if coupon_redemption.coupon.code != coupon.code or coupon_redemption.coupon.id == coupon.id:
-                log.exception("Coupon redemption already exist for user '{0}' against order id '{1}'"
-                              .format(order.user.username, order.id))
+                log.exception(
+                    u"Coupon redemption already exist for user '%s' against order id '%s'",
+                    order.user.username,
+                    order.id,
+                )
                 raise MultipleCouponsNotAllowedException
 
         for item in cart_items:
@@ -959,8 +962,11 @@ class CouponRedemption(models.Model):
                     item.list_price = item.unit_cost
                     item.unit_cost = discount_price
                     item.save()
-                    log.info("Discount generated for user {0} against order id '{1}' "
-                             .format(order.user.username, order.id))
+                    log.info(
+                        u"Discount generated for user %s against order id '%s'",
+                        order.user.username,
+                        order.id,
+                    )
                     is_redemption_applied = True
                     return is_redemption_applied
 
@@ -1018,8 +1024,12 @@ class PaidCourseRegistration(OrderItem):
             raise CourseDoesNotExistException
 
         if cls.contained_in_order(order, course_id):
-            log.warning("User {} tried to add PaidCourseRegistration for course {}, already in cart id {}"
-                        .format(order.user.email, course_id, order.id))
+            log.warning(
+                u"User %s tried to add PaidCourseRegistration for course %s, already in cart id %s",
+                order.user.email,
+                course_id,
+                order.id,
+            )
             raise ItemAlreadyInCartException
 
         if CourseEnrollment.is_enrolled(user=order.user, course_key=course_id):
@@ -1319,7 +1329,11 @@ class CertificateItem(OrderItem):
         try:
             target_cert = target_certs[0]
         except IndexError:
-            log.error("Matching CertificateItem not found while trying to refund.  User %s, Course %s", course_enrollment.user, course_enrollment.course_id)
+            log.error(
+                u"Matching CertificateItem not found while trying to refund. User %s, Course %s",
+                course_enrollment.user,
+                course_enrollment.course_id,
+            )
             return
         target_cert.status = 'refunded'
         target_cert.refund_requested_time = datetime.now(pytz.utc)
