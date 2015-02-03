@@ -80,10 +80,9 @@ log = logging.getLogger(__name__)
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
 
-DOCS_ANCHOR_TAG = (
-    "<a target='_blank'"
+DOCS_ANCHOR_TAG_OPEN = (
+    "<a target='_blank' "
     "href='http://edx.readthedocs.org/projects/ca/en/latest/exercises_tools/lti_component.html'>"
-    "the edX LTI documentation</a>"
 )
 
 
@@ -122,7 +121,10 @@ class LTIFields(object):
             "Enter the LTI ID for the external LTI provider.  "
             "This value must be the same LTI ID that you entered in the "
             "LTI Passports setting on the Advanced Settings page."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         default='',
         scope=Scope.settings
@@ -132,7 +134,10 @@ class LTIFields(object):
         help=_(
             "Enter the URL of the external tool that this component launches. "
             "This setting is only used when Hide External Tool is set to False."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         default='http://www.example.com',
         scope=Scope.settings)
@@ -141,7 +146,10 @@ class LTIFields(object):
         help=_(
             "Add the key/value pair for any custom parameters, such as the page your e-book should open to or "
             "the background color for this component."
-            "<br />See " + DOCS_ANCHOR_TAG + " for more details on this setting."
+            "<br />See {docs_anchor_open}the edX LTI documentation{anchor_close} for more details on this setting."
+        ).format(
+            docs_anchor_open=DOCS_ANCHOR_TAG_OPEN,
+            anchor_close="</a>"
         ),
         scope=Scope.settings)
     open_in_a_new_page = Boolean(

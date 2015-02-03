@@ -91,10 +91,10 @@ def add_course_to_cart(request, course_id):
     except CourseDoesNotExistException:
         return HttpResponseNotFound(_('The course you requested does not exist.'))
     except ItemAlreadyInCartException:
-        return HttpResponseBadRequest(_('The course {course_id} is already in your cart.'.format(course_id=course_id)))
+        return HttpResponseBadRequest(_('The course {course_id} is already in your cart.').format(course_id=course_id))
     except AlreadyEnrolledInCourseException:
         return HttpResponseBadRequest(
-            _('You are already registered in course {course_id}.'.format(course_id=course_id)))
+            _('You are already registered in course {course_id}.').format(course_id=course_id))
     else:
         # in case a coupon redemption code has been applied, new items should also get a discount if applicable.
         order = paid_course_item.order
@@ -283,7 +283,7 @@ def use_code(request):
         try:
             course_reg = CourseRegistrationCode.objects.get(code=code)
         except CourseRegistrationCode.DoesNotExist:
-            return HttpResponseNotFound(_("Discount does not exist against code '{code}'.".format(code=code)))
+            return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=code))
 
         return use_registration_code(course_reg, request.user)
 
@@ -432,18 +432,22 @@ def use_registration_code(course_reg, user):
     """
     if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg):
         log.warning("Registration code '{registration_code}' already used".format(registration_code=course_reg.code))
-        return HttpResponseBadRequest(_(
-            "Oops! The code '{registration_code}' you entered is either invalid or expired".format(
-                registration_code=course_reg.code)))
+        return HttpResponseBadRequest(
+            _("Oops! The code '{registration_code}' you entered is either invalid or expired").format(
+                registration_code=course_reg.code
+            )
+        )
     try:
         cart = Order.get_cart_for_user(user)
         cart_items = cart.find_item_by_course_id(course_reg.course_id)
     except ItemNotFoundInCartException:
         log.warning("Course item does not exist against registration code '{registration_code}'".format(
             registration_code=course_reg.code))
-        return HttpResponseNotFound(_(
-            "Code '{registration_code}' is not valid for any course in the shopping cart.".format(
-                registration_code=course_reg.code)))
+        return HttpResponseNotFound(
+            _("Code '{registration_code}' is not valid for any course in the shopping cart.").format(
+                registration_code=course_reg.code
+            )
+        )
     else:
         applicable_cart_items = [
             cart_item for cart_item in cart_items
@@ -478,7 +482,7 @@ def use_coupon_code(coupons, user):
 
     if not is_redemption_applied:
         log.warning("Discount does not exist against code '{code}'.".format(code=coupons[0].code))
-        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.".format(code=coupons[0].code)))
+        return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=coupons[0].code))
 
     return HttpResponse(
         json.dumps({'response': 'success', 'coupon_code_applied': True}),

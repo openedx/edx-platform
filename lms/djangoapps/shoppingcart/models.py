@@ -1381,7 +1381,10 @@ class CertificateItem(OrderItem):
         else:
             msg = u"Mode {mode} does not exist for {course_id}".format(mode=mode, course_id=course_id)
             log.error(msg)
-            raise InvalidCartItem(_(msg))
+            raise InvalidCartItem(
+                _(u"Mode {mode} does not exist for {course_id}").format(mode=mode, course_id=course_id)
+            )
+
         item, _created = cls.objects.get_or_create(
             order=order,
             user=order.user,
@@ -1649,7 +1652,9 @@ class Donation(OrderItem):
             if course is None:
                 msg = u"Could not find a course with the ID '{course_id}'".format(course_id=course_id)
                 log.error(msg)
-                raise CourseDoesNotExistException(_(msg))
+                raise CourseDoesNotExistException(
+                    _(u"Could not find a course with the ID '{course_id}'").format(course_id=course_id)
+                )
 
             return _(u"Donation for {course}").format(course=course.display_name)
 
