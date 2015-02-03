@@ -6,6 +6,7 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/tests/test_user_views.py]
 """
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from random import randint
 import json
 import uuid
@@ -111,10 +112,12 @@ class UsersApiTests(TestCase):
         self.test_bogus_content_id = 'i4x://foo/bar/baz/Chapter1'
 
         self.test_course_data = '<html>{}</html>'.format(str(uuid.uuid4()))
+        self.course_start_date = timezone.now() + relativedelta(days=-1)
+        self.course_end_date = timezone.now() + relativedelta(days=60)
         self.course = CourseFactory.create(
             display_name="TEST COURSE",
-            start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            start=self.course_start_date,
+            end=self.course_end_date,
             org='USERTEST',
             run='USERTEST1'
         )
@@ -122,7 +125,7 @@ class UsersApiTests(TestCase):
             category="videosequence",
             parent_location=self.course.location,
             data=self.test_course_data,
-            due=datetime(2016, 5, 16, 14, 30),
+            due=self.course_end_date,
             display_name="View_Sequence"
         )
         self.course2 = CourseFactory.create(display_name="TEST COURSE2", org='TESTORG2', run='USERTEST2')
@@ -130,7 +133,7 @@ class UsersApiTests(TestCase):
             category="videosequence",
             parent_location=self.course2.location,
             data=self.test_course_data,
-            due=datetime(2016, 5, 16, 14, 30),
+            due=self.course_end_date,
             display_name="View_Sequence2"
         )
 
@@ -991,8 +994,8 @@ class UsersApiTests(TestCase):
     def test_user_courses_detail_get(self):
         course = CourseFactory.create(
             display_name="UserCoursesDetailTestCourse",
-            start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            start=self.course_start_date,
+            end=self.course_end_date,
             org='TUCDG',
             run='TUCDG1'
         )
@@ -1315,7 +1318,7 @@ class UsersApiTests(TestCase):
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name=u"test mentoring homework 3",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
-            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+            due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
         points_scored = 1
         points_possible = 1
@@ -1372,7 +1375,7 @@ class UsersApiTests(TestCase):
             data=StringResponseXMLFactory().build_xml(answer='bar'),
             display_name=u"test mentoring homework 3",
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Homework"},
-            due=datetime(2015, 1, 16, 14, 30).replace(tzinfo=timezone.utc)
+            due=self.course_end_date.replace(tzinfo=timezone.utc)
         )
 
         test_uri = '{}/{}/courses/{}/grades'.format(self.users_base_uri, user_id, unicode(course.id))
