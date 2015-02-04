@@ -89,28 +89,28 @@
 <div class="entrance-exam-grade-container action-type-container">
   <h2>${_("Entrance Exam grade adjustment")}</h2>
   <div class="request-response-error"></div>
-  <p>
+  <label>
   ${_("Specify the {platform_name} email address or username of a student here:").format(platform_name=settings.PLATFORM_NAME)}
-  <input type="text" name="entrance-exam-student-select-grade" placeholder="${_("Student Email or Username")}">
-  </p>
+  <input type="text" name="entrance-exam-student-select-grade" placeholder="${_('Student Email or Username')}">
+  </label>
   <br>
 
   <p>
   ${_("Next, select an action to perform for the given user's entrance exam grade:")}
   </p>
 
-  <p>
-  <input type="button" name="reset-entrance-exam-attempts" value="${_("Reset Student Attempts")}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }">
+  <label>
+  <input type="button" name="reset-entrance-exam-attempts" value="${_('Reset Student Attempts')}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }">
 
   %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS') and section_data['access']['instructor']:
-    <input type="button" name="rescore-entrance-exam" value="${_("Rescore Student Submission")}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
+    <input type="button" name="rescore-entrance-exam" value="${_('Rescore Student Submission')}" data-endpoint="${ section_data['rescore_entrance_exam_url'] }">
   %endif
-  </p>
+  </label>
 
   <p>
   %if section_data['access']['instructor']:
     <p> ${_('You may also delete the entire state of a student for the entrance exam:')} </p>
-    <p><input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_("Delete Student State for entrance exam")}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }"></p>
+    <label><input type="button" class="molly-guard" name="delete-entrance-exam-state" value="${_('Delete Student State for entrance exam')}" data-endpoint="${ section_data['reset_student_attempts_for_entrance_exam_url'] }"></label>
   %endif
   </p>
 
@@ -121,7 +121,7 @@
       "To see status for all tasks submitted for this problem and student, click on this button:")}
     </p>
 
-    <p><input type="button" name="entrance-exam-task-history" value="${_("Show Background Task History for Student")}" data-endpoint="${ section_data['list_entrace_exam_instructor_tasks_url'] }"></p>
+    <label><input type="button" name="entrance-exam-task-history" value="${_('Show Background Task History for Student')}" data-endpoint="${ section_data['list_entrace_exam_instructor_tasks_url'] }"></label>
     <div class="entrance-exam-task-history-table"></div>
   %endif
   <hr>
