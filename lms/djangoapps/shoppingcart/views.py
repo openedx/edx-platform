@@ -81,7 +81,7 @@ def add_course_to_cart(request, course_id):
 
     assert isinstance(course_id, basestring)
     if not request.user.is_authenticated():
-        log.info("Anon user trying to add course {} to cart".format(course_id))
+        log.info(u"Anon user trying to add course %s to cart", course_id)
         return HttpResponseForbidden(_('You must be logged-in to add to a shopping cart'))
     cart = Order.get_cart_for_user(request.user)
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
@@ -131,7 +131,7 @@ def update_user_cart(request):
         try:
             item = OrderItem.objects.get(id=item_id, status='cart')
         except OrderItem.DoesNotExist:
-            log.exception('Cart OrderItem id={item_id} DoesNotExist'.format(item_id=item_id))
+            log.exception(u'Cart OrderItem id=%s DoesNotExist', item_id)
             return HttpResponseNotFound('Order item does not exist.')
 
         item.qty = qty
@@ -200,8 +200,11 @@ def clear_cart(request):
     coupon_redemption = CouponRedemption.objects.filter(user=request.user, order=cart.id)
     if coupon_redemption:
         coupon_redemption.delete()
-        log.info('Coupon redemption entry removed for user {user} for order {order_id}'.format(user=request.user,
-                                                                                               order_id=cart.id))
+        log.info(
+            u'Coupon redemption entry removed for user %s for order %s',
+            request.user,
+            cart.id,
+        )
 
     return HttpResponse('Cleared')
 
@@ -217,14 +220,20 @@ def remove_item(request):
     items = OrderItem.objects.filter(id=item_id, status='cart').select_subclasses()
 
     if not len(items):
-        log.exception('Cannot remove cart OrderItem id={item_id}. DoesNotExist or item is already purchased'.format(
-            item_id=item_id))
+        log.exception(
+            u'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased',
+            item_id
+        )
     else:
         item = items[0]
         if item.user == request.user:
             order_item_course_id = getattr(item, 'course_id')
             item.delete()
-            log.info('order item {item_id} removed for user {user}'.format(item_id=item_id, user=request.user))
+            log.info(
+                u'order item %s removed for user %s',
+                item_id,
+                request.user,
+            )
             remove_code_redemption(order_item_course_id, item_id, item, request.user)
             item.order.update_order_type()
 
@@ -244,10 +253,14 @@ def remove_code_redemption(order_item_course_id, item_id, item, user):
             order=item.order_id
         )
         coupon_redemption.delete()
-        log.info('Coupon "{code}" redemption entry removed for user "{user}" for order item "{item_id}"'
-                 .format(code=coupon_redemption.coupon.code, user=user, item_id=item_id))
+        log.info(
+            u'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+            coupon_redemption.coupon.code,
+            user,
+            item_id,
+        )
     except CouponRedemption.DoesNotExist:
-        log.debug('Code redemption does not exist for order item id={item_id}.'.format(item_id=item_id))
+        log.debug(u'Code redemption does not exist for order item id=%s.', item_id)
 
 
 @login_required
@@ -310,7 +323,7 @@ def get_reg_code_validity(registration_code, request, limiter):
             reg_code_already_redeemed = True
 
     if not reg_code_is_valid:
-        #tick the rate limiter counter
+        # tick the rate limiter counter
         AUDIT_LOG.info("Redemption of a non existing RegistrationCode {code}".format(code=registration_code))
         limiter.tick_bad_request_counter(request)
         raise Http404()
@@ -431,7 +444,7 @@ def use_registration_code(course_reg, user):
     and redirects the user to the Registration code redemption page.
     """
     if RegistrationCodeRedemption.is_registration_code_redeemed(course_reg):
-        log.warning("Registration code '{registration_code}' already used".format(registration_code=course_reg.code))
+        log.warning(u"Registration code '%s' already used", course_reg.code)
         return HttpResponseBadRequest(
             _("Oops! The code '{registration_code}' you entered is either invalid or expired").format(
                 registration_code=course_reg.code
@@ -441,8 +454,7 @@ def use_registration_code(course_reg, user):
         cart = Order.get_cart_for_user(user)
         cart_items = cart.find_item_by_course_id(course_reg.course_id)
     except ItemNotFoundInCartException:
-        log.warning("Course item does not exist against registration code '{registration_code}'".format(
-            registration_code=course_reg.code))
+        log.warning(u"Course item does not exist against registration code '%s'", course_reg.code)
         return HttpResponseNotFound(
             _("Code '{registration_code}' is not valid for any course in the shopping cart.").format(
                 registration_code=course_reg.code
@@ -481,7 +493,7 @@ def use_coupon_code(coupons, user):
             return HttpResponseBadRequest(_("Only one coupon redemption is allowed against an order"))
 
     if not is_redemption_applied:
-        log.warning("Discount does not exist against code '{code}'.".format(code=coupons[0].code))
+        log.warning(u"Discount does not exist against code '%s'.", coupons[0].code)
         return HttpResponseNotFound(_("Discount does not exist against code '{code}'.").format(code=coupons[0].code))
 
     return HttpResponse(
@@ -560,10 +572,11 @@ def donate(request):
         # Course ID may be None if this is a donation to the entire organization
         Donation.add_to_order(cart, amount, course_id=course_id)
     except InvalidCartItem as ex:
-        log.exception((
-            u"Could not create donation item for "
-            u"amount '{amount}' and course ID '{course_id}'"
-        ).format(amount=amount, course_id=course_id))
+        log.exception(
+            u"Could not create donation item for amount '%s' and course ID '%s'",
+            amount,
+            course_id
+        )
         return HttpResponseBadRequest(unicode(ex))
 
     # Start the purchase.

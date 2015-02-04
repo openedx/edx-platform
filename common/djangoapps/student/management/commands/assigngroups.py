@@ -82,9 +82,11 @@ class Command(BaseCommand):
             v = random.uniform(0, 1)
             group = group_from_value(groups, v)
             group_objects[group].users.add(user)
-            f.write("Assigned user {name} ({id}) to {group}\n".format(name=user.username,
-                                                                      id=user.id,
-                                                                      group=group))
+            f.write(u"Assigned user {name} ({id}) to {group}\n".format(
+                name=user.username,
+                id=user.id,
+                group=group
+            ).encode('utf-8'))
 
         ## Save groups
         for group in group_objects:

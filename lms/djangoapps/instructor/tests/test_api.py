@@ -334,7 +334,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEquals(len(data['general_errors']), 0)
 
         # test the log for email that's send to new created user.
-        info_log.assert_called_with('email sent to new created user at test_student@example.com')
+        info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
 
     @patch('instructor.views.api.log.info')
     def test_account_creation_and_enrollment_with_csv_with_blank_lines(self, info_log):
@@ -351,7 +351,7 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEquals(len(data['general_errors']), 0)
 
         # test the log for email that's send to new created user.
-        info_log.assert_called_with('email sent to new created user at test_student@example.com')
+        info_log.assert_called_with('email sent to new created user at %s', 'test_student@example.com')
 
     @patch('instructor.views.api.log.info')
     def test_email_and_username_already_exist(self, info_log):
@@ -370,7 +370,11 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         self.assertEquals(len(data['general_errors']), 0)
 
         # test the log for email that's send to new created user.
-        info_log.assert_called_with("user already exists with username '{username}' and email '{email}'".format(username='test_student_1', email='test_student@example.com'))
+        info_log.assert_called_with(
+            u"user already exists with username '%s' and email '%s'",
+            'test_student_1',
+            'test_student@example.com'
+        )
 
     def test_file_upload_type_not_csv(self):
         """
@@ -434,7 +438,11 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
         uploaded_file = SimpleUploadedFile("temp.csv", csv_content)
         response = self.client.post(self.url, {'students_list': uploaded_file})
         self.assertEqual(response.status_code, 200)
-        info_log.assert_called_with('user {username} enrolled in the course {course}'.format(username='NotEnrolledStudent', course=self.course.id))
+        info_log.assert_called_with(
+            u'user %s enrolled in the course %s',
+            u'NotEnrolledStudent',
+            self.course.id
+        )
 
     def test_user_with_already_existing_email_in_csv(self):
         """

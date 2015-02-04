@@ -358,15 +358,24 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         ).format(email=email, username=username)
 
                         warnings.append({
-                            'username': username, 'email': email, 'response': warning_message})
-                        log.warning('email {email} already exist'.format(email=email))
+                            'username': username, 'email': email, 'response': warning_message
+                        })
+                        log.warning(u'email %s already exist', email)
                     else:
-                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+                        log.info(
+                            u"user already exists with username '%s' and email '%s'",
+                            username,
+                            email
+                        )
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
                         CourseEnrollment.enroll(user, course_id)
-                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        log.info(
+                            u'user %s enrolled in the course %s',
+                            username,
+                            course.id,
+                        )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
                 else:
                     # This email does not yet exist, so we need to create a new account
@@ -390,7 +399,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         email_params['password'] = password
                         email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
                         send_mail_to_student(email, email_params)
-                        log.info('email sent to new created user at {email}'.format(email=email))
+                        log.info(u'email sent to new created user at %s', email)
 
     else:
         general_errors.append({
@@ -544,7 +553,7 @@ def students_update_enrollment(request, course_id):
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             results.append({
                 'identifier': identifier,
@@ -618,7 +627,7 @@ def bulk_beta_modify_access(request, course_id):
         # catch and log any unexpected exceptions
         # so that one error doesn't cause a 500.
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             error = True
         else:
@@ -1980,7 +1989,7 @@ def proxy_legacy_analytics(request, course_id):
     try:
         res = requests.get(url)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Error requesting from analytics server at %s", url)
+        log.exception(u"Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 
     if res.status_code is 200:
@@ -1995,9 +2004,8 @@ def proxy_legacy_analytics(request, course_id):
     else:
         # 500 on all other unexpected status codes.
         log.error(
-            "Error fetching {}, code: {}, msg: {}".format(
-                url, res.status_code, res.content
-            )
+            u"Error fetching %s, code: %s, msg: %s",
+            url, res.status_code, res.content
         )
         return HttpResponse(
             "Error from analytics server ({}).".format(res.status_code),
