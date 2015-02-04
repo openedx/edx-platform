@@ -208,11 +208,16 @@ ${fragment.foot_html()}
       </header>
 
       % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
-        <div id="courseware-search-bar" class="courseware-search-bar">
-          <form role="search-form">
-            <input type="text" class="search-field"/>
-            <button type="submit" class="search-button" aria-label="${_('Search')}">${_('search')} <i class="icon fa fa-search"></i></button>
-            <button type="button" class="cancel-button" aria-label="${_('Cancel')}"><i class="icon fa fa-remove"></i></button>
+        <div id="courseware-search-bar" class="courseware-search-bar" role="search" aria-label="Course">
+          <form>
+            <label for="course-search-input" class="sr">${_('Course Search')}</label>
+            <input id="course-search-input" type="text" class="search-field"/>
+            <button type="submit" class="search-button">
+              ${_('search')} <i class="icon fa fa-search" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="cancel-button" aria-label="${_('Clear search')}">
+              <i class="icon fa fa-remove" aria-hidden="true"></i>
+            </button>
           </form>
         </div>
       % endif
