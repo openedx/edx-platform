@@ -45,7 +45,14 @@
 
       <div class="footer-about-links">
         <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
-        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span> <span class="note">${_("(Revised 4/16/2014)")}</span></a>
+        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span>
+	  <span class="note">
+	    ## Translators: {date} will be an abbreviated date, indicating when the privacy policy was most recently revised.
+	    ${_("(Revised {date})").format(
+	      ## Translators: 10/22/2014 is a US-style date representing October 22, 2014. Please convert to use your local date system.
+	      date=_("10/22/2014")
+	    )}
+	</span></a>
       </div>
     </div>
 
