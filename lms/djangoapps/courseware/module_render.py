@@ -157,6 +157,7 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         required_content = _get_required_content(course, request.user)
 
         chapters = list()
+        chapters_number = 0
         for chapter in course_module.get_display_items():
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
@@ -183,9 +184,11 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                                      'active': active,
                                      'graded': section.graded,
                                      })
+            chapters_number += 1
             chapters.append({'display_name': chapter.display_name_with_default,
                              'url_name': chapter.url_name,
                              'sections': sections,
+                             'chapters_number': chapters_number,
                              'active': chapter.url_name == active_chapter})
         return chapters
 
@@ -881,7 +884,7 @@ def _invoke_xblock_handler(request, course_id, usage_id, handler, suffix, user):
     if instance is None:
         # Either permissions just changed, or someone is trying to be clever
         # and load something they shouldn't have access to.
-        log.debug("No module %s for user %s -- access denied?", usage_key, user)
+        log.debug("No module %s for user %s -- access denied ?", usage_key, user)
         raise Http404
 
     req = django_to_webob_request(request)

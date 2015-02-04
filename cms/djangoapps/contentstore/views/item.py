@@ -348,6 +348,7 @@ def xblock_container_handler(request, usage_key_string):
     This is used by the container page in particular to get additional information about publish state
     and ancestor state.
     """
+    return Http404
     usage_key = usage_key_with_run(usage_key_string)
 
     if not has_studio_read_access(request.user, usage_key.course_key):

@@ -192,6 +192,7 @@ ${fragment.foot_html()}
 % endif
 
 <%include file="/dashboard/_dashboard_prompt_midcourse_reverify.html" />
+
 % if default_tab:
   <%include file="/courseware/course_navigation.html" />
 % else:
@@ -223,6 +224,7 @@ ${fragment.foot_html()}
       % endif
 
       <div id="accordion" style="display: none">
+
         <nav aria-label="${_('Course Navigation')}">
           % if accordion.strip():
             ${accordion}
@@ -242,8 +244,8 @@ ${fragment.foot_html()}
     % endif
   </div>
 </div>
-
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}">
+
   <h2 class="sr nav-utilities-title">${_('Course Utilities Navigation')}</h2>
 
   ## Utility: Chat
