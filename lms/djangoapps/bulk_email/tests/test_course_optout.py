@@ -19,7 +19,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestOptoutCourseEmails(ModuleStoreTestCase):
 
     """
@@ -27,6 +26,7 @@ class TestOptoutCourseEmails(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(TestOptoutCourseEmails, self).setUp()
         course_title = u"ẗëṡẗ title ｲ乇丂ｲ ﾶ乇丂丂ﾑg乇 ｷo尺 ﾑﾚﾚ тэѕт мэѕѕаБэ"
         self.course = CourseFactory.create(display_name=course_title)
         self.instructor = AdminFactory.create()

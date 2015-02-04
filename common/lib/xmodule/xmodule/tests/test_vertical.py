@@ -14,6 +14,7 @@ class BaseVerticalModuleTest(XModuleXmlImportTest):
     test_html_2 = 'Test HTML 2'
 
     def setUp(self):
+        super(BaseVerticalModuleTest, self).setUp()
         # construct module
         course = xml.CourseFactory.build()
         sequence = xml.SequenceFactory.build(parent=course)

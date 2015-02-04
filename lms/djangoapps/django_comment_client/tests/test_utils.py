@@ -42,13 +42,14 @@ class DictionaryTestCase(TestCase):
         self.assertEqual(utils.merge_dict(d1, d2), expected)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class AccessUtilsTestCase(ModuleStoreTestCase):
     """
     Base testcase class for access and roles for the
     comment client service integration
     """
     def setUp(self):
+        super(AccessUtilsTestCase, self).setUp(create_user=False)
+
         self.course = CourseFactory.create()
         self.course_id = self.course.id
         self.student_role = RoleFactory(name='Student', course_id=self.course_id)
@@ -83,13 +84,14 @@ class AccessUtilsTestCase(ModuleStoreTestCase):
         self.assertFalse(ret)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CoursewareContextTestCase(ModuleStoreTestCase):
     """
     Base testcase class for courseware context for the
     comment client service integration
     """
     def setUp(self):
+        super(CoursewareContextTestCase, self).setUp()
+
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
             parent_location=self.course.location,
@@ -144,13 +146,14 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CategoryMapTestCase(ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
     comment client service integration
     """
     def setUp(self):
+        super(CategoryMapTestCase, self).setUp()
+
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",
             # This test needs to use a course that has already started --

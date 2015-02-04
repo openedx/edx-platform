@@ -172,9 +172,6 @@ def mock_render_template(*args, **kwargs):
 
 
 class ModelsTest(unittest.TestCase):
-    def setUp(self):
-        pass
-
     def test_load_class(self):
         vc = XModuleDescriptor.load_class('video')
         vc_str = "<class 'xmodule.video_module.video_module.VideoDescriptor'>"
@@ -187,6 +184,7 @@ class LogicTest(unittest.TestCase):
     raw_field_data = {}
 
     def setUp(self):
+        super(LogicTest, self).setUp()
         self.system = get_test_system()
         self.descriptor = Mock(name="descriptor", url_name='', category='test')
 

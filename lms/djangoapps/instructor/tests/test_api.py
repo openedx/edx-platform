@@ -9,7 +9,6 @@ import pytz
 import io
 import json
 import os
-import random
 import requests
 import shutil
 import tempfile
@@ -109,6 +108,7 @@ class TestCommonExceptions400(TestCase):
     """
 
     def setUp(self):
+        super(TestCommonExceptions400, self).setUp()
         self.request = Mock(spec=HttpRequest)
         self.request.META = {}
 
@@ -143,7 +143,6 @@ class TestCommonExceptions400(TestCase):
         self.assertIn("Task is already running", result["error"])
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -152,6 +151,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorAPIDenyLevels, self).setUp()
         self.course = CourseFactory.create()
         self.user = UserFactory.create()
         CourseEnrollment.enroll(self.user, self.course.id)
@@ -299,13 +299,14 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict(settings.FEATURES, {'ALLOW_AUTOMATED_SIGNUPS': True})
 class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test Bulk account creation and enrollment from csv file
     """
     def setUp(self):
+        super(TestInstructorAPIBulkAccountCreationAndEnrollment, self).setUp()
+
         self.request = RequestFactory().request()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -555,7 +556,6 @@ class TestInstructorAPIBulkAccountCreationAndEnrollment(ModuleStoreTestCase, Log
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test enrollment modification endpoint.
@@ -565,6 +565,8 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorAPIEnrollment, self).setUp()
+
         self.request = RequestFactory().request()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -1141,13 +1143,14 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test bulk beta modify access endpoint.
     """
 
     def setUp(self):
+        super(TestInstructorAPIBulkBetaEnrollment, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -1454,7 +1457,6 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change permissions
@@ -1468,6 +1470,8 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
     """
 
     def setUp(self):
+        super(TestInstructorAPILevelsAccess, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -1692,7 +1696,6 @@ class TestInstructorAPILevelsAccess(ModuleStoreTestCase, LoginEnrollmentTestCase
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2155,7 +2158,6 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         self.assertEqual(response.status_code, 400)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test endpoints whereby instructors can change student grades.
@@ -2166,6 +2168,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
     """
 
     def setUp(self):
+        super(TestInstructorAPIRegradeTask, self).setUp()
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2295,7 +2298,6 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertTrue(act.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2306,6 +2308,8 @@ class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
 
     def setUp(self):
+        super(TestInstructorSendEmail, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2378,7 +2382,6 @@ class MockCompletionInfo(object):
         return False, 'Task Errored In Some Way'
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test instructor task list endpoint.
@@ -2428,6 +2431,8 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
             return attr_dict
 
     def setUp(self):
+        super(TestInstructorAPITaskLists, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2540,7 +2545,6 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(actual_tasks, expected_tasks)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch.object(instructor_task.api, 'get_instructor_task_history')
 class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
@@ -2548,6 +2552,8 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
     """
 
     def setUp(self):
+        super(TestInstructorEmailContentList, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2676,7 +2682,6 @@ class TestInstructorEmailContentList(ModuleStoreTestCase, LoginEnrollmentTestCas
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @override_settings(ANALYTICS_SERVER_URL="http://robotanalyticsserver.netbot:900/")
 @override_settings(ANALYTICS_API_KEY="robot_api_key")
 class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2699,6 +2704,8 @@ class TestInstructorAPIAnalyticsProxy(ModuleStoreTestCase, LoginEnrollmentTestCa
             self.content = '{"test_content": "robot test content"}'
 
     def setUp(self):
+        super(TestInstructorAPIAnalyticsProxy, self).setUp()
+
         self.course = CourseFactory.create()
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
@@ -2858,7 +2865,6 @@ class TestInstructorAPIHelpers(TestCase):
         msk_from_problem_urlname(*args)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Test data dumps for reporting.
@@ -3047,7 +3053,6 @@ class TestDueDateExtensions(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 self.user1.profile.name, self.user1.username)})
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @override_settings(REGISTRATION_CODE_LENGTH=8)
 class TestCourseRegistrationCodes(ModuleStoreTestCase):
     """
@@ -3058,6 +3063,8 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestCourseRegistrationCodes, self).setUp()
+
         self.course = CourseFactory.create()
         CourseModeFactory.create(course_id=self.course.id, min_price=50)
         self.instructor = InstructorFactory(course_key=self.course.id)
@@ -3497,7 +3504,6 @@ class TestCourseRegistrationCodes(ModuleStoreTestCase):
         self.assertTrue(body.startswith(EXPECTED_COUPON_CSV_HEADER))
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestBulkCohorting(ModuleStoreTestCase):
     """
     Test adding users to cohorts in bulk via CSV upload.

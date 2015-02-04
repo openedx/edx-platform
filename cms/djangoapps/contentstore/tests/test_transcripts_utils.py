@@ -28,6 +28,8 @@ TEST_DATA_CONTENTSTORE['DOC_STORE_CONFIG']['db'] = 'test_xcontent_%s' % uuid4().
 class TestGenerateSubs(unittest.TestCase):
     """Tests for `generate_subs` function."""
     def setUp(self):
+        super(TestGenerateSubs, self).setUp()
+
         self.source_subs = {
             'start': [100, 200, 240, 390, 1000],
             'end': [200, 240, 380, 1000, 1500],
@@ -93,6 +95,7 @@ class TestSaveSubsToStore(ModuleStoreTestCase):
 
     def setUp(self):
 
+        super(TestSaveSubsToStore, self).setUp()
         self.course = CourseFactory.create(
             org=self.org, number=self.number, display_name=self.display_name)
 
@@ -183,6 +186,7 @@ class TestDownloadYoutubeSubs(ModuleStoreTestCase):
             self.clear_sub_content(subs_id)
 
     def setUp(self):
+        super(TestDownloadYoutubeSubs, self).setUp()
         self.course = CourseFactory.create(
             org=self.org, number=self.number, display_name=self.display_name)
 
@@ -477,6 +481,7 @@ class TestTranscript(unittest.TestCase):
     Tests for Transcript class e.g. different transcript conversions.
     """
     def setUp(self):
+        super(TestTranscript, self).setUp()
 
         self.srt_transcript = textwrap.dedent("""\
             0

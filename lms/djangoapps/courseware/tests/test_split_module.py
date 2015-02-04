@@ -15,7 +15,6 @@ from xmodule.partitions.partitions import Group, UserPartition
 from openedx.core.djangoapps.user_api.tests.factories import UserCourseTagFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SplitTestBase(ModuleStoreTestCase):
     """
     Sets up a basic course and user for split test testing.
@@ -29,6 +28,7 @@ class SplitTestBase(ModuleStoreTestCase):
     VISIBLE_CONTENT = None
 
     def setUp(self):
+        super(SplitTestBase, self).setUp()
         self.partition = UserPartition(
             0,
             'first_partition',
@@ -270,12 +270,13 @@ class TestSplitTestVert(SplitTestBase):
         html1 = self._html(cond1vert, 1)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class SplitTestPosition(ModuleStoreTestCase):
     """
     Check that we can change positions in a course with partitions defined
     """
     def setUp(self):
+        super(SplitTestPosition, self).setUp()
+
         self.partition = UserPartition(
             0,
             'first_partition',

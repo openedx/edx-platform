@@ -15,11 +15,12 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CoursewareMiddlewareTestCase(ModuleStoreTestCase):
     """Tests that courseware middleware is correctly redirected"""
 
     def setUp(self):
+        super(CoursewareMiddlewareTestCase, self).setUp()
+
         self.course = CourseFactory.create()
 
     def check_user_not_enrolled_redirect(self):

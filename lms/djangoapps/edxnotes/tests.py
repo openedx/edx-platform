@@ -56,12 +56,14 @@ class TestProblem(object):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesDecoratorTest(TestCase):
+class EdxNotesDecoratorTest(ModuleStoreTestCase):
     """
     Tests for edxnotes decorator.
     """
 
     def setUp(self):
+        super(EdxNotesDecoratorTest, self).setUp()
+
         ClientFactory(name="edx-notes")
         self.course = CourseFactory.create(edxnotes=True)
         self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
@@ -773,7 +775,7 @@ class EdxNotesHelpersTest(ModuleStoreTestCase):
 
 
 @skipUnless(settings.FEATURES["ENABLE_EDXNOTES"], "EdxNotes feature needs to be enabled.")
-class EdxNotesViewsTest(TestCase):
+class EdxNotesViewsTest(ModuleStoreTestCase):
     """
     Tests for EdxNotes views.
     """

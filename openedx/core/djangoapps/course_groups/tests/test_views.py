@@ -29,12 +29,12 @@ from ..cohorts import (
 from .helpers import config_course_cohorts, CohortFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CohortViewsTestCase(ModuleStoreTestCase):
     """
     Base class which sets up a course and staff/non-staff users.
     """
     def setUp(self):
+        super(CohortViewsTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.staff_user = UserFactory(is_staff=True, username="staff")
         self.non_staff_user = UserFactory(username="nonstaff")

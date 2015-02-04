@@ -85,6 +85,7 @@ class OpenEndedChildTest(unittest.TestCase):
     descriptor = Mock()
 
     def setUp(self):
+        super(OpenEndedChildTest, self).setUp()
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
         self.openendedchild = OpenEndedChild(self.test_system, self.location,
@@ -249,6 +250,7 @@ class OpenEndedModuleTest(unittest.TestCase):
     }
 
     def setUp(self):
+        super(OpenEndedModuleTest, self).setUp()
         self.test_system = get_test_system()
         self.test_system.open_ended_grading_interface = None
         self.test_system.location = self.location
@@ -529,6 +531,7 @@ class CombinedOpenEndedModuleTest(unittest.TestCase):
     )
 
     def setUp(self):
+        super(CombinedOpenEndedModuleTest, self).setUp()
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -885,6 +888,7 @@ class CombinedOpenEndedModuleConsistencyTest(unittest.TestCase):
     )
 
     def setUp(self):
+        super(CombinedOpenEndedModuleConsistencyTest, self).setUp()
         self.combinedoe = CombinedOpenEndedV1Module(self.test_system,
                                                     self.location,
                                                     self.definition,
@@ -987,6 +991,7 @@ class OpenEndedModuleXmlTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def _handle_ajax(self, dispatch, content):
@@ -1229,6 +1234,7 @@ class OpenEndedModuleXmlAttemptTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlAttemptTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def _handle_ajax(self, dispatch, content):
@@ -1304,6 +1310,7 @@ class OpenEndedModuleXmlImageUploadTest(unittest.TestCase, DummyModulestore):
         return test_system
 
     def setUp(self):
+        super(OpenEndedModuleXmlImageUploadTest, self).setUp()
         self.setup_modulestore(COURSE)
 
     def test_file_upload_fail(self):

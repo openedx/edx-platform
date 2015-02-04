@@ -153,13 +153,9 @@ class TestMongoModuleStoreBase(unittest.TestCase):
         # Destroy the test db.
         connection.drop_database(DB)
 
-    @classmethod
-    def setUp(cls):
-        cls.dummy_user = ModuleStoreEnum.UserID.test
-
-    @classmethod
-    def tearDown(cls):
-        pass
+    def setUp(self):
+        super(TestMongoModuleStoreBase, self).setUp()
+        self.dummy_user = ModuleStoreEnum.UserID.test
 
 
 class TestMongoModuleStore(TestMongoModuleStoreBase):
@@ -742,12 +738,13 @@ class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
         self.assertRaises(ItemNotFoundError, lambda: self.draft_store.get_all_asset_metadata(course_key, 'asset')[:1])
 
 
-class TestMongoKeyValueStore(object):
+class TestMongoKeyValueStore(unittest.TestCase):
     """
     Tests for MongoKeyValueStore.
     """
 
     def setUp(self):
+        super(TestMongoKeyValueStore, self).setUp()
         self.data = {'foo': 'foo_value'}
         self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
         self.parent = self.course_id.make_usage_key('parent', 'p')

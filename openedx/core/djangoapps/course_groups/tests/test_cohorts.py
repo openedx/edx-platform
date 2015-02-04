@@ -10,24 +10,17 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, mixed_store_config
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE, mixed_store_config, ModuleStoreTestCase
 
 from ..models import CourseUserGroup, CourseUserGroupPartitionGroup
 from .. import cohorts
 from ..tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory
 
-# NOTE: running this with the lms.envs.test config works without
-# manually overriding the modulestore.  However, running with
-# cms.envs.test doesn't.
-
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING)
-
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
     def setUp(self):
+        super(TestCohortSignals, self).setUp()
         self.course_key = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
 
     def test_cohort_added(self, mock_tracker):
@@ -122,16 +115,17 @@ class TestCohortSignals(TestCase):
         self.assertFalse(mock_tracker.emit.called)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
-class TestCohorts(TestCase):
+class TestCohorts(ModuleStoreTestCase):
     """
     Test the cohorts feature
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
         """
         Make sure that course is reloaded every time--clear out the modulestore.
         """
-        clear_existing_modulestores()
+        super(TestCohorts, self).setUp()
         self.toy_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
 
     def test_is_course_cohorted(self):
@@ -594,13 +588,15 @@ class TestCohorts(TestCase):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestCohortsAndPartitionGroups(TestCase):
+class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         """
         Regenerate a test course and cohorts for each test
         """
+        super(TestCohortsAndPartitionGroups, self).setUp()
+
         self.test_course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.test_course_key)
 

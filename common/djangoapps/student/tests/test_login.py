@@ -319,11 +319,11 @@ class LoginTest(TestCase):
             self.assertNotIn(log_string, format_string)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ExternalAuthShibTest(ModuleStoreTestCase):
     """
     Tests how login_user() interacts with ExternalAuth, in particular Shib
     """
+
     def setUp(self):
         super(ExternalAuthShibTest, self).setUp()
         self.course = CourseFactory.create(

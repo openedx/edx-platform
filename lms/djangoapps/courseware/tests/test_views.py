@@ -35,13 +35,14 @@ from util.tests.test_date_utils import fake_ugettext, fake_pgettext
 from util.views import ensure_valid_course_key
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
-class TestJumpTo(TestCase):
+class TestJumpTo(ModuleStoreTestCase):
     """
     Check the jumpto link for a course.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
+        super(TestJumpTo, self).setUp()
         # Use toy course from XML
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
@@ -76,12 +77,12 @@ class TestJumpTo(TestCase):
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class ViewsTestCase(TestCase):
+class ViewsTestCase(ModuleStoreTestCase):
     """
     Tests for views.py methods.
     """
     def setUp(self):
+        super(ViewsTestCase, self).setUp()
         self.course = CourseFactory.create()
         self.chapter = ItemFactory.create(category='chapter', parent_location=self.course.location)  # pylint: disable=no-member
         self.section = ItemFactory.create(category='sequential', parent_location=self.chapter.location, due=datetime(2013, 9, 18, 11, 30, 00))
@@ -465,7 +466,7 @@ class ViewsTestCase(TestCase):
 
 
 # setting TIME_ZONE_DISPLAYED_FOR_DEADLINES explicitly
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE, TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
+@override_settings(TIME_ZONE_DISPLAYED_FOR_DEADLINES="UTC")
 class BaseDueDateTests(ModuleStoreTestCase):
     """
     Base class that verifies that due dates are rendered correctly on a page
@@ -493,6 +494,7 @@ class BaseDueDateTests(ModuleStoreTestCase):
         return course
 
     def setUp(self):
+        super(BaseDueDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -580,7 +582,6 @@ class TestAccordionDueDate(BaseDueDateTests):
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class StartDateTests(ModuleStoreTestCase):
     """
     Test that start dates are properly localized and displayed on the student
@@ -588,6 +589,7 @@ class StartDateTests(ModuleStoreTestCase):
     """
 
     def setUp(self):
+        super(StartDateTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -635,13 +637,13 @@ class StartDateTests(ModuleStoreTestCase):
         self.assertIn("2015-JULY-17", text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ProgressPageTests(ModuleStoreTestCase):
     """
     Tests that verify that the progress page works correctly.
     """
 
     def setUp(self):
+        super(ProgressPageTests, self).setUp()
         self.request_factory = RequestFactory()
         self.user = UserFactory.create()
         self.request = self.request_factory.get("foo")
@@ -676,6 +678,8 @@ class VerifyCourseKeyDecoratorTests(TestCase):
     """
 
     def setUp(self):
+        super(VerifyCourseKeyDecoratorTests, self).setUp()
+
         self.request = RequestFactory().get("foo")
         self.valid_course_id = "edX/test/1"
         self.invalid_course_id = "edX/"

@@ -27,6 +27,8 @@ class TestTransferStudents(ModuleStoreTestCase):
 
     def setUp(self, **kwargs):
         """Connect a stub receiver, and analytics event tracking."""
+        super(TestTransferStudents, self).setUp()
+
         UNENROLL_DONE.connect(self.assert_unenroll_signal)
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()

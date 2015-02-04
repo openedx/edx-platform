@@ -13,6 +13,8 @@ class MockCommentServiceServerTest(unittest.TestCase):
     '''
 
     def setUp(self):
+        super(MockCommentServiceServerTest, self).setUp()
+
         # This is a test of the test setup,
         # so it does not need to run as part of the unit test suite
         # You can re-enable it by commenting out the line below

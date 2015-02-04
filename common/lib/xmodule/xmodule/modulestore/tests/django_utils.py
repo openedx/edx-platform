@@ -12,6 +12,7 @@ from mock import patch
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
+from django.test.utils import override_settings
 from request_cache.middleware import RequestCache
 
 from xmodule.contentstore.django import _CONTENTSTORE
@@ -19,6 +20,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.tests.sample_courses import default_block_info_tree, TOY_BLOCK_INFO_TREE
+from xmodule.modulestore.tests.factories import XMODULE_FACTORY_LOCK
 from xmodule.tabs import CoursewareTab, CourseInfoTab, StaticTab, DiscussionTab, ProgressTab, WikiTab
 
 
@@ -189,15 +191,14 @@ class ModuleStoreTestCase(TestCase):
     Usage:
 
         1. Create a subclass of `ModuleStoreTestCase`
-        2. Use Django's @override_settings decorator to use
-           the desired modulestore configuration.
+        2. (optional) If you need a specific variety of modulestore, or particular ModuleStore
+           options, set the MODULESTORE class attribute of your test class to the
+           appropriate modulestore config.
 
            For example:
 
-               MIXED_CONFIG = mixed_store_config(data_dir, mappings)
-
-               @override_settings(MODULESTORE=MIXED_CONFIG)
                class FooTest(ModuleStoreTestCase):
+                   MODULESTORE = mixed_store_config(data_dir, mappings)
                    # ...
 
         3. Use factories (e.g. `CourseFactory`, `ItemFactory`) to populate
@@ -219,6 +220,9 @@ class ModuleStoreTestCase(TestCase):
           `clear_existing_modulestores()` directly in
           your `setUp()` method.
     """
+
+    MODULESTORE = TEST_DATA_MOCK_MODULESTORE
+
     def setUp(self, **kwargs):
         """
         Creates a test User if `create_user` is True.
@@ -227,6 +231,22 @@ class ModuleStoreTestCase(TestCase):
         Args:
             create_user - specifies whether or not to create a test User.  Default is True.
         """
+        settings_override = override_settings(MODULESTORE=self.MODULESTORE)
+        settings_override.__enter__()
+        self.addCleanup(settings_override.__exit__, None, None, None)
+
+        # Clear out any existing modulestores,
+        # which will cause them to be re-created
+        clear_existing_modulestores()
+
+        self.addCleanup(self.drop_mongo_collections)
+
+        self.addCleanup(RequestCache().clear_request_cache)
+
+        # Enable XModuleFactories for the space of this test (and its setUp).
+        self.addCleanup(XMODULE_FACTORY_LOCK.disable)
+        XMODULE_FACTORY_LOCK.enable()
+
         super(ModuleStoreTestCase, self).setUp()
 
         self.store = modulestore()
@@ -292,43 +312,6 @@ class ModuleStoreTestCase(TestCase):
         _CONTENTSTORE.clear()
         if hasattr(module_store, 'close_connections'):
             module_store.close_connections()
-
-    @classmethod
-    def setUpClass(cls):
-        """
-        Delete the existing modulestores, causing them to be reloaded.
-        """
-        # Clear out any existing modulestores,
-        # which will cause them to be re-created
-        # the next time they are accessed.
-        clear_existing_modulestores()
-        TestCase.setUpClass()
-
-    def _pre_setup(self):
-        """
-        Flush the ModuleStore.
-        """
-        # Flush the Mongo modulestore
-        self.drop_mongo_collections()
-
-        # Call superclass implementation
-        super(ModuleStoreTestCase, self)._pre_setup()
-
-    def _post_teardown(self):
-        """
-        Flush the ModuleStore after each test.
-        """
-        self.drop_mongo_collections()
-        # Clear out the existing modulestores,
-        # which will cause them to be re-created
-        # the next time they are accessed.
-        # We do this at *both* setup and teardown just to be safe.
-        clear_existing_modulestores()
-        # clear RequestCache to emulate its clearance after each http request.
-        RequestCache().clear_request_cache()
-
-        # Call superclass implementation
-        super(ModuleStoreTestCase, self)._post_teardown()
 
     def create_sample_course(self, org, course, run, block_info_tree=None, course_fields=None):
         """

@@ -185,6 +185,7 @@ class VideoDescriptorTestBase(unittest.TestCase):
     """
 
     def setUp(self):
+        super(VideoDescriptorTestBase, self).setUp()
         self.descriptor = instantiate_descriptor()
 
 

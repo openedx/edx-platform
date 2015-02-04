@@ -43,6 +43,7 @@ class TestHandlerUrl(TestCase):
     """Test the LMS handler_url"""
 
     def setUp(self):
+        super(TestHandlerUrl, self).setUp()
         self.block = Mock(name='block', scope_ids=ScopeIds(None, None, None, 'dummy'))
         self.course_key = SlashSeparatedCourseKey("org", "course", "run")
         self.runtime = LmsModuleSystem(
@@ -107,6 +108,7 @@ class TestUserServiceAPI(TestCase):
     """Test the user service interface"""
 
     def setUp(self):
+        super(TestUserServiceAPI, self).setUp()
         self.course_id = SlashSeparatedCourseKey("org", "course", "run")
 
         self.user = User(username='runtime_robot', email='runtime_robot@edx.org', password='test', first_name='Robot')

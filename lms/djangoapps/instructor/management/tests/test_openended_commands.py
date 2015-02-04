@@ -29,11 +29,11 @@ from instructor.utils import get_module_for_student
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedPostTest(ModuleStoreTestCase):
     """Test the openended_post management command."""
 
     def setUp(self):
+        super(OpenEndedPostTest, self).setUp()
         self.user = UserFactory()
         store = modulestore()
         course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
@@ -130,11 +130,12 @@ class OpenEndedPostTest(ModuleStoreTestCase):
         self.assertFalse(result)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class OpenEndedStatsTest(ModuleStoreTestCase):
     """Test the openended_stats management command."""
 
     def setUp(self):
+        super(OpenEndedStatsTest, self).setUp()
+
         self.user = UserFactory()
         store = modulestore()
         course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member

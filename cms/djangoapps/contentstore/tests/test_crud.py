@@ -20,6 +20,7 @@ class TemplateTests(unittest.TestCase):
     """
 
     def setUp(self):
+        super(TemplateTests, self).setUp()
         clear_existing_modulestores()  # redundant w/ cleanup but someone was getting errors
         self.addCleanup(self._drop_mongo_collections)
         self.addCleanup(clear_existing_modulestores)

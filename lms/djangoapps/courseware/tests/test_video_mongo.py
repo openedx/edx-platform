@@ -150,6 +150,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestGetHtmlMethod, self).setUp()
         self.setup_course()
 
     def test_get_html_track(self):
@@ -766,6 +767,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestVideoDescriptorInitialization, self).setUp()
         self.setup_course()
 
     def test_source_not_in_html5sources(self):

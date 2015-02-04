@@ -101,6 +101,8 @@ class TestRescoringTask(TestIntegrationTask):
     """
 
     def setUp(self):
+        super(TestRescoringTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         self.create_student('u1')
@@ -374,6 +376,7 @@ class TestResetAttemptsTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestResetAttemptsTask, self).setUp()
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:
@@ -442,6 +445,8 @@ class TestDeleteProblemTask(TestIntegrationTask):
     userlist = ['u1', 'u2', 'u3', 'u4']
 
     def setUp(self):
+        super(TestDeleteProblemTask, self).setUp()
+
         self.initialize_course()
         self.create_instructor('instructor')
         for username in self.userlist:

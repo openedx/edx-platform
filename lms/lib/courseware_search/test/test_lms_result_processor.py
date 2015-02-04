@@ -47,6 +47,7 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
     def setUp(self):
         # from nose.tools import set_trace
         # set_trace()
+        super(LmsSearchResultProcessorTestCase, self).setUp()
         self.build_course()
 
     def test_url_parameter(self):

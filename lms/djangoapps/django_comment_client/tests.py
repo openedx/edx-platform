@@ -17,6 +17,7 @@ class PermissionsTestCase(TestCase):
         return ''.join(random.choice(chars) for x in range(length))
 
     def setUp(self):
+        super(PermissionsTestCase, self).setUp()
 
         self.course_id = "edX/toy/2012_Fall"
 

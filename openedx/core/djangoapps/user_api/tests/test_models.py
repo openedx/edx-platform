@@ -1,13 +1,13 @@
 from django.db import IntegrityError
-from django.test import TestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from student.tests.factories import UserFactory
 
 from ..tests.factories import UserPreferenceFactory, UserCourseTagFactory, UserOrgTagFactory
 from ..models import UserPreference
 
 
-class UserPreferenceModelTest(TestCase):
+class UserPreferenceModelTest(ModuleStoreTestCase):
     def test_duplicate_user_key(self):
         user = UserFactory.create()
         UserPreferenceFactory.create(user=user, key="testkey", value="first")

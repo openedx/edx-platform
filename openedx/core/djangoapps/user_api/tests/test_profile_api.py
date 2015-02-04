@@ -2,13 +2,13 @@
 """ Tests for the profile API. """
 from django.contrib.auth.models import User
 
-from django.test import TestCase
 import ddt
 from django.test.utils import override_settings
 from nose.tools import raises
 from dateutil.parser import parse as parse_datetime
 from pytz import UTC
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import datetime
 
 from ..api import account as account_api
@@ -17,7 +17,7 @@ from ..models import UserProfile, UserOrgTag
 
 
 @ddt.ddt
-class ProfileApiTest(TestCase):
+class ProfileApiTest(ModuleStoreTestCase):
 
     USERNAME = u'frank-underwood'
     PASSWORD = u'ṕáśśẃőŕd'

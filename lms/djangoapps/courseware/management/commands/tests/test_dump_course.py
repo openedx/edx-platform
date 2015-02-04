@@ -46,6 +46,7 @@ class CommandsTestBase(TestCase):
     """
 
     def setUp(self):
+        super(CommandsTestBase, self).setUp()
         self.loaded_courses = self.load_courses()
 
     def load_courses(self):
@@ -199,17 +200,17 @@ class CommandsTestBase(TestCase):
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_XML_MODULESTORE)
 class CommandsXMLTestCase(CommandsTestBase, ModuleStoreTestCase):
     """
     Test case for management commands using the xml modulestore.
 
     """
+    MODULESTORE = TEST_DATA_MIXED_XML_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class CommandsMongoTestCase(CommandsTestBase, ModuleStoreTestCase):
     """
     Test case for management commands using the mixed mongo modulestore.
 
     """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE

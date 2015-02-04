@@ -16,11 +16,11 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class EmbargoCourseFormTest(ModuleStoreTestCase):
     """Test the course form properly validates course IDs"""
 
     def setUp(self):
+        super(EmbargoCourseFormTest, self).setUp()
         self.course = CourseFactory.create()
         self.true_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': True}
         self.false_form_data = {'course_id': self.course.id.to_deprecated_string(), 'embargoed': False}

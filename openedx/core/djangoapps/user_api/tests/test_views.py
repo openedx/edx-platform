@@ -15,6 +15,7 @@ import ddt
 from pytz import UTC
 import mock
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from student.tests.factories import UserFactory
 from unittest import SkipTest
@@ -1465,7 +1466,7 @@ class RegistrationViewTest(ApiTestCase):
 
 
 @ddt.ddt
-class UpdateEmailOptInTestCase(ApiTestCase):
+class UpdateEmailOptInTestCase(ApiTestCase, ModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
 
     USERNAME = "steve"

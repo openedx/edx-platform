@@ -39,6 +39,8 @@ class TestPdfFile(unittest.TestCase):
     Unit test cases for pdf file generation
     """
     def setUp(self):
+        super(TestPdfFile, self).setUp()
+
         self.items_data = [self.get_item_data(1)]
         self.item_id = '1'
         self.date = datetime.now()

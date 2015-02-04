@@ -393,6 +393,7 @@ class MatlabTest(unittest.TestCase):
     Test Matlab input types
     '''
     def setUp(self):
+        super(MatlabTest, self).setUp()
         self.rows = '10'
         self.cols = '80'
         self.tabsize = '4'
@@ -1003,6 +1004,7 @@ class ChemicalEquationTest(unittest.TestCase):
     Check that chemical equation inputs work.
     '''
     def setUp(self):
+        super(ChemicalEquationTest, self).setUp()
         self.size = "42"
         xml_str = """<chemicalequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 
@@ -1089,6 +1091,7 @@ class FormulaEquationTest(unittest.TestCase):
     Check that formula equation inputs work.
     """
     def setUp(self):
+        super(FormulaEquationTest, self).setUp()
         self.size = "42"
         xml_str = """<formulaequationinput id="prob_1_2" size="{size}"/>""".format(size=self.size)
 

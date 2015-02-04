@@ -22,7 +22,7 @@ from cms.djangoapps.xblock_config.models import StudioConfig
 from xmodule.modulestore.django import modulestore
 
 
-class GetPreviewHtmlTestCase(TestCase):
+class GetPreviewHtmlTestCase(ModuleStoreTestCase):
     """
     Tests for get_preview_fragment.
 

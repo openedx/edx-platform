@@ -69,6 +69,8 @@ class CourseEmailTemplateTest(TestCase):
     """Test the CourseEmailTemplate model."""
 
     def setUp(self):
+        super(CourseEmailTemplateTest, self).setUp()
+
         # load initial content (since we don't run migrations as part of tests):
         call_command("loaddata", "course_email_template.json")
 

@@ -11,11 +11,12 @@ from django.contrib.auth.models import User
 from survey.models import SurveyForm
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from survey.utils import is_survey_required_for_course, must_answer_survey
 
 
-class SurveyModelsTests(TestCase):
+class SurveyModelsTests(ModuleStoreTestCase):
     """
     All tests for the utils.py file
     """
@@ -23,6 +24,8 @@ class SurveyModelsTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
+        super(SurveyModelsTests, self).setUp()
+
         self.client = Client()
 
         # Create two accounts

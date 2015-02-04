@@ -519,6 +519,7 @@ class SplitModuleTest(unittest.TestCase):
         split_store.copy("test@edx.org", source_course, destination, [to_publish], None)
 
     def setUp(self):
+        super(SplitModuleTest, self).setUp()
         self.user_id = random.getrandbits(32)
 
     def tearDown(self):
@@ -1707,7 +1708,7 @@ class TestPublish(SplitModuleTest):
     Test the publishing api
     """
     def setUp(self):
-        SplitModuleTest.setUp(self)
+        super(TestPublish, self).setUp()
 
     def tearDown(self):
         SplitModuleTest.tearDown(self)
