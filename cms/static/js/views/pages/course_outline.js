@@ -2,8 +2,9 @@
  * This page is used to show the user an outline of the course.
  */
 define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views/utils/xblock_utils",
-        "js/views/course_outline", "js/views/utils/view_utils", "js/views/feedback_alert"],
-    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView) {
+        "js/views/course_outline", "js/views/utils/view_utils", "js/views/feedback_alert",
+        "js/views/feedback_notification"],
+    function ($, _, gettext, BasePage, XBlockViewUtils, CourseOutlineView, ViewUtils, AlertView, NoteView) {
         var expandedLocators, CourseOutlinePage;
 
         CourseOutlinePage = BasePage.extend({
@@ -111,21 +112,33 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 var target = $(event.currentTarget);
                 target.css('cursor', 'wait');
                 this.startReIndex(target.attr('href'))
-                    .done(function() {self.onIndexSuccess();})
+                    .done(function(data) {self.onIndexSuccess(data);})
+                    .fail(function(data) {self.onIndexError(data);})
                     .always(function() {target.css('cursor', 'pointer');});
             },
 
             startReIndex: function(reindex_url) {
                 return $.ajax({
-                    url: reindex_url,
-                    method: 'GET'
+                        url: reindex_url,
+                        method: 'GET',
+                        global: false,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json"
                     });
             },
 
-            onIndexSuccess: function() {
+            onIndexSuccess: function(data) {
                 var msg = new AlertView.Announcement({
                         title: gettext('Course Index'),
-                        message: gettext('Course has been successfully reindexed.')
+                        message: data.user_message
+                    });
+                msg.show();
+            },
+
+            onIndexError: function(data) {
+                var msg = new NoteView.Error({
+                        title: gettext('There were errors reindexing course.'),
+                        message: data.user_message
                     });
                 msg.show();
             }

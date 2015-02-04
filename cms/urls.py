@@ -80,7 +80,7 @@ urlpatterns += patterns(
     ),
     url(r'^home/$', 'course_listing', name='home'),
     url(
-        r'^course_search_index/{}?$'.format(settings.COURSE_KEY_PATTERN),
+        r'^course/{}/search_reindex?$'.format(settings.COURSE_KEY_PATTERN),
         'course_search_index_handler',
         name='course_search_index_handler'
     ),
