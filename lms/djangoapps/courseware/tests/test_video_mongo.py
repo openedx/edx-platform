@@ -12,6 +12,7 @@ from xblock.field_data import DictFieldData
 
 from xmodule.video_module import create_youtube_string, VideoDescriptor
 from xmodule.x_module import STUDENT_VIEW
+from xmodule.license import ARRLicense
 from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.test_video import VideoDescriptorTestBase
 
@@ -47,6 +48,8 @@ class TestVideoYouTube(TestVideo):
             'show_captions': 'true',
             'handout': None,
             'download_video_link': u'example.mp4',
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -111,6 +114,8 @@ class TestVideoNonYouTube(TestVideo):
             'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': self.item_descriptor.location.html_id(),
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': sources,
             'speed': 'null',
             'general_speed': 1.0,
@@ -214,6 +219,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': u'example.mp4',
             'end': 3610.0,
             'id': None,
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': sources,
             'start': 3603.0,
             'saved_video_position': 0.0,
@@ -331,6 +338,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': None,
             'end': 3610.0,
             'id': None,
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,
@@ -471,6 +480,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': None,
             'end': 3610.0,
             'id': None,
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,
@@ -589,6 +600,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': None,
             'end': 3610.0,
             'id': None,
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,
@@ -708,6 +721,8 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'download_video_link': None,
             'end': 3610.0,
             'id': None,
+            'licensable': True,
+            'video_license': ARRLicense(),
             'sources': '[]',
             'speed': 'null',
             'general_speed': 1.0,

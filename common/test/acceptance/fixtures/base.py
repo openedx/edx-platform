@@ -112,6 +112,8 @@ class XBlockContainerFixture(StudioApiFixture):
         create_payload = {
             'category': xblock_desc.category,
             'display_name': xblock_desc.display_name,
+            'licensable': xblock_desc.licensable,
+            'license': xblock_desc.license,
         }
 
         if parent_loc is not None:

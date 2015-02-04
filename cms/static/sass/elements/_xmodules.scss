@@ -32,6 +32,34 @@
       }
     }
   }
+
+  .license {
+    @include float(right);
+
+    .tip {
+      display: inline;
+    }
+  }
+}
+
+.xmodule_licensable {
+  @include transition(opacity $tmg-f2 ease-in-out);
+  @include clearfix();
+  padding: ($baseline / 4) 0;
+  opacity: 0.4;
+  &, .license, .license-text {
+    color: $black;
+  }
+  &.opaque, &:hover {
+    opacity: 1;
+  }
+  .license {
+    @extend %t-copy-base;
+    color: $black;
+  }
+  .license-text {
+    @include margin-left(5px);
+  }
 }
 
 .xmodule_VideoDescriptor {

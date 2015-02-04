@@ -7,6 +7,9 @@ from xblock.fields import Boolean, Scope, String, XBlockMixin, Dict
 from xblock.validation import ValidationMessage
 from xmodule.modulestore.inheritance import UserPartitionList
 from xmodule.partitions.partitions import NoSuchUserPartitionError, NoSuchUserPartitionGroupError
+from xmodule.license import License
+
+from django.conf import settings
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -171,3 +174,22 @@ class LmsBlockMixin(XBlockMixin):
                 )
             )
         return validation
+
+class LicenseMixin(XBlockMixin):
+    """
+    Mixin that defines whether or not a block is licensable, and what
+    that license is.
+    """
+    license = License(
+        display_name=_("License"),
+        help=_("Select the license for this course. Reserve all rights, some rights, or no rights."),
+        default=None,
+        scope=Scope.settings
+    )
+
+    licensable = Boolean(
+        display_name=_("Licensable"),
+        help=_("Whether this course and its contents can be licensed using Creative Commons Licensing."),
+        default=hasattr(settings, 'FEATURES') and settings.FEATURES.get("DEFAULT_COURSE_LICENSABLE", False),
+        scope=Scope.settings
+    )

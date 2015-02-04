@@ -1,0 +1,12 @@
+<% if (!kind || kind === 'ARR') { %>
+  &copy; <span class='license-text'><%= gettext("All rights reserved") %></span>
+<% } else { %>
+  <a rel='license' href='http://creativecommons.org/licenses/<%- kind.replace(/CC-/, '').toLowerCase() %>/<%- version %>/' data-tooltip='<%- cc_tooltip %>' target='_blank' class='license'>
+    <i class='icon-cc'></i>
+    <i class='icon-cc-by'></i>
+    <%= /NC/.test(kind) ? "<i class='icon-cc-nc'></i>" : '' %>
+    <%= /ND/.test(kind) ? "<i class='icon-cc-nd'></i>" : '' %>
+    <%= /SA/.test(kind) ? "<i class='icon-cc-sa'></i>" : '' %>
+    <span class='license-text'><%- gettext("Some rights reserved") %></span>
+  </a>
+<% } %>

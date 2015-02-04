@@ -172,6 +172,100 @@ form {
   }
 }
 
+// +Forms - License selector UI
+// ==================== 
+.license-img {
+  padding: 4px;
+}
+
+.license-selector {
+  text-align: middle;
+
+  .action.license-button {
+    @include grey-button;
+    @extend %t-action2;
+
+    display: inline-block;
+
+    text-align: center;
+
+    width: 220px;
+    height: 40px;
+
+    cursor: pointer;
+
+    &.is-selected {
+      @include blue-button;
+    }
+  }
+  .selected-cc-license-options > .license-cc-options {
+    .license-button {
+      line-height: 1.5;
+      border-bottom: 1px solid #EEE;
+      padding: ($baseline / 2) 0 ($baseline * 0.4);
+      &.is-clickable {
+        cursor: pointer;
+      }
+      &.last {
+        border-bottom: none;
+      }
+      .fa {
+        vertical-align: top;
+      }
+      .fa-square-o {
+        display: inline-block;
+        margin: ($baseline * 0.15) 15px 0px;
+      }
+      .fa-check-square-o {
+        color: $blue;
+        display: none;
+        margin: ($baseline * 0.15) 14px 0px 16px;
+      }
+      .fa-check-square-o.disabled {
+        color: $gray;
+      }
+      &.is-selected {
+        .fa-check-square-o {
+          display: inline-block;
+        }
+        .fa-square-o {
+          display: none;
+        }
+      }
+      .option-name {
+        @extend %t-action3;
+        @extend %t-strong;
+        display: inline-block;
+        width: 15%;
+        vertical-align: top;
+      }
+      .explanation {
+        @extend %t-action4;
+        display: inline-block;
+        width: 75%;
+        vertical-align: top;
+        color: $gray;
+      }
+    }
+  }
+
+  .tip {
+    @extend %t-copy-sub2;
+    margin: 6px 0;
+  }
+  .selected-cc-license-options {
+    margin: ($baseline / 2) 0 0;
+  }
+  .selected-cc-license-options, .selected-license-text {
+    border-top: 1px solid $gray-l5;
+    padding: ($baseline / 2) 0;
+  }
+  .selected-license {
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
+
 // +Form - Create New
 // ==================== 
 // form styling for creating a new content item (course, user, textbook)

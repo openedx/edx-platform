@@ -139,6 +139,11 @@ from contentstore.utils import reverse_usage_url
             </div>
 
         </aside>
+        % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and context_course.licensable and context_course.license:
+            <div class="course-license">
+                <%include file="/license.html" args="context_license=context_course.license" />
+            </div>
+        % endif
     </section>
 </div>
 </%block>

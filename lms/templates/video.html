@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%! from django.conf import settings %>
 
 % if display_name is not UNDEFINED and display_name is not None:
     <h2>${display_name}</h2>
@@ -16,6 +17,9 @@
     data-sources='${sources}'
     data-save-state-url="${ajax_url}"
     data-caption-data-dir="${data_dir}"
+    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and licensable and video_license:
+        data-license="${video_license}"
+    % endif
     data-show-captions="${show_captions}"
     data-general-speed="${general_speed}"
     data-speed="${speed}"
@@ -141,12 +145,17 @@
             ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
         </li>
     % endif
+<<<<<<< HEAD
 
     % if branding_info:
       <li id="branding" class="branding">
         <span class="host-tag">${branding_info['logo_tag']}</span>
         <a href="${branding_info['url']}" target="_blank" title="${branding_info['logo_tag']}"><img class="brand-logo" src="${branding_info['logo_src']}" alt="${branding_info['logo_tag']}" /></a>
       </li>
+    % endif
+
+    % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and licensable and video_license:
+        <%include file="/license.html" args="context_license=video_license" />
     % endif
   </ul>
 </div>

@@ -10,10 +10,14 @@
 %>
 
 ## js templates
-<script id="metadata-editor-tpl" type="text/template">
-    <%static:include path="js/metadata-editor.underscore" />
-</script>
-% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry", "metadata-file-uploader-entry", "metadata-file-uploader-item"]:
+% for template_name in ["metadata-editor", "license-selector", "license-view"]:
+    ## Official style as required by the loadTemplate function, appends -tpl
+    ## see: cms/static/js/utils/templates.js
+    <script id="${template_name}-tpl" type="text/template">
+        <%static:include path="js/${template_name}.underscore" />
+    </script>
+% endfor
+% for template_name in ["metadata-number-entry", "metadata-string-entry", "metadata-option-entry", "metadata-list-entry", "metadata-dict-entry", "metadata-file-uploader-entry", "metadata-file-uploader-item", "metadata-license-entry"]:
     <script id="${template_name}" type="text/template">
         <%static:include path="js/${template_name}.underscore" />
     </script>

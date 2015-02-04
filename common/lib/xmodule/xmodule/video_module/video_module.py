@@ -232,6 +232,22 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
 
         track_url, transcript_language, sorted_languages = self.get_transcripts_for_student()
 
+        course = None
+        course_id = None
+
+        licensable = False
+        video_license = None
+        if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            video_license = self.license
+            if hasattr(self.descriptor.runtime, 'modulestore'):
+                course_id = self.descriptor.runtime.course_id
+                if course_id:
+                    course = self.descriptor.runtime.modulestore.get_course(course_id)
+            if course:
+                licensable = course.licensable
+                if not video_license:
+                    video_license = course.license
+
         return self.system.render_template('video.html', {
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
@@ -264,6 +280,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'licensable': licensable,
+            'video_license': video_license,
         })
 
 
@@ -273,6 +291,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
     """
     module_class = VideoModule
     transcript = module_attr('transcript')
+    course_id = module_attr('course_id')
 
     tabs = [
         {
@@ -372,6 +391,35 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         else:
             editable_fields.pop('source')
 
+        # By default, the video is not licensable.
+        # Unless the CREATIVE_COMMONS_LICENSING feature flag is set,
+        # a course is found, and the course is licensable.
+        licensable = False
+        course_id = None
+        course = None
+
+        # Is the CREATIVE_COMMONS_LICENSING feature flag enabled?
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
+            # We need to have a modulestore to lookup the course,
+            # only proceed if there is one.
+            if hasattr(self.runtime, 'modulestore'):
+                # Look-up the course_id of the course where this video is located
+                course_id = self.runtime.course_id
+                if course_id:
+                    # Retrieve the course from the modulestore
+                    course = self.runtime.modulestore.get_course(course_id)
+                    if course:
+                        # The video can only be licensable, if the course is
+                        # licensable. Otherwise it should hide the license and
+                        # the license editor.
+                        licensable = course.licensable
+
+        if not licensable:
+            # We need to remove the license editor fields, as this video is not
+            # licensable (either no course is found or the course is not licensable).
+            editable_fields.pop('license', None)
+            editable_fields.pop('license_version', None)
+
         languages = [{'label': label, 'code': lang} for lang, label in settings.ALL_LANGUAGES if lang != u'en']
         languages.sort(key=lambda l: l['label'])
         languages.insert(0, {'label': 'Table of Contents', 'code': 'table'})
@@ -435,6 +483,26 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'download_track': json.dumps(self.download_track),
             'download_video': json.dumps(self.download_video),
         }
+
+        # Only proceed if the CREATIVE_COMMONS_LICENSING feature is enabled.
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
+            if self.license:
+                # Set the license attributes if the video has a license
+                attrs['license'] = self.license.kind
+                attrs['license_version'] = self.license.version
+            elif hasattr(self.runtime, 'modulestore'):
+                # Otherwise, if we have a modulestore, we can look-up the default
+                # license that is set by the course and display that instead.
+                course_id = self.runtime.course_id
+                if course_id:
+                    course = self.runtime.modulestore.get_course(course_id)
+                    if course and course.license:
+                        # If the course is found, and it has a license set,
+                        # lets use the course license to display the license
+                        # attribute for this video instead.
+                        attrs['license'] = course.license.kind
+                        attrs['license_version'] = course.license.version
+
         for key, value in attrs.items():
             # Mild workaround to ensure that tests pass -- if a field
             # is set to its default value, we don't write it out.
@@ -476,6 +544,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
 
         display_name = metadata_fields['display_name']
         video_url = metadata_fields['html5_sources']
+
         youtube_id_1_0 = metadata_fields['youtube_id_1_0']
 
         def get_youtube_link(video_id):
@@ -509,6 +578,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'display_name': display_name,
             'video_url': video_url
         }
+
+        if getattr(settings, 'FEATURES', {}).get('CREATIVE_COMMONS_LICENSING', False):
+            metadata['license'] = getattr(metadata_fields, 'license', None)
 
         _context.update({'transcripts_basic_tab_metadata': metadata})
         return _context
@@ -557,6 +629,10 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             'from': 'start_time',
             'to': 'end_time'
         }
+
+        if hasattr(settings, 'FEATURES') and settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False):
+            field_data['license'] = xml.get('license')
+
         sources = xml.findall('source')
         if sources:
             field_data['html5_sources'] = [ele.get('src') for ele in sources]

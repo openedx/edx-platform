@@ -6,6 +6,7 @@ import datetime
 from xblock.fields import Scope, String, Float, Boolean, List, Dict
 
 from xmodule.fields import RelativeTime
+from xmodule.license import License
 
 # Make '_' a no-op so we can scrape strings
 _ = lambda text: text
@@ -17,6 +18,12 @@ class VideoFields(object):
         help=_("The name students see. This name appears in the course ribbon and as a header for the video."),
         display_name=_("Component Display Name"),
         default="Video",
+        scope=Scope.settings
+    )
+
+    license = License(
+        display_name=_("License"),
+        default=None,
         scope=Scope.settings
     )
 

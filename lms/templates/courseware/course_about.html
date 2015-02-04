@@ -217,6 +217,10 @@ from edxmako.shortcuts import marketing_link
 
       <div class="inner-wrapper">
         ${get_course_about_section(course, "overview")}
+        % if settings.FEATURES.get('CREATIVE_COMMONS_LICENSING', False) and course.licensable:
+          <h2>${_("License")}</h2>
+          <%include file="/license.html" args="context_license=course.license" />
+        % endif
       </div>
     </section>
 

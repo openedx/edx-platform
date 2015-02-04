@@ -41,7 +41,7 @@ from lms.envs.common import (
 from path import path
 from warnings import simplefilter
 
-from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin, LicenseMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
@@ -50,6 +50,7 @@ from xmodule.modulestore.edit_info import EditInfoMixin
 STUDIO_NAME = "Studio"
 STUDIO_SHORT_NAME = "Studio"
 FEATURES = {
+    'ALLOW_COURSE_RERUNS': True,
     'USE_DJANGO_PIPELINE': True,
 
     'GITHUB_PUSH': False,
@@ -149,6 +150,14 @@ FEATURES = {
 
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
+
+    # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': True,
+
+    # The default value for the licensable field of the course module.
+    # This determines whether a course is licensable or not by default.
+    # This will do nothing unless CREATIVE_COMMONS_LICENSING is True
+    'DEFAULT_COURSE_LICENSABLE': True,
 }
 
 ENABLE_JASMINE = False
@@ -300,6 +309,7 @@ from xmodule.x_module import XModuleMixin
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
     LmsBlockMixin,
+    LicenseMixin,
     InheritanceMixin,
     XModuleMixin,
     EditInfoMixin,
@@ -418,6 +428,8 @@ PIPELINE_CSS = {
     'style-app': {
         'source_filenames': [
             'sass/style-app.css',
+            'css/edx-cc.css',
+            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/cms-style-app.css',
     },

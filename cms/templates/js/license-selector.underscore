@@ -1,0 +1,66 @@
+<div class="license-buttons">
+  <div class="wrapper-license-type-buttons">
+      <button class="action license-button <%- (!kind || kind === 'ARR') ? 'is-selected' : ''%>" data-license="ARR" type="button" name="license-arr" value="<%= gettext("All rights reserved") %>" data-tooltip="<%- gettext("You reserve all rights for your work") %>">
+          <span><%- gettext("All rights reserved") %></span>
+      </button>
+      <button class="action license-button <%- (kind && kind !== 'ARR') ? 'is-selected' : ''%>" data-license="CC" type="button" name="license-cc" value="<%= gettext("Creative Commons") %>" data-tooltip="<%- gettext("You waive some rights for your work, such that others can use it too") %>">
+          <span><%- gettext("Creative Commons") %></span>
+      </button>
+      <p class='tip'><%=
+        interpolate(
+            gettext("%(link_start)sLearn more%(link_end)s about Creative Commons."),
+            {
+                link_start: "<a href='http://creativecommons.org/about' target='_blank'>",
+                link_end: "</a>"
+            },
+            true
+        )
+      %></p>
+  </div>
+</div>
+<div class="selected-cc-license-options <%- (!kind || kind === 'ARR') ? 'is-hidden' : '' %>">
+  <label class="label setting-label"><%- gettext("Creative Commons Options") %></label>
+  <p class='tip tip-inline'><%- gettext("The following options are available for inclusion in your Creative Commons licensing.") %></p>
+  <ul class="license-cc-options">
+    <li class="action-item license-button is-selected" data-license="BY">
+      <i class="fa fa-fw fa-check-square-o disabled"></i>
+      <h4 class='option-name'><%- gettext('Attribution') %></h4>
+      <div class="explanation">
+        <%- gettext('Allow others to copy, distribute, display and perform your copyrighted work but only if they give credit the way you request. This is enabled for all Creative Commons licenses on edX.') %>
+      </div>
+    </li>
+
+    <li class="action-item license-button is-clickable <%- /NC/.test(kind) ? 'is-selected' : '' %>"  data-license="NC">
+      <i class="fa fa-fw fa-check-square-o"></i>
+      <i class="fa fa-fw fa-square-o"></i>
+      <h4 class='option-name'><%- gettext('Noncommercial') %></h4>
+      <div class="explanation">
+        <%- gettext('Allow others to distribute, display and perform your work - and derivative works based upon it - but for noncommercial purposes only.') %>
+      </div>
+    </li>
+
+    <li class="action-item license-button is-clickable <%- /ND/.test(kind) ? 'is-selected' : '' %>" data-license="ND">
+      <i class="fa fa-fw fa-check-square-o"></i>
+      <i class="fa fa-fw fa-square-o"></i>
+      <h4 class='option-name'><%- gettext('No Derivatives') %></h4>
+      <div class="explanation">
+        <%- gettext('Allow others to copy, distribute, display and perform only verbatim copies of your work, not derivative works based upon it.') %>
+      </div>
+    </li>
+
+    <li class="action-item license-button is-clickable last <%- /SA/.test(kind) ? 'is-selected' : '' %>" data-license="SA">
+      <i class="fa fa-fw fa-check-square-o"></i>
+      <i class="fa fa-fw fa-square-o"></i>
+      <h4 class='option-name'><%- gettext('Share Alike') %></h4>
+      <div class="explanation">
+        <%- gettext('Allow others to distribute derivative works only under a license identical to the license that governs your work.') %>
+      </div>
+    </li>
+  </ul>
+</div>
+<div class="selected-license-text">
+  <label class='label setting-label' for="license"><%- gettext('Copyright Notice') %></label>
+  <p class='tip'><%- gettext("Students will see the following copyright notice beneath course content.") %></p>
+  <span class="xmodule_licensable opaque" id="license-preview"></span>
+  <input class="license" type="hidden" name="license" aria-required="false" value="<%= kind %>" />
+</div>

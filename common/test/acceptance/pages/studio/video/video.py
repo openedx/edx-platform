@@ -54,6 +54,7 @@ DEFAULT_SETTINGS = [
     # basic
     [DISPLAY_NAME, 'Video', False],
     ['Default Video URL', 'http://youtu.be/OEoXaMPEzfM, , ', False],
+    ['License', 'All rights reserved', False],
 
     # advanced
     [DISPLAY_NAME, 'Video', False],
@@ -61,6 +62,7 @@ DEFAULT_SETTINGS = [
     ['Download Transcript Allowed', 'False', False],
     ['Downloadable Transcript URL', '', False],
     ['EdX Video ID', '', False],
+    ['License', 'All rights reserved', False],
     ['Show Transcript', 'True', False],
     ['Transcript Languages', '', False],
     ['Upload Handout', '', False],
@@ -333,6 +335,8 @@ class VideoComponentPage(VideoPage):
         elif 'metadata-videolist-enum' in setting.get_attribute('class'):
             current_value = ', '.join(item.find_element_by_tag_name('input').get_attribute('value') for item in
                                       setting.find_elements_by_class_name('videolist-settings-item'))
+        elif 'metadata-license-entry' in setting.get_attribute('class'):
+            current_value = setting.find_element_by_css_selector('.license-button.selected').get_attribute('value')
         else:
             current_value = setting.find_element_by_class_name('setting-input').get_attribute('value')
 
@@ -341,7 +345,8 @@ class VideoComponentPage(VideoPage):
 
         # Clear button should be visible(active class is present) for
         # every setting that don't have 'metadata-videolist-enum' class
-        if 'metadata-videolist-enum' not in setting.get_attribute('class'):
+        if 'metadata-videolist-enum' not in setting.get_attribute('class') and \
+           'metadata-license-entry' not in setting.get_attribute('class'):
             setting_clear_button = setting.find_elements_by_class_name('setting-clear')[0]
             if 'active' not in setting_clear_button.get_attribute('class'):
                 return False

@@ -40,7 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
-from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
+from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin, LicenseMixin
 
 ################################### FEATURES ###################################
 # The display name of the platform to be used in templates/emails/etc.
@@ -297,6 +297,9 @@ FEATURES = {
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
+
+    # Whether or not to enable Creative Commons Licensing ability for courses
+    'CREATIVE_COMMONS_LICENSING': True,
 
     # Enable the new dashboard, account, and profile pages
     'ENABLE_NEW_DASHBOARD': False,
@@ -603,7 +606,7 @@ from xmodule.x_module import XModuleMixin
 
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
-XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
+XBLOCK_MIXINS = (LmsBlockMixin, LicenseMixin, InheritanceMixin, XModuleMixin)
 
 # Allow any XBlock in the LMS
 XBLOCK_SELECT_FUNCTION = prefer_xmodules
@@ -1167,7 +1170,9 @@ PIPELINE_CSS = {
     'style-app': {
         'source_filenames': [
             'sass/application.css',
-            'sass/ie.css'
+            'sass/ie.css',
+            'css/edx-cc.css',
+            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/lms-style-app.css',
     },
