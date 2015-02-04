@@ -314,12 +314,12 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
   opacity: 1.0;
 }
 
-.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer a.annotator-save {
+.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-save {
   @extend %btn-inherited-primary;
   @extend %t-action2;
 }
 
-.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer a.annotator-cancel {
+.edx-notes-wrapper .annotator-wrapper .annotator-editor.annotator-outer button.annotator-cancel {
   @extend %shame-link-base;
   @extend %t-action2;
   @extend %t-regular;
