@@ -3,7 +3,7 @@ Unit test tasks
 """
 import os
 import sys
-from paver.easy import sh, task, cmdopts, needs
+from paver.easy import sh, task, cmdopts, needs, call_task
 from pavelib.utils.test import suites
 from pavelib.utils.envs import Env
 from optparse import make_option
@@ -203,6 +203,21 @@ def coverage(options):
                 report_dir=report_dir,
                 dir=directory
             ))
+
+
+    call_task('diff_coverage', options=dict(options))
+
+
+@task
+@needs('pavelib.prereqs.install_prereqs')
+@cmdopts([
+    ("compare_branch=", "b", "Branch to compare against, defaults to origin/master"),
+])
+def diff_coverage(options):
+    """
+    Build the diff coverage reports
+    """
+    compare_branch = getattr(options, 'compare_branch', 'origin/master')
 
     # Find all coverage XML files (both Python and JavaScript)
     xml_reports = []
