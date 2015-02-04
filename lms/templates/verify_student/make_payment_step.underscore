@@ -107,14 +107,13 @@
           ) %>
         <% } else if ( !isActive ) { %>
           <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
-        <% } else if ( !upgrade ) { %>
+        <% } else { %>
             <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
         <% } %>
       </p>
       <% } %>
     </div>
 
-    <% if ( !upgrade ) { %>
     <div class="requirements-container">
       <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
         <% if ( requirements['account-activation-required'] ) { %>
@@ -156,7 +155,6 @@
         <% } %>
       </ul>
     </div>
-    <% } %>
 
 
   <% if ( isActive ) { %>
