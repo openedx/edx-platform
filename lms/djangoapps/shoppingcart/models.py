@@ -18,7 +18,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ugettext_lazy
 from django.db import transaction
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
@@ -773,11 +773,11 @@ class OrderItem(TimeStampedModel):
         self.save()
 
 
-class Invoice(models.Model):
+class Invoice(TimeStampedModel):
     """
-         This table capture all the information needed to support "invoicing"
-         which is when a user wants to purchase Registration Codes,
-         but will not do so via a Credit Card transaction.
+    This table capture all the information needed to support "invoicing"
+    which is when a user wants to purchase Registration Codes,
+    but will not do so via a Credit Card transaction.
     """
     company_name = models.CharField(max_length=255, db_index=True)
     company_contact_name = models.CharField(max_length=255)
@@ -785,16 +785,39 @@ class Invoice(models.Model):
     recipient_name = models.CharField(max_length=255)
     recipient_email = models.CharField(max_length=255)
     address_line_1 = models.CharField(max_length=255)
-    address_line_2 = models.CharField(max_length=255, null=True)
-    address_line_3 = models.CharField(max_length=255, null=True)
+    address_line_2 = models.CharField(max_length=255, null=True, blank=True)
+    address_line_3 = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, null=True)
     state = models.CharField(max_length=255, null=True)
     zip = models.CharField(max_length=15, null=True)
     country = models.CharField(max_length=64, null=True)
-    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    # This field has been deprecated.
+    # The total amount can now be calculated as the sum
+    # of each invoice item associated with the invoice.
+    # For backwards compatibility, this field is maintained
+    # and written to during invoice creation.
     total_amount = models.FloatField()
-    internal_reference = models.CharField(max_length=255, null=True)
-    customer_reference_number = models.CharField(max_length=63, null=True)
+
+    # This field has been deprecated in order to support
+    # invoices for items that are not course-related.
+    # Although this field is still maintained for backwards
+    # compatibility, you should use CourseRegistrationCodeInvoiceItem
+    # to look up the course ID for purchased redeem codes.
+    course_id = CourseKeyField(max_length=255, db_index=True)
+
+    internal_reference = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        help_text=ugettext_lazy("Internal reference code for this invoice.")
+    )
+    customer_reference_number = models.CharField(
+        max_length=63,
+        null=True,
+        blank=True,
+        help_text=ugettext_lazy("Customer's reference code for this invoice.")
+    )
     is_valid = models.BooleanField(default=True)
 
     def generate_pdf_invoice(self, course, course_price, quantity, sale_price):
@@ -824,6 +847,125 @@ class Invoice(models.Model):
 
         return pdf_buffer
 
+    def __unicode__(self):
+        label = (
+            unicode(self.internal_reference)
+            if self.internal_reference
+            else u"No label"
+        )
+
+        created = (
+            self.created.strftime("%Y-%m-%d")  # pylint: disable=no-member
+            if self.created
+            else u"No date"
+        )
+
+        return u"{label} ({date_created})".format(
+            label=label, date_created=created
+        )
+
+
+INVOICE_TRANSACTION_STATUSES = (
+    # A payment/refund is in process, but money has not yet been transferred
+    ('started', 'started'),
+
+    # A payment/refund has completed successfully
+    # This should be set ONLY once money has been successfully exchanged.
+    ('completed', 'completed'),
+
+    # A payment/refund was promised, but was cancelled before
+    # money had been transferred.  An example would be
+    # cancelling a refund check before the recipient has
+    # a chance to deposit it.
+    ('cancelled', 'cancelled')
+)
+
+
+class InvoiceTransaction(TimeStampedModel):
+    """Record payment and refund information for invoices.
+
+    There are two expected use cases:
+
+    1) We send an invoice to someone, and they send us a check.
+       We then manually create an invoice transaction to represent
+       the payment.
+
+    2) We send an invoice to someone, and they pay us.  Later, we
+       need to issue a refund for the payment.  We manually
+       create a transaction with a negative amount to represent
+       the refund.
+
+    """
+    invoice = models.ForeignKey(Invoice)
+    amount = models.DecimalField(
+        default=0.0, decimal_places=2, max_digits=30,
+        help_text=ugettext_lazy(
+            "The amount of the transaction.  Use positive amounts for payments"
+            " and negative amounts for refunds."
+        )
+    )
+    currency = models.CharField(
+        default="usd",
+        max_length=8,
+        help_text=ugettext_lazy("Lower-case ISO currency codes")
+    )
+    comments = models.TextField(
+        null=True,
+        blank=True,
+        help_text=ugettext_lazy("Optional: provide additional information for this transaction")
+    )
+    status = models.CharField(
+        max_length=32,
+        default='started',
+        choices=INVOICE_TRANSACTION_STATUSES,
+        help_text=ugettext_lazy(
+            "The status of the payment or refund. "
+            "'started' means that payment is expected, but money has not yet been transferred. "
+            "'completed' means that the payment or refund was received. "
+            "'cancelled' means that payment or refund was expected, but was cancelled before money was transferred. "
+        )
+    )
+    created_by = models.ForeignKey(User)
+    last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
+
+
+class InvoiceItem(TimeStampedModel):
+    """
+    This is the basic interface for invoice items.
+
+    Each invoice item represents a "line" in the invoice.
+    For example, in an invoice for course registration codes,
+    there might be an invoice item representing 10 registration
+    codes for the DemoX course.
+
+    """
+    objects = InheritanceManager()
+    invoice = models.ForeignKey(Invoice, db_index=True)
+    qty = models.IntegerField(
+        default=1,
+        help_text=ugettext_lazy("The number of items sold.")
+    )
+    unit_price = models.DecimalField(
+        default=0.0,
+        decimal_places=2,
+        max_digits=30,
+        help_text=ugettext_lazy("The price per item sold, including discounts.")
+    )
+    currency = models.CharField(
+        default="usd",
+        max_length=8,
+        help_text=ugettext_lazy("Lower-case ISO currency codes")
+    )
+
+
+class CourseRegistrationCodeInvoiceItem(InvoiceItem):
+    """
+    This is an invoice item that represents a payment for
+    a course registration.
+
+    """
+    course_id = CourseKeyField(max_length=128, db_index=True)
+
 
 class CourseRegistrationCode(models.Model):
     """
@@ -835,8 +977,13 @@ class CourseRegistrationCode(models.Model):
     created_by = models.ForeignKey(User, related_name='created_by_user')
     created_at = models.DateTimeField(default=datetime.now(pytz.utc))
     order = models.ForeignKey(Order, db_index=True, null=True, related_name="purchase_order")
-    invoice = models.ForeignKey(Invoice, null=True)
     mode_slug = models.CharField(max_length=100, null=True)
+
+    # For backwards compatibility, we maintain the FK to "invoice"
+    # In the future, we will remove this in favor of the FK
+    # to "invoice_item" (which can be used to look up the invoice).
+    invoice = models.ForeignKey(Invoice, null=True)
+    invoice_item = models.ForeignKey(CourseRegistrationCodeInvoiceItem, null=True)
 
 
 class RegistrationCodeRedemption(models.Model):
@@ -1227,7 +1374,7 @@ class CourseRegCodeItem(OrderItem):
         # is in another PR (for another feature)
         from instructor.views.api import save_registration_code
         for i in range(total_registration_codes):  # pylint: disable=unused-variable
-            save_registration_code(self.user, self.course_id, self.mode, invoice=None, order=self.order)
+            save_registration_code(self.user, self.course_id, self.mode, order=self.order)
 
         log.info("Enrolled {0} in paid course {1}, paid ${2}"
                  .format(self.user.email, self.course_id, self.line_cost))  # pylint: disable=no-member

@@ -465,8 +465,8 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
         # registration codes may be generated via Bulk Purchase Scenario
         # we have to check only for the invoice generated registration codes
         # that their invoice is valid or not
-        if redeemed_registration.invoice:
-            if not getattr(redeemed_registration.invoice, 'is_valid'):
+        if redeemed_registration.invoice_item:
+            if not getattr(redeemed_registration.invoice_item.invoice, 'is_valid'):
                 blocked = True
                 # disabling email notifications for unpaid registration courses
                 Optout.objects.get_or_create(user=request.user, course_id=course_key)
