@@ -16,7 +16,10 @@ from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
 from xmodule.partitions.partitions import Group, UserPartition
 
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+import openedx.core.djangoapps.user_api.api.course_tag as course_tag_api
+from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
@@ -64,11 +67,10 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         report_store = ReportStore.from_config()
         self.assertTrue(any('grade_report_err' in item[0] for item in report_store.links_for(self.course.id)))
 
-    def _verify_cohort_data(self, course_id, expected_cohort_groups):
+    def _verify_cell_data_for_user(self, username, course_id, column_header, expected_cell_content):
         """
-        Verify cohort data.
+        Verify cell data in the grades CSV for a particular user.
         """
-        cohort_groups_in_csv = []
         with patch('instructor_task.tasks_helper._get_current_task'):
             result = upload_grades_csv(None, None, course_id, None, 'graded')
             self.assertDictContainsSubset({'attempted': 2, 'succeeded': 2, 'failed': 0}, result)
@@ -76,9 +78,8 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
             report_csv_filename = report_store.links_for(course_id)[0][0]
             with open(report_store.path_to(course_id, report_csv_filename)) as csv_file:
                 for row in unicodecsv.DictReader(csv_file):
-                    cohort_groups_in_csv.append(row['Cohort Name'])
-
-        self.assertEqual(cohort_groups_in_csv, expected_cohort_groups)
+                    if row.get('username') == username:
+                        self.assertEqual(row[column_header], expected_cell_content)
 
     def test_cohort_data_in_grading(self):
         """
@@ -87,20 +88,22 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         cohort_groups = ['cohort 1', 'cohort 2']
         course = CourseFactory.create(cohort_config={'cohorted': True, 'auto_cohort': True,
                                                      'auto_cohort_groups': cohort_groups})
-        for _ in range(2):
-            CourseEnrollment.enroll(UserFactory.create(), course.id)
+
+        user_1 = 'user_1'
+        user_2 = 'user_2'
+        CourseEnrollment.enroll(UserFactory.create(username=user_1), course.id)
+        CourseEnrollment.enroll(UserFactory.create(username=user_2), course.id)
 
         # In auto cohorting a group will be assigned to a user only when user visits a problem
         # In grading calculation we only add a group in csv if group is already assigned to
         # user rather than creating a group automatically at runtime
-        expected_groups = ['', '']
-        self._verify_cohort_data(course.id, expected_groups)
+        self._verify_cell_data_for_user(user_1, course.id, 'Cohort Name', '')
+        self._verify_cell_data_for_user(user_2, course.id, 'Cohort Name', '')
 
     def test_unicode_cohort_data_in_grading(self):
         """
         Test that cohorts can contain unicode characters.
         """
-        cohort_groups = [u'ÞrÖfessÖr X', u'MàgnëtÖ']
         course = CourseFactory.create(cohort_config={'cohorted': True})
 
         # Create users and manually assign cohorts
@@ -108,12 +111,15 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
         user2 = UserFactory.create(username='user2')
         CourseEnrollment.enroll(user1, course.id)
         CourseEnrollment.enroll(user2, course.id)
-        cohort1 = CohortFactory(course_id=course.id, name=u'ÞrÖfessÖr X')
-        cohort2 = CohortFactory(course_id=course.id, name=u'MàgnëtÖ')
+        professor_x = u'ÞrÖfessÖr X'
+        magneto = u'MàgnëtÖ'
+        cohort1 = CohortFactory(course_id=course.id, name=professor_x)
+        cohort2 = CohortFactory(course_id=course.id, name=magneto)
         cohort1.users.add(user1)
         cohort2.users.add(user2)
 
-        self._verify_cohort_data(course.id, cohort_groups)
+        self._verify_cell_data_for_user(user1.username, course.id, 'Cohort Name', professor_x)
+        self._verify_cell_data_for_user(user2.username, course.id, 'Cohort Name', magneto)
 
     def test_unicode_user_partitions(self):
         """
@@ -139,6 +145,100 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
 
         _groups = [group.name for group in self.course.user_partitions[0].groups]
         self.assertEqual(_groups, user_groups)
+
+    def test_cohort_scheme_partition(self):
+        """
+        Test that cohort-schemed user partitions are ignored in the
+        grades export.
+        """
+        # Set up a course with 'cohort' and 'random' user partitions.
+        cohort_scheme_partition = UserPartition(
+            0,
+            'Cohort-schemed Group Configuration',
+            'Group Configuration based on Cohorts',
+            [Group(0, 'Group A'), Group(1, 'Group B')],
+            scheme_id='cohort'
+        )
+        experiment_group_a = Group(2, u'Expériment Group A')
+        experiment_group_b = Group(3, u'Expériment Group B')
+        experiment_partition = UserPartition(
+            1,
+            u'Content Expériment Configuration',
+            u'Group Configuration for Content Expériments',
+            [experiment_group_a, experiment_group_b],
+            scheme_id='random'
+        )
+        course = CourseFactory.create(
+            cohort_config={'cohorted': True},
+            user_partitions=[cohort_scheme_partition, experiment_partition]
+        )
+
+        # Create user_a and user_b which are enrolled in the course
+        # and assigned to experiment_group_a and experiment_group_b,
+        # respectively.
+        user_a = UserFactory.create(username='user_a')
+        user_b = UserFactory.create(username='user_b')
+        CourseEnrollment.enroll(user_a, course.id)
+        CourseEnrollment.enroll(user_b, course.id)
+        course_tag_api.set_course_tag(
+            user_a,
+            course.id,
+            RandomUserPartitionScheme.key_for_partition(experiment_partition),
+            experiment_group_a.id
+        )
+        course_tag_api.set_course_tag(
+            user_b,
+            course.id,
+            RandomUserPartitionScheme.key_for_partition(experiment_partition),
+            experiment_group_b.id
+        )
+
+        # Assign user_a to a group in the 'cohort'-schemed user
+        # partition (by way of a cohort) to verify that the user
+        # partition group does not show up in the "Experiment Group"
+        # cell.
+        cohort_a = CohortFactory.create(course_id=course.id, name=u'Cohørt A', users=[user_a])
+        CourseUserGroupPartitionGroup(
+            course_user_group=cohort_a,
+            partition_id=cohort_scheme_partition.id,
+            group_id=cohort_scheme_partition.groups[0].id
+        ).save()
+
+        # Verify that we see user_a and user_b in their respective
+        # content experiment groups, and that we do not see any
+        # content groups.
+        experiment_group_message = u'Experiment Group ({content_experiment})'
+        self._verify_cell_data_for_user(
+            user_a.username,
+            course.id,
+            experiment_group_message.format(
+                content_experiment=experiment_partition.name
+            ),
+            experiment_group_a.name
+        )
+        self._verify_cell_data_for_user(
+            user_b.username,
+            course.id,
+            experiment_group_message.format(
+                content_experiment=experiment_partition.name
+            ),
+            experiment_group_b.name
+        )
+
+        # Make sure cohort info is correct.
+        cohort_name_header = 'Cohort Name'
+        self._verify_cell_data_for_user(
+            user_a.username,
+            course.id,
+            cohort_name_header,
+            cohort_a.name
+        )
+        self._verify_cell_data_for_user(
+            user_b.username,
+            course.id,
+            cohort_name_header,
+            ''
+        )
 
     @patch('instructor_task.tasks_helper._get_current_task')
     @patch('instructor_task.tasks_helper.iterate_grades_for')
