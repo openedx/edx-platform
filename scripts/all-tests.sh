@@ -156,13 +156,20 @@ END
     "cms-acceptance")
         case "$SHARD" in
 
-            "all")
+            "all"|"1")
                 paver test_acceptance -s cms --extra_args="-v 3"
                 ;;
 
-            *)
-                paver test_acceptance -s cms --extra_args="-v 3 --tag shard_${SHARD}"
+            "2"|"3")
+                mkdir -p reports/acceptance
+                cat > reports/acceptance/xunit.xml <<END
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="nosetests" tests="1" errors="0" failures="0" skip="0">
+<testcase classname="lettuce.tests" name="shard_placeholder" time="0.001"></testcase>
+</testsuite>
+END
                 ;;
+
         esac
         ;;
 
