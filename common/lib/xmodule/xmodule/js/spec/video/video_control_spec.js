@@ -278,7 +278,8 @@
 
         describe('constructor with end-time', function () {
             it(
-                'saved position is 0, timer slider and VCR set to 0:00',
+                'saved position is 0, timer slider and VCR set to 0:00 ' + 
+                'and ending at specified end-time',
                 function ()
             {
                 var duration, sliderEl, expectedValue;
@@ -301,7 +302,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:00 / 1:00');
+                    expect(expectedValue).toHaveText('0:00 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(0);
@@ -335,7 +336,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:15 / 1:00');
+                    expect(expectedValue).toHaveText('0:15 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(15);
@@ -369,7 +370,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:00 / 1:00');
+                    expect(expectedValue).toHaveText('0:00 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(0);
@@ -403,7 +404,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:00 / 1:00');
+                    expect(expectedValue).toHaveText('0:00 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(0);
@@ -438,7 +439,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:00 / 1:00');
+                    expect(expectedValue).toHaveText('0:00 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(0);
@@ -450,7 +451,7 @@
 
         describe('constructor with start-time and end-time', function () {
             it(
-                'saved position is 0, timer slider and VCR set to start-time',
+                'saved position is 0, timer slider and VCR set to appropriate start and end times',
                 function ()
             {
                 var duration, sliderEl, expectedValue;
@@ -474,7 +475,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:10 / 1:00');
+                    expect(expectedValue).toHaveText('0:10 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);
@@ -509,7 +510,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:15 / 1:00');
+                    expect(expectedValue).toHaveText('0:15 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(15);
@@ -544,7 +545,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:10 / 1:00');
+                    expect(expectedValue).toHaveText('0:10 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);
@@ -579,7 +580,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:10 / 1:00');
+                    expect(expectedValue).toHaveText('0:10 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);
@@ -614,7 +615,7 @@
 
                 runs(function () {
                     expectedValue = $('.video-controls').find('.vidtime');
-                    expect(expectedValue).toHaveText('0:10 / 1:00');
+                    expect(expectedValue).toHaveText('0:10 / 0:20');
 
                     expectedValue = sliderEl.slider('option', 'value');
                     expect(expectedValue).toBe(10);

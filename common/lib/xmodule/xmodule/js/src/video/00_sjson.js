@@ -27,14 +27,24 @@ function() {
             return sjson.text.length;
         };
 
-        var search = function (time) {
+        function search(time, startTime, endTime) {
             var start = getStartTimes(),
                 max = size() - 1,
                 min = 0,
+                results,
                 index;
 
-            if (time < start[min]) {
-                return -1;
+            // if we specify a start and end time to search,
+            // search the filtered list of captions in between
+            // the start / end times.
+            // Else, search the unfiltered list.
+            if (typeof startTime !== 'undefined' &&
+                typeof endTime !== 'undefined') {
+              results = filter(startTime, endTime);
+              start = results.start;
+              max = results.captions.length - 1;
+            } else {
+              start = getStartTimes();
             }
             while (min < max) {
                 index = Math.ceil((max + min) / 2);
@@ -51,10 +61,44 @@ function() {
             return min;
         };
 
+        function filter(start, end) {
+            var filteredTimes = [];
+            var filteredCaptions = [];
+            var startTimes = getStartTimes();
+            var captions = getCaptions();
+            var currentStartTime;
+            var i;
+
+            if (startTimes.length !== captions.length) {
+                return [];
+            }
+
+            // if end is null, then it's been set to
+            // some erroneous value, so filter using the
+            // entire array as long as it's not empty
+            if (end === null && startTimes.length) {
+                end = startTimes[startTimes.length - 1];
+            }
+
+            for (i = 0; i < startTimes.length; i++) {
+              currentStartTime = startTimes[i];
+              if (currentStartTime >= start && currentStartTime <= end) {
+                filteredTimes.push(currentStartTime);
+                filteredCaptions.push(captions[i]);
+              }
+            }
+
+            return {
+              'start': filteredTimes,
+              'captions': filteredCaptions
+            };
+        }
+
         return {
             getCaptions: getCaptions,
             getStartTimes: getStartTimes,
             getSize: size,
+            filter: filter,
             search: search
         };
     };
