@@ -33,6 +33,7 @@ define([
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
+            spyOn(this.toggleNotes, 'toggleHandler').andCallThrough();
         });
 
         afterEach(function () {
@@ -94,6 +95,12 @@ define([
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
             expect(errorContainer).not.toHaveClass('annotator-notice-show');
+        });
+
+        it('toggles notes when CTRL + OPTION + n keydown on document', function () {
+            // Character 'n' has keyCode 78
+            $(document).trigger($.Event('keydown', {keyCode: 78, ctrlKey: true, altKey: true}));
+            expect(this.toggleNotes.toggleHandler).toHaveBeenCalled();
         });
     });
 });
