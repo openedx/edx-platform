@@ -150,7 +150,7 @@ class CMSVideoTest(CMSVideoBaseTest):
             YouTubeStubConfig.configure(youtube_stub_config)
 
         if subtitles:
-            self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
 
         self.navigate_to_course_unit()
 
@@ -287,9 +287,9 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.video.show_captions()
 
-        self.video.focus_caption_line(1)
+        self.video.focus_caption_line(2)
 
-        self.assertTrue(self.video.is_caption_line_focused(1))
+        self.assertTrue(self.video.is_caption_line_focused(2))
 
     def test_slider_range_works(self):
         """

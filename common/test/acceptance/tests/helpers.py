@@ -53,7 +53,7 @@ def is_youtube_available():
         'metadata': 'http://gdata.youtube.com/feeds/api/videos/',
         # For transcripts, you need to check an actual video, so we will
         # just specify our default video and see if that one is available.
-        'transcript': 'http://video.google.com/timedtext?lang=en&v=OEoXaMPEzfM',
+        'transcript': 'http://video.google.com/timedtext?lang=en&v=3_yD_cEKoCk',
     }
 
     for url in youtube_api_urls.itervalues():
