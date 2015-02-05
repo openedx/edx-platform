@@ -17,6 +17,7 @@ from static_replace import replace_static_urls
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.x_module import STUDENT_VIEW
 from microsite_configuration import microsite
+from util.keyword_substitution import substitute_keywords_with_data
 
 from courseware.access import has_access
 from courseware.model_data import FieldDataCache
@@ -285,6 +286,7 @@ def get_course_info_section(request, course, section_key):
     if info_module is not None:
         try:
             html = info_module.render(STUDENT_VIEW).content
+            html = substitute_keywords_with_data(html, request.user.id, course.id)
         except Exception:  # pylint: disable=broad-except
             html = render_to_string('courseware/error-message.html', None)
             log.exception(

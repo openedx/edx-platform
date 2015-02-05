@@ -37,7 +37,7 @@ class TestNewInstructorDashboardEmailViewMongoBacked(ModuleStoreTestCase):
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
         # URL for email view
-        self.email_link = '<a href="" data-section="send_email">Email</a>'
+        self.email_link = '<a href="#" class="instructor-dashboard-link" data-section="send_email">Email</a>'
 
     def tearDown(self):
         """

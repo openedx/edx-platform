@@ -93,14 +93,10 @@ def instructor_dashboard_2(request, course_id):
 
     disable_buttons = not _is_small_course(course_key)
 
-    analytics_dashboard_message = None
+    insights_dashboard_url = None
     if settings.ANALYTICS_DASHBOARD_URL:
         # Construct a URL to the external analytics dashboard
-        analytics_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
-        link_start = "<a href=\"{}\" target=\"_blank\">".format(analytics_dashboard_url)
-        analytics_dashboard_message = _("To gain insights into student enrollment and participation {link_start}visit {analytics_dashboard_name}, our new course analytics product{link_end}.")
-        analytics_dashboard_message = analytics_dashboard_message.format(
-            link_start=link_start, link_end="</a>", analytics_dashboard_name=settings.ANALYTICS_DASHBOARD_NAME)
+        insights_dashboard_url = '{0}/courses/{1}'.format(settings.ANALYTICS_DASHBOARD_URL, unicode(course_key))
 
     context = {
         'course': course,
@@ -108,7 +104,7 @@ def instructor_dashboard_2(request, course_id):
         'studio_url': get_studio_url(course, 'course'),
         'sections': sections,
         'disable_buttons': disable_buttons,
-        'analytics_dashboard_message': analytics_dashboard_message
+        'insights_dashboard_url': insights_dashboard_url,
     }
 
     return render_to_response('instructor/instructor_dashboard_2/instructor_dashboard_2.html', context)

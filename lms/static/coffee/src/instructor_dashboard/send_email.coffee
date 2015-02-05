@@ -34,6 +34,7 @@ class SendEmail
     @$email_messages_wrapper = @$container.find(".email-messages-wrapper")
 
     # attach click handlers
+    accessible_modal(".keyword-sub-link", ".keyword-sub-modal .close-modal", ".keyword-sub-modal", "#section-send-email")
 
     @$btn_send.click =>
       if @$subject.val() == ""
