@@ -31,6 +31,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -381,10 +382,15 @@ def _get_source_address(course_id, course_title):
     # For the email address, get the course.  Then make sure that it can be used
     # in an email address, by substituting a '_' anywhere a non-(ascii, period, or dash)
     # character appears.
-    from_addr = u'"{0}" Course Staff <{1}-{2}>'.format(
-        course_title_no_quotes,
-        re.sub(r"[^\w.-]", '_', course_id.course),
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
+
+    # Translators: This is the name that a sent email is from, for example, "Physics" Course Staff
+    course_staff_title = _('"{course_name}" Course Staff')
+    from_addr_format = course_staff_title + u' <{course_id}-{from_email}>'
+
+    from_addr = from_addr_format.format(
+        course_name=course_title_no_quotes,
+        course_id=re.sub(r"[^\w.-]", '_', course_id.course),
+        from_email=settings.BULK_EMAIL_DEFAULT_FROM_EMAIL,
     )
     return from_addr
 
