@@ -110,6 +110,7 @@ define(["backbone"], function(Backbone) {
     Metadata.DICT_TYPE = "Dict";
     Metadata.VIDEO_LIST_TYPE = "VideoList";
     Metadata.RELATIVE_TIME_TYPE = "RelativeTime";
+    Metadata.INTEGER_WARNING_TYPE = "IntegerWithWarning";
 
     return Metadata;
 });

@@ -14,6 +14,7 @@ import os
 import textwrap
 import unittest
 import ddt
+import re
 
 from mock import Mock, patch
 import webob
@@ -25,6 +26,7 @@ from capa.responsetypes import (StudentInputError, LoncapaProblemError,
                                 ResponseError)
 from capa.xqueue_interface import XQueueInterface
 from xmodule.capa_module import CapaModule, ComplexEncoder
+from xmodule.exceptions import TimeExpiredError
 from opaque_keys.edx.locations import Location
 from xblock.field_data import DictFieldData
 from xblock.fields import ScopeIds
@@ -1574,6 +1576,86 @@ class CapaModuleTest(unittest.TestCase):
         </multiplechoiceresponse>
         </problem>
     """)
+
+    def test_timed_problem_interstitial(self):
+        """
+        Test interstitial warning for timed exams.
+        """
+        module = CapaFactory.create(minutes_allowed=5)
+        self.assertTrue(module.is_timed_problem())
+
+        html = module.get_problem_html(encapsulate=False)
+        expected_html = module.runtime.render_template(
+            "problem_interstitial.html", {
+                "problem_is_timed": True,
+                "problem_has_finished": False,
+                "end_time": datetime.datetime.now(UTC) + datetime.timedelta(minutes=5),
+                "check_button": module.check_button_name(),
+            }
+        )
+
+        # Expect that we get the rendered template back
+        self.assertEquals(html, expected_html)
+
+    def test_start_problem(self):
+        """
+        Tests starting a problem and recording the time started
+        """
+        module = CapaFactory.create(minutes_allowed=5)
+        rendered = module.start_problem()
+
+        self.assertIsNotNone(module.time_started)
+        self.assertTrue(module.should_show_check_button())
+        self.assertFalse(module.closed())
+
+    def test_time_expired(self):
+        """
+        Tests that when time runs out, an error will pop up when
+        you try to submit
+        """
+        module = CapaFactory.create(minutes_allowed=5, attempts=3)
+        now = datetime.datetime.now(UTC)
+        past = now - datetime.timedelta(minutes=10)
+        module.time_started = past
+
+        self.assertTrue(module.exceeded_time_limit())
+
+        with self.assertRaises(TimeExpiredError) as context:
+            module.start_problem()
+            get_request_dict = {CapaFactory.answer_key(): '3'}
+            module.check_problem(get_request_dict)
+
+    def test_timed_multi_attempt(self):
+        """
+        Limit student to single attempts with timed, multi-attempt problems
+        """
+        module = CapaFactory.create(minutes_allowed=5, attempts=3)
+        module.start_problem()
+
+        with patch('capa.correctmap.CorrectMap.is_correct') as mock_is_correct, \
+             patch('capa.capa_problem.LoncapaProblem.grade_answers') as mock_grade:
+
+            mock_is_correct.return_value = False
+            mock_grade.return_value = CorrectMap(
+                    answer_id='1_2_1',
+                    correctness="correct",
+                    npoints=0.9,
+            )
+            get_request_dict = {CapaFactory.answer_key(): '3'}
+            results = module.check_problem(get_request_dict)
+            self.assertFalse(module.should_show_reset_button())
+            self.assertFalse(module.should_show_check_button())
+
+    def test_timed_save(self):
+        """
+        Test that saving during a timed exam still works
+        """
+        module = CapaFactory.create(minutes_allowed=30, max_attempts=3)
+        module.start_problem()
+        get_request_dict = {CapaFactory.input_key(): 'choice_3'}
+        self.assertTrue(module.should_show_save_button())
+        module.save_problem(get_request_dict)
+        self.assertFalse(module.closed())
 
     def test_check_unmask(self):
         """

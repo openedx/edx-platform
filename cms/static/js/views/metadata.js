@@ -34,9 +34,14 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
                             'Integer': 'Number'
                         },
                         type = model.getType();
+                        var options = model.get("options");
 
                     if (conversions[type]) {
                         type = conversions[type];
+                    }
+
+                    if (options.warning) {
+                        type = "NumberWithWarning";
                     }
 
                     if (_.isFunction(Metadata[type])) {
@@ -218,6 +223,40 @@ function(BaseView, _, MetadataModel, AbstractEditor, FileUpload, UploadDialog, V
             }
         }
 
+    });
+
+    Metadata.NumberWithWarning = Metadata.Number.extend({
+        initialize: function () {
+            Metadata.Number.prototype.initialize.apply(this);
+            var options = this.model.get("options");
+            this.$warning = this.$(".setting-help").clone();
+            this.$warning.text(options.warning);
+            this.$warning.addClass("setting-help-warning");
+            this.$(".setting-help").after(this.$warning);
+            this.checkWarning();
+        },
+
+        changed: function () {
+            Metadata.Number.prototype.changed.apply(this);
+            this.checkWarning();
+        },
+
+        checkWarning: function () {
+            var value = this.getValueFromEditor();
+            if (parseInt(value, 10)) {
+                this.showWarning();
+            } else {
+                this.hideWarning(); 
+            }
+        },
+
+        showWarning: function () {
+            this.$warning.show();
+        },
+
+        hideWarning: function () {
+            this.$warning.hide();
+        }
     });
 
     Metadata.Option = AbstractEditor.extend({
