@@ -863,6 +863,11 @@ ADVANCED_COMPONENT_TYPES = [
     'notes',
     'schoolyourself_review',
     'schoolyourself_lesson',
+
+    # Google Drive embedded components. These XBlocks allow one to
+    # embed public google drive documents and calendars within edX units
+    'google-document',
+    'google-calendar',
 ]
 
 # Adding components in this list will disable the creation of new problem for those
