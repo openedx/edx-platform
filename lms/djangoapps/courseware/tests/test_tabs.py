@@ -5,7 +5,6 @@ Note: Tests covering workflows in the actual tabs.py file begin after line 100
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.test.utils import override_settings
 from mock import MagicMock, Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -183,7 +182,7 @@ class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
     """
-    MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(TextBookTabsTestCase, self).setUp()
