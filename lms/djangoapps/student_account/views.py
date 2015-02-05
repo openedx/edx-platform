@@ -2,6 +2,8 @@
 
 import logging
 import json
+from ipware.ip import get_ip
+
 from django.conf import settings
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
@@ -14,8 +16,12 @@ from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
+
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
 from edxmako.shortcuts import render_to_response, render_to_string
 from microsite_configuration import microsite
+from embargo import api as embargo_api
 import third_party_auth
 from external_auth.login_and_register import (
     login as external_auth_login,
@@ -321,6 +327,26 @@ def _third_party_auth_context(request):
     course_id = request.GET.get("course_id")
     email_opt_in = request.GET.get('email_opt_in')
     redirect_to = request.GET.get("next")
+
+    # Check if the user is trying to enroll in a course
+    # that they don't have access to based on country
+    # access rules.
+    # We need to check this here, rather than within the third party auth
+    # pipeline for two reasons:
+    # (1) We need access to the request to determine the user's IP address.
+    # (2) We can't redirect people from within the pipeline without kicking
+    #     them out of the pipeline.
+    if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS') and course_id:
+        try:
+            course_key = CourseKey.from_string(course_id)
+            if not embargo_api.check_course_access(request.user, get_ip(request), course_key, url=request.path):
+                # If so, prevent them from enrolling and send them to the
+                # "blocked" message once they finish authenticating.
+                course_id = None
+                redirect_to = embargo_api.message_url_path(course_key, "enrollment")
+        except InvalidKeyError:
+            pass
+
     login_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_LOGIN,
         course_id=course_id,
@@ -330,7 +356,8 @@ def _third_party_auth_context(request):
     register_urls = auth_pipeline_urls(
         third_party_auth.pipeline.AUTH_ENTRY_REGISTER,
         course_id=course_id,
-        email_opt_in=email_opt_in
+        email_opt_in=email_opt_in,
+        redirect_url=redirect_to
     )
 
     if third_party_auth.is_enabled():

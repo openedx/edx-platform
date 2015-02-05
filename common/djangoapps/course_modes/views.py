@@ -3,6 +3,8 @@ Views for the course_mode module
 """
 
 import decimal
+from ipware.ip import get_ip
+
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest
@@ -21,6 +23,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey
 from util.db import commit_on_success_with_read_committed
 from xmodule.modulestore.django import modulestore
+
+from embargo import api as embargo_api
 
 
 class ChooseModeView(View):
@@ -51,6 +55,12 @@ class ChooseModeView(View):
 
         """
         course_key = CourseKey.from_string(course_id)
+
+        # Check whether the user has access to this course
+        # based on country access rules.
+        if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+            if not embargo_api.check_course_access(request.user, get_ip(request), course_key, url=request.path):
+                return redirect(embargo_api.message_url_path(course_key, 'enrollment'))
 
         enrollment_mode, is_active = CourseEnrollment.enrollment_mode_for_user(request.user, course_key)
         modes = CourseMode.modes_for_course_dict(course_key)
