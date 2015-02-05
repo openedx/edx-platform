@@ -15,6 +15,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import IntegrityError
 from django.http import HttpResponse, Http404
 from django.utils.decorators import method_decorator
@@ -684,6 +685,8 @@ class GitLogs(TemplateView):
         if course_id:
             course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
+        page_size = 10
+
         # Set mongodb defaults even if it isn't defined in settings
         mongo_db = {
             'host': 'localhost',
@@ -715,7 +718,7 @@ class GitLogs(TemplateView):
             # Require staff if not going to specific course
             if not request.user.is_staff:
                 raise Http404
-            cilset = CourseImportLog.objects.all().order_by('-created')
+            cilset = CourseImportLog.objects.order_by('-created')
         else:
             try:
                 course = get_course_by_id(course_id)
@@ -729,11 +732,27 @@ class GitLogs(TemplateView):
                     CourseStaffRole(course.id).has_user(request.user)):
                 raise Http404
             log.debug('course_id={0}'.format(course_id))
-            cilset = CourseImportLog.objects.filter(course_id=course_id).order_by('-created')
+            cilset = CourseImportLog.objects.filter(
+                course_id=course_id
+            ).order_by('-created')
             log.debug('cilset length={0}'.format(len(cilset)))
+
+        # Paginate the query set
+        paginator = Paginator(cilset, page_size)
+        try:
+            logs = paginator.page(request.GET.get('page'))
+        except PageNotAnInteger:
+            logs = paginator.page(1)
+        except EmptyPage:
+            # If the page is too high
+            logs = paginator.page(paginator.num_pages)
+
         mdb.disconnect()
-        context = {'cilset': cilset,
-                   'course_id': course_id.to_deprecated_string() if course_id else None,
-                   'error_msg': error_msg}
+        context = {
+            'logs': logs,
+            'course_id': course_id.to_deprecated_string() if course_id else None,
+            'error_msg': error_msg,
+            'page_size': page_size
+        }
 
         return render_to_response(self.template_name, context)

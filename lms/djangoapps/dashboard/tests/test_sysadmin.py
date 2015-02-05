@@ -582,6 +582,34 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
 
         self._rm_edx4edx()
 
+    def test_gitlog_pagination_out_of_range_invalid(self):
+        """
+        Make sure the pagination behaves properly when the requested page is out
+        of range.
+        """
+
+        self._setstaff_login()
+        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
+
+        self._add_edx4edx()
+
+        for page in [-1, 0, 1, 2, 'abc']:
+            # Test the page parameter in various different ways
+            response = self.client.get(
+                '{}?page={}'.format(
+                    reverse('gitlogs_detail', kwargs={
+                        'course_id': 'MITx/edx4edx/edx4edx'
+                    }),
+                    page
+                )
+            )
+            self.assertIn(
+                'Page 1 of 1',
+                response.content
+            )
+
+        self._rm_edx4edx()
+
     def test_gitlog_courseteam_access(self):
         """
         Ensure course team users are allowed to access only their own course.
