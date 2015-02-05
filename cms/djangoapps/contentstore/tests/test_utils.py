@@ -203,7 +203,7 @@ class CourseImageTestCase(ModuleStoreTestCase):
         )
 
 
-class XBlockVisibilityTestCase(TestCase):
+class XBlockVisibilityTestCase(ModuleStoreTestCase):
     """Tests for xblock visibility for students."""
 
     def setUp(self):

@@ -91,7 +91,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             TEST_DATA_DIR,
             ['2014_Uni'],
             target_course_id=course_id,
-            create_course_if_not_present=True
+            # When this test is run with split modulestore as the default, the create course option must be specified.
+            # create_course_if_not_present=True
         )
 
         course = module_store.get_course(course_id)

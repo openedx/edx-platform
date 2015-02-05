@@ -13,13 +13,13 @@ import factory
 from django.conf import settings
 from django.core.management import call_command
 from django.test.utils import override_settings
-from django.test.testcases import TestCase
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MONGO_MODULESTORE
+from xmodule.modulestore.tests.django_utils import (
+    TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MONGO_MODULESTORE_SPLIT_DEFAULT
+)
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
 
@@ -36,7 +36,7 @@ TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
 )
 
 
-class CommandsTestBase(TestCase):
+class CommandsTestBase(ModuleStoreTestCase):
     """
     Base class for testing different django commands.
 
@@ -44,6 +44,7 @@ class CommandsTestBase(TestCase):
     to be tested.
 
     """
+    __test__ = False
 
     def setUp(self):
         super(CommandsTestBase, self).setUp()
@@ -204,17 +205,28 @@ class CommandsTestBase(TestCase):
         assert_in('edX-simple-2012_Fall/sequential/Lecture_2.xml', names)
 
 
-class CommandsXMLTestCase(CommandsTestBase, ModuleStoreTestCase):
+class CommandsXMLTestCase(CommandsTestBase):
     """
-    Test case for management commands using the xml modulestore.
+    Test case for management commands with the xml modulestore present.
 
     """
     MODULESTORE = TEST_DATA_MIXED_XML_MODULESTORE
+    __test__ = True
 
 
-class CommandsMongoTestCase(CommandsTestBase, ModuleStoreTestCase):
+class CommandsMongoTestCase(CommandsTestBase):
     """
-    Test case for management commands using the mixed mongo modulestore.
+    Test case for management commands using the mixed mongo modulestore with old mongo as the default.
 
     """
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
+    __test__ = True
+
+
+class CommandSplitMongoTestCase(CommandsTestBase):
+    """
+    Test case for management commands using the mixed mongo modulestore with split as the default.
+
+    """
+    MODULESTORE = TEST_DATA_MONGO_MODULESTORE_SPLIT_DEFAULT
+    __test__ = True
