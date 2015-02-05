@@ -10,7 +10,14 @@ from util.request import course_id_from_url
 from courseware.models import CoursePreference
 from student.views import _create_and_login_nonregistered_user, _check_can_enroll_in_course
 
-DISALLOW_SNEAKPEEK_URL_NAMES = ('lti_rest_endpoints', 'xblock_handler_noauth', 'xqueue_callback')
+DISALLOW_SNEAKPEEK_URL_NAMES = (
+    'lti_rest_endpoints',
+    'xblock_handler_noauth',
+    'xqueue_callback',
+    'about_course',
+    'course_root',
+    'info',
+)
 
 
 class SneakPeekDeepLinkMiddleware(object):
