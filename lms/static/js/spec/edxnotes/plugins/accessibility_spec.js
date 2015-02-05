@@ -26,10 +26,7 @@ define([
         beforeEach(function() {
             this.KEY = $.ui.keyCode;
             customMatchers(this);
-            loadFixtures(
-                'js/fixtures/edxnotes/edxnotes_wrapper.html',
-                'js/fixtures/edxnotes/toggle_notes.html'
-            );
+            loadFixtures('js/fixtures/edxnotes/edxnotes_wrapper.html');
             this.annotator =  NotesFactory.factory(
                 $('div#edx-notes-wrapper-123').get(0), {
                     endpoint: 'http://example.com/'
@@ -115,12 +112,6 @@ define([
             it('should close the viewer on ESCAPE keydown', function () {
                 highlight.trigger(keyDownEvent(this.KEY.ESCAPE));
                 expect(this.annotator.viewer.hide).toHaveBeenCalled();
-            });
-
-            it('should focus on the show/hide notes button on CTRL + OPTION + n keydown', function () {
-                // keycode = 78 is n key
-                highlight.trigger($.Event('keydown', {keyCode: 78, ctrlKey: true, altKey: true}));
-                expect($('.action-toggle-notes')).toBeFocused();
             });
         });
 
