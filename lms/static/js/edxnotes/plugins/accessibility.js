@@ -121,7 +121,7 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
         },
 
         onHighlightKeyDown: function (event) {
-            var KEY = $.extend($.ui.keyCode, {'n': 78}),
+            var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.currentTarget),
                 annotations, position,
@@ -147,12 +147,6 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                     break;
                 case KEY.ESCAPE:
                     this.annotator.viewer.hide();
-                    break;
-                // Gives focus to the show/hide notes button
-                case KEY.n:
-                    if (event.ctrlKey && event.altKey)  {
-                        $('.action-toggle-notes').focus();
-                    }
                     break;
             }
             // We do not stop propagation and default behavior on a TAB keypress
