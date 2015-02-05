@@ -179,13 +179,15 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.assertEqual(course_tab_list[1]['tab_id'], 'instructor')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class TextBookTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Validate tab behavior when dealing with textbooks.
     """
+    MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
+        super(TextBookTabsTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         self.set_up_books(2)
         self.course.tabs = [
