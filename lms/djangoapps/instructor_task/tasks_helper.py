@@ -20,6 +20,7 @@ from pytz import UTC
 from track.views import task_track
 from util.file import course_filename_prefix_generator, UniversalNewlineIterator
 from xmodule.modulestore.django import modulestore
+from xmodule.split_test_module import get_split_user_partitions
 
 from courseware.courses import get_course_by_id
 from courseware.grades import iterate_grades_for
@@ -553,9 +554,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     course = get_course_by_id(course_id)
     cohorts_header = ['Cohort Name'] if course.is_cohorted else []
 
-    partition_service = LmsPartitionService(user=None, course_id=course_id)
-    partitions = partition_service.course_partitions
-    group_configs_header = ['Experiment Group ({})'.format(partition.name) for partition in partitions]
+    experiment_partitions = get_split_user_partitions(course.user_partitions)
+    group_configs_header = [u'Experiment Group ({})'.format(partition.name) for partition in experiment_partitions]
 
     # Loop over all our students and build our CSV lists in memory
     header = None
@@ -589,7 +589,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
                 cohorts_group_name.append(group.name if group else '')
 
             group_configs_group_names = []
-            for partition in partitions:
+            for partition in experiment_partitions:
                 group = LmsPartitionService(student, course_id).get_group(partition, assign=False)
                 group_configs_group_names.append(group.name if group else '')
 

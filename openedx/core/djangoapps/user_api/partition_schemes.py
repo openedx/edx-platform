@@ -22,7 +22,7 @@ class RandomUserPartitionScheme(object):
         Returns the group from the specified user position to which the user is assigned.
         If the user has not yet been assigned, a group will be randomly chosen for them if assign flag is True.
         """
-        partition_key = cls._key_for_partition(user_partition)
+        partition_key = cls.key_for_partition(user_partition)
         group_id = course_tag_api.get_course_tag(user, course_key, partition_key)
 
         group = None
@@ -72,7 +72,7 @@ class RandomUserPartitionScheme(object):
         return group
 
     @classmethod
-    def _key_for_partition(cls, user_partition):
+    def key_for_partition(cls, user_partition):
         """
         Returns the key to use to look up and save the user's group for a given user partition.
         """
