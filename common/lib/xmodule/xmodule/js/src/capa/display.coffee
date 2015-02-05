@@ -34,6 +34,17 @@ class @Problem
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
+    # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
+    @$('.clarification').focus (ev) =>
+      icon = $(ev.target).children "i"
+      iconPos = icon.offset()
+      fakeEvent = jQuery.Event "mouseover", {
+        pageX: iconPos.left + icon.width()/2,
+        pageY: iconPos.top + icon.height()/2
+      }
+      icon.trigger(fakeEvent).trigger "click"
+    @$('.clarification').blur (ev) =>
+      $(ev.target).children("i").trigger "mouseout"
 
     @bindResetCorrectness()
 
