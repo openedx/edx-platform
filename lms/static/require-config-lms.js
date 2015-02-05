@@ -145,11 +145,6 @@
                 ]
             },
             // End of needed by OVA
-        },
-        map: {
-          "js/edxnotes/*": {
-              "annotator": "annotator_1.2.9"
-          }
         }
     };
 

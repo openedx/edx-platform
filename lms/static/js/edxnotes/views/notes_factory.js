@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-     'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/logger',
+     'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/logger',
      'js/edxnotes/views/shim', 'js/edxnotes/plugins/scroller',
      'js/edxnotes/plugins/events'
 ], function ($, _, Annotator, NotesLogger) {

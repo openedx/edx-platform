@@ -82,7 +82,7 @@
             'js/student_profile/profile': 'js/student_profile/profile',
 
             // edxnotes
-            'annotator': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
+            'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
         shim: {
             'gettext': {
@@ -511,7 +511,7 @@
                 ]
             },
             // Student Notes
-            'annotator': {
+            'annotator_1.2.9': {
                 exports: 'Annotator',
                 deps: ['jquery']
             }
