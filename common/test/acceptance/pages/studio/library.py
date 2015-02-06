@@ -1,7 +1,7 @@
 """
 Library edit page in Studio
 """
-
+from bok_choy.javascript import js_defined, wait_for_js
 from bok_choy.page_object import PageObject
 from bok_choy.promise import EmptyPromise
 from selenium.webdriver.common.keys import Keys
@@ -252,11 +252,18 @@ class StudioLibraryContentXBlockEditModal(CourseOutlineModal, PageObject):
         return element
 
 
+@js_defined('window.LibraryContentAuthorView')
 class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
     """
     Wraps :class:`.container.XBlockWrapper` for use with LibraryContent blocks
     """
     url = None
+
+    def is_browser_on_page(self):
+        """
+        Returns true iff the library content area has been loaded
+        """
+        return self.q(css='article.content-primary').visible
 
     @classmethod
     def from_xblock_wrapper(cls, xblock_wrapper):
@@ -271,11 +278,18 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         """
         return self.q(css=self._bounded_selector(".xblock-message-area p"))
 
+    @wait_for_js  # Wait for the fragment.initialize_js('LibraryContentAuthorView') call to finish
     def refresh_children(self):
         """
         Click "Update now..." button
         """
         btn_selector = self._bounded_selector(".library-update-btn")
-        refresh_button = self.q(css=btn_selector)
-        refresh_button.click()
-        self.wait_for_element_absence(btn_selector, 'Wait for the XBlock to reload')
+        self.wait_for_element_presence(btn_selector, 'Update now button is present.')
+        self.q(css=btn_selector).first.click()
+
+        # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
+        self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
+
+        # And wait to make sure the ajax post has finished.
+        self.wait_for_ajax()
+        self.wait_for_element_absence(btn_selector, 'Wait for the XBlock to finish reloading')
