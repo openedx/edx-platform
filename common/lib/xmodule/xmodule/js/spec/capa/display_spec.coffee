@@ -78,6 +78,19 @@ describe 'Problem', ->
         [@problem.updateMathML, @stubbedJax, $('#input_example_1').get(0)]
       ]
 
+  describe 'bind_with_custom_input_id', ->
+    beforeEach ->
+      spyOn window, 'update_schematics'
+      MathJax.Hub.getAllJax.andReturn [@stubbedJax]
+      @problem = new Problem($('.xblock-student_view'))
+      $(@).html readFixtures('problem_content_1240.html')
+
+    it 'bind the check button', ->
+      expect($('div.action input.check')).toHandleWith 'click', @problem.check_fd
+
+    it 'bind the show button', ->
+      expect($('div.action button.show')).toHandleWith 'click', @problem.show
+
   describe 'renderProgressState', ->
     beforeEach ->
       @problem = new Problem($('.xblock-student_view'))
