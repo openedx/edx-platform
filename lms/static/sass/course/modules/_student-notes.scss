@@ -273,7 +273,7 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       @include float(right);
       @include padding-left($baseline/4);
 
-      .annotator-delete, .annotator-edit {
+      .annotator-edit, .annotator-delete, .annotator-close {
         position: relative;
         display: inline-block;
         vertical-align: middle;
@@ -297,6 +297,15 @@ $notes-annotator-background-dark: rgba(122,122,122,0.6); // taken from annotator
       }
 
       .annotator-delete {
+
+        &:before {
+          top: -($baseline/20);
+          @include left(0);
+          content: "\f1f8";
+        }
+      }
+
+      .annotator-close {
 
         &:before {
           top: -($baseline/20);
