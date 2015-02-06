@@ -22,15 +22,16 @@ class @Calculator
     $('form#calculator').submit(@calculate).submit (e) ->
       e.preventDefault()
     @hintButton
-      .hover(
-        $.proxy(@showHint, @),
-        $.proxy(@hideHint, @)
-      )
-      .keydown($.proxy(@handleKeyDown, @))
-      .click (e) -> e.preventDefault()
+      .click(($.proxy(@handleClickOnHintButton, @)))
+
+    @hintPopup
+      .click(($.proxy(@handleClickOnHintPopup, @)))
 
     @hintPopup
       .keydown($.proxy(@handleKeyDownOnHint, @))
+
+    $('#calculator_wrapper')
+      .keyup($.proxy(@handleKeyUpOnHint, @))
 
     @handleClickOnDocument = $.proxy(@handleClickOnDocument, @)
 
@@ -140,9 +141,6 @@ class @Calculator
       return true
 
     switch e.keyCode
-      when @KEY.TAB
-        # hide popup with hints
-        @hideHint()
 
       when @KEY.ESC
         # hide popup with hints
@@ -175,11 +173,27 @@ class @Calculator
     # allow the event to propagate
     return true
 
+  handleKeyUpOnHint: (e) ->
+    switch e.keyCode
+      when @KEY.TAB
+        # move focus to hint links and hide hint once focus is out of hint pop up
+        @active_element = document.activeElement
+        if not $(@active_element).parents().is(@hintPopup)
+          @hideHint()
+
   handleClickOnDocument: (e) ->
     @hideHint()
 
-    # allow the event to propagate
-    return true;
+  handleClickOnHintButton: (e) ->
+    e.stopPropagation()
+    if @hintPopup.hasClass 'shown'
+      @hideHint()
+    else
+      @showHint()
+      @activeHint.focus()
+
+  handleClickOnHintPopup: (e) ->
+    e.stopPropagation()
 
   calculate: ->
     $.getWithPrefix '/calculate', { equation: $('#calculator_input').val() }, (data) ->
