@@ -63,18 +63,20 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
         },
 
         getViewerTabControls: function () {
-            var viewer, viewerControls, editButtons, delButtons, tabControls = [], i;
+            var viewer, viewerControls, editButtons, delButtons, closeButtons, tabControls = [], i;
 
             // Viewer elements
             viewer = this.annotator.element.find('.annotator-viewer');
             viewerControls = viewer.find('.annotator-controls');
             editButtons = viewerControls.find('.annotator-edit');
             delButtons = viewerControls.find('.annotator-delete');
+            closeButtons = viewerControls.find('.annotator-close');
 
-            // Edit and delete buttons always come in pairs
+            // Edit, delete and close buttons always come in triplets
             for (i = 0; i < editButtons.length; i++) {
                 tabControls.push($(editButtons.get(i)));
                 tabControls.push($(delButtons.get(i)));
+                tabControls.push($(closeButtons.get(i)));
             }
 
             return tabControls;
@@ -125,16 +127,9 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                 keyCode = event.keyCode,
                 target = $(event.currentTarget),
                 annotations, position,
-                controls, edit;
+                viewer, controls, edit, self = this;
 
             switch (keyCode) {
-                case KEY.TAB:
-                    if (this.annotator.viewer.isShown()) {
-                        controls = this.annotator.element.find('.annotator-controls');
-                        edit = controls.find('.annotator-edit').first();
-                        edit.focus();
-                    }
-                    break;
                 case KEY.ENTER:
                 case KEY.SPACE:
                     if (!this.annotator.viewer.isShown()) {
@@ -143,6 +138,15 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                             return $(this).data('annotation');
                         });
                         this.annotator.showViewer($.makeArray(annotations), {top: position.top, left: position.left});
+                        setTimeout(function() {
+                            controls = self.annotator.element.find('.annotator-controls');
+                            edit = controls.find('.annotator-edit').first();
+                            edit.focus();
+                            // TODO: focus is given for the moment to the edit button
+                            // Give it instead to viewer.
+                            // viewer = self.annotator.element.find('.annotator-viewer');
+                            // viewer.focus();
+                        }, 50);
                     }
                     break;
                 case KEY.ESCAPE:
@@ -172,6 +176,13 @@ define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
                     }
                     event.preventDefault();
                     event.stopPropagation();
+                    break;
+                case KEY.ENTER:
+                case KEY.SPACE:
+                    if (target.hasClass('annotator-close')) {
+                        this.annotator.viewer.hide();
+                        this.focusOnHighlightedText(event);
+                    }
                     break;
                 case KEY.ESCAPE:
                     this.annotator.viewer.hide();
