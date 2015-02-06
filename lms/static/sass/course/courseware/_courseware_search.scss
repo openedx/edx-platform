@@ -49,7 +49,7 @@
   .search-info {
     padding-bottom: lh(.75);
     margin-bottom: lh(.50);
-    border-bottom: 1px solid $border-color-3;
+    border-bottom: 1px solid $gray-l2;
     .search-count {
       float: right;
       color: $gray;
@@ -62,7 +62,7 @@
 
   .search-results-item {
     position: relative;
-    border-bottom: 1px solid $border-color-1;
+    border-bottom: 1px solid $gray-l4;
     list-style-type: none;
     margin-bottom: lh(.75);
     padding-bottom: lh(.75);
