@@ -627,7 +627,7 @@ class TestGradeReportConditionalContent(TestReportMixin, TestIntegrationTask):
 
         def user_partition_group(user):
             """Return a dict having single key with value equals to students group in partition"""
-            group_config_hdr_tpl = 'Group Configuration Group Name ({})'
+            group_config_hdr_tpl = 'Experiment Group ({})'
             return {
                 group_config_hdr_tpl.format(self.partition.name): self.partition.scheme.get_group_for_user(   # pylint: disable=E1101
                     self.course.id, user, self.partition, track_function=None
