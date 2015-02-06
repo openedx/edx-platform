@@ -1420,30 +1420,6 @@ class CertificateItem(OrderItem):
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
-    @property
-    def single_item_receipt_template(self):
-        if self.mode in ('verified', 'professional'):
-            return 'shoppingcart/verified_cert_receipt.html'
-        else:
-            return super(CertificateItem, self).single_item_receipt_template
-
-    @property
-    def single_item_receipt_context(self):
-        course = modulestore().get_course(self.course_id)
-        return {
-            "course_id": self.course_id,
-            "course_name": course.display_name_with_default,
-            "course_org": course.display_org_with_default,
-            "course_num": course.display_number_with_default,
-            "course_start_date_text": course.start_datetime_text(),
-            "course_has_started": course.start > datetime.today().replace(tzinfo=pytz.utc),
-            "course_root_url": reverse(
-                'course_root',
-                kwargs={'course_id': self.course_id.to_deprecated_string()}  # pylint: disable=no-member
-            ),
-            "dashboard_url": reverse('dashboard'),
-        }
-
     def additional_instruction_text(self):
         refund_reminder = _(
             "You have up to two weeks into the course to unenroll from the Verified Certificate option "

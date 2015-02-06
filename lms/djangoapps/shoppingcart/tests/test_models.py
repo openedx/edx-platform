@@ -609,13 +609,10 @@ class CertificateItemTest(ModuleStoreTestCase):
     def test_single_item_template(self):
         cart = Order.get_cart_for_user(user=self.user)
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
-
-        self.assertEquals(cert_item.single_item_receipt_template,
-                          'shoppingcart/verified_cert_receipt.html')
+        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
         cert_item = CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        self.assertEquals(cert_item.single_item_receipt_template,
-                          'shoppingcart/receipt.html')
+        self.assertEquals(cert_item.single_item_receipt_template, 'shoppingcart/receipt.html')
 
     @override_settings(
         SEGMENT_IO_LMS_KEY="foobar",
