@@ -11,6 +11,7 @@ from django.conf import settings
 if not settings.configured:
     settings.configure()
 from django.core.cache import get_cache, InvalidCacheBackendError
+import django.dispatch
 import django.utils
 
 import re
@@ -39,6 +40,20 @@ except ImportError:
 
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
+class SignalHandler(object):
+    course_published = django.dispatch.Signal(providing_args=["course_key", "version"])
+
+    _mapping = {
+        "course_published": course_published
+    }
+
+    def __init__(self, modulestore_class):
+        self.modulestore_class = modulestore_class
+
+    def send(self, signal_name, **kwargs):
+        signal = self._mapping[signal_name]
+        signal.send_robust(sender=self.modulestore_class, **kwargs)
+
 
 def load_function(path):
     """
@@ -59,6 +74,7 @@ def create_modulestore_instance(
         i18n_service=None,
         fs_service=None,
         user_service=None,
+        signal_handler=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options
@@ -104,6 +120,7 @@ def create_modulestore_instance(
         i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
+        signal_handler=signal_handler or SignalHandler(class_),
         **_options
     )
 

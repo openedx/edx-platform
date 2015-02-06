@@ -504,6 +504,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  i18n_service=None,
                  fs_service=None,
                  user_service=None,
+                 signal_handler=None,
                  retry_wait_time=0.1,
                  **kwargs):
         """
@@ -560,6 +561,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.user_service = user_service
 
         self._course_run_cache = {}
+        self.signal_handler = signal_handler
 
     def close_connections(self):
         """

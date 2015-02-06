@@ -608,7 +608,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                  default_class=None,
                  error_tracker=null_error_tracker,
                  i18n_service=None, fs_service=None, user_service=None,
-                 services=None, **kwargs):
+                 services=None, signal_handler=None, **kwargs):
         """
         :param doc_store_config: must have a host, db, and collection entries. Other common entries: port, tz_aware.
         """
@@ -636,6 +636,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
 
         if user_service is not None:
             self.services["user"] = user_service
+
+        self.signal_handler = signal_handler
 
     def close_connections(self):
         """

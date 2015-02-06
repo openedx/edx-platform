@@ -294,7 +294,8 @@ class XMLModuleStore(ModuleStoreReadBase):
     """
     def __init__(
             self, data_dir, default_class=None, course_dirs=None, course_ids=None,
-            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, **kwargs
+            load_error_modules=True, i18n_service=None, fs_service=None, user_service=None, 
+            signal_handler=None, **kwargs
     ):
         """
         Initialize an XMLModuleStore from data_dir

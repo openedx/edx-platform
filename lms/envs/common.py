@@ -1620,6 +1620,8 @@ INSTALLED_APPS = (
     'survey',
 
     'lms.djangoapps.lms_xblock',
+
+    'openedx.core.djangoapps.content.course_structures',
 )
 
 ######################### MARKETING SITE ###############################

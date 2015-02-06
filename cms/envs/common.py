@@ -719,6 +719,8 @@ INSTALLED_APPS = (
 
     # Additional problem types
     'edx_jsme',    # Molecular Structure
+
+    'openedx.core.djangoapps.content.course_structures',
 )
 
 
