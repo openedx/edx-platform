@@ -481,10 +481,18 @@ class Order(models.Model):
             log.exception('Exception at creating pdf file.')
             pdf_file = None
 
-        self.send_confirmation_emails(
-            orderitems, self.order_type == OrderTypes.BUSINESS,
-            csv_file, pdf_file, site_name, courses_info
-        )
+        try:
+            self.send_confirmation_emails(
+                orderitems, self.order_type == OrderTypes.BUSINESS,
+                csv_file, pdf_file, site_name, courses_info
+            )
+        except Exception:  # pylint: disable=broad-except
+            # Catch all exceptions here, since the Django view implicitly
+            # wraps this in a transaction.  If the order completes successfully,
+            # we don't want to roll back just because we couldn't send
+            # the confirmation email.
+            log.exception('Error occurred while sending payment confirmation email')
+
         self._emit_order_event('Completed Order', orderitems)
 
     def refund(self):
@@ -1460,7 +1468,9 @@ class CertificateItem(OrderItem):
             "If you haven't verified your identity yet, please start the verification process ({verification_url})."
         ).format(verification_url=verification_url)
 
-        return "{verification_reminder} {refund_reminder}".format(
+        # Need this to be unicode in case the reminder strings
+        # have been translated and contain non-ASCII unicode
+        return u"{verification_reminder} {refund_reminder}".format(
             verification_reminder=verification_reminder,
             refund_reminder=refund_reminder
         )
