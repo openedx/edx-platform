@@ -1,13 +1,11 @@
 """
 Tests for deeplink middleware for sneakpeek
 """
-import mock
-import pygeoip
-import unittest
 from datetime import datetime, timedelta
+from ddt import ddt, data
 
 from django.conf import settings
-from django.test import TestCase, Client
+from django.test import Client
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
@@ -25,8 +23,13 @@ NO_SNEAKPEEK_PATHS = [
     '/courses/open/course/run/lti_rest_endpoints/',  # lti_rest_endpoint
     '/courses/open/course/run/xblock/usage_id/handler_noauth/handler',  # xblock_handler_noauth
     '/courses/open/course/run/xqueue/user_id/mod_id/dispatch',
+    '/courses/open/course/run/about',
+    '/courses/open/course/run/info',
+    '/courses/open/course/run/',
 ]
 
+
+@ddt
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class SneakPeekDeeplinkMiddlewareTests(ModuleStoreTestCase):
     """
@@ -75,7 +78,7 @@ class SneakPeekDeeplinkMiddlewareTests(ModuleStoreTestCase):
         """
         This returns a request which will cause a sneakpeek to happen
         """
-        sneakpeek_path = '/courses/open/course/run/info'
+        sneakpeek_path = '/courses/open/course/run/courseware'
         req = self.factory.get(sneakpeek_path)
         req.session = import_module(settings.SESSION_ENGINE).SessionStore()  # empty session
         req.user = AnonymousUser()
@@ -108,12 +111,12 @@ class SneakPeekDeeplinkMiddlewareTests(ModuleStoreTestCase):
         self.assertIsNone(self.middleware.process_request(req))
         self.assertNoSneakPeek(req, self.open_course)
 
-    def test_url_blacklists(self):
-        for path in NO_SNEAKPEEK_PATHS:
-            req = self.make_successful_sneakpeek_login_request()
-            req.path = path
-            self.assertIsNone(self.middleware.process_request(req))
-            self.assertNoSneakPeek(req, self.open_course)
+    @data(*NO_SNEAKPEEK_PATHS)
+    def test_url_blacklists(self, path):
+        req = self.make_successful_sneakpeek_login_request()
+        req.path = path
+        self.assertIsNone(self.middleware.process_request(req))
+        self.assertNoSneakPeek(req, self.open_course)
 
     def test_authenticated_user(self):
         req = self.make_successful_sneakpeek_login_request()

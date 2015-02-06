@@ -34,7 +34,7 @@ class TestECommerceDashboardViews(ModuleStoreTestCase):
         mode.save()
         # URL for instructor dash
         self.url = reverse('instructor_dashboard', kwargs={'course_id': self.course.id.to_deprecated_string()})
-        self.e_commerce_link = '<a href="" data-section="e-commerce">E-Commerce</a>'
+        self.e_commerce_link = '<a href="#" class="instructor-dashboard-link" data-section="e-commerce">E-Commerce</a>'
         CourseFinanceAdminRole(self.course.id).add_users(self.instructor)
 
     def tearDown(self):

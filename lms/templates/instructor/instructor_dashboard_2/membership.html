@@ -27,6 +27,15 @@
   </div>
 </script>
 
+<script type="text/template" id="email-list-widget-template">
+    <div class="wrapper-email-select">
+        <div class="email-selection-label">{{label}}</div>
+        <select class="single-email-selector">
+              <option> ${_("Loading problem list")} </option>
+        </select>
+    </div>
+</script>
+
 <div class="batch-enrollment membership-section">
   <h2> ${_("Batch Enrollment")} </h2>
   <p>
@@ -241,8 +250,132 @@
       data-add-button-label="${_("Add Community TA")}"
     ></div>
   %endif
-
 </div>
+
+
+<div
+    class="email-lists-management"
+    data-query-endpoint="${ section_data['get_single_query']}"
+    data-total-endpoint="${ section_data['get_all_students']}"
+    data-temp-queries-endpoint="${ section_data['get_temp_queries']}"
+    data-delete-bulk-temp-endpoint="${ section_data['delete_bulk_temp_query']}"
+    data-delete-saved-endpoint="${ section_data['delete_saved_query']}"
+    data-delete-temp-endpoint="${ section_data['delete_temp_query']}"
+>
+    <div class="email-widget">
+    <div class="header">
+        <h2 class="title">${_("Email Distribution")}</h2>
+    </div>
+    <label for="beginning_specific">
+        ${_("Select criteria on which to generate a list of student emails. "
+        "Please clear the active queries or load your saved work if you "
+        "are inactive for more than 15 minutes, otherwise queries might "
+        "be inaccurate. If the status gets stuck at 'working' for a long "
+        "time, you may come back to the page later.")}
+
+    </label>
+    <div class="email-list">
+        <div class="email-list-container"
+             data-label="${_("Inclusion")}"
+             data-selections="AND <> NOT <> OR">
+        </div>
+        <div class="email-list-container"
+             data-label="${_("Select a Type")}"
+             data-selections="Section<>Problem">
+        </div>
+        <div class="problem_specific">
+            <div class="email-list-container"
+                 data-label="${_("Select Problem")}"
+                 data-selections="${_("Loading problems...")}"
+                 data-list-endpoint="${ section_data['list_course_problems'] }">
+            </div>
+        </div>
+        <div class="problem_specific">
+            <div class="email-list-container"
+             data-label="${_("Filter On")}"
+             data-selections="Opened <>
+                              Completed <>
+                              Not Opened <>
+                              Not Completed">
+            </div>
+        </div>
+        <div class="section_specific">
+             <div class="email-list-container"
+                 data-rolename="staff"
+                 data-label="${_("Select Section")}"
+                 data-selections="Loading sections..."
+                 data-list-endpoint="${ section_data['list_course_sections'] }">
+            </div>
+        </div>
+        <div class="section_specific">
+          <div class="email-list-container"
+               data-label="${_("Filter On")}"
+               data-selections="Opened <>
+                                Not Opened">
+          </div>
+        </span>
+    </div>
+        <div class="addingQuery">
+            <span class="emailWidget incompleteMessage"></span>
+            <input type="button" name="addQuery" class="emailWidget addQuery" value="${_("Add Query")}" align="right">
+         </div>
+    </div>
+    <div class="email-list-widget">
+    <div class="email-list">
+      <table class="emailWidget queryTable">
+          <caption class="tableCaption">${_("Active Queries")}</caption>
+        <thead>
+          <tr>
+              <td class="label">${_("Inclusion")}</td>
+              <td class="label">${_("Type")}</td>
+              <td class="label">${_("Specification")}</td>
+              <td class="label">${_("Criteria")}</td>
+              <td class="label">${_("Status")}</td>
+              <td class="label"></td>
+          </tr>
+        </thead>
+        <tbody class="emailWidget queryTableBody"></tbody>
+      </table>
+      <div class="bottom-email">
+          <input type="button" name="getcsv" class="emailWidget getcsv" value="${_("Get CSV")}" data-endpoint="${ section_data['get_all_students'] }" data-csv="true" class="disabled">
+          <input type="button" name="savequery" class="emailWidget savequery" value="${_("Save Query")}" data-endpoint="${ section_data['save_query'] }" data-csv="true" class="disabled">
+          <div class="emailWidget estimated">${_("Approx 0 students selected")}</div>
+          <input type="button" name="getest" class="emailWidget getest" value="${_("Update Students Estimate")}" data-endpoint="${ section_data['get_all_students'] }" >
+          <input type="button" name="startover" class="emailWidget startover" value="${_("Clear Active Queries")}">
+      </div>
+      <table>
+          <caption class="tableCaption">${_("Saved Queries")}</caption>
+        <thead>
+          <tr>
+              <td class="label">${_("Date Saved")}</td>
+              <td class="label">${_("Query")}</td>
+              <td class="label"></td>
+              <td class="label"></td>
+          </tr>
+        </thead>
+        <tbody class="emailWidget savedQueriesTable" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
+
+      </table>
+        <table>
+            <tbody class="emailWidget invisibleQueriesStorage" data-endpoint="${ section_data['get_saved_queries'] }"></tbody>
+        </table>
+        <div class="emailWidget emailHelp">
+        <h3>${_("Example:")}</h3>
+        <div>${_("AND, Problem 1, Opened")}</div>
+        <div>${_("AND, Problem 2, Not Completed")}</div>
+        <div>${_("NOT, Problem 3, Opened")}</div>
+        <div>${_("OR, Problem 2, Not Opened")}</div>
+        <div>${_("Returns: Students who have opened Problem 1 and not completed Problem 2, but have not opened Problem"
+            " 3 in addition to students who have not opened Problem 4")}<br/><br/>
+            ${_("The intersection of <i>AND</i> queries is taken.")}<br/>
+            ${_("The union of <i>NOT</i> queries is taken")} <br/>
+            ${_("The union of <i>OR</i> queries is taken")} <br/>
+            ${_("The final result is ((<i>AND</i>)-(<i>NOT</i>))+(<i>OR</i>)")}
+        </div>
+        </div>
+    </div>
+  </div>
+ </div>
 
 %if course.is_cohorted:
     <hr class="divider" />

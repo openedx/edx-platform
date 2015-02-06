@@ -34,6 +34,7 @@ class @Problem
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
+    @$('div.action input.start').click @start
 
     @bindResetCorrectness()
 
@@ -145,6 +146,7 @@ class @Problem
         @setupInputTypes()
         @bind()
         @queueing()
+        @maybeSetupTimer()
       @el.attr('aria-busy', 'false')
     else
       $.postWithPrefix "#{@url}/problem_get", (response) =>
@@ -157,6 +159,98 @@ class @Problem
 
   # TODO add hooks for problem types here by inspecting response.html and doing
   # stuff if a div w a class is found
+          if response.progress_status != "done"
+            @maybeSetupTimer()
+
+  getSecondsLeft: =>
+    # Returns 
+    #   a nonnegative integer representing seconds left on a timed exam.
+    #   -1 on error
+    if _.isUndefined(@startTime) or _.isUndefined(@totalSeconds)
+      return -1
+    else
+      return Math.floor(Math.max(@totalSeconds - ((new Date() - @startTime) / 1000), 0))
+
+  maybeSetupTimer: =>
+    if @el.find(".problem-timer").length
+      @$timer = @el.find('.problem-timer')
+      @$display = @el.find('.minutes-left')
+      @startTime = new Date()
+      @totalSeconds = parseInt(@$timer.data('totalSecondsLeft'), 10)
+      @secondsBeforeWarning = parseInt(@$timer.data('secondsBeforeWarning'), 10)
+      @submittedBeforeTimeExpired = false
+
+      # The timer is initially hidden by CSS 
+      @$timer.show()
+
+      # Clear old timers, eg. if we press the submit button
+      if @timerId
+        clearInterval(@timerId)
+
+      # Sync every second
+      @timerId = setInterval(@syncTimer, 1000)
+
+      # Initialize and show timer
+      @syncTimer()
+
+  syncTimer: =>
+    @secondsLeft = @getSecondsLeft()
+    
+    # On timer error, avoid showing the timer
+    if @secondsLeft == -1
+      @removeTimer()
+    else
+      # Update timer state to warning
+      if @secondsLeft <= @secondsBeforeWarning
+        @showTimerWarning()
+
+      # Indicate that the submission went through
+      if @submittedBeforeTimeExpired
+        @$timer
+          .removeClass("danger")
+          .text(gettext("Submitted"))
+
+      # Indicate that the student failed to submit on time
+      if @secondsLeft <= 0
+        if not @submittedBeforeTimeExpired
+          @$timer
+            .addClass("danger")
+            .text(gettext("Timer has expired"))
+          # If our warning procedure is triggered,
+          # it inserts a cloned, second timer at
+          # the bottom of the problem.
+          # When the problem has expired, remove it.
+          @$timer.slice(1).remove()
+        clearInterval(@timerId)
+      
+      # Decrement the timer counter normally
+      else
+        @$display.text(@getDisplayText())
+
+  removeTimer: =>
+    @$(".problem-timer").remove()
+
+  showTimerWarning: =>
+    # if it's time to show a warning, show it
+    # both at the top of the problem and at the
+    # bottom. This is in case the user doesn't
+    # remember from a long problem that the problem
+    # is timed
+    if @$timer.length < 2
+      $clone = @el.find('.problem-timer').clone()
+      @el.find('.problem').after($clone.get(0))
+      # Re-find cached jQuery objects
+      @$timer = @el.find('.problem-timer')
+      @$display = @el.find('.minutes-left')
+      @$timer.addClass('danger')
+
+  getDisplayText: =>
+    secLeft = @getSecondsLeft()
+    min = Math.floor(secLeft / 60)
+    sec = secLeft % 60
+    if sec < 10
+      sec = "0" + sec
+    return "#{min}:#{sec}"
 
   setupInputTypes: =>
     @inputtypeDisplays = {}
@@ -288,6 +382,11 @@ class @Problem
             @gentle_alert response.success
         Logger.log 'problem_graded', [@answers, response.contents], @id
 
+        # if the student successfully submitted before
+        # time expired, remove the timer
+        if @getSecondsLeft() >= 0
+            @removeTimer()
+
     $.ajaxWithPrefix("#{@url}/problem_check", settings)
 
   check: =>
@@ -319,6 +418,9 @@ class @Problem
         else
           @gentle_alert response.success
       Logger.log 'problem_graded', [@answers, response.contents], @id
+      # Remove timer on successful student submission
+      if @getSecondsLeft() >= 0
+        @removeTimer()
     ).always(@enableCheckButtonAfterResponse)
 
   reset: =>
@@ -397,6 +499,11 @@ class @Problem
         for cls in classes
           hideMethod = @inputtypeHideAnswerMethods[cls]
           hideMethod(inputtype, display) if hideMethod?
+
+  start: =>
+    Logger.log 'problem_start', id: @id
+    $.postWithPrefix "#{@url}/problem_start", id: @id, (response) =>
+      @render(response.html)
 
   gentle_alert: (msg) =>
     if @el.find('.capa_alert').length

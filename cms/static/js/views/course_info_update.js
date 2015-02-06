@@ -1,6 +1,6 @@
 define(["js/views/baseview", "codemirror", "js/models/course_update",
-    "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal"],
-    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils) {
+    "js/views/feedback_prompt", "js/views/feedback_notification", "js/views/course_info_helper", "js/utils/modal", "js/views/utils/view_utils"],
+    function(BaseView, CodeMirror, CourseUpdateModel, PromptView, NotificationView, CourseInfoHelper, ModalUtils, ViewUtils) {
 
     var CourseInfoUpdateView = BaseView.extend({
         // collection is CourseUpdateCollection
@@ -73,6 +73,13 @@ define(["js/views/baseview", "codemirror", "js/models/course_update",
 
         onSave: function(event) {
             event.preventDefault();
+            var validation = ViewUtils.keywordValidator.validateString(this.$codeMirror.getValue());
+            if (!validation.isValid) {
+                message = gettext('There are invalid keywords in your message. Please check the following keywords and try again:');
+                message += "\n" + validation.keywordsInvalid.join('\n');
+                window.alert(message);
+                return;
+            }
             var targetModel = this.eventModel(event);
             targetModel.set({ date : this.dateEntry(event).val(), content : this.$codeMirror.getValue() });
             // push change to display, hide the editor, submit the change

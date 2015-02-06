@@ -89,13 +89,6 @@
       </div>
 
     <h1>${_("Instructor Dashboard")}</h1>
-
-      %if analytics_dashboard_message:
-        <div class="wrapper-msg urgency-low is-shown">
-            <p>${analytics_dashboard_message}</p>
-        </div>
-      %endif
-
     ## links which are tied to idash-sections below.
     ## the links are activated and handled in instructor_dashboard.coffee
     ## when the javascript loads, it clicks on the first section
@@ -103,8 +96,13 @@
       % for section_data in sections:
         ## This is necessary so we don't scrape 'section_display_name' as a string.
         <% dname = section_data['section_display_name'] %>
-        <li class="nav-item"><a href="" data-section="${ section_data['section_key'] }">${_(dname)}</a></li>
+        <li class="nav-item">
+            <a href="#" class="instructor-dashboard-link" data-section="${ section_data['section_key'] }">${_(dname)}</a>
+        </li>
       % endfor
+      %if insights_dashboard_url:
+        <li class="nav-item"><a href="${insights_dashboard_url}" target="_blank">${_("Insights")}</a></li>
+      % endif
     </ul>
 
     ## each section corresponds to a section_data sub-dictionary provided by the view
@@ -118,3 +116,6 @@
     </section>
   </div>
 </section>
+
+## Modal included here so leanModal can position it outside of dashboard wrapper
+<%include file='keyword_sub_modal.html' />
