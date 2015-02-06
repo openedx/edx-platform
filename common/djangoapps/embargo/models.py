@@ -23,7 +23,7 @@ from django_countries import countries
 from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 
-from embargo.messages import ENROLL_MESSAGES, ACCESS_MESSAGES
+from embargo.messages import ENROLL_MESSAGES, COURSEWARE_MESSAGES
 
 
 WHITE_LIST = 'whitelist'
@@ -105,9 +105,9 @@ class RestrictedCourse(models.Model):
         for msg_key, msg in ENROLL_MESSAGES.iteritems()
     ])
 
-    ACCESS_MSG_KEY_CHOICES = tuple([
+    COURSEWARE_MSG_KEY_CHOICES = tuple([
         (msg_key, msg.description)
-        for msg_key, msg in ACCESS_MESSAGES.iteritems()
+        for msg_key, msg in COURSEWARE_MESSAGES.iteritems()
     ])
 
     course_key = CourseKeyField(
@@ -124,7 +124,7 @@ class RestrictedCourse(models.Model):
 
     access_msg_key = models.CharField(
         max_length=255,
-        choices=ACCESS_MSG_KEY_CHOICES,
+        choices=COURSEWARE_MSG_KEY_CHOICES,
         default='default',
         help_text=ugettext_lazy(u"The message to show when a user is blocked from accessing a course.")
     )
@@ -325,6 +325,22 @@ class CountryAccessRule(models.Model):
                 country=unicode(self.country),
             )
 
+
+    def save(self, *args, **kwargs):
+        """
+        Clear the cached value when saving a entry
+        """
+        super(CountryAccessRule, self).save(*args, **kwargs)
+        cache.delete(self.cache_key_for_consolidated_countries(unicode(self.restricted_course.course_key)))
+
+    def delete(self, using=None):
+        """
+        clear the cached value when saving a entry
+        """
+        super(CountryAccessRule, self).delete()
+        cache.delete(self.cache_key_for_consolidated_countries(unicode(self.restricted_course.course_key)))
+
+
     class Meta:
         """a course can be added with either black or white list.  """
         unique_together = (
@@ -333,22 +349,6 @@ class CountryAccessRule(models.Model):
             # not both (for a particular course).
             ("restricted_course", "country")
         )
-
-    @classmethod
-    def cache_key_name(cls, course_id, cache_type):
-        return "{}/embargo/countries/{}".format(course_id, cache_type)
-
-    def save(self, *args, **kwargs):
-        """
-        Clear the cached value when saving a RestrictedCourse entry
-        """
-        super(CountryAccessRule, self).save(*args, **kwargs)
-        cache.delete(self.cache_key_name(self.restricted_course.course_key, self.rule_type))
-
-    def delete(self, using=None):
-        super(CountryAccessRule, self).delete()
-        cache.delete(self.cache_key_name(self.restricted_course.course_key, self.rule_type))
-
 
 class IPFilter(ConfigurationModel):
     """

@@ -19,7 +19,9 @@ from xmodule.modulestore.tests.django_utils import (
 
 # Explicitly import the cache from ConfigurationModel so we can reset it after each test
 from config_models.models import cache
-from embargo.models import IPFilter, RestrictedCourse, Country, CountryAccessRule, WHITE_LIST, BLACK_LIST
+from embargo.models import (
+    IPFilter, RestrictedCourse, Country, CountryAccessRule, WHITE_LIST, BLACK_LIST
+)
 from django_countries import countries
 
 
@@ -29,14 +31,14 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-class EmbargoApiTests(ModuleStoreTestCase):
+class EmbargoCountryAccessRulesTests(ModuleStoreTestCase):
     """
     Tests of EmbargoApi
     """
 
     def setUp(self):
+        super(EmbargoCountryAccessRulesTests, self).setUp()
         self.user = UserFactory(username='fred', password='secret')
         self.client.login(username='fred', password='secret')
         self.embargo_course1 = CourseFactory.create()
@@ -91,7 +93,7 @@ class EmbargoApiTests(ModuleStoreTestCase):
         ).save()
 
         # Text from lms/templates/static_templates/embargo.html
-        self.embargo_text = "Unfortunately, at this time edX must comply with export controls, and we cannot allow you to access this course."
+        self.embargo_text = "Unfortunately, at this time edX must comply with export controls, and we cannot allow you to access this course."  # pylint: disable=line-too-long
 
     def tearDown(self):
         # Explicitly clear ConfigurationModel's cache so tests have a clear cache

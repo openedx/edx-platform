@@ -10,7 +10,6 @@ import pygeoip
 
 from django.core.cache import cache
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponseForbidden
 from embargo.models import CountryAccessRule, IPFilter, RestrictedCourse
 
 log = logging.getLogger(__name__)

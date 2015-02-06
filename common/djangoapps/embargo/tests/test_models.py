@@ -211,3 +211,27 @@ class CountryAccessRuleTest(TestCase):
                 country=country
             )
 
+    def test_country_access_list_cache_with_save_delete(self):
+        course_id = SlashSeparatedCourseKey('abc', '123', 'doremi')
+        country = Country.objects.create(country='NZ')
+        restricted_course1 = RestrictedCourse.objects.create(course_key=course_id)
+
+        course = CountryAccessRule.objects.create(
+            restricted_course=restricted_course1,
+            rule_type=WHITE_LIST,
+            country=country
+        )
+
+        # Warm the cache
+        with self.assertNumQueries(1):
+            CountryAccessRule.check_country_access(course_id,'NZ')
+
+                # Warm the cache
+        with self.assertNumQueries(0):
+            CountryAccessRule.check_country_access(course_id,'NZ')
+
+        # deleting an object will delete cache also.and hit db on
+        # get the country access lists for course
+        course.delete()
+        with self.assertNumQueries(1):
+            CountryAccessRule.check_country_access(course_id,'NZ')
