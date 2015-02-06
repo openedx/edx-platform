@@ -216,7 +216,7 @@ $a11y--blue-s1: saturate($blue,15%);
 }
 
 .overlay {
-  @extend %ui-depth5;
+  @extend %ui-depth4;
   position: fixed;
   top: 0;
   left: 0;
