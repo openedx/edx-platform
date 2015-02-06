@@ -83,23 +83,24 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         """
         # Test that importing course with unicode 'id' and 'display name' doesn't give UnicodeEncodeError
         """
-        module_store = modulestore()
-        course_id = module_store.make_course_key(u'Юникода', u'unicode_course', u'échantillon')
-        import_from_xml(
-            module_store,
-            self.user.id,
-            TEST_DATA_DIR,
-            ['2014_Uni'],
-            target_course_id=course_id,
-            # When this test is run with split modulestore as the default, the create course option must be specified.
-            # create_course_if_not_present=True
-        )
+        # Test with the split modulestore because store.has_course fails in old mongo with unicode characters.
+        with modulestore().default_store(ModuleStoreEnum.Type.split):
+            module_store = modulestore()
+            course_id = module_store.make_course_key(u'Юникода', u'unicode_course', u'échantillon')
+            import_from_xml(
+                module_store,
+                self.user.id,
+                TEST_DATA_DIR,
+                ['2014_Uni'],
+                target_course_id=course_id,
+                create_course_if_not_present=True
+            )
 
-        course = module_store.get_course(course_id)
-        self.assertIsNotNone(course)
+            course = module_store.get_course(course_id)
+            self.assertIsNotNone(course)
 
-        # test that course 'display_name' same as imported course 'display_name'
-        self.assertEqual(course.display_name, u"Φυσικά το όνομα Unicode")
+            # test that course 'display_name' same as imported course 'display_name'
+            self.assertEqual(course.display_name, u"Φυσικά το όνομα Unicode")
 
     def test_static_import(self):
         '''
