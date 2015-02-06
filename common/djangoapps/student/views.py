@@ -1034,7 +1034,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
             })  # TODO: this should be status code 429  # pylint: disable=fixme
 
     # see if the user must reset his/her password due to any policy settings
-    if PasswordHistory.should_user_reset_password_now(user_found_by_email_lookup):
+    if user_found_by_email_lookup and PasswordHistory.should_user_reset_password_now(user_found_by_email_lookup):
         return JsonResponse({
             "success": False,
             "value": _('Your password has expired due to password policy on this account. You must '
