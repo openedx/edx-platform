@@ -9,7 +9,7 @@
 %>
 <div class="wrapper-utility edx-notes-visibility">
   <span class="action-toggle-message" aria-live="polite"></span>
-  <button class="utility-control utility-control-button action-toggle-notes is-disabled ${"is-active" if edxnotes_visibility else ""}" aria-pressed="${"true" if edxnotes_visibility else "false"}">
+  <button class="utility-control utility-control-button action-toggle-notes is-disabled ${"is-active" if edxnotes_visibility else ""}">
     <i class="icon fa fa-pencil"></i>
     % if edxnotes_visibility:
     <span class="utility-control-label sr">${_("Hide notes")}</span>
