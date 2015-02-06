@@ -125,6 +125,19 @@ describe 'Problem', ->
       it 're-bind the content', ->
         expect(@problem.bind).toHaveBeenCalled()
 
+    describe 'with timed exam', ->
+      beforeEach ->
+        @problem.el.append('''
+          <div class="problem-timer" data-seconds-left="120" data-minutes-before-warning="1">
+            You have <span class="minutes-left"></span> minutes left to complete these questions.
+          </div>
+        ''')
+        spyOn(@problem, 'maybeSetupTimer')
+        @problem.render("Hello world")
+
+      it 'should set up a timer', ->
+        expect(@problem.maybeSetupTimer).toHaveBeenCalled()
+
   describe 'check_fd', ->
     beforeEach ->
       # Insert an input of type file outside of the problem.
@@ -615,3 +628,148 @@ describe 'Problem', ->
     it 'check_save_waitfor should return false', ->
       $(@problem.inputs[0]).data('waitfor', ->)
       expect(@problem.check_save_waitfor()).toEqual(false)
+
+
+  describe 'getDisplayText', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+
+    it 'should show 0 seconds as `0:00`', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(0)
+      expect(@problem.getDisplayText()).toEqual("0:00")
+
+    it 'should show 30 seconds as `0:30`', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(30)
+      expect(@problem.getDisplayText()).toEqual("0:30")
+
+    it 'should show 60 seconds as `1:00`', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(60)
+      expect(@problem.getDisplayText()).toEqual("1:00")
+
+    it 'should show 89 seconds as `1:29`', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(89)
+      expect(@problem.getDisplayText()).toEqual("1:29")
+
+    it 'should show 601 seconds as `10:01`', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(601)
+      expect(@problem.getDisplayText()).toEqual("10:01")
+
+  describe 'maybeSetupTimer', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      content = '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        <div class="problem-timer" data-total-seconds-left="120" data-seconds-before-warning="60">
+          You have <span class="minutes-left"></span> minutes left to complete these questions.
+        </div>
+      '''
+      spyOn(@problem, 'showTimerWarning').andCallThrough()
+      spyOn(@problem, 'syncTimer').andCallThrough()
+      spyOn(@problem, 'maybeSetupTimer').andCallThrough()
+      @problem.render(content)
+
+    it 'correctly initializes the timer', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(119)
+      expect(@problem.maybeSetupTimer).toHaveBeenCalled()
+      expect(@problem.el.find(".problem-timer").length).not.toEqual(0)
+      expect(@problem.el.find(".minutes-left").length).not.toEqual(0)
+      expect(@problem.$timer).toBeDefined()
+      expect(@problem.$display).toBeDefined()
+      expect(@problem.timerId).toBeDefined()
+      expect(@problem.startTime).toBeDefined()
+      expect(@problem.secondsBeforeWarning).toEqual(60)
+      expect(@problem.submittedBeforeTimeExpired).toBe(false)
+      expect(@problem.$display.text()).toContain("1:59")
+      expect(@problem.$display.hasClass('danger')).toBe(false)
+      expect(@problem.syncTimer).toHaveBeenCalled()
+
+    it 'initializes the timer with warning if begin time is low', ->
+      spyOn(@problem, 'getSecondsLeft').andReturn(100)
+      @problem.secondsBeforeWarning = 120
+      @problem.syncTimer()
+      expect(@problem.showTimerWarning).toHaveBeenCalled()
+
+  describe 'syncTimer', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      content = '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        <div class="problem-timer" data-total-seconds-left="60" data-seconds-before-warning="60">
+          You have <span class="minutes-left"></span> minutes left to complete these questions.
+        </div>
+      '''
+      spyOn(@problem, 'syncTimer').andCallThrough()
+      spyOn(@problem, 'showTimerWarning').andCallThrough()
+      @problem.render(content)
+      jasmine.Clock.useMock()
+
+    it 'should call syncTimer after a couple of seconds', ->
+      jasmine.Clock.tick(2000)
+      expect(@problem.syncTimer).toHaveBeenCalled()
+
+    it 'should show a warning when showTimerWarning has been reached', ->
+      @problem.startTime = new Date()
+      @problem.secondsBeforeWarning = 59
+
+      runs(=>
+        @problem.syncTimer()
+      )
+
+      waitsFor(=>
+        @problem.getSecondsLeft() == 58
+      , "A few second have ticked by", 4000)
+
+      runs(=>
+        expect(@problem.syncTimer).toHaveBeenCalled()
+        expect(@problem.showTimerWarning).toHaveBeenCalled()
+        expect(@problem.getSecondsLeft()).toEqual(58)
+        expect(@problem.$display.text()).toContain("0:58")
+      )
+
+    it 'should remove the danger class if a problem was submitted before timed expired', ->
+      @problem.submittedBeforeTimeExpired = true
+      @problem.syncTimer()
+      expect(@problem.$timer.hasClass('danger')).toBe(false)
+
+  describe 'showTimerWarning', ->
+    beforeEach ->
+      @problem = new Problem($('.xblock-student_view'))
+      content = '''
+        <textarea class="CodeMirror" />
+        <input id="input_1_1" name="input_1_1" class="schematic" value="one" />
+        <input id="input_1_2" name="input_1_2" value="two" />
+        <input id="input_bogus_3" name="input_bogus_3" value="three" />
+        <div class="problem-timer" data-total-seconds-left="50" data-seconds-before-warning="60">
+          You have <span class="minutes-left"></span> minutes left to complete these questions.
+        </div>
+        <div class="problem">
+          Problem Content
+        </div>
+        '''
+      spyOn(@problem, 'showTimerWarning').andCallThrough()
+      @problem.render(content)
+      jasmine.Clock.useMock()
+
+    it 'should show two timer warnings in the html', ->
+      @problem.startTime = new Date()
+      @problem.secondsBeforeWarning = 60
+
+      runs(=>
+        @problem.syncTimer()
+      )
+
+      waitsFor(=>
+        @problem.getSecondsLeft() == 48
+      , "Two seconds have ticked by", 4000)
+  
+      runs(=>
+        expect(@problem.showTimerWarning).toHaveBeenCalled()
+        expect(@problem.$timer.length).toEqual(2)
+        expect(@problem.$timer.hasClass('danger')).toBe(true)
+      )

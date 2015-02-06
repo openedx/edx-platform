@@ -1545,6 +1545,10 @@ INSTALLED_APPS = (
 
     # Surveys
     'survey',
+
+    # Instructor email widget
+    'instructor_email_widget',
+
 )
 
 ######################### MARKETING SITE ###############################

@@ -24,13 +24,18 @@ from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.exceptions import NotFoundError
+from xmodule.exceptions import ProcessingError
+from xmodule.exceptions import TimeExpiredError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
+from xblock.fields import JSONField
 from .fields import Timedelta, Date
+from .fields import IntegerWithWarningField
 from django.utils.timezone import UTC
 from .util.duedate import get_extended_due_date
 from xmodule.capa_base_constants import RANDOMIZATION, SHOWANSWER
 from django.conf import settings
+from types import MethodType
 
 log = logging.getLogger("edx.courseware")
 
@@ -105,10 +110,17 @@ class CapaFields(object):
     max_attempts = Integer(
         display_name=_("Maximum Attempts"),
         help=_("Defines the number of times a student can try to answer this problem. "
-               "If the value is not set, infinite attempts are allowed."),
+               "If the value is not set, infinite attempts are allowed. "
+               "NOTE: If a problem is timed, we only allow a single attempt, and ignore "
+               "the value in this field."
+        ),
         values={"min": 0}, scope=Scope.settings
     )
-
+    minutes_before_warning = Integer(
+        help=_("Number of minutes at which the student will be issued a time warning. Works only when minutes_allowed is non-zero"),
+        default=1,
+        scope=Scope.settings,
+    )
     due = Date(help=_("Date that this problem is due by"), scope=Scope.settings)
     extended_due = Date(
         help=_("Date that this problem is due by for a particular student. This "
@@ -173,7 +185,11 @@ class CapaFields(object):
     student_answers = Dict(help=_("Dictionary with the current student responses"), scope=Scope.user_state)
     done = Boolean(help=_("Whether the student has answered the problem"), scope=Scope.user_state)
     seed = Integer(help=_("Random seed for this student"), scope=Scope.user_state)
-    minutes_allowed = Integer(help=_("EXPERIMENTAL FEATURE: DO NOT USE.  Number of minutes allowed to finish this assessment. Set 0 for no time-limit"),
+    minutes_allowed = IntegerWithWarningField(display_name=("Minutes Allowed"),
+                              help=_("Number of minutes allowed to finish this assessment. Set 0 for no time-limit. "
+                                     "If there is a time-limit, the student will only be given one attempt."),
+                              warning=_("Setting minutes allowed means that this question can only have one attempt, "
+                                     "regardless of the value of the maximum attempts field."),
                               default=0, scope=Scope.settings)
     time_started = Date(help=_("time student started this assessment"), scope=Scope.user_state)
     last_submission_time = Date(help=_("Last submission time"), scope=Scope.user_state)
@@ -475,12 +491,13 @@ class CapaMixin(CapaFields):
         Return True/False to indicate whether to show the "Check" button.
         """
         submitted_without_reset = (self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS)
+        submitted_timed_question = (self.is_submitted() and self.is_timed_problem())
 
         # If the problem is closed (past due / too many attempts)
         # then we do NOT show the "check" button
         # Also, do not show the "check" button if we're waiting
         # for the user to reset a randomized problem
-        if self.closed() or submitted_without_reset:
+        if self.closed() or submitted_without_reset or submitted_timed_question:
             return False
         else:
             return True
@@ -519,6 +536,7 @@ class CapaMixin(CapaFields):
         else:
             is_survey_question = (self.max_attempts == 0)
             needs_reset = self.is_submitted() and self.rerandomize == RANDOMIZATION.ALWAYS
+            submitted_timed_question = self.is_submitted() and self.is_timed_problem()
 
             # If the student has unlimited attempts, and their answers
             # are not randomized, then we do not need a save button
@@ -539,7 +557,9 @@ class CapaMixin(CapaFields):
             # then do NOT show the save button
             # If we're waiting for the user to reset a randomized problem
             # then do NOT show the save button
-            elif (self.closed() and not is_survey_question) or needs_reset:
+            # If the question is timed, enforce that we can only attempt
+            # once. Thus, do NOT show the save button
+            elif (self.closed() and not is_survey_question) or needs_reset or submitted_timed_question:
                 return False
             else:
                 return True
@@ -617,6 +637,8 @@ class CapaMixin(CapaFields):
     def get_problem_html(self, encapsulate=True):
         """
         Return html for the problem.
+        For timed problems, returns an interstitial view if
+        the problem has not yet been started.
 
         Adds check, reset, save buttons as necessary based on the problem config and state.
         """
@@ -640,14 +662,20 @@ class CapaMixin(CapaFields):
             check_button = False
             check_button_checking = False
 
-        problem_is_timed = self.minutes_allowed > 0
+        # For timed problems
+        now = datetime.datetime.now(UTC())
+        problem_has_finished = False
+        total_seconds_left = -1
+        end_time_to_display = now + datetime.timedelta(minutes=self.minutes_allowed)
 
-        if problem_is_timed and not self.time_started:
-            self.set_time_started()
 
-        end_time_to_display = (self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
-                               if problem_is_timed
-                               else None)
+        if self.is_timed_problem() and self.time_started:
+            end_time_to_display = self.time_started + datetime.timedelta(minutes=self.minutes_allowed)
+            problem_has_finished = end_time_to_display >= now
+            time_left = end_time_to_display - now
+            total_seconds_left = (time_left).total_seconds()
+
+
 
         # because we use self.due and not self.close_date below, this is not the actual end_time, but the
         # end_time we want to display to the user
@@ -663,7 +691,12 @@ class CapaMixin(CapaFields):
         context = {
             'problem': content,
             'id': self.location.to_deprecated_string(),
-            'problem_is_timed': problem_is_timed,
+            'problem_is_timed': self.is_timed_problem(),
+            'problem_has_finished': self.closed() or self.is_submitted(),
+            'exceeded_time_limit': self.exceeded_time_limit() and not self.done,
+            'seconds_before_warning': self.minutes_before_warning * 60,
+            'total_seconds_left': total_seconds_left,
+            'minutes_allowed': self.minutes_allowed,
             'start_time': self.time_started,
             'end_time_to_display': end_time_to_display,
             'check_button': check_button,
@@ -675,7 +708,10 @@ class CapaMixin(CapaFields):
             'attempts_allowed': self.max_attempts,
         }
 
-        html = self.runtime.render_template('problem.html', context)
+        if self.is_timed_problem() and not self.time_started:
+            html = self.runtime.render_template('problem_interstitial.html', context)
+        else:
+            html = self.runtime.render_template('problem.html', context)
 
         if encapsulate:
             html = u'<div id="problem_{id}" class="problem" data-url="{ajax_url}">'.format(
@@ -693,15 +729,29 @@ class CapaMixin(CapaFields):
 
         return html
 
+    def start_problem(self, _data=None):
+        """
+        Called from the interstitial view, starts a timed problem if
+        it hasn't already been started.
+
+        Returns html response for the problem.
+        """
+        if self.is_timed_problem() and not self.time_started:
+            self.set_time_started()
+
+        return {
+            'html': self.get_problem_html(encapsulate=False)
+        }
+
     def exceeded_time_limit(self):
         """
-        Has student used up allotted time, if set
+        For a timed exam, has student used up allotted time.
+        Returns false for non-timed exams.
         """
-        if self.minutes_allowed <= 0 or not self.time_started:
+        if not self.is_timed_problem() or not self.time_started:
             return False
         now = datetime.datetime.now(UTC())
-        # built in hardcoded grace period of 5 min
-        time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed + 5))
+        time_limit_end = self.time_started + datetime.timedelta(minutes=(self.minutes_allowed))
         return now > time_limit_end
 
     def is_past_due(self):
@@ -749,6 +799,12 @@ class CapaMixin(CapaFields):
         """
         score_dict = self.get_score()
         return score_dict['score'] == score_dict['total']
+
+    def is_timed_problem(self):
+        """
+        Checks whether the problem is a timed exam.
+        """
+        return self.minutes_allowed > 0
 
     def answer_available(self):
         """
@@ -1011,7 +1067,10 @@ class CapaMixin(CapaFields):
             self.track_function_unmask('problem_check_fail', event_info)
             if dog_stats_api:
                 dog_stats_api.increment(metric_name('checks'), tags=[u'result:failed', u'failure:closed'])
-            raise NotFoundError(_("Problem is closed."))
+            if self.exceeded_time_limit():
+                raise TimeExpiredError(_("Time has expired"))
+            else:
+                raise NotFoundError(_("Problem is closed."))
 
         # Problem submitted. Student should reset before checking again
         if self.done and self.rerandomize == RANDOMIZATION.ALWAYS:
