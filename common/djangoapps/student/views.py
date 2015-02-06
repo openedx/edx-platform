@@ -1122,6 +1122,9 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
 
         if third_party_auth_successful:
             redirect_url = pipeline.get_complete_url(backend_name)
+        elif third_party_auth_requested:
+            running_pipeline = pipeline.get(request)
+            redirect_url = pipeline.get_login_url(running_pipeline['backend'], pipeline.AUTH_ENTRY_DASHBOARD)
 
         response = JsonResponse({
             "success": True,
@@ -1669,7 +1672,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
     # Resume the third-party-auth pipeline if necessary.
     if third_party_auth.is_enabled() and pipeline.running(request):
         running_pipeline = pipeline.get(request)
-        redirect_url = pipeline.get_complete_url(running_pipeline['backend'])
+        redirect_url = pipeline.get_login_url(running_pipeline['backend'], pipeline.AUTH_ENTRY_DASHBOARD)
 
     response = JsonResponse({
         'success': True,
