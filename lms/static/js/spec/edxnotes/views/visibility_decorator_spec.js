@@ -1,5 +1,5 @@
 define([
-    'annotator', 'js/edxnotes/views/visibility_decorator',
+    'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator',
     'js/spec/edxnotes/helpers', 'js/spec/edxnotes/custom_matchers'
 ], function(Annotator, VisibilityDecorator, Helpers, customMatchers) {
     'use strict';
