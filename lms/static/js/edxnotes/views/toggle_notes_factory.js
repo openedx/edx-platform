@@ -12,7 +12,7 @@ define([
         errorMessage: gettext("An error has occurred. Make sure that you are connected to the Internet, and then try refreshing the page."),
 
         initialize: function (options) {
-            _.bindAll(this, 'onSuccess', 'onError');
+            _.bindAll(this, 'onSuccess', 'onError', 'keyDownToggleHandler');
             this.visibility = options.visibility;
             this.visibilityUrl = options.visibilityUrl;
             this.label = this.$('.utility-control-label');
@@ -20,6 +20,12 @@ define([
             this.actionLink.removeClass('is-disabled');
             this.actionToggleMessage = this.$('.action-toggle-message');
             this.notification = new Annotator.Notification();
+            $(document).on('keydown.edxnotes:togglenotes', this.keyDownToggleHandler);
+        },
+
+        remove: function() {
+            $(document).off('keydown.edxnotes:togglenotes');
+            Backbone.View.prototype.remove.call(this);
         },
 
         toggleHandler: function (event) {
@@ -27,6 +33,13 @@ define([
             this.visibility = !this.visibility;
             this.showActionMessage();
             this.toggleNotes(this.visibility);
+        },
+
+        keyDownToggleHandler: function (event) {
+            // Character 'n' has keyCode 78
+            if (event.keyCode === 78 && event.ctrlKey && event.altKey) {
+                this.toggleHandler(event);
+            }
         },
 
         toggleNotes: function (visibility) {
@@ -47,14 +60,14 @@ define([
 
         enableNotes: function () {
             _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
-            this.actionLink.addClass('is-active').attr('aria-pressed', true);
+            this.actionLink.addClass('is-active');
             this.label.text(gettext('Hide notes'));
             this.actionToggleMessage.text(gettext('Showing notes'));
         },
 
         disableNotes: function () {
             EdxnotesVisibilityDecorator.disableNotes();
-            this.actionLink.removeClass('is-active').attr('aria-pressed', false);
+            this.actionLink.removeClass('is-active');
             this.label.text(gettext('Show notes'));
             this.actionToggleMessage.text(gettext('Hiding notes'));
         },
