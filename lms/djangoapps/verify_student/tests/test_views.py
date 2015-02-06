@@ -37,11 +37,6 @@ from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
@@ -64,7 +59,6 @@ class StartView(TestCase):
         self.assertHttpForbidden(self.client.get(self.start_url()))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class TestPayAndVerifyView(ModuleStoreTestCase):
     """
@@ -769,13 +763,14 @@ class TestPayAndVerifyView(ModuleStoreTestCase):
         self.assertRedirects(response, url)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestCreateOrder(ModuleStoreTestCase):
     """
     Tests for the create order view.
     """
     def setUp(self):
         """ Create a user and course. """
+        super(TestCreateOrder, self).setUp()
+
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
         for mode in ('audit', 'honor', 'verified'):
@@ -852,7 +847,6 @@ class TestCreateOrder(ModuleStoreTestCase):
         attempt.approve()
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestCreateOrderView(ModuleStoreTestCase):
     """
     Tests for the create_order view of verified course enrollment process.
@@ -861,6 +855,8 @@ class TestCreateOrderView(ModuleStoreTestCase):
     IMAGE_DATA = ','
 
     def setUp(self):
+        super(TestCreateOrderView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'
@@ -1122,12 +1118,13 @@ class TestSubmitPhotosForVerification(TestCase):
         self.assertEqual(info['full_name'], full_name)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
     """
     Tests for the results_callback view.
     """
     def setUp(self):
+        super(TestPhotoVerificationResultsCallback, self).setUp()
+
         self.course = CourseFactory.create(org='Robot', number='999', display_name='Test Course')
         self.course_id = self.course.id
         self.user = UserFactory.create()
@@ -1337,12 +1334,13 @@ class TestPhotoVerificationResultsCallback(ModuleStoreTestCase):
         self.assertIsNotNone(CourseEnrollment.objects.get(course_id=self.course_id))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestReverifyView(ModuleStoreTestCase):
     """
     Tests for the reverification views
     """
     def setUp(self):
+        super(TestReverifyView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.user.profile.name = u"Røøsty Bøøgins"
         self.user.profile.save()
@@ -1384,12 +1382,13 @@ class TestReverifyView(ModuleStoreTestCase):
         self.assertTrue(context['error'])
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestMidCourseReverifyView(ModuleStoreTestCase):
     """
     Tests for the midcourse reverification views.
     """
     def setUp(self):
+        super(TestMidCourseReverifyView, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_key = SlashSeparatedCourseKey("Robot", "999", "Test_Course")
@@ -1505,7 +1504,6 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         self.assertEqual(response.status_code, 404)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class TestReverificationBanner(ModuleStoreTestCase):
     """
     Tests for toggling the "midcourse reverification failed" banner off.
@@ -1513,6 +1511,8 @@ class TestReverificationBanner(ModuleStoreTestCase):
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def setUp(self):
+        super(TestReverificationBanner, self).setUp()
+
         self.user = UserFactory.create(username="rusty", password="test")
         self.client.login(username="rusty", password="test")
         self.course_id = 'Robot/999/Test_Course'

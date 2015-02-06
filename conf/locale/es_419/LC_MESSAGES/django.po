@@ -96,6 +96,7 @@
 # Natalia, 2013
 # Natalia, 2013-2014
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
+# paul ochoa <palichis@solid-ec.org>, 2015
 # Etna Pretelín Ricárdez, 2014
 # Santiago Salkin <salkin.santiago@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014-2015
@@ -114,6 +115,7 @@
 # diegobe <diegobe@iadb.org>, 2014
 # David Salazar <imdjsg@gmail.com>, 2014
 # Fernando Abramowitz <ferabra@gmail.com>, 2013
+# Giancarlo  De  Agostini <giancarlo.deagostini@iaen.edu.ec>, 2015
 # Herty Nava <translation@bolmedia.ca>, 2013
 # Ismael Saavedra <isma.18.94@gmail.com>, 2014
 # Juan Camilo Montoya Franco <juan.montoya@edunext.co>, 2013-2014
@@ -124,6 +126,7 @@
 # Natalia, 2013
 # Nuri Plans Toral <nplans@gmail.com>, 2015
 # Cristian Salamea <ovnicraft@gmail.com>, 2013
+# paul ochoa <palichis@solid-ec.org>, 2015
 # Sarina Canelake <sarina@edx.org>, 2014
 # Valeria Freire <valtodopds@hotmail.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
@@ -145,7 +148,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-26 13:22+0000\n"
+"POT-Creation-Date: 2015-02-02 13:50+0000\n"
 "PO-Revision-Date: 2014-12-30 16:21+0000\n"
 "Last-Translator: Cristian Salamea <ovnicraft@gmail.com>\n"
 "Language-Team: Spanish (Latin America) (http://www.transifex.com/projects/p/edx-platform/language/es_419/)\n"
@@ -197,7 +200,7 @@ msgstr "Avanzado"
 #: cms/djangoapps/contentstore/views/helpers.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
-#: cms/templates/course_outline.html
+#: cms/templates/course_outline.html lms/templates/seq_module.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 msgid "Section"
 msgstr "Sección"
@@ -226,7 +229,6 @@ msgstr "Completo"
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/class_dashboard/dashboard_data.py
 #: lms/djangoapps/instructor/views/api.py lms/templates/help_modal.html
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
 #: lms/templates/instructor/instructor_dashboard_2/metrics.html
@@ -431,11 +433,8 @@ msgstr "Correo electrónico o contraseña incorrectos."
 #: common/djangoapps/student/views.py
 msgid ""
 "This account has not been activated. We have sent another activation "
-"message. Please check your e-mail for the activation instructions."
+"message. Please check your email for the activation instructions."
 msgstr ""
-"Esta cuenta no ha sido activada. Hemos enviado nuevamente el correo de "
-"activación. Por favor verifique su buzón de correo y siga las instrucciones "
-"de activación."
 
 #: common/djangoapps/student/views.py
 msgid "Please enter a username"
@@ -3083,6 +3082,12 @@ msgid "Edit Library List."
 msgstr "Editar Librerías"
 
 #: common/lib/xmodule/xmodule/library_content_module.py
+msgid ""
+"This course does not support content libraries. Contact your system "
+"administrator for more information."
+msgstr ""
+
+#: common/lib/xmodule/xmodule/library_content_module.py
 msgid "A library has not yet been selected."
 msgstr "No se ha seleccionado ninguna librería"
 
@@ -3645,6 +3650,18 @@ msgstr "Todas las posibles palabras, de todos los estudiantes."
 #: common/lib/xmodule/xmodule/word_cloud_module.py
 msgid "Top num_top_words words for word cloud."
 msgstr "Top de num_top_words para la nube de palabras."
+
+#: common/lib/xmodule/xmodule/modulestore/courseware_index.py
+msgid "Could not index item: {}"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/courseware_index.py
+msgid "General indexing error occurred"
+msgstr ""
+
+#: common/lib/xmodule/xmodule/modulestore/courseware_index.py
+msgid "Error(s) present during indexing"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid "Enter the default date by which problems are due."
@@ -4407,6 +4424,7 @@ msgstr "Índice"
 
 #: common/static/js/vendor/mathjax-MathJax-c9db6ac/docs/source/mjtheme/layout.html
 #: lms/templates/wiki/plugins/attachments/index.html
+#: lms/templates/courseware/courseware.html
 #: lms/templates/discussion/_thread_list_template.html
 #: lms/templates/edxnotes/edxnotes.html
 msgid "Search"
@@ -6800,8 +6818,6 @@ msgstr "Hubo un error verificando las fotos de su documento de identidad."
 
 #: lms/djangoapps/verify_student/views.py
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/show_requirements.html
 msgid "Intro"
 msgstr "Introducción"
 
@@ -6817,8 +6833,6 @@ msgstr "Confirmación del pago"
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Take photo"
 msgstr "Tomar foto"
 
@@ -6878,8 +6892,8 @@ msgstr "Taiwan"
 
 #: lms/templates/main_django.html cms/templates/base.html
 #: lms/templates/main.html
-msgid "Skip to this view's content"
-msgstr "Saltar a los contenidos de esta vista"
+msgid "Skip to main content"
+msgstr ""
 
 #: lms/templates/dashboard/_dashboard_refund.html
 #: lms/templates/dashboard/support.html
@@ -7899,6 +7913,10 @@ msgstr "Curso exportado exitósamente al repositorio de git"
 msgid "Vertical"
 msgstr "Vertical"
 
+#: cms/djangoapps/contentstore/views/helpers.py
+msgid "Empty"
+msgstr "Vacío"
+
 #: cms/djangoapps/contentstore/views/import_export.py
 msgid "We only support uploading a .tar.gz file."
 msgstr "Solo está soportado la carga de archivos .tar.gz."
@@ -7918,10 +7936,6 @@ msgstr "Datos inválidos"
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Invalid data ({details})"
 msgstr "Datos inválidos ({details})"
-
-#: cms/djangoapps/contentstore/views/item.py
-msgid "Empty"
-msgstr "Vacío"
 
 #: cms/djangoapps/contentstore/views/item.py
 msgid "Duplicate of {0}"
@@ -8133,6 +8147,7 @@ msgstr "cerrar"
 #: cms/templates/course-create-rerun.html cms/templates/index.html
 #: cms/templates/index.html cms/templates/manage_users.html
 #: cms/templates/manage_users_lib.html
+#: lms/templates/courseware/courseware.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
 #: lms/templates/discussion/_underscore_templates.html
@@ -8680,11 +8695,13 @@ msgstr ""
 "{EdX} es una iniciativa en línea sin fines de lucro creado por los socios "
 "fundadores {Harvard} y {MIT}."
 
-#. Translators: '&copy;' is an HTML character code for the copyright symbol.
-#. Please don't remove or change it.
+#. Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'.
+#. Please do not translate any of these trademarks and company names.
 #: lms/templates/footer-edx-new.html lms/templates/footer.html
-msgid "&copy; {copyright_year} {platform_name}, some rights reserved"
-msgstr "&copy; {copyright_year} {platform_name}, Algunos derechos reservados."
+msgid ""
+"EdX, Open edX, and the edX and Open edX logos are registered trademarks or "
+"trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
 
 #: lms/templates/footer-edx-new.html
 msgid "(Revised 4/16/2014)"
@@ -9613,10 +9630,6 @@ msgid "Previous"
 msgstr "Previo"
 
 #: lms/templates/seq_module.html lms/templates/seq_module.html
-msgid "Section Navigation"
-msgstr "Navegación de secciones"
-
-#: lms/templates/seq_module.html lms/templates/seq_module.html
 #: lms/templates/discussion/mustache/_pagination.mustache
 msgid "Next"
 msgstr "Siguiente"
@@ -10538,8 +10551,13 @@ msgid "Prerequisites"
 msgstr "Prerequisitos"
 
 #: lms/templates/courseware/course_about.html
-msgid "You must successfully complete {course} before you begin this course"
-msgstr "Debes terminar el {course} antes de iniciar este curso"
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"You must successfully complete {link_start}{prc_display}{link_end} before "
+"you begin this course."
+msgstr ""
+"Debes terminar completamente {link_start}{prc_display}{link_end} antes de "
+"empezar este curso."
 
 #: lms/templates/courseware/course_about.html
 msgid "Additional Resources"
@@ -10605,6 +10623,10 @@ msgstr "Material del curso {course_number}"
 #: lms/templates/courseware/courseware.html
 msgid "Return to Exam"
 msgstr "Volver al Examen"
+
+#: lms/templates/courseware/courseware.html
+msgid "search"
+msgstr ""
 
 #: lms/templates/courseware/courseware.html
 msgid "Course Navigation"
@@ -11196,7 +11218,6 @@ msgstr "Su verificacion esta pendiente"
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Enrolled as: "
 msgstr "Inscrito como;"
 
@@ -11213,17 +11234,14 @@ msgid "Verified: Pending Verification"
 msgstr "Verificado: Verificación pendiente"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "You're enrolled as a verified student"
 msgstr "Usted está inscrito como un estudiante verificado"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
-#: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "ID Verified Ribbon/Badge"
 msgstr "ID verificador Ribbon / insignia"
 
-#: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/instructor/instructor_dashboard_2/course_info.html
 msgid "Verified"
@@ -11376,14 +11394,6 @@ msgstr ""
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Email Settings"
 msgstr "Configuración de email"
-
-#: lms/templates/dashboard/_dashboard_course_listing.html
-msgid ""
-"You must successfully complete {link_start}{prc_display}{link_end} before "
-"you begin this course."
-msgstr ""
-"Debes terminar completamente {link_start}{prc_display}{link_end} antes de "
-"empezar este curso."
 
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
 #: lms/templates/dashboard/_dashboard_prompt_midcourse_reverify.html
@@ -12566,69 +12576,48 @@ msgstr ""
 "distribuya los códigos de registro a cada estudiante que planeé inscribirse "
 "usando la plantilla de correo debajo."
 
+#. Translators: This is the signature of an email.  "\n" is a newline
+#. character
+#. and should be placed between the closing word and the signature.
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Thanks,The {platform_name} Team"
-msgstr "Gracias, El Equipo {platform_name} "
+msgid ""
+"Thanks,\n"
+"The {platform_name} Team"
+msgstr ""
 
+#. Translators: please translate the text inside [[ ]]. This is meant as a
+#. template for course teams to use.
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid "Dear [[Name]]:"
 msgstr "Estimado/a [[Name]]:"
 
+#. Translators: please translate the text inside [[ ]]. This is meant as a
+#. template for course teams to use.
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"We have provided an enrollment for you in the course {course_name} from "
-"{platform_name}. Please follow the instructions below to claim your access."
+"We have provided a course enrollment code for you in {course_name}. To "
+"enroll in the course, click the following link:"
 msgstr ""
-"Se le ha otorgado acceso al curso {course_name} en {platform_name}. Por "
-"favor siga las instrucciones para obtener acceso."
 
 #: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Your redeem code is: [[Enter Redeem Code here from the attached CSV]]"
+msgid "HTML link from the attached CSV file"
 msgstr ""
-"Su código de redención es [[Ingrese aquí el código del archivo CSV adjunto]]"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(1) Register for an account at {site_name}."
-msgstr "(1) Crear una cuenta en {site_name}."
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(2) Once registered, navigate to {course_url}"
-msgstr "(2) Una vez registrado, ir a {course_url}"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(3) Click 'Add {course_number} to Cart'"
-msgstr "(3) Dar clic en 'Añadir {course_number} al Carrito'"
 
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"(4) On the shopping cart page, enter your redeem code and click 'Apply "
-"Code'. This will make payment equal to $0."
+"After you enroll, you can see the course on your student dashboard. You can "
+"see course materials after the course start date."
 msgstr ""
-"(4) En la página carro de compras, ingrese su código y haga clic en 'Aplicar"
-" Código \". Esto hará que el pago sea igual a $ 0."
 
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "(5) Click 'Register'"
-msgstr "(5) Dar clic en 'Registrar'"
-
+#. Translators: please translate the text inside [[ ]]. This is meant as a
+#. template for course teams to use.
+#. This is the signature of an email.  "\n" is a newline character
+#. and should be placed between the closing word and the signature.
 #: lms/templates/emails/registration_codes_sale_email.txt
 msgid ""
-"(6) You should be able to see your course on your student dashboard at "
-"{dashboard_url}"
+"Sincerely,\n"
+"[[Your Signature]]"
 msgstr ""
-"(6) Ud debe ver su curso en el panel de control de estudiante en "
-"{dashboard_url}"
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid ""
-"(7) Course materials will not be available until the course start date."
-msgstr ""
-"(7) Los materiales del curso no estaran disponibles hasta la fecha de "
-"lanzamiento del curso."
-
-#: lms/templates/emails/registration_codes_sale_email.txt
-msgid "Sincerely,[[Your Signature]]"
-msgstr "Sinceramente, [[Your Signature]]"
 
 #: lms/templates/emails/registration_codes_sale_invoice_attachment.txt
 msgid "INVOICE"
@@ -13094,44 +13083,40 @@ msgid "Registration Codes"
 msgstr "Códigos de registro"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Click to generate Registration Codes"
-msgstr "Dar clic para generar códigos de registro"
+msgid ""
+"Create one or more pre-paid course enrollment codes. Students can use these "
+"codes to enroll in the course."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Generate Registration Codes"
-msgstr "Generar códigos de registro"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Click to generate a CSV file of all Course Registrations Codes:"
+msgid "Create Enrollment Codes"
 msgstr ""
-"Haga clic para generar un archivo CSV con todos los códigos de registro del "
-"curso."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download Registration Codes"
-msgstr "Descargar códigos de registro"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Click to generate a CSV file of all Active Course Registrations Codes:"
+msgid "Download a .csv file of all enrollment codes for this course"
 msgstr ""
-"Haga clic para generar un archivo CSV con todos los códigos de registro del "
-"curso activos."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Active Registration Codes"
-msgstr "Activar códigos de registro"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Click to generate a CSV file of all Spent Course Registrations Codes:"
+msgid "Download All Enrollment Codes"
 msgstr ""
-"Haga clic para generar un archivo CSV con todos los códigos de registro del "
-"curso utilizados."
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Spent Registration Codes"
-msgstr "Utilizar códigos de registro"
+msgid "Download a .csv file of all unused enrollment codes for this course"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download Unused Enrollment Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download a .csv file of all used enrollment codes for this course"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Download Used Enrollment Codes"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 #: lms/templates/instructor/instructor_dashboard_2/set_course_mode_price_modal.html
@@ -13152,38 +13137,38 @@ msgid "Sales"
 msgstr "Ventas"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Total CC Amount: "
-msgstr "Total monto CC:"
-
-#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Click to generate a CSV file for all sales records in this course"
+msgid "Total Credit Card Purchases: "
 msgstr ""
-"Click para generar un archivo CSV con el registro de todas las ventas para "
-"este curso"
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download All Invoice Sales"
-msgstr "Descargar todas las facturas"
+msgid ""
+"Download a .csv file for all credit card purchases or for all invoices, "
+"regardless of status"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Download All CC Sales"
-msgstr "Descargar todas la ventas CC"
+msgid "Download All Invoices"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Enter the invoice number to invalidate or re-validate sale"
-msgstr "Introduzca el número de factura para invalidar o revalidar la compra"
+msgid "Download All Credit Card Purchases"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Enter Invoice Number"
-msgstr "Introducir el Número de Factura "
+msgid "To cancel or resubmit an invoice, enter the invoice number below."
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Invalidate Sale"
-msgstr "Venta inválida"
+msgid "Invoice Number"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
-msgid "Revalidate Sale"
-msgstr "Revalidar venta"
+msgid "Cancel Invoice"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
+msgid "Resubmit Invoice"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/e-commerce.html
 msgid "Coupons List"
@@ -13389,8 +13374,8 @@ msgid "Generate Registration Code Modal"
 msgstr "Generar código de Modal de Registro"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Please enter the details below"
-msgstr "Por favor ingrese los detalles a continuación"
+msgid "* Required Information"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
@@ -13398,8 +13383,8 @@ msgid "Organization Name"
 msgstr "Nombre de la organización"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "What is the company the seats were sold to?"
-msgstr "A que compañia se vendieron los cupos?"
+msgid "The organization that purchased enrollments in the course"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 #: lms/templates/shoppingcart/billing_details.html
@@ -13407,16 +13392,20 @@ msgid "Organization Contact"
 msgstr "Contacto en la organización"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Who is the key contact at the company the sale was made to? "
-msgstr "¿Quien es el contacto clave en la compañía a la que se hizo la venta?"
+msgid "Organization Contact Name"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "The primary contact at the organization"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Invoice Recipient"
 msgstr "Destinatario de la factura"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Who at the company should the invoice be sent to?"
-msgstr "¿A quien debe ser enviada la factura?"
+msgid "The contact who should receive the invoice"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Organization Billing Address"
@@ -13443,37 +13432,36 @@ msgid "Zip"
 msgstr "Código postal"
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Price of Sale"
-msgstr "Precio de venta"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "What was the total sale price for all seats sold?"
-msgstr "¿Cuál fue el precio total de venta de todos los cupos vendidos?"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Number of registrations"
-msgstr "Número de registros."
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Number of codes to generate for the Invoice"
-msgstr "Número de códigos a generar para la factura"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "(Optional) Sale Label"
-msgstr "(Opcional) Etiqueta de venta"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Internal tag to associate with the sale"
-msgstr "Etiqueta interna para asociar con la venta"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "(Optional) Customer Reference Number"
-msgstr "(Opcional) Número de referencia del cliente"
-
-#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
-msgid "Any reference specific to the purchasing company, e.g. PO #"
+msgid "Sale Price"
 msgstr ""
-"Alguna referencia específica a la compañía que hace la compra. Ej: PO #"
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "The total price for all enrollments purchased"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Number of Enrollment Codes"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "The total number of enrollment codes to create"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Course Team Internal Reference"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Internal reference information for the sale"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Customer Reference"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
+msgid "Customer's purchase order or other reference information"
+msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/generate_registarion_codes_modal.html
 msgid "Send me a copy of the invoice"
@@ -14724,19 +14712,17 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 msgid ""
-"You're already registered for this course. Visit your <a "
+"You're already enrolled for this course. Visit your <a "
 "href={dashboard_url}>dashboard</a> to see the course."
 msgstr ""
-"Ya se ha registrado para este curso. Visite su <a "
-"href={dashboard_url}>tablero</a> para ver el curso."
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are registering for is full."
-msgstr "El curso al que se está registrando está lleno."
+msgid "The course you are enrolling for is full."
+msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
-msgid "The course you are registering for is closed."
-msgstr "El curso al que se está registrando está cerrado."
+msgid "The course you are enrolling for is closed."
+msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_receipt.html
 #: lms/templates/shoppingcart/registration_code_redemption.html
@@ -14775,11 +14761,9 @@ msgstr ""
 
 #: lms/templates/shoppingcart/registration_code_redemption.html
 msgid ""
-"You're already registered for this course. Visit your "
+"You're already enrolled for this course. Visit your "
 "{link_start}dashboard{link_end} to see the course."
 msgstr ""
-"Ya se ha registrado para este curso. Visite su {link_start}Panel de "
-"Control{link_end} para ver el curso."
 
 #: lms/templates/shoppingcart/shopping_cart.html
 #: lms/templates/shoppingcart/shopping_cart.html
@@ -14839,10 +14823,7 @@ msgstr "{platform_name} - Carrito de compras"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
 msgid "Review"
 msgstr "Revisión"
 
@@ -14853,10 +14834,7 @@ msgstr "Pago"
 #: lms/templates/shoppingcart/shopping_cart_flow.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
 msgid "Confirmation"
 msgstr "Confirmación"
 
@@ -14878,39 +14856,26 @@ msgstr "ID Verificada"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
 msgid "Your Progress"
 msgstr "Su progreso"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/shoppingcart/verified_cert_receipt.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 #: lms/templates/verify_student/reverification_confirmation.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
 msgid "Current Step: "
 msgstr "Paso actual:"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/show_requirements.html
 msgid "Take Photo"
 msgstr "Tomar foto"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/show_requirements.html
 msgid "Take ID Photo"
 msgstr "Tomar foto de ID"
 
 #: lms/templates/shoppingcart/verified_cert_receipt.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/show_requirements.html
-#: lms/templates/verify_student/verified.html
 msgid "Make Payment"
 msgstr "Realizar Pago"
 
@@ -15046,19 +15011,10 @@ msgstr "Este curso no está disponible en su país"
 #: lms/templates/static_templates/embargo.html
 msgid ""
 "Our system indicates that you are trying to access this {platform_name} "
-"course from a country currently subject to U.S. economic and trade "
-"sanctions. Unfortunately, at this time {platform_name} must comply with "
-"export controls, and we cannot allow you to access this particular course. "
-"Feel free to browse our catalogue to find other courses you may be "
-"interested in taking."
+"course from a country or region currently subject to U.S. economic and trade"
+" sanctions. Unfortunately, at this time {platform_name} must comply with "
+"export controls, and we cannot allow you to access this course."
 msgstr ""
-"Nuestro sistema indica que usted está tratando de acceder a un curso de "
-"{platform_name} desde una dirección IP asociada con uno de los países "
-"sujetos a embargos económicos o sanciones comerciales de los Estados Unidos."
-" Infortunadamente, {platform_name} debe cumplir con los controles de "
-"exportaciones y no puede permitirle acceder a este curso en particular. Por "
-"favor consulte nuestro catálogo para encontrar algún otro curso de su "
-"interés."
 
 #: lms/templates/static_templates/media-kit.html
 #: lms/templates/static_templates/media-kit.html
@@ -15331,7 +15287,6 @@ msgstr "Re verificar"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "No Webcam Detected"
 msgstr "No se detectó una cámara web."
 
@@ -15346,13 +15301,11 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "No Flash Detected"
 msgstr "No se detectó Flash"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "You don't seem to have Flash installed. {a_start} Get Flash {a_end} to "
 "continue your registration."
@@ -15388,8 +15341,6 @@ msgstr ""
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Don't see your picture? Make sure to allow your browser to use your camera "
 "when it asks for permission."
@@ -15400,42 +15351,33 @@ msgstr ""
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Retake"
 msgstr "Tomar nuevamente"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Looks good"
 msgstr "Luce bien!"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Tips on taking a successful photo"
 msgstr "Consejos para tomar una foto exitosamente"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Make sure your face is well-lit"
 msgstr "Asegurese de que su rostro esté bien iluminado"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Be sure your entire face is inside the frame"
 msgstr "Verifique que su cara está completamente dentro del marco de la foto"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Can we match the photo you took with the one on your ID?"
 msgstr ""
 "¿Podemos verificar la foto que usted acaba de tomar contra la foto en su "
@@ -15444,50 +15386,39 @@ msgstr ""
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Once in position, use the camera button"
 msgstr "Una vez esté en posición, use el botón de la cámara"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "to capture your picture"
 msgstr "para capturar su imagen."
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Use the checkmark button"
 msgstr "Use el botón de verificación"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "once you are happy with the photo"
 msgstr "una vez esté satisfecho con la fotografía"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Common Questions"
 msgstr "Preguntas comunes"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Why do you need my photo?"
 msgstr "¿Para que necesitan mi foto?"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "As part of the verification process, we need your photo to confirm that you "
 "are you."
@@ -15498,14 +15429,11 @@ msgstr ""
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "What do you do with this picture?"
 msgstr "¿Que harán con esta fotografía?"
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "We only use it to verify your identity.  It is not displayed anywhere."
 msgstr ""
 "Solo usaremos la foto para verificar su identidad. No será mostrada en "
@@ -15513,7 +15441,6 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Check Your Name"
 msgstr "Verifique su nombre"
 
@@ -15530,7 +15457,6 @@ msgstr ""
 
 #: lms/templates/verify_student/midcourse_photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Edit your name"
 msgstr "Editar su nombre"
 
@@ -15742,7 +15668,6 @@ msgid "Re-Take ID Photo"
 msgstr "Volver a tomar la foto de identificación"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Use your webcam to take a picture of your face so we can match it with the "
 "picture on your ID."
@@ -15751,7 +15676,6 @@ msgstr ""
 "verificarla contra la fotografía de su documento de identificación."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Once you verify your photo looks good, you can move on to step 2."
 msgstr "Una vez haya verificado que su foto luce bien, puede pasar al paso 2."
 
@@ -15760,12 +15684,10 @@ msgid "Go to Step 2: Re-Take ID Photo"
 msgstr "Ir al paso 2: volver a tomar la foto de identificación"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Show Us Your ID"
 msgstr "Muestrenos su documento de identidad"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Use your webcam to take a picture of your ID so we can match it with your "
 "photo and the name on your account."
@@ -15774,12 +15696,10 @@ msgstr ""
 "podamos compararla con su foto y con el nombre de su cuenta."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Make sure your ID is well-lit"
 msgstr "Asegurese que su documento está bien iluminado"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Acceptable IDs include drivers licenses, passports, or other goverment-"
 "issued IDs that include your name and photo"
@@ -15789,19 +15709,16 @@ msgstr ""
 "que tengan su nombre y su fotografía."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Check that there isn't any glare"
 msgstr "Verifique que no haya brillos en el documento."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Ensure that you can see your photo and read your name"
 msgstr ""
 "Asegurese de que se pueda ver su cara y leer su nombre en la foto del "
 "documento de identificación."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Try to keep your fingers at the edge to avoid covering important information"
 msgstr ""
@@ -15809,17 +15726,14 @@ msgstr ""
 "importante"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "to capture your ID"
 msgstr "para capturar su documento de identificación"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Why do you need a photo of my ID?"
 msgstr "¿Para que necesitan una foto de mi documento de identificación?"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "We need to match your ID with your photo and name to confirm that you are "
 "you."
@@ -15828,7 +15742,6 @@ msgstr ""
 "su identidad."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "We encrypt it and send it to our secure authorization service for review. We"
 " use the highest levels of security and do not save the photo or information"
@@ -15840,24 +15753,20 @@ msgstr ""
 "verificación ha sido terminada."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Once you verify your ID photo looks good, you can move on to step 3."
 msgstr ""
 "Una vez haya verificado que la foto de su documento de identificación luce "
 "bien, puede proceder al paso 3."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Go to Step 3: Review Your Info"
 msgstr "Ir al paso 3. Revisar su información"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Verify Your Submission"
 msgstr "Verificar su envío"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Make sure we can verify your identity with the photos and information below."
 msgstr ""
@@ -15869,7 +15778,6 @@ msgid "Review the Photos You've Re-Taken"
 msgstr "Revisar las fotos que ha tomado nuevamente"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Please review the photos and verify that they meet the requirements listed "
 "below."
@@ -15879,50 +15787,39 @@ msgstr ""
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "The photo above needs to meet the following requirements:"
 msgstr "Las fotos deben cumplir con los siguientes requerimientos;"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Be well lit"
 msgstr "Estar bien iluminadas"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Show your whole face"
 msgstr "Mostrar su cara completa"
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "The photo on your ID must match the photo of your face"
 msgstr "La foto de su documento debe coincidir con la foto de su cara."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Be readable (not too far away, no glare)"
 msgstr "Ser legibles. (no demasiado lejos, sin brillos)"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "The name on your ID must match the name on your account below"
 msgstr "El nombre en su documento debe coincidir con el nombre en su cuenta."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Photos don't meet the requirements?"
 msgstr "¿Sus fotos no cumplen los requerimientos?"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Retake Your Photos"
 msgstr "Tome nuevamente sus fotos"
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid ""
 "Make sure your full name on your {platform_name} account ({full_name}) "
 "matches your ID. We will also use this as the name on your certificate."
@@ -15940,117 +15837,8 @@ msgstr ""
 "pasar a confirmar su envío de re-verificación."
 
 #: lms/templates/verify_student/photo_reverification.html
-#: lms/templates/verify_student/photo_verification.html
 msgid "Yes! My details all match."
 msgstr "Si! toda mi información está correcta."
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Upgrade Your Registration for {} | Verification"
-msgstr "Actualice su registro para  {} | Verificado"
-
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/verified.html
-msgid "Register for {} | Verification"
-msgstr "Registro para {} | Verificación"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You don't seem to have a webcam connected. Double-check that your webcam is "
-"connected and working to continue registering, or select to {a_start} audit "
-"the course for free {a_end} without verifying."
-msgstr ""
-"Al parecer no tiene un cámara web conectada. Revise nuevamente que su cámara"
-" web esté conectada y funcionando correctamente para continuar con el "
-"proceso de registro o seleccione {a_start} auditar el curso de forma "
-"gratuita {a_end} para ingresar sin realizar la verificación."
-
-#: lms/templates/verify_student/photo_verification.html
-#: lms/templates/verify_student/photo_verification.html
-msgid "Error processing your order"
-msgstr "Ocurrió un error procesando su orden"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"Oops! Something went wrong. Please confirm your details again and click the "
-"button to move on to payment. If you are still having trouble, please try "
-"again later."
-msgstr ""
-"Ha ocurrido un falló. Por favor confirme su información nuevamente y haga "
-"clic en el botón para proceder al pago. Si continua teniendo inconvenientes,"
-" por favor intente de nuevo mas tarde."
-
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"We're sorry, there has been an error on this page. Please refresh the page "
-"and retake your photos. If you are still having trouble, please contact us "
-"at {email_address}"
-msgstr ""
-"Lo sentimos, ocurrió un error en esta página. Por favor refresque la página "
-"y vuelva a tomar sus fotos. Si continúa experimentando problemas, por favor "
-"contáctenos al correo {email_address}"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Take Your Photo"
-msgstr "Tome su fotografía"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "What if my camera isn't working?"
-msgstr "¿Que sucede si mi cámara no está funcionando?"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "You can always continue to audit the course without verifying."
-msgstr ""
-"Siempre puede continuar asistiendo al curso sin hacer la verificación."
-
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"You can always {a_start} audit the course for free {a_end} without "
-"verifying."
-msgstr ""
-"Siempre puede {a_start} auditar el curso de forma gratuita {a_end} sin hacer"
-" la verificación."
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Go to Step 2: Take ID Photo"
-msgstr "Ir al paso 2: Tomar foto de documento de identidad"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Review the Photos You've Taken"
-msgstr "Revisar las fotos que ha tomado"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Check Your Contribution Level"
-msgstr "Revisar su contribución"
-
-#. Translators: The last part of this string will appear such as: "(min. 50
-#. USD)"
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"Please confirm your contribution for this course (min. {min_price} "
-"{currency}):"
-msgstr ""
-"Por favor confirme su contribución para este curso (min. {min_price} "
-"{currency}):"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Your Course Total"
-msgstr "Total para su curso"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "To complete your registration, you will need to pay:"
-msgstr "Para completar su inscripción deberá realizar el pago:"
-
-#: lms/templates/verify_student/photo_verification.html
-msgid "Before proceeding, please confirm that your details match"
-msgstr "Antes de continuar, por favor confirme que sus datos sean correctos."
-
-#: lms/templates/verify_student/photo_verification.html
-msgid ""
-"Once you verify your details match the requirements, you can move on to step"
-" 4, payment on our secure server."
-msgstr ""
-"Una vez se haya verificado que su información cumple todos los requisitos, "
-"puede pasar al paso 4, pago seguro."
 
 #: lms/templates/verify_student/prompt_midcourse_reverify.html
 msgid ""
@@ -16095,163 +15883,6 @@ msgid "Please contact support if you believe this message to be in error."
 msgstr ""
 "Por favor contacte al equipo de soporte, si considera que este mensaje se ha"
 " producido por error."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Upgrade Your Registration for {}"
-msgstr "Actualice su registro para  {}"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Register for {}"
-msgstr "Registro para {}"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "You need to activate your {platform_name} account before proceeding"
-msgstr "Necesita activar su cuenta de {platform_name} para poder proceder"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"Please check your email for further instructions on activating your new "
-"account."
-msgstr ""
-"Por favor verifique su correo electrónico para ver las instrucciones para la"
-" activación de su nueva cuenta."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "What You Will Need to Upgrade"
-msgstr "Qué necesitará para actualizar"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"There are three things you will need to upgrade to being an ID verified "
-"student:"
-msgstr ""
-"Hay tres cosas que necesitará para convertirse en un estudiante con "
-"verificación de identidad:"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "What You Will Need to Register"
-msgstr "Que necesitará para registrarse"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"There are three things you will need to register as an ID verified student:"
-msgstr ""
-"Hay tres cosas que va a necesitar para registrarse como un estudiante con ID"
-" verificada:"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Activate Your Account"
-msgstr "Activar su cuenta"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Check your email"
-msgstr "Verificar su correo electrónico"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"You need to activate your {platform_name} account before you can register "
-"for courses. Check your inbox for an activation email."
-msgstr ""
-"Necesita activar su cuenta en {platform_name} antes de continuar. Revise su "
-"correo electrónico para ver las instrucciones de activación"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Identification"
-msgstr "Identificación"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "A photo identification document"
-msgstr "Un documento de identificación con foto"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"A driver's license, passport, or other government or school-issued ID with "
-"your name and picture on it."
-msgstr ""
-"Una licencia de conducir, pasaporte, u otro documento emitido por el "
-"gobierno o por una institución de educación con su nombre y fotografía."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Webcam"
-msgstr "Cámara web"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "A webcam and a modern browser"
-msgstr "Una cámara web y un navegador moderno"
-
-#. Translators: This phrase will look like this: "Internet Explorer 9 or
-#. later"
-#: lms/templates/verify_student/show_requirements.html
-msgid "{internet_explorer_version} or later"
-msgstr "{internet_explorer_version} o superior"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"Please make sure your browser is updated to the most recent version "
-"possible."
-msgstr ""
-"Por favor asegurese de que su navegador está actualizado a la versión más "
-"reciente disponible."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Credit or Debit Card"
-msgstr "Tarjeta de crédito o débito"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "A major credit or debit card"
-msgstr "Una tarjeta de crédito o débito reconocida"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"Visa, MasterCard, American Express, Discover, Diners Club, or JCB with the "
-"Discover logo."
-msgstr ""
-"Visa, Master Card, American Express, Discover, Diners Club, o JCB con logo "
-"Discover"
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"Missing something? You can always continue to audit this course instead."
-msgstr ""
-"¿Le hace falta alguno de los requisitos? Recuerde que siempre podrá "
-"continuar tomando el curso como asistente."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid ""
-"Missing something? You can always {a_start}audit this course instead{a_end}"
-msgstr ""
-"¿Le hace falta alguno de los requisitos? Recuerde que siempre podrá "
-"{a_start}tomar el curso como asistente{a_end}."
-
-#: lms/templates/verify_student/show_requirements.html
-msgid "Go to Step 1: Take my Photo"
-msgstr "Ir al paso 1: Tomar mi foto"
-
-#: lms/templates/verify_student/verified.html
-msgid "ID Verification"
-msgstr "Verificación de ID"
-
-#: lms/templates/verify_student/verified.html
-msgid "You've Been Verified Previously"
-msgstr "Usted ha sido verificado previamente"
-
-#: lms/templates/verify_student/verified.html
-msgid ""
-"We've already verified your identity (through the photos of you and your ID "
-"you provided earlier). You can proceed to make your secure payment and "
-"complete registration."
-msgstr ""
-"Ya hemos verificado su identidad a través de las fotos y el documento de "
-"identificación que nos proporcionó anteriormente. Puede proceder a hacer su "
-"pago seguro y completar el proceso de registro."
-
-#: lms/templates/verify_student/verified.html
-msgid "Your Course Total is $ "
-msgstr "El total para su curso es: $"
-
-#: lms/templates/verify_student/verified.html
-msgid "You have decided to pay $ "
-msgstr "Ha decidido pagar $"
 
 #: lms/templates/wiki/includes/article_menu.html
 #: lms/templates/wiki/includes/article_menu.html
@@ -16436,6 +16067,9 @@ msgid ""
 "Use the {em_start}{studio_name} URL{em_end} value to link to the file or "
 "image from a component, a course update, or a course handout."
 msgstr ""
+"Use el valor {em_start}{studio_name} URL{em_end} para enlazarce con el "
+"archivo o imagen desde un componente, o desde una actualización de curso o "
+"desde un documento de curso."
 
 #: cms/templates/asset_index.html
 msgid ""
@@ -16443,12 +16077,18 @@ msgid ""
 "from outside of your course. {em_start}Note:{em_end} If you lock a file, the"
 " Web URL no longer works for external access to a file."
 msgstr ""
+"Use el valor {em_start}Web URL{em_end} para referenciar un archivo o imagen "
+"exclusivamente desde fuera del curso. {em_start}Note:{em_end} Si usted "
+"bloquea un un archivo, la url de la Web ya no tendrá acceso a un archivo "
+"externo."
 
 #: cms/templates/asset_index.html
 msgid ""
 "To copy a URL, double click the value in the URL column, then copy the "
 "selected text."
 msgstr ""
+"Para copiar una dirección URL, realice un doble clic en la columna de la "
+"URL, luego copie el texto seleccionado."
 
 #: cms/templates/asset_index.html
 msgid "Learn more about managing files"
@@ -16824,6 +16464,14 @@ msgstr "Haga clic para añadir un nuevo  nombre de sección."
 #: cms/templates/course_outline.html
 msgid "New Section"
 msgstr "Nueva Sección"
+
+#: cms/templates/course_outline.html
+msgid "Reindex current course"
+msgstr ""
+
+#: cms/templates/course_outline.html
+msgid "Reindex"
+msgstr ""
 
 #: cms/templates/course_outline.html
 msgid "Collapse All Sections"
@@ -17282,7 +16930,7 @@ msgstr "Url Git del curso:"
 #: cms/templates/group_configurations.html
 #: cms/templates/visibility_editor.html
 msgid "Content Groups"
-msgstr ""
+msgstr "Grupos de Contenido"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
@@ -17302,6 +16950,13 @@ msgid ""
 " can customize the content that a particular cohort or cohorts sees in your "
 "course."
 msgstr ""
+"Use grupos de contenido para dar acceso a grupos de estudiantes para una "
+"configuración especifica del contenido del curso. Además de los contenidos "
+"del curso que está dirigido a todos los alumnos, cada grupo de contenido "
+"muestra específicamente lo que usted designa como visible para dicho grupo. "
+"Al asociar un grupo de contenido con una o más conjuntos, se puede "
+"personalizar el contenido que una cohorte o cohortes particulares, ver en el"
+" curso."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -17309,6 +16964,10 @@ msgid ""
 "edit the name of a content group, hover over its box and click "
 "{em_start}Edit{em_end}. Content groups cannot be deleted."
 msgstr ""
+"Haga clic en {em_start}Nuevo Grupo de Contenido{em_end} para añadir un nuevo"
+" grupo de contenido. Para editar el nombre de un grupo de contenido, coloque"
+" el curso sobre el cuadro y haga clic en {em_start} Editar {em_end}. Grupos "
+"de contenido no pueden ser borrados"
 
 #: cms/templates/group_configurations.html
 #: cms/templates/group_configurations.html
@@ -17321,6 +16980,10 @@ msgid ""
 "are in a content experiment. When you create a content experiment for a "
 "course, you select the group configuration to use."
 msgstr ""
+"Utilice las configuraciones de grupo experimental para definir cuántos "
+"grupos de estudiantes están en un experimento de contenido. Cuando se crea "
+"un experimento de contenidos para un curso, seleccione la configuración del "
+"grupo."
 
 #: cms/templates/group_configurations.html
 msgid ""
@@ -18184,16 +17847,21 @@ msgid ""
 "Block, copy this ID and enter it in the Libraries field in the Randomized "
 "Content Block settings."
 msgstr ""
+"Para añadir contenido en la librería de un curso utilice un Bloque de "
+"Contenido Aleatorio, copiar este ID e ingrese en ajustes en el campo "
+"Librerías en el Bloque de Contenido Aleatorio"
 
 #: cms/templates/library.html
 msgid "Adding content to your library"
-msgstr ""
+msgstr "Agregando contenido a tu librería"
 
 #: cms/templates/library.html
 msgid ""
 "Add components to your library for use in courses, using Add New Component "
 "at the bottom of this page."
 msgstr ""
+"Añadir componentes a su librería para ser utilizados en los cursos, usando "
+"Añadir Nuevo Componente "
 
 #: cms/templates/library.html
 msgid ""
@@ -18201,10 +17869,14 @@ msgid ""
 "recently added at the bottom. Use the pagination arrows to navigate from "
 "page to page if you have more than one page of components in your library."
 msgstr ""
+"Los componentes son listados en el orden en el cual estos fueron añadidos, "
+"con el último agregado en la parte inferior. Utilice las flechas de "
+"paginación para navegar desde una página a otra si usted tienen más de una "
+"página de componentes en su librería."
 
 #: cms/templates/library.html
 msgid "Using library content in courses"
-msgstr ""
+msgstr "Utilizando contenido de la biblioteca en los cursos"
 
 #: cms/templates/library.html
 msgid ""
@@ -18218,7 +17890,7 @@ msgstr ""
 
 #: cms/templates/library.html
 msgid "Learn more about content libraries"
-msgstr ""
+msgstr "Aprender más acerca de los contenidos de las bibliotecas"
 
 #: cms/templates/login.html cms/templates/widgets/header.html
 msgid "Sign In"
@@ -18371,53 +18043,58 @@ msgstr ""
 
 #: cms/templates/manage_users_lib.html
 msgid "Library User Access"
-msgstr ""
+msgstr "Acceso de usuarios a la biblioteca"
 
 #: cms/templates/manage_users_lib.html cms/templates/widgets/header.html
 msgid "User Access"
-msgstr ""
+msgstr "Acceso de usuario"
 
 #: cms/templates/manage_users_lib.html
 msgid "Grant Access to This Library"
-msgstr ""
+msgstr "Permitir el acceso a Esta Biblioteca"
 
 #: cms/templates/manage_users_lib.html
 msgid "Provide the email address of the user you want to add"
 msgstr ""
+"Proporcionar la dirección de correo electrónico del usuario que desea "
+"agregar"
 
 #: cms/templates/manage_users_lib.html
 msgid "Remove Staff Access"
-msgstr ""
+msgstr "Quitar accesos de Staff"
 
 #: cms/templates/manage_users_lib.html
 msgid "Add Staff Access"
-msgstr ""
+msgstr "Añadir accesos de Staff"
 
 #: cms/templates/manage_users_lib.html
 msgid "Remove this user"
-msgstr ""
+msgstr "Remover este usuario"
 
 #: cms/templates/manage_users_lib.html
 msgid "Remove me"
-msgstr ""
+msgstr "Eliminarme"
 
 #: cms/templates/manage_users_lib.html
 msgid "Remove me from this library"
-msgstr ""
+msgstr "Eliminarme de esta biblioteca"
 
 #: cms/templates/manage_users_lib.html
 msgid "Add More Users to This Library"
-msgstr ""
+msgstr "Añadir más usuarios a Esta Biblioteca"
 
 #: cms/templates/manage_users_lib.html
 msgid ""
 "Grant other members of your course team access to this library. New library "
 "users must have an active {studio_name} account."
 msgstr ""
+"Permitir acceso a otros miembros del equipo del curso para esta biblioteca. "
+"Los nuevos usuarios de la biblioteca deben tener una cuenta activa "
+"{studio_name}."
 
 #: cms/templates/manage_users_lib.html
 msgid "Add a New User"
-msgstr ""
+msgstr "Añadir un nuevo Usuario"
 
 #: cms/templates/manage_users_lib.html
 msgid "Library Access Roles"
@@ -18607,19 +18284,8 @@ msgstr "Promueva su curso con {platform_name}"
 msgid ""
 "Your course summary page will not be viewable until your course has been "
 "announced. To provide content for the page and preview it, follow the "
-"instructions provided by your {manager}."
+"instructions provided by your Program Manager."
 msgstr ""
-"La página de resumen de su curso no será visible hasta que su curso haya "
-"sido anunciado. Para ingresar el contenido de dicha página y "
-"previsualizarla, siga las instrucciones entregadas por su  {manager}."
-
-#: cms/templates/settings.html cms/templates/settings.html
-msgid "Program Manager"
-msgstr "Administrador de programa"
-
-#: cms/templates/settings.html cms/templates/settings.html
-msgid "PM"
-msgstr "PM"
 
 #: cms/templates/settings.html
 msgid "Course Schedule"
@@ -18694,6 +18360,14 @@ msgstr ""
 "de resumen del curso</strong>. Para ingresar las fechas de inicio y las "
 "fechas de registro que se mostrarán en la página de resumen del curso, siga "
 "las instrucciones dadas por su {manager}."
+
+#: cms/templates/settings.html
+msgid "Program Manager"
+msgstr "Administrador de programa"
+
+#: cms/templates/settings.html
+msgid "PM"
+msgstr "PM"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
@@ -18828,7 +18502,7 @@ msgstr ""
 
 #: cms/templates/settings.html
 msgid " %"
-msgstr ""
+msgstr "%"
 
 #: cms/templates/settings.html
 msgid ""
@@ -19005,11 +18679,11 @@ msgstr "Expandir o Colapsar"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility Settings"
-msgstr ""
+msgstr "Configuración de visibilidad"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilidad"
 
 #: cms/templates/studio_xblock_wrapper.html
 msgid "This block contains multiple components."
@@ -19134,7 +18808,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "No content groups exist"
-msgstr ""
+msgstr "No existe contenido de grupos"
 
 #: cms/templates/visibility_editor.html
 msgid ""
@@ -19145,7 +18819,7 @@ msgstr ""
 
 #: cms/templates/visibility_editor.html
 msgid "Manage content groups"
-msgstr ""
+msgstr "Administrador de contenido  de grupo"
 
 #. Translators: Any text between {screen_reader_start} and {screen_reader_end}
 #. is only read by screen readers and never shown in the browser.
@@ -19162,21 +18836,23 @@ msgstr "Hacer visible a:"
 
 #: cms/templates/visibility_editor.html
 msgid "All Students and Staff"
-msgstr ""
+msgstr "Todos los estudiantes y personal"
 
 #: cms/templates/visibility_editor.html
 msgid "Specific Content Groups"
-msgstr ""
+msgstr "Contenido de grupo específico"
 
 #: cms/templates/visibility_editor.html
 msgid "Deleted Content Group"
-msgstr ""
+msgstr "Contenido de grupo eliminado"
 
 #: cms/templates/visibility_editor.html
 msgid ""
 "Content group no longer exists. Please choose another or allow access to All"
 " Students and staff"
 msgstr ""
+"El contenido del curso ya no existe. Por favor seleccione otro o conceda "
+"acceso a todos los estudiantes y al personal"
 
 #: cms/templates/emails/activation_email.txt
 msgid ""
@@ -19261,9 +18937,13 @@ msgstr ""
 "Un correo electrónico de activación ha sido enviado a {email} junto con las "
 "instrucciones para activar su cuenta."
 
+#. Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX
+#. Inc.'. Please do not translate any of these trademarks and company names.
 #: cms/templates/widgets/footer.html
-msgid "All rights reserved."
-msgstr "Todos los derechos reservados."
+msgid ""
+"EdX, Open edX, Studio, and the edX and Open edX logos are registered "
+"trademarks or trademarks of {link_start}edX Inc.{link_end}"
+msgstr ""
 
 #: cms/templates/widgets/footer.html cms/templates/widgets/sock.html
 msgid "Contact Us"
@@ -19275,7 +18955,7 @@ msgstr "Curso activo:"
 
 #: cms/templates/widgets/header.html cms/templates/widgets/header.html
 msgid "Navigation for {course_name}"
-msgstr ""
+msgstr "Navegando por {course_name}"
 
 #: cms/templates/widgets/header.html
 msgid "Outline"
@@ -19303,11 +18983,11 @@ msgstr "Exportar"
 
 #: cms/templates/widgets/header.html
 msgid "Current Library:"
-msgstr ""
+msgstr "Librería actual"
 
 #: cms/templates/widgets/header.html
 msgid "Library"
-msgstr ""
+msgstr "Librería"
 
 #: cms/templates/widgets/header.html
 msgid "Help &amp; Account Navigation"

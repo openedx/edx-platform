@@ -17,6 +17,8 @@ class RolesTest(TestCase):
     """
     def setUp(self):
         """ Test case setup """
+        super(RolesTest, self).setUp()
+
         self.global_admin = AdminFactory()
         self.instructor = User.objects.create_user('testinstructor', 'testinstructor+courses@edx.org', 'foo')
         self.staff = User.objects.create_user('teststaff', 'teststaff+courses@edx.org', 'foo')

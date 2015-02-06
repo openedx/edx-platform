@@ -341,7 +341,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         one should compare own_metadata(self) and old_medatada.
         Video player has two tabs, and due to nature of sync between tabs,
         metadata from Basic tab is always sent when video player is edited and saved first time, for example:
-        {'youtube_id_1_0': u'OEoXaMPEzfM', 'display_name': u'Video', 'sub': u'OEoXaMPEzfM', 'html5_sources': []},
+        {'youtube_id_1_0': u'3_yD_cEKoCk', 'display_name': u'Video', 'sub': u'3_yD_cEKoCk', 'html5_sources': []},
         that's why these fields will always present in old_metadata after first save. This should be fixed.
         At consequent save requests html5_sources are always sent too, disregard of their change by user.
         That means that html5_sources are always in list of fields that were changed (`metadata` param in save_item).
@@ -423,7 +423,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         youtube_string = create_youtube_string(self)
         # Mild workaround to ensure that tests pass -- if a field
         # is set to its default value, we don't need to write it out.
-        if youtube_string and youtube_string != '1.00:OEoXaMPEzfM':
+        if youtube_string and youtube_string != '1.00:3_yD_cEKoCk':
             xml.set('youtube', unicode(youtube_string))
         xml.set('url_name', self.url_name)
         attrs = {

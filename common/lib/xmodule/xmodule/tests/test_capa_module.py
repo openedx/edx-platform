@@ -187,6 +187,8 @@ if submission[0] == '':
 class CapaModuleTest(unittest.TestCase):
 
     def setUp(self):
+        super(CapaModuleTest, self).setUp()
+
         now = datetime.datetime.now(UTC)
         day_delta = datetime.timedelta(days=1)
         self.yesterday_str = str(now - day_delta)
@@ -1736,6 +1738,7 @@ class TestProblemCheckTracking(unittest.TestCase):
     """
 
     def setUp(self):
+        super(TestProblemCheckTracking, self).setUp()
         self.maxDiff = None
 
     def test_choice_answer_text(self):

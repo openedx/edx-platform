@@ -137,7 +137,7 @@ def _create_library(request):
     except KeyError as error:
         log.exception("Unable to create library - missing required JSON key.")
         return JsonResponseBadRequest({
-            "ErrMsg": _("Unable to create library - missing required field '{field}'".format(field=error.message))
+            "ErrMsg": _("Unable to create library - missing required field '{field}'").format(field=error.message)
         })
     except InvalidKeyError as error:
         log.exception("Unable to create library - invalid key.")

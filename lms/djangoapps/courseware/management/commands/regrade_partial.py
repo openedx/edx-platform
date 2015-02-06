@@ -52,9 +52,13 @@ class Command(BaseCommand):
         module_state = module.state
         if module_state is None:
             # not likely, since we filter on it.  But in general...
-            LOG.info("No state found for {type} module {id} for student {student} in course {course_id}"
-                     .format(type=module.module_type, id=module.module_state_key,
-                             student=module.student.username, course_id=module.course_id))
+            LOG.info(
+                u"No state found for %s module %s for student %s in course %s",
+                module.module_type,
+                module.module_state_key,
+                module.student.username,
+                module.course_id,
+            )
             return
 
         state_dict = json.loads(module_state)
@@ -66,15 +70,31 @@ class Command(BaseCommand):
         if (not student_answers) or len(student_answers) == 0:
             # we should not have a grade here:
             if module.grade != 0:
-                LOG.error("No answer found but grade {grade} exists for {type} module {id} for student {student} "
-                          "in course {course_id}".format(grade=module.grade,
-                                                         type=module.module_type, id=module.module_state_key,
-                                                         student=module.student.username, course_id=module.course_id))
+                log_msg = (
+                    u"No answer found but grade %(grade)s exists for %(type)s module %(id)s for student %(student)s " +
+                    u"in course %(course_id)s"
+                )
+
+                LOG.error(log_msg, {
+                    "grade": module.grade,
+                    "type": module.module_type,
+                    "id": module.module_state_key,
+                    "student": module.student.username,
+                    "course_id": module.course_id,
+                })
             else:
-                LOG.debug("No answer and no grade found for {type} module {id} for student {student} "
-                          "in course {course_id}".format(grade=module.grade,
-                                                         type=module.module_type, id=module.module_state_key,
-                                                         student=module.student.username, course_id=module.course_id))
+                log_msg = (
+                    u"No answer and no grade found for %(type)s module %(id)s for student %(student)s " +
+                    u"in course %(course_id)s"
+                )
+
+                LOG.debug(log_msg, {
+                    "grade": module.grade,
+                    "type": module.module_type,
+                    "id": module.module_state_key,
+                    "student": module.student.username,
+                    "course_id": module.course_id,
+                })
             return
 
         # load into a CorrectMap, as done in LoncapaProblem.__init__():
@@ -90,24 +110,48 @@ class Command(BaseCommand):
 
         if module.grade == correct:
             # nothing to change
-            LOG.debug("Grade matches for {type} module {id} for student {student} in course {course_id}"
-                      .format(type=module.module_type, id=module.module_state_key,
-                              student=module.student.username, course_id=module.course_id))
+            log_msg = u"Grade matches for %(type)s module %(id)s for student %(student)s in course %(course_id)s"
+            LOG.debug(log_msg, {
+                "type": module.module_type,
+                "id": module.module_state_key,
+                "student": module.student.username,
+                "course_id": module.course_id,
+            })
         elif save_changes:
             # make the change
-            LOG.info("Grade changing from {0} to {1} for {type} module {id} for student {student} "
-                     "in course {course_id}".format(module.grade, correct,
-                                                    type=module.module_type, id=module.module_state_key,
-                                                    student=module.student.username, course_id=module.course_id))
+            log_msg = (
+                u"Grade changing from %(grade)s to %(correct)s for %(type)s module " +
+                u"%(id)s for student %(student)s in course %(course_id)s"
+            )
+
+            LOG.debug(log_msg, {
+                "grade": module.grade,
+                "correct": correct,
+                "type": module.module_type,
+                "id": module.module_state_key,
+                "student": module.student.username,
+                "course_id": module.course_id,
+            })
+
             module.grade = correct
             module.save()
             self.num_changed += 1
         else:
             # don't make the change, but log that the change would be made
-            LOG.info("Grade would change from {0} to {1} for {type} module {id} for student {student} "
-                     "in course {course_id}".format(module.grade, correct,
-                                                    type=module.module_type, id=module.module_state_key,
-                                                    student=module.student.username, course_id=module.course_id))
+            log_msg = (
+                u"Grade would change from %(grade)s to %(correct)s for %(type)s module %(id)s for student " +
+                u"%(student)s in course %(course_id)s"
+            )
+
+            LOG.debug(log_msg, {
+                "grade": module.grade,
+                "correct": correct,
+                "type": module.module_type,
+                "id": module.module_state_key,
+                "student": module.student.username,
+                "course_id": module.course_id,
+            })
+
             self.num_changed += 1
 
     def handle(self, **options):

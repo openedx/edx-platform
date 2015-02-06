@@ -76,6 +76,10 @@ from django_comment_common.models import Role
 
 from external_auth.models import ExternalAuthMap
 import external_auth.views
+from external_auth.login_and_register import (
+    login as external_auth_login,
+    register as external_auth_register
+)
 
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
@@ -281,9 +285,12 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
 
                 yield (course, enrollment)
             else:
-                log.error("User {0} enrolled in {2} course {1}".format(
-                    user.username, enrollment.course_id, "broken" if course else "non-existent"
-                ))
+                log.error(
+                    u"User %s enrolled in %s course %s",
+                    user.username,
+                    "broken" if course else "non-existent",
+                    enrollment.course_id
+                )
 
 
 def _cert_info(user, course, cert_status):
@@ -334,8 +341,11 @@ def _cert_info(user, course, cert_status):
 
     if status == 'ready':
         if 'download_url' not in cert_status:
-            log.warning("User %s has a downloadable cert for %s, but no download url",
-                        user.username, course.id)
+            log.warning(
+                u"User %s has a downloadable cert for %s, but no download url",
+                user.username,
+                course.id
+            )
             return default_info
         else:
             status_dict['download_url'] = cert_status['download_url']
@@ -354,18 +364,10 @@ def _cert_info(user, course, cert_status):
 
 @ensure_csrf_cookie
 def signin_user(request):
-    """
-    This view will display the non-modal login form
-    """
-    if (settings.FEATURES['AUTH_USE_CERTIFICATES'] and
-            external_auth.views.ssl_get_cert_from_request(request)):
-        # SSL login doesn't require a view, so redirect
-        # branding and allow that to process the login if it
-        # is enabled and the header is in the request.
-        return external_auth.views.redirect_with_get('root', request.GET)
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        # If CAS is enabled, redirect auth handling to there
-        return redirect(reverse('cas-login'))
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+    external_auth_response = external_auth_login(request)
+    if external_auth_response is not None:
+        return external_auth_response
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
 
@@ -391,15 +393,13 @@ def signin_user(request):
 
 @ensure_csrf_cookie
 def register_user(request, extra_context=None):
-    """
-    This view will display the non-modal registration form
-    """
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
     if request.user.is_authenticated():
         return redirect(reverse('dashboard'))
-    if settings.FEATURES.get('AUTH_USE_CERTIFICATES_IMMEDIATE_SIGNUP'):
-        # Redirect to branding to process their certificate if SSL is enabled
-        # and registration is disabled.
-        return external_auth.views.redirect_with_get('root', request.GET)
+
+    external_auth_response = external_auth_register(request)
+    if external_auth_response is not None:
+        return external_auth_response
 
     course_id = request.GET.get('course_id')
     email_opt_in = request.GET.get('email_opt_in')
@@ -471,12 +471,17 @@ def is_course_blocked(request, redeemed_registration_codes, course_key):
         # registration codes may be generated via Bulk Purchase Scenario
         # we have to check only for the invoice generated registration codes
         # that their invoice is valid or not
-        if redeemed_registration.invoice:
-            if not getattr(redeemed_registration.invoice, 'is_valid'):
+        if redeemed_registration.invoice_item:
+            if not getattr(redeemed_registration.invoice_item.invoice, 'is_valid'):
                 blocked = True
                 # disabling email notifications for unpaid registration courses
                 Optout.objects.get_or_create(user=request.user, course_id=course_key)
-                log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(request.user.username, request.user.email, course_key))
+                log.info(
+                    u"User %s (%s) opted out of receiving emails from course %s",
+                    request.user.username,
+                    request.user.email,
+                    course_key
+                )
                 track.views.server_track(request, "change-email1-settings", {"receive_emails": "no", "course": course_key.to_deprecated_string()}, page='dashboard')
                 break
 
@@ -777,10 +782,9 @@ def try_change_enrollment(request):
             # There isn't really a way to display the results to the user, so we just log it
             # We expect the enrollment to be a success, and will show up on the dashboard anyway
             log.info(
-                "Attempted to automatically enroll after login. Response code: {0}; response body: {1}".format(
-                    enrollment_response.status_code,
-                    enrollment_response.content
-                )
+                u"Attempted to automatically enroll after login. Response code: %s; response body: %s",
+                enrollment_response.status_code,
+                enrollment_response.content
             )
             # Hack: since change_enrollment delivers its redirect_url in the content
             # of its response, we check here that only the 200 codes with content
@@ -788,7 +792,7 @@ def try_change_enrollment(request):
             if enrollment_response.status_code == 200 and enrollment_response.content != '':
                 return enrollment_response.content
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Exception automatically enrolling after login: %s", exc)
+            log.exception(u"Exception automatically enrolling after login: %s", exc)
 
 
 def _update_email_opt_in(request, username, org):
@@ -848,11 +852,10 @@ def change_enrollment(request, check_access=True):
         course_id = SlashSeparatedCourseKey.from_deprecated_string(request.POST.get("course_id"))
     except InvalidKeyError:
         log.warning(
-            "User {username} tried to {action} with invalid course id: {course_id}".format(
-                username=user.username,
-                action=action,
-                course_id=request.POST.get("course_id")
-            )
+            u"User %s tried to %s with invalid course id: %s",
+            user.username,
+            action,
+            request.POST.get("course_id"),
         )
         return HttpResponseBadRequest(_("Invalid course id"))
 
@@ -860,8 +863,11 @@ def change_enrollment(request, check_access=True):
         # Make sure the course exists
         # We don't do this check on unenroll, or a bad course id can't be unenrolled from
         if not modulestore().has_course(course_id):
-            log.warning("User {0} tried to enroll in non-existent course {1}"
-                        .format(user.username, course_id))
+            log.warning(
+                u"User %s tried to enroll in non-existent course %s",
+                user.username,
+                course_id
+            )
             return HttpResponseBadRequest(_("Course id is invalid"))
 
         # Record the user's email opt-in preference
@@ -918,56 +924,15 @@ def change_enrollment(request, check_access=True):
         return HttpResponseBadRequest(_("Enrollment action is invalid"))
 
 
-# pylint: disable=fixme
-# TODO: This function is kind of gnarly/hackish/etc and is only used in one location.
-# It'd be awesome if we could get rid of it; manually parsing course_id strings form larger strings
-# seems Probably Incorrect
-def _parse_course_id_from_string(input_str):
-    """
-    Helper function to determine if input_str (typically the queryparam 'next') contains a course_id.
-    @param input_str:
-    @return: the course_id if found, None if not
-    """
-    m_obj = re.match(r'^/courses/{}'.format(settings.COURSE_ID_PATTERN), input_str)
-    if m_obj:
-        return SlashSeparatedCourseKey.from_deprecated_string(m_obj.group('course_id'))
-    return None
-
-
-def _get_course_enrollment_domain(course_id):
-    """
-    Helper function to get the enrollment domain set for a course with id course_id
-    @param course_id:
-    @return:
-    """
-    course = modulestore().get_course(course_id)
-    if course is None:
-        return None
-
-    return course.enrollment_domain
-
-
 @never_cache
 @ensure_csrf_cookie
 def accounts_login(request):
-    """
-    This view is mainly used as the redirect from the @login_required decorator.  I don't believe that
-    the login path linked from the homepage uses it.
-    """
-    if settings.FEATURES.get('AUTH_USE_CAS'):
-        return redirect(reverse('cas-login'))
-    if settings.FEATURES['AUTH_USE_CERTIFICATES']:
-        # SSL login doesn't require a view, so login
-        # directly here
-        return external_auth.views.ssl_login(request)
-    # see if the "next" parameter has been set, whether it has a course context, and if so, whether
-    # there is a course-specific place to redirect
-    redirect_to = request.GET.get('next')
-    if redirect_to:
-        course_id = _parse_course_id_from_string(redirect_to)
-        if course_id and _get_course_enrollment_domain(course_id):
-            return external_auth.views.course_specific_login(request, course_id.to_deprecated_string())
+    """Deprecated. To be replaced by :class:`student_account.views.login_and_registration_form`."""
+    external_auth_response = external_auth_login(request)
+    if external_auth_response is not None:
+        return external_auth_response
 
+    redirect_to = request.GET.get('next')
     context = {
         'pipeline_running': 'false',
         'pipeline_url': auth_pipeline_urls(pipeline.AUTH_ENTRY_LOGIN, redirect_url=redirect_to),
@@ -1057,7 +1022,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
                 })  # TODO: this should be status code 301  # pylint: disable=fixme
         except ExternalAuthMap.DoesNotExist:
             # This is actually the common case, logging in user without external linked login
-            AUDIT_LOG.info("User %s w/o external auth attempting login", user)
+            AUDIT_LOG.info(u"User %s w/o external auth attempting login", user)
 
     # see if account has been locked out due to excessive login failures
     user_found_by_email_lookup = user
@@ -1173,7 +1138,7 @@ def login_user(request, error=""):  # pylint: disable-msg=too-many-statements,un
         AUDIT_LOG.warning(u"Login failed - Account not active for user {0}, resending activation".format(username))
 
     reactivation_email_for_user(user)
-    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your e-mail for the activation instructions.")
+    not_activated_msg = _("This account has not been activated. We have sent another activation message. Please check your email for the activation instructions.")
     return JsonResponse({
         "success": False,
         "value": not_activated_msg,
@@ -1295,11 +1260,11 @@ def disable_account_ajax(request):
         if account_action == 'disable':
             user_account.account_status = UserStanding.ACCOUNT_DISABLED
             context['message'] = _("Successfully disabled {}'s account").format(username)
-            log.info("{} disabled {}'s account".format(request.user, username))
+            log.info(u"%s disabled %s's account", request.user, username)
         elif account_action == 'reenable':
             user_account.account_status = UserStanding.ACCOUNT_ENABLED
             context['message'] = _("Successfully reenabled {}'s account").format(username)
-            log.info("{} reenabled {}'s account".format(request.user, username))
+            log.info(u"%s reenabled %s's account", request.user, username)
         else:
             context['message'] = _("Unexpected account status")
             return JsonResponse(context, status=400)
@@ -1666,7 +1631,7 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
             else:
                 user.email_user(subject, message, from_address)
         except Exception:  # pylint: disable=broad-except
-            log.error('Unable to send activation email to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
+            log.error(u'Unable to send activation email to user from "%s"', from_address, exc_info=True)
             js['value'] = _('Could not send activation e-mail.')
             # What is the correct status code to use here? I think it's 500, because
             # the problem is on the server's end -- but also, the account was created.
@@ -1689,8 +1654,8 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         eamap.user = new_user
         eamap.dtsignup = datetime.datetime.now(UTC)
         eamap.save()
-        AUDIT_LOG.info("User registered with external_auth %s", post_vars['username'])
-        AUDIT_LOG.info('Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
+        AUDIT_LOG.info(u"User registered with external_auth %s", post_vars['username'])
+        AUDIT_LOG.info(u'Updated ExternalAuthMap for %s to be %s', post_vars['username'], eamap)
 
         if settings.FEATURES.get('BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH'):
             log.info('bypassing activation email')
@@ -1998,7 +1963,7 @@ def reactivation_email_for_user(user):
     try:
         user.email_user(subject, message, settings.DEFAULT_FROM_EMAIL)
     except Exception:  # pylint: disable=broad-except
-        log.error('Unable to send reactivation email from "{from_address}"'.format(from_address=settings.DEFAULT_FROM_EMAIL), exc_info=True)
+        log.error(u'Unable to send reactivation email from "%s"', settings.DEFAULT_FROM_EMAIL, exc_info=True)
         return JsonResponse({
             "success": False,
             "error": _('Unable to send reactivation email')
@@ -2075,7 +2040,7 @@ def change_email_request(request):
     try:
         send_mail(subject, message, from_address, [pec.new_email])
     except Exception:  # pylint: disable=broad-except
-        log.error('Unable to send email activation link to user from "{from_address}"'.format(from_address=from_address), exc_info=True)
+        log.error(u'Unable to send email activation link to user from "%s"', from_address, exc_info=True)
         return JsonResponse({
             "success": False,
             "error": _('Unable to send email activation link. Please try again later.')
@@ -2275,11 +2240,21 @@ def change_email_settings(request):
         optout_object = Optout.objects.filter(user=user, course_id=course_key)
         if optout_object:
             optout_object.delete()
-        log.info(u"User {0} ({1}) opted in to receive emails from course {2}".format(user.username, user.email, course_id))
+        log.info(
+            u"User %s (%s) opted in to receive emails from course %s",
+            user.username,
+            user.email,
+            course_id
+        )
         track.views.server_track(request, "change-email-settings", {"receive_emails": "yes", "course": course_id}, page='dashboard')
     else:
         Optout.objects.get_or_create(user=user, course_id=course_key)
-        log.info(u"User {0} ({1}) opted out of receiving emails from course {2}".format(user.username, user.email, course_id))
+        log.info(
+            u"User %s (%s) opted out of receiving emails from course %s",
+            user.username,
+            user.email,
+            course_id
+        )
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})

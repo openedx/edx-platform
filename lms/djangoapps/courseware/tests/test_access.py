@@ -16,6 +16,7 @@ from xmodule.course_module import (
     CATALOG_VISIBILITY_NONE
 )
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from util.milestones_helpers import (
     set_prerequisite_courses,
@@ -27,11 +28,12 @@ from util.milestones_helpers import (
 # pylint: disable=protected-access
 
 
-class AccessTestCase(LoginEnrollmentTestCase):
+class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for the various access controls on the student dashboard
     """
     def setUp(self):
+        super(AccessTestCase, self).setUp()
         course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.course = course_key.make_usage_key('course', course_key.run)
         self.anonymous_user = AnonymousUserFactory()
@@ -329,6 +331,7 @@ class UserRoleTestCase(TestCase):
     Tests for user roles.
     """
     def setUp(self):
+        super(UserRoleTestCase, self).setUp()
         self.course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
         self.anonymous_user = AnonymousUserFactory()
         self.student = UserFactory()

@@ -122,13 +122,12 @@ def anonymous_id_for_user(user, course_id, save=True):
         )
         if anonymous_user_id.anonymous_user_id != digest:
             log.error(
-                "Stored anonymous user id {stored!r} for user {user!r} "
-                "in course {course!r} doesn't match computed id {digest!r}".format(
-                    user=user,
-                    course=course_id,
-                    stored=anonymous_user_id.anonymous_user_id,
-                    digest=digest
-                )
+                u"Stored anonymous user id %r for user %r "
+                u"in course %r doesn't match computed id %r",
+                user,
+                course_id,
+                anonymous_user_id.anonymous_user_id,
+                digest
             )
     except IntegrityError:
         # Another thread has already created this entry, so
@@ -889,7 +888,12 @@ class CourseEnrollment(models.Model):
 
         except:  # pylint: disable=bare-except
             if event_name and self.course_id:
-                log.exception('Unable to emit event %s for user %s and course %s', event_name, self.user.username, self.course_id)
+                log.exception(
+                    u'Unable to emit event %s for user %s and course %s',
+                    event_name,
+                    self.user.username,  # pylint: disable=no-member
+                    self.course_id,
+                )
 
     @classmethod
     def enroll(cls, user, course_key, mode="honor", check_access=False):
@@ -930,10 +934,9 @@ class CourseEnrollment(models.Model):
             course = modulestore().get_course(course_key)
         except ItemNotFoundError:
             log.warning(
-                "User {0} failed to enroll in non-existent course {1}".format(
-                    user.username,
-                    course_key.to_deprecated_string()
-                )
+                u"User %s failed to enroll in non-existent course %s",
+                user.username,
+                course_key.to_deprecated_string(),
             )
             raise NonExistentCourseError
 
@@ -942,27 +945,24 @@ class CourseEnrollment(models.Model):
                 raise NonExistentCourseError
             if CourseEnrollment.is_enrollment_closed(user, course):
                 log.warning(
-                    "User {0} failed to enroll in course {1} because enrollment is closed".format(
-                        user.username,
-                        course_key.to_deprecated_string()
-                    )
+                    u"User %s failed to enroll in course %s because enrollment is closed",
+                    user.username,
+                    course_key.to_deprecated_string()
                 )
                 raise EnrollmentClosedError
 
             if CourseEnrollment.is_course_full(course):
                 log.warning(
-                    "User {0} failed to enroll in full course {1}".format(
-                        user.username,
-                        course_key.to_deprecated_string()
-                    )
+                    u"User %s failed to enroll in full course %s",
+                    user.username,
+                    course_key.to_deprecated_string(),
                 )
                 raise CourseFullError
         if CourseEnrollment.is_enrolled(user, course_key):
             log.warning(
-                "User {0} attempted to enroll in {1}, but they were already enrolled".format(
-                    user.username,
-                    course_key.to_deprecated_string()
-                )
+                u"User %s attempted to enroll in %s, but they were already enrolled",
+                user.username,
+                course_key.to_deprecated_string()
             )
             if check_access:
                 raise AlreadyEnrolledError
@@ -1029,8 +1029,11 @@ class CourseEnrollment(models.Model):
             record.update_enrollment(is_active=False, skip_refund=skip_refund)
 
         except cls.DoesNotExist:
-            err_msg = u"Tried to unenroll student {} from {} but they were not enrolled"
-            log.error(err_msg.format(user, course_id))
+            log.error(
+                u"Tried to unenroll student %s from %s but they were not enrolled",
+                user,
+                course_id
+            )
 
     @classmethod
     def unenroll_by_email(cls, email, course_id):
@@ -1046,8 +1049,11 @@ class CourseEnrollment(models.Model):
             user = User.objects.get(email=email)
             return cls.unenroll(user, course_id)
         except User.DoesNotExist:
-            err_msg = u"Tried to unenroll email {} from course {}, but user not found"
-            log.error(err_msg.format(email, course_id))
+            log.error(
+                u"Tried to unenroll email %s from course %s, but user not found",
+                email,
+                course_id
+            )
 
     @classmethod
     def is_enrolled(cls, user, course_key):

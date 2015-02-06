@@ -67,7 +67,6 @@ class AjaxEnabledTestClient(Client):
         return self.get(path, data or {}, follow, HTTP_ACCEPT="application/json", **extra)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CourseTestCase(ModuleStoreTestCase):
     """
     Base class for Studio tests that require a logged in user and a course.
@@ -81,6 +80,7 @@ class CourseTestCase(ModuleStoreTestCase):
         will be cleared out before each test case execution and deleted
         afterwards.
         """
+
         self.user_password = super(CourseTestCase, self).setUp()
 
         self.client = AjaxEnabledTestClient()

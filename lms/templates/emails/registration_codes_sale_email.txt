@@ -6,29 +6,25 @@ ${_("An invoice for {currency_symbol}{total_price} is attached. Payment is due i
 
 ${_("A CSV file of your registration codes is attached. Please distribute registration codes to each student planning to enroll using the email template below.")}
 
-${_("Thanks,"
-"The {platform_name} Team").format(platform_name=platform_name)}
+## Translators: This is the signature of an email.  "\n" is a newline character
+## and should be placed between the closing word and the signature.
+${_("Thanks,\nThe {platform_name} Team").format(platform_name=platform_name)}
 
 
 ———————————————————————————————————————————
 
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
 ${_("Dear [[Name]]:")}
 
-${_("We have provided an enrollment for you in the course {course_name} from {platform_name}. Please follow the instructions below to claim your access.").format(course_name=course.display_name, platform_name=platform_name)}
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+${_("We have provided a course enrollment code for you in {course_name}. To enroll in the course, click the following link:").format(course_name=course.display_name)}
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
-${_("Your redeem code is: [[Enter Redeem Code here from the attached CSV]]")}
+[[${_("HTML link from the attached CSV file")}]]
 
-${_("(1) Register for an account at {site_name}.").format(site_name=u"https://{}".format(site_name))}
-${_("(2) Once registered, navigate to {course_url}").format(course_url=u"https://{}".format(course_url))}
-${_("(3) Click 'Add {course_number} to Cart'").format(course_number=course.display_coursenumber)}
-${_("(4) On the shopping cart page, enter your redeem code and click 'Apply Code'. This will make payment equal to $0.")}
-${_("(5) Click 'Register'")}
-${_("(6) You should be able to see your course on your student dashboard at {dashboard_url}").format(dashboard_url=u"https://{}".format(dashboard_url))}
-${_("(7) Course materials will not be available until the course start date.")}
+${_("After you enroll, you can see the course on your student dashboard. You can see course materials after the course start date.")}
 
-# Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
-${_("Sincerely,"
-"[[Your Signature]]")}
+## Translators: please translate the text inside [[ ]]. This is meant as a template for course teams to use.
+## This is the signature of an email.  "\n" is a newline character
+## and should be placed between the closing word and the signature.
+${_("Sincerely,\n[[Your Signature]]")}

@@ -30,17 +30,29 @@
       </div>
 
       <div class="footer-about-copyright">
-        ## Translators: '&copy;' is an HTML character code for the copyright symbol. Please don't remove or change it.
-        <p>${_("&copy; {copyright_year} {platform_name}, some rights reserved").format(
-          platform_name=settings.PLATFORM_NAME,
-          copyright_year=settings.COPYRIGHT_YEAR
-        )}
-      </p>
+      	## Using "edX Inc." explicitly here for copyright purposes (settings.PLATFORM_NAME is just "edX", and this footer is only used on edx.org)
+      	<p>&copy; ${settings.COPYRIGHT_YEAR} edX Inc.</p>
+
+      	## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+      	<p>
+      	  ## Translators: 'EdX', 'edX', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+      	  ${_("EdX, Open edX, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+      	      link_start=u"<a href='https://www.edx.org/'><span class='copy'>",
+      	      link_end=u"</span></a>"
+      	  )}
+      	</p>
       </div>
 
       <div class="footer-about-links">
         <a href="${marketing_link('TOS')}"><span class="copy">${_("Terms of Service and Honor Code")}</span></a>
-        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span> <span class="note">${_("(Revised 4/16/2014)")}</span></a>
+        <a href="${marketing_link('PRIVACY')}"><span class="copy">${_("Privacy Policy")}</span>
+	  <span class="note">
+	    ## Translators: {date} will be an abbreviated date, indicating when the privacy policy was most recently revised.
+	    ${_("(Revised {date})").format(
+	      ## Translators: 10/22/2014 is a US-style date representing October 22, 2014. Please convert to use your local date system.
+	      date=_("10/22/2014")
+	    )}
+	</span></a>
       </div>
     </div>
 

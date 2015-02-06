@@ -1747,6 +1747,7 @@ class EntryPageTestCase(TestCase):
     Tests entry pages that aren't specific to a course.
     """
     def setUp(self):
+        super(EntryPageTestCase, self).setUp()
         self.client = AjaxEnabledTestClient()
 
     def _test_page(self, page, status_code=200):

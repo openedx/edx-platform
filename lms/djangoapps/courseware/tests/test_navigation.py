@@ -14,7 +14,6 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestNavigation(ModuleStoreTestCase, LoginEnrollmentTestCase):
     """
     Check that navigation state is saved properly.

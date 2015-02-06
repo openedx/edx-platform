@@ -12,7 +12,7 @@ from django.utils.translation import ugettext as _, ugettext_noop
 from django.views.decorators.http import require_GET, require_http_methods
 import rfc6266
 
-from edxval.api import create_video, get_videos_for_ids
+from edxval.api import create_video, get_videos_for_ids, SortDirection, VideoSortField
 from opaque_keys.edx.keys import CourseKey
 
 from contentstore.models import VideoUploadConfig
@@ -222,7 +222,7 @@ def _get_videos(course):
         for v in modulestore().get_all_asset_metadata(course.id, VIDEO_ASSET_TYPE)
     ]
 
-    videos = list(get_videos_for_ids(edx_videos_ids))
+    videos = list(get_videos_for_ids(edx_videos_ids, VideoSortField.created, SortDirection.desc))
 
     # convert VAL's status to studio's Video Upload feature status.
     for video in videos:

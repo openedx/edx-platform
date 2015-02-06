@@ -19,8 +19,6 @@ from ..helpers import (
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
 from ...pages.common.logout import LogoutPage
-from ...pages.lms.find_courses import FindCoursesPage
-from ...pages.lms.course_about import CourseAboutPage
 from ...pages.lms.course_info import CourseInfoPage
 from ...pages.lms.tab_nav import TabNavPage
 from ...pages.lms.course_nav import CourseNavPage
@@ -34,48 +32,6 @@ from ...pages.lms.login_and_register import CombinedLoginAndRegisterPage
 from ...pages.lms.track_selection import TrackSelectionPage
 from ...pages.lms.pay_and_verify import PaymentAndVerificationFlow, FakePaymentPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc, CourseUpdateDesc
-
-
-class RegistrationTest(UniqueCourseTest):
-    """
-    Test the registration process.
-    """
-
-    def setUp(self):
-        """
-        Initialize pages and install a course fixture.
-        """
-        super(RegistrationTest, self).setUp()
-
-        self.find_courses_page = FindCoursesPage(self.browser)
-        self.course_about_page = CourseAboutPage(self.browser, self.course_id)
-
-        # Create a course to register for
-        CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        ).install()
-
-    def test_register(self):
-
-        # Visit the main page with the list of courses
-        self.find_courses_page.visit()
-
-        # Go to the course about page and click the register button
-        self.course_about_page.visit()
-        register_page = self.course_about_page.register()
-
-        # Fill in registration info and submit
-        username = "test_" + self.unique_id[0:6]
-        register_page.provide_info(
-            username + "@example.com", "test", username, "Test User"
-        )
-        dashboard = register_page.submit()
-
-        # We should end up at the dashboard
-        # Check that we're registered for the course
-        course_names = dashboard.available_courses
-        self.assertIn(self.course_info['display_name'], course_names)
 
 
 @attr('shard_1')
@@ -273,6 +229,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         # Add a verified mode to the course
         ModeCreationPage(self.browser, self.course_id, mode_slug=u'verified', mode_display_name=u'Verified Certificate', min_price=10, suggested_prices='10,20').visit()
 
+    @skip("Flaky 02/02/2015")
     def test_immediate_verification_enrollment(self):
         # Create a user and log them in
         AutoAuthPage(self.browser).visit()
@@ -538,6 +495,46 @@ class HighLevelTabTest(UniqueCourseTest):
         self.assertEqual(len(actual_items), len(EXPECTED_ITEMS))
         for expected in EXPECTED_ITEMS:
             self.assertIn(expected, actual_items)
+
+
+class PDFTextBooksTabTest(UniqueCourseTest):
+    """
+    Tests that verify each of the textbook tabs available within a course.
+    """
+
+    def setUp(self):
+        """
+        Initialize pages and install a course fixture.
+        """
+        super(PDFTextBooksTabTest, self).setUp()
+
+        self.course_info_page = CourseInfoPage(self.browser, self.course_id)
+        self.tab_nav = TabNavPage(self.browser)
+
+        # Install a course with TextBooks
+        course_fix = CourseFixture(
+            self.course_info['org'], self.course_info['number'],
+            self.course_info['run'], self.course_info['display_name']
+        )
+
+        # Add PDF textbooks to course fixture.
+        for i in range(1, 3):
+            course_fix.add_textbook("PDF Book {}".format(i), [{"title": "Chapter Of Book {}".format(i), "url": ""}])
+
+        course_fix.install()
+
+        # Auto-auth register for the course
+        AutoAuthPage(self.browser, course_id=self.course_id).visit()
+
+    def test_verify_textbook_tabs(self):
+        """
+        Test multiple pdf textbooks loads correctly in lms.
+        """
+        self.course_info_page.visit()
+
+        # Verify each PDF textbook tab by visiting, it will fail if correct tab is not loaded.
+        for i in range(1, 3):
+            self.tab_nav.go_to_tab("PDF Book {}".format(i))
 
 
 class VideoTest(UniqueCourseTest):

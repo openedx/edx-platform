@@ -13,9 +13,10 @@ from django.core.urlresolvers import reverse
 from survey.models import SurveyForm
 
 from xmodule.modulestore.tests.factories import CourseFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
-class SurveyViewsTests(TestCase):
+class SurveyViewsTests(ModuleStoreTestCase):
     """
     All tests for the views.py file
     """
@@ -23,6 +24,8 @@ class SurveyViewsTests(TestCase):
         """
         Set up the test data used in the specific tests
         """
+        super(SurveyViewsTests, self).setUp()
+
         self.client = Client()
 
         # Create two accounts

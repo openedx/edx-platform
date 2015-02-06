@@ -16,7 +16,6 @@ from xmodule.modulestore.django import modulestore
 USER_COUNT = 11
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGradebook(ModuleStoreTestCase):
     """
     Test functionality of the spoc gradebook. Sets up a course with assignments and
@@ -26,6 +25,8 @@ class TestGradebook(ModuleStoreTestCase):
     grading_policy = None
 
     def setUp(self):
+        super(TestGradebook, self).setUp()
+
         instructor = AdminFactory.create()
         self.client.login(username=instructor.username, password='test')
 

@@ -1,14 +1,18 @@
 """Django management command to force certificate regeneration for one user"""
 
+import logging
+import copy
 from optparse import make_option
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from certificates.queue import XQueueCertInterface
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -49,12 +53,32 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args, **options):
+
+        # Scrub the username from the log message
+        cleaned_options = copy.copy(options)
+        if 'username' in cleaned_options:
+            cleaned_options['username'] = '<USERNAME>'
+        LOGGER.info(
+            (
+                u"Starting to create tasks to regenerate certificates "
+                u"with arguments %s and options %s"
+            ),
+            unicode(args),
+            unicode(cleaned_options)
+        )
+
         if options['course']:
             # try to parse out the course from the serialized form
             try:
                 course_id = CourseKey.from_string(options['course'])
             except InvalidKeyError:
-                print("Course id {} could not be parsed as a CourseKey; falling back to SSCK.from_dep_str".format(options['course']))
+                LOGGER.warning(
+                    (
+                        u"Course id %s could not be parsed as a CourseKey; "
+                        u"falling back to SlashSeparatedCourseKey.from_deprecated_string()"
+                    ),
+                    options['course']
+                )
                 course_id = SlashSeparatedCourseKey.from_deprecated_string(options['course'])
         else:
             raise CommandError("You must specify a course")
@@ -64,23 +88,61 @@ class Command(BaseCommand):
             raise CommandError('both course id and student username are required')
 
         student = None
-        print "Fetching enrollment for student {0} in {1}".format(user, course_id)
         if '@' in user:
             student = User.objects.get(email=user, courseenrollment__course_id=course_id)
         else:
             student = User.objects.get(username=user, courseenrollment__course_id=course_id)
 
-        print "Fetching course data for {0}".format(course_id)
         course = modulestore().get_course(course_id, depth=2)
 
         if not options['noop']:
+            LOGGER.info(
+                (
+                    u"Adding task to the XQueue to generate a certificate "
+                    u"for student %s in course '%s'."
+                ),
+                student.id,
+                course_id
+            )
+
             # Add the certificate request to the queue
-            xq = XQueueCertInterface()
+            xqueue_interface = XQueueCertInterface()
             if options['insecure']:
-                xq.use_https = False
-            ret = xq.regen_cert(student, course_id, course=course,
-                                forced_grade=options['grade_value'],
-                                template_file=options['template_file'])
-            print '{0} - {1}'.format(student, ret)
+                xqueue_interface.use_https = False
+
+            ret = xqueue_interface.regen_cert(
+                student, course_id, course=course,
+                forced_grade=options['grade_value'],
+                template_file=options['template_file']
+            )
+
+            LOGGER.info(
+                (
+                    u"Added a certificate regeneration task to the XQueue "
+                    u"for student %s in course '%s'. "
+                    u"The new certificate status is '%s'."
+                ),
+                student.id,
+                unicode(course_id),
+                ret
+            )
+
         else:
-            print "noop option given, skipping work queueing..."
+            LOGGER.info(
+                (
+                    u"Skipping certificate generation for "
+                    u"student %s in course '%s' "
+                    u"because the noop flag is set."
+                ),
+                student.id,
+                unicode(course_id)
+            )
+
+        LOGGER.info(
+            (
+                u"Finished regenerating certificates command for "
+                u"user %s and course '%s'."
+            ),
+            student.id,
+            unicode(course_id)
+        )

@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
 'use strict';
 define([
-    'jquery', 'underscore', 'annotator', 'js/edxnotes/utils/utils'
+    'jquery', 'underscore', 'annotator_1.2.9', 'js/edxnotes/utils/utils'
 ], function ($, _, Annotator, Utils) {
     var _t = Annotator._t;
 

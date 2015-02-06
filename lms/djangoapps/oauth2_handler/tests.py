@@ -16,9 +16,10 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from oauth2_provider.tests import IDTokenTestCase, UserInfoTestCase
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class BaseTestMixin(ModuleStoreTestCase):
     profile = None
+
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         super(BaseTestMixin, self).setUp()

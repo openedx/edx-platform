@@ -23,6 +23,7 @@ class UtilsTest(TestCase):
         Setup a dummy course-like object with a tabs field that can be
         accessed via attribute lookup.
         '''
+        super(UtilsTest, self).setUp()
         self.course = collections.namedtuple('DummyCourse', ['tabs'])
         self.course.tabs = []
 
@@ -48,6 +49,7 @@ class UtilsTest(TestCase):
 class ApiTest(TestCase):
 
     def setUp(self):
+        super(ApiTest, self).setUp()
         self.client = Client()
 
         # Mocks
@@ -343,6 +345,8 @@ class ApiTest(TestCase):
 
 class NoteTest(TestCase):
     def setUp(self):
+        super(NoteTest, self).setUp()
+
         self.password = 'abc'
         self.student = User.objects.create_user('student', 'student@test.com', self.password)
         self.course_key = SlashSeparatedCourseKey('HarvardX', 'CB22x', 'The_Ancient_Greek_Hero')

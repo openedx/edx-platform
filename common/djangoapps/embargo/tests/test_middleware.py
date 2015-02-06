@@ -24,19 +24,15 @@ from config_models.models import cache
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EmbargoMiddlewareTests(ModuleStoreTestCase):
     """
     Tests of EmbargoMiddleware
     """
     def setUp(self):
+        super(EmbargoMiddlewareTests, self).setUp()
+
         self.user = UserFactory(username='fred', password='secret')
         self.client.login(username='fred', password='secret')
         self.embargo_course = CourseFactory.create()

@@ -148,7 +148,6 @@ class XmlCourseImageTestCase(XModuleXmlImportTest):
         self.assertEquals(course_image_url(course), u'/static/xml_test_course/before after.jpg')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content."""
 
@@ -196,9 +195,10 @@ class CoursesRenderTest(ModuleStoreTestCase):
             self.assertIn("this module is temporarily unavailable", course_about)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 class XmlCoursesRenderTest(ModuleStoreTestCase):
     """Test methods related to rendering courses content for an XML course."""
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     toy_course_key = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
 
     def test_get_course_info_section_render(self):

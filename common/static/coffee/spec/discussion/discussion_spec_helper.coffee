@@ -546,7 +546,7 @@ browser and pasting the output.  When that file changes, this one should be rege
         <li class="actions-item">
             <a href="javascript:void(0)" class="action-list-item action-edit" role="button">
                 <span class="action-label">Edit</span>
-                <span class="action-icon"><i class="icon fa fa-pencil-square-o"></i></span>
+                <span class="action-icon"><i class="icon fa fa-pencil"></i></span>
             </a>
         </li>
     </script>

@@ -463,7 +463,7 @@ class Courses(SysadminDashboardView):
             # new, and pull is when it is being updated from the
             # source.
             return _('Unable to clone or pull repository. Please check '
-                     'your url. Output was: {0!r}'.format(ex.output))
+                     'your url. Output was: {0!r}').format(ex.output)
 
         msg += u'<pre>{0}</pre>'.format(cmd_output)
         if not os.path.exists(gdir):
@@ -479,7 +479,7 @@ class Courses(SysadminDashboardView):
             # specific version of a courses content
             msg += u'<p>{0}</p>'.format(
                 _('Successfully switched to branch: '
-                  '{branch_name}'.format(branch_name=branch)))
+                  '{branch_name}').format(branch_name=branch))
 
         self.def_ms.try_load_course(os.path.abspath(gdir))
         errlog = self.def_ms.errored_courses.get(cdir, '')

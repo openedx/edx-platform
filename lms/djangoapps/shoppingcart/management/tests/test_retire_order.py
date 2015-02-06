@@ -12,6 +12,8 @@ from student.tests.factories import UserFactory
 class TestRetireOrder(ModuleStoreTestCase):
     """Test the retire_order command"""
     def setUp(self):
+        super(TestRetireOrder, self).setUp()
+
         course = CourseFactory.create()
         self.course_key = course.id
 

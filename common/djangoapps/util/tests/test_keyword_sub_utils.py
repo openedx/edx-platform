@@ -18,6 +18,7 @@ class KeywordSubTest(ModuleStoreTestCase):
     """ Tests for the keyword substitution feature """
 
     def setUp(self):
+        super(KeywordSubTest, self).setUp(create_user=False)
         self.user = UserFactory.create(
             email="testuser@edx.org",
             username="testuser",

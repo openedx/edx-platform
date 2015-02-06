@@ -312,12 +312,13 @@
     <div id="change_email_body">
       <form id="change_email_form">
         <div id="change_email_error" class="modal-form-error"> </div>
-        <fieldset>
           <div class="input-group">
-            <label>${_("Please enter your new email address:")}</label>
-            <input id="new_email_field" type="email" value="" />
-            <label>${_("Please confirm your password:")}</label>
-            <input id="new_email_password" value="" type="password" />
+            <label>${_("Please enter your new email address:")}
+              <input id="new_email_field" type="email" value="" />
+            </label>
+            <label>${_("Please confirm your password:")}
+              <input id="new_email_password" value="" type="password" />
+            </label>
           </div>
           <section>
             <p>${_("We will send a confirmation to both {email} and your new email address as part of the process.").format(email=user.email)}</p>
@@ -325,7 +326,6 @@
           <div class="submit">
             <input type="submit" id="submit_email_change" value="${_("Change Email")}"/>
           </div>
-        </fieldset>
       </form>
     </div>
   </div>
@@ -359,18 +359,18 @@
         ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
         <p>${_("To uphold the credibility of your {platform} {cert_name_short}, all name changes will be recorded.").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</p>
         <br/>
-        <fieldset>
           <div class="input-group">
             ## Translators: note that {platform} {cert_name_short} will look something like: "edX certificate". Please do not change the order of these placeholders.
-            <label>${_("Enter your desired full name, as it will appear on your {platform} {cert_name_short}:").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}</label>
-            <input id="new_name_field" value="" type="text" />
-            <label>${_("Reason for name change:")}</label>
-            <textarea id="name_rationale_field" value=""></textarea>
+            <label>${_("Enter your desired full name, as it will appear on your {platform} {cert_name_short}:").format(platform=settings.PLATFORM_NAME, cert_name_short=cert_name_short)}
+              <input id="new_name_field" value="" type="text" />
+            </label>
+            <label>${_("Reason for name change:")}
+              <textarea id="name_rationale_field" value=""></textarea>
+            </label>
           </div>
           <div class="submit">
             <input type="submit" id="submit" value="${_("Change My Name")}">
           </div>
-        </fieldset>
       </form>
     </div>
   </div>

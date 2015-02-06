@@ -634,10 +634,9 @@ REASONCODE_MAP.update(
             Possible fix: retry with another form of payment
             """)),
         '233': _('General decline by the processor.  Possible fix: retry with another form of payment'),
-        '234': dedent(_(
-            """
-            There is a problem with the information in your CyberSource account.  Please let us know at {0}
-            """.format(settings.PAYMENT_SUPPORT_EMAIL))),
+        '234': _(
+            "There is a problem with the information in your CyberSource account.  Please let us know at {0}"
+        ).format(settings.PAYMENT_SUPPORT_EMAIL),
         '236': _('Processor Failure.  Possible fix: retry the payment'),
         '240': dedent(_(
             """

@@ -72,6 +72,7 @@ class GroupAccessTestCase(ModuleStoreTestCase):
         modulestore().update_item(block, 1)
 
     def setUp(self):
+        super(GroupAccessTestCase, self).setUp()
 
         UserPartition.scheme_extensions = ExtensionManager.make_test_instance(
             [

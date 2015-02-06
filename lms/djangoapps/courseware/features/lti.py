@@ -16,6 +16,8 @@ from student.tests.factories import UserFactory
 
 from common import visit_scenario_item
 
+TEST_COURSE_NAME = "test_course_a"
+
 
 @step('I view the LTI and error is shown$')
 def lti_is_not_rendered(_step):
@@ -45,6 +47,7 @@ def check_lti_iframe_content(text):
 @step('I view the LTI and it is rendered in (.*)$')
 def lti_is_rendered(_step, rendered_in):
     if rendered_in.strip() == 'iframe':
+        world.wait_for_present('iframe')
         assert world.is_css_present('iframe', wait_time=2)
         assert not world.is_css_present('.link_lti_new_window', wait_time=0)
         assert not world.is_css_present('.error_message', wait_time=0)
@@ -58,7 +61,7 @@ def lti_is_rendered(_step, rendered_in):
         assert world.is_css_present('.link_lti_new_window', wait_time=0)
         assert not world.is_css_present('.error_message', wait_time=0)
         click_and_check_lti_popup()
-    else:  # incorrent rendered_in parameter
+    else:  # incorrect rendered_in parameter
         assert False
 
 
@@ -129,7 +132,7 @@ def incorrect_lti_is_rendered(_step):
 
 @step('the course has correct LTI credentials with registered (.*)$')
 def set_correct_lti_passport(_step, user='Instructor'):
-    coursenum = 'test_course'
+    coursenum = TEST_COURSE_NAME
     metadata = {
         'lti_passports': ["correct_lti_id:test_client_key:test_client_secret"]
     }
@@ -139,7 +142,7 @@ def set_correct_lti_passport(_step, user='Instructor'):
 
 @step('the course has incorrect LTI credentials$')
 def set_incorrect_lti_passport(_step):
-    coursenum = 'test_course'
+    coursenum = TEST_COURSE_NAME
     metadata = {
         'lti_passports': ["test_lti_id:test_client_key:incorrect_lti_secret_key"]
     }
@@ -269,10 +272,12 @@ def check_lti_popup(parent_window):
     # For verification, iterate through the window titles and make sure that
     # both are there.
     tabs = []
+    expected_tabs = [u'LTI | Test Section | {0} Courseware | edX'.format(TEST_COURSE_NAME), u'TEST TITLE']
+
     for window in windows:
         world.browser.switch_to_window(window)
         tabs.append(world.browser.title)
-    assert_equal(tabs, [u'LTI | Test Section | test_course Courseware | edX', u'TEST TITLE'])
+    assert_equal(tabs, expected_tabs)   # pylint: disable=no-value-for-parameter
 
     # Now verify the contents of the LTI window (which is the 2nd window/tab)
     # Note: The LTI opens in a new browser window, but Selenium sticks with the
@@ -372,7 +377,7 @@ def get_lti_frame_name():
 
 @step('I see in iframe that LTI role is (.*)$')
 def check_role(_step, role):
-    world.is_css_present('iframe')
+    world.wait_for_present('iframe')
     location = world.scenario_dict['LTI'].location.html_id()
     iframe_name = 'ltiFrame-' + location
     with world.browser.get_iframe(iframe_name) as iframe:
@@ -391,6 +396,7 @@ def switch_view(_step, view):
     if staff_status != view:
         world.browser.select("select", view)
         world.wait_for_ajax_complete()
+        assert_equal(world.css_find('#action-preview-select').first.value, view)
 
 
 @step("in the LTI component I do not see (.*)$")

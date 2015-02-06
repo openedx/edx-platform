@@ -28,6 +28,7 @@ class TestInstructorGradeReport(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that CSV grade report generation works.
     """
     def setUp(self):
+        super(TestInstructorGradeReport, self).setUp()
         self.course = CourseFactory.create()
 
     @ddt.data([u'student@example.com', u'ni\xf1o@example.com'])
@@ -163,6 +164,7 @@ class TestStudentReport(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that CSV student profile report generation works.
     """
     def setUp(self):
+        super(TestStudentReport, self).setUp()
         self.course = CourseFactory.create()
 
     def test_success(self):
@@ -218,6 +220,8 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
     Tests that bulk student cohorting works.
     """
     def setUp(self):
+        super(TestCohortStudents, self).setUp()
+
         self.course = CourseFactory.create()
         self.cohort_1 = CohortFactory(course_id=self.course.id, name='Cohort 1')
         self.cohort_2 = CohortFactory(course_id=self.course.id, name='Cohort 2')

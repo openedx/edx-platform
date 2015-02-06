@@ -2,7 +2,7 @@
 'use strict';
 define([
     'jquery', 'underscore', 'backbone', 'gettext',
-    'annotator', 'js/edxnotes/views/visibility_decorator'
+    'annotator_1.2.9', 'js/edxnotes/views/visibility_decorator'
 ], function($, _, Backbone, gettext, Annotator, EdxnotesVisibilityDecorator) {
     var ToggleNotesView = Backbone.View.extend({
         events: {

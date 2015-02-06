@@ -362,6 +362,7 @@ class TestXModuleHandler(TestCase):
     """
 
     def setUp(self):
+        super(TestXModuleHandler, self).setUp()
         self.module = XModule(descriptor=Mock(), field_data=Mock(), runtime=Mock(), scope_ids=Mock())
         self.module.handle_ajax = Mock(return_value='{}')
         self.request = webob.Request({})

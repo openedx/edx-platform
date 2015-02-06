@@ -15,7 +15,7 @@ from courseware.tests.test_masquerade import StaffMasqueradeTestCase
 from student.tests.factories import UserFactory
 from xmodule.partitions.partitions import Group, UserPartition, UserPartitionError
 from xmodule.modulestore.django import modulestore, clear_existing_modulestores
-from xmodule.modulestore.tests.django_utils import mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config, TEST_DATA_MIXED_TOY_MODULESTORE
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
@@ -26,22 +26,19 @@ from ..cohorts import add_user_to_cohort, get_course_cohorts
 from .helpers import CohortFactory, config_course_cohorts
 
 
-TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
-TEST_MAPPING = {'edX/toy/2012_Fall': 'xml'}
-TEST_DATA_MIXED_MODULESTORE = mixed_store_config(TEST_DATA_DIR, TEST_MAPPING, include_xml=True)
-
-
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestCohortPartitionScheme(django.test.TestCase):
+class TestCohortPartitionScheme(ModuleStoreTestCase):
     """
     Test the logic for linking a user to a partition group based on their cohort.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         """
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
+        super(TestCohortPartitionScheme, self).setUp()
+
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         config_course_cohorts(self.course, [], cohorted=True)
@@ -272,16 +269,18 @@ class TestExtension(django.test.TestCase):
             UserPartition.get_scheme('other')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_MODULESTORE)
-class TestGetCohortedUserPartition(django.test.TestCase):
+class TestGetCohortedUserPartition(ModuleStoreTestCase):
     """
     Test that `get_cohorted_user_partition` returns the first user_partition with scheme `CohortPartitionScheme`.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
         """
         Regenerate a course with cohort configuration, partition and groups,
         and a student for each test.
         """
+        super(TestGetCohortedUserPartition, self).setUp()
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
         self.student = UserFactory.create()

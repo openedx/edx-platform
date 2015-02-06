@@ -8,6 +8,7 @@ import django_comment_client.middleware as middleware
 
 class AjaxExceptionTestCase(TestCase):
     def setUp(self):
+        super(AjaxExceptionTestCase, self).setUp()
         self.a = middleware.AjaxExceptionMiddleware()
         self.request1 = django.http.HttpRequest()
         self.request0 = django.http.HttpRequest()

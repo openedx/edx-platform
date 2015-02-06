@@ -32,7 +32,7 @@ $sequence--border-color: #C8C8C8;
 
 // ====================
 
-nav.sequence-nav {
+.sequence-nav {
   // TODO (cpennington): This doesn't work anymore. XModules aren't able to
   // import from external sources.
   @extend .topbar;
@@ -231,93 +231,63 @@ nav.sequence-nav {
     }
   }
 
-  ul {
-    position: absolute;
-    top: 0;
-    list-style: none !important;
-    height: 100%;
-    right: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    border: none;
+  body.touch-based-device & ol li a:hover p {
+    display: none;
+  }
+}
 
-    li {
-      position: absolute;
-      margin-bottom: 0;
-      height: 44px;
-      width: 70px;
-      border: 1px solid $gray-l3;
-      @include linear-gradient(top, #eee, #ddd);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
-      z-index: 1;
+.sequence-nav-button {
+  @extend %ui-depth3;
+  position: absolute;
+  display: block;
+  top: 0;
+  width: ($baseline*2);
+  height: 46px;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-indent: -9999px;
+  overflow: hidden;
+  @include transition(all .2s $ease-in-out-quad 0s);
 
-      &.prev, &.next {
+  &.button-previous {
+    @include border-radius(35px, 0, 0, 35px);
+    left: 0;
+    background-position: center 15px;
 
-        a {
-          background-position: center;
-          background-repeat: no-repeat;
-          display: block;
-          height: 100%;
-          width: 40px;
-          text-indent: -9999px;
-          overflow: hidden;
-          @include transition(all .2s $ease-in-out-quad 0s);
+    // CASE: left to right layout
+    @include ltr {
+      background-image: url('../images/sequence-nav/previous-icon.png');
+    }
 
-          &:hover, &:focus {
-            opacity: 0.5;
-          }
-
-          &.disabled {
-            cursor: normal;
-            opacity: 0.4;
-          }
-        }
-      }
-
-      &.prev {
-        @include left(-10px);
-        @include border-radius(35px, 0, 0, 35px);
-
-        a {
-          background-position: center 15px;
-
-          // CASE: left to right layout
-          @include ltr {
-            background-image: url('../images/sequence-nav/previous-icon.png');
-          }
-
-          // CASE: right to left layout
-          @include rtl {
-            background-image: url('../images/sequence-nav/next-icon.png');
-          }
-        }
-      }
-
-      &.next {
-        @include right(-10px);
-        @include border-radius(0, 35px, 35px, 0);
-
-        a {
-          @include margin-left(30px);
-          background-position: center 15px;
-
-          // CASE: left to right layout
-          @include ltr {
-            background-image: url('../images/sequence-nav/next-icon.png');
-          }
-
-          // CASE: right to left layout
-          @include rtl {
-            background-image: url('../images/sequence-nav/previous-icon.png');
-          }
-        }
-      }
+    // CASE: right to left layout
+    @include rtl {
+      background-image: url('../images/sequence-nav/next-icon.png');
     }
   }
 
-  body.touch-based-device & ol li a:hover p {
-    display: none;
+  &.button-next {
+    @include border-radius(0, 35px, 35px, 0);
+    right: 0;
+    background-position: center 15px;
+
+    // CASE: left to right layout
+    @include ltr {
+      background-image: url('../images/sequence-nav/next-icon.png');
+    }
+
+    // CASE: right to left layout
+    @include rtl {
+      background-image: url('../images/sequence-nav/previous-icon.png');
+    }
+  }
+
+  &:hover,
+  &:active {
+
+  }
+
+  &.disabled {
+    cursor: normal;
   }
 }
 
@@ -326,83 +296,11 @@ nav.sequence-nav {
 }
 
 nav.sequence-bottom {
-  margin: lh(2) 0 0;
+  position: relative;
+  width: 79px;
+  height: 1px;
+  margin: lh(2) auto;
   text-align: center;
-
-  ul {
-    @include clearfix();
-    display: inline-block;
-
-    li {
-      @include float(left);
-      width: 50px;
-      height: 44px;
-      border: 1px solid $gray-l3;
-      @include linear-gradient(top, #eee, #ddd);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, .7) inset;
-
-      &.prev, &.next {
-        margin-bottom: 0;
-
-        a {
-          background-position: center center;
-          background-repeat: no-repeat;
-          border: none;
-          display: block;
-          padding: lh(0.5) 4px;
-          text-indent: -9999px;
-          overflow: hidden;
-          @include transition(all .2s $ease-in-out-quad 0s);
-
-          &:hover, &:focus {
-            opacity: 0.5;
-            background-position: center 15px;
-          }
-
-          &.disabled {
-            opacity: 0.4;
-          }
-        }
-      }
-
-      &.prev {
-        @include border-radius(35px, 0, 0, 35px);
-
-        a {
-          background-position: center 15px;
-
-         // CASE: left to right layout
-         @include ltr {
-            background-image: url('../images/sequence-nav/previous-icon.png');
-          }
-
-          // CASE: right to left layout
-          @include rtl {
-            background-image: url('../images/sequence-nav/next-icon.png');
-          }
-        }
-      }
-
-      &.next {
-        @include border-radius(0, 35px, 35px, 0);
-        @include border-left(none);
-
-        a {
-          background-position: center 15px;
-
-          // CASE: left to right layout
-          @include ltr {
-            background-image: url('../images/sequence-nav/next-icon.png');
-          }
-
-          // CASE: right to left layout
-          @include rtl {
-            background-image: url('../images/sequence-nav/previous-icon.png');
-          }
-        }
-      }
-    }
-  }
 }
 
 #seq_content {

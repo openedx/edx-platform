@@ -24,13 +24,15 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from bulk_email.models import CourseAuthorization  # pylint: disable=import-error
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestStudentDashboardEmailView(ModuleStoreTestCase):
     """
     Check for email view displayed with flag
     """
+
     def setUp(self):
+        super(TestStudentDashboardEmailView, self).setUp()
+
         self.course = CourseFactory.create()
 
         # Create student account
@@ -90,12 +92,13 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.assertTrue(self.email_modal_link in response.content)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MIXED_TOY_MODULESTORE)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestStudentDashboardEmailViewXMLBacked(ModuleStoreTestCase):
     """
     Check for email view on student dashboard, with XML backed course.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
+
     def setUp(self):
         self.course_name = 'edX/toy/2012_Fall'
 

@@ -25,7 +25,7 @@ class VideoEditorTest(CMSVideoBaseTest):
 
         """
         if subtitles:
-            self.assets.append('subs_OEoXaMPEzfM.srt.sjson')
+            self.assets.append('subs_3_yD_cEKoCk.srt.sjson')
 
         self.navigate_to_course_unit()
 
@@ -345,7 +345,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         And I open tab "Advanced"
         And I click button "Add"
         And I choose "uk" language code
-        And I try to upload transcript file "subs_OEoXaMPEzfM.srt.sjson"
+        And I try to upload transcript file "subs_3_yD_cEKoCk.srt.sjson"
         Then I see validation error "Only SRT files can be uploaded. Please select a file ending in .srt to upload."
         """
         self._create_video_component()
@@ -353,7 +353,7 @@ class VideoEditorTest(CMSVideoBaseTest):
         self.open_advanced_tab()
         self.video.click_button('translation_add')
         self.video.select_translation_language('uk')
-        self.video.upload_asset('subs_OEoXaMPEzfM.srt.sjson', asset_type='transcript')
+        self.video.upload_asset('subs_3_yD_cEKoCk.srt.sjson', asset_type='transcript')
         error_msg = 'Only SRT files can be uploaded. Please select a file ending in .srt to upload.'
         self.assertEqual(self.video.upload_status_message, error_msg)
 

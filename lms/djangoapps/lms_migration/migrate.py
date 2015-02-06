@@ -69,11 +69,11 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
         html += '<h3>IP address: %s <h3>' % ip
         html += '<h3>User: %s </h3>' % request.user
         html += '<h3>My pid: %s</h3>' % os.getpid()
-        log.debug('request from ip=%s, user=%s' % (ip, request.user))
+        log.debug(u'request from ip=%s, user=%s', ip, request.user)
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
         if request.user and request.user.is_staff:
-            log.debug('request allowed because user=%s is staff' % request.user)
+            log.debug(u'request allowed because user=%s is staff', request.user)
         else:
             html += 'Permission denied'
             html += "</body></html>"
@@ -185,7 +185,7 @@ def gitreload(request, reload_dir=None):
 
     if not (ip in ALLOWED_IPS or 'any' in ALLOWED_IPS):
         if request.user and request.user.is_staff:
-            log.debug('request allowed because user=%s is staff' % request.user)
+            log.debug(u'request allowed because user=%s is staff', request.user)
         else:
             html += 'Permission denied'
             html += "</body></html>"

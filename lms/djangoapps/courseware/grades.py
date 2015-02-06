@@ -89,8 +89,9 @@ def answer_distributions(course_key):
             raw_answers = state_dict.get("student_answers", {})
         except ValueError:
             log.error(
-                "Answer Distribution: Could not parse module state for " +
-                "StudentModule id={}, course={}".format(module.id, course_key)
+                u"Answer Distribution: Could not parse module state for StudentModule id=%s, course=%s",
+                module.id,
+                course_key,
             )
             continue
 

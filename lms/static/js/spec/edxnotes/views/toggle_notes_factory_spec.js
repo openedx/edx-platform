@@ -1,5 +1,5 @@
 define([
-    'jquery', 'annotator', 'js/common_helpers/ajax_helpers', 'js/edxnotes/views/visibility_decorator',
+    'jquery', 'annotator_1.2.9', 'js/common_helpers/ajax_helpers', 'js/edxnotes/views/visibility_decorator',
     'js/edxnotes/views/toggle_notes_factory', 'js/spec/edxnotes/helpers',
     'js/spec/edxnotes/custom_matchers', 'jasmine-jquery'
 ], function(

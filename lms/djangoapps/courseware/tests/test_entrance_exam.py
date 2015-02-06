@@ -15,7 +15,6 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import generate_milestone_namespace, NAMESPACE_CHOICES
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class EntranceExamTestCases(ModuleStoreTestCase):
     """
     Check that content is properly gated.  Create a test course from scratch to mess with.

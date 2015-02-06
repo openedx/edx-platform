@@ -8,25 +8,19 @@ from mock import patch
 from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
 
 @ddt.ddt
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class EnrollmentTest(ModuleStoreTestCase):
     """
     Test student enrollment, especially with different course modes.
     """
+
     USERNAME = "Bob"
     EMAIL = "bob@example.com"
     PASSWORD = "edx"

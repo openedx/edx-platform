@@ -14,13 +14,13 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from class_dashboard import views
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestViews(ModuleStoreTestCase):
     """
     Tests related to class_dashboard/views.py
     """
 
     def setUp(self):
+        super(TestViews, self).setUp()
 
         self.request_factory = RequestFactory()
         self.request = self.request_factory.get('')

@@ -118,7 +118,7 @@ class TestVideoNonYouTube(TestVideo):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -150,6 +150,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestGetHtmlMethod, self).setUp()
         self.setup_course()
 
     def test_get_html_track(self):
@@ -221,7 +222,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'speed': 'null',
             'general_speed': 1.0,
             'track': u'http://www.example.com/track',
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -338,7 +339,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -478,7 +479,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -596,7 +597,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -715,7 +716,7 @@ class TestGetHtmlMethod(BaseTestXmodule):
             'saved_video_position': 0.0,
             'sub': u'a_sub_file.srt.sjson',
             'track': None,
-            'youtube_streams': '1.00:OEoXaMPEzfM',
+            'youtube_streams': '1.00:3_yD_cEKoCk',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', True),
             'yt_test_timeout': 1500,
             'yt_api_url': 'www.youtube.com/iframe_api',
@@ -766,12 +767,13 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     METADATA = {}
 
     def setUp(self):
+        super(TestVideoDescriptorInitialization, self).setUp()
         self.setup_course()
 
     def test_source_not_in_html5sources(self):
         metadata = {
             'source': 'http://example.org/video.mp4',
-            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
         }
 
         self.initialize_module(metadata=metadata)
@@ -819,7 +821,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
                     'display_name': 'Video Sources',
                     'help': 'A list of filenames to be used with HTML5 video.',
                     'type': 'List',
-                    'value': [u'http://youtu.be/OEoXaMPEzfM.mp4'],
+                    'value': [u'http://youtu.be/3_yD_cEKoCk.mp4'],
                     'field_name': 'html5_sources',
                     'options': [],
                 },
@@ -860,7 +862,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
             metadata = {
                 'track': u'http://some_track.srt',
                 'source': 'http://example.org/video.mp4',
-                'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+                'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
             }
 
             self.initialize_module(metadata=metadata)
@@ -875,7 +877,7 @@ class TestVideoDescriptorInitialization(BaseTestXmodule):
     def test_source_is_empty(self):
         metadata = {
             'source': '',
-            'html5_sources': ['http://youtu.be/OEoXaMPEzfM.mp4'],
+            'html5_sources': ['http://youtu.be/3_yD_cEKoCk.mp4'],
         }
 
         self.initialize_module(metadata=metadata)

@@ -12,6 +12,7 @@ from student.roles import (
     CourseInstructorRole, CourseStaffRole, CourseCreatorRole, LibraryUserRole,
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
+from xblock.reference.user_service import XBlockUser
 from xmodule.library_content_module import LibraryVersionReference
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -80,7 +81,8 @@ class LibraryTestCase(ModuleStoreTestCase):
         of a LibraryContent block
         """
         if 'user' not in lib_content_block.runtime._services:  # pylint: disable=protected-access
-            mocked_user_service = Mock(user_id=self.user.id).get_current_user.return_value = {}
+            mocked_user_service = Mock(user_id=self.user.id)
+            mocked_user_service.get_current_user.return_value = XBlockUser(is_current_user=True)
             lib_content_block.runtime._services['user'] = mocked_user_service  # pylint: disable=protected-access
 
         handler_url = reverse_usage_url(

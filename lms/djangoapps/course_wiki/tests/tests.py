@@ -2,23 +2,20 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from courseware.tests.tests import LoginEnrollmentTestCase
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from mock import patch
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
-class WikiRedirectTestCase(LoginEnrollmentTestCase):
+class WikiRedirectTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
     """
     Tests for wiki course redirection.
     """
 
-    @classmethod
-    def setUpClass(cls):
-        cls.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
-
     def setUp(self):
+        super(WikiRedirectTestCase, self).setUp()
+        self.toy = CourseFactory.create(org='edX', course='toy', display_name='2012_Fall')
 
         # Create two accounts
         self.student = 'view@test.com'

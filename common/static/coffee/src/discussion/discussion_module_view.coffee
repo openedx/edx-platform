@@ -29,7 +29,7 @@ if Backbone?
       if @showed
         @newPostForm.slideDown(300)
       else
-        @newPostForm.show()
+        @newPostForm.show().focus()
       @toggleDiscussionBtn.addClass('shown')
       @toggleDiscussionBtn.find('.button-text').html(gettext("Hide Discussion"))
       @$("section.discussion").slideDown()
@@ -128,7 +128,7 @@ if Backbone?
       @renderPagination(response.num_pages)
 
       if @isWaitingOnNewPost
-        @newPostForm.show()
+        @newPostForm.show().focus()
 
     addThread: (thread, collection, options) =>
       # TODO: When doing pagination, this will need to repaginate. Perhaps just reload page 1?

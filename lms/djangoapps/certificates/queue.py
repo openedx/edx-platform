@@ -19,7 +19,7 @@ import lxml.html
 from lxml.etree import XMLSyntaxError, ParserError
 
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 class XQueueCertInterface(object):
@@ -101,8 +101,31 @@ class XQueueCertInterface(object):
         #       AWS. See note in the docstring too.
         try:
             certificate = GeneratedCertificate.objects.get(user=student, course_id=course_id)
+
+            LOGGER.info(
+                (
+                    u"Found an existing certificate entry for student %s "
+                    u"in course '%s' "
+                    u"with status '%s' while regenerating certificates. "
+                ),
+                student.id,
+                unicode(course_id),
+                certificate.status
+            )
+
             certificate.status = status.unavailable
             certificate.save()
+
+            LOGGER.info(
+                (
+                    u"The certificate status for student %s "
+                    u"in course '%s' has been changed to '%s'."
+                ),
+                student.id,
+                unicode(course_id),
+                certificate.status
+            )
+
         except GeneratedCertificate.DoesNotExist:
             pass
 
@@ -153,17 +176,30 @@ class XQueueCertInterface(object):
         Returns the student's status
         """
 
-        VALID_STATUSES = [status.generating,
-                          status.unavailable,
-                          status.deleted,
-                          status.error,
-                          status.notpassing]
+        valid_statuses = [
+            status.generating,
+            status.unavailable,
+            status.deleted,
+            status.error,
+            status.notpassing
+        ]
 
         cert_status = certificate_status_for_student(student, course_id)['status']
-
         new_status = cert_status
 
-        if cert_status in VALID_STATUSES:
+        if cert_status not in valid_statuses:
+            LOGGER.warning(
+                (
+                    u"Cannot create certificate generation task for user %s "
+                    u"in the course '%s'; "
+                    u"the certificate status '%s' is not one of %s."
+                ),
+                student.id,
+                unicode(course_id),
+                cert_status,
+                unicode(valid_statuses)
+            )
+        else:
             # grade the student
 
             # re-use the course passed in optionally so we don't have to re-fetch everything
@@ -207,11 +243,32 @@ class XQueueCertInterface(object):
             grade_contents = grade.get('grade', None)
             try:
                 grade_contents = lxml.html.fromstring(grade_contents).text_content()
-            except (TypeError, XMLSyntaxError, ParserError) as e:
+            except (TypeError, XMLSyntaxError, ParserError) as exc:
+                LOGGER.info(
+                    (
+                        u"Could not retrieve grade for student %s "
+                        u"in the course '%s' "
+                        u"because an exception occurred while parsing the "
+                        u"grade contents '%s' as HTML. "
+                        u"The exception was: '%s'"
+                    ),
+                    student.id,
+                    unicode(course_id),
+                    grade_contents,
+                    unicode(exc)
+                )
+
                 #   Despite blowing up the xml parser, bad values here are fine
                 grade_contents = None
 
             if is_whitelisted or grade_contents is not None:
+
+                if is_whitelisted:
+                    LOGGER.info(
+                        u"Student %s is whitelisted in '%s'",
+                        student.id,
+                        unicode(course_id)
+                    )
 
                 # check to see whether the student is on the
                 # the embargoed country restricted list
@@ -222,6 +279,18 @@ class XQueueCertInterface(object):
                     new_status = status.restricted
                     cert.status = new_status
                     cert.save()
+
+                    LOGGER.info(
+                        (
+                            u"Student %s is in the embargoed country restricted "
+                            u"list, so their certificate status has been set to '%s' "
+                            u"for the course '%s'. "
+                            u"No certificate generation task was sent to the XQueue."
+                        ),
+                        student.id,
+                        new_status,
+                        unicode(course_id)
+                    )
                 else:
                     key = make_hashkey(random.random())
                     cert.key = key
@@ -240,14 +309,36 @@ class XQueueCertInterface(object):
                     cert.status = new_status
                     cert.save()
                     self._send_to_xqueue(contents, key)
+
+                    LOGGER.info(
+                        (
+                            u"The certificate status has been set to '%s'.  "
+                            u"Sent a certificate grading task to the XQueue "
+                            u"with the key '%s'. "
+                        ),
+                        key,
+                        new_status
+                    )
             else:
                 cert_status = status.notpassing
                 cert.status = cert_status
                 cert.save()
 
+                LOGGER.info(
+                    (
+                        u"Student %s does not have a grade for '%s', "
+                        u"so their certificate status has been set to '%s'. "
+                        u"No certificate generation task was sent to the XQueue."
+                    ),
+                    student.id,
+                    unicode(course_id),
+                    cert_status
+                )
+
         return new_status
 
     def _send_to_xqueue(self, contents, key):
+        """Create a new task on the XQueue. """
 
         if self.use_https:
             proto = "https"
@@ -261,5 +352,5 @@ class XQueueCertInterface(object):
         (error, msg) = self.xqueue_interface.send_to_queue(
             header=xheader, body=json.dumps(contents))
         if error:
-            logger.critical('Unable to add a request to the queue: {} {}'.format(error, msg))
+            LOGGER.critical(u'Unable to add a request to the queue: %s %s', unicode(error), msg)
             raise Exception('Unable to send queue message')

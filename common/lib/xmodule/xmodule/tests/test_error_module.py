@@ -14,8 +14,10 @@ from xblock.fields import ScopeIds
 from xblock.test.tools import unabc
 
 
-class SetupTestErrorModules():
+class SetupTestErrorModules(unittest.TestCase):
+    """Common setUp for use in ErrorModule tests."""
     def setUp(self):
+        super(SetupTestErrorModules, self).setUp()
         self.system = get_test_system()
         self.course_id = SlashSeparatedCourseKey('org', 'course', 'run')
         self.location = self.course_id.make_usage_key('foo', 'bar')
@@ -23,13 +25,10 @@ class SetupTestErrorModules():
         self.error_msg = "Error"
 
 
-class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
+class TestErrorModule(SetupTestErrorModules):
     """
     Tests for ErrorModule and ErrorDescriptor
     """
-    def setUp(self):
-        SetupTestErrorModules.setUp(self)
-
     def test_error_module_xml_rendering(self):
         descriptor = ErrorDescriptor.from_xml(
             self.valid_xml,
@@ -58,13 +57,10 @@ class TestErrorModule(unittest.TestCase, SetupTestErrorModules):
         self.assertIn(repr(descriptor), context_repr)
 
 
-class TestNonStaffErrorModule(unittest.TestCase, SetupTestErrorModules):
+class TestNonStaffErrorModule(SetupTestErrorModules):
     """
     Tests for NonStaffErrorModule and NonStaffErrorDescriptor
     """
-    def setUp(self):
-        SetupTestErrorModules.setUp(self)
-
     def test_non_staff_error_module_create(self):
         descriptor = NonStaffErrorDescriptor.from_xml(
             self.valid_xml,
@@ -125,6 +121,7 @@ class TestErrorModuleConstruction(unittest.TestCase):
     """
 
     def setUp(self):
+        super(TestErrorModuleConstruction, self).setUp()
         field_data = Mock(spec=FieldData)
         self.descriptor = BrokenDescriptor(
             TestRuntime(Mock(spec=IdReader), field_data),

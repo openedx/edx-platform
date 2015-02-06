@@ -162,7 +162,6 @@ class ThreadActionGroupIdTestCase(
         )
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('lms.lib.comment_client.utils.requests.request')
 class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
@@ -750,7 +749,6 @@ class ViewsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
 
 
 @patch("lms.lib.comment_client.utils.requests.request")
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSetupMixin):
     @patch.dict("django.conf.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
     def setUp(self):
@@ -844,9 +842,10 @@ class ViewPermissionsTestCase(UrlResetMixin, ModuleStoreTestCase, MockRequestSet
         self.assertEqual(response.status_code, 200)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateThreadUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -866,9 +865,10 @@ class CreateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["title"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(UpdateThreadUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -894,9 +894,10 @@ class UpdateThreadUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockReq
         self.assertEqual(mock_request.call_args[1]["data"]["commentable_id"], "test_commentable")
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -917,9 +918,10 @@ class CreateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(UpdateCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -941,9 +943,10 @@ class UpdateCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRe
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, MockRequestSetupMixin):
     def setUp(self):
+        super(CreateSubCommentUnicodeTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()
@@ -965,7 +968,6 @@ class CreateSubCommentUnicodeTestCase(ModuleStoreTestCase, UnicodeTestMixin, Moc
         self.assertEqual(mock_request.call_args[1]["data"]["body"], text)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
 
     def set_post_counts(self, mock_request, threads_count=1, comments_count=1):
@@ -978,6 +980,8 @@ class UsersEndpointTestCase(ModuleStoreTestCase, MockRequestSetupMixin):
         })
 
     def setUp(self):
+        super(UsersEndpointTestCase, self).setUp()
+
         self.course = CourseFactory.create()
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()

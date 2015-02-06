@@ -252,9 +252,11 @@ def instructor_dashboard(request, course_id):
                     try:
                         ddata.append([student.email, student.grades[aidx]])
                     except IndexError:
-                        log.debug('No grade for assignment {idx} ({name}) for student {email}'.format(
-                            idx=aidx, name=aname, email=student.email)
-                        )
+                        log.debug(u'No grade for assignment %(idx)s (%(name)s) for student %(email)s', {
+                            "idx": aidx,
+                            "name": aname,
+                            "email": student.email,
+                        })
                 datatable['data'] = ddata
 
                 datatable['title'] = _('Grades for assignment "{name}"').format(name=aname)
@@ -749,7 +751,7 @@ def get_student_grade_summary_data(request, course, get_grades=True, get_raw_sco
 
         if get_grades:
             gradeset = student_grades(student, request, course, keep_raw_scores=get_raw_scores, use_offline=use_offline)
-            log.debug('student={0}, gradeset={1}'.format(student, gradeset))
+            log.debug(u'student=%s, gradeset=%s', student, gradeset)
             with gtab.add_row(student.id) as add_grade:
                 if get_raw_scores:
                     # TODO (ichuang) encode Score as dict instead of as list, so score[0] -> score['earned']
@@ -825,7 +827,7 @@ def _do_enroll_students(course, course_key, students, secure=False, overload=Fal
         registration_url = '{proto}://{site}{path}'.format(
             proto=protocol,
             site=stripped_site_name,
-            path=reverse('student.views.register_user')
+            path=reverse('register_user')
         )
         course_url = '{proto}://{site}{path}'.format(
             proto=protocol,

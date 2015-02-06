@@ -60,6 +60,8 @@ class LicenseTestCase(TestCase):
     '''Tests for licenses.views'''
     def setUp(self):
         '''creates a user and logs in'''
+
+        super(LicenseTestCase, self).setUp()
         # self.setup_viewtest_user()
         self.user = UserFactory(username='test',
                                 email='test@edx.org', password='test_password')
@@ -144,10 +146,11 @@ class LicenseTestCase(TestCase):
         self.assertEqual(302, response.status_code)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class CommandTest(ModuleStoreTestCase):
     '''Test management command for importing serial numbers'''
     def setUp(self):
+        super(CommandTest, self).setUp()
+
         course = CourseFactory.create()
         self.course_id = course.id
 

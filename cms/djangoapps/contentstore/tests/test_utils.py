@@ -12,6 +12,7 @@ from contentstore import utils
 from contentstore.tests.utils import CourseTestCase
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.django import modulestore
@@ -164,7 +165,7 @@ class ExtraPanelTabTestCase(TestCase):
                 self.assertEqual(actual_tabs, expected_tabs)
 
 
-class CourseImageTestCase(TestCase):
+class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
     def test_get_image_url(self):
@@ -196,6 +197,8 @@ class XBlockVisibilityTestCase(TestCase):
     """Tests for xblock visibility for students."""
 
     def setUp(self):
+        super(XBlockVisibilityTestCase, self).setUp()
+
         self.dummy_user = ModuleStoreEnum.UserID.test
         self.past = datetime(1970, 1, 1)
         self.future = datetime.now(UTC) + timedelta(days=1)

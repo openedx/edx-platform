@@ -70,6 +70,7 @@ class TestRequireStudentIdentifier(unittest.TestCase):
         """
         Fixtures
         """
+        super(TestRequireStudentIdentifier, self).setUp()
         self.student = UserFactory.create()
 
     def test_valid_student_id(self):
@@ -97,7 +98,6 @@ class TestParseDatetime(unittest.TestCase):
             tools.parse_datetime('foo')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestFindUnit(ModuleStoreTestCase):
     """
     Test the find_unit function.
@@ -107,6 +107,8 @@ class TestFindUnit(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestFindUnit, self).setUp()
+
         course = CourseFactory.create()
         week1 = ItemFactory.create(parent=course)
         homework = ItemFactory.create(parent=week1)
@@ -131,7 +133,6 @@ class TestFindUnit(ModuleStoreTestCase):
             tools.find_unit(self.course, url)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGetUnitsWithDueDate(ModuleStoreTestCase):
     """
     Test the get_units_with_due_date function.
@@ -140,6 +141,8 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestGetUnitsWithDueDate, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
@@ -179,7 +182,6 @@ class TestTitleOrUrl(unittest.TestCase):
         self.assertEquals(tools.title_or_url(unit), 'test:hello')
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestSetDueDateExtension(ModuleStoreTestCase):
     """
     Test the set_due_date_extensions function.
@@ -188,6 +190,8 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestSetDueDateExtension, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)
@@ -253,7 +257,6 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.extended_due(self.homework), None)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestDataDumps(ModuleStoreTestCase):
     """
     Test data dumps for reporting.
@@ -263,6 +266,8 @@ class TestDataDumps(ModuleStoreTestCase):
         """
         Fixtures.
         """
+        super(TestDataDumps, self).setUp()
+
         due = datetime.datetime(2010, 5, 12, 2, 42, tzinfo=utc)
         course = CourseFactory.create()
         week1 = ItemFactory.create(due=due, parent=course)

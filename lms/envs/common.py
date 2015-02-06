@@ -220,6 +220,9 @@ FEATURES = {
     # Enable flow for payments for course registration (DIFFERENT from verified student flow)
     'ENABLE_PAID_COURSE_REGISTRATION': False,
 
+    # Enable the display of cosmetic course price display (set in course advanced settings)
+    'ENABLE_COSMETIC_DISPLAY_PRICE': False,
+
     # Automatically approve student identity verification attempts
     'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': False,
 
@@ -251,6 +254,10 @@ FEATURES = {
 
     # Toggles the embargo site functionality, which enable embargoing for the whole site
     'SITE_EMBARGOED': False,
+
+    # Toggle whether to replace the current embargo implementation with
+    # the more flexible "country access" feature.
+    'ENABLE_COUNTRY_ACCESS': False,
 
     # Whether the Wiki subsystem should be accessible via the direct /wiki/ paths. Setting this to True means
     # that people can submit content and modify the Wiki in any arbitrary manner. We're leaving this as True in the
@@ -2014,6 +2021,6 @@ PDF_RECEIPT_COBRAND_LOGO_PATH = PROJECT_ROOT + '/static/images/default-theme/log
 PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 
 # Use None for the default search engine
-SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"

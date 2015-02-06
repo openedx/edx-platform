@@ -27,6 +27,7 @@ import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
+import decimal
 from student import auth
 from student.roles import CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
@@ -49,7 +50,14 @@ from django_comment_common.models import (
 )
 from edxmako.shortcuts import render_to_response, render_to_string
 from courseware.models import StudentModule
-from shoppingcart.models import Coupon, CourseRegistrationCode, RegistrationCodeRedemption, Invoice, CourseMode
+from shoppingcart.models import (
+    Coupon,
+    CourseRegistrationCode,
+    RegistrationCodeRedemption,
+    Invoice,
+    CourseMode,
+    CourseRegistrationCodeInvoiceItem,
+)
 from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
@@ -350,15 +358,24 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         ).format(email=email, username=username)
 
                         warnings.append({
-                            'username': username, 'email': email, 'response': warning_message})
-                        log.warning('email {email} already exist'.format(email=email))
+                            'username': username, 'email': email, 'response': warning_message
+                        })
+                        log.warning(u'email %s already exist', email)
                     else:
-                        log.info("user already exists with username '{username}' and email '{email}'".format(email=email, username=username))
+                        log.info(
+                            u"user already exists with username '%s' and email '%s'",
+                            username,
+                            email
+                        )
 
                     # make sure user is enrolled in course
                     if not CourseEnrollment.is_enrolled(user, course_id):
                         CourseEnrollment.enroll(user, course_id)
-                        log.info('user {username} enrolled in the course {course}'.format(username=username, course=course.id))
+                        log.info(
+                            u'user %s enrolled in the course %s',
+                            username,
+                            course.id,
+                        )
                         enroll_email(course_id=course_id, student_email=email, auto_enroll=True, email_students=True, email_params=email_params)
                 else:
                     # This email does not yet exist, so we need to create a new account
@@ -374,7 +391,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                     except Exception as ex:
                         log.exception(type(ex).__name__)
                         row_errors.append({
-                            'username': username, 'email': email, 'response': _(type(ex).__name__)})
+                            'username': username, 'email': email, 'response': type(ex).__name__})
                     else:
                         # It's a new user, an email will be sent to each newly created user.
                         email_params['message'] = 'account_creation_and_enrollment'
@@ -382,7 +399,7 @@ def register_and_enroll_students(request, course_id):  # pylint: disable=too-man
                         email_params['password'] = password
                         email_params['platform_name'] = microsite.get_value('platform_name', settings.PLATFORM_NAME)
                         send_mail_to_student(email, email_params)
-                        log.info('email sent to new created user at {email}'.format(email=email))
+                        log.info(u'email sent to new created user at %s', email)
 
     else:
         general_errors.append({
@@ -536,7 +553,7 @@ def students_update_enrollment(request, course_id):
         except Exception as exc:  # pylint: disable=broad-except
             # catch and log any exceptions
             # so that one error doesn't cause a 500.
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             results.append({
                 'identifier': identifier,
@@ -610,7 +627,7 @@ def bulk_beta_modify_access(request, course_id):
         # catch and log any unexpected exceptions
         # so that one error doesn't cause a 500.
         except Exception as exc:  # pylint: disable=broad-except
-            log.exception("Error while #{}ing student")
+            log.exception(u"Error while #{}ing student")
             log.exception(exc)
             error = True
         else:
@@ -885,8 +902,12 @@ def sale_validation(request, course_id):
 
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     try:
-        obj_invoice = Invoice.objects.select_related('is_valid').get(id=invoice_number, course_id=course_id)
-    except Invoice.DoesNotExist:
+        obj_invoice = CourseRegistrationCodeInvoiceItem.objects.select_related('invoice').get(
+            invoice_id=invoice_number,
+            course_id=course_id
+        )
+        obj_invoice = obj_invoice.invoice
+    except CourseRegistrationCodeInvoiceItem.DoesNotExist:  # Check for old type invoices
         return HttpResponseNotFound(_("Invoice number '{0}' does not exist.".format(invoice_number)))
 
     if event_type == "invalidate":
@@ -1053,7 +1074,7 @@ def get_coupon_codes(request, course_id):  # pylint: disable=unused-argument
     return instructor_analytics.csvs.create_csv_response('Coupons.csv', header, data_rows)
 
 
-def save_registration_code(user, course_id, mode_slug, invoice=None, order=None):
+def save_registration_code(user, course_id, mode_slug, invoice=None, order=None, invoice_item=None):
     """
     recursive function that generate a new code every time and saves in the Course Registration Table
     if validation check passes
@@ -1064,6 +1085,7 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         mode_slug (str): The Course Mode Slug associated with any enrollment made by these codes.
         invoice (Invoice): (Optional) The associated invoice for this code.
         order (Order): (Optional) The associated order for this code.
+        invoice_item (CourseRegistrationCodeInvoiceItem) : (Optional) The associated CourseRegistrationCodeInvoiceItem
 
     Returns:
         The newly created CourseRegistrationCode.
@@ -1074,7 +1096,9 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
     # check if the generated code is in the Coupon Table
     matching_coupons = Coupon.objects.filter(code=code, is_active=True)
     if matching_coupons:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
     course_registration = CourseRegistrationCode(
         code=code,
@@ -1082,13 +1106,16 @@ def save_registration_code(user, course_id, mode_slug, invoice=None, order=None)
         created_by=user,
         invoice=invoice,
         order=order,
-        mode_slug=mode_slug
+        mode_slug=mode_slug,
+        invoice_item=invoice_item
     )
     try:
         course_registration.save()
         return course_registration
     except IntegrityError:
-        return save_registration_code(user, course_id, invoice, order)
+        return save_registration_code(
+            user, course_id, mode_slug, invoice=invoice, order=order, invoice_item=invoice_item
+        )
 
 
 def registration_codes_csv(file_name, codes_list, csv_type=None):
@@ -1130,11 +1157,13 @@ def get_registration_codes(request, course_id):  # pylint: disable=unused-argume
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     #filter all the  course registration codes
-    registration_codes = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['download_company_name']
     if company_name:
-        registration_codes = registration_codes.filter(invoice__company_name=company_name)
+        registration_codes = registration_codes.filter(invoice_item__invoice__company_name=company_name)
 
     csv_type = 'download'
     return registration_codes_csv("Registration_Codes.csv", registration_codes, csv_type)
@@ -1160,7 +1189,21 @@ def generate_registration_codes(request, course_id):
     company_name = request.POST['company_name']
     company_contact_name = request.POST['company_contact_name']
     company_contact_email = request.POST['company_contact_email']
-    sale_price = request.POST['sale_price']
+    unit_price = request.POST['unit_price']
+
+    try:
+        unit_price = (
+            decimal.Decimal(unit_price)
+        ).quantize(
+            decimal.Decimal('.01'),
+            rounding=decimal.ROUND_DOWN
+        )
+    except decimal.InvalidOperation:
+        return HttpResponse(
+            status=400,
+            content=_(u"Could not parse amount as a decimal")
+        )
+
     recipient_name = request.POST['recipient_name']
     recipient_email = request.POST['recipient_email']
     address_line_1 = request.POST['address_line_1']
@@ -1177,6 +1220,7 @@ def generate_registration_codes(request, course_id):
         recipient_list.append(request.user.email)
         invoice_copy = True
 
+    sale_price = unit_price * course_code_number
     UserPreference.set_preference(request.user, INVOICE_KEY, invoice_copy)
     sale_invoice = Invoice.objects.create(
         total_amount=sale_price,
@@ -1195,6 +1239,13 @@ def generate_registration_codes(request, course_id):
         country=country,
         internal_reference=internal_reference,
         customer_reference_number=customer_reference_number
+    )
+
+    invoice_item = CourseRegistrationCodeInvoiceItem.objects.create(
+        invoice=sale_invoice,
+        qty=course_code_number,
+        unit_price=unit_price,
+        course_id=course_id
     )
 
     course = get_course_by_id(course_id, depth=0)
@@ -1217,7 +1268,7 @@ def generate_registration_codes(request, course_id):
     registration_codes = []
     for __ in range(course_code_number):  # pylint: disable=redefined-outer-name
         generated_registration_code = save_registration_code(
-            request.user, course_id, course_mode.slug, sale_invoice, order=None
+            request.user, course_id, course_mode.slug, invoice=sale_invoice, order=None, invoice_item=invoice_item
         )
         registration_codes.append(generated_registration_code)
 
@@ -1309,13 +1360,17 @@ def active_registration_codes(request, course_id):  # pylint: disable=unused-arg
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
 
     # find all the registration codes in this course
-    registration_codes_list = CourseRegistrationCode.objects.filter(course_id=course_id).order_by('invoice__company_name')
+    registration_codes_list = CourseRegistrationCode.objects.filter(
+        course_id=course_id
+    ).order_by('invoice_item__invoice__company_name')
 
     company_name = request.POST['active_company_name']
     if company_name:
-        registration_codes_list = registration_codes_list.filter(invoice__company_name=company_name)
+        registration_codes_list = registration_codes_list.filter(invoice_item__invoice__company_name=company_name)
     # find the redeemed registration codes if any exist in the db
-    code_redemption_set = RegistrationCodeRedemption.objects.select_related('registration_code').filter(registration_code__course_id=course_id)
+    code_redemption_set = RegistrationCodeRedemption.objects.select_related(
+        'registration_code', 'registration_code__invoice_item__invoice'
+    ).filter(registration_code__course_id=course_id)
     if code_redemption_set.exists():
         redeemed_registration_codes = [code.registration_code.code for code in code_redemption_set]
         # exclude the redeemed registration codes from the registration codes list and you will get
@@ -1346,11 +1401,11 @@ def spent_registration_codes(request, course_id):  # pylint: disable=unused-argu
         # you will get a list of all the spent(Redeemed) Registration Codes
         spent_codes_list = CourseRegistrationCode.objects.filter(
             course_id=course_id, code__in=redeemed_registration_codes
-        ).order_by('invoice__company_name')
+        ).order_by('invoice_item__invoice__company_name').select_related('invoice_item__invoice')
 
         company_name = request.POST['spent_company_name']
         if company_name:
-            spent_codes_list = spent_codes_list.filter(invoice__company_name=company_name)  # pylint: disable=maybe-no-member
+            spent_codes_list = spent_codes_list.filter(invoice_item__invoice__company_name=company_name)  # pylint: disable=maybe-no-member
 
     csv_type = 'spent'
     return registration_codes_csv("Spent_Registration_Codes.csv", spent_codes_list, csv_type)
@@ -1934,7 +1989,7 @@ def proxy_legacy_analytics(request, course_id):
     try:
         res = requests.get(url)
     except Exception:  # pylint: disable=broad-except
-        log.exception("Error requesting from analytics server at %s", url)
+        log.exception(u"Error requesting from analytics server at %s", url)
         return HttpResponse("Error requesting from analytics server.", status=500)
 
     if res.status_code is 200:
@@ -1949,9 +2004,8 @@ def proxy_legacy_analytics(request, course_id):
     else:
         # 500 on all other unexpected status codes.
         log.error(
-            "Error fetching {}, code: {}, msg: {}".format(
-                url, res.status_code, res.content
-            )
+            u"Error fetching %s, code: %s, msg: %s",
+            url, res.status_code, res.content
         )
         return HttpResponse(
             "Error from analytics server ({}).".format(res.status_code),

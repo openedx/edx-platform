@@ -41,12 +41,7 @@ from shoppingcart.exceptions import (
 
 from opaque_keys.edx.locator import CourseLocator
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
 
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class OrderTest(ModuleStoreTestCase):
     def setUp(self):
@@ -378,6 +373,8 @@ class OrderTest(ModuleStoreTestCase):
 
 class OrderItemTest(TestCase):
     def setUp(self):
+        super(OrderItemTest, self).setUp()
+
         self.user = UserFactory.create()
 
     def test_order_item_purchased_callback(self):
@@ -402,9 +399,10 @@ class OrderItemTest(TestCase):
         self.assertEquals(set([]), inst_set)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class PaidCourseRegistrationTest(ModuleStoreTestCase):
     def setUp(self):
+        super(PaidCourseRegistrationTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         self.course = CourseFactory.create()
@@ -541,12 +539,13 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertTrue(PaidCourseRegistration.contained_in_order(cart, self.course_key))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class CertificateItemTest(ModuleStoreTestCase):
     """
     Tests for verifying specific CertificateItem functionality
     """
     def setUp(self):
+        super(CertificateItemTest, self).setUp()
+
         self.user = UserFactory.create()
         self.cost = 40
         course = CourseFactory.create()
@@ -775,7 +774,6 @@ class CertificateItemTest(ModuleStoreTestCase):
         self.assertFalse(ret_val)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class DonationTest(ModuleStoreTestCase):
     """Tests for the donation order item type. """
 

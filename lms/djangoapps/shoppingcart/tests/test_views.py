@@ -62,16 +62,12 @@ render_mock = Mock(side_effect=mock_render_to_response)
 postpay_mock = Mock()
 
 
-# Since we don't need any XML course fixtures, use a modulestore configuration
-# that disables the XML modulestore.
-MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, include_xml=False)
-
-
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 @ddt.ddt
 class ShoppingCartViewsTests(ModuleStoreTestCase):
     def setUp(self):
+        super(ShoppingCartViewsTests, self).setUp()
+
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.user = UserFactory.create()
@@ -584,7 +580,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
                                 {'id': reg_item.id})
         debug_log.assert_called_with(
-            'Code redemption does not exist for order item id={0}.'.format(reg_item.id))
+            'Code redemption does not exist for order item id=%s.',
+            str(reg_item.id)
+        )
 
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
@@ -604,7 +602,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 0)
         info_log.assert_called_with(
-            'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+            self.coupon_code,
+            self.user,
+            str(reg_item.id)
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_reset_redemption_for_coupon(self, info_log):
@@ -619,7 +621,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         self.assertEqual(resp.status_code, 200)
         info_log.assert_called_with(
-            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+            'Coupon redemption entry removed for user %s for order %s',
+            self.user,
+            reg_item.id
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_coupon_discount_for_multiple_courses_in_cart(self, info_log):
@@ -648,7 +653,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'Coupon "{0}" redemption entry removed for user "{1}" for order item "{2}"'.format(self.coupon_code, self.user, reg_item.id))
+            'Coupon "%s" redemption entry removed for user "%s" for order item "%s"',
+            self.coupon_code,
+            self.user,
+            str(reg_item.id)
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_delete_certificate_item(self, info_log):
@@ -664,7 +673,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEquals(self.cart.orderitem_set.count(), 1)
         info_log.assert_called_with(
-            'order item {0} removed for user {1}'.format(cert_item.id, self.user))
+            'order item %s removed for user %s',
+            str(cert_item.id),
+            self.user
+        )
 
     @patch('shoppingcart.views.log.info')
     def test_remove_coupon_redemption_on_clear_cart(self, info_log):
@@ -682,7 +694,10 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEquals(self.cart.orderitem_set.count(), 0)
 
         info_log.assert_called_with(
-            'Coupon redemption entry removed for user {0} for order {1}'.format(self.user, reg_item.id))
+            'Coupon redemption entry removed for user %s for order %s',
+            self.user,
+            reg_item.id
+        )
 
     def test_add_course_to_cart_already_registered(self):
         CourseEnrollment.enroll(self.user, self.course_key)
@@ -773,13 +788,18 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
                                  {'id': cert_item.id})
         self.assertEqual(resp2.status_code, 200)
         exception_log.assert_called_with(
-            'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(cert_item.id))
+            'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased', str(cert_item.id)
+        )
 
-        resp3 = self.client.post(reverse('shoppingcart.views.remove_item', args=[]),
-                                 {'id': -1})
+        resp3 = self.client.post(
+            reverse('shoppingcart.views.remove_item', args=[]),
+            {'id': -1}
+        )
         self.assertEqual(resp3.status_code, 200)
         exception_log.assert_called_with(
-            'Cannot remove cart OrderItem id={0}. DoesNotExist or item is already purchased'.format(-1))
+            'Cannot remove cart OrderItem id=%s. DoesNotExist or item is already purchased',
+            '-1'
+        )
 
     @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
     def test_postpay_callback_success(self):
@@ -1253,7 +1273,6 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self._assert_404(reverse('shoppingcart.views.billing_details', args=[]))
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class ReceiptRedirectTest(ModuleStoreTestCase):
     """Test special-case redirect from the receipt page. """
 
@@ -1315,7 +1334,6 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
         self.assertRedirects(resp, redirect_url)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
     """
@@ -1429,13 +1447,14 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertIn('40.00', resp.content)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
 class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
     """
     Test suite for RegistrationCodeRedemption Course Enrollments
     """
     def setUp(self, **kwargs):
+        super(RegistrationCodeRedemptionCourseEnrollment, self).setUp()
+
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -1518,7 +1537,7 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
 
         data = {
             'total_registration_codes': 12, 'company_name': 'Test Group', 'company_contact_name': 'Test@company.com',
-            'company_contact_email': 'Test@company.com', 'sale_price': 122.45, 'recipient_name': 'Test123',
+            'company_contact_email': 'Test@company.com', 'unit_price': 122.45, 'recipient_name': 'Test123',
             'recipient_email': 'test@123.com', 'address_line_1': 'Portland Street',
             'address_line_2': '', 'address_line_3': '', 'city': '', 'state': '', 'zip': '', 'country': '',
             'customer_reference_number': '123A23F', 'internal_reference': '', 'invoice': ''
@@ -1558,7 +1577,6 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         self.assertIn(self.course.display_name, response.content)
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @ddt.ddt
 class DonationViewTest(ModuleStoreTestCase):
     """Tests for making a donation.
@@ -1716,12 +1734,13 @@ class DonationViewTest(ModuleStoreTestCase):
         return reverse("shoppingcart.views.show_receipt", kwargs={"ordernum": order_id})
 
 
-@override_settings(MODULESTORE=MODULESTORE_CONFIG)
 class CSVReportViewsTest(ModuleStoreTestCase):
     """
     Test suite for CSV Purchase Reporting
     """
     def setUp(self):
+        super(CSVReportViewsTest, self).setUp()
+
         self.user = UserFactory.create()
         self.user.set_password('password')
         self.user.save()
@@ -1834,6 +1853,8 @@ class UtilFnsTest(TestCase):
     Tests for utility functions in views.py
     """
     def setUp(self):
+        super(UtilFnsTest, self).setUp()
+
         self.user = UserFactory.create()
 
     def test_can_download_report_no_group(self):

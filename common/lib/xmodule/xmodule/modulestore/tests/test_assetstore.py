@@ -62,6 +62,7 @@ class TestSortedAssetList(unittest.TestCase):
     Tests the SortedAssetList class.
     """
     def setUp(self):
+        super(TestSortedAssetList, self).setUp()
         asset_list = [dict(zip(AssetStoreTestData.asset_fields, asset)) for asset in AssetStoreTestData.all_asset_data]
         self.sorted_asset_list_by_filename = SortedAssetList(iterable=asset_list)
         self.sorted_asset_list_by_last_edit = SortedAssetList(iterable=asset_list, key=lambda x: x['edited_on'])

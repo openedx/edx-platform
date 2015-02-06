@@ -8,6 +8,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 class TabTestCase(unittest.TestCase):
     """Base class for Tab-related test cases."""
     def setUp(self):
+        super(TabTestCase, self).setUp()
 
         self.course = MagicMock()
         self.course.id = SlashSeparatedCourseKey('edX', 'toy', '2012_Fall')
@@ -450,6 +451,7 @@ class KeyCheckerTestCase(unittest.TestCase):
     """Test cases for KeyChecker class"""
 
     def setUp(self):
+        super(KeyCheckerTestCase, self).setUp()
 
         self.valid_keys = ['a', 'b']
         self.invalid_keys = ['a', 'v', 'g']
@@ -467,6 +469,7 @@ class NeedNameTestCase(unittest.TestCase):
     """Test cases for NeedName validator"""
 
     def setUp(self):
+        super(NeedNameTestCase, self).setUp()
 
         self.valid_dict1 = {'a': 1, 'name': 2}
         self.valid_dict2 = {'name': 1}

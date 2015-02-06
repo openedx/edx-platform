@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-01-26 14:02+0000\n"
-"PO-Revision-Date: 2015-01-26 14:03:14.240646\n"
+"POT-Creation-Date: 2015-02-02 14:05+0000\n"
+"PO-Revision-Date: 2015-02-02 14:06:45.583976\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -847,6 +847,7 @@ msgstr "Héädér çéll Ⱡ#"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Header"
 msgstr "Héädér Ⱡ'σяєм ιρѕ#"
 
@@ -1519,9 +1520,11 @@ msgstr "V Àlïgn #"
 msgid "Vertical space"
 msgstr "Vértïçäl späçé Ⱡ'#"
 
+#. #-#-#-#-#  djangojs-partial.po (0.1a)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
+#: lms/templates/courseware_search/search_item.underscore
 msgid "View"
 msgstr "Vïéw Ⱡ'σяєм#"
 
@@ -1596,6 +1599,36 @@ msgstr ""
 "Çlïçk ÖK tö hävé ýöür é-mäïl äddréss sént tö ä 3rd pärtý äpplïçätïön.\n"
 "\n"
 "Çlïçk Çänçél tö rétürn tö thïs pägé wïthöüt séndïng ýöür ïnförmätïön. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "incorrect"
+msgstr "ïnçörréçt #"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "correct"
+msgstr "çörréçt #"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "answer"
+msgstr "änswér Ⱡ'σяєм ιρѕ#"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid "Short explanation"
+msgstr "Shört éxplänätïön Ⱡ'σ#"
+
+#: common/lib/xmodule/xmodule/js/src/problem/edit.js
+msgid ""
+"If you use the Advanced Editor, this problem will be converted to XML and you will not be able to return to the Simple Editor Interface.\n"
+"\n"
+"Proceed to the Advanced Editor and convert this problem to XML?"
+msgstr ""
+"Ìf ýöü üsé thé Àdvänçéd Édïtör, thïs prößlém wïll ßé çönvértéd tö XML änd ýöü wïll nöt ßé äßlé tö rétürn tö thé Sïmplé Édïtör Ìntérfäçé.\n"
+"\n"
+"Pröçééd tö thé Àdvänçéd Édïtör änd çönvért thïs prößlém tö XML? Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂#"
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
@@ -1926,6 +1959,10 @@ msgid "%(unread_count)s new comment"
 msgid_plural "%(unread_count)s new comments"
 msgstr[0] "%(unread_count)s néw çömmént Ⱡ'#"
 msgstr[1] "%(unread_count)s néw çömménts Ⱡ'σ#"
+
+#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
+msgid "Current conversation"
+msgstr "Çürrént çönvérsätïön Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
@@ -2276,6 +2313,7 @@ msgstr ""
 " ∂σłσя#"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
+#: lms/templates/courseware_search/search_loading.underscore
 msgid "Loading"
 msgstr "Löädïng #"
 
@@ -3234,6 +3272,12 @@ msgstr ""
 "Ýöür fïlé '{file}' häs ßéén üplöädéd. Àllöw ä féw mïnütés för pröçéssïng. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕι#"
 
+#: lms/static/js/search/views/search_list_view.js
+msgid "%s result"
+msgid_plural "%s results"
+msgstr[0] "%s résült #"
+msgstr[1] "%s résülts Ⱡ#"
+
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
 msgid "The data could not be saved."
@@ -4162,6 +4206,14 @@ msgstr ""
 msgid "Making Visible to Students"
 msgstr "Mäkïng Vïsïßlé tö Stüdénts Ⱡ'σяєм#"
 
+#: cms/static/js/views/pages/course_outline.js
+msgid "Course Index"
+msgstr "Çöürsé Ìndéx Ⱡ#"
+
+#: cms/static/js/views/pages/course_outline.js
+msgid "Course has been successfully reindexed."
+msgstr "Çöürsé häs ßéén süççéssfüllý réïndéxéd. Ⱡ'σяєм ιρѕ#"
+
 #: cms/static/js/views/settings/advanced.js
 msgid ""
 "Your changes will not take effect until you save your progress. Take care "
@@ -4270,6 +4322,19 @@ msgstr ""
 msgid "Upload translation"
 msgstr "Ûplöäd tränslätïön Ⱡ'σ#"
 
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/course-outline.underscore cms/templates/js/list.underscore
+#: cms/templates/js/list.underscore cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/publish-xblock.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: cms/templates/js/xblock-outline.underscore
+#: lms/templates/courseware_search/search_list.underscore
+#: lms/templates/courseware_search/search_list.underscore
+msgid "gettext("
+msgstr "géttéxt( #"
+
 #: cms/templates/js/previous-video-upload-list.underscore
 #: lms/templates/verify_student/enrollment_confirmation_step.underscore
 msgid "Status"
@@ -4314,6 +4379,14 @@ msgstr "Çlöséd Ⱡ'σяєм ιρѕ#"
 #: common/templates/js/discussion/thread-show.underscore
 msgid "(this post is about %(courseware_title_linked)s)"
 msgstr "(thïs pöst ïs äßöüt %(courseware_title_linked)s) Ⱡ'σяє#"
+
+#: lms/templates/courseware_search/search_error.underscore
+msgid "There was an error, try searching again."
+msgstr "Théré wäs än érrör, trý séärçhïng ägäïn. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/courseware_search/search_list.underscore
+msgid "Sorry, no results were found."
+msgstr "Sörrý, nö résülts wéré föünd. Ⱡ'σяєм #"
 
 #: lms/templates/dashboard/donation.underscore
 msgid "Donate"
@@ -5244,17 +5317,6 @@ msgid "Unpublished changes to content that will release in the future"
 msgstr ""
 "Ûnpüßlïshéd çhängés tö çöntént thät wïll réléäsé ïn thé fütüré Ⱡ'σяєм ιρѕυм "
 "∂σłσя#"
-
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore cms/templates/js/list.underscore
-#: cms/templates/js/list.underscore cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: cms/templates/js/xblock-outline.underscore
-msgid "gettext("
-msgstr "géttéxt( #"
 
 #: cms/templates/js/course-outline.underscore
 msgid "Display Name"

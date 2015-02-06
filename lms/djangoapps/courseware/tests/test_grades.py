@@ -27,7 +27,6 @@ def _grade_with_errors(student, request, course, keep_raw_scores=False):
     return grade(student, request, course, keep_raw_scores=keep_raw_scores)
 
 
-@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 class TestGradeIteration(ModuleStoreTestCase):
     """
     Test iteration through student gradesets.
@@ -39,6 +38,8 @@ class TestGradeIteration(ModuleStoreTestCase):
         """
         Create a course and a handful of users to assign grades
         """
+        super(TestGradeIteration, self).setUp()
+
         self.course = CourseFactory.create(
             display_name=self.COURSE_NAME,
             number=self.COURSE_NUM
