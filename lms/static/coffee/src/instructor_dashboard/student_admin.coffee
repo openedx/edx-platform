@@ -42,8 +42,8 @@ class @StudentAdmin
     @$table_task_history_single   = @$section.find ".task-history-single-table"
 
     # entrance-exam-specific
-    @$field_entrance_exam_student_select_grade  = find_and_assert @$section, "input[name='entrance-exam-student-select-grade']"
-    @$btn_reset_entrance_exam_attempts   = find_and_assert @$section, "input[name='reset-entrance-exam-attempts']"
+    @$field_entrance_exam_student_select_grade  = @$section.find "input[name='entrance-exam-student-select-grade']"
+    @$btn_reset_entrance_exam_attempts   = @$section.find "input[name='reset-entrance-exam-attempts']"
     @$btn_delete_entrance_exam_state     = @$section.find "input[name='delete-entrance-exam-state']"
     @$btn_rescore_entrance_exam          = @$section.find "input[name='rescore-entrance-exam']"
     @$btn_entrance_exam_task_history     = @$section.find "input[name='entrance-exam-task-history']"
@@ -60,7 +60,7 @@ class @StudentAdmin
     # response areas
     @$request_response_error_progress = find_and_assert @$section, ".student-specific-container .request-response-error"
     @$request_response_error_grade = find_and_assert @$section, ".student-grade-container .request-response-error"
-    @$request_response_error_ee       = find_and_assert @$section, ".entrance-exam-grade-container .request-response-error"
+    @$request_response_error_ee       = @$section.find ".entrance-exam-grade-container .request-response-error"
     @$request_response_error_all    = @$section.find ".course-specific-container .request-response-error"
 
     # attach click handlers
