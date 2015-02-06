@@ -36,13 +36,12 @@ data: |
         hint = "&lt;font color='blue'&gt;Hint: {0}&lt;/font&gt;".format(hint)
         new_cmap.set_hint_and_mode(aid,hint,'always')
     </script>
-        <p>
-    What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes. </p>
-        <p>
+        <label>
+    What is the best programming language that exists today? You may enter your answer in upper or lower case, with or without quotes.
           <customresponse cfn="test_str" expect="python">
-            <textline correct_answer="python" label="What is the best programming language that exists today?"/>
+            <textline correct_answer="python"/>
             <hintgroup hintfn="hint_fn"/>
           </customresponse>
-        </p>
+        </label>
       </text>
     </problem>
