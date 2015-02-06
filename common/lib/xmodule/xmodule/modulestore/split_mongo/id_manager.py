@@ -26,7 +26,7 @@ class SplitMongoIdManager(OpaqueKeyReader, AsideKeyGenerator):  # pylint: disabl
             block_key = BlockKey.from_usage_key(usage_id)
             module_data = self._cds.get_module_data(block_key, usage_id.course_key)
 
-            if 'definition' in module_data:
-                return DefinitionLocator(usage_id.block_type, module_data['definition'])
+            if module_data.definition is not None:
+                return DefinitionLocator(usage_id.block_type, module_data.definition)
             else:
                 raise ValueError("All non-local blocks should have a definition specified")

@@ -457,6 +457,7 @@ class TestLibraryContentAnalytics(LibraryContentTest):
         # except for one of the two already assigned to the student:
         keep_block_key = initial_blocks_assigned[0].location
         keep_block_lib_usage_key, keep_block_lib_version = self.store.get_block_original_usage(keep_block_key)
+        self.assertIsNotNone(keep_block_lib_usage_key)
         deleted_block_key = initial_blocks_assigned[1].location
         self.library.children = [keep_block_lib_usage_key]
         self.store.update_item(self.library, self.user_id)

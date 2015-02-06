@@ -10,7 +10,8 @@ from pymongo.errors import DuplicateKeyError  # pylint: disable=unused-import
 
 from contracts import check, new_contract
 from xmodule.exceptions import HeartbeatFailure
-from xmodule.modulestore.split_mongo import BlockKey, BlockData
+from xmodule.modulestore import BlockData
+from xmodule.modulestore.split_mongo import BlockKey
 import datetime
 import pytz
 
@@ -37,7 +38,7 @@ def structure_from_mongo(structure):
     for block in structure['blocks']:
         if 'children' in block['fields']:
             block['fields']['children'] = [BlockKey(*child) for child in block['fields']['children']]
-        new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = BlockData(block)
+        new_blocks[BlockKey(block['block_type'], block.pop('block_id'))] = BlockData(**block)
     structure['blocks'] = new_blocks
 
     return structure
@@ -54,8 +55,8 @@ def structure_to_mongo(structure):
     check('BlockKey', structure['root'])
     check('dict(BlockKey: BlockData)', structure['blocks'])
     for block in structure['blocks'].itervalues():
-        if 'children' in block['fields']:
-            check('list(BlockKey)', block['fields']['children'])
+        if 'children' in block.fields:
+            check('list(BlockKey)', block.fields['children'])
 
     new_structure = dict(structure)
     new_structure['blocks'] = []

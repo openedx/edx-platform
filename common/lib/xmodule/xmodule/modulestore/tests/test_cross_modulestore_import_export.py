@@ -101,7 +101,7 @@ class MongoModulestoreBuilder(object):
         fs_root = mkdtemp()
 
         # pylint: disable=attribute-defined-outside-init
-        self.modulestore = DraftModuleStore(
+        modulestore = DraftModuleStore(
             contentstore,
             doc_store_config,
             fs_root,
@@ -110,25 +110,19 @@ class MongoModulestoreBuilder(object):
             metadata_inheritance_cache_subsystem=MemoryCache(),
             xblock_mixins=XBLOCK_MIXINS,
         )
-        self.modulestore.ensure_indexes()
+        modulestore.ensure_indexes()
 
         try:
-            yield self.modulestore
+            yield modulestore
         finally:
             # Delete the created database
-            self.modulestore._drop_database()  # pylint: disable=protected-access
+            modulestore._drop_database()  # pylint: disable=protected-access
 
             # Delete the created directory on the filesystem
             rmtree(fs_root, ignore_errors=True)
 
     def __repr__(self):
         return 'MongoModulestoreBuilder()'
-
-    def asset_collection(self):
-        """
-        Returns the collection storing the asset metadata.
-        """
-        return self.modulestore.asset_collection
 
 
 class VersioningModulestoreBuilder(object):
@@ -213,7 +207,7 @@ class MixedModulestoreBuilder(object):
         """
         self.store_builders = store_builders
         self.mappings = mappings or {}
-        self.modulestore = None
+        self.mixed_modulestore = None
 
     @contextmanager
     def build(self, contentstore):
@@ -235,7 +229,7 @@ class MixedModulestoreBuilder(object):
             # Generate a fake list of stores to give the already generated stores appropriate names
             stores = [{'NAME': name, 'ENGINE': 'This space deliberately left blank'} for name in names]
 
-            self.modulestore = MixedModuleStore(
+            self.mixed_modulestore = MixedModuleStore(
                 contentstore,
                 self.mappings,
                 stores,
@@ -243,7 +237,7 @@ class MixedModulestoreBuilder(object):
                 xblock_mixins=XBLOCK_MIXINS,
             )
 
-            yield self.modulestore
+            yield self.mixed_modulestore
 
     def __repr__(self):
         return 'MixedModulestoreBuilder({!r}, {!r})'.format(self.store_builders, self.mappings)
@@ -252,7 +246,7 @@ class MixedModulestoreBuilder(object):
         """
         Returns the collection storing the asset metadata.
         """
-        all_stores = self.modulestore.modulestores
+        all_stores = self.mixed_modulestore.modulestores
         if len(all_stores) > 1:
             return None
 
