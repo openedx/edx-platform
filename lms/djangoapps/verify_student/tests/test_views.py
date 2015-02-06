@@ -609,6 +609,25 @@ class TestPayAndVerifyView(ModuleStoreTestCase):
         data = self._get_page_data(response)
         self.assertEqual(data['verification_deadline'], "Jan 02, 2999 at 00:00 UTC")
 
+    def test_course_mode_expired(self):
+        course = self._create_course("verified")
+        mode = CourseMode.objects.get(
+            course_id=course.id,
+            mode_slug="verified"
+        )
+        expiration = datetime(1999, 1, 2, tzinfo=pytz.UTC)
+        mode.expiration_datetime = expiration
+        mode.save()
+
+        # Need to be enrolled
+        self._enroll(course.id, "verified")
+
+        # The course mode has expired, so expect an explanation
+        # to the student that the deadline has passed
+        response = self._get_page("verify_student_verify_later", course.id)
+        self.assertContains(response, "verification deadline")
+        self.assertContains(response, "Jan 02, 1999 at 00:00 UTC")
+
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """
         course = CourseFactory.create()
