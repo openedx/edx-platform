@@ -113,7 +113,7 @@ def delete_problem_state(entry_id, xmodule_instance_args):
     return run_main_task(entry_id, visit_fcn, action_name)
 
 
-@task(base=BaseInstructorTask)  # pylint: disable=E1102
+@task(base=BaseInstructorTask, routing_key=settings.BULK_EMAIL_ROUTING_KEY)  # pylint: disable=E1102
 def send_bulk_course_email(entry_id, _xmodule_instance_args):
     """Sends emails to recipients enrolled in a course.
 
