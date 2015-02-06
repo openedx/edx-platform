@@ -76,6 +76,11 @@ describe('TooltipManager', function () {
         expect($('.tooltip')).toBeVisible();
     });
 
+    it('can be be triggered manually', function () {
+        this.tooltip.openTooltip(this.element);
+        expect($('.tooltip')).toBeVisible();
+    });
+
     it('should moves correctly', function () {
         showTooltip(this.element);
         expect($('.tooltip')).toBeVisible();

@@ -37,14 +37,9 @@ class @Problem
     # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
     @$('.clarification').focus (ev) =>
       icon = $(ev.target).children "i"
-      iconPos = icon.offset()
-      fakeEvent = jQuery.Event "mouseover", {
-        pageX: iconPos.left + icon.width()/2,
-        pageY: iconPos.top + icon.height()/2
-      }
-      icon.trigger(fakeEvent).trigger "click"
+      window.globalTooltipManager.openTooltip icon
     @$('.clarification').blur (ev) =>
-      $(ev.target).children("i").trigger "mouseout"
+      window.globalTooltipManager.hide()
 
     @bindResetCorrectness()
 
