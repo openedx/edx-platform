@@ -55,7 +55,6 @@ define([
             this.button.click();
             expect(this.label).toContainText('Show notes');
             expect(this.button).not.toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'false');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Hiding notes');
             expect(Annotator._instances).toHaveLength(0);
@@ -68,7 +67,6 @@ define([
             this.button.click();
             expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'true');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Showing notes');
             expect(Annotator._instances).toHaveLength(2);
