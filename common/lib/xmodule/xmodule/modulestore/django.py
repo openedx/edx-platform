@@ -41,7 +41,37 @@ except ImportError:
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
 
 class SignalHandler(object):
-    course_published = django.dispatch.Signal(providing_args=["course_key", "version"])
+    """
+    This class is to allow the modulestores to emit signals that can be caught
+    by other parts of the Django application. If your app needs to do something
+    every time a course is published (e.g. search indexing), you can listen for
+    that event and kick off a celery task when it happens.
+
+    To listen for a signal, do the following::
+
+        from django.dispatch import receiver
+        from celery.task import task
+        from xmodule.modulestore.django import modulestore, SignalHandler
+
+        @receiver(SignalHandler.course_published)
+        def listen_for_course_publish(sender, course_key, **kwargs):
+            do_my_expensive_update(course_key)
+
+        @task()
+        def do_my_expensive_update(course_key):
+            # ...
+
+    Things to note:
+
+    1. We receive using the Django Signals mechanism.
+    2. The sender is going to be the class of the modulestore sending it.
+    3. Always have **kwargs in your signal handler, as new things may be added.
+    4. The thing that listens for the signal lives in process, but should do
+       almost no work. It's main job is to kick off the celery task that will
+       do the actual work.
+
+    """
+    course_published = django.dispatch.Signal(providing_args=["course_key"])
 
     _mapping = {
         "course_published": course_published
