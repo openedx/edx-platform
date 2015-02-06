@@ -37,7 +37,7 @@ class JsTestSuite(TestSuite):
         if self.mode == 'run' and not self.run_under_coverage:
             test_utils.clean_dir(self.report_dir)
 
-        assets.compile_coffeescript("`find lms cms common -type f -name \"*.coffee\"`")
+            assets.compile_coffeescript(["lms","studio"])
 
     @property
     def cmd(self):

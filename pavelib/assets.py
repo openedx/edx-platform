@@ -37,6 +37,22 @@ def compile_assets(systems, production):
         sh(cmd(*command))
 
 
+def compile_coffeescript(systems):
+    """
+    Compile js.
+    """
+    for sys in systems:
+        command = [
+            # grunt should be installed globally
+            # for now here as we don't want to
+            # break tests & people's devstacks.
+            './node_modules/grunt-cli/bin/grunt',
+            sys + ':js'
+        ]
+
+        sh(cmd(*command))
+
+
 def compile_templated_sass(systems, settings):
     """
     Render Mako templates for Sass files.
