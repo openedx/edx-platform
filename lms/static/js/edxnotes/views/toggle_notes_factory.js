@@ -60,14 +60,14 @@ define([
 
         enableNotes: function () {
             _.each($('.edx-notes-wrapper'), EdxnotesVisibilityDecorator.enableNote);
-            this.actionLink.addClass('is-active').attr('aria-pressed', true);
+            this.actionLink.addClass('is-active');
             this.label.text(gettext('Hide notes'));
             this.actionToggleMessage.text(gettext('Showing notes'));
         },
 
         disableNotes: function () {
             EdxnotesVisibilityDecorator.disableNotes();
-            this.actionLink.removeClass('is-active').attr('aria-pressed', false);
+            this.actionLink.removeClass('is-active');
             this.label.text(gettext('Show notes'));
             this.actionToggleMessage.text(gettext('Hiding notes'));
         },
