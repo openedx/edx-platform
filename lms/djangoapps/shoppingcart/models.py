@@ -35,7 +35,6 @@ from edxmako.shortcuts import render_to_string
 from student.models import CourseEnrollment, UNENROLL_DONE
 from util.query import use_read_replica_if_available
 from xmodule_django.models import CourseKeyField
-from verify_student.models import SoftwareSecurePhotoVerification
 from .exceptions import (
     InvalidCartItem,
     PurchasedCallbackException,
@@ -1574,13 +1573,6 @@ class CertificateItem(OrderItem):
         """
         When purchase goes through, activate and update the course enrollment for the correct mode
         """
-        try:
-            verification_attempt = SoftwareSecurePhotoVerification.active_for_user(self.course_enrollment.user)
-            verification_attempt.submit()
-        except Exception:
-            log.exception(
-                "Could not submit verification attempt for enrollment {}".format(self.course_enrollment)
-            )
         self.course_enrollment.change_mode(self.mode)
         self.course_enrollment.activate()
 
