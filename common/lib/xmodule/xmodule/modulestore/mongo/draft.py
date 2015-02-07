@@ -722,6 +722,8 @@ class DraftModuleStore(MongoModuleStore):
 
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         CoursewareSearchIndexer.add_to_search_index(self, location)
+        if self.signal_handler:
+            self.signal_handler.send("course_published", course_key=location.course_key)
 
         return self.get_item(as_published(location))
 
