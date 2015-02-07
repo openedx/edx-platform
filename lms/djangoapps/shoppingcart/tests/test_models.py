@@ -12,6 +12,7 @@ from mock import patch, MagicMock
 import pytz
 import ddt
 from django.core import mail
+from django.core.mail.message import EmailMessage
 from django.conf import settings
 from django.db import DatabaseError
 from django.test import TestCase
@@ -298,7 +299,8 @@ class OrderTest(ModuleStoreTestCase):
     def test_purchase_item_email_boto_failure(self, error_logger):
         cart = Order.get_cart_for_user(user=self.user)
         CertificateItem.add_to_order(cart, self.course_key, self.cost, 'honor')
-        with patch('shoppingcart.models.send_mail', side_effect=BotoServerError("status", "reason")):
+        with patch.object(EmailMessage, 'send') as mock_send:
+            mock_send.side_effect = BotoServerError("status", "reason")
             cart.purchase()
             self.assertTrue(error_logger.called)
 
