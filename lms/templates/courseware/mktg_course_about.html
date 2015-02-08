@@ -121,13 +121,14 @@
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
+        <legend class="sr">${_("Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
         <input name="email_opt_in" type="hidden" value="true">
         <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }">
       </fieldset>
       <div class="submit">
-        <input name="enroll" type="submit" value="enroll">
+        <input name="enroll" type="submit" value="${_('enroll')}">
       </div>
     </form>
   </div>

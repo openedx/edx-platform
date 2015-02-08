@@ -367,11 +367,12 @@ from edxmako.shortcuts import marketing_link
   <div style="display: none;">
     <form id="class_enroll_form" method="post" data-remote="true" action="${reverse('change_enrollment')}">
       <fieldset class="enroll_fieldset">
+        <legend class="sr">${_("Enroll")}</legend>
         <input name="course_id" type="hidden" value="${course.id | h}">
         <input name="enrollment_action" type="hidden" value="enroll">
       </fieldset>
       <div class="submit">
-        <input name="submit" type="submit" value="enroll">
+        <input name="submit" type="submit" value="${_('enroll')}">
       </div>
     </form>
   </div>
