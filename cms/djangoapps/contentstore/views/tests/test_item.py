@@ -34,6 +34,7 @@ from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import Location
 from xmodule.partitions.partitions import Group, UserPartition
 
+from django.test.client import Client
 
 class ItemTest(CourseTestCase):
     """ Base test class for create, save, and delete """
@@ -144,6 +145,11 @@ class GetItemTest(ItemTest):
         self.populate_course(branching_factor)
         with check_mongo_calls(unit_queries):
             self.client.get(reverse_usage_url('xblock_container_handler', self.populated_usage_keys['vertical'][-1]))
+
+    def test_container_handler(self):
+        response = self.client.get(reverse_usage_url('container_handler', "i4x://UAx/Test101/vertical/static/story2.html"))
+        self.assertEqual(response.status_code, 404)
+
 
     def test_get_vertical(self):
         # Add a vertical

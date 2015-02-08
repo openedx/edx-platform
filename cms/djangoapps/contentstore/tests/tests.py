@@ -21,7 +21,6 @@ from pytz import UTC
 
 from freezegun import freeze_time
 
-
 class ContentStoreTestCase(ModuleStoreTestCase):
     def _login(self, email, password):
         """

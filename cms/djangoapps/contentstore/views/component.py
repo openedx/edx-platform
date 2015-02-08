@@ -154,7 +154,11 @@ def container_handler(request, usage_key_string):
     """
     if 'text/html' in request.META.get('HTTP_ACCEPT', 'text/html'):
 
-        usage_key = UsageKey.from_string(usage_key_string)
+        try:
+           usage_key = UsageKey.from_string(usage_key_string)
+        except Exception:
+               raise Http404("Invalid key")
+
         with modulestore().bulk_operations(usage_key.course_key):
             try:
                 course, xblock, lms_link, preview_lms_link = _get_item_in_course(request, usage_key)
