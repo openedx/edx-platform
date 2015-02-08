@@ -4,6 +4,8 @@ Tests for the Shopping Cart Models
 from decimal import Decimal
 import datetime
 import sys
+import json
+import copy
 
 import smtplib
 from boto.exception import BotoServerError  # this is a super-class of SESError and catches connection errors
@@ -18,15 +20,14 @@ from django.db import DatabaseError
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.contrib.auth.models import AnonymousUser
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from shoppingcart.models import (
     Order, OrderItem, CertificateItem,
     InvalidCartItem, CourseRegistrationCode, PaidCourseRegistration, CourseRegCodeItem,
-    Donation, OrderItemSubclassPK
+    Donation, OrderItemSubclassPK,
+    Invoice, CourseRegistrationCodeInvoiceItem, InvoiceTransaction, InvoiceHistory
 )
 from student.tests.factories import UserFactory
 from student.models import CourseEnrollment
@@ -850,3 +851,164 @@ class DonationTest(ModuleStoreTestCase):
         # Verify that the donation is marked as purchased
         donation = Donation.objects.get(pk=donation.id)
         self.assertEqual(donation.status, "purchased")
+
+
+class InvoiceHistoryTest(TestCase):
+    """Tests for the InvoiceHistory model. """
+
+    INVOICE_INFO = {
+        'is_valid': True,
+        'internal_reference': 'Test Internal Ref Num',
+        'customer_reference_number': 'Test Customer Ref Num',
+    }
+
+    CONTACT_INFO = {
+        'company_name': 'Test Company',
+        'company_contact_name': 'Test Company Contact Name',
+        'company_contact_email': 'test-contact@example.com',
+        'recipient_name': 'Test Recipient Name',
+        'recipient_email': 'test-recipient@example.com',
+        'address_line_1': 'Test Address 1',
+        'address_line_2': 'Test Address 2',
+        'address_line_3': 'Test Address 3',
+        'city': 'Test City',
+        'state': 'Test State',
+        'zip': '12345',
+        'country': 'US',
+    }
+
+    def setUp(self):
+        invoice_data = copy.copy(self.INVOICE_INFO)
+        invoice_data.update(self.CONTACT_INFO)
+        self.invoice = Invoice.objects.create(total_amount="123.45", **invoice_data)
+        self.course_key = CourseLocator('edX', 'DemoX', 'Demo_Course')
+        self.user = UserFactory.create()
+
+    def test_invoice_contact_info_history(self):
+        self._assert_history_invoice_info(
+            is_valid=True,
+            internal_ref=self.INVOICE_INFO['internal_reference'],
+            customer_ref=self.INVOICE_INFO['customer_reference_number']
+        )
+        self._assert_history_contact_info(**self.CONTACT_INFO)
+        self._assert_history_items([])
+        self._assert_history_transactions([])
+
+    def test_invoice_history_items(self):
+        # Create an invoice item
+        CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.invoice,
+            qty=1,
+            unit_price='123.45',
+            course_id=self.course_key
+        )
+        self._assert_history_items([{
+            'qty': 1,
+            'unit_price': '123.45',
+            'currency': 'usd',
+            'course_id': unicode(self.course_key)
+        }])
+
+        # Create a second invoice item
+        CourseRegistrationCodeInvoiceItem.objects.create(
+            invoice=self.invoice,
+            qty=2,
+            unit_price='456.78',
+            course_id=self.course_key
+        )
+        self._assert_history_items([
+            {
+                'qty': 1,
+                'unit_price': '123.45',
+                'currency': 'usd',
+                'course_id': unicode(self.course_key)
+            },
+            {
+                'qty': 2,
+                'unit_price': '456.78',
+                'currency': 'usd',
+                'course_id': unicode(self.course_key)
+            }
+        ])
+
+    def test_invoice_history_transactions(self):
+        # Create an invoice transaction
+        first_transaction = InvoiceTransaction.objects.create(
+            invoice=self.invoice,
+            amount='123.45',
+            currency='usd',
+            comments='test comments',
+            status='completed',
+            created_by=self.user,
+            last_modified_by=self.user
+        )
+        self._assert_history_transactions([{
+            'amount': '123.45',
+            'currency': 'usd',
+            'comments': 'test comments',
+            'status': 'completed',
+            'created_by': self.user.username,
+            'last_modified_by': self.user.username,
+        }])
+
+        # Create a second invoice transaction
+        second_transaction = InvoiceTransaction.objects.create(
+            invoice=self.invoice,
+            amount='456.78',
+            currency='usd',
+            comments='test more comments',
+            status='started',
+            created_by=self.user,
+            last_modified_by=self.user
+        )
+        self._assert_history_transactions([
+            {
+                'amount': '123.45',
+                'currency': 'usd',
+                'comments': 'test comments',
+                'status': 'completed',
+                'created_by': self.user.username,
+                'last_modified_by': self.user.username,
+            },
+            {
+                'amount': '456.78',
+                'currency': 'usd',
+                'comments': 'test more comments',
+                'status': 'started',
+                'created_by': self.user.username,
+                'last_modified_by': self.user.username,
+            }
+        ])
+
+        # Delete the transactions
+        first_transaction.delete()
+        second_transaction.delete()
+        self._assert_history_transactions([])
+
+    def _assert_history_invoice_info(self, is_valid=True, customer_ref=None, internal_ref=None):
+        """Check top-level invoice information in the latest history record. """
+        latest = self._latest_history()
+        self.assertEqual(latest['is_valid'], is_valid)
+        self.assertEqual(latest['customer_reference'], customer_ref)
+        self.assertEqual(latest['internal_reference'], internal_ref)
+
+    def _assert_history_contact_info(self, **kwargs):
+        """Check contact info in the latest history record. """
+        contact_info = self._latest_history()['contact_info']
+        for key, value in kwargs.iteritems():
+            self.assertEqual(contact_info[key], value)
+
+    def _assert_history_items(self, expected_items):
+        """Check line item info in the latest history record. """
+        items = self._latest_history()['items']
+        self.assertItemsEqual(items, expected_items)
+
+    def _assert_history_transactions(self, expected_transactions):
+        """Check transactions (payments/refunds) in the latest history record. """
+        transactions = self._latest_history()['transactions']
+        self.assertItemsEqual(transactions, expected_transactions)
+
+    def _latest_history(self):
+        """Retrieve the snapshot from the latest history record. """
+        latest = InvoiceHistory.objects.latest()
+        return json.loads(latest.snapshot)

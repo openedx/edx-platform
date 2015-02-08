@@ -4,6 +4,7 @@ from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
+import json
 import analytics
 from io import BytesIO
 import pytz
@@ -21,6 +22,8 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.db import transaction
 from django.db.models import Sum
+from django.db.models.signals import post_save, post_delete
+
 from django.core.urlresolvers import reverse
 from model_utils.managers import InheritanceManager
 from model_utils.models import TimeStampedModel
@@ -846,6 +849,48 @@ class Invoice(TimeStampedModel):
 
         return pdf_buffer
 
+    def snapshot(self):
+        """Create a snapshot of the invoice.
+
+        A snapshot is a JSON-serializable representation
+        of the invoice's state, including its line items
+        and associated transactions (payments/refunds).
+
+        This is useful for saving the history of changes
+        to the invoice.
+
+        Returns:
+            dict
+
+        """
+        return {
+            'internal_reference': self.internal_reference,
+            'customer_reference': self.customer_reference_number,
+            'is_valid': self.is_valid,
+            'contact_info': {
+                'company_name': self.company_name,
+                'company_contact_name': self.company_contact_name,
+                'company_contact_email': self.company_contact_email,
+                'recipient_name': self.recipient_name,
+                'recipient_email': self.recipient_email,
+                'address_line_1': self.address_line_1,
+                'address_line_2': self.address_line_2,
+                'address_line_3': self.address_line_3,
+                'city': self.city,
+                'state': self.state,
+                'zip': self.zip,
+                'country': self.country,
+            },
+            'items': [
+                item.snapshot()
+                for item in InvoiceItem.objects.filter(invoice=self).select_subclasses()
+            ],
+            'transactions': [
+                trans.snapshot()
+                for trans in InvoiceTransaction.objects.filter(invoice=self)
+            ],
+        }
+
     def __unicode__(self):
         label = (
             unicode(self.internal_reference)
@@ -927,6 +972,24 @@ class InvoiceTransaction(TimeStampedModel):
     created_by = models.ForeignKey(User)
     last_modified_by = models.ForeignKey(User, related_name='last_modified_by_user')
 
+    def snapshot(self):
+        """Create a snapshot of the invoice transaction.
+
+        The returned dictionary is JSON-serializable.
+
+        Returns:
+            dict
+
+        """
+        return {
+            'amount': unicode(self.amount),
+            'currency': self.currency,
+            'comments': self.comments,
+            'status': self.status,
+            'created_by': self.created_by.username,  # pylint: disable=no-member
+            'last_modified_by': self.last_modified_by.username  # pylint: disable=no-member
+        }
+
 
 class InvoiceItem(TimeStampedModel):
     """
@@ -956,6 +1019,21 @@ class InvoiceItem(TimeStampedModel):
         help_text=ugettext_lazy("Lower-case ISO currency codes")
     )
 
+    def snapshot(self):
+        """Create a snapshot of the invoice item.
+
+        The returned dictionary is JSON-serializable.
+
+        Returns:
+            dict
+
+        """
+        return {
+            'qty': self.qty,
+            'unit_price': unicode(self.unit_price),
+            'currency': self.currency
+        }
+
 
 class CourseRegistrationCodeInvoiceItem(InvoiceItem):
     """
@@ -964,6 +1042,89 @@ class CourseRegistrationCodeInvoiceItem(InvoiceItem):
 
     """
     course_id = CourseKeyField(max_length=128, db_index=True)
+
+    def snapshot(self):
+        """Create a snapshot of the invoice item.
+
+        This is the same as a snapshot for other invoice items,
+        with the addition of a `course_id` field.
+
+        Returns:
+            dict
+
+        """
+        snapshot = super(CourseRegistrationCodeInvoiceItem, self).snapshot()
+        snapshot['course_id'] = unicode(self.course_id)
+        return snapshot
+
+
+class InvoiceHistory(models.Model):
+    """History of changes to invoices.
+
+    This table stores snapshots of invoice state,
+    including the associated line items and transactions
+    (payments/refunds).
+
+    Entries in the table are created, but never deleted
+    or modified.
+
+    We use Django signals to save history entries on change
+    events.  These signals are fired within a database
+    transaction, so the history record is created only
+    if the invoice change is successfully persisted.
+
+    """
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    invoice = models.ForeignKey(Invoice)
+
+    # JSON-serialized representation of the current state
+    # of the invoice, including its line items and
+    # transactions (payments/refunds).
+    snapshot = models.TextField(blank=True)
+
+    @classmethod
+    def save_invoice_snapshot(cls, invoice):
+        """Save a snapshot of the invoice's current state.
+
+        Arguments:
+            invoice (Invoice): The invoice to save.
+
+        """
+        cls.objects.create(
+            invoice=invoice,
+            snapshot=json.dumps(invoice.snapshot())
+        )
+
+    @staticmethod
+    def snapshot_receiver(sender, instance, **kwargs):  # pylint: disable=unused-argument
+        """Signal receiver that saves a snapshot of an invoice.
+
+        Arguments:
+            sender: Not used, but required by Django signals.
+            instance (Invoice, InvoiceItem, or InvoiceTransaction)
+
+        """
+        if isinstance(instance, Invoice):
+            InvoiceHistory.save_invoice_snapshot(instance)
+        elif hasattr(instance, 'invoice'):
+            InvoiceHistory.save_invoice_snapshot(instance.invoice)
+
+    class Meta:  # pylint: disable=missing-docstring,old-style-class
+        get_latest_by = "timestamp"
+
+
+# Hook up Django signals to record changes in the history table.
+# We record any change to an invoice, invoice item, or transaction.
+# We also record any deletion of a transaction, since users can delete
+# transactions via Django admin.
+# Note that we need to include *each* InvoiceItem subclass
+# here, since Django signals do not fire automatically for subclasses
+# of the "sender" class.
+post_save.connect(InvoiceHistory.snapshot_receiver, sender=Invoice)
+post_save.connect(InvoiceHistory.snapshot_receiver, sender=InvoiceItem)
+post_save.connect(InvoiceHistory.snapshot_receiver, sender=CourseRegistrationCodeInvoiceItem)
+post_save.connect(InvoiceHistory.snapshot_receiver, sender=InvoiceTransaction)
+post_delete.connect(InvoiceHistory.snapshot_receiver, sender=InvoiceTransaction)
 
 
 class CourseRegistrationCode(models.Model):
