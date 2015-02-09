@@ -35,6 +35,8 @@
   </head>
 
   <body class="<%block name='bodyclass'></%block> hide-wip lang_${LANGUAGE_CODE}">
+  <%include file="google_tag_manager.html" />
+
   <%block name="view_notes"></%block>
 
     <a class="nav-skip" href="#content">${_("Skip to this view's content")}</a>
