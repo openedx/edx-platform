@@ -59,13 +59,17 @@ define([
     };
 
     /**
-     * Modifies Annotator.highlightRange to add a "tabindex=0" attribute
-     * to the <span class="annotator-hl"> markup that encloses the note.
-     * These are then focusable via the TAB key.
+     * Modifies Annotator.highlightRange to add "tabindex=0" and role="link"
+     * attributes to the <span class="annotator-hl"> markup that encloses the
+     * note. These are then focusable via the TAB key and are accessible to
+     * screen readers.
      **/
     Annotator.prototype.highlightRange = _.compose(
         function (results) {
-            $('.annotator-hl', this.wrapper).attr('tabindex', 0);
+            $('.annotator-hl', this.wrapper).attr({
+                'tabindex': 0,
+                'role': 'link'
+            });
             return results;
         },
         Annotator.prototype.highlightRange
@@ -98,26 +102,53 @@ define([
     );
 
     /**
-     * Modifies Annotator.Viewer.html.item template to add an i18n for the
-     * buttons.
+     * Modifies Annotator.Viewer.html template to make viewer div focusable.
+     * Also adds a close button and necessary i18n attributes to all buttons.
      **/
-    Annotator.Viewer.prototype.html.item = [
-        '<li class="annotator-annotation annotator-item">',
-            '<span class="annotator-controls">',
-                '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
-                    _t('View as webpage'),
-                '</a>',
-                '<button class="annotator-edit">',
-                    _t('Edit'),
-                    '<span class="sr">', _t('Note'), '</span>',
-                '</button>',
-                '<button class="annotator-delete">',
-                    _t('Delete'),
-                    '<span class="sr">', _t('Note'), '</span>',
-                '</button>',
-            '</span>',
-        '</li>'
-    ].join('');
+    Annotator.Viewer.prototype.html = {
+        element: [
+            '<div class="annotator-outer annotator-viewer" tabindex="-1">',
+                '<ul class="annotator-widget annotator-listing"></ul>',
+            '</div>'
+        ].join(''),
+        item: [
+            '<li class="annotator-annotation annotator-item">',
+                '<span class="annotator-controls">',
+                    '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
+                        _t('View as webpage'),
+                    '</a>',
+                    '<button class="annotator-edit">',
+                        _t('Edit'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                    '<button class="annotator-delete">',
+                        _t('Delete'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                    '<button class="annotator-close">',
+                        _t('Close'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                '</span>',
+            '</li>'
+        ].join('')
+    };
+
+    /**
+     * Adds close event to viewer.
+     **/
+    Annotator.Viewer.prototype.events = {
+      ".annotator-edit click": "onEditClick",
+      ".annotator-delete click": "onDeleteClick",
+      ".annotator-close click": "onCloseClick"
+    };
+
+    /**
+     * Adds close event handler to viewer.
+     **/
+    Annotator.Viewer.prototype.onCloseClick = function(event) {
+      return this.onButtonClick(event, 'close');
+    };
 
     /**
      * Overrides Annotator._setupViewer to add a "click" event on viewer and to
@@ -130,6 +161,7 @@ define([
         this.viewer.hide()
             .on("edit", this.onEditAnnotation)
             .on("delete", this.onDeleteAnnotation)
+            .on("close", this.viewer.hide)
             .addField({
                 load: function (field, annotation) {
                     if (annotation.text) {
@@ -149,7 +181,8 @@ define([
 
     Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
 
-    /* Modifies Annotator.Editor.html template to reverse order of Save and
+    /**
+     * Modifies Annotator.Editor.html template to reverse order of Save and
      * Cancel buttons.
      **/
     Annotator.Editor.prototype.html = [

@@ -33,6 +33,7 @@ define([
             this.button = $('.action-toggle-notes');
             this.label = this.button.find('.utility-control-label');
             this.toggleMessage = $('.action-toggle-message');
+            spyOn(this.toggleNotes, 'toggleHandler').andCallThrough();
         });
 
         afterEach(function () {
@@ -54,7 +55,6 @@ define([
             this.button.click();
             expect(this.label).toContainText('Show notes');
             expect(this.button).not.toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'false');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Hiding notes');
             expect(Annotator._instances).toHaveLength(0);
@@ -67,7 +67,6 @@ define([
             this.button.click();
             expect(this.label).toContainText('Hide notes');
             expect(this.button).toHaveClass('is-active');
-            expect(this.button).toHaveAttr('aria-pressed', 'true');
             expect(this.toggleMessage).toHaveClass('is-fleeting');
             expect(this.toggleMessage).toContainText('Showing notes');
             expect(Annotator._instances).toHaveLength(2);
@@ -94,6 +93,12 @@ define([
             this.button.click();
             AjaxHelpers.respondWithJson(requests, {});
             expect(errorContainer).not.toHaveClass('annotator-notice-show');
+        });
+
+        it('toggles notes when CTRL + OPTION + n keydown on document', function () {
+            // Character 'n' has keyCode 78
+            $(document).trigger($.Event('keydown', {keyCode: 78, ctrlKey: true, altKey: true}));
+            expect(this.toggleNotes.toggleHandler).toHaveBeenCalled();
         });
     });
 });
