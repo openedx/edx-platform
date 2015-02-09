@@ -375,6 +375,34 @@ class OrderTest(ModuleStoreTestCase):
             cart.generate_receipt_instructions()
             mock_gen_inst.assert_called_with()
 
+    def test_confirmation_email_error(self):
+        CourseMode.objects.create(
+            course_id=self.course_key,
+            mode_slug="verified",
+            mode_display_name="Verified",
+            min_price=self.cost
+        )
+
+        cart = Order.get_cart_for_user(self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'verified')
+
+        # Simulate an error when sending the confirmation
+        # email.  This should NOT raise an exception.
+        # If it does, then the implicit view-level
+        # transaction could cause a roll-back, effectively
+        # reversing order fulfillment.
+        with patch.object(mail.message.EmailMessage, 'send') as mock_send:
+            mock_send.side_effect = Exception("Kaboom!")
+            cart.purchase()
+
+        # Verify that the purchase completed successfully
+        self.assertEqual(cart.status, 'purchased')
+
+        # Verify that the user is enrolled as "verified"
+        mode, is_active = CourseEnrollment.enrollment_mode_for_user(self.user, self.course_key)
+        self.assertTrue(is_active)
+        self.assertEqual(mode, 'verified')
+
 
 class OrderItemTest(TestCase):
     def setUp(self):
