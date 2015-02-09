@@ -27,16 +27,18 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
             parent_location=chapter.location,
             display_name='Test Sequential'
         )
-        self.vertical = ItemFactory.create(
+        vertical = ItemFactory.create(
             category='vertical',
             parent_location=sequential.location,
             display_name='Test Vertical'
         )
-        self.video = ItemFactory.create(
+        video = ItemFactory.create(
             category='video',
-            parent_location=self.vertical.location,
+            parent_location=vertical.location,
             display_name='Test Vertical'
         )
+        self.vertical_location = vertical.location
+        self.video_location = video.location
         self.pet_groups = [Group(1, 'Cat Lovers'), Group(2, 'Dog Lovers')]
 
     def create_content_groups(self, content_groups):
@@ -54,68 +56,72 @@ class AuthoringMixinTestCase(ModuleStoreTestCase):
         self.course.user_partitions = [self.content_partition]
         self.store.update_item(self.course, self.user.id)
 
-    def set_staff_only(self, item):
+    def set_staff_only(self, item_location):
         """Make an item visible to staff only."""
+        item = self.store.get_item(item_location)
         item.visible_to_staff_only = True
         self.store.update_item(item, self.user.id)
 
-    def set_group_access(self, item, group_ids):
+    def set_group_access(self, item_location, group_ids):
         """
         Set group_access for the specified item to the specified group
         ids within the content partition.
         """
+        item = self.store.get_item(item_location)
         item.group_access[self.content_partition.id] = group_ids  # pylint: disable=no-member
         self.store.update_item(item, self.user.id)
 
-    def verify_visibility_view_contains(self, item, substrings):
+    def verify_visibility_view_contains(self, item_location, substrings):
         """
         Verify that an item's visibility view returns an html string
         containing all the expected substrings.
         """
+        item = self.store.get_item(item_location)
         html = item.visibility_view().body_html()
         for string in substrings:
             self.assertIn(string, html)
 
     def test_html_no_partition(self):
-        self.verify_visibility_view_contains(self.video, 'No content groups exist')
+        self.verify_visibility_view_contains(self.video_location, 'No content groups exist')
 
     def test_html_empty_partition(self):
         self.create_content_groups([])
-        self.verify_visibility_view_contains(self.video, 'No content groups exist')
+        self.verify_visibility_view_contains(self.video_location, 'No content groups exist')
 
     def test_html_populated_partition(self):
         self.create_content_groups(self.pet_groups)
-        self.verify_visibility_view_contains(self.video, ['Cat Lovers', 'Dog Lovers'])
+        self.verify_visibility_view_contains(self.video_location, ['Cat Lovers', 'Dog Lovers'])
 
     def test_html_no_partition_staff_locked(self):
-        self.set_staff_only(self.vertical)
-        self.verify_visibility_view_contains(self.video, ['No content groups exist'])
+        self.set_staff_only(self.vertical_location)
+        self.verify_visibility_view_contains(self.video_location, ['No content groups exist'])
 
     def test_html_empty_partition_staff_locked(self):
         self.create_content_groups([])
-        self.set_staff_only(self.vertical)
-        self.verify_visibility_view_contains(self.video, 'No content groups exist')
+        self.set_staff_only(self.vertical_location)
+        self.verify_visibility_view_contains(self.video_location, 'No content groups exist')
 
     def test_html_populated_partition_staff_locked(self):
         self.create_content_groups(self.pet_groups)
-        self.set_staff_only(self.vertical)
+        self.set_staff_only(self.vertical_location)
         self.verify_visibility_view_contains(
-            self.video, ['The Unit this component is contained in is hidden from students.', 'Cat Lovers', 'Dog Lovers']
+            self.video_location,
+            ['The Unit this component is contained in is hidden from students.', 'Cat Lovers', 'Dog Lovers']
         )
 
     def test_html_false_content_group(self):
         self.create_content_groups(self.pet_groups)
-        self.set_group_access(self.video, ['false_group_id'])
+        self.set_group_access(self.video_location, ['false_group_id'])
         self.verify_visibility_view_contains(
-            self.video, ['Cat Lovers', 'Dog Lovers', 'Content group no longer exists.']
+            self.video_location, ['Cat Lovers', 'Dog Lovers', 'Content group no longer exists.']
         )
 
     def test_html_false_content_group_staff_locked(self):
         self.create_content_groups(self.pet_groups)
-        self.set_staff_only(self.vertical)
-        self.set_group_access(self.video, ['false_group_id'])
+        self.set_staff_only(self.vertical_location)
+        self.set_group_access(self.video_location, ['false_group_id'])
         self.verify_visibility_view_contains(
-            self.video,
+            self.video_location,
             [
                 'Cat Lovers',
                 'Dog Lovers',

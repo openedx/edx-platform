@@ -8,7 +8,6 @@ from django.core.urlresolvers import reverse
 from mock import patch
 from student.roles import CourseSalesAdminRole
 from student.tests.factories import UserFactory, CourseModeFactory
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from shoppingcart.models import (
     CourseRegistrationCode, RegistrationCodeRedemption, Order,
     Invoice, Coupon, CourseRegCodeItem, CouponRedemption, CourseRegistrationCodeInvoiceItem
@@ -33,7 +32,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
 
     def setUp(self):
         super(TestAnalyticsBasic, self).setUp()
-        self.course_key = SlashSeparatedCourseKey('robot', 'course', 'id')
+        self.course_key = self.store.make_course_key('robot', 'course', 'id')
         self.users = tuple(UserFactory() for _ in xrange(30))
         self.ces = tuple(CourseEnrollment.enroll(user, self.course_key)
                          for user in self.users)
@@ -80,7 +79,7 @@ class TestAnalyticsBasic(ModuleStoreTestCase):
             self.assertIn(userreport['meta.company'], ["Open edX Inc {}".format(user.id) for user in self.users])
 
     def test_enrolled_students_features_keys_cohorted(self):
-        course = CourseFactory.create(course_key=self.course_key)
+        course = CourseFactory.create(org="test", course="course1", display_name="run1")
         course.cohort_config = {'cohorted': True, 'auto_cohort': True, 'auto_cohort_groups': ['cohort']}
         self.store.update_item(course, self.instructor.id)
         cohort = CohortFactory.create(name='cohort', course_id=course.id)

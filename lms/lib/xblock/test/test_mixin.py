@@ -34,10 +34,22 @@ class LmsXBlockMixinTestCase(ModuleStoreTestCase):
         self.group1 = self.user_partition.groups[0]    # pylint: disable=no-member
         self.group2 = self.user_partition.groups[1]    # pylint: disable=no-member
         self.course = CourseFactory.create(user_partitions=[self.user_partition])
-        self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
-        self.subsection = ItemFactory.create(parent=self.section, category='sequential', display_name='Test Subsection')
-        self.vertical = ItemFactory.create(parent=self.subsection, category='vertical', display_name='Test Unit')
-        self.video = ItemFactory.create(parent=self.vertical, category='video', display_name='Test Video 1')
+        section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
+        subsection = ItemFactory.create(parent=section, category='sequential', display_name='Test Subsection')
+        vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='Test Unit')
+        video = ItemFactory.create(parent=vertical, category='video', display_name='Test Video 1')
+        self.section_location = section.location
+        self.subsection_location = subsection.location
+        self.vertical_location = vertical.location
+        self.video_location = video.location
+
+    def set_group_access(self, block_location, access_dict):
+        """
+        Sets the group_access dict on the block referenced by block_location.
+        """
+        block = self.store.get_item(block_location)
+        block.group_access = access_dict
+        self.store.update_item(block, 1)
 
 
 class XBlockValidationTest(LmsXBlockMixinTestCase):
@@ -59,23 +71,23 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         Test the validation messages produced for an xblock with full group access.
         """
-        validation = self.video.validate()
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 0)
 
     def test_validate_restricted_group_access(self):
         """
         Test the validation messages produced for an xblock with a valid group access restriction
         """
-        self.video.group_access[self.user_partition.id] = [self.group1.id, self.group2.id]  # pylint: disable=no-member
-        validation = self.video.validate()
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 0)
 
     def test_validate_invalid_user_partitions(self):
         """
         Test the validation messages produced for an xblock referring to non-existent user partitions.
         """
-        self.video.group_access[999] = [self.group1.id]
-        validation = self.video.validate()
+        self.set_group_access(self.video_location, {999: [self.group1.id]})
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
@@ -86,8 +98,8 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         # Now add a second invalid user partition and validate again.
         # Note that even though there are two invalid configurations,
         # only a single error message will be returned.
-        self.video.group_access[998] = [self.group2.id]
-        validation = self.video.validate()
+        self.set_group_access(self.video_location, {998: [self.group2.id]})
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
@@ -99,8 +111,8 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         """
         Test the validation messages produced for an xblock referring to non-existent groups.
         """
-        self.video.group_access[self.user_partition.id] = [self.group1.id, 999]    # pylint: disable=no-member
-        validation = self.video.validate()
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, 999]})
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
@@ -109,8 +121,8 @@ class XBlockValidationTest(LmsXBlockMixinTestCase):
         )
 
         # Now try again with two invalid group ids
-        self.video.group_access[self.user_partition.id] = [self.group1.id, 998, 999]    # pylint: disable=no-member
-        validation = self.video.validate()
+        self.set_group_access(self.video_location, {self.user_partition.id: [self.group1.id, 998, 999]})
+        validation = self.store.get_item(self.video_location).validate()
         self.assertEqual(len(validation.messages), 1)
         self.verify_validation_message(
             validation.messages[0],
@@ -184,10 +196,11 @@ class XBlockGetParentTest(LmsXBlockMixinTestCase):
         # move the video to the new vertical
         with self.store.default_store(modulestore_type):
             self.build_course()
-            new_vertical = ItemFactory.create(parent=self.subsection, category='vertical', display_name='New Test Unit')
-            child_to_move_location = self.video.location.for_branch(None)
+            subsection = self.store.get_item(self.subsection_location)
+            new_vertical = ItemFactory.create(parent=subsection, category='vertical', display_name='New Test Unit')
+            child_to_move_location = self.video_location.for_branch(None)
             new_parent_location = new_vertical.location.for_branch(None)
-            old_parent_location = self.vertical.location.for_branch(None)
+            old_parent_location = self.vertical_location.for_branch(None)
 
             with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred):
                 self.assertIsNone(self.course.get_parent())
@@ -252,23 +265,23 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
     PARTITION_2_GROUP_2 = 22
 
     PARENT_CHILD_PAIRS = (
-        ddt_named('section', 'subsection'),
-        ddt_named('section', 'vertical'),
-        ddt_named('section', 'video'),
-        ddt_named('subsection', 'vertical'),
-        ddt_named('subsection', 'video'),
+        ddt_named('section_location', 'subsection_location'),
+        ddt_named('section_location', 'vertical_location'),
+        ddt_named('section_location', 'video_location'),
+        ddt_named('subsection_location', 'vertical_location'),
+        ddt_named('subsection_location', 'video_location'),
     )
 
     def setUp(self):
         super(XBlockMergedGroupAccessTest, self).setUp()
         self.build_course()
 
-    def set_group_access(self, block, access_dict):
+    def verify_group_access(self, block_location, expected_dict):
         """
-        DRY helper.
+        Verify the expected value for the block's group_access.
         """
-        block.group_access = access_dict
-        block.runtime.modulestore.update_item(block, 1)
+        block = self.store.get_item(block_location)
+        self.assertEqual(block.merged_group_access, expected_dict)
 
     @ddt.data(*PARENT_CHILD_PAIRS)
     @ddt.unpack
@@ -284,14 +297,8 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
         self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]})
         self.set_group_access(child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
 
-        self.assertEqual(
-            parent_block.merged_group_access,
-            {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]},
-        )
-        self.assertEqual(
-            child_block.merged_group_access,
-            {self.PARTITION_1: [self.PARTITION_1_GROUP_2]},
-        )
+        self.verify_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]})
+        self.verify_group_access(child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
 
     @ddt.data(*PARENT_CHILD_PAIRS)
     @ddt.unpack
@@ -306,14 +313,8 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
         self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
         self.set_group_access(child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
 
-        self.assertEqual(
-            parent_block.merged_group_access,
-            {self.PARTITION_1: [self.PARTITION_1_GROUP_1]},
-        )
-        self.assertEqual(
-            child_block.merged_group_access,
-            {self.PARTITION_1: False},
-        )
+        self.verify_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.verify_group_access(child_block, {self.PARTITION_1: False})
 
     def test_disjoint_groups_no_override(self):
         """
@@ -321,18 +322,14 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
         to the block being queried even if blocks further down in the hierarchy
         try to override it.
         """
-        self.set_group_access(self.section, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
-        self.set_group_access(self.subsection, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
-        self.set_group_access(self.vertical, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]})
+        self.set_group_access(self.section_location, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.set_group_access(self.subsection_location, {self.PARTITION_1: [self.PARTITION_1_GROUP_2]})
+        self.set_group_access(
+            self.vertical_location, {self.PARTITION_1: [self.PARTITION_1_GROUP_1, self.PARTITION_1_GROUP_2]}
+        )
 
-        self.assertEqual(
-            self.vertical.merged_group_access,
-            {self.PARTITION_1: False},
-        )
-        self.assertEqual(
-            self.video.merged_group_access,
-            {self.PARTITION_1: False},
-        )
+        self.verify_group_access(self.vertical_location, {self.PARTITION_1: False})
+        self.verify_group_access(self.video_location, {self.PARTITION_1: False})
 
     @ddt.data(*PARENT_CHILD_PAIRS)
     @ddt.unpack
@@ -348,11 +345,7 @@ class XBlockMergedGroupAccessTest(LmsXBlockMixinTestCase):
         self.set_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
         self.set_group_access(child_block, {self.PARTITION_2: [self.PARTITION_1_GROUP_2]})
 
-        self.assertEqual(
-            parent_block.merged_group_access,
-            {self.PARTITION_1: [self.PARTITION_1_GROUP_1]},
-        )
-        self.assertEqual(
-            child_block.merged_group_access,
-            {self.PARTITION_1: [self.PARTITION_1_GROUP_1], self.PARTITION_2: [self.PARTITION_1_GROUP_2]},
+        self.verify_group_access(parent_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1]})
+        self.verify_group_access(
+            child_block, {self.PARTITION_1: [self.PARTITION_1_GROUP_1], self.PARTITION_2: [self.PARTITION_1_GROUP_2]}
         )

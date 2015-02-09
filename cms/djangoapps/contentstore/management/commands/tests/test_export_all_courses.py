@@ -21,8 +21,12 @@ class ExportAllCourses(ModuleStoreTestCase):
         super(ExportAllCourses, self).setUp()
         self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
         self.temp_dir = mkdtemp()
-        self.first_course = CourseFactory.create(org="test", course="course1", display_name="run1")
-        self.second_course = CourseFactory.create(org="test", course="course2", display_name="run2")
+        self.first_course = CourseFactory.create(
+            org="test", course="course1", display_name="run1", default_store=ModuleStoreEnum.Type.mongo
+        )
+        self.second_course = CourseFactory.create(
+            org="test", course="course2", display_name="run2", default_store=ModuleStoreEnum.Type.mongo
+        )
 
     def test_export_all_courses(self):
         """

@@ -35,7 +35,7 @@ class MobileAPITestCase(ModuleStoreTestCase, APITestCase):
     """
     def setUp(self):
         super(MobileAPITestCase, self).setUp()
-        self.course = CourseFactory.create(mobile_available=True)
+        self.course = CourseFactory.create(mobile_available=True, static_asset_path="needed_for_split")
         self.user = UserFactory.create()
         self.password = 'test'
         self.username = self.user.username

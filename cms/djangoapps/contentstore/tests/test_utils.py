@@ -168,32 +168,42 @@ class ExtraPanelTabTestCase(TestCase):
 class CourseImageTestCase(ModuleStoreTestCase):
     """Tests for course image URLs."""
 
+    def verify_url(self, expected_url, actual_url):
+        """
+        Helper method for verifying the URL is as expected.
+        """
+        if not expected_url.startswith("/"):
+            expected_url = "/" + expected_url
+        self.assertEquals(expected_url, actual_url)
+
     def test_get_image_url(self):
         """Test image URL formatting."""
         course = CourseFactory.create()
-        url = utils.course_image_url(course)
-        self.assertEquals(url, unicode(course.id.make_asset_key('asset', course.course_image)))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course.course_image)),
+            utils.course_image_url(course)
+        )
 
     def test_non_ascii_image_name(self):
         """ Verify that non-ascii image names are cleaned """
         course_image = u'before_\N{SNOWMAN}_after.jpg'
         course = CourseFactory.create(course_image=course_image)
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_')))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(u'\N{SNOWMAN}', '_'))),
+            utils.course_image_url(course)
         )
 
     def test_spaces_in_image_name(self):
         """ Verify that image names with spaces in them are cleaned """
         course_image = u'before after.jpg'
         course = CourseFactory.create(course_image=u'before after.jpg')
-        self.assertEquals(
-            utils.course_image_url(course),
-            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_")))
+        self.verify_url(
+            unicode(course.id.make_asset_key('asset', course_image.replace(" ", "_"))),
+            utils.course_image_url(course)
         )
 
 
-class XBlockVisibilityTestCase(TestCase):
+class XBlockVisibilityTestCase(ModuleStoreTestCase):
     """Tests for xblock visibility for students."""
 
     def setUp(self):
@@ -202,6 +212,7 @@ class XBlockVisibilityTestCase(TestCase):
         self.dummy_user = ModuleStoreEnum.UserID.test
         self.past = datetime(1970, 1, 1)
         self.future = datetime.now(UTC) + timedelta(days=1)
+        self.course = CourseFactory.create()
 
     def test_private_unreleased_xblock(self):
         """Verifies that a private unreleased xblock is not visible"""
@@ -253,10 +264,9 @@ class XBlockVisibilityTestCase(TestCase):
 
     def _create_xblock_with_start_date(self, name, start_date, publish=False, visible_to_staff_only=False):
         """Helper to create an xblock with a start date, optionally publishing it"""
-        course_key = CourseLocator('edX', 'visibility', '2012_Fall')
 
         vertical = modulestore().create_item(
-            self.dummy_user, course_key, 'vertical', name,
+            self.dummy_user, self.course.location.course_key, 'vertical', name,
             fields={'start': start_date, 'visible_to_staff_only': visible_to_staff_only}
         )
 
