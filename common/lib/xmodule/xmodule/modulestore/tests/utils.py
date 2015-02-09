@@ -48,6 +48,7 @@ def create_modulestore_instance(
     return class_(
         doc_store_config=doc_store_config,
         contentstore=contentstore,
+        signal_handler=signal_handler,
         **options
     )
 

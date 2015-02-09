@@ -167,44 +167,46 @@ class DraftModuleStore(MongoModuleStore):
         if not self.has_course(source_course_id):
             raise ItemNotFoundError("Cannot find a course at {0}. Aborting".format(source_course_id))
 
-        # verify that the dest_location really is an empty course
-        # b/c we don't want the payload, I'm copying the guts of get_items here
-        query = self._course_key_to_son(dest_course_id)
-        query['_id.category'] = {'$nin': ['course', 'about']}
-        if self.collection.find(query).limit(1).count() > 0:
-            raise DuplicateCourseError(
-                dest_course_id,
-                "Course at destination {0} is not an empty course. You can only clone into an empty course. Aborting...".format(
-                    dest_course_id
+        with self.bulk_operations(dest_course_id):
+            # verify that the dest_location really is an empty course
+            # b/c we don't want the payload, I'm copying the guts of get_items here
+            query = self._course_key_to_son(dest_course_id)
+            query['_id.category'] = {'$nin': ['course', 'about']}
+            if self.collection.find(query).limit(1).count() > 0:
+                raise DuplicateCourseError(
+                    dest_course_id,
+                    "Course at destination {0} is not an empty course. "
+                    "You can only clone into an empty course. Aborting...".format(
+                        dest_course_id
+                    )
                 )
-            )
 
-        # clone the assets
-        super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
+            # clone the assets
+            super(DraftModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields)
 
-        # get the whole old course
-        new_course = self.get_course(dest_course_id)
-        if new_course is None:
-            # create_course creates the about overview
-            new_course = self.create_course(
-                dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
-            )
-        else:
-            # update fields on existing course
-            for key, value in fields.iteritems():
-                setattr(new_course, key, value)
-            self.update_item(new_course, user_id)
+            # get the whole old course
+            new_course = self.get_course(dest_course_id)
+            if new_course is None:
+                # create_course creates the about overview
+                new_course = self.create_course(
+                    dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id, fields=fields
+                )
+            else:
+                # update fields on existing course
+                for key, value in fields.iteritems():
+                    setattr(new_course, key, value)
+                self.update_item(new_course, user_id)
 
-        # Get all modules under this namespace which is (tag, org, course) tuple
-        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
-        self._clone_modules(modules, dest_course_id, user_id)
-        course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
-        self.publish(course_location, user_id)
+            # Get all modules under this namespace which is (tag, org, course) tuple
+            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.published_only)
+            self._clone_modules(modules, dest_course_id, user_id)
+            course_location = dest_course_id.make_usage_key('course', dest_course_id.run)
+            self.publish(course_location, user_id)
 
-        modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
-        self._clone_modules(modules, dest_course_id, user_id)
+            modules = self.get_items(source_course_id, revision=ModuleStoreEnum.RevisionOption.draft_only)
+            self._clone_modules(modules, dest_course_id, user_id)
 
-        return True
+            return True
 
     def _clone_modules(self, modules, dest_course_id, user_id):
         """Clones each module into the given course"""
@@ -447,7 +449,12 @@ class DraftModuleStore(MongoModuleStore):
 
         # if the revision is published, defer to base
         if draft_loc.revision == MongoRevisionKey.published:
-            return super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+            item = super(DraftModuleStore, self).update_item(xblock, user_id, allow_not_found)
+            course_key = xblock.location.course_key
+            bulk_record = self._get_bulk_ops_record(course_key)
+            if self.signal_handler and not bulk_record.active:
+                self.signal_handler.send("course_published", course_key=course_key)
+            return item
 
         if not super(DraftModuleStore, self).has_item(draft_loc):
             try:
@@ -715,15 +722,17 @@ class DraftModuleStore(MongoModuleStore):
         _verify_revision_is_published(location)
 
         _internal_depth_first(location, True)
+        course_key = location.course_key
+        bulk_record = self._get_bulk_ops_record(course_key)
         if len(to_be_deleted) > 0:
-            bulk_record = self._get_bulk_ops_record(location.course_key)
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
 
+        if self.signal_handler and not bulk_record.active:
+            self.signal_handler.send("course_published", course_key=course_key)
+
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         CoursewareSearchIndexer.add_to_search_index(self, location)
-        if self.signal_handler:
-            self.signal_handler.send("course_published", course_key=location.course_key)
 
         return self.get_item(as_published(location))
 
@@ -736,6 +745,11 @@ class DraftModuleStore(MongoModuleStore):
         """
         self._verify_branch_setting(ModuleStoreEnum.Branch.draft_preferred)
         self._convert_to_draft(location, user_id, delete_published=True)
+
+        course_key = location.course_key
+        bulk_record = self._get_bulk_ops_record(course_key)
+        if self.signal_handler and not bulk_record.active:
+            self.signal_handler.send("course_published", course_key=course_key)
 
     def revert_to_published(self, location, user_id=None):
         """

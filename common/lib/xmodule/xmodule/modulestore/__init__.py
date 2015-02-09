@@ -170,7 +170,7 @@ class BulkOperationsMixin(object):
         self._active_bulk_ops = ActiveBulkThread(self._bulk_ops_record_type)
 
     @contextmanager
-    def bulk_operations(self, course_id):
+    def bulk_operations(self, course_id, emit_signals=True):
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
 
@@ -181,7 +181,7 @@ class BulkOperationsMixin(object):
             self._begin_bulk_operation(course_id)
             yield
         finally:
-            self._end_bulk_operation(course_id)
+            self._end_bulk_operation(course_id, emit_signals)
 
     # the relevant type of bulk_ops_record for the mixin (overriding classes should override
     # this variable)
@@ -197,12 +197,14 @@ class BulkOperationsMixin(object):
         # Retrieve the bulk record based on matching org/course/run (possibly ignoring case)
         if ignore_case:
             for key, record in self._active_bulk_ops.records.iteritems():
-                if (
+                # Shortcut: check basic equivalence for cases where org/course/run might be None.
+                if key == course_key or (
                     key.org.lower() == course_key.org.lower() and
                     key.course.lower() == course_key.course.lower() and
                     key.run.lower() == course_key.run.lower()
                 ):
                     return record
+
         return self._active_bulk_ops.records[course_key.for_branch(None)]
 
     @property
@@ -242,7 +244,7 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.is_root:
             self._start_outermost_bulk_operation(bulk_ops_record, course_key)
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, course_key):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, course_key, emit_signals=True):
         """
         The outermost nested bulk_operation call: do the actual end of the bulk operation.
 
@@ -250,7 +252,7 @@ class BulkOperationsMixin(object):
         """
         pass
 
-    def _end_bulk_operation(self, course_key):
+    def _end_bulk_operation(self, course_key, emit_signals=True):
         """
         End the active bulk operation on course_key.
         """
@@ -266,7 +268,7 @@ class BulkOperationsMixin(object):
         if bulk_ops_record.active:
             return
 
-        self._end_outermost_bulk_operation(bulk_ops_record, course_key)
+        self._end_outermost_bulk_operation(bulk_ops_record, course_key, emit_signals)
 
         self._clear_bulk_ops_record(course_key)
 
@@ -900,7 +902,7 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         pass
 
     @contextmanager
-    def bulk_operations(self, course_id):
+    def bulk_operations(self, course_id, emit_signals=True):    # pylint: disable=unused-argument
         """
         A context manager for notifying the store of bulk operations. This affects only the current thread.
         """
@@ -1242,10 +1244,11 @@ class ModuleStoreWriteBase(ModuleStoreReadBase, ModuleStoreWrite):
         This base method just copies the assets. The lower level impls must do the actual cloning of
         content.
         """
-        # copy the assets
-        if self.contentstore:
-            self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
-        return dest_course_id
+        with self.bulk_operations(dest_course_id):
+            # copy the assets
+            if self.contentstore:
+                self.contentstore.copy_all_course_assets(source_course_id, dest_course_id)
+            return dest_course_id
 
     def delete_course(self, course_key, user_id, **kwargs):
         """
