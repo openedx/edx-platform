@@ -134,8 +134,12 @@ class @DiscussionUtil
 
   @safeAjax: (params) ->
     $elem = params.$elem
+
     if $elem and $elem.attr("disabled")
-      return
+      deferred = $.Deferred()
+      deferred.reject()
+      return deferred.promise()
+
     params["url"] = URI(params["url"]).addSearch ajax: 1
     params["beforeSend"] = ->
       if $elem

@@ -127,7 +127,7 @@ if Backbone?
         $loading: elem
         takeFocus: true
         complete: =>
-          @responseRequest = null
+          @responsesRequest = null
         success: (data, textStatus, xhr) =>
           Content.loadContentInfos(data['annotated_content_info'])
           if @isQuestion()
