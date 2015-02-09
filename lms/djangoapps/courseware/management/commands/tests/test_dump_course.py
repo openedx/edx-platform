@@ -18,7 +18,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MONGO_MODULESTORE, TEST_DATA_MONGO_MODULESTORE_SPLIT_DEFAULT
+    TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.xml_importer import import_from_xml
@@ -228,5 +228,5 @@ class CommandSplitMongoTestCase(CommandsTestBase):
     Test case for management commands using the mixed mongo modulestore with split as the default.
 
     """
-    MODULESTORE = TEST_DATA_MONGO_MODULESTORE_SPLIT_DEFAULT
+    MODULESTORE = TEST_DATA_SPLIT_MODULESTORE
     __test__ = True
