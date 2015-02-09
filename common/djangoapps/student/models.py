@@ -20,7 +20,9 @@ from collections import defaultdict
 import dogstats_wrapper as dog_stats_api
 from django.db.models import Q
 import pytz
+from urllib import urlencode
 
+from django.utils.translation import ugettext_lazy
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -1435,3 +1437,33 @@ class DashboardConfiguration(ConfigurationModel):
     @property
     def recent_enrollment_seconds(self):
         return self.recent_enrollment_time_delta
+
+
+class LinkedInAddToProfileConfiguration(ConfigurationModel):
+    """
+    LinkedIn Add to Profile Configuration
+    """
+    # tracking code field
+    dashboard_tracking_code = models.TextField(
+        blank=True,
+        help_text=ugettext_lazy(
+            u"A dashboard tracking code field for LinkedIn Add-to-profile Certificates. "
+            u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
+        )
+    )
+
+    @classmethod
+    def linked_in_dashboard_tracking_code_url(cls, params):
+        """
+        Get the linked-in Configuration.
+        """
+        config = cls.current()
+        if config.enabled:
+            return u'http://www.linkedin.com/profile/add?_ed={tracking_code}&{params}'.format(
+                tracking_code=config.dashboard_tracking_code,
+                params=urlencode(params)
+            )
+        return None
+
+    def __unicode__(self):
+        return self.dashboard_tracking_code

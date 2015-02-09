@@ -54,6 +54,14 @@ else:
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
          ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
+
+         % if cert_status['linked_in_url']:
+           <li class="action action-certificate">
+           <a class="btn" target="_blank" href="${cert_status['linked_in_url']}"
+             title="${_('Add to LinkedIn Profile')}">
+             ${_("Add Certificate to LinkedIn.")}</a></li>
+          % endif
+
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':
       <li class="action">
       <p>${_('Since we did not have a valid set of verification photos from you when your {cert_name_long} was generated, we could not grant you a verified {cert_name_short}. An honor code {cert_name_short} has been granted instead.').format(cert_name_short=cert_name_short, cert_name_long=cert_name_long)}</p>
