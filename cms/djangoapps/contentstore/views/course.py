@@ -481,6 +481,9 @@ def course_index(request, course_key):
     with modulestore().bulk_operations(course_key):
         course_module = get_course_and_check_access(course_key, request.user, depth=None)
         lms_link = get_lms_link_for_item(course_module.location)
+        reindex_link = None
+        if settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False):
+            reindex_link = "/course_search_index/{course_id}".format(course_id=unicode(course_key))
         sections = course_module.get_children()
         course_structure = _course_outline_json(request, course_module)
         locator_to_show = request.REQUEST.get('show', None)
@@ -504,7 +507,7 @@ def course_index(request, course_key):
             'rerun_notification_id': current_action.id if current_action else None,
             'course_release_date': course_release_date,
             'settings_url': settings_url,
-            'reindex_button': settings.FEATURES.get('ENABLE_COURSEWARE_INDEX', False),
+            'reindex_link': reindex_link,
             'notification_dismiss_url': reverse_course_url(
                 'course_notifications_handler',
                 current_action.course_key,

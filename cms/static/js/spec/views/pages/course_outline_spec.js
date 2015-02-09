@@ -329,8 +329,10 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
                     var successSpy = spyOn(outlinePage, 'onIndexSuccess').andCallThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
+                    var test_url = '/course_search_index/5';
+                    reindexButton.attr('href', test_url)
                     reindexButton.trigger('click');
-                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/course_search_index/5');
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', test_url);
                     AjaxHelpers.respondWithJson(requests, createMockIndexJSON(true));
                     expect(reindexSpy).toHaveBeenCalled();
                     expect(successSpy).toHaveBeenCalled();
@@ -340,8 +342,10 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
+                    var test_url = '/course_search_index/5';
+                    reindexButton.attr('href', test_url)
                     reindexButton.trigger('click');
-                    AjaxHelpers.expectJsonRequest(requests, 'GET', '/course_search_index/5');
+                    AjaxHelpers.expectJsonRequest(requests, 'GET', test_url);
                     AjaxHelpers.respondWithJson(requests, createMockIndexJSON(false));
                     expect(reindexSpy).toHaveBeenCalled();
                 });
