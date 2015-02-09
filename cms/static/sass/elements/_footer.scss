@@ -58,5 +58,22 @@
         }
       }
     }
+
+    // platform Open edX logo and link
+    .powered-by {
+      @include float(right);
+      width: flex-grid(3,12);
+      display: inline-block;
+      vertical-align: bottom;
+      @include text-align(right);
+
+      a {
+        display: inline-block;
+
+        &:hover {
+          border-bottom: none;
+        }
+      }
+    }
   }
 }
