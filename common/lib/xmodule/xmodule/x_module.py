@@ -4,6 +4,7 @@ import sys
 import yaml
 import xml.sax.saxutils as saxutils
 
+from contracts import contract, new_contract
 from functools import partial
 from lxml import etree
 from collections import namedtuple
@@ -1308,6 +1309,9 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
         pass
 
 
+new_contract('DescriptorSystem', DescriptorSystem)
+
+
 class XMLParsingSystem(DescriptorSystem):
     def __init__(self, process_xml, **kwargs):
         """
@@ -1543,6 +1547,8 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
     Note that these functions can be closures over e.g. a django request
     and user, or other environment-specific info.
     """
+
+    @contract(descriptor_runtime='DescriptorSystem')
     def __init__(
             self, static_url, track_function, get_module, render_template,
             replace_urls, descriptor_runtime, user=None, filestore=None,

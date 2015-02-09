@@ -78,7 +78,7 @@ class SplitTestModuleTest(XModuleXmlImportTest, PartitionTestCase):
         self.course_sequence = self.course.get_children()[0]
         self.module_system = get_test_system()
 
-        self.module_system.descriptor_runtime = self.course.runtime._descriptor_system  # pylint: disable=protected-access
+        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
         self.partitions_service = StaticPartitionService(
