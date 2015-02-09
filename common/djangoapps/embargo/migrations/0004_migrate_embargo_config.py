@@ -11,13 +11,16 @@ class Migration(DataMigration):
         for old_course in orm.EmbargoedCourse.objects.all():
             new_course, __ = orm.RestrictedCourse.objects.get_or_create(course_key=old_course.course_id)
 
+            # Set the message keys to 'embargo'
+            new_course.enroll_msg_key = 'embargo'
+            new_course.access_msg_key = 'embargo'
+            new_course.save()
+
             for country in self._embargoed_countries_list(orm):
                 country_model = orm.Country.objects.get(country=country)
                 orm.CountryAccessRule.objects.get_or_create(
                     country=country_model,
                     rule_type='blacklist',
-                    enroll_msg_key='embargo',
-                    access_msg_key='embargo',
                     restricted_course=new_course
                 )
 
@@ -31,12 +34,15 @@ class Migration(DataMigration):
         # doesn't give us access to class methods on the Django model objects.
         try:
             current_config = orm.EmbargoedState.objects.order_by('-change_date')[0]
-            return [
-                country.strip().upper() for country
-                in current_config.embargoed_countries.split(',')
-            ]
+            if current_config.enabled and current_config.embargoed_countries:
+                return [
+                    country.strip().upper() for country
+                    in current_config.embargoed_countries.split(',')
+                ]
         except IndexError:
-            return []
+            pass
+
+        return []
 
     models = {
         'auth.group': {
