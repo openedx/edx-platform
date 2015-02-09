@@ -73,6 +73,7 @@
 
         // Set module_id attribute on metrics_overlay
         metrics_overlay.data("module-id", module_id);
+        metrics_overlay.data("course-id", "${section_data['course_id']}");
 
         var header = $(this).closest('.metrics-left').siblings('.metrics-tooltip').text();
         var overlay_content = '<h3 class="metrics-overlay-title">' + header + '</h3>';
@@ -81,7 +82,7 @@
         $.ajax({
           url: "${section_data['get_students_opened_subsection_url']}",
           type: "GET",
-          data: {module_id: module_id},
+          data: {module_id: module_id, course_id: "${section_data['course_id']}"},
           dataType: "json",
 
           success: function(response) {
@@ -110,6 +111,7 @@
 
         //Set module_id attribute on metrics_overlay
         metrics_overlay.data("module-id", module_id);
+        metrics_overlay.data("course-id", "${section_data['course_id']}");
 
         var header = $(this).closest('.metrics-right').siblings('.metrics-tooltip').text();
         var far_index = header.indexOf(' - ');
@@ -121,7 +123,7 @@
         $.ajax({
           url: "${section_data['get_students_problem_grades_url']}",
           type: "GET",
-          data: {module_id: module_id},
+          data: {module_id: module_id, course_id: "${section_data['course_id']}"},
           dataType: "json",
 
           success: function(response) {
@@ -261,8 +263,9 @@
   $('.metrics-overlay .download-csv').click(function(event) {
 
     var module_id = $(this).closest('.metrics-overlay').data("module-id");
+    var course_id = $(this).closest('.metrics-overlay').data("course-id");
     var tooltip = $(this).closest('.metrics-container').children('.metrics-tooltip').text();
-    var attributes = '?module_id=' + module_id + '&csv=true' + '&tooltip=' + tooltip;
+    var attributes = '?module_id=' + module_id + '&course_id=' + course_id + '&csv=true' + '&tooltip=' + tooltip;
     var url = $(this).data("endpoint");
     url += attributes;
 

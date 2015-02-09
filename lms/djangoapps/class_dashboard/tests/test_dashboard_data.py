@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.tests import TEST_DATA_MONGO_MODULESTORE
-from courseware.tests.factories import StudentModuleFactory
+from courseware.tests.factories import StudentModuleFactory, StaffFactory, InstructorFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminFactory
 from capa.tests.response_xml_factory import StringResponseXMLFactory
 
@@ -20,10 +20,14 @@ from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_
                                             get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
                                             get_section_display_name, get_array_section_has_problem,
                                             get_students_opened_subsection, get_students_problem_grades,
+                                            get_non_student_list,
                                             )
 from class_dashboard.views import has_instructor_access_for_class
+from student.models import CourseEnrollment
+from courseware.models import StudentModule
 
 USER_COUNT = 11
+
 
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
@@ -64,6 +68,13 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         for user in self.users:
             CourseEnrollmentFactory.create(user=user, course_id=self.course.id)
 
+        #  Adding an instructor and a staff to the site.  These should not be included in any reports.
+        instructor_member = InstructorFactory(course_key=self.course.id)
+        CourseEnrollment.enroll(instructor_member, self.course.id)
+
+        staff_member = StaffFactory(course_key=self.course.id)
+        CourseEnrollment.enroll(staff_member, self.course.id)
+
         for i in xrange(USER_COUNT - 1):
             category = "problem"
             self.item = ItemFactory.create(
@@ -84,12 +95,56 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     state=json.dumps({'attempts': self.attempts}),
                 )
 
-            for j, user in enumerate(self.users):
-                StudentModuleFactory.create(
-                    course_id=self.course.id,
-                    module_type='sequential',
-                    module_state_key=self.item.location,
-                )
+            StudentModuleFactory.create(
+                grade=1,
+                max_grade=1,
+                student=instructor_member,
+                course_id=self.course.id,
+                module_state_key=self.item.location,
+                state=json.dumps({'attempts': self.attempts}),
+            )
+
+            StudentModuleFactory.create(
+                grade=1,
+                max_grade=1,
+                student=staff_member,
+                course_id=self.course.id,
+                module_state_key=self.item.location,
+                state=json.dumps({'attempts': self.attempts}),
+            )
+
+        for j, user in enumerate(self.users):
+            StudentModuleFactory.create(
+                course_id=self.course.id,
+                student=user,
+                module_type='sequential',
+                module_state_key=self.sub_section.location,
+            )
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            student=instructor_member,
+            module_type='sequential',
+            module_state_key=self.sub_section.location,
+        )
+
+        StudentModuleFactory.create(
+            course_id=self.course.id,
+            student=staff_member,
+            module_type='sequential',
+            module_state_key=self.sub_section.location,
+        )
+
+    def test_instructor_staff_studentmodules(self):
+        non_students = get_non_student_list(self.course.id)
+        total_sm_count_problem = StudentModule.objects.filter(module_type='problem', module_state_key=self.item.location).count()
+        total_student_sm_count_problem = StudentModule.objects.filter(module_type='problem', module_state_key=self.item.location).exclude(student__id__in=non_students).count()
+        self.assertEqual(total_sm_count_problem, USER_COUNT + 2)
+        self.assertEqual(total_student_sm_count_problem, USER_COUNT)
+        total_sm_count_seq = StudentModule.objects.filter(module_type='sequential', module_state_key=self.sub_section.location).count()
+        total_student_sm_count_seq = StudentModule.objects.filter(module_type='sequential', module_state_key=self.sub_section.location).exclude(student__id__in=non_students).count()
+        self.assertEqual(total_sm_count_seq, USER_COUNT + 2)
+        self.assertEqual(total_student_sm_count_seq, USER_COUNT)
 
     @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT + 1))
     def test_get_problem_grade_distribution_from_db(self):
@@ -207,7 +262,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
             for stack_data in data['data']:
                 for problem in stack_data['stackData']:
                     value = problem['value']
-                self.assertEquals(0, value)
+                self.assertEquals(USER_COUNT, value)
 
     @patch('class_dashboard.dashboard_data.Client')
     def test_get_d3_section_grade_distrib(self, mock_client):
@@ -229,7 +284,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_students_problem_grades(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string()
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -247,7 +302,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_problem_grades_max(self):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string()
             request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
             response = get_students_problem_grades(request)
@@ -261,7 +316,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_problem_grades_csv(self):
 
         tooltip = 'P1.2.1 Q1 - 3382 Students (100%: 1/1 questions)'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_problem_grades') + attributes)
 
         response = get_students_problem_grades(request)
@@ -281,7 +336,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
     def test_get_students_opened_subsection(self):
 
-        attributes = '?module_id=' + self.item.location.to_deprecated_string()
+        attributes = '?module_id=' + self.sub_section.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string()
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
@@ -294,7 +349,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
 
         with patch('class_dashboard.dashboard_data.MAX_SCREEN_LIST_LENGTH', 2):
 
-            attributes = '?module_id=' + self.item.location.to_deprecated_string()
+            attributes = '?module_id=' + self.sub_section.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string()
             request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
             response = get_students_opened_subsection(request)
@@ -308,7 +363,7 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     def test_get_students_opened_subsection_csv(self):
 
         tooltip = '4162 students opened Subsection 5: Relational Algebra Exercises'
-        attributes = '?module_id=' + self.item.location.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
+        attributes = '?module_id=' + self.sub_section.location.to_deprecated_string() + '&course_id=' + self.course.id.to_deprecated_string() + '&tooltip=' + tooltip + '&csv=true'
         request = self.request_factory.get(reverse('get_students_opened_subsection') + attributes)
 
         response = get_students_opened_subsection(request)
