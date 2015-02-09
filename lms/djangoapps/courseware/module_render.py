@@ -642,7 +642,7 @@ def get_module_system_for_user(user, field_data_cache,
             'user': DjangoXBlockUserService(user, user_is_staff=user_is_staff),
         },
         get_user_role=lambda: get_user_role(user, course_id),
-        descriptor_runtime=descriptor.runtime,
+        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         user_location=user_location,
         request_token=request_token,
