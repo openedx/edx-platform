@@ -138,7 +138,7 @@ class CombinedOpenEndedV1Module():
         self.skip_basic_checks = instance_state.get('skip_spelling_checks', SKIP_BASIC_CHECKS) in TRUE_DICT
 
         if system.open_ended_grading_interface:
-            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system)
+            self.peer_gs = PeerGradingService(system.open_ended_grading_interface, system.render_template)
         else:
             self.peer_gs = MockPeerGradingService()
 
@@ -159,7 +159,7 @@ class CombinedOpenEndedV1Module():
             raise
         self.display_due_date = self.timeinfo.display_due_date
 
-        self.rubric_renderer = CombinedOpenEndedRubric(system, True)
+        self.rubric_renderer = CombinedOpenEndedRubric(system.render_template, True)
         rubric_string = stringify_children(definition['rubric'])
         self._max_score = self.rubric_renderer.check_if_rubric_is_parseable(rubric_string, location, MAX_SCORE_ALLOWED)
 
