@@ -256,19 +256,35 @@ class PayAndVerifyView(View):
             log.warn(u"No course specified for verification flow request.")
             raise Http404
 
-        # Verify that the course has a verified mode
-        course_mode = CourseMode.verified_mode_for_course(course_key)
-        if course_mode is None:
+        # Check that the course has an unexpired verified mode
+        course_mode, expired_course_mode = self._get_verified_modes_for_course(course_key)
+
+        if course_mode is not None:
+            log.info(
+                u"Entering verified workflow for user '%s', course '%s', with current step '%s'.",
+                request.user.id, course_id, current_step
+            )
+        elif expired_course_mode is not None:
+            # Check if there is an *expired* verified course mode;
+            # if so, we should show a message explaining that the verification
+            # deadline has passed.
+            log.info(u"Verification deadline for '%s' has passed.", course_id)
+            context = {
+                'course': course,
+                'deadline': (
+                    get_default_time_display(expired_course_mode.expiration_datetime)
+                    if expired_course_mode.expiration_datetime else ""
+                )
+            }
+            return render_to_response("verify_student/missed_verification_deadline.html", context)
+        else:
+            # Otherwise, there has never been a verified mode,
+            # so return a page not found response.
             log.warn(
-                u"No verified course mode found for course '{course_id}' for verification flow request"
-                .format(course_id=course_id)
+                u"No verified course mode found for course '%s' for verification flow request",
+                course_id
             )
             raise Http404
-
-        log.info(
-            u"Entering verified workflow for user '{user}', course '{course_id}', with current step '{current_step}'."
-            .format(user=request.user, course_id=course_id, current_step=current_step)
-        )
 
         # Check whether the user has verified, paid, and enrolled.
         # A user is considered "paid" if he or she has an enrollment
@@ -426,6 +442,31 @@ class PayAndVerifyView(View):
         # Redirect if necessary, otherwise implicitly return None
         if url is not None:
             return redirect(url)
+
+    def _get_verified_modes_for_course(self, course_key):
+        """Retrieve unexpired and expired verified modes for a course.
+
+        Arguments:
+            course_key (CourseKey): The location of the course.
+
+        Returns:
+            Tuple of `(verified_mode, expired_verified_mode)`.  If provided,
+                `verified_mode` is an *unexpired* verified mode for the course.
+                If provided, `expired_verified_mode` is an *expired* verified
+                mode for the course.  Either of these may be None.
+
+        """
+        # Retrieve all the modes at once to reduce the number of database queries
+        all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
+
+        # Find an unexpired verified mode
+        verified_mode = CourseMode.verified_mode_for_course(course_key, modes=unexpired_modes[course_key])
+        expired_verified_mode = None
+
+        if verified_mode is None:
+            expired_verified_mode = CourseMode.verified_mode_for_course(course_key, modes=all_modes[course_key])
+
+        return (verified_mode, expired_verified_mode)
 
     def _display_steps(self, always_show_payment, already_verified, already_paid):
         """Determine which steps to display to the user.
