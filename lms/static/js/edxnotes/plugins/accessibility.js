@@ -1,6 +1,6 @@
 ;(function (define, undefined) {
 'use strict';
-define(['jquery', 'underscore', 'annotator'], function ($, _, Annotator) {
+define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
     /**
      * Adds the Accessibility Plugin
      **/

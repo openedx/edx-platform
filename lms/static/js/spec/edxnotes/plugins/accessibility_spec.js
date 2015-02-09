@@ -1,5 +1,5 @@
 define([
-    'jquery', 'underscore', 'annotator', 'logger', 'js/edxnotes/views/notes_factory', 'js/spec/edxnotes/custom_matchers'
+    'jquery', 'underscore', 'annotator_1.2.9', 'logger', 'js/edxnotes/views/notes_factory', 'js/spec/edxnotes/custom_matchers'
 ], function($, _, Annotator, Logger, NotesFactory, customMatchers) {
     'use strict';
     describe('EdxNotes Accessibility Plugin', function() {
