@@ -71,15 +71,15 @@ define([
                 note = $('#aria-note-01');
                 expect(highlight).toHaveAttr('aria-describedby', 'aria-note-01');
                 expect(note).toExist();
-                expect(note).toHaveAttr({
-                    'aria-label': 'Note',
-                    'role': 'notee'
-                });
+                expect(note).toHaveAttr('tabindex', -1);
+                expect(note).toHaveAttr('role', 'note');
+                expect(note).toHaveAttr('aria-label', 'Note');
+                expect(note).toHaveAttr('class', 'annotator-note');
             });
         });
 
         describe('keydown events on highlighted text', function () {
-            var highlight, annotation, edit;
+            var highlight, annotation, note;
 
             beforeEach(function() {
                 highlight = $('<span class="annotator-hl" tabindex="0"/>').appendTo(this.annotator.element);
@@ -92,31 +92,25 @@ define([
                 spyOn(this.annotator.viewer, 'hide').andCallThrough();
             });
 
-            it('should focus on Edit button of the viewer, if it is opened, on TAB keydown', function () {
-                this.annotator.viewer.load([annotation]);
-                highlight.trigger(keyDownEvent(this.KEY.TAB));
-                edit = this.annotator.element.find('.annotator-edit').first();
-                expect(edit).toBeFocused();
-            });
-
-            it('should open the viewer on SPACE keydown', function () {
+            it('should open the viewer on SPACE keydown and focus on note', function () {
                 highlight.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.showViewer).toHaveBeenCalled();
+                // TODO: Check that note is focused
+                // note = this.annotator.element.find('.annotator-note').first();
+                // expect(note).toBeFocused();
             });
 
-            it('should open the viewer on ENTER keydown', function () {
+            it('should open the viewer on ENTER keydown and focus on note', function () {
                 highlight.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.showViewer).toHaveBeenCalled();
-            });
-
-            it('should close the viewer on ESCAPE keydown', function () {
-                highlight.trigger(keyDownEvent(this.KEY.ESCAPE));
-                expect(this.annotator.viewer.hide).toHaveBeenCalled();
+                // TODO: Check that note is focused
+                // note = this.annotator.element.find('.annotator-note').first();
+                // expect(note).toBeFocused();
             });
         });
 
         describe('keydown events on viewer', function () {
-            var html, outerHighlight, innerHighlight, annotations, edits = [], dels = [];
+            var html, outerHighlight, innerHighlight, annotations, notes = [], edits = [], dels = [], closes = [];
 
             beforeEach(function() {
                 html = [
@@ -143,35 +137,57 @@ define([
                     }
                 ];
                 this.annotator.viewer.load(annotations);
+                notes[0] = this.annotator.element.find('.annotator-note').first();
                 edits[0] = this.annotator.element.find('.annotator-edit').first();
                 dels[0] = this.annotator.element.find('.annotator-delete').first();
+                closes[0] = this.annotator.element.find('.annotator-close').first();
+                notes[1] = this.annotator.element.find('.annotator-note').last();
                 edits[1] = this.annotator.element.find('.annotator-edit').last();
                 dels[1] = this.annotator.element.find('.annotator-delete').last();
+                closes[1] = this.annotator.element.find('.annotator-close').last();
                 spyOn(this.annotator.viewer, 'hide').andCallThrough();;
             });
 
-            it('should cycle forward through the multiple Edit and Delete on TAB keydown', function () {
-                edits[0].focus();
+            it('should cycle forward through the multiple Note, Edit, Delete, and Close on TAB keydown', function () {
+                // TODO: Improve this code
+                notes[0].focus();
+                notes[0].trigger(tabForwardEvent());
+                expect(edits[0]).toBeFocused();
                 edits[0].trigger(tabForwardEvent());
                 expect(dels[0]).toBeFocused();
                 dels[0].trigger(tabForwardEvent());
+                expect(closes[0]).toBeFocused();
+                closes[0].trigger(tabForwardEvent());
+                expect(notes[1]).toBeFocused();
+                notes[1].trigger(tabForwardEvent());
                 expect(edits[1]).toBeFocused();
                 edits[1].trigger(tabForwardEvent());
                 expect(dels[1]).toBeFocused();
                 dels[1].trigger(tabForwardEvent());
-                expect(edits[0]).toBeFocused();
+                expect(closes[1]).toBeFocused();
+                closes[1].trigger(tabForwardEvent());
+                expect(notes[0]).toBeFocused();
             });
 
-            it('should cycle backward through the multiple Edit and Delete on SHIFT + TAB keydown', function () {
-                edits[0].focus();
-                edits[0].trigger(tabBackwardEvent());
+            it('should cycle backward through the multiple Note, Edit, Delete, and Close on SHIFT + TAB keydown', function () {
+                // TODO: Improve this code
+                notes[0].focus();
+                notes[0].trigger(tabBackwardEvent());
+                expect(closes[1]).toBeFocused();
+                closes[1].trigger(tabBackwardEvent());
                 expect(dels[1]).toBeFocused();
                 dels[1].trigger(tabBackwardEvent());
                 expect(edits[1]).toBeFocused();
                 edits[1].trigger(tabBackwardEvent());
+                expect(notes[1]).toBeFocused();
+                notes[1].trigger(tabBackwardEvent());
+                expect(closes[0]).toBeFocused();
+                closes[0].trigger(tabBackwardEvent());
                 expect(dels[0]).toBeFocused();
                 dels[0].trigger(tabBackwardEvent());
                 expect(edits[0]).toBeFocused();
+                edits[0].trigger(tabBackwardEvent());
+                expect(notes[0]).toBeFocused();
             });
 
             it('should close the viewer and give focus back to highlight on ESCAPE keydown', function () {

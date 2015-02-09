@@ -38,42 +38,44 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
         addAriaAttributes: function (field, annotation) {
             var ariaNoteId = 'aria-note-' + annotation.id;
             // Add ARIA attributes to highlighted text ie <span class="annotator-hl">Highlighted text</span>
-            // tabindex is set to 0 to make the span focusable via the TAB key.
             // aria-describedby refers to the actual note that was taken.
             _.each(annotation.highlights, function(highlight) {
                 $(highlight).attr('aria-describedby', ariaNoteId);
             });
             // Add ARIA attributes to associated note ie <div>My note</div>
             $(field).attr({
+                'tabindex': -1,
                 'id': ariaNoteId,
                 'role': 'note',
-                'aria-label': 'Note'
+                'aria-label': 'Note',
+                'class': 'annotator-note'
             });
         },
 
         focusOnHighlightedText: function (event) {
-            var viewer, viewerControls, note, id;
+            var note, id;
 
-            viewer = this.annotator.element.find('.annotator-viewer');
-            viewerControls = viewer.find('.annotator-controls');
-            note = viewerControls.siblings('div[role="note"]');
+            note = this.annotator.element.find('.annotator-viewer')
+                                         .find('.annotator-note');
             id = note.attr('id');
             $('.annotator-hl[aria-describedby=' + id + ']').focus();
             event.preventDefault();
         },
 
         getViewerTabControls: function () {
-            var viewer, viewerControls, editButtons, delButtons, closeButtons, tabControls = [], i;
+            var viewer, notes, viewerControls, editButtons, delButtons, closeButtons, tabControls = [], i;
 
             // Viewer elements
             viewer = this.annotator.element.find('.annotator-viewer');
+            notes = viewer.find('.annotator-note');
             viewerControls = viewer.find('.annotator-controls');
             editButtons = viewerControls.find('.annotator-edit');
             delButtons = viewerControls.find('.annotator-delete');
             closeButtons = viewerControls.find('.annotator-close');
 
-            // Edit, delete and close buttons always come in triplets
+            // Note and ddit, delete and close buttons always come in quadruplets
             for (i = 0; i < editButtons.length; i++) {
+                tabControls.push($(notes.get(i)));
                 tabControls.push($(editButtons.get(i)));
                 tabControls.push($(delButtons.get(i)));
                 tabControls.push($(closeButtons.get(i)));
@@ -127,7 +129,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                 keyCode = event.keyCode,
                 target = $(event.currentTarget),
                 annotations, position,
-                viewer, controls, edit, self = this;
+                self = this;
 
             switch (keyCode) {
                 case KEY.ENTER:
@@ -139,13 +141,11 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                         });
                         this.annotator.showViewer($.makeArray(annotations), {top: position.top, left: position.left});
                         setTimeout(function() {
-                            controls = self.annotator.element.find('.annotator-controls');
-                            edit = controls.find('.annotator-edit').first();
-                            edit.focus();
-                            // TODO: focus is given for the moment to the edit button
-                            // Give it instead to viewer.
-                            // viewer = self.annotator.element.find('.annotator-viewer');
-                            // viewer.focus();
+                            // Focus on note
+                            self.annotator.element.find('.annotator-viewer')
+                                                  .find('.annotator-note')
+                                                  .first()
+                                                  .focus();
                         }, 50);
                     }
                     break;

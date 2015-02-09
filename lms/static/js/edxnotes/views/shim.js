@@ -102,37 +102,30 @@ define([
     );
 
     /**
-     * Modifies Annotator.Viewer.html template to make viewer div focusable.
-     * Also adds a close button and necessary i18n attributes to all buttons.
+     * Modifies Viewer template to add a close button and i18n attributes to all
+     * buttons.
      **/
-    Annotator.Viewer.prototype.html = {
-        element: [
-            '<div class="annotator-outer annotator-viewer" tabindex="-1">',
-                '<ul class="annotator-widget annotator-listing"></ul>',
-            '</div>'
-        ].join(''),
-        item: [
-            '<li class="annotator-annotation annotator-item">',
-                '<span class="annotator-controls">',
-                    '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
-                        _t('View as webpage'),
-                    '</a>',
-                    '<button class="annotator-edit">',
-                        _t('Edit'),
-                        '<span class="sr">', _t('Note'), '</span>',
-                    '</button>',
-                    '<button class="annotator-delete">',
-                        _t('Delete'),
-                        '<span class="sr">', _t('Note'), '</span>',
-                    '</button>',
-                    '<button class="annotator-close">',
-                        _t('Close'),
-                        '<span class="sr">', _t('Note'), '</span>',
-                    '</button>',
-                '</span>',
-            '</li>'
-        ].join('')
-    };
+    Annotator.Viewer.prototype.html.item = [
+        '<li class="annotator-annotation annotator-item">',
+            '<span class="annotator-controls">',
+                '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
+                    _t('View as webpage'),
+                '</a>',
+                '<button class="annotator-edit">',
+                    _t('Edit'),
+                    '<span class="sr">', _t('Note'), '</span>',
+                '</button>',
+                '<button class="annotator-delete">',
+                    _t('Delete'),
+                    '<span class="sr">', _t('Note'), '</span>',
+                '</button>',
+                '<button class="annotator-close">',
+                    _t('Close'),
+                    '<span class="sr">', _t('Note'), '</span>',
+                '</button>',
+            '</span>',
+        '</li>'
+    ].join('');
 
     /**
      * Adds close event to viewer.
