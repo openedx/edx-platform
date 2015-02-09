@@ -195,11 +195,18 @@ def import_from_xml(
         if target_course_id is not None:
             dest_course_id = target_course_id
         else:
+            # Note that dest_course_id will be in the format for the default modulestore.
             dest_course_id = store.make_course_key(course_key.org, course_key.course, course_key.run)
+
+        existing_course_id = store.has_course(dest_course_id, ignore_case=True)
+        # store.has_course will return the course_key in the format for the modulestore in which it was found.
+        # This may be different from dest_course_id, so correct to the format found.
+        if existing_course_id:
+            dest_course_id = existing_course_id
 
         runtime = None
         # Creates a new course if it doesn't already exist
-        if create_course_if_not_present and not store.has_course(dest_course_id, ignore_case=True):
+        if create_course_if_not_present and not existing_course_id:
             try:
                 new_course = store.create_course(dest_course_id.org, dest_course_id.course, dest_course_id.run, user_id)
                 runtime = new_course.runtime
