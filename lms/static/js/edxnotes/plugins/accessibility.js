@@ -141,11 +141,8 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                         });
                         this.annotator.showViewer($.makeArray(annotations), {top: position.top, left: position.left});
                         setTimeout(function() {
-                            // Focus on note
-                            self.annotator.element.find('.annotator-viewer')
-                                                  .find('.annotator-note')
-                                                  .first()
-                                                  .focus();
+                            // Focus on listing
+                            self.annotator.element.find('.annotator-listing').focus();
                         }, 50);
                     }
                     break;
@@ -164,15 +161,26 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.target),
+                listing = this.annotator.element.find('.annotator-listing'),
                 tabControls;
 
             switch (keyCode) {
                 case KEY.TAB:
                     tabControls = this.getViewerTabControls();
                     if (event.shiftKey) { // Tabbing backwards
-                        this.focusOnPreviousTabControl(tabControls, target);
+                        if (target.is(listing)) {
+                            _.last(tabControls).focus();
+                        }
+                        else {
+                            this.focusOnPreviousTabControl(tabControls, target);
+                        }
                     } else { // Tabbing forward
-                        this.focusOnNextTabControl(tabControls, target);
+                        if (target.is(listing)) {
+                            _.first(tabControls).focus();
+                        }
+                        else {
+                            this.focusOnNextTabControl(tabControls, target);
+                        }
                     }
                     event.preventDefault();
                     event.stopPropagation();
