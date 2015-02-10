@@ -348,7 +348,7 @@ define([
             this.listView.render();
             expect(this.listView.$el.find('ol')[0]).toExist();
             expect(this.listView.$el.find('li').length).toEqual(1);
-            expect(this.listView.$el).toContainHtml('Test Course');
+            expect(this.listView.$el).toContainHtml('Search Results');
             expect(this.listView.$el).toContainHtml('this is a short excerpt');
 
             this.collection.set(searchResults);

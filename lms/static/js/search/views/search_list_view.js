@@ -31,7 +31,6 @@ define([
 
         render: function () {
             this.$el.html(this.listTemplate({
-                courseName: this.courseName,
                 totalCount: this.collection.totalCount,
                 totalCountMsg: this.totalCountMsg(),
                 pageSize: this.collection.pageSize,
