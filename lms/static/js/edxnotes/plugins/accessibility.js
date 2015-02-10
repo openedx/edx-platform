@@ -25,9 +25,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
 
         destroy: function () {
             this.annotator.unsubscribe('annotationViewerTextField', this.addAriaAttributes);
-            this.annotator.element.off('keydown.accessibility.hl');
-            this.annotator.element.off('keydown.accessibility.viewer');
-            this.annotator.element.off('keydown.accessibility.editor');
+            this.annotator.element.off('.accessibility');
         },
 
         addTabIndex: function () {

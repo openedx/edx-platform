@@ -179,6 +179,7 @@ define([
                     '</button>',
                     '<button class="annotator-cancel">',
                         _t('Cancel'),
+                        '<span class="sr">', _t('Note'), '</span>',
                     '</button>',
                 '</div>',
             '</form>',
