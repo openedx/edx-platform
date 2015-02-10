@@ -181,6 +181,7 @@ class CMSVideoTest(CMSVideoBaseTest):
 
         self.assertTrue(self.video.is_button_shown('play'))
         self.video.click_player_button('play')
+        self.video.wait_for_state('playing')
         self.assertTrue(self.video.is_button_shown('pause'))
 
     def test_youtube_stub_blocks_youtube_api(self):
