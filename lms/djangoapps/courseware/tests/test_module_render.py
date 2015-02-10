@@ -41,7 +41,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory, check_mongo_calls
-from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW
+from xmodule.x_module import XModuleDescriptor, XModule, STUDENT_VIEW, CombinedSystem
 
 TEST_DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 
@@ -903,13 +903,16 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             _field_data=Mock(spec=FieldData),
             location=location,
             static_asset_path=None,
-            runtime=Mock(
+            _runtime=Mock(
                 spec=Runtime,
                 resources_fs=None,
-                mixologist=Mock(_mixins=())
+                mixologist=Mock(_mixins=(), name='mixologist'),
+                name='runtime',
             ),
             scope_ids=Mock(spec=ScopeIds),
+            name='descriptor'
         )
+        descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
         # Use the xblock_class's bind_for_student method
         descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
 
@@ -919,10 +922,10 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         return render.get_module_for_descriptor_internal(
             user=self.user,
             descriptor=descriptor,
-            field_data_cache=Mock(spec=FieldDataCache),
+            field_data_cache=Mock(spec=FieldDataCache, name='field_data_cache'),
             course_id=course_id,
-            track_function=Mock(),  # Track Function
-            xqueue_callback_url_prefix=Mock(),  # XQueue Callback Url Prefix
+            track_function=Mock(name='track_function'),  # Track Function
+            xqueue_callback_url_prefix=Mock(name='xqueue_callback_url_prefix'),  # XQueue Callback Url Prefix
             request_token='request_token',
         ).xmodule_runtime.anonymous_student_id
 
