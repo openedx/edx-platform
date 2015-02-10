@@ -403,7 +403,7 @@ class XModuleMixin(XBlockMixin):
         else:
             return [self.display_name_with_default]
 
-    def get_children(self):
+    def get_children(self, usage_key_filter=lambda location: True):
         """Returns a list of XBlock instances for the children of
         this module"""
 
@@ -413,6 +413,9 @@ class XModuleMixin(XBlockMixin):
         if getattr(self, '_child_instances', None) is None:
             self._child_instances = []  # pylint: disable=attribute-defined-outside-init
             for child_loc in self.children:
+                # Skip if it doesn't satisfy the filter function
+                if not usage_key_filter(child_loc):
+                    continue
                 try:
                     child = self.runtime.get_block(child_loc)
                     if child is None:
