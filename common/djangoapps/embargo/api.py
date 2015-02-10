@@ -10,12 +10,114 @@ import pygeoip
 
 from django.core.cache import cache
 from django.conf import settings
+
 from embargo.models import CountryAccessRule, RestrictedCourse
+
 
 log = logging.getLogger(__name__)
 
 
-def get_user_country_from_profile(user):
+def redirect_if_blocked(course_key, access_point='enrollment', **kwargs):
+    """Redirect if the user does not have access to the course.
+
+    Arguments:
+        course_key (CourseKey): Location of the course the user is trying to access.
+
+    Keyword Arguments:
+        Same as `check_course_access` and `message_url_path`
+
+    """
+    if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+        is_blocked = not check_course_access(course_key, **kwargs)
+        if is_blocked:
+            return message_url_path(course_key, access_point)
+
+
+def check_course_access(course_key, user=None, ip_address=None, url=None):
+    """
+    Check is the user with this ip_address has access to the given course
+
+    Arguments:
+        course_key (CourseKey): Location of the course the user is trying to access.
+
+    Keyword Arguments:
+        user (User): The user making the request.  Can be None, in which case
+            the user's profile country will not be checked.
+        ip_address (str): The IP address of the request.
+        url (str): The URL the user is trying to access.  Used in
+            log messages.
+
+    Returns:
+        Boolean: True if the user has access to the course; False otherwise
+
+    """
+    # First, check whether there are any restrictions on the course.
+    # If not, then we do not need to do any further checks
+    course_is_restricted = RestrictedCourse.is_restricted_course(course_key)
+
+    if not course_is_restricted:
+        return True
+
+    if ip_address is not None:
+        # Retrieve the country code from the IP address
+        # and check it against the allowed countries list for a course
+        user_country_from_ip = _country_code_from_ip(ip_address)
+
+        if not CountryAccessRule.check_country_access(course_key, user_country_from_ip):
+            log.info(
+                (
+                    u"Blocking user %s from accessing course %s at %s "
+                    u"because the user's IP address %s appears to be "
+                    u"located in %s."
+                ),
+                getattr(user, 'id', '<Not Authenticated>'),
+                course_key,
+                url,
+                ip_address,
+                user_country_from_ip
+            )
+            return False
+
+    if user is not None:
+        # Retrieve the country code from the user's profile
+        # and check it against the allowed countries list for a course.
+        user_country_from_profile = _get_user_country_from_profile(user)
+
+        if not CountryAccessRule.check_country_access(course_key, user_country_from_profile):
+            log.info(
+                (
+                    u"Blocking user %s from accessing course %s at %s "
+                    u"because the user's profile country is %s."
+                ),
+                user.id, course_key, url, user_country_from_profile
+            )
+            return False
+
+    return True
+
+
+def message_url_path(course_key, access_point):
+    """Determine the URL path for the message explaining why the user was blocked.
+
+    This is configured per-course.  See `RestrictedCourse` in the `embargo.models`
+    module for more details.
+
+    Arguments:
+        course_key (CourseKey): The location of the course.
+        access_point (str): How the user was trying to access the course.
+            Can be either "enrollment" or "courseware".
+
+    Returns:
+        unicode: The URL path to a page explaining why the user was blocked.
+
+    Raises:
+        InvalidAccessPoint: Raised if access_point is not a supported value.
+
+    """
+    return RestrictedCourse.message_url_path(course_key, access_point)
+
+
+def _get_user_country_from_profile(user):
     """
     Check whether the user is embargoed based on the country code in the user's profile.
 
@@ -55,40 +157,3 @@ def _country_code_from_ip(ip_addr):
         return pygeoip.GeoIP(settings.GEOIPV6_PATH).country_code_by_addr(ip_addr)
     else:
         return pygeoip.GeoIP(settings.GEOIP_PATH).country_code_by_addr(ip_addr)
-
-
-def check_course_access(user, ip_address, course_key):
-    """
-    Check is the user with this ip_address has access to the given course
-
-    Params:
-        user (User): Currently logged in user object
-        ip_address (str): The ip_address of user
-        course_key (CourseLocator): CourseLocator object the user is trying to access
-
-    Returns:
-        The return will be True if the user has access on the course.
-        if any constraints fails it will return the False
-    """
-    course_is_restricted = RestrictedCourse.is_restricted_course(course_key)
-    # If they're trying to access a course that cares about embargoes
-
-    # If course is not restricted then return immediately return True
-    # no need for further checking
-    if not course_is_restricted:
-        return True
-
-    # Retrieve the country code from the IP address
-    # and check it against the allowed countries list for a course
-    user_country_from_ip = _country_code_from_ip(ip_address)
-    # if user country has access to course return True
-    if not CountryAccessRule.check_country_access(course_key, user_country_from_ip):
-        return False
-
-    # Retrieve the country code from the user profile.
-    user_country_from_profile = get_user_country_from_profile(user)
-    # if profile country has access return True
-    if not CountryAccessRule.check_country_access(course_key, user_country_from_profile):
-        return False
-
-    return True
