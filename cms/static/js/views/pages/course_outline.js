@@ -110,15 +110,14 @@ define(["jquery", "underscore", "gettext", "js/views/pages/base_page", "js/views
                 event.preventDefault();
                 var target = $(event.currentTarget);
                 target.css('cursor', 'wait');
-                this.startReIndex()
+                this.startReIndex(target.attr('href'))
                     .done(function() {self.onIndexSuccess();})
                     .always(function() {target.css('cursor', 'pointer');});
             },
 
-            startReIndex: function() {
-                var locator =  window.course.id;
+            startReIndex: function(reindex_url) {
                 return $.ajax({
-                    url: '/course_search_index/' + locator,
+                    url: reindex_url,
                     method: 'GET'
                     });
             },
