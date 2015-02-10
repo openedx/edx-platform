@@ -37,3 +37,4 @@ git+https://github.com/mitocw/django-cas.git@60a5b8e5a62e63e0d5d224a87f0b489201a
 -e git+https://github.com/pmitros/RecommenderXBlock.git@9b07e807c89ba5761827d0387177f71aa57ef056#egg=recommender-xblock
 -e git+https://github.com/edx/edx-milestones.git@547f2250ee49e73ce8d7ff4e78ecf1b049892510#egg=edx-milestones
 -e git+https://github.com/edx/edx-search.git@264bb3317f98e9cb22b932aa11b89d0651fd741c#egg=edx-search
+git+https://github.com/edx/edx-lint.git@e0e73bcc7b3b7ed632a1db6e3b32b0a249721261#egg=edx_lint
