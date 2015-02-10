@@ -55,6 +55,10 @@ from django.conf import settings
     % endif
     % if check_button:
     <input class="check ${ check_button }" type="button" data-checking="${ check_button_checking }" value="${ check_button }" />
+    %elif exceeded_time_limit:
+    <p class="exceeded-time-limit-message">
+      Deadline has passed, you can no longer submit.
+    </p>
     % endif
     % if answer_available:
     <button class="show"><span class="show-label">${_('Show Answer')}</span> <span class="sr">${_("Reveal Answer")}</span></button>
