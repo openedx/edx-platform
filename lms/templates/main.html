@@ -65,7 +65,7 @@ from microsite_configuration import page_title_breadcrumbs
   ## If RequireJS is not enabled, then we will need to load i18n explicitly
   ## so that JavaScript on the page can use internationalization functions.
   % if not enable_require_js_optimizer:
-  <script type="text/javascript" src="/i18n.js"></script>
+    <script type="text/javascript" src="/i18n.js"></script>
   % endif
 
 
@@ -76,45 +76,7 @@ from microsite_configuration import page_title_breadcrumbs
   <%static:css group='style-app-extend1'/>
   <%static:css group='style-app-extend2'/>
 
-  ## Set up RequireJS so that it can be used by the current page.
-  ## There are two schemes available:
-  ##   1. if enable_require_js_optimizer is true then the whole page will
-  ##      be compressed and minified into a single JavaScript file.
-  ##   2. if not, then RequireJS will load each dependency independently.
-  ##      The files will be loaded without the MD5 hash so the Git
-  ##      a separate cache busting
-  <script type="text/javascript" src="${static.url("require-config-lms.js")}"></script>
-  <script>
-    window.baseUrl = "${settings.STATIC_URL}";
-    require = require || {};
-    require.baseUrl = window.baseUrl;
-  </script>
-  % if enable_require_js_optimizer:
-    ${render_require_js_path_overrides(settings.REQUIRE_JS_PATH_OVERRIDES)}
-    <script type="text/javascript" src="${static.url("js/vendor/require.js")}"></script>
-  % else:
-    % if disable_courseware_js:
-      <%static:js group='base_vendor'/>
-    % else:
-      <%static:js group='main_vendor'/>
-    % endif
-  % endif
-
-  <script>
-    (function (require) {
-      % if settings.DEBUG is True:
-        ## Using what amounts to a random number in the Development environment for cache-busting
-        var urlArgs = "bust=" + (new Date()).getTime();
-      % else:
-        var urlArgs = "v=${settings.EDX_PLATFORM_REVISION}";
-      % endif
-      require.config({
-          baseUrl: baseUrl,
-          urlArgs: urlArgs
-      });
-    }).call(this, require || RequireJS.require);
-  </script>
-  <script type="text/javascript" src="${static.url("require-config-lms-overrides.js")}"></script>
+  <%include file="require_js.html" />
 
   <%block name="headextra"/>
 
