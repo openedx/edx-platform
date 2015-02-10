@@ -359,6 +359,27 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.course.cohort_config = {"cohorted": True}
         check_cohorted(True)
 
+    def test_tree_with_duplicate_targets(self):
+        self.create_discussion("Chapter 1", "Discussion A")
+        self.create_discussion("Chapter 1", "Discussion B")
+        self.create_discussion("Chapter 1", "Discussion A")  # duplicate
+        self.create_discussion("Chapter 1", "Discussion A")  # another duplicate
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
+        self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")  # duplicate
+
+        category_map = utils.get_discussion_category_map(self.course, self.user)
+
+        chapter1 = category_map["subcategories"]["Chapter 1"]
+        chapter1_discussions = set(["Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"])
+        self.assertEqual(set(chapter1["children"]), chapter1_discussions)
+        self.assertEqual(set(chapter1["entries"].keys()), chapter1_discussions)
+
+        chapter2 = category_map["subcategories"]["Chapter 2"]
+        subsection1 = chapter2["subcategories"]["Section 1"]["subcategories"]["Subsection 1"]
+        subsection1_discussions = set(["Discussion", "Discussion (1)"])
+        self.assertEqual(set(subsection1["children"]), subsection1_discussions)
+        self.assertEqual(set(subsection1["entries"].keys()), subsection1_discussions)
+
     def test_start_date_filter(self):
         now = datetime.now()
         later = datetime.max
