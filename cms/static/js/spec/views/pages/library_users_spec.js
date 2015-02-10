@@ -39,7 +39,9 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             expect($('.wrapper-create-user')).not.toHaveClass('is-shown');
         });
 
-        it("displays an error when the required field is blank", function () {
+        // Disabled flaky test - the following three disabled by bradenmacdonald on 2015-02-09
+        // These tests are expected to be removed or rewritten as part of SOL-194
+        xit("displays an error when the required field is blank", function () {
             var requests = AjaxHelpers.requests(this);
             $('.create-user-button').click();
             $('.user-email-input').val('');
@@ -51,7 +53,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
             expect(requests.length).toEqual(0);
         });
 
-        it("displays an error when the user has already been added", function () {
+        xit("displays an error when the user has already been added", function () {
             var requests = AjaxHelpers.requests(this);
             $('.create-user-button').click();
             $('.user-email-input').val('honor@example.com');
@@ -64,7 +66,7 @@ function ($, AjaxHelpers, ViewHelpers, ManageUsersFactory, ViewUtils) {
         });
 
 
-        it("can remove a user's permission to access the library", function () {
+        xit("can remove a user's permission to access the library", function () {
             var requests = AjaxHelpers.requests(this);
             var reloadSpy = spyOn(ViewUtils, 'reload');
             $('.user-item[data-email="honor@example.com"] .action-delete .delete').click();
