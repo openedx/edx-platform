@@ -32,6 +32,8 @@ from student.models import CourseEnrollment
 from course_modes.tests.factories import CourseModeFactory
 from course_modes.models import CourseMode
 from shoppingcart.models import Order, CertificateItem
+from embargo.test_utils import restrict_course
+from util.testing import UrlResetMixin
 from verify_student.views import render_to_response, PayAndVerifyView
 from verify_student.models import SoftwareSecurePhotoVerification
 from reverification.tests.factories import MidcourseReverificationWindowFactory
@@ -60,7 +62,7 @@ class StartView(TestCase):
 
 
 @ddt.ddt
-class TestPayAndVerifyView(ModuleStoreTestCase):
+class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
     """
     Tests for the payment and verification flow views.
     """
@@ -72,8 +74,9 @@ class TestPayAndVerifyView(ModuleStoreTestCase):
     YESTERDAY = NOW - timedelta(days=1)
     TOMORROW = NOW + timedelta(days=1)
 
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
     def setUp(self):
-        super(TestPayAndVerifyView, self).setUp()
+        super(TestPayAndVerifyView, self).setUp('embargo')
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
         result = self.client.login(username=self.USERNAME, password=self.PASSWORD)
         self.assertTrue(result, msg="Could not log in")
@@ -621,6 +624,20 @@ class TestPayAndVerifyView(ModuleStoreTestCase):
         response = self._get_page("verify_student_verify_later", course.id)
         self.assertContains(response, "verification deadline")
         self.assertContains(response, "Jan 02, 1999 at 00:00 UTC")
+
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def test_embargo_restrict(self):
+        course = self._create_course("verified")
+        with restrict_course(course.id) as redirect_url:
+            # Simulate that we're embargoed from accessing this
+            # course based on our IP address.
+            response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
+            self.assertRedirects(response, redirect_url)
+
+    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def test_embargo_allow(self):
+        course = self._create_course("verified")
+        self._get_page('verify_student_start_flow', course.id)
 
     def _create_course(self, *course_modes, **kwargs):
         """Create a new course with the specified course modes. """

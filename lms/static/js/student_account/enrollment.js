@@ -36,7 +36,26 @@ var edx = edx || {};
                 data: data,
                 headers: this.headers,
                 context: this
-            }).always(function() {
+            })
+            .fail(function( jqXHR ) {
+                var responseData = JSON.parse(jqXHR.responseText);
+                if ( jqXHR.status === 403 && responseData.user_message_url ) {
+                    // Check if we've been blocked from the course
+                    // because of country access rules.
+                    // If so, redirect to a page explaining to the user
+                    // why they were blocked.
+                    this.redirect( responseData.user_message_url );
+                }
+                else {
+                    // Otherwise, go to the track selection page as usual.
+                    // This can occur, for example, when a course does not
+                    // have a free enrollment mode, so we can't auto-enroll.
+                    this.redirect( this.trackSelectionUrl( courseKey ) );
+                }
+            })
+            .done(function() {
+                // If we successfully enrolled, go to the track selection
+                // page to allow the user to choose a paid enrollment mode.
                 this.redirect( this.trackSelectionUrl( courseKey ) );
             });
         },
