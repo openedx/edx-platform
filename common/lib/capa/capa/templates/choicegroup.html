@@ -16,9 +16,11 @@
         </span>
     % endif
     </div>
-
-    <fieldset role="${input_type}group" aria-label="${label}">
-
+    % if input_type == 'checkbox':
+        <div class="choicegroup-choices" role="group" aria-labelledby="${label}">
+    % else:
+        <div class="choicegroup-choices" role="${input_type}group" aria-labelledby="${label}">
+    % endif
         % for choice_id, choice_description in choices:
         <label for="input_${id}_${choice_id}"
             ## If the student has selected this choice...
@@ -36,15 +38,12 @@
             % endif
             % endif
             >
-            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-role="radio" aria-describedby="answer_${id}" value="${choice_id}"
+            <input type="${input_type}" name="input_${id}${name_array_suffix}" id="input_${id}_${choice_id}" aria-describedby="answer_${id}" value="${choice_id}"
             ## If the student selected this choice...
             % if input_type == 'radio' and ( (isinstance(value, basestring) and (choice_id == value))  or  (not isinstance(value, basestring) and choice_id in value) ):
             checked="true"
             % elif input_type != 'radio' and choice_id in value:
             checked="true"
-            % endif
-            % if input_type != 'radio':
-            aria-multiselectable="true"
             % endif
 
             /> ${choice_description}
@@ -57,7 +56,7 @@
         </label>
         % endfor
         <span id="answer_${id}"></span>
-    </fieldset>
+    </div>
 
     % if show_correctness == "never" and (value or status not in ['unsubmitted']):
     <div class="capa_alert">${submitted_message}</div>

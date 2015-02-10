@@ -87,11 +87,12 @@ div.problem {
       @include margin-right(15px);
     }
 
-    fieldset {
+    .choicegroup-choices {
       @include box-sizing(border-box);
       margin: 0px 0px $baseline;
       @include padding-left($baseline);
       @include border-left(1px solid #ddd);
+      display: inline-block;
     }
 
     input[type="radio"],
