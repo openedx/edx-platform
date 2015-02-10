@@ -196,11 +196,18 @@ def get_discussion_category_map(course, user):
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
 
+        dupe_counters = defaultdict(lambda: 0)  # counts the number of times we see each title
         for entry in entries:
-            node[level]["entries"][entry["title"]] = {"id": entry["id"],
-                                                      "sort_key": entry["sort_key"],
-                                                      "start_date": entry["start_date"],
-                                                      "is_cohorted": is_course_cohorted}
+            title = entry["title"]
+            if node[level]["entries"][title]:
+                # If we've already seen this title, append an incrementing number to disambiguate
+                # the category from other categores sharing the same title in the course discussion UI.
+                dupe_counters[title] += 1
+                title = u"{title} ({counter})".format(title=title, counter=dupe_counters[title])
+            node[level]["entries"][title] = {"id": entry["id"],
+                                             "sort_key": entry["sort_key"],
+                                             "start_date": entry["start_date"],
+                                             "is_cohorted": is_course_cohorted}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
