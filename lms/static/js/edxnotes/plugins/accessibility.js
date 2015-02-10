@@ -5,6 +5,10 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
      * Adds the Accessibility Plugin
      **/
     Annotator.Plugin.Accessibility = function () {
+        _.bindAll(this,
+            'addAriaAttributes', 'onHighlightKeyDown', 'onViewerKeyDown',
+            'onEditorKeyDown'
+        );
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
         Annotator.Plugin.apply(this, arguments);
@@ -12,27 +16,24 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
 
     $.extend(Annotator.Plugin.Accessibility.prototype, new Annotator.Plugin(), {
         pluginInit: function () {
-            this.annotator.subscribe('annotationViewerTextField', _.bind(this.addAriaAttributes, this));
-            this.annotator.element.on('keydown', '.annotator-hl', _.bind(this.onHighlightKeyDown, this));
-            this.annotator.element.on('keydown', '.annotator-viewer', _.bind(this.onViewerKeyDown, this));
-            this.annotator.element.on('keydown', '.annotator-editor', _.bind(this.onEditorKeyDown, this));
+            this.annotator.subscribe('annotationViewerTextField', this.addAriaAttributes);
+            this.annotator.element.on('keydown.accessibility.hl', '.annotator-hl', this.onHighlightKeyDown);
+            this.annotator.element.on('keydown.accessibility.viewer', '.annotator-viewer', this.onViewerKeyDown);
+            this.annotator.element.on('keydown.accessibility.editor', '.annotator-editor', this.onEditorKeyDown);
             this.addTabIndex();
         },
 
         destroy: function () {
             this.annotator.unsubscribe('annotationViewerTextField', this.addAriaAttributes);
-            this.annotator.element.off('keydown', '.annotator-hl');
-            this.annotator.element.off('keydown', '.annotator-viewer');
-            this.annotator.element.off('keydown', '.annotator-editor');
+            this.annotator.element.off('keydown.accessibility.hl');
+            this.annotator.element.off('keydown.accessibility.viewer');
+            this.annotator.element.off('keydown.accessibility.editor');
         },
 
         addTabIndex: function () {
-            var controls, edit, del;
-            controls = this.annotator.element.find('.annotator-controls');
-            edit = controls.find('.annotator-edit');
-            edit.attr('tabindex', 0);
-            del = controls.find('.annotator-delete');
-            del.attr('tabindex', 0);
+            this.annotator.element
+                .find('.annotator-edit, .annotator-delete')
+                .attr('tabindex', 0);
         },
 
         addAriaAttributes: function (field, annotation) {
@@ -47,17 +48,14 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                 'tabindex': -1,
                 'id': ariaNoteId,
                 'role': 'note',
-                'aria-label': 'Note',
                 'class': 'annotator-note'
             });
         },
 
         focusOnHighlightedText: function (event) {
-            var note, id;
-
-            note = this.annotator.element.find('.annotator-viewer')
-                                         .find('.annotator-note');
-            id = note.attr('id');
+            var id = this.annotator.element.find('.annotator-viewer')
+                                           .find('.annotator-note')
+                                           .attr('id');
             $('.annotator-hl[aria-describedby=' + id + ']').focus();
             event.preventDefault();
         },
@@ -128,8 +126,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.currentTarget),
-                annotations, position,
-                self = this;
+                annotations, position;
 
             switch (keyCode) {
                 case KEY.ENTER:
@@ -140,10 +137,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                             return $(this).data('annotation');
                         });
                         this.annotator.showViewer($.makeArray(annotations), {top: position.top, left: position.left});
-                        setTimeout(function() {
-                            // Focus on listing
-                            self.annotator.element.find('.annotator-listing').focus();
-                        }, 50);
+                        this.annotator.element.find('.annotator-listing').focus();
                     }
                     break;
                 case KEY.ESCAPE:

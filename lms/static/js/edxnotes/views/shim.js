@@ -135,22 +135,6 @@ define([
     };
 
     /**
-     * Adds close event to viewer.
-     **/
-    Annotator.Viewer.prototype.events = {
-      ".annotator-edit click": "onEditClick",
-      ".annotator-delete click": "onDeleteClick",
-      ".annotator-close click": "onCloseClick"
-    };
-
-    /**
-     * Adds close event handler to viewer.
-     **/
-    Annotator.Viewer.prototype.onCloseClick = function(event) {
-      return this.onButtonClick(event, 'close');
-    };
-
-    /**
      * Overrides Annotator._setupViewer to add a "click" event on viewer and to
      * improve line breaks.
      **/
@@ -161,7 +145,6 @@ define([
         this.viewer.hide()
             .on("edit", this.onEditAnnotation)
             .on("delete", this.onDeleteAnnotation)
-            .on("close", this.viewer.hide)
             .addField({
                 load: function (field, annotation) {
                     if (annotation.text) {
