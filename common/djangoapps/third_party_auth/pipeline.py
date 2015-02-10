@@ -61,6 +61,7 @@ import random
 import string  # pylint: disable-msg=deprecated-module
 from collections import OrderedDict
 import urllib
+from ipware.ip import get_ip
 import analytics
 from eventtracking import tracker
 
@@ -73,6 +74,7 @@ from social.exceptions import AuthException
 from social.pipeline import partial
 
 import student
+from embargo import api as embargo_api
 from shoppingcart.models import Order, PaidCourseRegistration  # pylint: disable=import-error
 from shoppingcart.exceptions import (  # pylint: disable=import-error
     CourseDoesNotExistException,
@@ -634,7 +636,7 @@ def login_analytics(strategy, *args, **kwargs):
 
 
 @partial.partial
-def change_enrollment(strategy, user=None, *args, **kwargs):
+def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
     """Enroll a user in a course.
 
     If a user entered the authentication flow when trying to enroll
@@ -653,17 +655,55 @@ def change_enrollment(strategy, user=None, *args, **kwargs):
     upon completion of the authentication pipeline
     (configured using the ?next parameter to the third party auth login url).
 
+    Keyword Arguments:
+        user (User): The user being authenticated.
+        is_dashboard (boolean): Whether the user entered the authentication
+            pipeline from the "link account" button on the student dashboard.
+
     """
+    # We skip enrollment if the user entered the flow from the "link account"
+    # button on the student dashboard.  At this point, either:
+    #
+    # 1) The user already had a linked account when they started the enrollment flow,
+    # in which case they would have been enrolled during the normal authentication process.
+    #
+    # 2) The user did NOT have a linked account, in which case they would have
+    # needed to go through the login/register page.  Since we preserve the querystring
+    # args when sending users to this page, successfully authenticating through this page
+    # would also enroll the student in the course.
     enroll_course_id = strategy.session_get('enroll_course_id')
-    if enroll_course_id:
+    if enroll_course_id and not is_dashboard:
         course_id = CourseKey.from_string(enroll_course_id)
         modes = CourseMode.modes_for_course_dict(course_id)
+
         # If the email opt in parameter is found, set the preference.
         email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
         if email_opt_in:
             opt_in = email_opt_in.lower() == 'true'
             profile.update_email_opt_in(user.username, course_id.org, opt_in)
-        if CourseMode.can_auto_enroll(course_id, modes_dict=modes):
+
+        # Check whether we're blocked from enrolling by a
+        # country access rule.
+        # Note: We skip checking the user's profile setting
+        # for country here because the "redirect URL" pointing
+        # to the blocked message page is set when the user
+        # *enters* the pipeline, at which point they're
+        # not authenticated.  If they end up being blocked
+        # from the courseware, it's better to let them
+        # enroll and then show the message when they
+        # enter the course than to skip enrollment
+        # altogether.
+        is_blocked = not embargo_api.check_course_access(
+            course_id, ip_address=get_ip(strategy.request),
+            url=strategy.request.path
+        )
+        if is_blocked:
+            # If we're blocked, skip enrollment.
+            # A redirect URL should have been set so the user
+            # ends up on the embargo page when enrollment completes.
+            pass
+
+        elif CourseMode.can_auto_enroll(course_id, modes_dict=modes):
             try:
                 CourseEnrollment.enroll(user, course_id, check_access=True)
             except CourseEnrollmentException:
