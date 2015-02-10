@@ -32,11 +32,13 @@ EMBARGO_SITE_REDIRECT_URL = 'https://www.edx.org/'
 """
 from functools import partial
 import logging
+import re
 import pygeoip
 from lazy import lazy
 
 from django.core.exceptions import MiddlewareNotUsed
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpResponseForbidden
@@ -45,7 +47,7 @@ from util.request import course_id_from_url
 
 from student.models import unique_id_for_user
 from embargo.models import EmbargoedCourse, EmbargoedState, IPFilter
-from embargo.api import check_course_access
+from embargo import api as embargo_api
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +59,17 @@ class EmbargoMiddleware(object):
     This is configured by creating ``EmbargoedCourse``, ``EmbargoedState``, and
     optionally ``IPFilter`` rows in the database, using the django admin site.
     """
+
+    ALLOW_URL_PATTERNS = [
+        # Don't block the embargo message pages; otherwise we'd
+        # end up in an infinite redirect loop.
+        re.compile(r'^/embargo/blocked-message/'),
+
+        # Don't block the Django admin pages.  Otherwise, we might
+        # accidentally lock ourselves out of Django admin
+        # during testing.
+        re.compile(r'^/admin/'),
+    ]
 
     # Reasons a user might be blocked.
     # These are used to generate info messages in the logs.
@@ -71,20 +84,81 @@ class EmbargoMiddleware(object):
 
     def __init__(self):
         self.site_enabled = settings.FEATURES.get('SITE_EMBARGOED', False)
-        # If embargoing is turned off, make this middleware do nothing
-        if not settings.FEATURES.get('EMBARGO', False) and not self.site_enabled:
-            raise MiddlewareNotUsed()
         self.enable_country_access = settings.FEATURES.get('ENABLE_COUNTRY_ACCESS', False)
 
+        # If embargoing is turned off, make this middleware do nothing
+        disable_middleware = not (
+            settings.FEATURES.get('EMBARGO') or
+            self.site_enabled or
+            self.enable_country_access
+        )
+        if disable_middleware:
+            raise MiddlewareNotUsed()
+
     def process_request(self, request):
+        """Block requests based on embargo rules.
+
+        In the new ENABLE_COUNTRY_ACCESS implmentation,
+        this will perform the following checks:
+
+        1) If the user's IP address is blacklisted, block.
+        2) If the user's IP address is whitelisted, allow.
+        3) If the user's country (inferred from their IP address) is blocked for
+            a courseware page, block.
+        4) If the user's country (retrieved from the user's profile) is blocked
+            for a courseware page, block.
+        5) Allow access.
+
         """
-        Processes embargo requests.
-        """
+        # If the feature flag is set, use the new "country access" implementation.
+        # This is a more flexible implementation of the embargo feature that allows
+        # per-course country access rules.
         if self.enable_country_access:
-            if self.country_access_rules(request):
+
+            # Never block certain patterns by IP address
+            for pattern in self.ALLOW_URL_PATTERNS:
+                if pattern.match(request.path) is not None:
+                    return None
+
+            ip_address = get_ip(request)
+            ip_filter = IPFilter.current()
+
+            if ip_filter.enabled and ip_address in ip_filter.blacklist_ips:
+                log.info(
+                    (
+                        u"User %s was blocked from accessing %s "
+                        u"because IP address %s is blacklisted."
+                    ), request.user.id, request.path, ip_address
+                )
+
+                # If the IP is blacklisted, reject.
+                # This applies to any request, not just courseware URLs.
+                ip_blacklist_url = reverse(
+                    'embargo_blocked_message',
+                    kwargs={
+                        'access_point': 'courseware',
+                        'message_key': 'embargo'
+                    }
+                )
+                return redirect(ip_blacklist_url)
+
+            elif ip_filter.enabled and ip_address in ip_filter.whitelist_ips:
+                log.info(
+                    (
+                        u"User %s was allowed access to %s because "
+                        u"IP address %s is whitelisted."
+                    ),
+                    request.user.id, request.path, ip_address
+                )
+
+                # If the IP is whitelisted, then allow access,
+                # skipping later checks.
                 return None
+
             else:
-                return self._embargo_redirect_response
+                # Otherwise, perform the country access checks.
+                # This applies only to courseware URLs.
+                return self.country_access_rules(request.user, ip_address, request.path)
 
         url = request.path
         course_id = course_id_from_url(url)
@@ -306,19 +380,30 @@ class EmbargoMiddleware(object):
 
         return _inner
 
-    def country_access_rules(self, request):
+    def country_access_rules(self, user, ip_address, url_path):
         """
-        check the country access rules for a given course.
-        if course id is invalid return True
+        Check the country access rules for a given course.
+        Applies only to courseware URLs.
+
         Args:
-            request
+            user (User): The user making the current request.
+            ip_address (str): The IP address from which the request originated.
+            url_path (str): The request path.
 
-        Return:
-            boolean: True if the user has access else false.
+        Returns:
+            HttpResponse or None
 
         """
-        url = request.path
-        course_id = course_id_from_url(url)
-        if course_id is None:
-            return True
-        return check_course_access(request.user, get_ip(request), course_id)
+        course_id = course_id_from_url(url_path)
+
+        if course_id:
+            redirect_url = embargo_api.redirect_if_blocked(
+                course_id,
+                user=user,
+                ip_address=ip_address,
+                url=url_path,
+                access_point='courseware'
+            )
+
+            if redirect_url:
+                return redirect(redirect_url)
