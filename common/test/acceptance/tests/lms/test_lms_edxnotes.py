@@ -11,7 +11,6 @@ from ...pages.lms.edxnotes import EdxNotesUnitPage, EdxNotesPage
 from ...fixtures.edxnotes import EdxNotesFixture, Note, Range
 
 
-@skipUnless(os.environ.get("FEATURE_EDXNOTES"), "Requires Student Notes feature to be enabled")
 class EdxNotesTestMixin(UniqueCourseTest):
     """
     Creates a course with initial data and contains useful helper methods.
