@@ -49,6 +49,7 @@ if settings.FEATURES.get('ALLOW_ALL_ADVANCED_COMPONENTS'):
     ADVANCED_COMPONENT_TYPES = sorted(set(name for name, class_ in XBlock.load_classes()) - set(COMPONENT_TYPES))
 else:
     ADVANCED_COMPONENT_TYPES = settings.ADVANCED_COMPONENT_TYPES
+XBLOCKS_ALWAYS_IN_STUDIO = getattr(settings, 'XBLOCKS_ALWAYS_IN_STUDIO', [])
 
 ADVANCED_COMPONENT_CATEGORY = 'advanced'
 ADVANCED_COMPONENT_POLICY_KEY = 'advanced_modules'
@@ -293,6 +294,8 @@ def get_component_templates(course):
     course_advanced_keys = course.advanced_modules
     advanced_component_templates = {"type": "advanced", "templates": [], "display_name": _("Advanced")}
     # Set component types according to course policy file
+    course_advanced_keys = course_advanced_keys or []
+    course_advanced_keys = list(set(course_advanced_keys + XBLOCKS_ALWAYS_IN_STUDIO))
     if isinstance(course_advanced_keys, list):
         for category in course_advanced_keys:
             if category in ADVANCED_COMPONENT_TYPES and not category in categories:
