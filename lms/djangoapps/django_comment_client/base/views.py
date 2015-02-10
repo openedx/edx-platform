@@ -177,14 +177,6 @@ def update_thread(request, course_id, thread_id):
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
         commentable_ids = get_discussion_categories_ids(course)
-        # The commentable ID on thread creation may not be available in the
-        # topic menu, such as when the thread is concerning the current
-        # unit in context. In this case the topic menu will be blank, but the
-        # old commentable_id will be sent.
-        try:
-            commentable_ids.append(thread.commentable_id)
-        except AttributeError:
-            pass
         if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:
