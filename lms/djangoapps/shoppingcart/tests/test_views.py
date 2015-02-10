@@ -24,12 +24,11 @@ from datetime import datetime, timedelta
 from mock import patch, Mock
 import ddt
 
-from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
-)
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
+from util.testing import UrlResetMixin
 
 from shoppingcart.views import _can_download_report, _get_date_from_str
 from shoppingcart.models import (
@@ -42,6 +41,7 @@ from courseware.tests.factories import InstructorFactory
 from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
+from embargo.test_utils import restrict_course
 from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.views import initialize_report
@@ -1576,6 +1576,51 @@ class RegistrationCodeRedemptionCourseEnrollment(ModuleStoreTestCase):
         response = self.client.get(dashboard_url)
         self.assertEquals(response.status_code, 200)
         self.assertIn(self.course.display_name, response.content)
+
+
+@ddt.ddt
+class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
+    """Test blocking redeem code redemption based on country access rules. """
+
+    USERNAME = 'bob'
+    PASSWORD = 'test'
+
+    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def setUp(self):
+        super(RedeemCodeEmbargoTests, self).setUp('embargo')
+        self.course = CourseFactory.create()
+        self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
+        result = self.client.login(username=self.user.username, password=self.PASSWORD)
+        self.assertTrue(result, msg="Could not log in")
+
+    @ddt.data('get', 'post')
+    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def test_registration_code_redemption_embargo(self, method):
+        # Create a valid registration code
+        reg_code = CourseRegistrationCode.objects.create(
+            code="abcd1234",
+            course_id=self.course.id,
+            created_by=self.user
+        )
+
+        # Try to redeem the code from a restricted country
+        with restrict_course(self.course.id) as redirect_url:
+            url = reverse(
+                'register_code_redemption',
+                kwargs={'registration_code': 'abcd1234'}
+            )
+            response = getattr(self.client, method)(url)
+            self.assertRedirects(response, redirect_url)
+
+        # The registration code should NOT be redeemed
+        is_redeemed = RegistrationCodeRedemption.objects.filter(
+            registration_code=reg_code
+        ).exists()
+        self.assertFalse(is_redeemed)
+
+        # The user should NOT be enrolled
+        is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
+        self.assertFalse(is_enrolled)
 
 
 @ddt.ddt

@@ -8,6 +8,7 @@ import decimal
 import datetime
 from collections import namedtuple
 from pytz import UTC
+from ipware.ip import get_ip
 
 from edxmako.shortcuts import render_to_response, render_to_string
 
@@ -45,6 +46,8 @@ from opaque_keys.edx.keys import CourseKey
 from .exceptions import WindowExpiredException
 from xmodule.modulestore.django import modulestore
 from microsite_configuration import microsite
+
+from embargo import api as embargo_api
 
 from util.json_request import JsonResponse
 from util.date_utils import get_default_time_display
@@ -255,6 +258,17 @@ class PayAndVerifyView(View):
         if course is None:
             log.warn(u"No course specified for verification flow request.")
             raise Http404
+
+        # Check whether the user has access to this course
+        # based on country access rules.
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_key,
+            user=request.user,
+            ip_address=get_ip(request),
+            url=request.path
+        )
+        if redirect_url:
+            return redirect(redirect_url)
 
         # Check that the course has an unexpired verified mode
         course_mode, expired_course_mode = self._get_verified_modes_for_course(course_key)

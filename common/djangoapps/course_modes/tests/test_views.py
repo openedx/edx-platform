@@ -11,6 +11,7 @@ from xmodule.modulestore.tests.django_utils import (
 )
 
 from util.testing import UrlResetMixin
+from embargo.test_utils import restrict_course
 from xmodule.modulestore.tests.factories import CourseFactory
 from course_modes.tests.factories import CourseModeFactory
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
@@ -274,7 +275,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
 
         # Create a verified mode
         url = reverse('create_mode', args=[unicode(self.course.id)])
-        response = self.client.get(url, parameters)
+        self.client.get(url, parameters)
 
         honor_mode = Mode(u'honor', u'Honor Code Certificate', 0, '', 'usd', None, None)
         verified_mode = Mode(u'verified', u'Verified Certificate', 10, '10,20', 'usd', None, None)
@@ -282,3 +283,34 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         course_modes = CourseMode.modes_for_course(self.course.id)
 
         self.assertEquals(course_modes, expected_modes)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+class TrackSelectionEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
+    """Test embargo restrictions on the track selection page. """
+
+    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def setUp(self):
+        super(TrackSelectionEmbargoTest, self).setUp('embargo')
+
+        # Create a course and course modes
+        self.course = CourseFactory.create()
+        CourseModeFactory(mode_slug='honor', course_id=self.course.id)
+        CourseModeFactory(mode_slug='verified', course_id=self.course.id, min_price=10)
+
+        # Create a user and log in
+        self.user = UserFactory.create(username="Bob", email="bob@example.com", password="edx")
+        self.client.login(username=self.user.username, password="edx")
+
+        # Construct the URL for the track selection page
+        self.url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+
+    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    def test_embargo_restrict(self):
+        with restrict_course(self.course.id) as redirect_url:
+            response = self.client.get(self.url)
+            self.assertRedirects(response, redirect_url)
+
+    def test_embargo_allow(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)

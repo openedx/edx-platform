@@ -3,15 +3,19 @@ The Enrollment API Views should be simple, lean HTTP endpoints for API access. T
 consist primarily of authentication, request validation, and serialization.
 
 """
-from opaque_keys import InvalidKeyError
+from ipware.ip import get_ip
+from django.conf import settings
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys import InvalidKeyError
 from enrollment import api
 from enrollment.errors import CourseNotFoundError, CourseEnrollmentError, CourseModeNotFoundError
+from embargo import api as embargo_api
 from util.authentication import SessionAuthenticationAllowInactiveUser
 from util.disable_rate_limit import can_disable_rate_limit
 
@@ -278,7 +282,36 @@ class EnrollmentListView(APIView):
         course_id = request.DATA['course_details']['course_id']
 
         try:
-            return Response(api.add_enrollment(user, course_id))
+            course_id = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
+                }
+            )
+
+        # Check whether any country access rules block the user from enrollment
+        # We do this at the view level (rather than the Python API level)
+        # because this check requires information about the HTTP request.
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_id, user=request.user,
+            ip_address=get_ip(request),
+            url=request.path
+        )
+        if redirect_url:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": (
+                        u"Users from this location cannot access the course '{course_id}'."
+                    ).format(course_id=course_id),
+                    "user_message_url": redirect_url
+                }
+            )
+
+        try:
+            return Response(api.add_enrollment(user, unicode(course_id)))
         except CourseModeNotFoundError as error:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
@@ -303,12 +336,5 @@ class EnrollmentListView(APIView):
                         u"An error occurred while creating the new course enrollment for user "
                         u"'{user}' in course '{course_id}'"
                     ).format(user=user, course_id=course_id)
-                }
-            )
-        except InvalidKeyError:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data={
-                    "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
                 }
             )
