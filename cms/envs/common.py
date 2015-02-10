@@ -186,7 +186,7 @@ for namespace, template_dirs in lms.envs.common.MAKO_TEMPLATES.iteritems():
 
 TEMPLATE_DIRS = MAKO_TEMPLATES['main']
 
-EDX_ROOT_URL = 'beta.iaen.edu.ec'
+EDX_ROOT_URL = ''
 
 LOGIN_REDIRECT_URL = EDX_ROOT_URL + '/signin'
 LOGIN_URL = EDX_ROOT_URL + '/signin'
