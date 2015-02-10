@@ -6,6 +6,7 @@ import re
 import random
 import json
 from time import sleep
+from collections import Counter
 
 import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
@@ -418,12 +419,31 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
         'failed' count above.
     """
     # Get information from current task's request:
+    parent_task_id = InstructorTask.objects.get(pk=entry_id).task_id
     task_id = subtask_status.task_id
+    total_recipients = len(to_list)
+    recipient_num = 0
+    total_recipients_successful = 0
+    total_recipients_failed = 0
+    recipients_info = Counter()
+
+    log.info(
+        "BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, TotalRecipients: %s",
+        parent_task_id,
+        task_id,
+        email_id,
+        total_recipients
+    )
 
     try:
         course_email = CourseEmail.objects.get(id=email_id)
     except CourseEmail.DoesNotExist as exc:
-        log.exception("Task %s: could not find email id:%s to send.", task_id, email_id)
+        log.exception(
+            "BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Could not find email to send.",
+            parent_task_id,
+            task_id,
+            email_id
+        )
         raise
 
     # Exclude optouts (if not a retry):
@@ -459,6 +479,7 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             # That way, the to_list will always contain the recipients remaining to be emailed.
             # This is convenient for retries, which will need to send to those who haven't
             # yet been emailed, but not send to those who have already been sent to.
+            recipient_num += 1
             current_recipient = to_list[-1]
             email = current_recipient['email']
             email_context['email'] = email
@@ -489,29 +510,81 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
                 sleep(settings.BULK_EMAIL_RETRY_DELAY_BETWEEN_SENDS)
 
             try:
-                log.debug('Email with id %s to be sent to %s', email_id, email)
-
+                log.info(
+                    "BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Recipient num: %s/%s, \
+                    Recipient name: %s, Email address: %s",
+                    parent_task_id,
+                    task_id,
+                    email_id,
+                    recipient_num,
+                    total_recipients,
+                    current_recipient['profile__name'],
+                    email
+                )
                 with dog_stats_api.timer('course_email.single_send.time.overall', tags=[_statsd_tag(course_title)]):
                     connection.send_messages([email_msg])
 
             except SMTPDataError as exc:
                 # According to SMTP spec, we'll retry error codes in the 4xx range.  5xx range indicates hard failure.
+                total_recipients_failed += 1
+                log.error(
+                    "BulkEmail ==> Status: Failed(SMTPDataError), Task: %s, SubTask: %s, EmailId: %s, \
+                    Recipient num: %s/%s, Email address: %s",
+                    parent_task_id,
+                    task_id,
+                    email_id,
+                    recipient_num,
+                    total_recipients,
+                    email
+                )
                 if exc.smtp_code >= 400 and exc.smtp_code < 500:
                     # This will cause the outer handler to catch the exception and retry the entire task.
                     raise exc
                 else:
                     # This will fall through and not retry the message.
-                    log.warning('Task %s: email with id %s not delivered to %s due to error %s', task_id, email_id, email, exc.smtp_error)
+                    log.warning(
+                        'BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Recipient num: %s/%s, \
+                        Email not delivered to %s due to error %s',
+                        parent_task_id,
+                        task_id,
+                        email_id,
+                        recipient_num,
+                        total_recipients,
+                        email,
+                        exc.smtp_error
+                    )
                     dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
                     subtask_status.increment(failed=1)
 
             except SINGLE_EMAIL_FAILURE_ERRORS as exc:
                 # This will fall through and not retry the message.
-                log.warning('Task %s: email with id %s not delivered to %s due to error %s', task_id, email_id, email, exc)
+                total_recipients_failed += 1
+                log.error(
+                    "BulkEmail ==> Status: Failed(SINGLE_EMAIL_FAILURE_ERRORS), Task: %s, SubTask: %s, \
+                    EmailId: %s, Recipient num: %s/%s, Email address: %s, Exception: %s",
+                    parent_task_id,
+                    task_id,
+                    email_id,
+                    recipient_num,
+                    total_recipients,
+                    email,
+                    exc
+                )
                 dog_stats_api.increment('course_email.error', tags=[_statsd_tag(course_title)])
                 subtask_status.increment(failed=1)
 
             else:
+                total_recipients_successful += 1
+                log.info(
+                    "BulkEmail ==> Status: Success, Task: %s, SubTask: %s, EmailId: %s, \
+                    Recipient num: %s/%s, Email address: %s,",
+                    parent_task_id,
+                    task_id,
+                    email_id,
+                    recipient_num,
+                    total_recipients,
+                    email
+                )
                 dog_stats_api.increment('course_email.sent', tags=[_statsd_tag(course_title)])
                 if settings.BULK_EMAIL_LOG_SENT_EMAILS:
                     log.info('Email with id %s sent to %s', email_id, email)
@@ -522,7 +595,31 @@ def _send_course_email(entry_id, email_id, to_list, global_email_context, subtas
             # Pop the user that was emailed off the end of the list only once they have
             # successfully been processed.  (That way, if there were a failure that
             # needed to be retried, the user is still on the list.)
+            recipients_info[email] += 1
             to_list.pop()
+
+        log.info(
+            "BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Total Successful Recipients: %s/%s, \
+            Failed Recipients: %s/%s",
+            parent_task_id,
+            task_id,
+            email_id,
+            total_recipients_successful,
+            total_recipients,
+            total_recipients_failed,
+            total_recipients
+        )
+        duplicate_recipients = ["{0} ({1})".format(email, repetition)
+                                for email, repetition in recipients_info.most_common() if repetition > 1]
+        if duplicate_recipients:
+            log.info(
+                "BulkEmail ==> Task: %s, SubTask: %s, EmailId: %s, Total Duplicate Recipients [%s]: [%s]",
+                parent_task_id,
+                task_id,
+                email_id,
+                len(duplicate_recipients),
+                ', '.join(duplicate_recipients)
+            )
 
     except INFINITE_RETRY_ERRORS as exc:
         dog_stats_api.increment('course_email.infinite_retry', tags=[_statsd_tag(course_title)])

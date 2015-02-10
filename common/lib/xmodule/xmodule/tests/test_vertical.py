@@ -28,7 +28,7 @@ class BaseVerticalModuleTest(XModuleXmlImportTest):
         course_seq = self.course.get_children()[0]
         self.module_system = get_test_system()
 
-        self.module_system.descriptor_runtime = self.course.runtime._descriptor_system  # pylint: disable=protected-access
+        self.module_system.descriptor_runtime = self.course._runtime  # pylint: disable=protected-access
         self.course.runtime.export_fs = MemoryFS()
 
         self.vertical = course_seq.get_children()[0]

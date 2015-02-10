@@ -95,7 +95,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
     """
     user = Mock(name='get_test_system.user', is_staff=False)
 
-    descriptor_system = get_test_descriptor_system(),
+    descriptor_system = get_test_descriptor_system()
 
     def get_module(descriptor):
         """Mocks module_system get_module function"""
@@ -108,7 +108,7 @@ def get_test_system(course_id=SlashSeparatedCourseKey('org', 'course', 'run')):
 
         # Descriptors can all share a single DescriptorSystem.
         # So, bind to the same one as the current descriptor.
-        module_system.descriptor_runtime = descriptor.runtime._descriptor_system
+        module_system.descriptor_runtime = descriptor._runtime  # pylint: disable=protected-access
 
         descriptor.bind_for_student(module_system, descriptor._field_data)
 
