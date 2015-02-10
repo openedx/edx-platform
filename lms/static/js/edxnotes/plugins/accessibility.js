@@ -59,29 +59,23 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
         },
 
         getViewerTabControls: function () {
-            var viewer, notes, viewerControls, editButtons, delButtons, closeButtons, tabControls = [], i;
+            var viewer, note, viewerControls, editButton, delButton, closeButton, tabControls = [];
 
             // Viewer elements
             viewer = this.annotator.element.find('.annotator-viewer');
-            notes = viewer.find('.annotator-note');
+            note = viewer.find('.annotator-note');
             viewerControls = viewer.find('.annotator-controls');
-            editButtons = viewerControls.find('.annotator-edit');
-            delButtons = viewerControls.find('.annotator-delete');
-            closeButtons = viewerControls.find('.annotator-close');
+            editButton = viewerControls.find('.annotator-edit');
+            delButton = viewerControls.find('.annotator-delete');
+            closeButton = viewerControls.find('.annotator-close');
 
-            // Note and ddit, delete and close buttons always come in quadruplets
-            for (i = 0; i < editButtons.length; i++) {
-                tabControls.push($(notes.get(i)));
-                tabControls.push($(editButtons.get(i)));
-                tabControls.push($(delButtons.get(i)));
-                tabControls.push($(closeButtons.get(i)));
-            }
+            tabControls.push(note, editButton, delButton, closeButton);
 
             return tabControls;
         },
 
         getEditorTabControls: function () {
-            var editor, editorControls, textArea, save, cancel, tabControls = [];
+            var editor, editorControls, textArea, saveButton, cancelButton, tabControls = [];
 
             // Editor elements
             editor = this.annotator.element.find('.annotator-editor');
@@ -90,10 +84,10 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                              .find('.annotator-item')
                              .first()
                              .children('textarea');
-            save  = editorControls.find('.annotator-save');
-            cancel = editorControls.find('.annotator-cancel');
+            saveButton  = editorControls.find('.annotator-save');
+            cancelButton = editorControls.find('.annotator-cancel');
 
-            tabControls.push($(textArea.get(0)), $(save.get(0)), $(cancel.get(0)));
+            tabControls.push(textArea, saveButton, cancelButton);
 
             return tabControls;
         },
@@ -106,7 +100,6 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     nextIndex = index === tabControls.length - 1 ? 0 : index + 1;
                     tabControls[nextIndex].focus();
                 }
-
             });
         },
 
@@ -124,17 +117,15 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.currentTarget),
-                annotations, position;
+                annotation, position;
 
             switch (keyCode) {
                 case KEY.ENTER:
                 case KEY.SPACE:
                     if (!this.annotator.viewer.isShown()) {
                         position = target.position();
-                        annotations = target.parents('.annotator-hl').addBack().map(function() {
-                            return $(this).data('annotation');
-                        });
-                        this.annotator.showViewer($.makeArray(annotations), {top: position.top, left: position.left});
+                        annotation = $.makeArray(target.data('annotation'));
++                       this.annotator.showViewer(annotation, {top: position.top, left: position.left});
                         this.annotator.element.find('.annotator-listing').focus();
                     }
                     break;
