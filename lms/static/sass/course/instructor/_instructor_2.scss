@@ -435,6 +435,248 @@
     }
   }
 
+  .batch-enrollment, .batch-beta-testers {
+    textarea {
+      margin-top: 0.2em;
+      height: auto;
+      width: 90%;
+    }
+
+    input {
+      margin-right: ($baseline/4);
+    }
+
+    .request-res-section {
+      margin-top: 1.5em;
+
+      h3 {
+        color: #646464;
+      }
+
+      ul {
+        margin: 0;
+        margin-top: 0.5em;
+        padding: 0;
+        list-style-type: none;
+        line-height: 1.5em;
+      }
+    }
+  }
+  // Auto Enroll Csv Section
+  .auto_enroll_csv {
+    .results {
+
+    }
+    .enrollment_signup_button {
+      @include margin-right($baseline/4);
+    }
+    // Custom File upload
+    .customBrowseBtn {
+      margin: ($baseline/2) 0;
+      display: inline-block;
+      .file-browse {
+        position:relative;
+        overflow:hidden;
+        display: inline;
+        @include margin-left(-5px);
+        span.browse{
+          @include button(simple, $blue);
+          @include margin-right($baseline);
+          padding: 6px ($baseline/2);
+          font-size: 12px;
+          border-radius: 0 3px 3px 0;
+        }
+        input.file_field {
+          position:absolute;
+          @include right(0);
+          top:0;
+          margin:0;
+          padding:0;
+          cursor:pointer;
+          opacity:0;
+          filter:alpha(opacity=0);
+        }
+      }
+      & > span, & input[disabled]{
+        vertical-align: middle;
+      }
+      input[disabled] {
+        @include border-radius(4px 0 0 4px);
+        @include padding(6px 6px 5px);
+        border: 1px solid $lightGrey1;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .enroll-option {
+    margin: ($baseline/2) 0;
+    position: relative;
+
+      label {
+        border-bottom: 1px dotted $base-font-color;
+      }
+
+    .hint {
+      @extend %t-copy-sub2;
+      display: none;
+      position: absolute;
+      top: 15px;
+      @include left($baseline*10);
+      padding: ($baseline/2);
+      width: 50%;
+      background-color: $light-gray;
+      box-shadow: 2px 2px 3px $shadow;
+
+      .hint-caret {
+        display: block;
+        position: absolute;
+        top: 0;
+        @include left(-15px);
+        @include border-right(8px solid $light-gray);
+        @include border-left(8px solid transparent);
+        border-top: 8px solid $light-gray;
+        border-bottom: 8px solid transparent;
+      }
+    }
+  }
+
+  label[for="auto-enroll"]:hover + .auto-enroll-hint {
+    display: block;
+  }
+
+  label[for="auto-enroll-beta"]:hover + .auto-enroll-beta-hint {
+    width: 30%;
+    display: block;
+  }
+
+  label[for="email-students"]:hover + .email-students-hint {
+    display: block;
+  }
+
+  label[for="email-students-beta"]:hover + .email-students-beta-hint {
+    width: 30%;
+    display: block;
+  }
+
+  .enroll-actions {
+    margin-top: $baseline;
+  }
+
+  .member-lists-management {
+
+    .wrapper-member-select {
+      padding: ($baseline/2);
+      background-color: $light-gray;
+    }
+
+    .member-lists-selector {
+      display: block;
+      margin: ($baseline/4) 0;
+      padding: ($baseline/4);
+    }
+
+    .auth-list-container {
+      display: none;
+      margin-bottom: ($baseline*1.5);
+
+      &.active {
+        display: block;
+      }
+
+      .member-list-widget {
+
+        .header {
+          @include box-sizing(border-box);
+          @include border-top-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          background-color: #efefef;
+          border: 1px solid $light-gray;
+          display: none; // hiding to prefer dropdown as header
+        }
+
+        .title {
+          @include font-size(16);
+        }
+
+        .label,
+        .form-label {
+          @extend %t-copy-sub1;
+          color: $lighter-base-font-color;
+        }
+
+        .info {
+          @include box-sizing(border-box);
+          padding: ($baseline/2);
+          border: 1px solid $light-gray;
+          color: $lighter-base-font-color;
+          line-height: 1.3em;
+          font-size: .85em;
+        }
+
+        .member-list {
+          @include box-sizing(border-box);
+
+          table {
+            width: 100%;
+          }
+
+          thead {
+            background-color: $light-gray;
+          }
+
+          tr {
+            border-bottom: 1px solid $light-gray;
+          }
+
+          td {
+            @extend %t-copy-sub1;
+            vertical-align: middle;
+            padding: ($baseline/2) ($baseline/4);
+            @include border-left(1px solid $light-gray);
+            @include border-right(1px solid $light-gray);
+            word-wrap: break-word;
+          }
+        }
+
+        .bottom-bar {
+          @include box-sizing(border-box);
+          @include border-bottom-radius(3);
+          position: relative;
+          padding: ($baseline/2);
+          margin-top: -1px;
+          border: 1px solid $light-gray;
+          background-color: #efefef;
+          box-shadow: inset #bbb 0px 1px 1px 0px;
+        }
+
+        // .add-field
+
+        input[type="button"].add {
+          @include idashbutton($blue);
+          position: absolute;
+          @include right($baseline);
+        }
+      }
+
+      .revoke {
+        color: $lighter-base-font-color;
+        cursor: pointer;
+
+        &:hover, &:focus {
+          color: $alert-color;
+        }
+      }
+    }
+  }
+}
+
+
+// view - cohort management
+// --------------------
+.instructor-dashboard-wrapper-2 section.idash-section#cohort_management {
+
   // cohort management
   %cohort-management-form {
 
@@ -733,245 +975,6 @@
     }
   }
 
-
-
-  .batch-enrollment, .batch-beta-testers {
-    textarea {
-      margin-top: 0.2em;
-      height: auto;
-      width: 90%;
-    }
-
-    input {
-      margin-right: ($baseline/4);
-    }
-
-    .request-res-section {
-      margin-top: 1.5em;
-
-      h3 {
-        color: #646464;
-      }
-
-      ul {
-        margin: 0;
-        margin-top: 0.5em;
-        padding: 0;
-        list-style-type: none;
-        line-height: 1.5em;
-      }
-    }
-  }
-  // Auto Enroll Csv Section
-  .auto_enroll_csv {
-    .results {
-
-    }
-    .enrollment_signup_button {
-      @include margin-right($baseline/4);
-    }
-    // Custom File upload
-    .customBrowseBtn {
-      margin: ($baseline/2) 0;
-      display: inline-block;
-      .file-browse {
-        position:relative;
-        overflow:hidden;
-        display: inline;
-        @include margin-left(-5px);
-        span.browse{
-          @include button(simple, $blue);
-          @include margin-right($baseline);
-          padding: 6px ($baseline/2);
-          font-size: 12px;
-          border-radius: 0 3px 3px 0;
-        }
-        input.file_field {
-          position:absolute;
-          @include right(0);
-          top:0;
-          margin:0;
-          padding:0;
-          cursor:pointer;
-          opacity:0;
-          filter:alpha(opacity=0);
-        }
-      }
-      & > span, & input[disabled]{
-        vertical-align: middle;
-      }
-      input[disabled] {
-        @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
-        border: 1px solid $lightGrey1;
-        cursor: not-allowed;
-      }
-    }
-  }
-
-  .enroll-option {
-    margin: ($baseline/2) 0;
-    position: relative;
-
-      label {
-        border-bottom: 1px dotted $base-font-color;
-      }
-
-    .hint {
-      @extend %t-copy-sub2;
-      display: none;
-      position: absolute;
-      top: 15px;
-      @include left($baseline*10);
-      padding: ($baseline/2);
-      width: 50%;
-      background-color: $light-gray;
-      box-shadow: 2px 2px 3px $shadow;
-
-      .hint-caret {
-        display: block;
-        position: absolute;
-        top: 0;
-        @include left(-15px);
-        @include border-right(8px solid $light-gray);
-        @include border-left(8px solid transparent);
-        border-top: 8px solid $light-gray;
-        border-bottom: 8px solid transparent;
-      }
-    }
-  }
-
-  label[for="auto-enroll"]:hover + .auto-enroll-hint {
-    display: block;
-  }
-
-  label[for="auto-enroll-beta"]:hover + .auto-enroll-beta-hint {
-    width: 30%;
-    display: block;
-  }
-
-
-  label[for="email-students"]:hover + .email-students-hint {
-    display: block;
-  }
-
-  label[for="email-students-beta"]:hover + .email-students-beta-hint {
-    width: 30%;
-    display: block;
-  }
-
-  .enroll-actions {
-    margin-top: $baseline;
-  }
-
-  .member-lists-management {
-
-    .wrapper-member-select {
-      padding: ($baseline/2);
-      background-color: $light-gray;
-    }
-
-    .member-lists-selector {
-      display: block;
-      margin: ($baseline/4) 0;
-      padding: ($baseline/4);
-    }
-
-    .auth-list-container {
-      display: none;
-      margin-bottom: ($baseline*1.5);
-
-      &.active {
-        display: block;
-      }
-
-      .member-list-widget {
-
-        .header {
-          @include box-sizing(border-box);
-          @include border-top-radius(3);
-          position: relative;
-          padding: ($baseline/2);
-          background-color: #efefef;
-          border: 1px solid $light-gray;
-          display: none; // hiding to prefer dropdown as header
-        }
-
-        .title {
-          @include font-size(16);
-        }
-
-        .label,
-        .form-label {
-          @extend %t-copy-sub1;
-          color: $lighter-base-font-color;
-        }
-
-        .info {
-          @include box-sizing(border-box);
-          padding: ($baseline/2);
-          border: 1px solid $light-gray;
-          color: $lighter-base-font-color;
-          line-height: 1.3em;
-          font-size: .85em;
-        }
-
-        .member-list {
-          @include box-sizing(border-box);
-
-          table {
-            width: 100%;
-          }
-
-          thead {
-            background-color: $light-gray;
-          }
-
-          tr {
-            border-bottom: 1px solid $light-gray;
-          }
-
-          td {
-            @extend %t-copy-sub1;
-            vertical-align: middle;
-            padding: ($baseline/2) ($baseline/4);
-            @include border-left(1px solid $light-gray);
-            @include border-right(1px solid $light-gray);
-            word-wrap: break-word;
-          }
-        }
-
-        .bottom-bar {
-          @include box-sizing(border-box);
-          @include border-bottom-radius(3);
-          position: relative;
-          padding: ($baseline/2);
-          margin-top: -1px;
-          border: 1px solid $light-gray;
-          background-color: #efefef;
-          box-shadow: inset #bbb 0px 1px 1px 0px;
-        }
-
-        // .add-field
-
-        input[type="button"].add {
-          @include idashbutton($blue);
-          position: absolute;
-          @include right($baseline);
-        }
-      }
-
-      .revoke {
-        color: $lighter-base-font-color;
-        cursor: pointer;
-
-        &:hover, &:focus {
-          color: $alert-color;
-        }
-      }
-    }
-  }
-
   .has-other-input-text { // Given to groups which have an 'other' input that appears when needed
     display: inline-block;
 
@@ -1117,6 +1120,7 @@
     }
   }
 }
+
 
 // view - student admin
 // --------------------

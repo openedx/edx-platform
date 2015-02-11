@@ -8,7 +8,9 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from ..models import CourseUserGroup, CourseCohort
+from ..models import CourseUserGroup, CourseCohort, CourseCohortsSettings
+
+import json
 
 
 class CohortFactory(DjangoModelFactory):
@@ -38,6 +40,19 @@ class CourseCohortFactory(DjangoModelFactory):
 
     course_user_group = factory.SubFactory(CohortFactory)
     assignment_type = 'manual'
+
+
+class CourseCohortSettingsFactory(DjangoModelFactory):
+    """
+    Factory for constructing mock course cohort settings.
+    """
+    FACTORY_FOR = CourseCohortsSettings
+
+    is_cohorted = False
+    course_id = SlashSeparatedCourseKey("dummy", "dummy", "dummy")
+    cohorted_discussions = json.dumps([])
+    # pylint: disable=invalid-name
+    always_cohort_inline_discussions = True
 
 
 def topic_name_to_id(course, name):
