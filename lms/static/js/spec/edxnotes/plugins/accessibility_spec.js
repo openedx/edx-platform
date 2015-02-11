@@ -45,16 +45,14 @@ define([
                 spyOn($.fn, 'off');
                 spyOn(this.annotator, 'unsubscribe');
                 this.plugin.destroy();
-                expect($.fn.off).toHaveBeenCalledWith('keydown', '.annotator-hl');
-                expect($.fn.off).toHaveBeenCalledWith('keydown', '.annotator-viewer');
-                expect($.fn.off).toHaveBeenCalledWith('keydown', '.annotator-editor');
                 expect(this.annotator.unsubscribe).toHaveBeenCalledWith(
                     'annotationViewerTextField', this.plugin.addAriaAttributes
                 );
+                expect($.fn.off).toHaveBeenCalledWith('.accessibility');
             });
         });
 
-        describe('a11y attibutes', function () {
+        describe('a11y attributes', function () {
             var highlight, annotation, note;
 
             beforeEach(function() {
@@ -73,7 +71,6 @@ define([
                 expect(note).toExist();
                 expect(note).toHaveAttr('tabindex', -1);
                 expect(note).toHaveAttr('role', 'note');
-                expect(note).toHaveAttr('aria-label', 'Note');
                 expect(note).toHaveAttr('class', 'annotator-note');
             });
         });
@@ -95,115 +92,82 @@ define([
             it('should open the viewer on SPACE keydown and focus on note', function () {
                 highlight.trigger(keyDownEvent(this.KEY.SPACE));
                 expect(this.annotator.showViewer).toHaveBeenCalled();
-                // TODO: Check that note is focused
-                // note = this.annotator.element.find('.annotator-note').first();
-                // expect(note).toBeFocused();
             });
 
             it('should open the viewer on ENTER keydown and focus on note', function () {
                 highlight.trigger(keyDownEvent(this.KEY.ENTER));
                 expect(this.annotator.showViewer).toHaveBeenCalled();
-                // TODO: Check that note is focused
-                // note = this.annotator.element.find('.annotator-note').first();
-                // expect(note).toBeFocused();
             });
         });
 
         describe('keydown events on viewer', function () {
-            var html, outerHighlight, innerHighlight, annotations, notes = [], edits = [], dels = [], closes = [];
+            var highlight, annotation, listing, note, edit, del, close;
 
             beforeEach(function() {
-                html = [
-                    '<span class="annotator-hl" tabindex="0">',
-                        'Outer highlight containing an ',
-                        '<span class="annotator-hl" tabindex="0">',
-                            'inner highlight',
-                        '</span>',
-                        'in its text.',
-                    '</span>'
-                ].join('');
-                outerHighlight = $(html).appendTo(this.annotator.element);
-                innerHighlight = outerHighlight.children();
-                annotations = [
-                    {
-                        id: '01',
-                        text: 'Outer highlight note',
-                        highlights: [outerHighlight.get(0)]
-                    },
-                    {
-                        id: '02',
-                        text: 'Inner highlight note',
-                        highlights: [innerHighlight.get(0)]
-                    }
-                ];
-                this.annotator.viewer.load(annotations);
-                notes[0] = this.annotator.element.find('.annotator-note').first();
-                edits[0] = this.annotator.element.find('.annotator-edit').first();
-                dels[0] = this.annotator.element.find('.annotator-delete').first();
-                closes[0] = this.annotator.element.find('.annotator-close').first();
-                notes[1] = this.annotator.element.find('.annotator-note').last();
-                edits[1] = this.annotator.element.find('.annotator-edit').last();
-                dels[1] = this.annotator.element.find('.annotator-delete').last();
-                closes[1] = this.annotator.element.find('.annotator-close').last();
+                highlight = $('<span class="annotator-hl" tabindex="0"/>').appendTo(this.annotator.element);
+                annotation = {
+                    id: '01',
+                    text: "Test text",
+                    highlights: [highlight.get(0)]
+                };
+                this.annotator.viewer.load([annotation]);
+                listing = this.annotator.element.find('.annotator-listing').first(),
+                note = this.annotator.element.find('.annotator-note').first();
+                edit= this.annotator.element.find('.annotator-edit').first();
+                del = this.annotator.element.find('.annotator-delete').first();
+                close = this.annotator.element.find('.annotator-close').first();
                 spyOn(this.annotator.viewer, 'hide').andCallThrough();;
             });
 
-            it('should cycle forward through the multiple Note, Edit, Delete, and Close on TAB keydown', function () {
-                // TODO: Improve this code
-                notes[0].focus();
-                notes[0].trigger(tabForwardEvent());
-                expect(edits[0]).toBeFocused();
-                edits[0].trigger(tabForwardEvent());
-                expect(dels[0]).toBeFocused();
-                dels[0].trigger(tabForwardEvent());
-                expect(closes[0]).toBeFocused();
-                closes[0].trigger(tabForwardEvent());
-                expect(notes[1]).toBeFocused();
-                notes[1].trigger(tabForwardEvent());
-                expect(edits[1]).toBeFocused();
-                edits[1].trigger(tabForwardEvent());
-                expect(dels[1]).toBeFocused();
-                dels[1].trigger(tabForwardEvent());
-                expect(closes[1]).toBeFocused();
-                closes[1].trigger(tabForwardEvent());
-                expect(notes[0]).toBeFocused();
+            it('should give focus to Note on Listing TAB keydown', function () {
+                listing.focus();
+                listing.trigger(tabForwardEvent());
+                expect(note).toBeFocused();
             });
 
-            it('should cycle backward through the multiple Note, Edit, Delete, and Close on SHIFT + TAB keydown', function () {
-                // TODO: Improve this code
-                notes[0].focus();
-                notes[0].trigger(tabBackwardEvent());
-                expect(closes[1]).toBeFocused();
-                closes[1].trigger(tabBackwardEvent());
-                expect(dels[1]).toBeFocused();
-                dels[1].trigger(tabBackwardEvent());
-                expect(edits[1]).toBeFocused();
-                edits[1].trigger(tabBackwardEvent());
-                expect(notes[1]).toBeFocused();
-                notes[1].trigger(tabBackwardEvent());
-                expect(closes[0]).toBeFocused();
-                closes[0].trigger(tabBackwardEvent());
-                expect(dels[0]).toBeFocused();
-                dels[0].trigger(tabBackwardEvent());
-                expect(edits[0]).toBeFocused();
-                edits[0].trigger(tabBackwardEvent());
-                expect(notes[0]).toBeFocused();
+            it('should give focus to Close on Listing SHIFT + TAB keydown', function () {
+                listing.focus();
+                listing.trigger(tabBackwardEvent());
+                expect(close).toBeFocused();
             });
 
-            it('should close the viewer and give focus back to highlight on ESCAPE keydown', function () {
-                edits[0].focus();
-                edits[0].trigger(keyDownEvent(this.KEY.ESCAPE));
-                expect(this.annotator.viewer.hide).toHaveBeenCalled();
-                expect(outerHighlight).toBeFocused();
-                dels[0].focus();
-                dels[0].trigger(keyDownEvent(this.KEY.ESCAPE));
-                expect(this.annotator.viewer.hide).toHaveBeenCalled();
-                expect(outerHighlight).toBeFocused();
+            it('should cycle forward through Note, Edit, Delete, and Close on TAB keydown', function () {
+                note.focus();
+                note.trigger(tabForwardEvent());
+                expect(edit).toBeFocused();
+                edit.trigger(tabForwardEvent());
+                expect(del).toBeFocused();
+                del.trigger(tabForwardEvent());
+                expect(close).toBeFocused();
+                close.trigger(tabForwardEvent());
+                expect(note).toBeFocused();
+            });
+
+            it('should cycle backward through Note, Edit, Delete, and Close on SHIFT + TAB keydown', function () {
+                note.focus();
+                note.trigger(tabBackwardEvent());
+                expect(close).toBeFocused();
+                close.trigger(tabBackwardEvent());
+                expect(del).toBeFocused();
+                del.trigger(tabBackwardEvent());
+                expect(edit).toBeFocused();
+                edit.trigger(tabBackwardEvent());
+                expect(note).toBeFocused();
+            });
+
+            it('should hide on ESCAPE keydown', function () {
+                var tabControls = [listing, note, edit, del, close];
+
+                _.each(tabControls, (function (control) {
+                    control.focus();
+                    control.trigger(keyDownEvent(this.KEY.ESCAPE));
+                }).bind(this));
+                expect(this.annotator.viewer.hide.callCount).toBe(5);
             });
         });
 
         describe('keydown events on editor', function () {
-            var highlight, annotation, textArea, save, cancel;
+            var highlight, annotation, form, textArea, save, cancel;
 
             beforeEach(function() {
                 highlight = $('<span class="annotator-hl" tabindex="0"/>').appendTo(this.annotator.element);
@@ -213,6 +177,7 @@ define([
                     highlights: [highlight.get(0)]
                 };
                 this.annotator.editor.show(annotation, {'left': 0, 'top': 0});
+                form = this.annotator.element.find('form.annotator-widget');
                 textArea = this.annotator.element.find('.annotator-item').first().children('textarea');
                 save  = this.annotator.element.find('.annotator-save');
                 cancel = this.annotator.element.find('.annotator-cancel');
@@ -220,8 +185,20 @@ define([
                 spyOn(this.annotator.editor, 'hide').andCallThrough();
             });
 
-            it('should cycle forward through texarea, save, and cancel on TAB keydown', function () {
+            it('should give focus to TextArea on Form TAB keydown', function () {
+                form.focus();
+                form.trigger(tabForwardEvent());
                 expect(textArea).toBeFocused();
+            });
+
+            it('should give focus to Cancel on Form SHIFT + TAB keydown', function () {
+                form.focus();
+                form.trigger(tabBackwardEvent());
+                expect(cancel).toBeFocused();
+            });
+
+            it('should cycle forward through texarea, save, and cancel on TAB keydown', function () {
+                textArea.focus();
                 textArea.trigger(tabForwardEvent());
                 expect(save).toBeFocused();
                 save.trigger(tabForwardEvent());
@@ -231,7 +208,7 @@ define([
             });
 
             it('should cycle back through texarea, save, and cancel on SHIFT + TAB keydown', function () {
-                expect(textArea).toBeFocused();
+                textArea.focus();
                 textArea.trigger(tabBackwardEvent());
                 expect(cancel).toBeFocused();
                 cancel.trigger(tabBackwardEvent());
@@ -271,9 +248,13 @@ define([
             });
 
             it('should hide on ESCAPE keydown', function () {
-                textArea.focus();
-                textArea.trigger(keyDownEvent(this.KEY.ESCAPE));
-                expect(this.annotator.editor.hide).toHaveBeenCalled();
+                var tabControls = [textArea, save, cancel];
+
+                _.each(tabControls, (function (control) {
+                    control.focus();
+                    control.trigger(keyDownEvent(this.KEY.ESCAPE));
+                }).bind(this));
+                expect(this.annotator.editor.hide.callCount).toBe(3);
             });
         });
     });
