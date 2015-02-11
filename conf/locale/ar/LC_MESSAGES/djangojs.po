@@ -71,9 +71,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
-"PO-Revision-Date: 2015-02-02 13:52+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"PO-Revision-Date: 2015-02-05 11:21+0000\n"
+"Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -4165,13 +4165,8 @@ msgstr "محرّر"
 
 #: cms/static/js/views/xblock_editor.js
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
-#, fuzzy
 msgid "Settings"
-msgstr ""
-"#-#-#-#-#  djangojs-studio.po (edx-platform)  #-#-#-#-#\n"
-"إعدادات\n"
-"#-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#\n"
-"الإعدادات"
+msgstr "الإعدادات"
 
 #: cms/static/js/views/xblock_outline.js
 msgid "New %(component_type)s"
@@ -4191,11 +4186,11 @@ msgstr "جاري الإضافة"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "%(display_name)s Settings"
-msgstr "إعدادات %(display_name)s"
+msgstr "الإعدادات الخاصة بـ %(display_name)s "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Change the settings for %(display_name)s"
-msgstr "غيّر إعدادات %(display_name)s"
+msgstr "تغيير الإعدادات الخاصة بـ %(display_name)s "
 
 #: cms/static/js/views/modals/course_outline_modals.js
 msgid "Publish %(display_name)s"
@@ -4418,7 +4413,6 @@ msgstr "تحميل الترجمة"
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""
@@ -5846,7 +5840,7 @@ msgid ""
 "course settings:"
 msgstr ""
 "يُرجى التحقّق من الملاحظات والتعليقات التالية بشأن التحقّق، وتطبيقها على "
-"إعدادات مساقك:"
+"الإعدادات الخاصة بمساقك:"
 
 #: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore

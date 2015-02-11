@@ -14,6 +14,7 @@
 # Mateusz <blue90pl@gmail.com>, 2014
 # Michał Szkutnik <michal7x7@o2.pl>, 2015
 # Cairath, 2014
+# Radek <d.exax@hotmail.com>, 2015
 # Sebastian <foobarbaz@gazeta.pl>, 2014
 # Jaroslaw Lukawski <sekretariat@kmti.uz.zgora.pl>, 2014
 # Dyfeomorfizm <ximixd@gmail.com>, 2014
@@ -55,8 +56,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
-"PO-Revision-Date: 2015-02-02 13:52+0000\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"PO-Revision-Date: 2015-02-10 13:11+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Polish (http://www.transifex.com/projects/p/edx-platform/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -1921,6 +1922,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: lms/templates/courseware_search/search_list.underscore
 msgid "Search Results"
 msgstr ""
 
@@ -4095,7 +4097,6 @@ msgstr ""
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""

@@ -16,6 +16,7 @@
 # Cristiano Oliveira <cristoliv@gmail.com>, 2014
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
+# Erik Henrique <contato@erikhenrique.com.br>, 2015
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
@@ -62,6 +63,7 @@
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
 # LucasPPires <lucaspylespires@hotmail.com>, 2014
+# Luiz Penedo <luiz.penedo@radixeng.com.br>, 2015
 # Marco Túlio Pires <mtrpires@outlook.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
 # niels006 <niels006@gmail.com>, 2014
@@ -110,7 +112,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
 "PO-Revision-Date: 2015-02-02 13:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -1960,6 +1962,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: lms/templates/courseware_search/search_list.underscore
 msgid "Search Results"
 msgstr ""
 
@@ -4184,7 +4187,6 @@ msgstr ""
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""

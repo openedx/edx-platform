@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
 "PO-Revision-Date: 2015-02-02 13:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/edx-platform/language/sq/)\n"
@@ -4036,7 +4036,6 @@ msgstr "Ngarko përkthimin"
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""
