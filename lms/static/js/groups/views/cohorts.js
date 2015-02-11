@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext, interpolate_text, CohortModel, CohortEditorView, CohortFormView,
-          NotificationModel, NotificationView, FileUploaderView) {
+          CourseCohortSettingsNotificationView, NotificationModel, NotificationView, FileUploaderView) {
     'use strict';
 
     var hiddenClass = 'is-hidden',
@@ -12,6 +12,7 @@ var edx = edx || {};
     edx.groups.CohortsView = Backbone.View.extend({
         events : {
             'change .cohort-select': 'onCohortSelected',
+            'change .cohorts-state': 'onCohortsEnabledChanged',
             'click .action-create': 'showAddCohortForm',
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
@@ -26,19 +27,21 @@ var edx = edx || {};
             this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
             this.context = options.context;
             this.contentGroups = options.contentGroups;
+            this.cohortSettings = options.cohortSettings;
             model.on('sync', this.onSync, this);
 
-            // Update cohort counts when the user clicks back on the membership tab
+            // Update cohort counts when the user clicks back on the cohort management tab
             // (for example, after uploading a csv file of cohort assignments and then
             // checking results on data download tab).
-            $(this.getSectionCss('membership')).click(function () {
+            $(this.getSectionCss('cohort_management')).click(function () {
                 model.fetch();
             });
         },
 
         render: function() {
             this.$el.html(this.template({
-                cohorts: this.model.models
+                cohorts: this.model.models,
+                cohortsEnabled: this.cohortSettings.get('is_cohorted')
             }));
             this.onSync();
             return this;
@@ -49,6 +52,13 @@ var edx = edx || {};
                 cohorts: this.model.models,
                 selectedCohort: selectedCohort
             }));
+        },
+
+        renderCourseCohortSettingsNotificationView: function() {
+            var cohortStateMessageNotificationView = new CourseCohortSettingsNotificationView({
+                el: $('.cohort-state-message'),
+                cohortEnabled: this.getCohortsEnabled()});
+            cohortStateMessageNotificationView.render();
         },
 
         onSync: function(model, response, options) {
@@ -96,6 +106,28 @@ var edx = edx || {};
             var selectedCohort = this.getSelectedCohort();
             this.lastSelectedCohortId = selectedCohort.get('id');
             this.showCohortEditor(selectedCohort);
+        },
+
+        onCohortsEnabledChanged: function(event) {
+            event.preventDefault();
+            this.saveCohortSettings();
+        },
+
+        saveCohortSettings: function() {
+            var self = this,
+                cohortSettings,
+                fieldData = {is_cohorted: this.getCohortsEnabled()};
+            cohortSettings = this.cohortSettings;
+            cohortSettings.save(
+                fieldData, {wait: true}
+            ).done(function() {
+                self.render();
+                self.renderCourseCohortSettingsNotificationView();
+            });
+        },
+
+        getCohortsEnabled: function() {
+            return this.$('.cohorts-state').prop('checked');
         },
 
         showCohortEditor: function(cohort) {
@@ -242,4 +274,5 @@ var edx = edx || {};
         }
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
-    edx.groups.CohortFormView, NotificationModel, NotificationView, FileUploaderView);
+    edx.groups.CohortFormView, edx.groups.CourseCohortSettingsNotificationView, NotificationModel, NotificationView,
+    FileUploaderView);

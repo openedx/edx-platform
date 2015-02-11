@@ -67,6 +67,8 @@
             'js/views/notification': 'js/views/notification',
             'js/groups/models/cohort': 'js/groups/models/cohort',
             'js/groups/models/content_group': 'js/groups/models/content_group',
+            'js/groups/models/course_cohort_settings': 'js/groups/models/course_cohort_settings',
+            'js/groups/views/course_cohort_settings_notification': 'js/groups/views/course_cohort_settings_notification',
             'js/groups/collections/cohort': 'js/groups/collections/cohort',
             'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
             'js/groups/views/cohort_form': 'js/groups/views/cohort_form',
@@ -292,6 +294,14 @@
             },
             'js/groups/models/content_group': {
                 exports: 'edx.groups.ContentGroupModel',
+                deps: ['backbone']
+            },
+            'js/groups/models/course_cohort_settings': {
+                exports: 'edx.groups.CourseCohortSettingsModel',
+                deps: ['backbone']
+            },
+            'js/groups/views/course_cohort_settings_notification': {
+                exports: 'edx.groups.CourseCohortSettingsNotificationView',
                 deps: ['backbone']
             },
             'js/groups/collections/cohort': {

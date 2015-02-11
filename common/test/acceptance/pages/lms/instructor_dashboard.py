@@ -28,6 +28,15 @@ class InstructorDashboardPage(CoursePage):
         membership_section.wait_for_page()
         return membership_section
 
+    def select_cohort_management(self):
+        """
+        Selects the cohort management tab and returns the CohortManagementSection
+        """
+        self.q(css='a[data-section=cohort_management]').first.click()
+        cohort_management_section = CohortManagementSection(self.browser)
+        cohort_management_section.wait_for_page()
+        return cohort_management_section
+
     def select_data_download(self):
         """
         Selects the data download tab and returns a DataDownloadPage.
@@ -84,16 +93,10 @@ class MembershipPage(PageObject):
         """
         return MembershipPageAutoEnrollSection(self.browser)
 
-    def select_cohort_management_section(self):
-        """
-        Returns the MembershipPageCohortManagementSection page object.
-        """
-        return MembershipPageCohortManagementSection(self.browser)
 
-
-class MembershipPageCohortManagementSection(PageObject):
+class CohortManagementSection(PageObject):
     """
-    The cohort management subsection of the Membership section of the Instructor dashboard.
+    The Cohort Management section of the Instructor dashboard.
     """
     url = None
     csv_browse_button_selector_css = '.csv-upload #file-upload-form-file'
@@ -104,13 +107,13 @@ class MembershipPageCohortManagementSection(PageObject):
     assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
 
     def is_browser_on_page(self):
-        return self.q(css='.cohort-management.membership-section').present
+        return self.q(css='.cohort-management').present
 
     def _bounded_selector(self, selector):
         """
         Return `selector`, but limited to the cohort management context.
         """
-        return '.cohort-management.membership-section {}'.format(selector)
+        return '.cohort-management {}'.format(selector)
 
     def _get_cohort_options(self):
         """
@@ -158,10 +161,10 @@ class MembershipPageCohortManagementSection(PageObject):
         Return assignment settings disabled message in case of default cohort.
         """
         query = self.q(css=self._bounded_selector('.copy-error'))
-        if query.present:
+        if query.visible:
             return query.text[0]
-        else:
-            return ''
+
+        return ''
 
     @property
     def cohort_name_in_header(self):
@@ -232,7 +235,11 @@ class MembershipPageCohortManagementSection(PageObject):
         Adds a new manual cohort with the specified name.
         If a content group should also be associated, the name of the content group should be specified.
         """
-        create_buttons = self.q(css=self._bounded_selector(".action-create"))
+        add_cohort_selector = self._bounded_selector(".action-create")
+
+        # We need to wait because sometime add cohort button is not in a state to be clickable.
+        self.wait_for_element_presence(add_cohort_selector, 'Add Cohort button is present.')
+        create_buttons = self.q(css=add_cohort_selector)
         # There are 2 create buttons on the page. The second one is only present when no cohort yet exists
         # (in which case the first is not visible). Click on the last present create button.
         create_buttons.results[len(create_buttons.results) - 1].click()
@@ -443,6 +450,28 @@ class MembershipPageCohortManagementSection(PageObject):
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
         self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.click()
+
+    @property
+    def is_cohorted(self):
+        """
+        Returns the state of `Enable Cohorts` checkbox state.
+        """
+        return self.q(css=self._bounded_selector('.cohorts-state')).selected
+
+    @is_cohorted.setter
+    def is_cohorted(self, state):
+        """
+        Check/Uncheck the `Enable Cohorts` checkbox state.
+        """
+        if state != self.is_cohorted:
+            self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+
+    def cohort_management_controls_visible(self):
+        """
+        Return the visibility status of cohort management controls(cohort selector section etc).
+        """
+        return (self.q(css=self._bounded_selector('.cohort-management-nav')).visible and
+                self.q(css=self._bounded_selector('.wrapper-cohort-supplemental')).visible)
 
 
 class MembershipPageAutoEnrollSection(PageObject):

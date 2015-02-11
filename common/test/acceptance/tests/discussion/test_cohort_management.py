@@ -63,8 +63,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
-        membership_page = self.instructor_dashboard_page.select_membership()
-        self.cohort_management_page = membership_page.select_cohort_management_section()
+        self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
     def verify_cohort_description(self, cohort_name, expected_description):
         """
@@ -441,8 +440,30 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
 
         self.assertTrue(self.cohort_management_page.is_assignment_settings_disabled)
 
-        message = "There must be one cohort to which students can be randomly assigned."
+        message = "There must be one cohort to which students can automatically be assigned."
         self.assertEqual(message, self.cohort_management_page.assignment_settings_message)
+
+    def test_cohort_enable_disable(self):
+        """
+        Scenario: Cohort Enable/Disable checkbox related functionality is working as intended.
+
+        Given I have a cohorted course with a user.
+        And I can see the `Enable Cohorts` checkbox is checked.
+        And cohort management controls are visible.
+        When I uncheck the `Enable Cohorts` checkbox.
+        Then I cohort management controls are not visible.
+        And When I reload the page.
+        Then I can see the `Enable Cohorts` checkbox is unchecked.
+        And cohort management controls are not visible.
+        """
+        self.assertTrue(self.cohort_management_page.is_cohorted)
+        self.assertTrue(self.cohort_management_page.cohort_management_controls_visible())
+        self.cohort_management_page.is_cohorted = False
+        self.assertFalse(self.cohort_management_page.cohort_management_controls_visible())
+        self.browser.refresh()
+        self.cohort_management_page.wait_for_page()
+        self.assertFalse(self.cohort_management_page.is_cohorted)
+        self.assertFalse(self.cohort_management_page.cohort_management_controls_visible())
 
     def test_link_to_data_download(self):
         """
@@ -656,8 +677,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
-        membership_page = self.instructor_dashboard_page.select_membership()
-        self.cohort_management_page = membership_page.select_cohort_management_section()
+        self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
     def test_no_content_group_linked(self):
         """

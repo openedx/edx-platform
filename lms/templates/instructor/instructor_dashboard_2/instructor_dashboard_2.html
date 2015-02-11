@@ -53,12 +53,16 @@
   <%static:js group='application'/>
 
   ## Backbone classes declared explicitly until RequireJS is supported
+  <script type="text/javascript" src="${static.url('js/instructor_dashboard/ecommerce.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/instructor_dashboard/cohort_management.js')}"></script>
   <script type="text/javascript" src="${static.url('js/models/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/views/file_uploader.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/models/cohort.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/models/content_group.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/groups/models/course_cohort_settings.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/collections/cohort.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/groups/views/course_cohort_settings_notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohort_form.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohort_editor.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohorts.js')}"></script>
@@ -66,7 +70,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification"]:
+% for template_name in ["cohorts", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>

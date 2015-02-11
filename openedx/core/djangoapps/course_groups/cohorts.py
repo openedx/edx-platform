@@ -5,7 +5,6 @@ forums, and to the cohort admin views.
 
 import logging
 import random
-import json
 
 from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
@@ -238,7 +237,7 @@ def migrate_cohort_settings(course):
         course_id=course_id,
         defaults={
             'is_cohorted': course.is_cohorted,
-            'cohorted_discussions': json.dumps(list(course.cohorted_discussions)),
+            'cohorted_discussions': list(course.cohorted_discussions),
             'always_cohort_inline_discussions': course.always_cohort_inline_discussions
         }
     )
@@ -324,7 +323,8 @@ def add_cohort(course_key, name, assignment_type):
         raise ValueError("Invalid course_key")
 
     cohort = CourseCohort.create(
-        cohort_name=name, course_id=course.id,
+        cohort_name=name,
+        course_id=course.id,
         assignment_type=assignment_type
     ).course_user_group
 
@@ -413,7 +413,7 @@ def set_assignment_type(user_group, assignment_type):
     course_cohort = user_group.cohort
 
     if is_default_cohort(user_group) and course_cohort.assignment_type != assignment_type:
-        raise ValueError(_("There must be one cohort to which students can be randomly assigned."))
+        raise ValueError(_("There must be one cohort to which students can automatically be assigned."))
 
     course_cohort.assignment_type = assignment_type
     course_cohort.save()
@@ -438,3 +438,48 @@ def is_default_cohort(user_group):
     )
 
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
+
+
+def set_course_cohort_settings(course_key, **kwargs):
+    """
+    Set cohort settings for a course.
+
+    Arguments:
+        course_key: CourseKey
+        is_cohorted (bool): If the course should be cohorted.
+        always_cohort_inline_discussions (bool): If inline discussions should always be cohorted.
+        cohorted_discussions (list): List of discussion ids.
+
+    Returns:
+        A CourseCohortSettings object.
+
+    Raises:
+        ValueError if course_key is invalid.
+    """
+    course_cohort_settings = get_course_cohort_settings(course_key)
+    for field in ('is_cohorted', 'always_cohort_inline_discussions', 'cohorted_discussions'):
+        if field in kwargs:
+            setattr(course_cohort_settings, field, kwargs[field])
+    course_cohort_settings.save()
+    return course_cohort_settings
+
+
+def get_course_cohort_settings(course_key):
+    """
+    Return cohort settings for a course.
+
+    Arguments:
+        course_key: CourseKey
+
+    Returns:
+        A CourseCohortSettings object.
+
+    Raises:
+        ValueError if course_key is invalid.
+    """
+    try:
+        course_cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key)
+    except CourseCohortsSettings.DoesNotExist:
+        course = courses.get_course(course_key)
+        course_cohort_settings = migrate_cohort_settings(course)
+    return course_cohort_settings

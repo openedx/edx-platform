@@ -3,7 +3,6 @@ Tests for cohorts
 """
 # pylint: disable=no-member
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
@@ -19,8 +18,9 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTO
 
 from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
-from ..tests.helpers import topic_name_to_id, config_course_cohorts, CohortFactory, CourseCohortFactory
-
+from ..tests.helpers import (
+    topic_name_to_id, config_course_cohorts, CohortFactory, CourseCohortFactory, CourseCohortSettingsFactory
+)
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
 class TestCohortSignals(TestCase):
@@ -209,7 +209,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertEqual(cohorts.get_assignment_type(cohort), CourseCohort.RANDOM)
 
-        exception_msg = "There must be one cohort to which students can be randomly assigned."
+        exception_msg = "There must be one cohort to which students can automatically be assigned."
         with self.assertRaises(ValueError) as context_manager:
             cohorts.set_assignment_type(cohort, CourseCohort.MANUAL)
 
@@ -685,12 +685,43 @@ class TestCohorts(ModuleStoreTestCase):
             lambda: cohorts.add_user_to_cohort(first_cohort, "non_existent_username")
         )
 
+    def test_get_course_cohort_settings(self):
+        """
+        Test that cohorts.get_course_cohort_settings is working as expected.
+        """
+        course = modulestore().get_course(self.toy_course_key)
+        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
+
+        self.assertFalse(course_cohort_settings.is_cohorted)
+        self.assertEqual(course_cohort_settings.cohorted_discussions, [])
+        self.assertTrue(course_cohort_settings.always_cohort_inline_discussions)
+
+    def test_update_course_cohort_settings(self):
+        """
+        Test that cohorts.set_course_cohort_settings is working as expected.
+        """
+        course = modulestore().get_course(self.toy_course_key)
+        CourseCohortSettingsFactory(course_id=course.id)
+
+        cohorts.set_course_cohort_settings(
+            course.id,
+            is_cohorted=False,
+            cohorted_discussions=['topic a id', 'topic b id'],
+            always_cohort_inline_discussions=False
+        )
+
+        course_cohort_settings = cohorts.get_course_cohort_settings(course.id)
+
+        self.assertFalse(course_cohort_settings.is_cohorted)
+        self.assertEqual(course_cohort_settings.cohorted_discussions, ['topic a id', 'topic b id'])
+        self.assertFalse(course_cohort_settings.always_cohort_inline_discussions)
+
 
 class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
-    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
     """
     Test Cohorts and Partitions Groups.
     """
+    MODULESTORE = TEST_DATA_MIXED_TOY_MODULESTORE
 
     def setUp(self):
         """
