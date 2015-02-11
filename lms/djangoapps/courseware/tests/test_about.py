@@ -544,3 +544,17 @@ class AboutPurchaseCourseTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn("Course is full", resp.content)
         self.assertNotIn("Add buyme to Cart ($10)", resp.content)
+
+    def test_free_course_display(self):
+        """
+        Make sure other courses that don't have shopping cart enabled don't display the add-to-cart button
+        and don't display the course_price field if Cosmetic Price is disabled.
+        """
+        course = CourseFactory.create(org='MITx', number='free', display_name='Course For Free')
+        self.setup_user()
+        url = reverse('about_course', args=[course.id.to_deprecated_string()])
+
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertNotIn("Add free to Cart (Free)", resp.content)
+        self.assertNotIn('<p class="important-dates-item-title">Price</p>', resp.content)
