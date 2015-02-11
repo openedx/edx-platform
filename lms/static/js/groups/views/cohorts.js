@@ -105,22 +105,17 @@ var edx = edx || {};
             event.preventDefault();
             this.cohortsEnabled = this.getCohortState();
             this.saveCohortSettings();
-//            this.render();
         },
 
         saveCohortSettings: function() {
-            var cohortSettings,
-                fieldData = {
-                    is_cohorted: this.getCohortState(),
-                    cohorted_discussions: [],
-                    always_cohort_inline_discussions: true
-                };
+            var self = this,
+                cohortSettings,
+                fieldData = {is_cohorted: this.getCohortState()};
             cohortSettings = this.cohortSettings;
             cohortSettings.save(
                 fieldData, {patch: true, wait: true}
             ).done(function() {
-                this.render();
-                alert('saved');
+                self.render();
             });
         },
 
