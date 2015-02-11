@@ -15,6 +15,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from util.testing import UrlResetMixin
 from enrollment import api
 from enrollment.errors import CourseEnrollmentError
+from openedx.core.djangoapps.user_api.models import UserOrgTag
 from student.tests.factories import UserFactory, CourseModeFactory
 from student.models import CourseEnrollment
 from embargo.test_utils import restrict_course
@@ -81,6 +82,30 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
         self.assertEqual('honor', data['mode'])
         self.assertTrue(data['is_active'])
+
+    @ddt.data(
+        (True, u"True"),
+        (False, u"False"),
+        (None, None)
+    )
+    @ddt.unpack
+    def test_email_opt_in_true(self, opt_in, pref_value):
+        """
+        Verify that the email_opt_in parameter sets the underlying flag.
+        And that if the argument is not present, then it does not affect the flag
+        """
+        def _assert_no_opt_in_set():
+            """ Check the tag doesn't exit"""
+            with self.assertRaises(UserOrgTag.DoesNotExist):
+                UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
+
+        _assert_no_opt_in_set()
+        self._create_enrollment(email_opt_in=opt_in)
+        if opt_in is None:
+            _assert_no_opt_in_set()
+        else:
+            preference = UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
+            self.assertEquals(preference.value, pref_value)
 
     def test_enroll_prof_ed(self):
         # Create the prod ed mode.
@@ -207,21 +232,20 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def _create_enrollment(self, course_id=None, username=None, expected_status=status.HTTP_200_OK):
+    def _create_enrollment(self, course_id=None, username=None, expected_status=status.HTTP_200_OK, email_opt_in=None):
+        """Enroll in the course and verify the URL we are sent to. """
         course_id = unicode(self.course.id) if course_id is None else course_id
         username = self.user.username if username is None else username
-        """Enroll in the course and verify the URL we are sent to. """
 
-        resp = self.client.post(
-            reverse('courseenrollments'),
-            {
-                'course_details': {
-                    'course_id': course_id
-                },
-                'user': username
+        params = {
+            'course_details': {
+                'course_id': course_id
             },
-            format='json'
-        )
+            'user': username
+        }
+        if email_opt_in is not None:
+            params['email_opt_in'] = email_opt_in
+        resp = self.client.post(reverse('courseenrollments'), params, format='json')
         self.assertEqual(resp.status_code, expected_status)
 
         if expected_status == status.HTTP_200_OK:
