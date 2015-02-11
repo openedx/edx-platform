@@ -6,7 +6,7 @@ Instructor (2) dashboard page.
 from bok_choy.page_object import PageObject
 from .course_page import CoursePage
 import os
-from bok_choy.promise import EmptyPromise
+from bok_choy.promise import EmptyPromise, Promise
 from ...tests.helpers import select_option_by_text, get_selected_option_text, get_options
 
 
@@ -92,6 +92,7 @@ class MembershipPageCohortManagementSection(PageObject):
     content_group_selector_css = 'select.input-cohort-group-association'
     no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
     select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
+    assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management.membership-section').present
@@ -106,7 +107,12 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Returns the available options in the cohort dropdown, including the initial "Select a cohort".
         """
-        return self.q(css=self._bounded_selector("#cohort-select option"))
+        def check_func():
+            """Promise Check Function"""
+            query = self.q(css=self._bounded_selector("#cohort-select option"))
+            return len(query) > 0, query
+
+        return Promise(check_func, "Waiting for cohort selector to populate").fulfill()
 
     def _cohort_name(self, label):
         """
@@ -119,6 +125,41 @@ class MembershipPageCohortManagementSection(PageObject):
         Returns the count for the cohort (as specified in the label in the selector).
         """
         return int(label.split(' (')[1].split(')')[0])
+
+    def save_cohort_settings(self):
+        """
+        Click on Save button shown after click on Settings tab or when we add a new cohort.
+        """
+        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+
+    @property
+    def is_assignment_settings_disabled(self):
+        """
+        Check if assignment settings are disabled.
+        """
+        attributes = self.q(css=self._bounded_selector('.cohort-management-assignment-type-settings')).attrs('class')
+        if 'is-disabled' in attributes[0].split():
+            return True
+
+        return False
+
+    @property
+    def assignment_settings_message(self):
+        """
+        Return assignment settings disabled message in case of default cohort.
+        """
+        query = self.q(css=self._bounded_selector('.copy-error'))
+        if query.present:
+            return query.text[0]
+        else:
+            return ''
+
+    @property
+    def cohort_name_in_header(self):
+        """
+        Return cohort name as shown in cohort header.
+        """
+        return self._cohort_name(self.q(css=self._bounded_selector(".group-header-title .title-value")).text[0])
 
     def get_cohorts(self):
         """
@@ -133,10 +174,6 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Returns the name of the selected cohort.
         """
-        EmptyPromise(
-            lambda: len(self._get_cohort_options().results) > 0,
-            "Waiting for cohort selector to populate"
-        ).fulfill()
         return self._cohort_name(
             self._get_cohort_options().filter(lambda el: el.is_selected()).first.text[0]
         )
@@ -153,16 +190,30 @@ class MembershipPageCohortManagementSection(PageObject):
         """
         Selects the given cohort in the drop-down.
         """
-        EmptyPromise(
-            lambda: cohort_name in self.get_cohorts(),
-            "Waiting for cohort selector to populate"
-        ).fulfill()
         # Note: can't use Select to select by text because the count is also included in the displayed text.
         self._get_cohort_options().filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
 
-    def add_cohort(self, cohort_name, content_group=None):
+    def set_cohort_name(self, cohort_name):
+        """
+        Set Cohort Name.
+        """
+        textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
+        textinput.clear()
+        textinput.send_keys(cohort_name)
+
+    def set_assignment_type(self, assignment_type):
+        """
+        Set assignment type for selected cohort.
+
+        Arguments:
+            assignment_type (str): Should be 'random' or 'manual'
+        """
+        css = self._bounded_selector(self.assignment_type_buttons_css)
+        self.q(css=css).filter(lambda el: el.get_attribute('value') == assignment_type).first.click()
+
+    def add_cohort(self, cohort_name, content_group=None, assignment_type=None):
         """
         Adds a new manual cohort with the specified name.
         If a content group should also be associated, the name of the content group should be specified.
@@ -173,9 +224,15 @@ class MembershipPageCohortManagementSection(PageObject):
         create_buttons.results[len(create_buttons.results) - 1].click()
         textinput = self.q(css=self._bounded_selector("#cohort-name")).results[0]
         textinput.send_keys(cohort_name)
+
+        # Manual assignment type will be selected by default for a new cohort
+        # if we are not setting the assignment type explicitly
+        if assignment_type:
+            self.set_assignment_type(assignment_type)
+
         if content_group:
             self._select_associated_content_group(content_group)
-        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+        self.save_cohort_settings()
 
     def get_cohort_group_setup(self):
         """
@@ -185,6 +242,12 @@ class MembershipPageCohortManagementSection(PageObject):
 
     def select_edit_settings(self):
         self.q(css=self._bounded_selector(".action-edit")).first.click()
+
+    def select_manage_settings(self):
+        """
+        Click on Manage Students Tab under cohort management section.
+        """
+        self.q(css=self._bounded_selector(".tab-manage_students")).first.click()
 
     def add_students_to_selected_cohort(self, users):
         """
@@ -231,6 +294,15 @@ class MembershipPageCohortManagementSection(PageObject):
             return None
         return get_selected_option_text(self.q(css=self._bounded_selector(self.content_group_selector_css)))
 
+    def get_cohort_associated_assignment_type(self):
+        """
+        Returns the assignment type associated with the cohort currently being edited.
+        """
+        self.select_cohort_settings()
+        css_selector = self._bounded_selector(self.assignment_type_buttons_css)
+        radio_button = self.q(css=css_selector).filter(lambda el: el.is_selected()).results[0]
+        return radio_button.get_attribute('value')
+
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
         Sets the content group associated with the cohort currently being edited.
@@ -243,7 +315,7 @@ class MembershipPageCohortManagementSection(PageObject):
             self.q(css=self._bounded_selector(self.no_content_group_button_css)).first.click()
         else:
             self._select_associated_content_group(content_group)
-        self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+        self.save_cohort_settings()
 
     def _select_associated_content_group(self, content_group):
         """

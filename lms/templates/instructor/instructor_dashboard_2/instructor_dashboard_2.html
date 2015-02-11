@@ -67,7 +67,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "cohort-editor", "cohort-selector", "cohort-form", "notification"]:
+% for template_name in ["cohorts", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>
