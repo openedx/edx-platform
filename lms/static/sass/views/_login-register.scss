@@ -89,7 +89,6 @@ $sm-btn-linkedin: #0077b5;
 
     .section-title {
         position: relative;
-        height: 16px;
         margin: 20px 0 10px;
 
         &.lines {
@@ -275,15 +274,14 @@ $sm-btn-linkedin: #0077b5;
         }
 
         .field-link {
-            position: absolute;
-            top: 0;
-            right: 0;
+            display: block;
+            margin-bottom: ($baseline/2);
+            margin-top: ($baseline/4);
             color: $m-blue-d5;
             font-weight: $font-regular;
             text-decoration: none !important; // needed but nasty
             font-family: $sans-serif;
             font-size: 0.8em;
-            padding-top: 7px;
         }
 
         input,
