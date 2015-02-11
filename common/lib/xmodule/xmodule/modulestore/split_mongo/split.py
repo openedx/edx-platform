@@ -688,8 +688,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     new_module_data
                 )
 
-            if not lazy:
-                # Load all descendants by id
+            # This code supports lazy loading, where the descendent definitions aren't loaded
+            # until they're actually needed.
+            # However, assume that depth == 0 means no depth is specified and depth != 0 means
+            # a depth *is* specified. If a non-zero depth is specified, force non-lazy definition
+            # loading in order to populate the definition cache for later access.
+            load_definitions_now = depth != 0 or not lazy
+            if load_definitions_now:
+                # Non-lazy loading: Load all descendants by id.
                 descendent_definitions = self.get_definitions(
                     course_key,
                     [
@@ -697,14 +703,14 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                         for block in new_module_data.itervalues()
                     ]
                 )
-                # turn into a map
+                # Turn definitions into a map.
                 definitions = {definition['_id']: definition
                                for definition in descendent_definitions}
 
                 for block in new_module_data.itervalues():
                     if block.definition in definitions:
                         definition = definitions[block.definition]
-                        # convert_fields was being done here, but it gets done later in the runtime's xblock_from_json
+                        # convert_fields gets done later in the runtime's xblock_from_json
                         block.fields.update(definition.get('fields'))
                         block.definition_loaded = True
 
@@ -723,7 +729,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         if runtime is None:
             runtime = self.create_runtime(course_entry, lazy)
             self._add_cache(course_entry.structure['_id'], runtime)
-            self.cache_items(runtime, block_keys, course_entry.course_key, depth, depth == 0 and lazy)
+            self.cache_items(runtime, block_keys, course_entry.course_key, depth, lazy)
 
         return [runtime.load_item(block_key, course_entry, **kwargs) for block_key in block_keys]
 
