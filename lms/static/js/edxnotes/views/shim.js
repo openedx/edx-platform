@@ -245,8 +245,6 @@ define([
         Annotator.prototype._setupWrapper
     );
 
-    Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
-
     $.extend(true, Annotator.prototype, {
         isFrozen: false,
         uid: _.uniqueId(),
