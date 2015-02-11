@@ -5,7 +5,7 @@ var edx = edx || {};
 
     edx.groups = edx.groups || {};
 
-    edx.groups.CohortSettings = Backbone.Model.extend({
+    edx.groups.CohortSettingsModel = Backbone.Model.extend({
         idAttribute: 'id',
         defaults: {
             is_cohorted: false,

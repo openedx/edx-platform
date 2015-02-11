@@ -25,7 +25,7 @@
         var cohortManagementElement = $('.cohort-management');
         if (cohortManagementElement.length > 0) {
             var cohorts = new edx.groups.CohortCollection(),
-                cohortSettings = new edx.groups.CohortSettings(),
+                cohortSettings = new edx.groups.CohortSettingsModel(),
                 cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
                 contentGroups = [
                     % for content_group in content_groups:
@@ -42,7 +42,7 @@
                 el: cohortManagementElement,
                 model: cohorts,
                 contentGroups: contentGroups,
-                cohortSettings: cohortSettings, //cohortManagementElement.data('cohorts-enabled') == 'True' ? true : false,
+                cohortSettings: cohortSettings,
                 context: {
                     uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
                     studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
