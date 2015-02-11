@@ -11,7 +11,7 @@
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Eric Fortin, 2014
 # Françoise Docq, 2014
-# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # jmc <jmc@edx.org>, 2014
 # jmc <jmc@edx.org>, 2014
@@ -47,13 +47,14 @@
 # Encolpe Degoute <inactive+encolpe@transifex.com>, 2013
 # Eric Fortin, 2014
 # Françoise Docq, 2014
-# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # Dosto92 <hakim.poubelle@gmail.com>, 2014
 # Julien Rolland <julien.rolland33@gmail.com>, 2013
 # Julien Colmonts <julien.colmonts@student.uclouvain.be>, 2014
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
 # Olivier Marquez <oliviermarquez@gmail.com>, 2013
 # Philippe Chiu <philippe.chiu@gmail.com>, 2013
+# Pierre-Emmanuel Colas <pecolas44@gmail.com>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2015
 # samuel <samuelecin@gmail.com>, 2014
 # Sarina Canelake <sarina@edx.org>, 2014
@@ -83,17 +84,18 @@
 # 
 # Translators:
 # Daniel Le Berre, 2014
-# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014
+# Gérard Vidal <Gerard.Vidal@ens-lyon.fr>, 2014-2015
 # laurentFUN <laurent.at.fun@gmail.com>, 2014
+# moocit-france <contact@moocit.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
-"PO-Revision-Date: 2015-02-02 13:52+0000\n"
-"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"PO-Revision-Date: 2015-02-08 17:51+0000\n"
+"Last-Translator: moocit-france <contact@moocit.fr>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -191,7 +193,7 @@ msgstr ""
 #: lms/static/js/verify_student/views/payment_confirmation_step_view.js
 #: lms/static/js/verify_student/views/step_view.js
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
@@ -1659,22 +1661,22 @@ msgstr ""
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
-msgstr ""
+msgstr "incorrect"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "correct"
-msgstr ""
+msgstr "correct"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "answer"
-msgstr ""
+msgstr "réponse"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "Short explanation"
-msgstr ""
+msgstr "Brève explication"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid ""
@@ -1703,11 +1705,11 @@ msgstr "Pause"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Mute"
-msgstr ""
+msgstr "Couper le son"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Unmute"
-msgstr ""
+msgstr "Remettre le son"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
@@ -1721,7 +1723,7 @@ msgstr "Remplir le navigateur"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Speed"
-msgstr ""
+msgstr "Vitesse"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 msgid "Volume"
@@ -1830,11 +1832,11 @@ msgstr "Masquer la transcription"
 
 #: common/lib/xmodule/xmodule/public/js/library_content_edit.js
 msgid "Updating with latest library content"
-msgstr ""
+msgstr "Mise à jour des derniers ajouts à la bibliothèque"
 
 #: common/lib/xmodule/xmodule/public/js/split_test_author_view.js
 msgid "Creating missing groups"
-msgstr ""
+msgstr "Création des groupes manquants"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
 #: common/static/coffee/src/discussion/discussion_module_view.js
@@ -2361,9 +2363,8 @@ msgid "Error generating student profile information. Please try again."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
-#: lms/templates/courseware_search/search_loading.underscore
 msgid "Loading"
-msgstr ""
+msgstr "Chargement"
 
 #: lms/static/coffee/src/instructor_dashboard/data_download.js
 msgid "Error getting student list."
@@ -2455,27 +2456,27 @@ msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Errors"
-msgstr ""
+msgstr "Erreurs"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following errors were generated:"
-msgstr ""
+msgstr "Les erreurs suivantes ont été générées:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Warnings"
-msgstr ""
+msgstr "Avertissements"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "The following warnings were generated:"
-msgstr ""
+msgstr "Les avertissements suivants ont été générés:"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Success"
-msgstr ""
+msgstr "Opération réussie"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "All accounts were created successfully."
-msgstr ""
+msgstr "Tous les comptes ont été créés avec succès."
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error adding/removing users as beta testers."
@@ -2607,6 +2608,8 @@ msgid ""
 "There are invalid keywords in your email. Please check the following "
 "keywords and try again:"
 msgstr ""
+"Votre courriel contient des mots-clés invalides. Veuillez consulter la liste"
+" de mots-clés ci-dessous et essayer de nouveau:"
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "Your email was successfully queued for sending."
@@ -3098,7 +3101,7 @@ msgstr "Vous avez été déconnecté de votre compte edX"
 
 #: lms/static/js/course_survey.js
 msgid "There has been an error processing your survey."
-msgstr ""
+msgstr "Il y a eu une erreur lors du traitement de votre enquête."
 
 #: lms/static/js/staff_debug_actions.js
 msgid "Unknown Error Occurred."
@@ -3130,15 +3133,15 @@ msgstr "Échec lors de la réévaluation du problème."
 
 #: lms/static/js/dashboard/donation.js
 msgid "Please enter a valid donation amount."
-msgstr ""
+msgstr "Veuillez entrer un montant de don valide."
 
 #: lms/static/js/dashboard/donation.js
 msgid "Your donation could not be submitted."
-msgstr ""
+msgstr "Votre don n'a pas pu être soumis"
 
 #: lms/static/js/dashboard/legacy.js
 msgid "An error occurred. Please try again later."
-msgstr ""
+msgstr "Une erreur est survenue. Veuillez essayer de nouveau plus tard."
 
 #: lms/static/js/dashboard/legacy.js
 msgid "Please verify your new email address"
@@ -3156,15 +3159,19 @@ msgid ""
 "An error has occurred. Make sure that you are connected to the Internet, and"
 " then try refreshing the page."
 msgstr ""
+"Une erreur est survenue. Assurez-vous que vous êtes bien connecté à Internet"
+" et essayez de rafraîchir la page."
 
 #: lms/static/js/edxnotes/views/search_box.js
 msgid ""
 "Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
 msgstr ""
+"Saisir votre terme dans le %(anchor_start)s champ de "
+"recherche%(anchor_end)s."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
-msgstr ""
+msgstr "Onglet en cours"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Hide notes"
@@ -3172,32 +3179,31 @@ msgstr ""
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Showing notes"
-msgstr ""
+msgstr "Affichage des notes en cours"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Show notes"
-msgstr ""
+msgstr "Afficher les notes"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Hiding notes"
-msgstr ""
+msgstr "Masquage des notes en cours"
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
-msgstr ""
+msgstr "Emplacement dans le cours"
 
 #: lms/static/js/edxnotes/views/tabs/recent_activity.js
 msgid "Recent Activity"
-msgstr ""
+msgstr "Activité récente"
 
 #: lms/static/js/edxnotes/views/tabs/search_results.js
 msgid "No results found for \"%(query_string)s\". Please try searching again."
 msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "Selected tab"
-msgstr ""
+msgstr "Onglet sélectionné"
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Saved cohort"
@@ -3205,7 +3211,7 @@ msgstr ""
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Error adding students."
-msgstr ""
+msgstr "Problème lors de l'ajout des étudiants."
 
 #: lms/static/js/groups/views/cohort_editor.js
 msgid "Enter a username or email."
@@ -4324,7 +4330,6 @@ msgstr "Envoyer une traduction"
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: lms/templates/courseware_search/search_list.underscore
-#: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""
 
@@ -5086,7 +5091,7 @@ msgstr ""
 
 #: cms/templates/js/active-video-upload-list.underscore
 msgid "Drag and drop or click here to upload video files."
-msgstr ""
+msgstr "Glisser déposer ou cliquer ici pour importer des fichiers vidéo."
 
 #: cms/templates/js/active-video-upload.underscore
 msgid "status"

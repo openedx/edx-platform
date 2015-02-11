@@ -22,6 +22,7 @@
 # mmazaheri <me.mazaheri@gmail.com>, 2014
 # Saman Ismael <saman.2791@gmail.com>, 2013
 # Sarina Canelake <sarina@edx.org>, 2014
+# Sina Shirinpour <sshirinpoor@gmail.com>, 2015
 # soroosh khoram <soroosh.strife@gmail.com>, 2014
 # #-#-#-#-#  underscore.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -40,7 +41,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 13:49+0000\n"
+"POT-Creation-Date: 2015-02-11 15:33+0000\n"
 "PO-Revision-Date: 2015-02-02 13:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Persian (Iran) (http://www.transifex.com/projects/p/edx-platform/language/fa_IR/)\n"
@@ -1890,6 +1891,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: lms/templates/courseware_search/search_list.underscore
 msgid "Search Results"
 msgstr ""
 
@@ -4022,7 +4024,6 @@ msgstr ""
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr ""

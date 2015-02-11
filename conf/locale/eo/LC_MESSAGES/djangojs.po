@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-02 14:05+0000\n"
-"PO-Revision-Date: 2015-02-02 14:06:45.583976\n"
+"POT-Creation-Date: 2015-02-11 15:47+0000\n"
+"PO-Revision-Date: 2015-02-11 15:48:11.991475\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1966,6 +1966,7 @@ msgstr "Çürrént çönvérsätïön Ⱡ'σя#"
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: lms/templates/courseware_search/search_list.underscore
 msgid "Search Results"
 msgstr "Séärçh Résülts Ⱡ'#"
 
@@ -4330,7 +4331,6 @@ msgstr "Ûplöäd tränslätïön Ⱡ'σ#"
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
-#: lms/templates/courseware_search/search_list.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
 msgstr "géttéxt( #"
