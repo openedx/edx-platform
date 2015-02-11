@@ -6,23 +6,6 @@
             <div class="tab-content is-visible new-cohort-form">
         <% } %>
         <div class="form-fields">
-            <%
-            // Don't allow renaming of existing cohorts yet as it doesn't interact well with
-            // the course's advanced setting for auto cohorting.
-            if (isNewCohort) {
-            %>
-                <div class="form-field">
-                    <div class="cohort-management-settings-form-name field field-text">
-                        <label for="cohort-name" class="form-label">
-                            <%- gettext('Cohort Name') %> *
-                            <span class="sr"><%- gettext('(Required Field)')%></span>
-                        </label>
-                        <input type="text" name="cohort-name" value="<%- cohort ? cohort.get('name') : '' %>" class="input cohort-name"
-                               id="cohort-name"
-                               placeholder="<%- gettext("Enter the name of the cohort") %>" required="required" />
-                    </div>
-                </div>
-            <% } %>
 
             <%
             var foundSelected = false;
@@ -30,8 +13,44 @@
             var selectedUserPartitionId = cohort.get('user_partition_id');
             var hasSelectedContentGroup = selectedContentGroupId != null;
             var hasContentGroups = contentGroups.length > 0;
+            var assignment_type = cohort.get('assignment_type');
+            var cohort_name = cohort.get('name');
+            var cohort_name_value = isNewCohort ? '' : cohort_name;
+            var placeholder_value = isNewCohort ? gettext('Enter the name of the cohort') : '';
+
             %>
             <div class="form-field">
+                <div class="cohort-management-settings-form-name field field-text">
+                    <label for="cohort-name" class="form-label">
+                            <%- gettext('Cohort Name') %> *
+                            <span class="sr"><%- gettext('(Required Field)')%></span>
+                    </label>
+                    <input name="cohort-name" value="<%- cohort_name_value %>" class="input cohort-name" id="cohort-name"
+                           placeholder="<%- placeholder_value %>" required="required" type="text">
+                </div>
+                <hr class="divider divider-lv1">
+                <% if (isDefaultCohort) { %>
+                    <div class="cohort-management-assignment-type-settings field field-radio is-disabled" aria-disabled="true">
+                <% } else {  %>
+                    <div class="cohort-management-assignment-type-settings field field-radio">
+                <% } %>
+                    <h4 class="form-label">
+                        <%- gettext('Students in this cohort are:') %>
+                    </h4>
+                    <label>
+                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
+                    </label>
+                    <label>
+                        <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
+                    </label>
+                </div>
+                <% if (isDefaultCohort) { %>
+                    <p class="copy-error">
+                        <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        <%- gettext("There must be one cohort to which students can be randomly assigned.") %>
+                    </p>
+                <% } %>
+                <hr class="divider divider-lv1">
                 <div class="cohort-management-details-association-course field field-radio">
                     <h4 class="form-label">
                         <%- gettext('Associated Content Group') %>
@@ -119,12 +138,9 @@
 
         <div class="form-actions <% if (isNewCohort) { %>new-cohort-form<% } %>">
             <button class="form-submit button action-primary action-save">
-                <i class="icon fa fa-plus" aria-hidden="true"></i>
                 <%- gettext('Save') %>
             </button>
-            <% if (isNewCohort) { %>
-                <a href="" class="form-cancel action-secondary action-cancel"><%- gettext('Cancel') %></a>
-            <% } %>
+            <a href="" class="form-cancel action-secondary action-cancel"><%- gettext('Cancel') %></a>
         </div>
     </form>
 </div>

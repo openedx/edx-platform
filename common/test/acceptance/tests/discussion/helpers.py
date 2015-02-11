@@ -70,7 +70,7 @@ class CohortTestMixin(object):
         Adds a cohort by name, returning its ID.
         """
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/'
-        data = json.dumps({"name": cohort_name})
+        data = json.dumps({"name": cohort_name, 'assignment_type': 'manual'})
         response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to create cohort")
         return response.json()['id']
