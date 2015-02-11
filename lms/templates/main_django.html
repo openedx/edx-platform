@@ -7,12 +7,12 @@
 
  <link rel="icon" type="image/x-icon" href="{% favicon_path %}" />
 
-  {% compressed_css 'style-vendor' %}
-  {% compressed_css 'style-app' %}
-  {% compressed_css 'style-app-extend1' %}
-  {% compressed_css 'style-app-extend2' %}
-  {% compressed_css 'style-course-vendor' %}
-  {% compressed_css 'style-course' %}
+  <link rel="stylesheet" href="{% static 'css/lms-style-vendor.css' %}" type="text/css" media="all" />
+  <link rel="stylesheet" href="{% static 'css/lms-style-app.css' %}" type="text/css" media="all" />
+  <link rel="stylesheet" href="{% static 'css/lms-style-app-extend1.css' %}" type="text/css" media="all" />
+  <link rel="stylesheet" href="{% static 'css/lms-style-app-extend2.css' %}" type="text/css" media="all" />
+  <link rel="stylesheet" href="{% static 'css/lms-style-course-vendor.css' %}" type="text/css" media="all" />
+  <link rel="stylesheet" href="{% static 'css/lms-style-course.css' %}" type="text/css" media="all" />
 
   {% block main_vendor_js %}
   {% compressed_js 'main_vendor' %}

@@ -270,10 +270,6 @@ FILE_UPLOAD_HANDLERS = (
 FEATURES['AUTH_USE_SHIB'] = True
 FEATURES['RESTRICT_ENROLL_BY_REG_METHOD'] = True
 
-########################### PIPELINE #################################
-
-PIPELINE_SASS_ARGUMENTS = '--debug-info --require {proj_dir}/static/sass/bourbon/lib/bourbon.rb'.format(proj_dir=PROJECT_ROOT)
-
 ########################## ANALYTICS TESTING ########################
 
 ANALYTICS_SERVER_URL = "http://127.0.0.1:9000/"

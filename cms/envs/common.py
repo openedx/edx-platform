@@ -153,6 +153,7 @@ ENABLE_JASMINE = False
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/cms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+BOWER_ROOT = REPO_ROOT / "bower_components"
 LMS_ROOT = REPO_ROOT / "lms"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 
@@ -380,12 +381,25 @@ STATIC_URL = '/static/' + EDX_PLATFORM_REVISION + "/"
 STATIC_ROOT = ENV_ROOT / "staticfiles" / EDX_PLATFORM_REVISION
 
 STATICFILES_DIRS = [
-    COMMON_ROOT / "static",
-    PROJECT_ROOT / "static",
-    LMS_ROOT / "static",
+    ("css", PROJECT_ROOT / "static/css"),
 
-    # This is how you would use the textbook images locally
-    # ("book", ENV_ROOT / "book_images"),
+    ("js", COMMON_ROOT / "static/js"),
+    ("js", PROJECT_ROOT / "static/js"),
+
+    ("fonts", PROJECT_ROOT / "static/fonts"),
+    ("font", BOWER_ROOT / "font-awesome/font"),
+
+    ("images", COMMON_ROOT / "static/images"),
+    ("images", PROJECT_ROOT / "static/images"),
+
+    ("xmodule", COMMON_ROOT / "static/xmodule"),
+
+    # All these should not be here
+
+    ("coffee", COMMON_ROOT / "static/coffee"),
+    ("coffee", PROJECT_ROOT / "static/coffee"),
+
+    PROJECT_ROOT / "static"
 ]
 
 # Locale/Internationalization
@@ -413,89 +427,6 @@ STATICFILES_STORAGE = 'cms.lib.django_require.staticstorage.OptimizedCachedRequi
 
 from rooted_paths import rooted_glob
 
-PIPELINE_CSS = {
-    'style-vendor': {
-        'source_filenames': [
-            'css/vendor/normalize.css',
-            'css/vendor/font-awesome.css',
-            'css/vendor/html5-input-polyfills/number-polyfill.css',
-            'js/vendor/CodeMirror/codemirror.css',
-            'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-            'css/vendor/jquery.qtip.min.css',
-            'js/vendor/markitup/skins/simple/style.css',
-            'js/vendor/markitup/sets/wiki/style.css',
-        ],
-        'output_filename': 'css/cms-style-vendor.css',
-    },
-    'style-vendor-tinymce-content': {
-        'source_filenames': [
-            'css/tinymce-studio-content-fonts.css',
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css',
-            'css/tinymce-studio-content.css'
-        ],
-        'output_filename': 'css/cms-style-vendor-tinymce-content.css',
-    },
-    'style-vendor-tinymce-skin': {
-        'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
-        ],
-        'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
-    },
-    'style-app': {
-        'source_filenames': [
-            'sass/style-app.css',
-        ],
-        'output_filename': 'css/cms-style-app.css',
-    },
-    'style-app-extend1': {
-        'source_filenames': [
-            'sass/style-app-extend1.css',
-        ],
-        'output_filename': 'css/cms-style-app-extend1.css',
-    },
-    'style-app-rtl': {
-        'source_filenames': [
-            'sass/style-app-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-app-rtl.css',
-    },
-    'style-app-extend1-rtl': {
-        'source_filenames': [
-            'sass/style-app-extend1-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-app-extend1-rtl.css',
-    },
-    'style-xmodule': {
-        'source_filenames': [
-            'sass/style-xmodule.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule.css',
-    },
-    'style-xmodule-rtl': {
-        'source_filenames': [
-            'sass/style-xmodule-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule-rtl.css',
-    },
-    'style-xmodule-annotations': {
-        'source_filenames': [
-            'css/vendor/ova/annotator.css',
-            'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
-            'css/vendor/ova/rangeslider.css',
-            'css/vendor/ova/share-annotator.css',
-            'css/vendor/ova/richText-annotator.css',
-            'css/vendor/ova/tags-annotator.css',
-            'css/vendor/ova/flagging-annotator.css',
-            'css/vendor/ova/diacritic-annotator.css',
-            'css/vendor/ova/grouping-annotator.css',
-            'css/vendor/ova/ova.css',
-            'js/vendor/ova/catch/css/main.css'
-        ],
-        'output_filename': 'css/cms-style-xmodule-annotations.css',
-    },
-}
-
 # test_order: Determines the position of this chunk of javascript on
 # the jasmine test page
 PIPELINE_JS = {
@@ -514,7 +445,6 @@ PIPELINE_COMPILERS = (
     'pipeline.compilers.coffee.CoffeeScriptCompiler',
 )
 
-PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
 STATICFILES_IGNORE_PATTERNS = (
@@ -531,11 +461,7 @@ STATICFILES_IGNORE_PATTERNS = (
     "coffee/*.coffee",
     "coffee/*/*.coffee",
     "coffee/*/*/*.coffee",
-    "coffee/*/*/*/*.coffee",
-
-    # Symlinks used by js-test-tool
-    "xmodule_js",
-    "common_static",
+    "coffee/*/*/*/*.coffee"
 )
 
 PIPELINE_YUI_BINARY = 'yui-compressor'

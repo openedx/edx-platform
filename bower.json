@@ -1,0 +1,11 @@
+{
+  "name": "edx",
+  "private": true,
+  "homepage": "https://github.com/edx/edx-platform",
+  "dependencies": {
+    "bourbon": "https://github.com/thoughtbot/bourbon.git#v4.0.2",
+    "neat": "https://github.com/thoughtbot/neat.git#1.7.0",
+    "bi-app-sass": "https://github.com/anasnakawa/bi-app-sass.git#master",
+    "font-awesome": "https://github.com/FortAwesome/Font-Awesome.git#3.2.1"
+  }
+}

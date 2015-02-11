@@ -12,7 +12,6 @@ EDX4EDX_ROOT = ENV_ROOT / "data/edx4edx"
 ### Dark code. Should be enabled in local settings for devel.
 ENABLE_MULTICOURSE = True   # set to False to disable multicourse display (see lib.util.views.edxhome)
 ###
-PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = None
 
 COURSE_DEFAULT = 'edx4edx'

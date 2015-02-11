@@ -65,9 +65,6 @@ info() {
     cat<<EO
     edX base dir : $BASE
     Python virtualenv dir : $PYTHON_DIR
-    Ruby rbenv dir : $RBENV_ROOT
-    Ruby ver : $RUBY_VER
-
 EO
 }
 
@@ -130,17 +127,6 @@ BASE="${PROJECT_HOME:-$(set_base_default)}"
 # Use a sensible default (~/.virtualenvs) for your Python virtualenvs
 # unless you've already got one set up with virtualenvwrapper.
 PYTHON_DIR=${WORKON_HOME:-"$HOME/.virtualenvs"}
-
-# Find rbenv root (~/.rbenv by default)
-if [ -z "${RBENV_ROOT}" ]; then
-  RBENV_ROOT="${HOME}/.rbenv"
-else
-  RBENV_ROOT="${RBENV_ROOT%/}"
-fi
-# Let the repo override the version of Ruby to install
-if [[ -r $BASE/edx-platform/.ruby-version ]]; then
-  RUBY_VER=`cat $BASE/edx-platform/.ruby-version`
-fi
 
 LOG="/var/tmp/install-$(date +%Y%m%d-%H%M%S).log"
 
@@ -213,7 +199,6 @@ if [[ ! $quiet ]]; then
 
        * Django
        * A local copy of Python and library dependencies
-       * A local copy of Ruby and library dependencies
 
   It will also attempt to install operating system dependencies
   with apt(debian) or brew(OSx).
@@ -222,8 +207,7 @@ if [[ ! $quiet ]]; then
 
   !!! Do not run this script from an existing virtualenv !!!
 
-  If you are in a ruby/python virtualenv please start a new
-  shell.
+  If you are in a python virtualenv please start a new shell.
 
 EO
 fi
@@ -335,39 +319,6 @@ else
             raise an issue on Github and someone should fix it."
     exit 1
 fi
-
-# Install system-level dependencies
-if [[ ! -d $RBENV_ROOT ]]; then
-    output "Installing rbenv"
-    git clone https://github.com/sstephenson/rbenv.git $RBENV_ROOT
-fi
-if [[ ! -d $RBENV_ROOT/plugins/ruby-build ]]; then
-    output "Installing ruby-build"
-    git clone https://github.com/sstephenson/ruby-build.git $RBENV_ROOT/plugins/ruby-build
-fi
-shelltype=$(basename $SHELL)
-if ! hash rbenv 2>/dev/null; then
-    output "Adding rbenv to \$PATH in ~/.${shelltype}rc"
-    echo "export PATH=\"$RBENV_ROOT/bin:\$PATH\"" >> $HOME/.${shelltype}rc
-    echo 'eval "$(rbenv init -)"' >> $HOME/.${shelltype}rc
-    export PATH="$RBENV_ROOT/bin:$PATH"
-    eval "$(rbenv init -)"
-fi
-
-if [[ ! -d $RBENV_ROOT/versions/$RUBY_VER ]]; then
-    output "Installing Ruby $RUBY_VER"
-    rbenv install $RUBY_VER
-    rbenv global $RUBY_VER
-fi
-
-if ! hash bundle 2>/dev/null; then
-    output "Installing gem bundler"
-    gem install bundler
-fi
-rbenv rehash
-
-output "Installing ruby packages"
-bundle install --gemfile $BASE/edx-platform/Gemfile
 
 # Install Python virtualenv
 output "Installing python virtualenv"
@@ -493,7 +444,6 @@ output "Finishing Touches"
 cd $BASE
 pip install argcomplete
 cd $BASE/edx-platform
-bundle install
 paver install_prereqs
 
 mkdir -p "$BASE/log"

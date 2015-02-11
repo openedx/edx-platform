@@ -65,8 +65,8 @@ test_root/uploads/*.txt
 .pip_download_cache/
 .prereqs_cache
 .vagrant/
-node_modules
-.bundle/
+node_modules/
+bower_components/
 bin/
 
 ### Static assets pipeline artifacts

@@ -13,13 +13,14 @@ DEFAULT_PORT = {"lms": 8000, "studio": 8001}
 DEFAULT_SETTINGS = 'devstack'
 
 
-def run_server(system, settings=None, port=None, skip_assets=False, contracts=False):
+def run_server(system, settings=None, port=None, skip_assets=False, watch_assets=False, contracts=False):
     """
     Start the server for the specified `system` (lms or studio).
     `settings` is the Django settings module to use; if not provided, use the default.
     `port` is the port to run the server on; if not provided, use the default port for the system.
 
     If `skip_assets` is True, skip the asset compilation step.
+    If `watch_assets` is True, watch for assets modifications.
     """
     if system not in ['lms', 'studio']:
         print("System must be either lms or studio", file=sys.stderr)
@@ -30,8 +31,14 @@ def run_server(system, settings=None, port=None, skip_assets=False, contracts=Fa
 
     if not skip_assets:
         # Local dev settings use staticfiles to serve assets, so we can skip the collecstatic step
-        args = [system, '--settings={}'.format(settings), '--skip-collect', '--watch']
+        args = [system, '--settings={}'.format(settings), '--skip-collect']
         call_task('pavelib.assets.update_assets', args=args)
+
+    if watch_assets:
+        call_task('pavelib.assets.watch_assets', options={
+            'background': True,
+            'systems': [system]
+        })
 
     if port is None:
         port = DEFAULT_PORT[system]
@@ -49,7 +56,8 @@ def run_server(system, settings=None, port=None, skip_assets=False, contracts=Fa
 @cmdopts([
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
-    ("fast", "f", "Skip updating assets")
+    ("fast", "f", "Skip updating assets"),
+    ("watch", None, "Watch assets modifications")
 ])
 def lms(options):
     """
@@ -58,7 +66,8 @@ def lms(options):
     settings = getattr(options, 'settings', None)
     port = getattr(options, 'port', None)
     fast = getattr(options, 'fast', False)
-    run_server('lms', settings=settings, port=port, skip_assets=fast)
+    watch = getattr(options, 'watch', False)
+    run_server('lms', settings=settings, port=port, skip_assets=fast, watch_assets=watch)
 
 
 @task
@@ -66,7 +75,8 @@ def lms(options):
 @cmdopts([
     ("settings=", "s", "Django settings"),
     ("port=", "p", "Port"),
-    ("fast", "f", "Skip updating assets")
+    ("fast", "f", "Skip updating assets"),
+    ("watch", None, "Watch assets modifications")
 ])
 def studio(options):
     """
@@ -75,7 +85,8 @@ def studio(options):
     settings = getattr(options, 'settings', None)
     port = getattr(options, 'port', None)
     fast = getattr(options, 'fast', False)
-    run_server('studio', settings=settings, port=port, skip_assets=fast)
+    watch = getattr(options, 'watch', False)
+    run_server('studio', settings=settings, port=port, skip_assets=fast, watch_assets=watch)
 
 
 @task
@@ -89,6 +100,7 @@ def devstack(args):
     parser = argparse.ArgumentParser(prog='paver devstack')
     parser.add_argument('system', type=str, nargs=1, help="lms or studio")
     parser.add_argument('--fast', action='store_true', default=False, help="Skip updating assets")
+    parser.add_argument('--watch', action='store_true', default=False, help="Watch assets modifications")
     parser.add_argument(
         '--no-contracts',
         action='store_true',
@@ -96,7 +108,7 @@ def devstack(args):
         help="Disable contracts. By default, they're enabled in devstack."
     )
     args = parser.parse_args(args)
-    run_server(args.system[0], settings='devstack', skip_assets=args.fast, contracts=(not args.no_contracts))
+    run_server(args.system[0], settings='devstack', skip_assets=args.fast, watch_assets=args.watch, contracts=(not args.no_contracts))
 
 
 @task
@@ -118,6 +130,7 @@ def celery(options):
     ("settings=", "s", "Django settings for both LMS and Studio"),
     ("worker_settings=", "w", "Celery worker Django settings"),
     ("fast", "f", "Skip updating assets"),
+    ("watch", None, "Watch assets modifications"),
     ("settings_lms=", "l", "Set LMS only, overriding the value from --settings (if provided)"),
     ("settings_cms=", "c", "Set Studio only, overriding the value from --settings (if provided)"),
 ])
@@ -130,6 +143,7 @@ def run_all_servers(options):
     settings_cms = getattr(options, 'settings_cms', settings)
     worker_settings = getattr(options, 'worker_settings', 'dev_with_worker')
     fast = getattr(options, 'fast', False)
+    watch = getattr(options, 'watch', False)
 
     if not fast:
         args = ['lms', '--settings={}'.format(settings_lms), '--skip-collect']
@@ -138,7 +152,12 @@ def run_all_servers(options):
         args = ['studio', '--settings={}'.format(settings_cms), '--skip-collect']
         call_task('pavelib.assets.update_assets', args=args)
 
-        call_task('pavelib.assets.watch_assets', options={'background': True})
+    if watch:
+        call_task('pavelib.assets.watch_assets', options={
+            'background': True,
+            'systems': ['lms', 'studio']
+        })
+
     run_multi_processes([
         django_cmd('lms', settings_lms, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['lms'])),
         django_cmd('studio', settings_cms, 'runserver', '--traceback', '--pythonpath=.', "0.0.0.0:{}".format(DEFAULT_PORT['studio'])),

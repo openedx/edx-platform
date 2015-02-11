@@ -796,7 +796,7 @@
       }
       input[disabled] {
         @include border-radius(4px 0 0 4px);
-        @include padding(6px 6px 5px);
+        @include padding(6px, 6px, 5px, 5px);
         border: 1px solid $lightGrey1;
         cursor: not-allowed;
       }
@@ -1052,7 +1052,7 @@
 
       .cohort-section-header {
         margin-top: ($baseline*1.5);
-        @include padding($baseline 0 ($baseline/2) 0);
+        @include padding($baseline, 0, ($baseline/2), 0);
       }
 
       .cohort-section-header > .form-field {
@@ -1088,7 +1088,7 @@
         a {
           padding-bottom: ($baseline - 5);
           border-style: solid;
-          @include border-width(1px 1px 0 1px);
+          @include border-width(1px, 1px, 0, 1px);
           border-color: $gray-l4;
           background: $white;
           color: inherit;
@@ -1099,7 +1099,7 @@
   }
 
   .tab-content {
-    @include padding($baseline $baseline 0 $baseline);
+    @include padding($baseline, $baseline, 0, $baseline);
     border: 1px solid $gray-l5;
 
     &.new-cohort-form {
@@ -1582,7 +1582,7 @@ input[name="subject"] {
       @extend .button-reset;
     }
     .modal-form-error {
-      @include margin($baseline 0 ($baseline/2) 0);
+      @include margin($baseline, 0, ($baseline/2), 0);
       padding: $baseline;
       box-shadow: inset 0 -1px 2px 0 #f3d9db;
       -webkit-box-sizing: border-box;
@@ -1855,7 +1855,7 @@ input[name="subject"] {
   span.code_tip {
     display: block;
     margin-bottom: 30px;
-    @include padding(($baseline/2) 15px ($baseline/2) 0);
+    @include padding(($baseline/2), 15px, ($baseline/2), 0);
     color: #3C3C3C;
     line-height: 30px;
     .add{
@@ -1868,7 +1868,7 @@ input[name="subject"] {
     display: block;
     line-height: 30px;
     margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) 1px);
+    @include padding(($baseline/2), 15px, ($baseline/2), 1px);
     .add{
       font-size: em(13);
     }
@@ -1877,7 +1877,7 @@ input[name="subject"] {
     display: block;
     height: 37px;
     margin-bottom: 6px;
-    @include padding(($baseline/2) 15px ($baseline/2) 1px);
+    @include padding(($baseline/2), 15px, ($baseline/2), 1px);
     background: none repeat scroll 0 0 #F8F4EC;
     color: #3C3C3C;
     line-height: 30px;

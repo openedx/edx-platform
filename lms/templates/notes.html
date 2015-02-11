@@ -10,8 +10,8 @@ ${static.css(group='style-xmodule-annotations', raw=True)}
 %>
 
 <%block name="headextra">
-<%static:css group='style-course-vendor'/>
-<%static:css group='style-course'/>
+<link rel="stylesheet" href="${static.url('css/lms-style-course-vendor.css')}" type="text/css" media="all" />
+<link rel="stylesheet" href="${static.url('css/lms-style-course.css')}" type="text/css" media="all" />
 <%static:js group='courseware'/>
 
 <style type="text/css">

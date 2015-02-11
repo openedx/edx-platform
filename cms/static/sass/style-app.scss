@@ -8,11 +8,10 @@
 // * +Base - Assets
 // * +Base - Starter
 // * +Base - Elements
-
 // +Libs and Resets - *do not edit*
 // ==================== 
-@import 'bourbon/bourbon'; // lib - bourbon
-@import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
+@import 'bourbon/dist/bourbon'; // lib - bourbon
+@import 'bi-app-sass/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
 // +Vendor and Rebase - *referenced/used vendor presentation and reset*
 // ==================== 

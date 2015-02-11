@@ -354,6 +354,7 @@ XQUEUE_WAITTIME_BETWEEN_REQUESTS = 5  # seconds
 PROJECT_ROOT = path(__file__).abspath().dirname().dirname()  # /edx-platform/lms
 REPO_ROOT = PROJECT_ROOT.dirname()
 COMMON_ROOT = REPO_ROOT / "common"
+BOWER_ROOT = REPO_ROOT / "bower_components"
 ENV_ROOT = REPO_ROOT.dirname()  # virtualenv dir /edx-platform is in
 COURSES_ROOT = ENV_ROOT / "data"
 
@@ -730,8 +731,26 @@ STATIC_URL = '/static/'
 STATIC_ROOT = ENV_ROOT / "staticfiles"
 
 STATICFILES_DIRS = [
-    COMMON_ROOT / "static",
-    PROJECT_ROOT / "static",
+    ("css", COMMON_ROOT / "static/css"),
+    ("css", PROJECT_ROOT / "static/css"),
+
+    ("js", COMMON_ROOT / "static/js"),
+    ("js", PROJECT_ROOT / "static/js"),
+
+    ("fonts", PROJECT_ROOT / "static/fonts"),
+    ("font", BOWER_ROOT / "font-awesome/font"),
+
+    ("images", COMMON_ROOT / "static/images"),
+    ("images", PROJECT_ROOT / "static/images"),
+
+    ("xmodule", COMMON_ROOT / "static/xmodule"),
+
+    # All these should not be here
+
+    ("coffee", COMMON_ROOT / "static/coffee"),
+    ("coffee", PROJECT_ROOT / "static/coffee"),
+
+    ("sass", PROJECT_ROOT / "static/sass")
 ]
 
 FAVICON_PATH = 'images/favicon.ico'
@@ -1142,114 +1161,6 @@ verify_student_js = [
     'js/verify_student/pay_and_verify.js',
 ]
 
-PIPELINE_CSS = {
-    'style-vendor': {
-        'source_filenames': [
-            'css/vendor/font-awesome.css',
-            'css/vendor/jquery.qtip.min.css',
-            'css/vendor/responsive-carousel/responsive-carousel.css',
-            'css/vendor/responsive-carousel/responsive-carousel.slide.css',
-        ],
-        'output_filename': 'css/lms-style-vendor.css',
-    },
-    'style-vendor-tinymce-content': {
-        'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/content.min.css'
-        ],
-        'output_filename': 'css/lms-style-vendor-tinymce-content.css',
-    },
-    'style-vendor-tinymce-skin': {
-        'source_filenames': [
-            'js/vendor/tinymce/js/tinymce/skins/studio-tmce4/skin.min.css'
-        ],
-        'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
-    },
-    'style-app': {
-        'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
-        ],
-        'output_filename': 'css/lms-style-app.css',
-    },
-    'style-app-extend1': {
-        'source_filenames': [
-            'sass/application-extend1.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend1.css',
-    },
-    'style-app-extend2': {
-        'source_filenames': [
-            'sass/application-extend2.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend2.css',
-    },
-    'style-app-rtl': {
-        'source_filenames': [
-            'sass/application-rtl.css',
-            'sass/ie-rtl.css'
-        ],
-        'output_filename': 'css/lms-style-app-rtl.css',
-    },
-    'style-app-extend1-rtl': {
-        'source_filenames': [
-            'sass/application-extend1-rtl.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend1-rtl.css',
-    },
-    'style-app-extend2-rtl': {
-        'source_filenames': [
-            'sass/application-extend2-rtl.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend2-rtl.css',
-    },
-    'style-course-vendor': {
-        'source_filenames': [
-            'js/vendor/CodeMirror/codemirror.css',
-            'css/vendor/jquery.treeview.css',
-            'css/vendor/ui-lightness/jquery-ui-1.8.22.custom.css',
-        ],
-        'output_filename': 'css/lms-style-course-vendor.css',
-    },
-    'style-student-notes': {
-        'source_filenames': [
-            'css/vendor/edxnotes/annotator.min.css',
-        ],
-        'output_filename': 'css/lms-style-student-notes.css',
-    },
-    'style-course': {
-        'source_filenames': [
-            'sass/course.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course.css',
-    },
-    'style-course-rtl': {
-        'source_filenames': [
-            'sass/course-rtl.css',
-            'xmodule/modules.css',
-        ],
-        'output_filename': 'css/lms-style-course-rtl.css',
-    },
-    'style-xmodule-annotations': {
-        'source_filenames': [
-            'css/vendor/ova/annotator.css',
-            'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
-            'css/vendor/ova/rangeslider.css',
-            'css/vendor/ova/share-annotator.css',
-            'css/vendor/ova/richText-annotator.css',
-            'css/vendor/ova/tags-annotator.css',
-            'css/vendor/ova/flagging-annotator.css',
-            'css/vendor/ova/diacritic-annotator.css',
-            'css/vendor/ova/grouping-annotator.css',
-            'css/vendor/ova/ova.css',
-            'js/vendor/ova/catch/css/main.css'
-        ],
-        'output_filename': 'css/lms-style-xmodule-annotations.css',
-    },
-}
-
-
 common_js = set(rooted_glob(COMMON_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 project_js = set(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/**/*.js')) - set(courseware_js + discussion_js + staff_grading_js + open_ended_js + notes_js + instructor_dash_js)
 
@@ -1356,7 +1267,6 @@ if os.path.isdir(DATA_DIR):
                 os.system("coffee -c %s" % (js_dir / filename))
 
 
-PIPELINE_CSS_COMPRESSOR = None
 PIPELINE_JS_COMPRESSOR = "pipeline.compressors.uglifyjs.UglifyJSCompressor"
 
 STATICFILES_IGNORE_PATTERNS = (
