@@ -406,7 +406,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         data = {'name': cohort_name, 'assignment_type': CourseCohort.MANUAL}
         response_dict = self.put_cohort_handler(self.course, cohort, data=data, expected_response_code=400)
         self.assertEqual(
-            'There must be one cohort to which students can be randomly assigned.', response_dict.get("error")
+            'There must be one cohort to which students can automatically be assigned.', response_dict.get("error")
         )
 
     def test_update_cohort_group_id(self):

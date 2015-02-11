@@ -1,15 +1,18 @@
 define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
-        'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group'],
-    function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel) {
+        'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
+        'js/groups/models/cohort_settings'],
+    function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
+              CohortSettingsModel) {
         'use strict';
 
         describe("Cohorts View", function () {
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
-                createMockCohort, createMockCohorts, createMockContentGroups, createCohortsView, cohortsView,
-                requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage, verifyHeader,
-                expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup, saveFormAndExpectErrors,
-                MOCK_COHORTED_USER_PARTITION_ID, MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL,
-                MOCK_STUDIO_GROUP_CONFIGURATIONS_URL, MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
+                createMockCohort, createMockCohorts, createMockContentGroups, createCohortSettings, createCohortsView,
+                cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage,
+                verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup,
+                saveFormAndExpectErrors, MOCK_COHORTED_USER_PARTITION_ID, MOCK_UPLOAD_COHORTS_CSV_URL,
+                MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL, MOCK_MANUAL_ASSIGNMENT,
+                MOCK_RANDOM_ASSIGNMENT;
 
             MOCK_MANUAL_ASSIGNMENT = 'manual';
             MOCK_RANDOM_ASSIGNMENT = 'random';
@@ -49,17 +52,28 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 ];
             };
 
+            createCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+                return new CohortSettingsModel({
+                    id: 0,
+                    is_cohorted: isCohorted || false,
+                    cohorted_discussions: cohortedDiscussions || [],
+                    always_cohort_inline_discussions: alwaysCohortInlineDiscussions || true
+                });
+            };
+
             createCohortsView = function (test, options) {
-                var cohortsJson, cohorts, contentGroups;
+                var cohortsJson, cohorts, contentGroups, cohortSettings;
                 options = options || {};
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
                 cohorts = new CohortCollection(cohortsJson, {parse: true});
                 contentGroups = options.contentGroups || createMockContentGroups();
+                cohortSettings = options.cohortSettings || createCohortSettings(true);
                 cohorts.url = '/mock_service/cohorts';
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
                     model: cohorts,
                     contentGroups: contentGroups,
+                    cohortSettings: cohortSettings,
                     context: {
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
@@ -177,7 +191,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             };
 
             beforeEach(function () {
-                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section="membership" class="active-section">Membership</a></li></ul><div></div>');
+                setFixtures('<ul class="instructor-nav"><li class="nav-item"><<a href data-section="cohort_management" class="active-section">Cohort Management</a></li></ul><div></div>');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohorts');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-form');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-selector');
@@ -202,7 +216,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             it("syncs data when membership tab is clicked", function() {
                 createCohortsView(this, {selectCohort: 1});
                 verifyHeader(1, 'Cat Lovers', catLoversInitialCount);
-                $(cohortsView.getSectionCss("membership")).click();
+                $(cohortsView.getSectionCss("cohort_management")).click();
                 AjaxHelpers.expectRequest(requests, 'GET', '/mock_service/cohorts');
                 respondToRefresh(1001, 2);
                 verifyHeader(1, 'Cat Lovers', 1001);
@@ -867,7 +881,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                         // We have a single random cohort so we should not be allowed to change it assignment type
                         expect(cohortsView.$('.cohort-management-assignment-type-settings')).toHaveClass('is-disabled');
-                        expect(cohortsView.$('.copy-error').text()).toContain("There must be one cohort to which students can be randomly assigned.");
+                        expect(cohortsView.$('.copy-error').text()).toContain("There must be one cohort to which students can automatically be assigned.");
                     });
 
                     it("cancel settings works", function() {

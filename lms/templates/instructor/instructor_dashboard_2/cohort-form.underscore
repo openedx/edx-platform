@@ -38,7 +38,7 @@
                         <%- gettext('Students in this cohort are:') %>
                     </h4>
                     <label>
-                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Randomly Assigned") %>
+                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Automatically Assigned") %>
                     </label>
                     <label>
                         <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
@@ -47,7 +47,7 @@
                 <% if (isDefaultCohort) { %>
                     <p class="copy-error">
                         <i class="icon fa fa-exclamation-triangle" aria-hidden="true"></i>
-                        <%- gettext("There must be one cohort to which students can be randomly assigned.") %>
+                        <%- gettext("There must be one cohort to which students can automatically be assigned.") %>
                     </p>
                 <% } %>
                 <hr class="divider divider-lv1">

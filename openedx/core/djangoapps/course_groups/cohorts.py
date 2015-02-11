@@ -16,6 +16,7 @@ from courseware import courses
 from eventtracking import tracker
 from student.models import get_user_by_username_or_email
 from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
+from opaque_keys.edx.keys import CourseKey
 
 
 log = logging.getLogger(__name__)
@@ -322,7 +323,8 @@ def add_cohort(course_key, name, assignment_type):
         raise ValueError("Invalid course_key")
 
     cohort = CourseCohort.create(
-        cohort_name=name, course_id=course.id,
+        cohort_name=name,
+        course_id=course.id,
         assignment_type=assignment_type
     ).course_user_group
 
@@ -411,7 +413,7 @@ def set_assignment_type(user_group, assignment_type):
     course_cohort = user_group.cohort
 
     if is_default_cohort(user_group) and course_cohort.assignment_type != assignment_type:
-        raise ValueError(_("There must be one cohort to which students can be randomly assigned."))
+        raise ValueError(_("There must be one cohort to which students can automatically be assigned."))
 
     course_cohort.assignment_type = assignment_type
     course_cohort.save()
@@ -436,3 +438,20 @@ def is_default_cohort(user_group):
     )
 
     return len(random_cohorts) == 1 and random_cohorts[0].name == user_group.name
+
+
+def set_cohort_state(course_id, is_cohorted):
+    """
+    Enable/Disable cohort for a course.
+    """
+    cohort_settings = CourseCohortsSettings.objects.get(course_id=CourseKey.from_string(course_id))
+    cohort_settings.is_cohorted = is_cohorted
+    cohort_settings.save()
+    return cohort_settings
+
+
+def get_cohort_settings(course_id):
+    """
+    Return cohort settings for a course.
+    """
+    return CourseCohortsSettings.objects.get(course_id=CourseKey.from_string(course_id))
