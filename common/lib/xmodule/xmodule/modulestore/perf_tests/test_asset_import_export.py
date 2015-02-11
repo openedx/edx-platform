@@ -97,46 +97,196 @@ class CrossStoreXMLRoundtrip(unittest.TestCase):
                 make_asset_xml(num_assets, ASSET_XML_PATH)
                 validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
 
-            # Construct the contentstore for storing the first import
-            with MongoContentstoreBuilder().build() as source_content:
-                # Construct the modulestore for storing the first import (using the previously created contentstore)
-                with source_ms.build(source_content) as source_store:
-                    # Construct the contentstore for storing the second import
-                    with MongoContentstoreBuilder().build() as dest_content:
-                        # Construct the modulestore for storing the second import (using the second contentstore)
-                        with dest_ms.build(dest_content) as dest_store:
-                            source_course_key = source_store.make_course_key('a', 'course', 'course')
-                            dest_course_key = dest_store.make_course_key('a', 'course', 'course')
+            with source_ms.build() as (source_content, source_store):
+                with dest_ms.build() as (dest_content, dest_store):
+                    source_course_key = source_store.make_course_key('a', 'course', 'course')
+                    dest_course_key = dest_store.make_course_key('a', 'course', 'course')
 
-                            with CodeBlockTimer("initial_import"):
-                                import_from_xml(
-                                    source_store,
-                                    'test_user',
-                                    TEST_DATA_ROOT,
-                                    course_dirs=TEST_COURSE,
-                                    static_content_store=source_content,
-                                    target_course_id=source_course_key,
-                                    create_course_if_not_present=True,
-                                    raise_on_failure=True,
-                                )
+                    with CodeBlockTimer("initial_import"):
+                        import_from_xml(
+                            source_store,
+                            'test_user',
+                            TEST_DATA_ROOT,
+                            course_dirs=TEST_COURSE,
+                            static_content_store=source_content,
+                            target_course_id=source_course_key,
+                            create_course_if_not_present=True,
+                            raise_on_failure=True,
+                        )
 
-                            with CodeBlockTimer("export"):
-                                export_to_xml(
-                                    source_store,
-                                    source_content,
-                                    source_course_key,
-                                    self.export_dir,
-                                    'exported_source_course',
-                                )
+                    with CodeBlockTimer("export"):
+                        export_to_xml(
+                            source_store,
+                            source_content,
+                            source_course_key,
+                            self.export_dir,
+                            'exported_source_course',
+                        )
 
-                            with CodeBlockTimer("second_import"):
-                                import_from_xml(
-                                    dest_store,
-                                    'test_user',
-                                    self.export_dir,
-                                    course_dirs=['exported_source_course'],
-                                    static_content_store=dest_content,
-                                    target_course_id=dest_course_key,
-                                    create_course_if_not_present=True,
-                                    raise_on_failure=True,
-                                )
+                    with CodeBlockTimer("second_import"):
+                        import_from_xml(
+                            dest_store,
+                            'test_user',
+                            self.export_dir,
+                            course_dirs=['exported_source_course'],
+                            static_content_store=dest_content,
+                            target_course_id=dest_course_key,
+                            create_course_if_not_present=True,
+                            raise_on_failure=True,
+                        )
+
+
+@ddt.ddt
+# Eventually, exclude this attribute from regular unittests while running *only* tests
+# with this attribute during regular performance tests.
+# @attr("perf_test")
+@unittest.skip
+class FindAssetTest(unittest.TestCase):
+    """
+    This class exists to time asset finding in different modulestore
+    classes with different amounts of asset metadata.
+    """
+
+    # Use this attr to skip this test on regular unittest CI runs.
+    perf_test = True
+
+    def setUp(self):
+        super(FindAssetTest, self).setUp()
+        self.export_dir = mkdtemp()
+        self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
+
+    @ddt.data(*itertools.product(
+        MODULESTORE_SETUPS,
+        ASSET_AMOUNT_PER_TEST,
+    ))
+    @ddt.unpack
+    def test_generate_find_timings(self, source_ms, num_assets):
+        """
+        Generate timings for different amounts of asset metadata and different modulestores.
+        """
+        if CodeBlockTimer is None:
+            raise SkipTest("CodeBlockTimer undefined.")
+
+        desc = "FindAssetTest:{}:{}".format(
+            SHORT_NAME_MAP[source_ms],
+            num_assets,
+        )
+
+        with CodeBlockTimer(desc):
+
+            with CodeBlockTimer("fake_assets"):
+                # First, make the fake asset metadata.
+                make_asset_xml(num_assets, ASSET_XML_PATH)
+                validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
+
+            with source_ms.build() as (source_content, source_store):
+                source_course_key = source_store.make_course_key('a', 'course', 'course')
+                asset_key = source_course_key.make_asset_key(
+                    AssetMetadata.GENERAL_ASSET_TYPE, 'silly_cat_picture.gif'
+                )
+
+                with CodeBlockTimer("initial_import"):
+                    import_from_xml(
+                        source_store,
+                        'test_user',
+                        TEST_DATA_ROOT,
+                        course_dirs=TEST_COURSE,
+                        static_content_store=source_content,
+                        target_course_id=source_course_key,
+                        create_course_if_not_present=True,
+                        raise_on_failure=True,
+                    )
+
+                with CodeBlockTimer("find_nonexistent_asset"):
+                    # More correct would be using the AssetManager.find() - but since the test
+                    # has created its own test modulestore, the AssetManager can't be used.
+                    __ = source_store.find_asset_metadata(asset_key)
+
+                # Perform get_all_asset_metadata for each sort.
+                for sort in ALL_SORTS:
+                    with CodeBlockTimer("get_asset_list:{}-{}".format(
+                        sort[0],
+                        'asc' if sort[1] == ModuleStoreEnum.SortOrder.ascending else 'desc'
+                    )):
+                        # Grab two ranges of 50 assets using different sorts.
+                        # Why 50? That's how many are displayed on the current Studio "Files & Uploads" page.
+                        start_middle = num_assets / 2
+                        __ = source_store.get_all_asset_metadata(
+                            source_course_key, 'asset', start=0, sort=sort, maxresults=50
+                        )
+                        __ = source_store.get_all_asset_metadata(
+                            source_course_key, 'asset', start=start_middle, sort=sort, maxresults=50
+                        )
+
+
+@ddt.ddt
+# Eventually, exclude this attribute from regular unittests while running *only* tests
+# with this attribute during regular performance tests.
+# @attr("perf_test")
+@unittest.skip
+class TestModulestoreAssetSize(unittest.TestCase):
+    """
+    This class exists to measure the size of asset metadata in ifferent modulestore
+    classes with different amount of asset metadata.
+    """
+
+    # Use this attribute to skip this test on regular unittest CI runs.
+    perf_test = True
+
+    test_run_time = datetime.datetime.now()
+
+    @ddt.data(*itertools.product(
+        MODULESTORE_SETUPS,
+        ASSET_AMOUNT_PER_TEST
+    ))
+    @ddt.unpack
+    def test_asset_sizes(self, source_ms, num_assets):
+        """
+        Generate timings for different amounts of asset metadata and different modulestores.
+        """
+        # First, make the fake asset metadata.
+        make_asset_xml(num_assets, ASSET_XML_PATH)
+        validate_xml(ASSET_XSD_PATH, ASSET_XML_PATH)
+
+        with source_ms.build() as (source_content, source_store):
+            source_course_key = source_store.make_course_key('a', 'course', 'course')
+
+            import_from_xml(
+                source_store,
+                'test_user',
+                TEST_DATA_ROOT,
+                course_dirs=TEST_COURSE,
+                static_content_store=source_content,
+                target_course_id=source_course_key,
+                create_course_if_not_present=True,
+                raise_on_failure=True,
+            )
+
+            asset_collection = source_ms.asset_collection()
+            # Ensure the asset collection exists.
+            if asset_collection.name in asset_collection.database.collection_names():
+
+                # Map gets the size of each structure.
+                mapper = Code("""
+                    function() { emit("size", (this == null) ? 0 : Object.bsonsize(this)) }
+                    """)
+
+                # Reduce finds the largest structure size and returns only it.
+                reducer = Code("""
+                    function(key, values) {
+                        var max_size = 0;
+                        for (var i=0; i < values.length; i++) {
+                            if (values[i] > max_size) {
+                                max_size = values[i];
+                            }
+                        }
+                        return max_size;
+                    }
+                """)
+
+                results = asset_collection.map_reduce(mapper, reducer, "size_results")
+                result_str = "{} - Store: {:<15} - Num Assets: {:>6} - Result: {}\n".format(
+                    self.test_run_time, SHORT_NAME_MAP[source_ms], num_assets, [r for r in results.find()]
+                )
+                with open("bson_sizes.txt", "a") as f:
+                    f.write(result_str)
