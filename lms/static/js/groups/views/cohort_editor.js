@@ -6,14 +6,17 @@ var edx = edx || {};
     edx.groups = edx.groups || {};
 
     edx.groups.CohortEditorView = Backbone.View.extend({
+
         events : {
             'click .wrapper-tabs .tab': 'selectTab',
             'click .tab-content-settings .action-save': 'saveSettings',
+            'click .tab-content-settings .action-cancel': 'cancelSettings',
             'submit .cohort-management-group-add-form': 'addStudents'
         },
 
         initialize: function(options) {
             this.template = _.template($('#cohort-editor-tpl').text());
+            this.groupHeaderTemplate = _.template($('#cohort-group-header-tpl').text());
             this.cohorts = options.cohorts;
             this.contentGroups = options.contentGroups;
             this.context = options.context;
@@ -26,9 +29,9 @@ var edx = edx || {};
 
         render: function() {
             this.$el.html(this.template({
-                cohort: this.model,
-                studioAdvancedSettingsUrl: this.context.studioAdvancedSettingsUrl
+                cohort: this.model
             }));
+            this.renderGroupHeader();
             this.cohortFormView = new CohortFormView({
                 model: this.model,
                 contentGroups: this.contentGroups,
@@ -37,6 +40,13 @@ var edx = edx || {};
             this.cohortFormView.render();
             this.$('.tab-content-settings').append(this.cohortFormView.$el);
             return this;
+        },
+
+        renderGroupHeader: function() {
+            this.$('.cohort-management-group-header').html(this.groupHeaderTemplate({
+                cohort: this.model,
+                studioAdvancedSettingsUrl: this.context.studioAdvancedSettingsUrl
+            }));
         },
 
         selectTab: function(event) {
@@ -53,11 +63,18 @@ var edx = edx || {};
 
         saveSettings: function(event) {
             var cohortFormView = this.cohortFormView;
+            var self = this;
             event.preventDefault();
             cohortFormView.saveForm()
                 .done(function() {
+                    self.renderGroupHeader();
                     cohortFormView.showMessage(gettext('Saved cohort'));
                 });
+        },
+
+        cancelSettings: function(event) {
+            event.preventDefault();
+            this.render();
         },
 
         setCohort: function(cohort) {
