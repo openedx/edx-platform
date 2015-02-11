@@ -55,6 +55,18 @@ def unlink_cohort_partition_group(cohort):
     CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort).delete()
 
 
+def _get_cohort_settings_representation(course_cohort_settings):
+    """
+    Returns a JSON representation of a course cohort settings.
+    """
+    return {
+        'id': course_cohort_settings.id,
+        'is_cohorted': course_cohort_settings.is_cohorted,
+        'cohorted_discussions': course_cohort_settings.cohorted_discussions,
+        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+    }
+
+
 def _get_cohort_representation(cohort, course):
     """
     Returns a JSON representation of a cohort.
@@ -69,6 +81,30 @@ def _get_cohort_representation(cohort, course):
         'user_partition_id': partition_id,
         'group_id': group_id,
     }
+
+
+@require_http_methods(("GET", "PATCH"))
+@ensure_csrf_cookie
+@expect_json
+@login_required
+def cohort_settings_handler(request, course_key_string):
+    """
+    The restful handler for cohort setting requests. Requires JSON.
+    GET
+        Returns the JSON representation of cohort settings for the course.
+    PUT or POST or PATCH
+        Updates the cohort settings for the course. Returns the JSON representation of updated settings.
+    """
+    if request.method == 'GET':
+        cohort_settings = cohorts.get_cohort_settings(course_key_string)
+        return JsonResponse(_get_cohort_settings_representation(cohort_settings))
+    else:
+        is_cohorted = request.json.get('is_cohorted')
+        if is_cohorted is None:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": "Bad Request"}, 400)
+        cohort_settings = cohorts.set_cohort_state(course_key_string, is_cohorted=is_cohorted)
+        return JsonResponse(_get_cohort_settings_representation(cohort_settings))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
