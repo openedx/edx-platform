@@ -93,13 +93,19 @@ class TestCreateAccount(TestCase):
     def test_profile_saved_no_optional_fields(self):
         profile = self.create_account_and_fetch_profile()
         self.assertEqual(profile.name, self.params["name"])
-        self.assertIsNone(profile.level_of_education)
-        self.assertIsNone(profile.gender)
-        self.assertIsNone(profile.mailing_address)
-        self.assertIsNone(profile.city)
+        self.assertEqual(profile.level_of_education, "")
+        self.assertEqual(profile.gender, "")
+        self.assertEqual(profile.mailing_address, "")
+        self.assertEqual(profile.city, "")
         self.assertEqual(profile.country, "")
-        self.assertIsNone(profile.goals)
-        self.assertEqual(profile.meta, "")
+        self.assertEqual(profile.goals, "")
+        self.assertEqual(
+            profile.get_meta(),
+            {
+                "extra1": "",
+                "extra2": "",
+            }
+        )
         self.assertIsNone(profile.year_of_birth)
 
     @unittest.skipUnless(
@@ -267,7 +273,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["username"]
-        assert_username_error("Error (401 username). E-mail us.")
+        assert_username_error("Username must be minimum of two characters long")
 
         # Empty, too short
         for username in ["", "a"]:
@@ -282,10 +288,6 @@ class TestCreateAccountValidation(TestCase):
         params["username"] = "invalid username"
         assert_username_error("Username should only consist of A-Z and 0-9, with no spaces.")
 
-        # Matching password
-        params["username"] = params["password"] = "test_username_and_password"
-        assert_username_error("Username and password fields cannot match")
-
     def test_email(self):
         params = dict(self.minimal_params)
 
@@ -298,7 +300,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["email"]
-        assert_email_error("Error (401 email). E-mail us.")
+        assert_email_error("A properly formatted e-mail is required")
 
         # Empty, too short
         for email in ["", "a"]:
@@ -311,7 +313,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Invalid
         params["email"] = "not_an_email_address"
-        assert_email_error("Valid e-mail is required.")
+        assert_email_error("A properly formatted e-mail is required")
 
     def test_password(self):
         params = dict(self.minimal_params)
@@ -325,7 +327,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["password"]
-        assert_password_error("Error (401 password). E-mail us.")
+        assert_password_error("A valid password is required")
 
         # Empty, too short
         for password in ["", "a"]:
@@ -333,6 +335,10 @@ class TestCreateAccountValidation(TestCase):
             assert_password_error("A valid password is required")
 
         # Password policy is tested elsewhere
+
+        # Matching username
+        params["username"] = params["password"] = "test_username_and_password"
+        assert_password_error("Username and password fields cannot match")
 
     def test_name(self):
         params = dict(self.minimal_params)
@@ -346,7 +352,7 @@ class TestCreateAccountValidation(TestCase):
 
         # Missing
         del params["name"]
-        assert_name_error("Error (401 name). E-mail us.")
+        assert_name_error("Your legal name must be a minimum of two characters long")
 
         # Empty, too short
         for name in ["", "a"]:
@@ -369,13 +375,20 @@ class TestCreateAccountValidation(TestCase):
             assert_honor_code_error("To enroll, you must follow the honor code.")
 
             # Empty, invalid
-            for honor_code in ["", "false", "True"]:
+            for honor_code in ["", "false", "not_boolean"]:
                 params["honor_code"] = honor_code
                 assert_honor_code_error("To enroll, you must follow the honor code.")
+
+            # True
+            params["honor_code"] = "tRUe"
+            self.assert_success(params)
 
         with override_settings(REGISTRATION_EXTRA_FIELDS={"honor_code": "optional"}):
             # Missing
             del params["honor_code"]
+            # Need to change username/email because user was created above
+            params["username"] = "another_test_username"
+            params["email"] = "another_test_email@example.com"
             self.assert_success(params)
 
     def test_terms_of_service(self):
@@ -393,9 +406,13 @@ class TestCreateAccountValidation(TestCase):
         assert_terms_of_service_error("You must accept the terms of service.")
 
         # Empty, invalid
-        for terms_of_service in ["", "false", "True"]:
+        for terms_of_service in ["", "false", "not_boolean"]:
             params["terms_of_service"] = terms_of_service
             assert_terms_of_service_error("You must accept the terms of service.")
+
+        # True
+        params["terms_of_service"] = "tRUe"
+        self.assert_success(params)
 
     @ddt.data(
         ("level_of_education", 1, "A level of education is required"),

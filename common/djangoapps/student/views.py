@@ -56,7 +56,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration)
-from student.forms import PasswordResetFormNoActive
+from student.forms import AccountCreationForm, PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -1336,7 +1336,7 @@ def user_signup_handler(sender, **kwargs):  # pylint: disable=unused-argument
             log.info(u'user {} originated from a white labeled "Microsite"'.format(kwargs['instance'].id))
 
 
-def _do_create_account(post_vars, extended_profile=None):
+def _do_create_account(form):
     """
     Given cleaned post variables, create the User and UserProfile objects, as well as the
     registration for this user.
@@ -1345,10 +1345,15 @@ def _do_create_account(post_vars, extended_profile=None):
 
     Note: this function is also used for creating test users.
     """
-    user = User(username=post_vars['username'],
-                email=post_vars['email'],
-                is_active=False)
-    user.set_password(post_vars['password'])
+    if not form.is_valid():
+        raise ValidationError(form.errors)
+
+    user = User(
+        username=form.cleaned_data["username"],
+        email=form.cleaned_data["email"],
+        is_active=False
+    )
+    user.set_password(form.cleaned_data["password"])
     registration = Registration()
 
     # TODO: Rearrange so that if part of the process fails, the whole process fails.
@@ -1357,14 +1362,14 @@ def _do_create_account(post_vars, extended_profile=None):
         user.save()
     except IntegrityError:
         # Figure out the cause of the integrity error
-        if len(User.objects.filter(username=post_vars['username'])) > 0:
+        if len(User.objects.filter(username=user.username)) > 0:
             raise AccountValidationError(
-                _("An account with the Public Username '{username}' already exists.").format(username=post_vars['username']),
+                _("An account with the Public Username '{username}' already exists.").format(username=user.username),
                 field="username"
             )
-        elif len(User.objects.filter(email=post_vars['email'])) > 0:
+        elif len(User.objects.filter(email=user.email)) > 0:
             raise AccountValidationError(
-                _("An account with the Email '{email}' already exists.").format(email=post_vars['email']),
+                _("An account with the Email '{email}' already exists.").format(email=user.email),
                 field="email"
             )
         else:
@@ -1377,25 +1382,17 @@ def _do_create_account(post_vars, extended_profile=None):
 
     registration.register(user)
 
-    profile = UserProfile(user=user)
-    profile.name = post_vars['name']
-    profile.level_of_education = post_vars.get('level_of_education')
-    profile.gender = post_vars.get('gender')
-    profile.mailing_address = post_vars.get('mailing_address')
-    profile.city = post_vars.get('city')
-    profile.country = post_vars.get('country')
-    profile.goals = post_vars.get('goals')
-
-    # add any extended profile information in the denormalized 'meta' field in the profile
+    profile_fields = [
+        "name", "level_of_education", "gender", "mailing_address", "city", "country", "goals",
+        "year_of_birth"
+    ]
+    profile = UserProfile(
+        user=user,
+        **{key: form.cleaned_data.get(key) for key in profile_fields}
+    )
+    extended_profile = form.cleaned_extended_profile
     if extended_profile:
         profile.meta = json.dumps(extended_profile)
-
-    try:
-        profile.year_of_birth = int(post_vars['year_of_birth'])
-    except (ValueError, KeyError):
-        # If they give us garbage, just ignore it instead
-        # of asking them to put an integer.
-        profile.year_of_birth = None
     try:
         profile.save()
     except Exception:  # pylint: disable=broad-except
@@ -1447,19 +1444,15 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         post_vars.update(dict(email=email, name=name, password=password))
         log.debug(u'In create_account with external_auth: user = %s, email=%s', name, email)
 
-    # Confirm we have a properly formed request
-    for req_field in ['username', 'email', 'password', 'name']:
-        if req_field not in post_vars:
-            js['value'] = _("Error (401 {field}). E-mail us.").format(field=req_field)
-            js['field'] = req_field
-            return JsonResponse(js, status=400)
-
-    if extra_fields.get('honor_code', 'required') == 'required' and \
-            post_vars.get('honor_code', 'false') != u'true':
-        js['value'] = _("To enroll, you must follow the honor code.")
-        js['field'] = 'honor_code'
-        return JsonResponse(js, status=400)
-
+    extra_fields = microsite.get_value(
+        'REGISTRATION_EXTRA_FIELDS',
+        getattr(settings, 'REGISTRATION_EXTRA_FIELDS', {})
+    )
+    extended_profile_fields = microsite.get_value('extended_profile_fields', [])
+    enforce_password_policy = (
+        settings.FEATURES.get("ENFORCE_PASSWORD_POLICY", False) and
+        not do_external_auth
+    )
     # Can't have terms of service for certain SHIB users, like at Stanford
     tos_required = (
         not settings.FEATURES.get("AUTH_USE_SHIB") or
@@ -1470,120 +1463,29 @@ def create_account(request, post_override=None):  # pylint: disable-msg=too-many
         )
     )
 
-    if tos_required:
-        if post_vars.get('terms_of_service', 'false') != u'true':
-            js['value'] = _("You must accept the terms of service.")
-            js['field'] = 'terms_of_service'
-            return JsonResponse(js, status=400)
+    form = AccountCreationForm(
+        data=post_vars,
+        extra_fields=extra_fields,
+        extended_profile_fields=extended_profile_fields,
+        enforce_username_neq_password=True,
+        enforce_password_policy=enforce_password_policy,
+        tos_required=tos_required
+    )
 
-    # Confirm appropriate fields are there.
-    # TODO: Check e-mail format is correct.
-    # TODO: Confirm e-mail is not from a generic domain (mailinator, etc.)? Not sure if
-    # this is a good idea
-    # TODO: Check password is sane
+    if not form.is_valid():
+        field, error_list = next(form.errors.iteritems())
+        return JsonResponse(
+            {
+                "success": False,
+                "field": field,
+                "value": error_list[0],
+            },
+            status=400
+        )
 
-    required_post_vars = ['username', 'email', 'name', 'password']
-    required_post_vars += [fieldname for fieldname, val in extra_fields.items()
-                           if val == 'required']
-    if tos_required:
-        required_post_vars.append('terms_of_service')
-
-    for field_name in required_post_vars:
-        if field_name in ('gender', 'level_of_education'):
-            min_length = 1
-        else:
-            min_length = 2
-
-        if field_name not in post_vars or len(post_vars[field_name]) < min_length:
-            error_str = {
-                'username': _('Username must be minimum of two characters long'),
-                'email': _('A properly formatted e-mail is required'),
-                'name': _('Your legal name must be a minimum of two characters long'),
-                'password': _('A valid password is required'),
-                'terms_of_service': _('Accepting Terms of Service is required'),
-                'honor_code': _('Agreeing to the Honor Code is required'),
-                'level_of_education': _('A level of education is required'),
-                'gender': _('Your gender is required'),
-                'year_of_birth': _('Your year of birth is required'),
-                'mailing_address': _('Your mailing address is required'),
-                'goals': _('A description of your goals is required'),
-                'city': _('A city is required'),
-                'country': _('A country is required')
-            }
-
-            if field_name in error_str:
-                js['value'] = error_str[field_name]
-            else:
-                js['value'] = _('You are missing one or more required fields')
-
-            js['field'] = field_name
-            return JsonResponse(js, status=400)
-
-        max_length = 75
-        if field_name == 'username':
-            max_length = 30
-
-        if field_name in ('email', 'username') and len(post_vars[field_name]) > max_length:
-            error_str = {
-                'username': _('Username cannot be more than {num} characters long').format(num=max_length),
-                'email': _('Email cannot be more than {num} characters long').format(num=max_length)
-            }
-            js['value'] = error_str[field_name]
-            js['field'] = field_name
-            return JsonResponse(js, status=400)
-
-    try:
-        validate_email(post_vars['email'])
-    except ValidationError:
-        js['value'] = _("Valid e-mail is required.")
-        js['field'] = 'email'
-        return JsonResponse(js, status=400)
-
-    try:
-        validate_slug(post_vars['username'])
-    except ValidationError:
-        js['value'] = _("Username should only consist of A-Z and 0-9, with no spaces.")
-        js['field'] = 'username'
-        return JsonResponse(js, status=400)
-
-    # enforce password complexity as an optional feature
-    # but not if we're doing ext auth b/c those pws never get used and are auto-generated so might not pass validation
-    if settings.FEATURES.get('ENFORCE_PASSWORD_POLICY', False) and not do_external_auth:
-        try:
-            password = post_vars['password']
-
-            validate_password_length(password)
-            validate_password_complexity(password)
-            validate_password_dictionary(password)
-        except ValidationError, err:
-            js['value'] = _('Password: ') + '; '.join(err.messages)
-            js['field'] = 'password'
-            return JsonResponse(js, status=400)
-
-    # allow microsites to define 'extended profile fields' which are
-    # captured on user signup (for example via an overriden registration.html)
-    # and then stored in the UserProfile
-    extended_profile_fields = microsite.get_value('extended_profile_fields', [])
-    extended_profile = None
-
-    for field in extended_profile_fields:
-        if field in post_vars:
-            if not extended_profile:
-                extended_profile = {}
-            extended_profile[field] = post_vars[field]
-
-    # Make sure that password and username fields do not match
-    username = post_vars['username']
-    password = post_vars['password']
-    if username == password:
-        js['value'] = _("Username and password fields cannot match")
-        js['field'] = 'username'
-        return JsonResponse(js, status=400)
-
-    # Ok, looks like everything is legit.  Create the account.
     try:
         with transaction.commit_on_success():
-            ret = _do_create_account(post_vars, extended_profile)
+            ret = _do_create_account(form)
     except AccountValidationError as exc:
         return JsonResponse({'success': False, 'value': exc.message, 'field': exc.field}, status=400)
 
@@ -1757,21 +1659,21 @@ def auto_auth(request):
     role_names = [v.strip() for v in request.GET.get('roles', '').split(',') if v.strip()]
     login_when_done = 'no_login' not in request.GET
 
-    # Get or create the user object
-    post_data = {
-        'username': username,
-        'email': email,
-        'password': password,
-        'name': full_name,
-        'honor_code': u'true',
-        'terms_of_service': u'true',
-    }
+    form = AccountCreationForm(
+        data={
+            'username': username,
+            'email': email,
+            'password': password,
+            'name': full_name,
+        },
+        tos_required=False
+    )
 
     # Attempt to create the account.
     # If successful, this will return a tuple containing
     # the new user object.
     try:
-        user, _profile, reg = _do_create_account(post_data)
+        user, _profile, reg = _do_create_account(form)
     except AccountValidationError:
         # Attempt to retrieve the existing user.
         user = User.objects.get(username=username)
