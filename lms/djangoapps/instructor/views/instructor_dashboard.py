@@ -339,6 +339,7 @@ def _section_data_download(course, access):
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': unicode(course_key)}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': unicode(course_key)}),
+        'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data
 

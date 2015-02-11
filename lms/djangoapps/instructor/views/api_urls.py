@@ -76,6 +76,11 @@ urlpatterns = patterns('',  # nopep8
     url(r'spent_registration_codes$',
         'instructor.views.api.spent_registration_codes', name="spent_registration_codes"),
 
+    # pylint: disable=bad-continuation
+    # Ora2 Report download...
+    url(r'get_ora2_responses',
+        'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
+
     # Coupon Codes..
     url(r'get_coupon_codes',
         'instructor.views.api.get_coupon_codes', name="get_coupon_codes"),
