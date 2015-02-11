@@ -1281,7 +1281,7 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
             password=self.PASSWORD
         )
 
-    def test_show_receipt_redirect_to_verify_student(self):
+    def test_postpay_callback_redirect_to_verify_student(self):
         # Create other carts first
         # This ensures that the order ID and order item IDs do not match
         Order.get_cart_for_user(self.user).start_purchase()
@@ -1296,11 +1296,13 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
             self.COST,
             'verified'
         )
-        self.cart.purchase()
+        self.cart.start_purchase()
 
-        # Visit the receipt page
-        url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
-        resp = self.client.get(url)
+        # Simulate hitting the post-pay callback
+        with patch('shoppingcart.views.process_postpay_callback') as mock_process:
+            mock_process.return_value = {'success': True, 'order': self.cart}
+            url = reverse('shoppingcart.views.postpay_callback')
+            resp = self.client.post(url, follow=True)
 
         # Expect to be redirected to the payment confirmation
         # page in the verify_student app
@@ -1311,8 +1313,7 @@ class ReceiptRedirectTest(ModuleStoreTestCase):
         redirect_url += '?payment-order-num={order_num}'.format(
             order_num=self.cart.id
         )
-
-        self.assertRedirects(resp, redirect_url)
+        self.assertIn(redirect_url, resp.redirect_chain[0][0])
 
 
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)

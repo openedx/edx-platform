@@ -37,8 +37,9 @@ from .exceptions import (
 from .models import (
     Order, OrderTypes,
     PaidCourseRegistration, OrderItem, Coupon,
-    CouponRedemption, CourseRegistrationCode, RegistrationCodeRedemption,
-    CourseRegCodeItem, Donation, DonationConfiguration
+    CertificateItem, CouponRedemption, CourseRegistrationCode,
+    RegistrationCodeRedemption, CourseRegCodeItem,
+    Donation, DonationConfiguration
 )
 from .processors import (
     process_postpay_callback, render_purchase_form_html,
@@ -595,6 +596,43 @@ def donate(request):
     return HttpResponse(response_params, content_type="text/json")
 
 
+def _get_verify_flow_redirect(order):
+    """Check if we're in the verification flow and redirect if necessary.
+
+    Arguments:
+        order (Order): The order received by the post-pay callback.
+
+    Returns:
+        HttpResponseRedirect or None
+
+    """
+    # See if the order contained any certificate items
+    # If so, the user is coming from the payment/verification flow.
+    cert_items = CertificateItem.objects.filter(order=order)
+
+    if cert_items.count() > 0:
+        # Currently, we allow the purchase of only one verified
+        # enrollment at a time; if there are more than one,
+        # this will choose the first.
+        if cert_items.count() > 1:
+            log.warning(
+                u"More than one certificate item in order %s; "
+                u"continuing with the payment/verification flow for "
+                u"the first order item (course %s).",
+                order.id, cert_items[0].course_id
+            )
+
+        course_id = cert_items[0].course_id
+        url = reverse(
+            'verify_student_payment_confirmation',
+            kwargs={'course_id': unicode(course_id)}
+        )
+        # Add a query string param for the order ID
+        # This allows the view to query for the receipt information later.
+        url += '?payment-order-num={order_num}'.format(order_num=order.id)
+        return HttpResponseRedirect(url)
+
+
 @csrf_exempt
 @require_POST
 def postpay_callback(request):
@@ -609,7 +647,16 @@ def postpay_callback(request):
     """
     params = request.POST.dict()
     result = process_postpay_callback(params)
+
     if result['success']:
+        # See if this payment occurred as part of the verification flow process
+        # If so, send the user back into the flow so they have the option
+        # to continue with verification.
+        verify_flow_redirect = _get_verify_flow_redirect(result['order'])
+        if verify_flow_redirect is not None:
+            return verify_flow_redirect
+
+        # Otherwise, send the user to the receipt page
         return HttpResponseRedirect(reverse('shoppingcart.views.show_receipt', args=[result['order'].id]))
     else:
         return render_to_response('shoppingcart/error.html', {'order': result['order'],
@@ -852,28 +899,12 @@ def _show_receipt_html(request, order):
         'reg_code_info_list': reg_code_info_list,
         'order_purchase_date': order.purchase_time.strftime("%B %d, %Y"),
     }
+
     # We want to have the ability to override the default receipt page when
     # there is only one item in the order.
     if order_items.count() == 1:
         receipt_template = order_items[0].single_item_receipt_template
         context.update(order_items[0].single_item_receipt_context)
-
-        # Ideally, the shoppingcart app would own the receipt view. However,
-        # as a result of changes made to the payment and verification flows as
-        # part of an A/B test, the verify_student app owns it instead. This is
-        # left over, and will be made more general in the future.
-        if receipt_template == 'shoppingcart/verified_cert_receipt.html':
-            url = reverse(
-                'verify_student_payment_confirmation',
-                kwargs={'course_id': unicode(order_items[0].course_id)}
-            )
-
-            # Add a query string param for the order ID
-            # This allows the view to query for the receipt information later.
-            url += '?payment-order-num={order_num}'.format(
-                order_num=order_items[0].order.id
-            )
-            return HttpResponseRedirect(url)
 
     return render_to_response(receipt_template, context)
 
