@@ -1,8 +1,8 @@
 """
 Acceptance tests for Library Content in LMS
 """
-import textwrap
 import ddt
+import textwrap
 
 from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import CourseFixture

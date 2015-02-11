@@ -265,6 +265,12 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
         """
         return self.q(css='article.content-primary').visible
 
+    def is_finished_loading(self):
+        """
+        Returns true iff the Loading indicator is not visible
+        """
+        return not self.q(css='div.ui-loading').visible
+
     @classmethod
     def from_xblock_wrapper(cls, xblock_wrapper):
         """
@@ -289,6 +295,7 @@ class StudioLibraryContainerXBlockWrapper(XBlockWrapper):
 
         # This causes a reload (see cms/static/xmodule_js/public/js/library_content_edit.js)
         self.wait_for(lambda: self.is_browser_on_page(), 'StudioLibraryContainerXBlockWrapper has reloaded.')
+        self.wait_for(lambda: self.is_finished_loading(), 'Loading indicator is not visible.')
 
         # And wait to make sure the ajax post has finished.
         self.wait_for_ajax()
