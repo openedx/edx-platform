@@ -54,7 +54,7 @@ from student.models import (
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
-    DashboardConfiguration)
+    DashboardConfiguration, LinkedInAddToProfileConfiguration)
 from student.forms import PasswordResetFormNoActive
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
@@ -187,7 +187,7 @@ def process_survey_link(survey_link, user):
     return survey_link.format(UNIQUE_ID=unique_id_for_user(user))
 
 
-def cert_info(user, course):
+def cert_info(user, course, course_mode):
     """
     Get the certificate info needed to render the dashboard section for the given
     student and course.  Returns a dictionary with keys:
@@ -203,7 +203,7 @@ def cert_info(user, course):
     if not course.may_certify():
         return {}
 
-    return _cert_info(user, course, certificate_status_for_student(user, course.id))
+    return _cert_info(user, course, certificate_status_for_student(user, course.id), course_mode)
 
 
 def reverification_info(course_enrollment_pairs, user, statuses):
@@ -293,7 +293,7 @@ def get_course_enrollment_pairs(user, course_org_filter, org_filter_out_set):
                 )
 
 
-def _cert_info(user, course, cert_status):
+def _cert_info(user, course, cert_status, course_mode):
     """
     Implements the logic for cert_info -- split out for testing.
     """
@@ -328,7 +328,8 @@ def _cert_info(user, course, cert_status):
         'status': status,
         'show_download_url': status == 'ready',
         'show_disabled_download_button': status == 'generating',
-        'mode': cert_status.get('mode', None)
+        'mode': cert_status.get('mode', None),
+        'linked_in_url': None
     }
 
     if (status in ('generating', 'ready', 'notpassing', 'restricted') and
@@ -349,6 +350,31 @@ def _cert_info(user, course, cert_status):
             return default_info
         else:
             status_dict['download_url'] = cert_status['download_url']
+
+            # getting linkedin URL and then pass the params which appears
+            # on user profile. if linkedin config is empty don't show the button.
+
+            modes_dict = {
+                "honor": "Honor Code Certificate",
+                "verified": "Verified Certificate",
+                "professional": "Professional Certificate",
+            }
+
+            certification_name = u'{type} for {course_name}'.format(
+                type=modes_dict.get(course_mode, "Certificate"), course_name=course.display_name
+            ).encode('utf-8')
+
+            params_dict = {
+                'pfCertificationName': certification_name,
+                'pfCertificationUrl': cert_status['download_url'],
+            }
+
+            # following method will construct and return url if current enabled config exists otherwise return None
+            # In case of None linked-in-button will not appear on dashboard.
+
+            status_dict['linked_in_url'] = LinkedInAddToProfileConfiguration.linked_in_dashboard_tracking_code_url(
+                params_dict
+            )
 
     if status in ('generating', 'ready', 'notpassing', 'restricted'):
         if 'grade' not in cert_status:
@@ -583,9 +609,8 @@ def dashboard(request):
         course_enrollment_pairs,
         all_course_modes
     )
-
     cert_statuses = {
-        course.id: cert_info(request.user, course)
+        course.id: cert_info(request.user, course, _enrollment.mode)
         for course, _enrollment in course_enrollment_pairs
     }
 
