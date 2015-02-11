@@ -6,7 +6,8 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
 
             var COURSE_KEY = 'edX/DemoX/Fall',
                 ENROLL_URL = '/api/enrollment/v1/enrollment',
-                FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/';
+                FORWARD_URL = '/course_modes/choose/edX/DemoX/Fall/',
+                EMBARGO_MSG_URL = '/embargo/blocked-message/enrollment/default/';
 
             beforeEach(function() {
                 // Mock the redirect call
@@ -47,6 +48,27 @@ define(['js/common_helpers/ajax_helpers', 'js/student_account/enrollment'],
 
                 // Verify that the user was still redirected
                 expect(EnrollmentInterface.redirect).toHaveBeenCalledWith( FORWARD_URL );
+            });
+
+            it('redirects the user if blocked by an embargo', function() {
+                // Spy on Ajax requests
+                var requests = AjaxHelpers.requests( this );
+
+                // Attempt to enroll the user
+                EnrollmentInterface.enroll( COURSE_KEY );
+
+                // Simulate an error response (403) from the server
+                // with a "user_message_url" parameter for the redirect.
+                // This will redirect the user to a page with messaging
+                // explaining why he/she can't enroll.
+                AjaxHelpers.respondWithError(
+                    requests, 403,
+                    { 'user_message_url': EMBARGO_MSG_URL }
+                );
+
+                // Verify that the user was redirected
+                expect(EnrollmentInterface.redirect).toHaveBeenCalledWith( EMBARGO_MSG_URL );
+
             });
 
         });

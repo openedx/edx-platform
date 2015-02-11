@@ -2,9 +2,11 @@ import logging
 import datetime
 import decimal
 import pytz
+from ipware.ip import get_ip
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.shortcuts import redirect
 from django.http import (
     HttpResponse, HttpResponseRedirect, HttpResponseNotFound,
     HttpResponseBadRequest, HttpResponseForbidden, Http404
@@ -28,6 +30,7 @@ from config_models.decorators import require_config
 from shoppingcart.reports import RefundReport, ItemizedPurchaseReport, UniversityRevenueShareReport, CertificateStatusReport
 from student.models import CourseEnrollment, EnrollmentClosedError, CourseFullError, \
     AlreadyEnrolledError
+from embargo import api as embargo_api
 from .exceptions import (
     ItemAlreadyInCartException, AlreadyEnrolledInCourseException,
     CourseDoesNotExistException, ReportTypeDoesNotExistException,
@@ -49,6 +52,7 @@ from .processors import (
 import json
 from xmodule_django.models import CourseKeyField
 from .decorators import enforce_shopping_cart_enabled
+
 
 log = logging.getLogger("shoppingcart")
 AUDIT_LOG = logging.getLogger("audit")
@@ -352,6 +356,15 @@ def register_code_redemption(request, registration_code):
         reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
                                                                                                   request, limiter)
         course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+
+        # Restrict the user from enrolling based on country access rules
+        embargo_redirect = embargo_api.redirect_if_blocked(
+            course.id, user=request.user, ip_address=get_ip(request),
+            url=request.path
+        )
+        if embargo_redirect is not None:
+            return redirect(embargo_redirect)
+
         context = {
             'reg_code_already_redeemed': reg_code_already_redeemed,
             'reg_code_is_valid': reg_code_is_valid,
@@ -365,6 +378,15 @@ def register_code_redemption(request, registration_code):
         reg_code_is_valid, reg_code_already_redeemed, course_registration = get_reg_code_validity(registration_code,
                                                                                                   request, limiter)
         course = get_course_by_id(getattr(course_registration, 'course_id'), depth=0)
+
+        # Restrict the user from enrolling based on country access rules
+        embargo_redirect = embargo_api.redirect_if_blocked(
+            course.id, user=request.user, ip_address=get_ip(request),
+            url=request.path
+        )
+        if embargo_redirect is not None:
+            return redirect(embargo_redirect)
+
         context = {
             'reg_code': registration_code,
             'site_name': site_name,
