@@ -144,6 +144,9 @@ FEATURES = {
 
     # Enable the courseware search functionality
     'ENABLE_COURSEWARE_INDEX': False,
+
+    # Enable course reruns, which will always use the split modulestore
+    'ALLOW_COURSE_RERUNS': True,
 }
 
 ENABLE_JASMINE = False
