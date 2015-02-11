@@ -1928,6 +1928,16 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
+### SHIB
+# For SHIB backup register and login URLs
+SHIB_ONLY_SITE = False
+# Mapping of hosts to a list of safe redirect domains from that host (not including itself)
+# For example:
+# SHIB_REDIRECT_DOMAIN_WHITELIST = {
+#    'suclass.stanford.edu': ['studio.suclass.stanford.edu']
+# }
+SHIB_REDIRECT_DOMAIN_WHITELIST = {}
+
 ### Analytics Data API + Dashboard (Insights) settings
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
