@@ -125,7 +125,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     if (!this.annotator.viewer.isShown()) {
                         position = target.position();
                         annotation = $.makeArray(target.data('annotation'));
-+                       this.annotator.showViewer(annotation, {top: position.top, left: position.left});
+                        this.annotator.showViewer(annotation, {top: position.top, left: position.left});
                         this.annotator.element.find('.annotator-listing').focus();
                     }
                     break;
@@ -186,10 +186,11 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             var KEY = $.ui.keyCode,
                 keyCode = event.keyCode,
                 target = $(event.target),
-                editor, editorControls, save, cancel,
+                editor, form, editorControls, save, cancel,
                 tabControls;
 
             editor = this.annotator.element.find('.annotator-editor');
+            form = editor.find('.annotator-widget');
             editorControls = editor.find('.annotator-controls');
             save  = editorControls.find('.annotator-save');
             cancel = editorControls.find('.annotator-cancel');
@@ -198,9 +199,17 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                 case KEY.TAB:
                     tabControls = this.getEditorTabControls();
                     if (event.shiftKey) { // Tabbing backwards
-                        this.focusOnPreviousTabControl(tabControls, target);
+                        if (target.is(form)) {
+                            _.last(tabControls).focus();
+                        } else {
+                            this.focusOnPreviousTabControl(tabControls, target);
+                        }
                     } else { // Tabbing forward
-                        this.focusOnNextTabControl(tabControls, target);
+                        if (target.is(form)) {
+                            _.first(tabControls).focus();
+                        } else {
+                            this.focusOnNextTabControl(tabControls, target);
+                        }
                     }
                     event.preventDefault();
                     event.stopPropagation();

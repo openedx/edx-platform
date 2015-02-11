@@ -165,12 +165,12 @@ define([
     Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
 
     /**
-     * Modifies Annotator.Editor.html template to reverse order of Save and
-     * Cancel buttons.
+     * Modifies Annotator.Editor.html template to add tabindex = -1 to
+     * form.annotor-widget and reverse order of Save and Cancel buttons.
      **/
     Annotator.Editor.prototype.html = [
         '<div class="annotator-outer annotator-editor">',
-            '<form class="annotator-widget">',
+            '<form class="annotator-widget" tabindex="-1">',
                 '<ul class="annotator-listing"></ul>',
                 '<div class="annotator-controls">',
                     '<button class="annotator-save">',
@@ -187,11 +187,26 @@ define([
     ].join('');
 
     /**
-     * Modifies Annotator.Editor.show to remove focus on Save button.
+     * Modifies Annotator._setupEditor to add a label for textarea#annotator-field-0.
+     **/
+    Annotator.prototype._setupEditor = _.compose(
+        function () {
+            $('<label class="sr" for="annotator-field-0">Edit note</label>').insertBefore(
+                $('#annotator-field-0', this.wrapper)
+            );
+            return this;
+        },
+        Annotator.prototype._setupEditor
+    );
+
+    /**
+     * Modifies Annotator.Editor.show to remove focus on Save button and put it
+     * on form.annotator-widget instead.
      **/
     Annotator.Editor.prototype.show = _.compose(
         function () {
             this.element.find('.annotator-save').removeClass(this.classes.focus);
+            this.element.find('form.annotator-widget').focus();
         },
         Annotator.Editor.prototype.show
     );
