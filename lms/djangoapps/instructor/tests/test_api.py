@@ -2328,6 +2328,7 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
     """
 
     def setUp(self):
+        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
         self.course = CourseFactory.create(
             org='test_org',
             course='test_course',
