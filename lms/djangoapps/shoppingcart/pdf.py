@@ -193,24 +193,26 @@ class PDFInvoice(object):
         )
 
         # Left-Aligned cobrand logo
-        cobrand_img = self.load_image(self.cobrand_logo_path)
-        if cobrand_img:
-            img_width = float(cobrand_img.size[0]) / (float(cobrand_img.size[1]) / self.cobrand_logo_height)
-            self.pdf.drawImage(cobrand_img.filename, horizontal_padding_from_border, img_y_pos, img_width,
-                               self.cobrand_logo_height, mask='auto')
+        if self.cobrand_logo_path:
+            cobrand_img = self.load_image(self.cobrand_logo_path)
+            if cobrand_img:
+                img_width = float(cobrand_img.size[0]) / (float(cobrand_img.size[1]) / self.cobrand_logo_height)
+                self.pdf.drawImage(cobrand_img.filename, horizontal_padding_from_border, img_y_pos, img_width,
+                                   self.cobrand_logo_height, mask='auto')
 
         # Right aligned brand logo
-        logo_img = self.load_image(self.logo_path)
-        if logo_img:
-            img_width = float(logo_img.size[0]) / (float(logo_img.size[1]) / self.brand_logo_height)
-            self.pdf.drawImage(
-                logo_img.filename,
-                self.page_width - (horizontal_padding_from_border + img_width),
-                img_y_pos,
-                img_width,
-                self.brand_logo_height,
-                mask='auto'
-            )
+        if self.logo_path:
+            logo_img = self.load_image(self.logo_path)
+            if logo_img:
+                img_width = float(logo_img.size[0]) / (float(logo_img.size[1]) / self.brand_logo_height)
+                self.pdf.drawImage(
+                    logo_img.filename,
+                    self.page_width - (horizontal_padding_from_border + img_width),
+                    img_y_pos,
+                    img_width,
+                    self.brand_logo_height,
+                    mask='auto'
+                )
 
         return img_y_pos - self.min_clearance
 
