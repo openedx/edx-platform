@@ -55,47 +55,14 @@ set -e
 #
 ###############################################################################
 
-# Violations thresholds for failing the build
-PYLINT_THRESHOLD=6300
-PEP8_THRESHOLD=0
-
-source $HOME/jenkins_env
-
 # Clean up previous builds
 git clean -qxfd
 
-# Clear the mongo database
-# Note that this prevents us from running jobs in parallel on a single worker.
-mongo --quiet --eval 'db.getMongo().getDBNames().forEach(function(i){db.getSiblingDB(i).dropDatabase()})'
+source scripts/jenkins-common.sh
 
-# Ensure we have fetched origin/master
-# Some of the reporting tools compare the checked out branch to origin/master;
-# depending on how the GitHub plugin refspec is configured, this may
-# not already be fetched.
-git fetch origin master:refs/remotes/origin/master
-
-# Reset the jenkins worker's ruby environment back to
-# the state it was in when the instance was spun up.
-if [ -e $HOME/edx-rbenv_clean.tar.gz ]; then
-    rm -rf $HOME/.rbenv
-    tar -C $HOME -xf $HOME/edx-rbenv_clean.tar.gz
-fi
-
-# Bootstrap Ruby requirements so we can run the tests
-bundle install
-
-# Ensure the Ruby environment contains no stray gems
-bundle clean --force
-
-# Reset the jenkins worker's virtualenv back to the
-# state it was in when the instance was spun up.
-if [ -e $HOME/edx-venv_clean.tar.gz ]; then
-    rm -rf $HOME/edx-venv
-    tar -C $HOME -xf $HOME/edx-venv_clean.tar.gz
-fi
-
-# Activate the Python virtualenv
-source $HOME/edx-venv/bin/activate
+# Violations thresholds for failing the build
+PYLINT_THRESHOLD=6300
+PEP8_THRESHOLD=0
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
 # This could happen if you are trying to use this script from
@@ -126,8 +93,22 @@ END
         ;;
 
     "unit")
-        paver test
-        paver coverage
+        case "$SHARD" in        
+            "lms")
+                paver test_system -s lms
+                paver coverage
+                ;;
+            "cms-js-commonlib")
+                paver test_system -s cms
+                paver test_js --coverage --skip_clean
+                paver test_lib --skip_clean
+                paver coverage
+                ;;
+            *)
+                paver test
+                paver coverage
+                ;;
+        esac
         ;;
 
     "lms-acceptance")

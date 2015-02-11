@@ -1,7 +1,7 @@
 """
 Helper functions for test tasks
 """
-from paver.easy import sh, task
+from paver.easy import sh, task, cmdopts
 from pavelib.utils.envs import Env
 import os
 import subprocess
@@ -33,10 +33,17 @@ def clean_dir(directory):
 
 
 @task
-def clean_reports_dir():
+@cmdopts([
+    ('skip_clean', 'C', 'skip cleaning repository before running tests'),
+])
+def clean_reports_dir(options):
     """
     Clean coverage files, to ensure that we don't use stale data to generate reports.
     """
+    if getattr(options, 'skip_clean', False):
+        print('--skip_clean is set, skipping...')
+        return
+
     # We delete the files but preserve the directory structure
     # so that coverage.py has a place to put the reports.
     reports_dir = Env.REPORT_DIR.makedirs_p()

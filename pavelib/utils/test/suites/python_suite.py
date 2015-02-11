@@ -21,7 +21,7 @@ class PythonTestSuite(TestSuite):
 
     def __enter__(self):
         super(PythonTestSuite, self).__enter__()
-        if not self.fasttest:
+        if not (self.fasttest or self.skip_clean):
             test_utils.clean_test_files()
 
     @property
