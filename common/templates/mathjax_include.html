@@ -27,6 +27,27 @@
       ]
     }
   });
+   MathJax.Hub.signal.Interest(function(message) {
+    set_mathjax_display_div_settings(message);
+  });
+  function set_mathjax_display_div_settings(message) {
+    if (message[1].id && message[0] == 'End Math') {
+        var status = message[2] == 'Reprocess' ? true : false;
+        if (status) {
+            try {
+                var mathjax_display = message[1].MathJax['preview'].nextSibling;
+                if (mathjax_display.className == 'MathJax_Display') {
+                    var input_id = mathjax_display.parentElement.id.replace("_preview", "");
+                    mathjax_display.setAttribute('aria-label', 'Math output for ' + input_id);
+                    mathjax_display.setAttribute('tabindex', '0');
+                }
+
+            } catch (err) {
+
+            }
+        }
+      }
+    }
 </script>
 %endif
 
