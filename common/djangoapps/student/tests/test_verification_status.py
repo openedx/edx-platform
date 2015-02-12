@@ -288,13 +288,11 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Sanity check: verify that the course is on the page
         self.assertContains(response, unicode(self.course.id))
 
-        # Verify that the correct banner is rendered on the dashboard
-        self.assertContains(response, self.BANNER_ALT_MESSAGES[status])
-
         # Verify that the correct banner color is rendered
         self.assertContains(
             response,
-            "<article class=\"course {}\">".format(self.MODE_CLASSES[status])
+            "<div role=\"region\" aria-labelledby=\"{course_id}\" class=\"course {status}\">".format(
+                course_id=self.course.id, status=self.MODE_CLASSES[status])
         )
 
         # Verify that the correct copy is rendered on the dashboard
