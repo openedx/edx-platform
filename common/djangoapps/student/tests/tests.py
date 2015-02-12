@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import logging
 import pytz
 import unittest
+import ddt
 
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
@@ -44,8 +45,16 @@ from config_models.models import cache
 log = logging.getLogger(__name__)
 
 
+@ddt.ddt
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
+
+    def setUp(self):
+        super(CourseEndingTest, self).setUp()
+
+        # Clear the model-based config cache to avoid
+        # interference between tests.
+        cache.clear()
 
     def test_process_survey_link(self):
         username = "fred"
@@ -194,8 +203,11 @@ class CourseEndingTest(TestCase):
 
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
-        course.display_name = u'edx/abc/courseregisters®'
+        course = Mock(
+            end_of_course_survey_url=survey_url,
+            certificates_display_behavior='end',
+            display_name=u'edx/abc/courseregisters®'
+        )
         download_url = 'http://s3.edx/cert'
 
         cert_status = {
@@ -204,25 +216,28 @@ class CourseEndingTest(TestCase):
             'mode': 'honor'
         }
         LinkedInAddToProfileConfiguration(
-            dashboard_tracking_code='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True).save()
+            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
+            enabled=True
+        ).save()
 
         status_dict = _cert_info(user, course, cert_status, 'honor')
-        self.assertIn(
-            'http://www.linkedin.com/profile/add?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            status_dict['linked_in_url']
+        expected_url = (
+            'http://www.linkedin.com/profile/add'
+            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            'pfCertificationName=edX+Honor+Code+Certificate+for+edx%2Fabc%2Fcourseregisters%C2%AE&'
+            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
+            'source=o'
         )
-        self.assertIn('pfCertificationName', status_dict['linked_in_url'])
-        self.assertIn('pfCertificationUrl', status_dict['linked_in_url'])
-        self.assertIn('courseregisters', status_dict['linked_in_url'])
-        self.assertIn('Honor+Code+Certificate', status_dict['linked_in_url'])
+        self.assertEqual(expected_url, status_dict['linked_in_url'])
 
     def test_linked_in_url_not_exists_without_config(self):
-        # Test case with Linked-In URL empty with if linked-in-config is none.
-        cache.clear()
         user = Mock(username="fred")
         survey_url = "http://a_survey.com"
-        course = Mock(end_of_course_survey_url=survey_url, certificates_display_behavior='end')
+        course = Mock(
+            display_name="Demo Course",
+            end_of_course_survey_url=survey_url,
+            certificates_display_behavior='end'
+        )
 
         download_url = 'http://s3.edx/cert'
         cert_status = {
@@ -246,16 +261,54 @@ class CourseEndingTest(TestCase):
             }
         )
 
-        # adding config. linked-in-url will be return
+        # Enabling the configuration will cause the LinkedIn
+        # "add to profile" button to appear.
+        # We need to clear the cache again to make sure we
+        # pick up the modified configuration.
+        cache.clear()
         LinkedInAddToProfileConfiguration(
-            dashboard_tracking_code='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True).save()
+            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
+            enabled=True
+        ).save()
 
         status_dict = _cert_info(user, course, cert_status, 'honor')
-        self.assertIn(
-            'http://www.linkedin.com/profile/add?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            status_dict['linked_in_url']
+        expected_url = (
+            'http://www.linkedin.com/profile/add'
+            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            'pfCertificationName=edX+Verified+Certificate+for+Demo+Course&'
+            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
+            'source=o'
         )
+        self.assertEqual(expected_url, status_dict['linked_in_url'])
+
+    @ddt.data(
+        ('honor', 'edX Honor Code Certificate for DemoX'),
+        ('verified', 'edX Verified Certificate for DemoX'),
+        ('professional', 'edX Professional Certificate for DemoX'),
+        ('default_mode', 'edX Certificate for DemoX')
+    )
+    @ddt.unpack
+    def test_linked_in_url_certificate_types(self, cert_mode, cert_name):
+        user = Mock(username="fred")
+        course = Mock(
+            display_name='DemoX',
+            end_of_course_survey_url='http://example.com',
+            certificates_display_behavior='end'
+        )
+        cert_status = {
+            'status': 'downloadable',
+            'grade': '67',
+            'download_url': 'http://edx.org',
+            'mode': cert_mode
+        }
+
+        LinkedInAddToProfileConfiguration(
+            company_identifier="abcd123",
+            enabled=True
+        ).save()
+
+        status_dict = _cert_info(user, course, cert_status, cert_mode)
+        self.assertIn(cert_name.replace(' ', '+'), status_dict['linked_in_url'])
 
 
 class DashboardTest(ModuleStoreTestCase):
@@ -511,8 +564,10 @@ class DashboardTest(ModuleStoreTestCase):
         """
 
         self.client.login(username="jack", password="test")
-        tracking_code = '0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9'
-        LinkedInAddToProfileConfiguration(dashboard_tracking_code=tracking_code, enabled=True).save()
+        LinkedInAddToProfileConfiguration(
+            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
+            enabled=True
+        ).save()
 
         CourseModeFactory.create(
             course_id=self.course.id,
@@ -542,14 +597,14 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn('Add Certificate to LinkedIn', response.content)
 
-        response_url = (
-            'http://www.linkedin.com/profile/add?_ed='
-            '{tracking_code}&pfCertificationUrl={download}&pfCertificationName='
-            'Honor+Code+Certificate+for+{name}'
-        ).format(
-            tracking_code=tracking_code, download=download_url, name='Omega'
+        expected_url = (
+            'http://www.linkedin.com/profile/add'
+            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
+            'pfCertificationName=edX+Honor+Code+Certificate+for+Omega&'
+            'pfCertificationUrl=www.edx.org&'
+            'source=o'
         )
-        self.assertContains(response, response_url)
+        self.assertContains(response, expected_url)
 
 
 class EnrollInCourseTest(TestCase):
