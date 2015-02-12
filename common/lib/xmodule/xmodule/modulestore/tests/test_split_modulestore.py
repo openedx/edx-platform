@@ -295,6 +295,16 @@ class SplitModuleTest(unittest.TestCase):
                             "fields": {
                                 "display_name": "Problem 3.2"
                             },
+                        },
+                        {
+                            "id": "problem32",
+                            "parent": "chapter3",
+                            "parent_type": "chapter",
+                            "category": "problem",
+                            "fields": {
+                                "display_name": "Problem 3.3",
+                                "group_access": {"3": ["33"]},
+                            },
                         }
                     ]
                 },
@@ -898,6 +908,17 @@ class SplitModuleItemTests(SplitModuleTest):
         self.assertFalse(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotcha']}))
         self.assertTrue(modulestore()._value_matches('gotcha', {'$nin': ['a', 'bunch', 'of', 'gotchas']}))
 
+        self.assertTrue(modulestore()._block_matches({'group_access': {'1': [1]}}, {'group_access': {'$exists': True}}))
+        self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'group_access': {'$exists': False}}))
+        self.assertTrue(modulestore()._block_matches(
+            {'a': 1, 'group_access': {'1': [1]}},
+            {'a': 1, 'group_access': {'$exists': True}}))
+        self.assertFalse(modulestore()._block_matches(
+            {'a': 1, 'group_access': {'1': [1]}},
+            {'a': 111, 'group_access': {'$exists': True}}))
+        self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 1, 'group_access': {'$exists': False}}))
+        self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 9, 'group_access': {'$exists': False}}))
+
         self.assertTrue(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 1}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'a': 2}))
         self.assertFalse(modulestore()._block_matches({'a': 1, 'b': 2}, {'c': 1}))
@@ -911,9 +932,9 @@ class SplitModuleItemTests(SplitModuleTest):
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         # get all modules
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 6)
+        self.assertEqual(len(matches), 7)
         matches = modulestore().get_items(locator)
-        self.assertEqual(len(matches), 6)
+        self.assertEqual(len(matches), 7)
         matches = modulestore().get_items(locator, qualifiers={'category': 'chapter'})
         self.assertEqual(len(matches), 3)
         matches = modulestore().get_items(locator, qualifiers={'category': 'garbage'})
@@ -924,6 +945,10 @@ class SplitModuleItemTests(SplitModuleTest):
             settings={'display_name': re.compile(r'Hera')},
         )
         self.assertEqual(len(matches), 2)
+        matches = modulestore().get_items(locator, settings={'group_access': {'$exists': True}})
+        self.assertEqual(len(matches), 1)
+        matches = modulestore().get_items(locator, settings={'group_access': {'$exists': False}})
+        self.assertEqual(len(matches), 6)
 
     def test_get_parents(self):
         '''
