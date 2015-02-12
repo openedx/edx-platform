@@ -53,6 +53,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
 
     def setUp(self):
         super(SegmentIOTrackingTestCase, self).setUp()
+        self.maxDiff = None  # pylint: disable=invalid-name
         self.request_factory = RequestFactory()
 
     def test_get_request(self):
@@ -189,6 +190,8 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             self.assertEquals(response.status_code, 200)
 
             expected_event = {
+                'accept_language': '',
+                'referer': '',
                 'username': str(sentinel.username),
                 'ip': '',
                 'session': '',
@@ -207,7 +210,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
                     },
                     'user_id': USER_ID,
                     'course_id': course_id,
-                    'org_id': 'foo',
+                    'org_id': u'foo',
                     'path': ENDPOINT,
                     'client': {
                         'library': {
@@ -224,7 +227,7 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         finally:
             middleware.process_response(request, None)
 
-        self.assertEquals(self.get_event(), expected_event)
+        self.assertEqualUnicode(self.get_event(), expected_event)
 
     def test_invalid_course_id(self):
         request = self.create_request(
@@ -352,6 +355,8 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
             self.assertEquals(response.status_code, 200)
 
             expected_event_without_payload = {
+                'accept_language': '',
+                'referer': '',
                 'username': str(sentinel.username),
                 'ip': '',
                 'session': '',
@@ -397,5 +402,5 @@ class SegmentIOTrackingTestCase(EventTrackingTestCase):
         actual_event = dict(self.get_event())
         payload = json.loads(actual_event.pop('event'))
 
-        self.assertEquals(actual_event, expected_event_without_payload)
-        self.assertEquals(payload, expected_payload)
+        self.assertEqualUnicode(actual_event, expected_event_without_payload)
+        self.assertEqualUnicode(payload, expected_payload)

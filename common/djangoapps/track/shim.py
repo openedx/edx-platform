@@ -14,7 +14,9 @@ CONTEXT_FIELDS_TO_INCLUDE = [
     'session',
     'ip',
     'agent',
-    'host'
+    'host',
+    'referer',
+    'accept_language'
 ]
 
 
