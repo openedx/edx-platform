@@ -175,7 +175,13 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
 
         var keywordValidator = (function () {
             var regexp = /%%[^%\s]+%%/g;
-            var keywordsSupported = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'];
+            var keywordsSupported = [
+                '%%USER_ID%%',
+                '%%USER_FULLNAME%%',
+                '%%COURSE_DISPLAY_NAME%%',
+                '%%COURSE_START_DATE%%',
+                '%%COURSE_END_DATE%%'
+            ];
             function validate(string) {
                 var keywordsFound = string.match(regexp) || [];
                 var keywordsInvalid = $.map(keywordsFound, function (keyword) {

@@ -1,4 +1,5 @@
 <%! from django.utils.translation import ugettext as _ %>
+<%page args="keywords_supported"/>
 
 <section id="keyword-sub-modal" class="modal keyword-sub-modal" aria-hidden="true">
   <div class="inner-wrapper keyword-sub-wrapper" role="dialog" aria-labelledby="keyword-sub-tip-title">
@@ -25,22 +26,12 @@
       ${_("Copy and paste keywords on the left into your email message. They will be replaced by the values on the right for each student when the email is sent.")}
     </p>
     <table>
-      <tr>
-        <td><input type="text" value="%%USER_FULLNAME%%" readonly="readonly" /></td>
-        <td>${_("user profile name")}</td>
-      </tr>
-      <tr>
-        <td><input type="text" value="%%USER_ID%%" readonly="readonly" /></td>
-        <td>${_("anonymous_user_id (for use in survey links)")}</td>
-      </tr>
-      <tr>
-        <td><input type="text" value="%%COURSE_DISPLAY_NAME%%" readonly="readonly" /></td>
-        <td>${_("display name of the course")}</td>
-      </tr>
-      <tr>
-        <td><input type="text" value="%%COURSE_END_DATE%%" readonly="readonly" /></td>
-        <td>${_("end date of the course")}</td>
-      </tr>
+      % for keyword in keywords_supported:
+        <tr>
+          <td><input type="text" value="${keyword['name']}" readonly="readonly" /></td>
+          <td>${_(keyword['desc'])}</td>
+        </tr>
+      % endfor
     </table>
 
   </div>
