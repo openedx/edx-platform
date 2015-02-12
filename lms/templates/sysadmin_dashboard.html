@@ -58,6 +58,7 @@ textarea {
       <a href="${reverse('sysadmin_staffing')}" class="${modeflag.get('staffing')}">${_('Staffing and Enrollment')}</a> 
       ## Translators: refers to http://git-scm.com/docs/git-log
       <a href="${reverse('gitlogs')}">${_('Git Logs')}</a>
+      <a href="${reverse('sysadmin_task_queue')}" class="${modeflag.get('task_queue')}">${_('Task Queue')}</a>
     </h2>
 	<hr />
 %if modeflag.get('users'):
@@ -161,6 +162,29 @@ textarea {
   </div>
 </form>
 <hr style="width:40%" />
+%endif
+
+%if modeflag.get('task_queue'):
+  <h3>${_('Kill Queuing Tasks')}</h3><br/>
+
+  <form name="action" method="POST">
+    <input type="hidden" name="csrfmiddlewaretoken" value="${ csrf_token }" />
+
+    <ul class="list-input">
+      <li class="field text" style="padding-bottom: 1.2em">
+        <label for="row_id">${_('ID of row in instructor_task_instructortask')}</label>
+        <input type="text" name="row_id" size=40 />
+      </li>
+    </ul>
+
+    <div class="form-actions">
+      <p>
+        <button type="submit" name="action" value="kill_task">${_('Kill task')}</button>
+      </p>
+    </div>
+
+    <hr />
+  </form>
 %endif
 
 %if msg:
