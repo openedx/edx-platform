@@ -44,3 +44,4 @@
 -e git+https://github.com/edx-solutions/xblock-utils.git@0c636f244abf1161e915ed6d15f0ef589dcd2a4e#egg=xblock-utils
 -e git+https://github.com/edx-solutions/xblock-google-drive.git@31a811911612e87244f760f483998867e4883565#egg=xblock-google-drive
 -e git+https://github.com/openlearninginitiative/xblock-submit-and-compare.git@f89d3debd58003a5bfedfbaad06072ec2082259d#egg=xblock-submit-and-compare
+-e git+https://github.com/mckinseyacademy/xblock-poll.git@09e8feda40fdf77bd19b830b497ff969891e11af#egg=xblock-poll
