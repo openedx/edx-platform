@@ -223,15 +223,14 @@ $sm-btn-linkedin: #0077b5;
         width: 100%;
         margin: 0 0 5px 0;
 
-        &.select-gender {
-            margin-right: 20px;
+        &.select-year_of_birth {
+            @include margin-left(15px);
         }
 
         &.select-gender,
         &.select-year_of_birth {
+            display: inline-block;
             width: calc( 50% - 10px );
-            float: left;
-            clear: none;
         }
 
         /** FROM _accounts.scss - start **/
@@ -250,6 +249,7 @@ $sm-btn-linkedin: #0077b5;
 
         label {
             @include transition(color 0.15s ease-in-out 0s);
+            display: block;
             margin: 0 0 6px 0;
             color: tint($black, 20%);
             font-weight: $font-semibold;
@@ -263,10 +263,10 @@ $sm-btn-linkedin: #0077b5;
             }
 
             &[for="register-honor_code"] {
-                display: block;
-                margin: -30px 5% 15px;
+                display: inline-block;
+                margin: 5px 5px 0 0;
                 width: 90%;
-                text-align: center;
+                vertical-align: top;
             }
 
             a {
@@ -287,6 +287,7 @@ $sm-btn-linkedin: #0077b5;
         }
 
         input,
+        select,
         textarea {
             display: block;
             width: 100%;

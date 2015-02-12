@@ -1,4 +1,4 @@
-<p class="form-field <%=type%>-<%= name %>">
+<div class="form-field <%=type%>-<%= name %>">
     <% if ( type !== 'checkbox' ) { %>
         <label for="<%= form %>-<%= name %>">
             <%= label %>
@@ -63,4 +63,4 @@
     <% if( form === 'login' && name === 'password' ) { %>
         <a href="#" class="forgot-password field-link"><%- gettext("Forgot password?") %></a>
     <% } %>
-</p>
+</div>
