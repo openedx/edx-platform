@@ -152,6 +152,3 @@ PyContracts==1.7.1
 analytics-python==0.4.4
 
 git+https://github.com/mfogel/django-settings-context-processor.git
-
-# edX packages
-edx-submissions==0.0.8
