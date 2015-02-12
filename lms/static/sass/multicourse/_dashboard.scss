@@ -384,7 +384,7 @@
         @include clearfix();
         @include padding(0, 10px, 0, 230px);
 
-        > hgroup {
+         .course-item-info {
           padding: 0;
           width: 100%;
 
@@ -399,13 +399,13 @@
           }
 
           .date-block {
-            position: absolute;
             top: 0;
             @include right(0);
             font-family: $sans-serif;
             font-size: 13px;
             font-style: italic;
             color: $lighter-base-font-color;
+            float: right;
           }
 
           h3 a, h3 span {
