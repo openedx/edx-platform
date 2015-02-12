@@ -87,12 +87,14 @@ class CountMongoCallsCourseTraversal(TestCase):
     """
 
     @ddt.data(
-        (None, 7),  # The way this traversal *should* be done.
-        (0, 145)    # The pathological case - do *not* query a course this way!
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, 189),  # The way this traversal *should* be done.
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, 387),     # The pathological case - do *not* query a course this way!
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, 7),  # The way this traversal *should* be done.
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, 145)    # The pathological case - do *not* query a course this way!
     )
     @ddt.unpack
-    def test_number_mongo_calls(self, depth, num_mongo_calls):
-        with MIXED_SPLIT_MODULESTORE_BUILDER.build() as (source_content, source_store):
+    def test_number_mongo_calls(self, store, depth, num_mongo_calls):
+        with store.build() as (source_content, source_store):
 
             source_course_key = source_store.make_course_key('a', 'course', 'course')
 
