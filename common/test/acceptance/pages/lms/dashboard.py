@@ -49,7 +49,7 @@ class DashboardPage(PageObject):
             _, course_name = el.text.split(' ', 1)
             return course_name
 
-        return self.q(css='section.info > hgroup > h3 > a').map(_get_course_name).results
+        return self.q(css='section.info > div.course-item-info > h3 > a').map(_get_course_name).results
 
     @property
     def full_name(self):
