@@ -141,6 +141,10 @@ div.problem {
     }
   }
 
+  input.math {
+    direction: ltr; // Equations are always English
+  }
+
   .inline {
     display: inline;
 
