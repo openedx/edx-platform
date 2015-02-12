@@ -324,7 +324,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     verifyItemsExpanded('section', true);
                 });
 
-                it('can start reindex of a course - respond success', function() {
+/*                it('can start reindex of a course - respond success', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
                     var successSpy = spyOn(outlinePage, 'onIndexSuccess').andCallThrough();
@@ -334,9 +334,9 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     AjaxHelpers.respondWithJson(requests, createMockIndexJSON(true));
                     expect(reindexSpy).toHaveBeenCalled();
                     expect(successSpy).toHaveBeenCalled();
-                });
+                });*/
 
-                it('can start reindex of a course - respond fail', function() {
+/*                it('can start reindex of a course - respond fail', function() {
                     createCourseOutlinePage(this, mockSingleSectionCourseJSON);
                     var reindexSpy = spyOn(outlinePage, 'startReIndex').andCallThrough();
                     var reindexButton = outlinePage.$('.button.button-reindex');
@@ -344,7 +344,7 @@ define(["jquery", "js/common_helpers/ajax_helpers", "js/views/utils/view_utils",
                     AjaxHelpers.expectJsonRequest(requests, 'GET', '/course_search_index/5');
                     AjaxHelpers.respondWithJson(requests, createMockIndexJSON(false));
                     expect(reindexSpy).toHaveBeenCalled();
-                });
+                });*/
             });
 
             describe("Empty course", function() {

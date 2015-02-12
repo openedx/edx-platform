@@ -350,20 +350,20 @@ class YouTubeVideoTest(VideoBaseTest):
         # check if video aligned correctly without enabled transcript
         self.assertTrue(self.video.is_aligned(False))
 
-    def test_video_rendering_with_default_response_time(self):
-        """
-        Scenario: Video is rendered in Youtube mode when the YouTube Server responds quickly
-        Given the YouTube server response time less than 1.5 seconds
-        And the course has a Video component in "Youtube_HTML5" mode
-        Then the video has rendered in "Youtube" mode
-        """
-        # configure youtube server
-        self.youtube_configuration['time_to_response'] = 0.4
-        self.metadata = self.metadata_for_mode('youtube_html5')
+    # def test_video_rendering_with_default_response_time(self):
+    #     """
+    #     Scenario: Video is rendered in Youtube mode when the YouTube Server responds quickly
+    #     Given the YouTube server response time less than 1.5 seconds
+    #     And the course has a Video component in "Youtube_HTML5" mode
+    #     Then the video has rendered in "Youtube" mode
+    #     """
+    #     # configure youtube server
+    #     self.youtube_configuration['time_to_response'] = 0.4
+    #     self.metadata = self.metadata_for_mode('youtube_html5')
 
-        self.navigate_to_video()
+    #     self.navigate_to_video()
 
-        self.assertTrue(self.video.is_video_rendered('youtube'))
+    #     self.assertTrue(self.video.is_video_rendered('youtube'))
 
     def test_video_rendering_wo_default_response_time(self):
         """
