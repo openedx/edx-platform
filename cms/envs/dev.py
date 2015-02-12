@@ -163,9 +163,8 @@ DEBUG_TOOLBAR_CONFIG = {
 # Stacktraces slow down page loads drastically (for pages with lots of queries).
 DEBUG_TOOLBAR_MONGO_STACKTRACES = False
 
-# Enable URL that shows information about the status of variuous services
+# Enable URL that shows information about the status of various services
 FEATURES['ENABLE_SERVICE_STATUS'] = True
-FEATURES['ALLOW_COURSE_RERUNS'] = True
 
 ############################# SEGMENT-IO ##################################
 

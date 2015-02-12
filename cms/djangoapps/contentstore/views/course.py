@@ -459,7 +459,7 @@ def course_listing(request):
         'course_creator_status': _get_course_creator_status(request.user),
         'rerun_creator_status': GlobalStaff().has_user(request.user),
         'allow_unicode_course_id': settings.FEATURES.get('ALLOW_UNICODE_COURSE_ID', False),
-        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', False)
+        'allow_course_reruns': settings.FEATURES.get('ALLOW_COURSE_RERUNS', True)
     })
 
 
