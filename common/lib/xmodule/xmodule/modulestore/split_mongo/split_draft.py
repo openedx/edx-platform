@@ -366,9 +366,6 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
 
         self._flag_publish_event(location.course_key)
 
-        # Now it's been published, add the object to the courseware search index so that it appears in search results
-        CoursewareSearchIndexer.do_publish_index(self, location)
-
         return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.published), **kwargs)
 
     def unpublish(self, location, user_id, **kwargs):

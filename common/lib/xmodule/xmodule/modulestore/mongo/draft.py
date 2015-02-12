@@ -745,9 +745,6 @@ class DraftModuleStore(MongoModuleStore):
 
         self._flag_publish_event(course_key)
 
-        # Now it's been published, add the object to the courseware search index so that it appears in search results
-        CoursewareSearchIndexer.do_publish_index(self, location)
-
         return self.get_item(as_published(location))
 
     def unpublish(self, location, user_id, **kwargs):
