@@ -159,7 +159,7 @@
     }
 
     // platform Open edX logo and link
-    .powered-by {
+    .footer-about-openedx {
       @include float(right);
       width: flex-grid(3,12);
       display: inline-block;
@@ -307,7 +307,7 @@ $edx-footer-bg-color: rgb(252,252,252);
     @extend %edx-footer-title;
   }
 
-  .footer-about-logo, .footer-about-openedx-logo {
+  .footer-about-logo, .footer-about-openedx {
     margin-bottom: $edx-footer-spacing;
 
     img {

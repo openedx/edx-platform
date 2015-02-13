@@ -3,37 +3,46 @@
 
 <div class="wrapper-footer wrapper">
   <footer class="primary" role="contentinfo">
-    <div class="colophon">
-      <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
-      ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
-      <p>
-	## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
-	${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
-	  link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
-	  link_end=u"</a>"
-	)}
-      </p>
+
+    <div class="footer-content-primary">
+      <div class="colophon">
+        <p>&copy; ${settings.COPYRIGHT_YEAR} <a data-rel="edx.org" href="${marketing_link('ROOT')}" rel="external">${settings.PLATFORM_NAME}</a>.</p>
+      </div>
+
+      <nav class="nav-peripheral">
+        <ol>
+          <li class="nav-item nav-peripheral-tos">
+            <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
+          </li>
+          <li class="nav-item nav-peripheral-pp">
+            <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
+          </li>
+          % if settings.TENDER_DOMAIN and user.is_authenticated():
+          <li class="nav-item nav-peripheral-feedback">
+            <a data-rel="edx.org" href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
+          </li>
+          % endif
+        </ol>
+      </nav>
     </div>
 
-    <nav class="nav-peripheral" aria-label="{_('Legal')}">
-      <ol>
-        <li class="nav-item nav-peripheral-tos">
-          <a data-rel="edx.org" href="${marketing_link('TOS')}">${_("Terms of Service")}</a>
-        </li>
-        <li class="nav-item nav-peripheral-pp">
-          <a data-rel="edx.org" href="${marketing_link('PRIVACY')}">${_("Privacy Policy")}</a>
-        </li>
-        % if settings.TENDER_DOMAIN and user.is_authenticated():
-        <li class="nav-item nav-peripheral-feedback">
-          <a data-rel="edx.org" href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_('Use our feedback tool, Tender, to share your feedback')}">${_("Contact Us")}</a>
-        </li>
-        % endif
-      </ol>
-    </nav>
-    <div class="powered-by">
-      <a href="http://openedx.org" title="${_("Powered by Open edX")}">
-        <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png" width="150" height="50">
-      </a>
+    <div class="footer-content-secondary" aria-label="{_('Legal')}">
+      <div class="footer-about-copyright">
+        ## Site operators: Please do not remove this paragraph! This attributes back to edX and makes your acknowledgement of edX's trademarks clear.
+        <p>
+          ## Translators: 'EdX', 'edX', 'Studio', and 'Open edX' are trademarks of 'edX Inc.'. Please do not translate any of these trademarks and company names.
+          ${_("EdX, Open edX, Studio, and the edX and Open edX logos are registered trademarks or trademarks of {link_start}edX Inc.{link_end}").format(
+            link_start=u"<a data-rel='edx.org' href='https://www.edx.org/'>",
+            link_end=u"</a>"
+          )}
+        </p>
+      </div>
+
+      <div class="footer-about-openedx">
+        <a href="http://open.edx.org" title="${_("Powered by Open edX")}">
+          <img alt="${_("Powered by Open edX")}" src="https://files.edx.org/openedx-logos/edx-openedx-logo-tag.png">
+        </a>
+      </div>
     </div>
   </footer>
 </div>

@@ -16,9 +16,13 @@
     margin: 0 auto;
     color: $gray-l1;
 
+    .footer-content-primary {
+      @include clearfix();
+    }
+
     .colophon {
       width: flex-grid(4, 12);
-      float: left;
+      @include float(left);
       margin-right: flex-gutter(2);
     }
 
@@ -32,15 +36,15 @@
 
     .nav-peripheral {
       width: flex-grid(6, 12);
-      float: right;
-      text-align: right;
+      @include float(right);
+      @include text-align(right);
 
       .nav-item {
         display: inline-block;
-        margin-right: ($baseline/4);
+        @include margin-right($baseline/4);
 
         &:last-child {
-          margin-right: 0;
+          @include margin-right(0);
         }
 
         a {
@@ -59,16 +63,36 @@
       }
     }
 
+    .footer-content-secondary {
+      @include clearfix();
+      margin-top: $baseline;
+    }
+
+    .footer-about-copyright, .footer-about-openedx {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // platform trademarks
+    .footer-about-copyright {
+      width: flex-grid(4, 12);
+      @include float(left);
+      margin-right: flex-gutter(2);
+    }
+
     // platform Open edX logo and link
-    .powered-by {
+    .footer-about-openedx {
       @include float(right);
       width: flex-grid(3,12);
-      display: inline-block;
-      vertical-align: bottom;
       @include text-align(right);
 
       a {
         display: inline-block;
+
+        img {
+          display: block;
+          width: ($baseline* 6);
+        }
 
         &:hover {
           border-bottom: none;
