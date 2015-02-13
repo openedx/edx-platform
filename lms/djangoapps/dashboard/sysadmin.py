@@ -42,6 +42,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from instructor_task.models import InstructorTask
 
 
 log = logging.getLogger(__name__)
@@ -736,4 +737,129 @@ class GitLogs(TemplateView):
                    'course_id': course_id.to_deprecated_string() if course_id else None,
                    'error_msg': error_msg}
 
+        return render_to_response(self.template_name, context)
+
+
+class TaskQueue(SysadminDashboardView):
+    """
+    This provides the ability to kill an InstructorTask.
+
+    This is done by updating the row's task_state from "QUEUING" to "FAILURE".
+    """
+
+    def kill_task(self, row_id=None):
+        """
+        Kills an InstructorTask by changing it's task_state from 'QUEUING' to 'FAILURE'
+
+        Args:
+          Input: row_id (string)
+        """
+        if not row_id:
+            return _('Must provide an ID')
+
+        try:
+            int(row_id)
+        except ValueError:
+            return _('ID must be an integer')
+
+        msg = u''
+        try:
+            task = InstructorTask.objects.get(
+                id=row_id,
+                task_state='QUEUING',
+            )
+        except InstructorTask.DoesNotExist, err:
+            msg = _('Cannot find task with ID {row_id} and task_state QUEUING - {error}').format(
+                row_id=row_id,
+                error=str(err)
+            )
+            return msg
+
+        task.task_state = 'FAILURE'
+        task.save()
+
+        msg += _('Task with id {row_id} was successfully killed!').format(row_id=row_id)
+        return msg
+
+    def make_datatable(self):
+        """Creates InstructorTask information datatable"""
+
+        data = []
+
+        tasks = InstructorTask.objects.filter(
+            task_state='QUEUING',
+        ).order_by('id').reverse()
+        for task in tasks:
+            data.append(
+                [
+                    task.id,
+                    task.course_id,
+                    task.task_type,
+                    task.task_state,
+                ]
+            )
+
+        return dict(
+            header=[
+                _('ID'),
+                _('Course ID'),
+                _('Task Type'),
+                _('Task State'),
+            ],
+            title=_('List of Queueing Tasks'),
+            data=data,
+        )
+
+    def get(self, request):
+        """
+        Displays form allowing admin to kill an InstructorTask.
+
+        Args:
+          Input: request (Django Request object)
+        """
+        if not request.user.is_staff:
+            raise Http404
+
+        context = {
+            'datatable': self.make_datatable(),
+            'msg': self.msg,
+            'djangopid': os.getpid(),
+            'modeflag': {'task_queue': 'active-section'},
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
+        }
+        return render_to_response(self.template_name, context)
+
+    def post(self, request):
+        """
+        Handle actions on page Task Queue page.
+
+        Args:
+          Input: request (Django Request object)
+        """
+
+        if not request.user.is_staff:
+            raise Http404
+
+        action = request.POST.get('action', '')
+        track.views.server_track(request, action, {},
+                                 page='task_queue_sysdashboard')
+
+        if action == 'kill_task':
+            row_id = request.POST.get('row_id', '').strip()
+            self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
+                _('Kill Task Results'),
+                self.kill_task(row_id), self.msg)
+
+        else:
+            self.msg = u'<p>{0}</p><hr />'.format(
+                _('Unrecognized action'),
+            )
+
+        context = {
+            'datatable': self.datatable,
+            'msg': self.msg,
+            'djangopid': os.getpid(),
+            'modeflag': {'task_queue': 'active-section'},
+            'edx_platform_version': getattr(settings, 'EDX_PLATFORM_VERSION_STRING', ''),
+        }
         return render_to_response(self.template_name, context)

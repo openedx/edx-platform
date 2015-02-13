@@ -24,13 +24,15 @@ def has_instructor_access_for_class(user, course_id):
     return has_access(user, 'staff', course)
 
 
-def all_sequential_open_distrib(request, course_id):
+def all_sequential_open_distrib(request, course_id, enrollment):
     """
     Creates a json with the open distribution for all the subsections in the course.
 
     `request` django request
 
     `course_id` the course ID for the course interested in
+
+    `enrollment` the number of students enrolled in the course
 
     Returns the format in dashboard_data.get_d3_sequential_open_distrib
     """
@@ -41,7 +43,7 @@ def all_sequential_open_distrib(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_sequential_open_distrib(course_key)
+            json = dashboard_data.get_d3_sequential_open_distrib(course_key, int(enrollment))
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}
@@ -51,13 +53,15 @@ def all_sequential_open_distrib(request, course_id):
     return HttpResponse(simplejson.dumps(json), mimetype="application/json")
 
 
-def all_problem_grade_distribution(request, course_id):
+def all_problem_grade_distribution(request, course_id, enrollment):
     """
     Creates a json with the grade distribution for all the problems in the course.
 
     `Request` django request
 
     `course_id` the course ID for the course interested in
+
+    `enrollment` the number of students enrolled in the course
 
     Returns the format in dashboard_data.get_d3_problem_grade_distrib
     """
@@ -67,7 +71,7 @@ def all_problem_grade_distribution(request, course_id):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_problem_grade_distrib(course_key)
+            json = dashboard_data.get_d3_problem_grade_distrib(course_key, int(enrollment))
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}
@@ -77,7 +81,7 @@ def all_problem_grade_distribution(request, course_id):
     return HttpResponse(simplejson.dumps(json), mimetype="application/json")
 
 
-def section_problem_grade_distrib(request, course_id, section):
+def section_problem_grade_distrib(request, course_id, section, enrollment):
     """
     Creates a json with the grade distribution for the problems in the specified section.
 
@@ -86,6 +90,8 @@ def section_problem_grade_distrib(request, course_id, section):
     `course_id` the course ID for the course interested in
 
     `section` The zero-based index of the section for the course
+
+    `enrollment` the number of students enrolled in the course
 
     Returns the format in dashboard_data.get_d3_section_grade_distrib
 
@@ -98,7 +104,7 @@ def section_problem_grade_distrib(request, course_id, section):
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     if has_instructor_access_for_class(request.user, course_key):
         try:
-            json = dashboard_data.get_d3_section_grade_distrib(course_key, section)
+            json = dashboard_data.get_d3_section_grade_distrib(course_key, section, int(enrollment))
         except Exception as ex:  # pylint: disable=broad-except
             log.error('Generating metrics failed with exception: %s', ex)
             json = {'error': "error"}

@@ -25,7 +25,6 @@ from class_dashboard.views import has_instructor_access_for_class
 
 USER_COUNT = 11
 
-
 @override_settings(MODULESTORE=TEST_DATA_MONGO_MODULESTORE)
 class TestGetProblemGradeDistribution(ModuleStoreTestCase):
     """
@@ -92,9 +91,9 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     module_state_key=self.item.location,
                 )
 
-    def test_get_problem_grade_distribution(self):
-
-        prob_grade_distrib, total_student_count = get_problem_grade_distribution(self.course.id)
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT + 1))
+    def test_get_problem_grade_distribution_from_db(self):
+        prob_grade_distrib, total_student_count = get_problem_grade_distribution(self.course.id, USER_COUNT)
 
         for problem in prob_grade_distrib:
             max_grade = prob_grade_distrib[problem]['max_grade']
@@ -103,18 +102,48 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         for val in total_student_count.values():
             self.assertEquals(USER_COUNT, val)
 
-    def test_get_sequential_open_distibution(self):
+    @patch('class_dashboard.dashboard_data.Client')
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_problem_grade_distribution_from_client(self, mock_client):
+        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
+            {
+                'grade': 1,
+                'max_grade': 1,
+                'count': USER_COUNT,
+            },
+        ]
 
-        sequential_open_distrib = get_sequential_open_distrib(self.course.id)
+        prob_grade_distrib, total_student_count = get_problem_grade_distribution(self.course.id, USER_COUNT)
+
+        for problem in prob_grade_distrib:
+            max_grade = prob_grade_distrib[problem]['max_grade']
+            self.assertEquals(1, max_grade)
+
+        for val in total_student_count.values():
+            self.assertEquals(USER_COUNT, val)
+
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT + 1))
+    def test_get_sequential_open_distibution_from_db(self):
+        sequential_open_distrib = get_sequential_open_distrib(self.course.id, USER_COUNT)
 
         for problem in sequential_open_distrib:
             num_students = sequential_open_distrib[problem]
             self.assertEquals(USER_COUNT, num_students)
 
-    def test_get_problemset_grade_distrib(self):
+    @patch('class_dashboard.dashboard_data.Client')
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_sequential_open_distibution_from_client(self, mock_client):
+        mock_client.return_value.modules.return_value.sequential_open_distribution.return_value = [{'count': USER_COUNT}]
+        sequential_open_distrib = get_sequential_open_distrib(self.course.id, USER_COUNT)
 
-        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id)
-        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib)
+        for problem in sequential_open_distrib:
+            num_students = sequential_open_distrib[problem]
+            self.assertEquals(USER_COUNT, num_students)
+
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT + 1))
+    def test_get_problem_set_grade_distrib_from_db(self):
+        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
+        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
 
         for problem in probset_grade_distrib:
             max_grade = probset_grade_distrib[problem]['max_grade']
@@ -126,9 +155,41 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                 sum_attempts += item[1]
             self.assertEquals(USER_COUNT, sum_attempts)
 
-    def test_get_d3_problem_grade_distrib(self):
+    @patch('class_dashboard.dashboard_data.Client')
+    @override_settings(MAX_ENROLLEES_FOR_METRICS_USING_DB=(USER_COUNT - 1))
+    def test_get_problem_set_grade_distrib_from_client(self, mock_client):
+        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
+            {
+                'grade': 1,
+                'max_grade': 1,
+                'count': USER_COUNT,
+            },
+        ]
 
-        d3_data = get_d3_problem_grade_distrib(self.course.id)
+        prob_grade_distrib, __ = get_problem_grade_distribution(self.course.id, USER_COUNT)
+        probset_grade_distrib = get_problem_set_grade_distrib(self.course.id, prob_grade_distrib, USER_COUNT)
+
+        for problem in probset_grade_distrib:
+            max_grade = probset_grade_distrib[problem]['max_grade']
+            self.assertEquals(1, max_grade)
+
+            grade_distrib = probset_grade_distrib[problem]['grade_distrib']
+            sum_attempts = 0
+            for item in grade_distrib:
+                sum_attempts += item[1]
+            self.assertEquals(USER_COUNT, sum_attempts)
+
+    @patch('class_dashboard.dashboard_data.Client')
+    def test_get_d3_problem_grade_distrib(self, mock_client):
+        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
+            {
+                'grade': 1,
+                'max_grade': 1,
+                'count': USER_COUNT,
+            },
+        ]
+
+        d3_data = get_d3_problem_grade_distrib(self.course.id, USER_COUNT)
         for data in d3_data:
             for stack_data in data['data']:
                 sum_values = 0
@@ -136,9 +197,11 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     sum_values += problem['value']
                 self.assertEquals(USER_COUNT, sum_values)
 
-    def test_get_d3_sequential_open_distrib(self):
+    @patch('class_dashboard.dashboard_data.Client')
+    def test_get_d3_sequential_open_distrib(self, mock_client):
+        mock_client.return_value.modules.return_value.sequential_open_distribution.return_value = [{'count': 0}]
 
-        d3_data = get_d3_sequential_open_distrib(self.course.id)
+        d3_data = get_d3_sequential_open_distrib(self.course.id, USER_COUNT)
 
         for data in d3_data:
             for stack_data in data['data']:
@@ -146,9 +209,17 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
                     value = problem['value']
                 self.assertEquals(0, value)
 
-    def test_get_d3_section_grade_distrib(self):
+    @patch('class_dashboard.dashboard_data.Client')
+    def test_get_d3_section_grade_distrib(self, mock_client):
+        mock_client.return_value.modules.return_value.grade_distribution.return_value = [
+            {
+                'grade': 1,
+                'max_grade': 1,
+                'count': USER_COUNT,
+            },
+        ]
 
-        d3_data = get_d3_section_grade_distrib(self.course.id, 0)
+        d3_data = get_d3_section_grade_distrib(self.course.id, 0, USER_COUNT)
 
         for stack_data in d3_data:
             sum_values = 0

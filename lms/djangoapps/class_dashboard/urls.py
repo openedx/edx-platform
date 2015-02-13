@@ -8,10 +8,10 @@ COURSE_ID_PATTERN = settings.COURSE_ID_PATTERN
 
 urlpatterns = patterns('',  # nopep8
     # Json request data for metrics for entire course
-    url(r'^{}/all_sequential_open_distrib$'.format(settings.COURSE_ID_PATTERN),
+    url(r'^{}/all_sequential_open_distrib/(?P<enrollment>\d+)$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.all_sequential_open_distrib', name="all_sequential_open_distrib"),
 
-    url(r'^{}/all_problem_grade_distribution$'.format(settings.COURSE_ID_PATTERN),
+    url(r'^{}/all_problem_grade_distribution/(?P<enrollment>\d+)$'.format(settings.COURSE_ID_PATTERN),
         'class_dashboard.views.all_problem_grade_distribution', name="all_problem_grade_distribution"),
 
     # Json request data for metrics for particular section
