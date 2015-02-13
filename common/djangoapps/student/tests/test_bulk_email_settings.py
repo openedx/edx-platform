@@ -45,11 +45,12 @@ class TestStudentDashboardEmailView(ModuleStoreTestCase):
         self.email_modal_link = (
             '<a href="#email-settings-modal" class="email-settings" rel="leanModal" '
             'data-course-id="{org}/{num}/{name}" data-course-number="{num}" '
-            'data-optout="False">Email Settings</a>'
+            'data-optout="False">Email Settings<span class="sr">for {num} {course_name}</span></a>'
         ).format(
             org=self.course.org,
             num=self.course.number,
             name=self.course.display_name.replace(' ', '_'),
+            course_name=self.course.display_name_with_default
         )
 
     def tearDown(self):
