@@ -27,9 +27,8 @@ def serialize_content(course_descriptor, about_descriptor):
         'start': _formatted_datetime(course_descriptor, 'start'),
         'end': _formatted_datetime(course_descriptor, 'end'),
         'announcement': None,
-        'effort': about_descriptor.get("effort", None)
-
     }
+    data.update(about_descriptor)
 
     content_id = unicode(course_descriptor.id)
     data["course_id"] = unicode(content_id)
