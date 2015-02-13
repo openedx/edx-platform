@@ -49,7 +49,7 @@ class DashboardPage(PageObject):
             _, course_name = el.text.split(' ', 1)
             return course_name
 
-        return self.q(css='section.info > hgroup > h3 > a').map(_get_course_name).results
+        return self.q(css='section.info > div.course-item-info > h3 > a').map(_get_course_name).results
 
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.
