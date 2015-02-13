@@ -51,6 +51,10 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
         Boolean: True if the user has access to the course; False otherwise
 
     """
+    # No-op if the country access feature is not enabled
+    if not settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+        return True
+
     # First, check whether there are any restrictions on the course.
     # If not, then we do not need to do any further checks
     course_is_restricted = RestrictedCourse.is_restricted_course(course_key)
