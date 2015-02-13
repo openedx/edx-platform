@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
@@ -25,7 +25,9 @@ from django_comment_common.models import Role
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from edxmako.shortcuts import marketing_link
 
+from student.views import create_account_with_params, set_marketing_cookie
 from util.authentication import SessionAuthenticationAllowInactiveUser
+from util.json_request import JsonResponse
 from .api import account as account_api, profile as profile_api
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
@@ -232,10 +234,8 @@ class RegistrationView(APIView):
 
         You must send all required form fields with the request.
 
-        You can optionally send an `analytics` param with a JSON-encoded
-        object with additional info to include in the registration analytics event.
-        Currently, the only supported field is "enroll_course_id" to indicate
-        that the user registered while enrolling in a particular course.
+        You can optionally send a "course_id" param to indicate in analytics
+        events that the user registered while enrolling in a particular course.
 
         Arguments:
             request (HTTPRequest)
@@ -243,11 +243,13 @@ class RegistrationView(APIView):
         Returns:
             HttpResponse: 200 on success
             HttpResponse: 400 if the request is not valid.
-            HttpResponse: 302 if redirecting to another page.
-
+            HttpResponse: 409 if an account with the given username or email
+                address already exists
         """
-        email = request.POST.get('email')
-        username = request.POST.get('username')
+        data = request.POST.copy()
+
+        email = data.get('email')
+        username = data.get('username')
 
         # Handle duplicate email/username
         conflicts = account_api.check_account_exists(email=email, username=username)
@@ -278,10 +280,29 @@ class RegistrationView(APIView):
                 content_type="text/plain"
             )
 
-        # For the initial implementation, shim the existing login view
-        # from the student Django app.
-        from student.views import create_account
-        return shim_student_view(create_account)(request)
+        # Backwards compatibility: the student view expects both
+        # terms of service and honor code values.  Since we're combining
+        # these into a single checkbox, the only value we may get
+        # from the new view is "honor_code".
+        # Longer term, we will need to make this more flexible to support
+        # open source installations that may have separate checkboxes
+        # for TOS, privacy policy, etc.
+        if data.get("honor_code") and "terms_of_service" not in data:
+            data["terms_of_service"] = data["honor_code"]
+
+        try:
+            create_account_with_params(request, data)
+        except ValidationError as err:
+            error_list = next(err.message_dict.itervalues())
+            return HttpResponse(
+                status=400,
+                content=error_list[0],
+                content_type="text/plain"
+            )
+
+        response = JsonResponse({"success": True})
+        set_marketing_cookie(request, response)
+        return response
 
     def _add_email_field(self, form_desc, required=True):
         """Add an email field to a form description.
