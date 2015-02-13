@@ -7,24 +7,30 @@ Passes settings.MODULESTORE as kwargs to MongoModuleStore
 from __future__ import absolute_import
 
 from importlib import import_module
-from django.conf import settings
-if not settings.configured:
-    settings.configure()
-from django.core.cache import get_cache, InvalidCacheBackendError
-import django.utils
+import logging
 
 import re
+from django.conf import settings
 
-from xmodule.util.django import get_current_request_hostname
-import xmodule.modulestore  # pylint: disable=unused-import
-from xmodule.modulestore.mixed import MixedModuleStore
-from xmodule.modulestore.draft_and_published import BranchSettingMixin
+# This configuration must be executed BEFORE any additional Django imports. Otherwise, the imports may fail due to
+# Django not being configured properly. This mostly applies to tests.
+if not settings.configured:
+    settings.configure()
+
+from django.core.cache import get_cache, InvalidCacheBackendError
+import django.dispatch
+import django.utils
 from xmodule.contentstore.django import contentstore
+from xmodule.modulestore.draft_and_published import BranchSettingMixin
+from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.util.django import get_current_request_hostname
 import xblock.reference.plugins
 
-# We may not always have the request_cache module available
+
 try:
+    # We may not always have the request_cache module available
     from request_cache.middleware import RequestCache
+
     HAS_REQUEST_CACHE = True
 except ImportError:
     HAS_REQUEST_CACHE = False
@@ -33,11 +39,64 @@ except ImportError:
 try:
     from xblock_django.user_service import DjangoXBlockUserService
     from crum import get_current_user
+
     HAS_USER_SERVICE = True
 except ImportError:
     HAS_USER_SERVICE = False
 
+log = logging.getLogger(__name__)
 ASSET_IGNORE_REGEX = getattr(settings, "ASSET_IGNORE_REGEX", r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)")
+
+
+class SignalHandler(object):
+    """
+    This class is to allow the modulestores to emit signals that can be caught
+    by other parts of the Django application. If your app needs to do something
+    every time a course is published (e.g. search indexing), you can listen for
+    that event and kick off a celery task when it happens.
+
+    To listen for a signal, do the following::
+
+        from django.dispatch import receiver
+        from celery.task import task
+        from xmodule.modulestore.django import modulestore, SignalHandler
+
+        @receiver(SignalHandler.course_published)
+        def listen_for_course_publish(sender, course_key, **kwargs):
+            do_my_expensive_update.delay(course_key)
+
+        @task()
+        def do_my_expensive_update(course_key):
+            # ...
+
+    Things to note:
+
+    1. We receive using the Django Signals mechanism.
+    2. The sender is going to be the class of the modulestore sending it.
+    3. Always have **kwargs in your signal handler, as new things may be added.
+    4. The thing that listens for the signal lives in process, but should do
+       almost no work. Its main job is to kick off the celery task that will
+       do the actual work.
+
+    """
+    course_published = django.dispatch.Signal(providing_args=["course_key"])
+
+    _mapping = {
+        "course_published": course_published
+    }
+
+    def __init__(self, modulestore_class):
+        self.modulestore_class = modulestore_class
+
+    def send(self, signal_name, **kwargs):
+        """
+        Send the signal to the receivers.
+        """
+        signal = self._mapping[signal_name]
+        responses = signal.send_robust(sender=self.modulestore_class, **kwargs)
+
+        for receiver, response in responses:
+            log.info('Sent %s signal to %s with kwargs %s. Response was: %s', signal_name, receiver, kwargs, response)
 
 
 def load_function(path):
@@ -59,6 +118,7 @@ def create_modulestore_instance(
         i18n_service=None,
         fs_service=None,
         user_service=None,
+        signal_handler=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options
@@ -104,6 +164,7 @@ def create_modulestore_instance(
         i18n_service=i18n_service or ModuleI18nService(),
         fs_service=fs_service or xblock.reference.plugins.FSService(),
         user_service=user_service or xb_user_service,
+        signal_handler=signal_handler or SignalHandler(class_),
         **_options
     )
 
@@ -149,6 +210,7 @@ class ModuleI18nService(object):
     i18n service.
 
     """
+
     def __getattr__(self, name):
         return getattr(django.utils.translation, name)
 
@@ -166,6 +228,7 @@ class ModuleI18nService(object):
         # right there.  If you are reading this comment after April 1, 2014,
         # then Cale was a liar.
         from util.date_utils import strftime_localized
+
         return strftime_localized(*args, **kwargs)
 
 
@@ -177,6 +240,7 @@ def _get_modulestore_branch_setting():
 
     The value of the branch setting is cached in a thread-local variable so it is not repeatedly recomputed
     """
+
     def get_branch_setting():
         """
         Finds and returns the branch setting based on the Django request and the configuration settings

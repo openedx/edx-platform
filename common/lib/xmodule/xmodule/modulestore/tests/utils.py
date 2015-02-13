@@ -34,7 +34,8 @@ def create_modulestore_instance(
         options,
         i18n_service=None,
         fs_service=None,
-        user_service=None
+        user_service=None,
+        signal_handler=None,
 ):
     """
     This will return a new instance of a modulestore given an engine and options
@@ -47,6 +48,7 @@ def create_modulestore_instance(
     return class_(
         doc_store_config=doc_store_config,
         contentstore=contentstore,
+        signal_handler=signal_handler,
         **options
     )
 

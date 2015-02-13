@@ -4,6 +4,7 @@ Unit tests for the Mixed Modulestore, with DDT for the various stores (Split, Dr
 """
 from collections import namedtuple
 import datetime
+import logging
 import ddt
 import itertools
 import mimetypes
@@ -13,6 +14,7 @@ from uuid import uuid4
 # before importing the module
 # TODO remove this import and the configuration -- xmodule should not depend on django!
 from django.conf import settings
+from mock_django import mock_signal_receiver
 from nose.plugins.attrib import attr
 import pymongo
 from pytz import UTC
@@ -23,7 +25,7 @@ from xmodule.modulestore.tests.test_cross_modulestore_import_export import Mongo
 from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.xml_importer import import_from_xml
-from nose import SkipTest
+from xmodule.modulestore.django import SignalHandler
 
 if not settings.configured:
     settings.configure()
@@ -32,7 +34,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import BlockUsageLocator, CourseLocator, LibraryLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.exceptions import ItemNotFoundError, DuplicateCourseError, ReferentialIntegrityError, NoPathToItem
 from xmodule.modulestore.mixed import MixedModuleStore
 from xmodule.modulestore.search import path_to_location
@@ -41,6 +43,8 @@ from xmodule.modulestore.tests.factories import check_mongo_calls, check_exact_n
 from xmodule.modulestore.tests.utils import create_modulestore_instance, LocationMixin
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR, CourseComparisonTest
+
+log = logging.getLogger(__name__)
 
 
 @ddt.ddt
@@ -1960,134 +1964,74 @@ class TestMixedModuleStore(CourseComparisonTest):
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_import_delete_import(self, default):
-        """
-        Test that deleting an element after import and then re-importing restores that element in draft
-        as well as published branches (PLAT_297)
-        """
-        # set the default modulestore
+    def test_course_publish_signal_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
             self.store = MixedModuleStore(
                 contentstore=contentstore,
                 create_modulestore_instance=create_modulestore_instance,
                 mappings={},
+                signal_handler=SignalHandler(MixedModuleStore),
                 **self.OPTIONS
             )
             self.addCleanup(self.store.close_all_connections)
+
             with self.store.default_store(default):
-                dest_course_key = self.store.make_course_key('a', 'course', 'course')
-                courses = import_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
-                    static_content_store=contentstore,
-                    target_course_id=dest_course_key,
-                    create_course_if_not_present=True,
-                )
-                course_id = courses[0].id
-                # no need to verify course content here as test_cross_modulestore_import_export does that
-                # delete the vertical
-                vertical_loc = course_id.make_usage_key('vertical', 'vertical_test')
-                self.assertTrue(self.store.has_item(vertical_loc))
-                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-                    self.store.delete_item(vertical_loc, self.user_id)
-                # verify it's in the published still
-                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-                    self.assertTrue(self.store.has_item(vertical_loc))
+                self.assertIsNotNone(self.store.thread_cache.default_store.signal_handler)
 
-                # now re-import
-                import_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
-                    static_content_store=contentstore,
-                    target_course_id=dest_course_key,
-                )
-                # verify it's in both published and draft
-                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-                    self.assertTrue(self.store.has_item(vertical_loc))
-                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-                    self.assertTrue(self.store.has_item(vertical_loc))
+                with mock_signal_receiver(SignalHandler.course_published) as receiver:
+                    self.assertEqual(receiver.call_count, 0)
 
-    @ddt.data(ModuleStoreEnum.Type.split)  # Need to fix and add ModuleStoreEnum.Type.mongo,
-    def test_delete_dag(self, default):
-        """
-        Test that deleting an element with more than one parent fully removes it from the course.
-        """
-        # set the default modulestore
-        with MongoContentstoreBuilder().build() as contentstore:
-            self.store = MixedModuleStore(
-                contentstore=contentstore,
-                create_modulestore_instance=create_modulestore_instance,
-                mappings={},
-                **self.OPTIONS
-            )
-            self.addCleanup(self.store.close_all_connections)
-            with self.store.default_store(default):
-                dest_course_key = self.store.make_course_key('a', 'course', 'course')
-                courses = import_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['xml_dag'], load_error_modules=False,
-                    static_content_store=contentstore,
-                    target_course_id=dest_course_key,
-                    create_course_if_not_present=True,
-                )
-                course_id = courses[0].id
-                # ensure both parents point to the dag item
-                dag_item = course_id.make_usage_key('html', 'toyhtml')
-                one_parent = course_id.make_usage_key('vertical', 'vertical_test')
-                other_parent = course_id.make_usage_key('vertical', 'zeta')
-                with self.store.bulk_operations(course_id):
-                    # actually should test get_parent but it's not alphabetized yet
-                    self.assertEqual(self.store.get_parent_location(dag_item), one_parent)
-                    for parent_loc in [one_parent, other_parent]:
-                        parent = self.store.get_item(parent_loc)
-                        self.assertIn(dag_item, parent.children)
-                    # just testing draft branch assuming it doesn't matter which branch
-                    with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-                        self.store.delete_item(dag_item, self.user_id)
-                        for parent_loc in [one_parent, other_parent]:
-                            parent = self.store.get_item(parent_loc)
-                            self.assertNotIn(dag_item, parent.children)
+                    # Course creation and publication should fire the signal
+                    course = self.store.create_course('org_x', 'course_y', 'run_z', self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
 
-    @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
-    def test_import_edit_import(self, default):
-        """
-        Test that editing an element after import and then re-importing resets the draft and pub'd
-        to the imported pub'd value (PLAT-299)
-        """
-        if default == ModuleStoreEnum.Type.mongo:
-            raise SkipTest
-        # set the default modulestore
-        with MongoContentstoreBuilder().build() as contentstore:
-            self.store = MixedModuleStore(
-                contentstore=contentstore,
-                create_modulestore_instance=create_modulestore_instance,
-                mappings={},
-                **self.OPTIONS
-            )
-            self.addCleanup(self.store.close_all_connections)
-            with self.store.default_store(default):
-                dest_course_key = self.store.make_course_key('a', 'course', 'course')
-                courses = import_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
-                    static_content_store=contentstore,
-                    target_course_id=dest_course_key,
-                    create_course_if_not_present=True,
-                )
-                course_id = courses[0].id
-                # no need to verify course content here as test_cross_modulestore_import_export does that
-                # delete the vertical
-                vertical_loc = course_id.make_usage_key('vertical', 'vertical_test')
-                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-                    vertical = self.store.get_item(vertical_loc)
-                    vertical.display_name = "4"
-                    self.store.update_item(vertical, self.user_id)
+                    course_key = course.id
 
-                # now re-import
-                import_from_xml(
-                    self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
-                    static_content_store=contentstore,
-                    target_course_id=dest_course_key,
-                )
-                # verify it's the same in both published and draft (toy has no drafts)
-                with self.store.branch_setting(ModuleStoreEnum.Branch.draft_preferred, course_id):
-                    draft_vertical = self.store.get_item(vertical_loc)
-                with self.store.branch_setting(ModuleStoreEnum.Branch.published_only, course_id):
-                    published_vertical = self.store.get_item(vertical_loc)
-                self.assertEqual(draft_vertical.display_name, published_vertical.display_name)
+                    # Test non-draftable block types. The block should be published with every change.
+                    categories = DIRECT_ONLY_CATEGORIES
+                    for block_type in categories:
+                        log.debug('Testing with block type %s', block_type)
+                        receiver.reset_mock()
+                        block = self.store.create_item(self.user_id, course_key, block_type)
+                        self.assertEqual(receiver.call_count, 1)
+
+                        block.display_name = block_type
+                        self.store.update_item(block, self.user_id)
+                        self.assertEqual(receiver.call_count, 2)
+
+                        self.store.publish(block.location, self.user_id)
+                        self.assertEqual(receiver.call_count, 3)
+
+                    # Test a draftable block type, which needs to be explicitly published.
+                    receiver.reset_mock()
+                    block = self.store.create_child(self.user_id, course.location, 'problem')
+                    self.assertEqual(receiver.call_count, 1)
+
+                    self.store.update_item(block, self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    self.store.publish(block.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 2)
+
+                    self.store.unpublish(block.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 3)
+
+                    self.store.delete_item(block.location, self.user_id)
+                    self.assertEqual(receiver.call_count, 4)
+
+                    # Test course re-runs
+                    receiver.reset_mock()
+                    dest_course_id = self.store.make_course_key("org.other", "course.other", "run.other")
+                    self.store.clone_course(course_key, dest_course_id, self.user_id)
+                    self.assertEqual(receiver.call_count, 1)
+
+                    # Test course imports
+                    # Note: The signal is fired once when the course is created and
+                    # a second time after the actual data import.
+                    receiver.reset_mock()
+                    import_from_xml(
+                        self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
+                        static_content_store=contentstore,
+                        create_course_if_not_present=True,
+                    )
+                    self.assertEqual(receiver.call_count, 2)

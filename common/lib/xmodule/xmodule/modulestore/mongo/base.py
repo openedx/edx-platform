@@ -448,13 +448,17 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
         # ensure it starts clean
         bulk_ops_record.dirty = False
 
-    def _end_outermost_bulk_operation(self, bulk_ops_record, course_id):
+    def _end_outermost_bulk_operation(self, bulk_ops_record, course_id, emit_signals=True):
         """
         Restart updating the meta-data inheritance cache for the given course.
         Refresh the meta-data inheritance cache now since it was temporarily disabled.
         """
         if bulk_ops_record.dirty:
             self.refresh_cached_metadata_inheritance_tree(course_id)
+
+            if emit_signals and self.signal_handler:
+                self.signal_handler.send("course_published", course_key=course_id)
+
             bulk_ops_record.dirty = False  # brand spanking clean now
 
     def _is_in_bulk_operation(self, course_id, ignore_case=False):
@@ -504,6 +508,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
                  i18n_service=None,
                  fs_service=None,
                  user_service=None,
+                 signal_handler=None,
                  retry_wait_time=0.1,
                  **kwargs):
         """
@@ -560,6 +565,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         self.user_service = user_service
 
         self._course_run_cache = {}
+        self.signal_handler = signal_handler
 
     def close_connections(self):
         """
@@ -1117,14 +1123,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         if courses.count() > 0:
             raise DuplicateCourseError(course_id, courses[0]['_id'])
 
-        xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
+        with self.bulk_operations(course_id):
+            xblock = self.create_item(user_id, course_id, 'course', course_id.run, fields=fields, **kwargs)
 
-        # create any other necessary things as a side effect
-        super(MongoModuleStore, self).create_course(
-            org, course, run, user_id, runtime=xblock.runtime, **kwargs
-        )
+            # create any other necessary things as a side effect
+            super(MongoModuleStore, self).create_course(
+                org, course, run, user_id, runtime=xblock.runtime, **kwargs
+            )
 
-        return xblock
+            return xblock
 
     def create_xblock(
         self, runtime, course_key, block_type, block_id=None, fields=None,
@@ -1305,6 +1312,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         is_publish_root: when publishing, this indicates whether xblock is the root of the publish and should
           therefore propagate subtree edit info up the tree
         """
+        course_key = xblock.location.course_key
+
         try:
             definition_data = self._serialize_scope(xblock, Scope.content)
             now = datetime.now(UTC)
@@ -1356,8 +1365,8 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         except ItemNotFoundError:
             if not allow_not_found:
                 raise
-            elif not self.has_course(xblock.location.course_key):
-                raise ItemNotFoundError(xblock.location.course_key)
+            elif not self.has_course(course_key):
+                raise ItemNotFoundError(course_key)
 
         return xblock
 

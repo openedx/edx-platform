@@ -118,7 +118,10 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
     def update_item(self, descriptor, user_id, allow_not_found=False, force=False, **kwargs):
         old_descriptor_locn = descriptor.location
         descriptor.location = self._map_revision_to_branch(old_descriptor_locn)
-        with self.bulk_operations(descriptor.location.course_key):
+        emit_signals = descriptor.location.branch == ModuleStoreEnum.BranchName.published \
+            or descriptor.location.block_type in DIRECT_ONLY_CATEGORIES
+
+        with self.bulk_operations(descriptor.location.course_key, emit_signals=emit_signals):
             item = super(DraftVersioningModuleStore, self).update_item(
                 descriptor,
                 user_id,
@@ -139,7 +142,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         See :py:meth `ModuleStoreDraftAndPublished.create_item`
         """
         course_key = self._map_revision_to_branch(course_key)
-        with self.bulk_operations(course_key):
+        emit_signals = course_key.branch == ModuleStoreEnum.BranchName.published \
+            or block_type in DIRECT_ONLY_CATEGORIES
+        with self.bulk_operations(course_key, emit_signals=emit_signals):
             item = super(DraftVersioningModuleStore, self).create_item(
                 user_id, course_key, block_type, block_id=block_id,
                 definition_locator=definition_locator, fields=fields,

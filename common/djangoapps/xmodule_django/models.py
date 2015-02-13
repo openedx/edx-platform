@@ -99,7 +99,8 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return None
 
-        assert isinstance(value, (basestring, self.KEY_CLASS))
+        assert isinstance(value, (basestring, self.KEY_CLASS)), \
+            "%s is not an instance of basestring or %s" % (value, self.KEY_CLASS)
         if value == '':
             # handle empty string for models being created w/o fields populated
             return None
@@ -123,7 +124,7 @@ class OpaqueKeyField(models.CharField):
         if value is self.Empty or value is None:
             return ''  # CharFields should use '' as their empty value, rather than None
 
-        assert isinstance(value, self.KEY_CLASS)
+        assert isinstance(value, self.KEY_CLASS), "%s is not an instance of %s" % (value, self.KEY_CLASS)
         return unicode(_strip_value(value))
 
     def validate(self, value, model_instance):

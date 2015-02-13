@@ -108,6 +108,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             fs_service=None,
             user_service=None,
             create_modulestore_instance=None,
+            signal_handler=None,
             **kwargs
     ):
         """
@@ -142,6 +143,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                     for course_key, store_key in self.mappings.iteritems()
                     if store_key == key
                 ]
+
             store = create_modulestore_instance(
                 store_settings['ENGINE'],
                 self.contentstore,
@@ -150,6 +152,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
                 i18n_service=i18n_service,
                 fs_service=fs_service,
                 user_service=user_service,
+                signal_handler=signal_handler,
             )
             # replace all named pointers to the store into actual pointers
             for course_key, store_name in self.mappings.iteritems():
@@ -634,6 +637,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             * copy the assets
             * migrate the courseware
         """
+
         source_modulestore = self._get_modulestore_for_courselike(source_course_id)
         # for a temporary period of time, we may want to hardcode dest_modulestore as split if there's a split
         # to have only course re-runs go to split. This code, however, uses the config'd priority
@@ -643,9 +647,9 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
 
         if dest_modulestore.get_modulestore_type() == ModuleStoreEnum.Type.split:
             split_migrator = SplitMigrator(dest_modulestore, source_modulestore)
-            split_migrator.migrate_mongo_course(
-                source_course_id, user_id, dest_course_id.org, dest_course_id.course, dest_course_id.run, fields, **kwargs
-            )
+            split_migrator.migrate_mongo_course(source_course_id, user_id, dest_course_id.org,
+                                                dest_course_id.course, dest_course_id.run, fields, **kwargs)
+
             # the super handles assets and any other necessities
             super(MixedModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
         else:
@@ -915,13 +919,13 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
             yield
 
     @contextmanager
-    def bulk_operations(self, course_id):
+    def bulk_operations(self, course_id, emit_signals=True):
         """
         A context manager for notifying the store of bulk operations.
         If course_id is None, the default store is used.
         """
         store = self._get_modulestore_for_courselike(course_id)
-        with store.bulk_operations(course_id):
+        with store.bulk_operations(course_id, emit_signals):
             yield
 
     def ensure_indexes(self):
