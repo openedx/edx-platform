@@ -730,8 +730,7 @@ def find_target_student_module(request, user_id, course_id, mod_id):
     )
     instance = get_module(user, request, usage_key, field_data_cache, grade_bucket_type='xqueue')
     if instance is None:
-        msg = "No module {0} for user {1}--access denied?".format(mod_id, user)
-        log.debug(msg)
+        log.error(u"No module %s for user %s -- access denied?", mod_id, user)
         raise Http404
     return instance
 
@@ -748,10 +747,12 @@ def xqueue_callback(request, course_id, userid, mod_id, dispatch):
     #               'xqueue_body'  : 'Message from grader'}
     for key in ['xqueue_header', 'xqueue_body']:
         if key not in data:
+            log.error(u"xqueue_callback missing %s", key)
             raise Http404
 
     header = json.loads(data['xqueue_header'])
     if not isinstance(header, dict) or 'lms_key' not in header:
+        log.error(u"xqueue_callback received invalid header: %s", header)
         raise Http404
 
     instance = find_target_student_module(request, userid, course_id, mod_id)
