@@ -132,7 +132,7 @@
                     ${_("Unlink")}
                   </a>
                 % else:
-                  <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD)}">
+                  <a href="${pipeline.get_login_url(state.provider.NAME, pipeline.AUTH_ENTRY_DASHBOARD, redirect_url='/')}">
                     ## Translators: clicking on this creates a link between a user's edX account and their account with an external authentication provider (like Google or LinkedIn).
                     ${_("Link")}
                   </a>
