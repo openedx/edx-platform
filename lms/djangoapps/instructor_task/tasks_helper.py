@@ -552,7 +552,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     course = get_course_by_id(course_id)
-    cohorts_header = ['Cohort Name'] if course.is_cohorted else []
+    cohorts_header = [u'Cohort Name'] if course.is_cohorted else []
 
     experiment_partitions = get_split_user_partitions(course.user_partitions)
     group_configs_header = [u'Experiment Group ({})'.format(partition.name) for partition in experiment_partitions]
@@ -560,7 +560,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     # Loop over all our students and build our CSV lists in memory
     header = None
     rows = []
-    err_rows = [["id", "username", "error_msg"]]
+    err_rows = [[u"id", u"username", u"error_msg"]]
     current_step = {'step': 'Calculating Grades'}
     for student, gradeset, err_msg in iterate_grades_for(course_id, enrolled_students):
         # Periodically update task status (this is a cache write)
@@ -574,7 +574,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             if not header:
                 header = [section['label'] for section in gradeset[u'section_breakdown']]
                 rows.append(
-                    ["id", "email", "username", "grade"] + header + cohorts_header + group_configs_header
+                    [u"id", u"email", u"username", u"grade"] + header + cohorts_header + group_configs_header
                 )
 
             percents = {
@@ -586,7 +586,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             cohorts_group_name = []
             if course.is_cohorted:
                 group = get_cohort(student, course_id, assign=False)
-                cohorts_group_name.append(group.name if group else '')
+                cohorts_group_name.append(group.name if group else u'')
 
             group_configs_group_names = []
             for partition in experiment_partitions:
@@ -599,15 +599,15 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             # without regard for the item they didn't have access to, so it's
             # possible for a student to have a 0.0 show up in their row but
             # still have 100% for the course.
-            row_percents = [percents.get(label, 0.0) for label in header]
+            row_percents = [unicode(percents.get(label, 0.0)) for label in header]
             rows.append(
-                [student.id, student.email, student.username, gradeset['percent']] +
+                [unicode(item) for item in [student.id, student.email, student.username, gradeset['percent']]] +
                 row_percents + cohorts_group_name + group_configs_group_names
             )
         else:
             # An empty gradeset means we failed to grade a student.
             task_progress.failed += 1
-            err_rows.append([student.id, student.username, err_msg])
+            err_rows.append([unicode(item) for item in [student.id, student.username, err_msg]])
 
     # By this point, we've got the rows we're going to stuff into our CSV files.
     current_step = {'step': 'Uploading CSVs'}
@@ -650,7 +650,18 @@ def upload_students_csv(_xmodule_instance_args, _entry_id, course_id, task_input
     task_progress.update_task_state(extra_meta=current_step)
 
     # Perform the upload
-    upload_csv_to_report_store(rows, 'student_profile_info', course_id, start_date)
+    # Note: values in each row are expected to be unicode, str, int, or
+    # None. When adding features that will get written out, make sure
+    # they can be coerced to unicode.
+    upload_csv_to_report_store(
+        [
+            [unicode(item) if item is not None else u'' for item in row]
+            for row in rows
+        ],
+        'student_profile_info',
+        course_id,
+        start_date
+    )
 
     return task_progress.update_task_state(extra_meta=current_step)
 
@@ -725,11 +736,11 @@ def cohort_students_and_upload(_xmodule_instance_args, _entry_id, course_id, tas
     task_progress.update_task_state(extra_meta=current_step)
 
     # Filter the output of `add_users_to_cohorts` in order to upload the result.
-    output_header = ['Cohort Name', 'Exists', 'Students Added', 'Students Not Found']
+    output_header = [u'Cohort Name', u'Exists', u'Students Added', u'Students Not Found']
     output_rows = [
         [
-            ','.join(status_dict.get(column_name, '')) if column_name == 'Students Not Found'
-            else status_dict[column_name]
+            unicode(','.join(status_dict.get(column_name, ''))) if column_name == 'Students Not Found'
+            else unicode(status_dict[column_name])
             for column_name in output_header
         ]
         for _cohort_name, status_dict in cohorts_status.iteritems()

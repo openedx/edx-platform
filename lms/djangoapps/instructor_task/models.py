@@ -12,6 +12,7 @@ file and check it in at the same time as your model changes. To do that,
 ASSUMPTIONS: modules have unique IDs, even across different module_types
 
 """
+from contracts import contract, new_contract
 from cStringIO import StringIO
 from gzip import GzipFile
 from uuid import uuid4
@@ -34,6 +35,11 @@ from xmodule_django.models import CourseKeyField
 # define custom states used by InstructorTask
 QUEUING = 'QUEUING'
 PROGRESS = 'PROGRESS'
+
+# This contract mandates a list of list of unicode objects.
+# It is currently used by store_rows methods to verify that we can
+# correctly encode unicode strings before writing out CSVs.
+new_contract('unicode_rows', 'list(list(unicode))')
 
 
 class InstructorTask(models.Model):
@@ -209,6 +215,7 @@ class ReportStore(object):
         elif storage_type.lower() == "localfs":
             return LocalFSReportStore.from_config()
 
+    @contract(rows='unicode_rows')
     def _get_utf8_encoded_rows(self, rows):
         """
         Given a list of `rows` containing unicode strings, return a
@@ -216,7 +223,7 @@ class ReportStore(object):
         compatibility.
         """
         for row in rows:
-            yield [unicode(item).encode('utf-8') for item in row]
+            yield [item.encode('utf-8') for item in row]
 
 
 class S3ReportStore(ReportStore):
@@ -305,6 +312,7 @@ class S3ReportStore(ReportStore):
             }
         )
 
+    @contract(rows='unicode_rows')
     def store_rows(self, course_id, filename, rows):
         """
         Given a `course_id`, `filename`, and `rows` (each row is an iterable of
@@ -386,6 +394,7 @@ class LocalFSReportStore(ReportStore):
         with open(full_path, "wb") as f:
             f.write(buff.getvalue())
 
+    @contract(rows='unicode_rows')
     def store_rows(self, course_id, filename, rows):
         """
         Given a course_id, filename, and rows (each row is an iterable of strings),
