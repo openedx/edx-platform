@@ -492,7 +492,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         self.assertEqual(actual, expected)
 
-    def test_can_get_correct_usage_info_when_special_characters_are_in_content(self):
+    def test_can_get_usage_info_when_special_characters_are_used(self):
         """
         Test if group configurations json updated successfully when special
          characters are being used in content experiment
