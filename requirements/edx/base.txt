@@ -149,4 +149,4 @@ git+https://github.com/mitocw/django-cas.git
 -e git+https://github.com/Stanford-Online/edx-submissions.git@346bee219e888e78c20bf8ce381bb37f40e86e08#egg=edx-submissions
 
 # XBlocks from PyPi
-xblock-image-modal >=0.1.0, <1.0.0
+xblock-image-modal >=0.1.2, <1.0.0
