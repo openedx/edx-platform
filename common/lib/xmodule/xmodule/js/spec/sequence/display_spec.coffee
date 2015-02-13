@@ -20,7 +20,8 @@ xdescribe 'Sequence', ->
       elements = $('#sequence-list li>a').map(-> $(this).attr('data-element')).get()
       titles = $('#sequence-list li>a>p').map(-> $(this).html()).get()
 
-      expect(classes).toEqual ['seq_video_active', 'seq_video_inactive', 'seq_problem_inactive']
+      # expect(classes).toEqual ['seq_video_active', 'seq_video_inactive', 'seq_problem_inactive']
+      expect(classes).toEqual ['active', 'inactive', 'visited']
       expect(elements).toEqual ['1', '2', '3']
       expect(titles).toEqual ['Video 1', 'Video 2', 'Sample Problem']
 
@@ -92,13 +93,15 @@ xdescribe 'Sequence', ->
           @sequence.render 1
 
         it 'mark the previous tab as visited', ->
-          expect($('[data-element="2"]')).toHaveClass 'seq_video_visited'
+          # expect($('[data-element="2"]')).toHaveClass 'seq_video_visited'
+          expect($('[data-element="2"]')).toHaveClass 'visited'
 
         it 'save the new position', ->
           expect($.postWithPrefix).toHaveBeenCalledWith '/modx/1/goto_position', position: 1
 
       it 'mark new tab as active', ->
-        expect($('[data-element="1"]')).toHaveClass 'seq_video_active'
+        # expect($('[data-element="1"]')).toHaveClass 'seq_video_active'
+        expect($('[data-element="1"]')).toHaveClass 'active'
 
       it 'render the new content', ->
         expect($('#seq_content').html()).toEqual 'Video 1'

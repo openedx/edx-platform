@@ -19,9 +19,9 @@
            data-page-title="${item['page_title']|h}"
            aria-controls="seq_contents_${idx}"
            id="tab_${idx}"
-           tabindex="0"
-           role="tab">
-            <p aria-hidden="false">${item['title']}</p>
+           tabindex="0">
+            <i class="icon fa seq_${item['type']}" aria-hidden="true"></i>
+            <p><span class="sr">${item['type']}</span> ${item['title']}</p>
           </a>
         </li>
         % endfor
@@ -30,12 +30,14 @@
     <button class="sequence-nav-button button-next">${_('Next')}</button>
   </div>
 
+  <div id="sr-is-focusable" tabindex="-1"></div>
+
   % for idx, item in enumerate(items):
   <div id="seq_contents_${idx}"
-       aria-labelledby="tab_${idx}"
-       aria-hidden="true"
-       class="seq_contents tex2jax_ignore asciimath2jax_ignore">
-     ${item['content'] | h}
+    aria-labelledby="tab_${idx}"
+    aria-hidden="true"
+    class="seq_contents tex2jax_ignore asciimath2jax_ignore">
+    ${item['content'] | h}
   </div>
   % endfor
   <div id="seq_content"></div>

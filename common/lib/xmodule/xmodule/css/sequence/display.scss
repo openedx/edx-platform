@@ -70,7 +70,7 @@ $sequence--border-color: #C8C8C8;
     position: relative;
     border: 1px solid $gray-l3;
     height: 44px;
-    margin: 0 ($baseline*1.5);
+    margin: 0 ($baseline*2);
     box-shadow: 0 1px 3px $shadow-l1 inset;
   }
 
@@ -105,6 +105,40 @@ $sequence--border-color: #C8C8C8;
         display: block;
         padding: 0;
         position: relative;
+        text-align: center;
+
+        .icon {
+          line-height: 42px; // This matches the height of the <a> it's within (the parent) to get vertical centering.
+          font-size: 90%;  // The icons at 100% are just a tad too big.
+          color: rgb(90, 90, 90);
+          -webkit-font-smoothing: antialiased; // Clear up the lines on the icons
+        }
+
+        &.inactive {
+
+          .icon {
+            color: rgb(90, 90, 90);
+          }
+        }
+
+        &.active {
+          @extend %ui-depth1;
+          background-color: $white;
+
+          .icon {
+            color: rgb(10, 10, 10);
+          }
+
+          &:hover, &:focus {
+            background-color: $white;
+            background-repeat: no-repeat;
+            background-position: center 14px;
+
+            .icon {
+              color: rgb(10, 10, 10);
+            }
+          }
+        }
 
         &:hover, &:focus {
           background-color: $white;
@@ -112,72 +146,39 @@ $sequence--border-color: #C8C8C8;
           background-position: center 14px;
         }
 
-        &.active {
-          @extend %ui-depth1;
-          background-color: $white;
-
-          &:hover, &:focus {
-            background-color: $white;
-            background-repeat: no-repeat;
-            background-position: center 14px;
-          }
-        }
-
         //video
         &.seq_video {
-          &.inactive {
-            background-image: url('../images/sequence-nav/video-icon-normal.png');
-          }
 
-          &.visited {
-            background-image: url('../images/sequence-nav/video-icon-visited.png');
-          }
-
-          &.active {
-            @extend .active;
-            background-image: url('../images/sequence-nav/video-icon-current.png');
+          .icon:before {
+            content: "\f008"; // .fa-film
           }
         }
 
         //other
         &.seq_other {
-          &.inactive {
-            background-image: url('../images/sequence-nav/document-icon-normal.png');
-          }
 
-          &.visited {
-            background-image: url('../images/sequence-nav/document-icon-visited.png');
-          }
-
-          &.active {
-            background-image: url('../images/sequence-nav/document-icon-current.png');
+          .icon:before {
+            content: "\f016"; // .fa-file-o
           }
         }
 
         //vertical & problems
         &.seq_vertical, &.seq_problem {
-          &.inactive {
-            background-image: url('../images/sequence-nav/list-icon-normal.png');
-          }
 
-          &.visited {
-            background-image: url('../images/sequence-nav/list-icon-visited.png');
-          }
-
-          &.active {
-            background-image: url('../images/sequence-nav/list-icon-current.png');
+          .icon:before {
+            content: "\f00b";  // .fa-tasks
           }
 
           &.progress-none {
-            background-image: url('../images/sequence-nav/list-unstarted.png');
+
           }
 
           &.progress-some, &.progress-in_progress {
-            background-image: url('../images/sequence-nav/list-unfinished.png');
+
           }
 
           &.progress-done {
-            background-image: url('../images/sequence-nav/list-finished.png');
+
           }
         }
 
