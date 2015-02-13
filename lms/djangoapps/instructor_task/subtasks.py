@@ -7,8 +7,8 @@ from uuid import uuid4
 import math
 import psutil
 from contextlib import contextmanager
+import logging
 
-from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, READY_STATES, RETRY
 import dogstats_wrapper as dog_stats_api
 
@@ -17,7 +17,7 @@ from django.core.cache import cache
 
 from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 
-TASK_LOG = get_task_logger(__name__)
+TASK_LOG = logging.getLogger('edx.celery.task')
 
 # Lock expiration should be long enough to allow a subtask to complete.
 SUBTASK_LOCK_EXPIRE = 60 * 10  # Lock expires in 10 minutes

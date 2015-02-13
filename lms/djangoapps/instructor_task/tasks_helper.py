@@ -7,9 +7,9 @@ import json
 from datetime import datetime
 from time import time
 import unicodecsv
+import logging
 
 from celery import Task, current_task
-from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
@@ -38,7 +38,7 @@ from student.models import CourseEnrollment
 
 
 # define different loggers for use within tasks and on client side
-TASK_LOG = get_task_logger(__name__)
+TASK_LOG = logging.getLogger('edx.celery.task')
 
 # define value to use when no task_id is provided:
 UNKNOWN_TASK_ID = 'unknown-task_id'
