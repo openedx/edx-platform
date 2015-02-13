@@ -32,20 +32,17 @@ var edx = edx || {};
         sync: function(method, model) {
             var headers = { 'X-CSRFToken': $.cookie('csrftoken') },
                 data = {},
-                analytics,
                 courseId = $.url( '?course_id' );
 
             // If there is a course ID in the query string param,
             // send that to the server as well so it can be included
             // in analytics events.
             if ( courseId ) {
-                analytics = JSON.stringify({
-                    enroll_course_id: decodeURIComponent( courseId )
-                });
+                data.course_id = decodeURIComponent(courseId);
             }
 
             // Include all form fields and analytics info in the data sent to the server
-            $.extend( data, model.attributes, { analytics: analytics });
+            $.extend( data, model.attributes);
 
             $.ajax({
                 url: model.urlRoot,

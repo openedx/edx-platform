@@ -1233,6 +1233,7 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertHttpOK(response)
+        self.assertIn(settings.EDXMKTG_COOKIE_NAME, self.client.cookies)
 
         # Verify that the user exists
         self.assertEqual(
