@@ -744,8 +744,10 @@ class GitLogs(TemplateView):
         except PageNotAnInteger:
             logs = paginator.page(1)
         except EmptyPage:
-            # If the page is too high
-            logs = paginator.page(paginator.num_pages)
+            # If the page is too high or low
+            given_page = int(request.GET.get('page'))
+            page = min(max(1, given_page), paginator.num_pages)
+            logs = paginator.page(page)
 
         mdb.disconnect()
         context = {

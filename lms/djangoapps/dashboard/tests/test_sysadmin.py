@@ -25,6 +25,7 @@ from xmodule.modulestore.tests.django_utils import (
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
+from datetime import datetime
 from external_auth.models import ExternalAuthMap
 from student.roles import CourseStaffRole, GlobalStaff
 from student.tests.factories import UserFactory
@@ -589,26 +590,32 @@ class TestSysAdminMongoCourseImport(SysadminBaseTestCase):
         """
 
         self._setstaff_login()
-        self._mkdir(getattr(settings, 'GIT_REPO_DIR'))
 
-        self._add_edx4edx()
+        mongoengine.connect(TEST_MONGODB_LOG['db'])
 
-        for page in [-1, 0, 1, 2, 'abc']:
-            # Test the page parameter in various different ways
+        for _ in xrange(15):
+            CourseImportLog(
+                course_id=SlashSeparatedCourseKey("test", "test", "test"),
+                location="location",
+                import_log="import_log",
+                git_log="git_log",
+                repo_dir="repo_dir",
+                created=datetime.now()
+            ).save()
+
+        for page, expected in [(-1, 1), (1, 1), (2, 2), (30, 2), ('abc', 1)]:
             response = self.client.get(
                 '{}?page={}'.format(
-                    reverse('gitlogs_detail', kwargs={
-                        'course_id': 'MITx/edx4edx/edx4edx'
-                    }),
+                    reverse('gitlogs'),
                     page
                 )
             )
             self.assertIn(
-                'Page 1 of 1',
+                'Page {} of 2'.format(expected),
                 response.content
             )
 
-        self._rm_edx4edx()
+        CourseImportLog.objects.delete()
 
     def test_gitlog_courseteam_access(self):
         """
