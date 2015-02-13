@@ -7,6 +7,7 @@ import random
 import json
 from time import sleep
 from collections import Counter
+import logging
 
 import dogstats_wrapper as dog_stats_api
 from smtplib import SMTPServerDisconnected, SMTPDataError, SMTPConnectError, SMTPException
@@ -24,7 +25,6 @@ from boto.ses.exceptions import (
 from boto.exception import AWSConnectionError
 
 from celery import task, current_task
-from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, FAILURE, RETRY
 from celery.exceptions import RetryTaskError
 
@@ -48,7 +48,7 @@ from instructor_task.subtasks import (
 )
 from util.query import use_read_replica_if_available
 
-log = get_task_logger(__name__)
+log = logging.getLogger('edx.celery.task')
 
 
 # Errors that an individual email is failing to be sent, and should just
