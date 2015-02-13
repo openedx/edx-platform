@@ -402,13 +402,18 @@ class SplitBulkWriteMixin(BulkOperationsMixin):
 
         bulk_write_record = self._get_bulk_ops_record(course_key)
         if bulk_write_record.active:
+            # Only query for the definitions that aren't already cached.
             for definition in bulk_write_record.definitions.values():
                 definition_id = definition.get('_id')
                 if definition_id in ids:
                     ids.remove(definition_id)
                     definitions.append(definition)
 
-        definitions.extend(self.db_connection.get_definitions(list(ids)))
+        # Query the db for the definitions.
+        defs_from_db = self.db_connection.get_definitions(list(ids))
+        # Add the retrieved definitions to the cache.
+        bulk_write_record.definitions.update({d.get('_id'): d for d in defs_from_db})
+        definitions.extend(defs_from_db)
         return definitions
 
     def update_definition(self, course_key, definition):
@@ -683,23 +688,29 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                     new_module_data
                 )
 
-            if not lazy:
-                # Load all descendants by id
+            # This code supports lazy loading, where the descendent definitions aren't loaded
+            # until they're actually needed.
+            # However, assume that depth == 0 means no depth is specified and depth != 0 means
+            # a depth *is* specified. If a non-zero depth is specified, force non-lazy definition
+            # loading in order to populate the definition cache for later access.
+            load_definitions_now = depth != 0 or not lazy
+            if load_definitions_now:
+                # Non-lazy loading: Load all descendants by id.
                 descendent_definitions = self.get_definitions(
                     course_key,
                     [
-                        block['definition']
+                        block.definition
                         for block in new_module_data.itervalues()
                     ]
                 )
-                # turn into a map
+                # Turn definitions into a map.
                 definitions = {definition['_id']: definition
                                for definition in descendent_definitions}
 
                 for block in new_module_data.itervalues():
                     if block.definition in definitions:
                         definition = definitions[block.definition]
-                        # convert_fields was being done here, but it gets done later in the runtime's xblock_from_json
+                        # convert_fields gets done later in the runtime's xblock_from_json
                         block.fields.update(definition.get('fields'))
                         block.definition_loaded = True
 

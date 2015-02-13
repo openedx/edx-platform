@@ -34,7 +34,7 @@ class TestAsidesXmlStore(TestCase):
         """
         Check that the xml modulestore read in all the asides with their values
         """
-        with XmlModulestoreBuilder().build(course_ids=['edX/aside_test/2012_Fall']) as store:
+        with XmlModulestoreBuilder().build(course_ids=['edX/aside_test/2012_Fall']) as (__, store):
             def check_block(block):
                 """
                 Check whether block has the expected aside w/ its fields and then recurse to the block's children
