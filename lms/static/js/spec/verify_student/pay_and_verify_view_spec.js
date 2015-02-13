@@ -13,7 +13,8 @@ define(['jquery', 'js/common_helpers/template_helpers', 'js/verify_student/views
                 'make_payment_step',
                 'payment_confirmation_step',
                 'review_photos_step',
-                'webcam_photo'
+                'webcam_photo',
+                'image_input'
             ];
 
             var INTRO_STEP = {
