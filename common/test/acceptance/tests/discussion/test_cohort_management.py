@@ -67,8 +67,7 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
-        membership_page = self.instructor_dashboard_page.select_membership()
-        self.cohort_management_page = membership_page.select_cohort_management_section()
+        self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
     def verify_cohort_description(self, cohort_name, expected_description):
         """
@@ -660,8 +659,7 @@ class CohortContentGroupAssociationTest(UniqueCourseTest, CohortTestMixin):
         # go to the membership page on the instructor dashboard
         self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         self.instructor_dashboard_page.visit()
-        membership_page = self.instructor_dashboard_page.select_membership()
-        self.cohort_management_page = membership_page.select_cohort_management_section()
+        self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
 
     def test_no_content_group_linked(self):
         """

@@ -154,8 +154,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         """
         instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
         instructor_dashboard_page.visit()
-        membership_page = instructor_dashboard_page.select_membership()
-        cohort_management_page = membership_page.select_cohort_management_section()
+        cohort_management_page = instructor_dashboard_page.select_cohort_management()
 
         def add_cohort_with_student(cohort_name, content_group, student):
             cohort_management_page.add_cohort(cohort_name, content_group=content_group)
