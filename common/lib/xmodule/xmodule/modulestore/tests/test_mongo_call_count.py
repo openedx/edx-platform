@@ -32,8 +32,8 @@ class CountMongoCallsXMLRoundtrip(TestCase):
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     @ddt.data(
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 287, 780, 702, 702),
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 37, 16, 190, 189),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 171, 691, 551, 551),
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 37, 16, 189, 189),
     )
     @ddt.unpack
     def test_import_export(self, store_builder, export_reads, import_reads, first_import_writes, second_import_writes):
@@ -87,10 +87,10 @@ class CountMongoCallsCourseTraversal(TestCase):
     """
 
     @ddt.data(
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, 189),  # The way this traversal *should* be done.
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, 387),     # The pathological case - do *not* query a course this way!
-        (MIXED_SPLIT_MODULESTORE_BUILDER, None, 7),  # The way this traversal *should* be done.
-        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, 145)    # The pathological case - do *not* query a course this way!
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, None, 147),  # The way this traversal *should* be done.
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 0, 357),     # The pathological case - do *not* query a course this way!
+        (MIXED_SPLIT_MODULESTORE_BUILDER, None, 144),  # The way this traversal *should* be done.
+        (MIXED_SPLIT_MODULESTORE_BUILDER, 0, 144)    # The pathological case - do *not* query a course this way!
     )
     @ddt.unpack
     def test_number_mongo_calls(self, store, depth, num_mongo_calls):
