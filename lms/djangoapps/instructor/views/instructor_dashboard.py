@@ -284,7 +284,6 @@ def _section_cohort_management(course, access):
         'section_key': 'cohort_management',
         'section_display_name': _('Cohort Management'),
         'access': access,
-        'cohorts_enabled': course.is_cohorted,
         'cohort_settings_url': reverse('cohort_settings', kwargs={'course_key_string': unicode(course_key)}),
         'cohorts_ajax_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
