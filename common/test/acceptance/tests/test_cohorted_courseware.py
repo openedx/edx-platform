@@ -47,7 +47,7 @@ class EndToEndCohortedCoursewareTest(ContainerBase):
         ).visit()
 
         # Create a student who will end up in the default cohort group
-        self.cohort_default_student_username = "cohort default student"
+        self.cohort_default_student_username = "cohort_default_student"
         self.cohort_default_student_email = "cohort_default_student@example.com"
         StudioAutoAuthPage(
             self.browser, username=self.cohort_default_student_username,
