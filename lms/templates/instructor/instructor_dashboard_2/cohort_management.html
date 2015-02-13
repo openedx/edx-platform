@@ -10,7 +10,6 @@
      data-advanced-settings-url="${section_data['advanced_settings_url']}"
      data-upload_cohorts_csv_url="${section_data['upload_cohorts_csv_url']}"
      data-cohort_settings_url="${section_data['cohort_settings_url']}"
-     data-cohorts-enabled="${section_data['cohorts_enabled']}"
 >
 </div>
 
@@ -20,13 +19,10 @@
     cohorted_user_partition = get_cohorted_user_partition(course.id)
     content_groups = cohorted_user_partition.groups if cohorted_user_partition else []
     %>
-    <script>
-    $(document).ready(function() {
-        var cohortManagementElement = $('.cohort-management');
-        if (cohortManagementElement.length > 0) {
-            var cohorts = new edx.groups.CohortCollection(),
-                cohortSettings = new edx.groups.CohortSettingsModel(),
-                cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            var cohortUserPartitionId = ${cohorted_user_partition.id if cohorted_user_partition else 'null'},
                 contentGroups = [
                     % for content_group in content_groups:
                         new edx.groups.ContentGroupModel({
@@ -36,26 +32,13 @@
                         }),
                     % endfor
                 ];
-            cohorts.url = cohortManagementElement.data('ajax_url');
-            cohortSettings.url = cohortManagementElement.data('cohort_settings_url');
-            var cohortsView = new edx.groups.CohortsView({
-                el: cohortManagementElement,
-                model: cohorts,
-                contentGroups: contentGroups,
-                cohortSettings: cohortSettings,
-                context: {
-                    uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
-                    studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
-                    studioGroupConfigurationsUrl: '${get_studio_url(course, 'group_configurations') | h}'
-                }
-            });
-            cohorts.fetch().done(function() {
-                cohortSettings.fetch().done(function() {
-                    cohortsView.render();
-                })
-            });
-        }
-    });
+
+            (function (require) {
+                require(['js/factories/cohorts_factory'], function (CohortsFactory) {
+                    CohortsFactory(contentGroups, '${get_studio_url(course, 'group_configurations') | h}');
+                });
+            }).call(this, require || RequireJS.require);
+        });
     </script>
 
 </%block>
