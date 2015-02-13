@@ -6,7 +6,7 @@
   cert_name_short = course.cert_name_short
   if cert_name_short == "":
     cert_name_short = settings.CERT_NAME_SHORT
-  
+
   cert_name_long = course.cert_name_long
   if cert_name_long == "":
     cert_name_long = settings.CERT_NAME_LONG
@@ -53,13 +53,13 @@ else:
       <li class="action action-certificate">
       <a class="btn" href="${cert_status['download_url']}"
          title="${_('This link will open/download a PDF document')}">
-         ${_("Download Your {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
+         ${_("Download {cert_name_short} (PDF)").format(cert_name_short=cert_name_short,)}</a></li>
 
          % if cert_status['linked_in_url']:
-           <li class="action action-certificate">
+           <li class="action action-share">
            <a class="btn" target="_blank" href="${cert_status['linked_in_url']}"
-             title="${_('Add to LinkedIn Profile')}">
-             ${_("Add Certificate to LinkedIn.")}</a></li>
+             title="${_('Add Certificate to LinkedIn Profile')}">
+             ${_("Share on LinkedIn")}</a></li>
           % endif
 
     % elif cert_status['show_download_url'] and enrollment.mode == 'verified' and cert_status['mode'] == 'honor':

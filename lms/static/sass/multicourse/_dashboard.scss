@@ -901,11 +901,51 @@
       }
 
       &.course-status-certavailable {
+        background-color: $gray-l5;
+        border: 0;
 
-        .action-certificate {
+        .message-copy {
+          width: flex-grid(6, 12);
+          position: relative;
+          float: left;
+        }
 
-          .btn {
+        .actions {
+          width: flex-grid(6, 12);
+          position: relative;
+          @include float(right);
+
+          .action {
+            @include margin(0, 0, ($baseline/2), ($baseline*.75));
+            float: none;
+            text-align: center;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .btn {
+              float: none;
+            }
+          }
+
+          .action-certificate .btn {
             @extend %btn-inherited-primary;
+            @include box-sizing(border-box);
+            float: none;
+            border-radius: 3px;
+            display: block;
+            @include padding(7px, ($baseline*.75), 7px, ($baseline*.75));
+            text-align: center;
+
+            a:link, a:visited {
+              color: #fff;
+            }
+          }
+
+          .action-share .btn {
+            display: inline;
+            letter-spacing: 0;
           }
         }
       }

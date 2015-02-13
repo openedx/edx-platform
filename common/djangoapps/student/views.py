@@ -354,30 +354,16 @@ def _cert_info(user, course, cert_status, course_mode):
         else:
             status_dict['download_url'] = cert_status['download_url']
 
-            # getting linkedin URL and then pass the params which appears
-            # on user profile. if linkedin config is empty don't show the button.
-
-            modes_dict = {
-                "honor": "Honor Code Certificate",
-                "verified": "Verified Certificate",
-                "professional": "Professional Certificate",
-            }
-
-            certification_name = u'{type} for {course_name}'.format(
-                type=modes_dict.get(course_mode, "Certificate"), course_name=course.display_name
-            ).encode('utf-8')
-
-            params_dict = {
-                'pfCertificationName': certification_name,
-                'pfCertificationUrl': cert_status['download_url'],
-            }
-
-            # following method will construct and return url if current enabled config exists otherwise return None
-            # In case of None linked-in-button will not appear on dashboard.
-
-            status_dict['linked_in_url'] = LinkedInAddToProfileConfiguration.linked_in_dashboard_tracking_code_url(
-                params_dict
-            )
+            # If enabled, show the LinkedIn "add to profile" button
+            # Clicking this button sends the user to LinkedIn where they
+            # can add the certificate information to their profile.
+            linkedin_config = LinkedInAddToProfileConfiguration.current()
+            if linkedin_config.enabled:
+                status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
+                    course.display_name,
+                    cert_status.get('mode'),
+                    cert_status['download_url']
+                )
 
     if status in ('generating', 'ready', 'notpassing', 'restricted'):
         if 'grade' not in cert_status:

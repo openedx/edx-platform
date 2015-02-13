@@ -16,13 +16,13 @@ import json
 import logging
 from pytz import UTC
 import uuid
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import dogstats_wrapper as dog_stats_api
 from django.db.models import Q
 import pytz
 from urllib import urlencode
 
-from django.utils.translation import ugettext_lazy
+from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -1442,28 +1442,56 @@ class DashboardConfiguration(ConfigurationModel):
 class LinkedInAddToProfileConfiguration(ConfigurationModel):
     """
     LinkedIn Add to Profile Configuration
+
+    This configuration enables the "Add to Profile" LinkedIn
+    button on the student dashboard.  The button appears when
+    users have a certificate available; when clicked,
+    users are sent to the LinkedIn site with a pre-filled
+    form allowing them to add the certificate to their
+    LinkedIn profile.
     """
-    # tracking code field
-    dashboard_tracking_code = models.TextField(
-        blank=True,
+
+    MODE_TO_CERT_NAME = {
+        "honor": ugettext_lazy(u"{platform_name} Honor Code Certificate for {course_name}"),
+        "verified": ugettext_lazy(u"{platform_name} Verified Certificate for {course_name}"),
+        "professional": ugettext_lazy(u"{platform_name} Professional Certificate for {course_name}"),
+    }
+
+    company_identifier = models.TextField(
         help_text=ugettext_lazy(
-            u"A dashboard tracking code field for LinkedIn Add-to-profile Certificates. "
+            u"The company identifier for the LinkedIn Add-to-Profile button "
             u"e.g 0_0dPSPyS070e0HsE9HNz_13_d11_"
         )
     )
 
-    @classmethod
-    def linked_in_dashboard_tracking_code_url(cls, params):
-        """
-        Get the linked-in Configuration.
-        """
-        config = cls.current()
-        if config.enabled:
-            return u'http://www.linkedin.com/profile/add?_ed={tracking_code}&{params}'.format(
-                tracking_code=config.dashboard_tracking_code,
-                params=urlencode(params)
-            )
-        return None
+    def add_to_profile_url(self, course_name, enrollment_mode, cert_url, source="o"):
+        """Construct the URL for the "add to profile" button.
 
-    def __unicode__(self):
-        return self.dashboard_tracking_code
+        Arguments:
+            course_name (unicode): The display name of the course.
+            enrollment_mode (str): The enrollment mode of the user (e.g. "verified", "honor", "professional")
+            cert_url (str): The download URL for the certificate.
+
+        Keyword Arguments:
+            source (str): Either "o" (for onsite/UI), "e" (for emails), or "m" (for mobile)
+
+        """
+        params = OrderedDict([
+            ('_ed', self.company_identifier),
+            ('pfCertificationName', self._cert_name(course_name, enrollment_mode).encode('utf-8')),
+            ('pfCertificationUrl', cert_url),
+            ('source', source)
+        ])
+        return u'http://www.linkedin.com/profile/add?{params}'.format(
+            params=urlencode(params)
+        )
+
+    def _cert_name(self, course_name, enrollment_mode):
+        """Name of the certification, for display on LinkedIn. """
+        return self.MODE_TO_CERT_NAME.get(
+            enrollment_mode,
+            _(u"{platform_name} Certificate for {course_name}")
+        ).format(
+            platform_name=settings.PLATFORM_NAME,
+            course_name=course_name
+        )
