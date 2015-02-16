@@ -17,8 +17,7 @@ if Backbone?
       discussion = new Discussion(threads, {pages: thread_pages, sort: sort_preference})
       course_settings = new DiscussionCourseSettings(element.data("course-settings"))
       if Backbone.History.started
-        # TODO: hardcoded route - replace with relative path based on current URL and existing history.root
-        DiscussionUtil.route_prefix = "courses/#{$$course_id}/discussion"
+        DiscussionUtil.route_prefix = DiscussionUtil.getHistoryPath(window.location.pathname, Backbone.History.root)
       new DiscussionRouter({discussion: discussion, course_settings: course_settings})
       if !Backbone.History.started
         Backbone.history.start({pushState: true, root: "/courses/#{$$course_id}/discussion/forum/"})
