@@ -8,7 +8,7 @@ import os
 from path import path
 import sys
 import mock
- 
+
 MOCK_MODULES = ['lxml', 'requests', 'xblock', 'fields', 'xblock.fields',
 'frament', 'xblock.fragment', 'webob', 'multidict', 'webob.multidict', 'core',
 'xblock.core', 'runtime', 'xblock.runtime', 'sortedcontainers', 'contracts',

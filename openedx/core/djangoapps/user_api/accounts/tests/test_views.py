@@ -20,17 +20,12 @@ class TestAccountAPI(APITestCase):
 
     def setUp(self):
         super(TestAccountAPI, self).setUp()
-
         self.anonymous_client = APIClient()
-
         self.different_user = UserFactory.create(password=TEST_PASSWORD)
         self.different_client = APIClient()
-
         self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
         self.staff_client = APIClient()
-
         self.user = UserFactory.create(password=TEST_PASSWORD)
-        
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     def test_get_account_anonymous_user(self):
