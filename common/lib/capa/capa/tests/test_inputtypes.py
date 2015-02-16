@@ -72,10 +72,10 @@ class OptionInputTest(unittest.TestCase):
     def test_option_parsing(self):
         f = inputtypes.OptionInput.parse_options
 
-        def check(input, options):
+        def check(input_value, options):
             """Take list of options, confirm that output is in the silly doubled format"""
             expected = [(o, o) for o in options]
-            self.assertEqual(f(input), expected)
+            self.assertEqual(f(input_value), expected)
 
         check("('a','b')", ['a', 'b'])
         check("('a', 'b')", ['a', 'b'])

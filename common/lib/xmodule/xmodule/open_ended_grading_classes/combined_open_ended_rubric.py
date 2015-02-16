@@ -332,8 +332,11 @@ class CombinedOpenEndedRubric(object):
         score_tuples = []
         for i in xrange(0, len(score_lists)):
             for j in xrange(0, len(score_lists[i])):
-                tuple = [1, j, score_lists[i][j], [], []]
-                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(score_tuples, tuple)
+                score_tuple = [1, j, score_lists[i][j], [], []]
+                score_tuples, tup_ind = CombinedOpenEndedRubric.check_for_tuple_matches(
+                    score_tuples,
+                    score_tuple,
+                )
                 score_tuples[tup_ind][0] += 1
                 score_tuples[tup_ind][3].append(score_type_list[i])
                 score_tuples[tup_ind][4].append(feedback_type_list[i])

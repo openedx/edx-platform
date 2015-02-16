@@ -201,8 +201,8 @@ class SingleSectionGrader(CourseGrader):
     If the name is not appropriate for the short short_label or category, they each may
     be specified individually.
     """
-    def __init__(self, type, name, short_label=None, category=None):
-        self.type = type
+    def __init__(self, format_type, name, short_label=None, category=None):
+        self.type = format_type
         self.name = name
         self.short_label = short_label or name
         self.category = category or name
@@ -279,9 +279,19 @@ class AssignmentFormatGrader(CourseGrader):
     min_count = 2 would produce the labels "Assignment 3", "Assignment 4"
 
     """
-    def __init__(self, type, min_count, drop_count, category=None, section_type=None, short_label=None,
-                 show_only_average=False, hide_average=False, starting_index=1):
-        self.type = type
+    def __init__(
+            self,
+            format_type,
+            min_count,
+            drop_count,
+            category=None,
+            section_type=None,
+            short_label=None,
+            show_only_average=False,
+            hide_average=False,
+            starting_index=1,
+    ):
+        self.type = format_type
         self.min_count = min_count
         self.drop_count = drop_count
         self.category = category or self.type

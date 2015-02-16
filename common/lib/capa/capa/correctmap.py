@@ -125,15 +125,17 @@ class CorrectMap(object):
         # if not correct and no points have been assigned, return 0
         return 0
 
-    def set_property(self, answer_id, property, value):
+    def set_property(self, answer_id, key, value):
         if answer_id in self.cmap:
-            self.cmap[answer_id][property] = value
+            self.cmap[answer_id][key] = value
         else:
-            self.cmap[answer_id] = {property: value}
+            self.cmap[answer_id] = {
+                key: value,
+            }
 
-    def get_property(self, answer_id, property, default=None):
+    def get_property(self, answer_id, key, default=None):
         if answer_id in self.cmap:
-            return self.cmap[answer_id].get(property, default)
+            return self.cmap[answer_id].get(key, default)
         return default
 
     def get_correctness(self, answer_id):

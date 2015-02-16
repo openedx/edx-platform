@@ -159,10 +159,10 @@ class CyberSourceTests(TestCase):
         """
         Tests the processor exception html message
         """
-        for type in [CCProcessorSignatureException, CCProcessorWrongAmountException, CCProcessorDataException]:
-            error_msg = "An exception message of with exception type {0}".format(str(type))
-            exception = type(error_msg)
-            html = get_processor_exception_html(exception)
+        for exception_type in [CCProcessorSignatureException, CCProcessorWrongAmountException, CCProcessorDataException]:
+            error_msg = "An exception message of with exception type {0}".format(str(exception_type))
+            exception = exception_type(error_msg)
+            html = get_processor_exception_html(exception_type)
             self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, html)
             self.assertIn('Sorry!', html)
             self.assertIn(error_msg, html)

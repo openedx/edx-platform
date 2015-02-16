@@ -115,14 +115,14 @@ class LoncapaProblem(object):
     Main class for capa Problems.
     """
 
-    def __init__(self, problem_text, id, capa_system, state=None, seed=None):
+    def __init__(self, problem_text, problem_id, capa_system, state=None, seed=None):
         """
         Initializes capa Problem.
 
         Arguments:
 
             problem_text (string): xml defining the problem.
-            id (string): identifier for this problem, often a filename (no spaces).
+            problem_id (string): identifier for this problem, often a filename (no spaces).
             capa_system (LoncapaSystem): LoncapaSystem instance which provides OS,
                 rendering, user context, and other resources.
             state (dict): containing the following keys:
@@ -137,7 +137,7 @@ class LoncapaProblem(object):
 
         ## Initialize class variables from state
         self.do_reset()
-        self.problem_id = id
+        self.problem_id = problem_id
         self.capa_system = capa_system
 
         state = state or {}
@@ -600,20 +600,20 @@ class LoncapaProblem(object):
         # find additional comma-separated modules search path
         path = []
 
-        for dir in raw_path:
-            if not dir:
+        for directory in raw_path:
+            if not directory:
                 continue
 
-            # path is an absolute path or a path relative to the data dir
-            dir = os.path.join(self.capa_system.filestore.root_path, dir)
+            # path is an absolute path or a path relative to the data directory
+            directory = os.path.join(self.capa_system.filestore.root_path, directory)
             # Check that we are within the filestore tree.
-            reldir = os.path.relpath(dir, self.capa_system.filestore.root_path)
-            if ".." in reldir:
-                log.warning("Ignoring Python directory outside of course: %r", dir)
+            directory_relative = os.path.relpath(directory, self.capa_system.filestore.root_path)
+            if '..' in directory_relative:
+                log.warning("Ignoring Python directory outside of course: %r", directory)
                 continue
 
-            abs_dir = os.path.normpath(dir)
-            path.append(abs_dir)
+            directory_absolute = os.path.normpath(directory)
+            path.append(directory_absolute)
 
         return path
 

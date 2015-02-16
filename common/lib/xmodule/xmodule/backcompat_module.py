@@ -22,14 +22,14 @@ def process_includes(fn):
         next_include = xml_object.find('include')
         while next_include is not None:
             system.error_tracker("WARNING: the <include> tag is deprecated, and will go away.")
-            file = next_include.get('file')
+            path_file = next_include.get('file')
             parent = next_include.getparent()
 
-            if file is None:
+            if path_file is None:
                 continue
 
             try:
-                ifp = system.resources_fs.open(file)
+                ifp = system.resources_fs.open(path_file)
                 # read in and convert to XML
                 incxml = etree.XML(ifp.read())
 

@@ -95,8 +95,8 @@ class Model(object):
         return tags
 
     @classmethod
-    def find(cls, id):
-        return cls(id=id)
+    def find(cls, identifier):
+        return cls(id=identifier)
 
     def _update_from_response(self, response_data):
         for k, v in response_data.items():

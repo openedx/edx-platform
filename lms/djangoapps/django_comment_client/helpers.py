@@ -19,8 +19,11 @@ def include_mustache_templates():
     def process_mako(template_content):
         return Template(template_content).render_unicode()
 
-    def make_script_tag(id, content):
-        return u"<script type='text/template' id='{0}'>{1}</script>".format(id, content)
+    def make_script_tag(identifier, content):
+        return u"<script type='text/template' id='{0}'>{1}</script>".format(
+            identifier,
+            content,
+        )
 
     return u'\n'.join(
         make_script_tag(template_id_from_file_name(file_name), process_mako(read_file(file_name)))

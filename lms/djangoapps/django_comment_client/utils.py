@@ -145,13 +145,18 @@ def get_discussion_category_map(course):
     cohorted_discussion_ids = course.cohorted_discussions
 
     for module in modules:
-        id = module.discussion_id
+        discussion_id = module.discussion_id
         title = module.discussion_target
         sort_key = module.sort_key
         category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
         #Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
-        unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
+        unexpanded_category_map[category].append({
+            'id': discussion_id,
+            'sort_key': sort_key,
+            'start_date': entry_start_date,
+            'title': title,
+        })
 
     category_map = {"entries": defaultdict(dict), "subcategories": defaultdict(dict)}
     for category_path, entries in unexpanded_category_map.items():
