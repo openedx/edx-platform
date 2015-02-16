@@ -286,7 +286,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         return [rubric_scores]
 
 
-class SelfAssessmentDescriptor():
+class SelfAssessmentDescriptor(object):
     """
     Module for adding self assessment questions to courses
     """

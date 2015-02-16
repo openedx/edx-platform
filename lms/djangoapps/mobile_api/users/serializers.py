@@ -80,7 +80,7 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
         else:
             return {}
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = CourseEnrollment
         fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
@@ -96,7 +96,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field='username'
     )
 
-    class Meta:  # pylint: disable=missing-docstring
+    class Meta(object):  # pylint: disable=missing-docstring
         model = User
         fields = ('id', 'username', 'email', 'name', 'course_enrollments')
         lookup_field = 'username'

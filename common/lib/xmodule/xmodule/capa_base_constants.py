@@ -4,7 +4,7 @@ Constants for capa_base problems
 """
 
 
-class SHOWANSWER:
+class SHOWANSWER(object):
     """
     Constants for when to show answer
     """
@@ -18,7 +18,7 @@ class SHOWANSWER:
     NEVER = "never"
 
 
-class RANDOMIZATION:
+class RANDOMIZATION(object):
     """
     Constants for problem randomization
     """

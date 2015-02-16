@@ -114,7 +114,7 @@ class GeneratedCertificate(models.Model):
         auto_now=True, default=datetime.now)
     error_reason = models.CharField(max_length=512, blank=True, default='')
 
-    class Meta:
+    class Meta(object):
         unique_together = (('user', 'course_id'),)
 
     @classmethod
