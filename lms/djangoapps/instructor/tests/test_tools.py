@@ -148,7 +148,7 @@ class TestGetUnitsWithDueDate(ModuleStoreTestCase):
         week1 = ItemFactory.create(due=due, parent=course)
         week2 = ItemFactory.create(due=due, parent=course)
 
-        homework = ItemFactory.create(
+        ItemFactory.create(
             parent=week1,
             due=due
         )
