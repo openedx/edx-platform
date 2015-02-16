@@ -92,7 +92,7 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_queryset(user_id, to_option, course_id, course_location):
+def _get_recipient_queryset(user_id, to_option, course_id):
     """
     Returns a query set of email recipients corresponding to the requested to_option category.
 
@@ -230,7 +230,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         )
         return new_subtask
 
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
+    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id)
     recipient_fields = ['profile__name', 'email']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",

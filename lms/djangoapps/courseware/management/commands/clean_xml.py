@@ -45,7 +45,7 @@ def export(course, export_dir):
     return False
 
 
-def import_with_checks(course_dir, verbose=True):
+def import_with_checks(course_dir):
     all_ok = True
 
     print "Attempting to load '{0}'".format(course_dir)
