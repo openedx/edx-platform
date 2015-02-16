@@ -83,5 +83,3 @@ project = u'edX Platform API Version 0.5 Alpha'
 copyright = u'2015, edX'
 
 exclude_patterns = ['build', 'links.rst']
-
-

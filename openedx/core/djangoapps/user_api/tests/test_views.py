@@ -1602,4 +1602,3 @@ class UpdateEmailOptInTestCase(ApiTestCase, ModuleStoreTestCase):
         self.assertHttpBadRequest(response)
         with self.assertRaises(UserOrgTag.DoesNotExist):
             UserOrgTag.objects.get(user=self.user, org=self.course.id.org, key="email-optin")
-
