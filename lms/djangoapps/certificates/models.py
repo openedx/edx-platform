@@ -1,13 +1,3 @@
-from django.contrib.auth.models import User
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.conf import settings
-from datetime import datetime
-from model_utils import Choices
-from xmodule_django.models import CourseKeyField, NoneToEmptyManager
-from util.milestones_helpers import fulfill_course_milestone
-
 """
 Certificates are created for a student and an offering of a course.
 
@@ -54,6 +44,16 @@ Eligibility:
        then the student will be issued a certificate regardless of his grade,
        unless he has allow_certificate set to False.
 """
+
+from django.contrib.auth.models import User
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.conf import settings
+from datetime import datetime
+from model_utils import Choices
+from xmodule_django.models import CourseKeyField, NoneToEmptyManager
+from util.milestones_helpers import fulfill_course_milestone
 
 
 class CertificateStatuses(object):
