@@ -13,6 +13,7 @@ $ ->
 
 class @DiscussionUtil
 
+  @relative_path_regex = /(.*)\/.*\/threads\/.*$/
   @baseUrl = ''
   @wmdEditors: {}
 
@@ -361,3 +362,10 @@ class @DiscussionUtil
       rightdots: maxPage < numPages-1
       first: if minPage > 1 then pageInfo(1) else null
       last: if maxPage < numPages then pageInfo(numPages) else null
+
+  @getHistoryPath: (path, current_history_root) =>
+    if path.indexOf(current_history_root) == 0
+      path = path.replace(current_history_root, '')
+    if @relative_path_regex.test(path)
+      path = path.replace(@relative_path_regex, "$1")
+    path
