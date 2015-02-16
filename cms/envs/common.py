@@ -134,9 +134,6 @@ FEATURES = {
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
-    # Toggle course milestones app/feature
-    'MILESTONES_APP': False,
-
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
 
