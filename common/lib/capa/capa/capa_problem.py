@@ -577,7 +577,11 @@ class LoncapaProblem(object):
                 parent = inc.getparent()
                 parent.insert(parent.index(inc), incxml)
                 parent.remove(inc)
-                log.debug('Included %s into %s' % (filename, self.problem_id))
+                log.debug(
+                    "Included %s into %s",
+                    filename,
+                    self.problem_id,
+                )
 
     def _extract_system_path(self, script):
         """

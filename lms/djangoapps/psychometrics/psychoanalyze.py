@@ -266,7 +266,10 @@ def generate_plots_for_problem(problem):
                 yset['fitx'] = fitx
                 yset['fity'] = func_2pl(np.array(fitx), *cfp[0])
             except Exception as err:
-                log.debug('Error in psychoanalyze curve fitting: %s' % err)
+                log.debug(
+                    "Error in psychoanalyze curve fitting: %s",
+                    err,
+                )
 
         dataset['grade_%d' % grade] = yset
 

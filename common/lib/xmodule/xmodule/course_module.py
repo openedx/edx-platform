@@ -115,7 +115,10 @@ class Textbook(object):
             pass
 
         # Get the table of contents from S3
-        log.info("Retrieving textbook table of contents from %s" % toc_url)
+        log.info(
+            "Retrieving textbook table of contents from %s",
+            toc_url,
+        )
         try:
             r = requests.get(toc_url)
         except Exception as err:

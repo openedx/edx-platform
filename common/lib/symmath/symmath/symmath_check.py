@@ -254,7 +254,10 @@ def symmath_check(expect, ans, dynamath=None, options=None, debug=None, xml=None
         fsym = f.sympy
         msg += '<p>You entered: %s</p>' % to_latex(f.sympy)
     except Exception, err:
-        log.exception("Error evaluating expression '%s' as a valid equation" % ans)
+        log.exception(
+            "Error evaluating expression '%s' as a valid equation",
+            ans,
+        )
         msg += "<p>Error in evaluating your expression '%s' as a valid equation</p>" % (ans)
         if "Illegal math" in str(err):
             msg += "<p>Illegal math expression</p>"

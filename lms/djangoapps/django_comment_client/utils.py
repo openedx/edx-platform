@@ -65,7 +65,11 @@ def _get_discussion_modules(course):
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
             if getattr(module, key) is None:
-                log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
+                log.warning(
+                    "Required key '%s' not in discussion %s, leaving out of category map",
+                    key,
+                    module.location,
+                )
                 return False
         return True
 
@@ -270,7 +274,11 @@ class QueryCountDebugMiddleware(object):
                     query_time = query.get('duration', 0) / 1000
                 total_time += float(query_time)
 
-            log.info('%s queries run, total %s seconds' % (len(connection.queries), total_time))
+            log.info(
+                "%s queries run, total %s seconds",
+                len(connection.queries),
+                total_time,
+            )
         return response
 
 
