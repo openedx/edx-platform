@@ -1827,7 +1827,7 @@ class CustomResponseTest(ResponseTest):
             num = my_helper.seventeen()
             """)
         capa_system = test_capa_system()
-        capa_system.get_python_lib_zip = lambda: zipstring.getvalue()
+        capa_system.get_python_lib_zip = zipstring.getvalue()
         problem = self.build_problem(script=script, capa_system=capa_system)
         self.assertEqual(problem.context['num'], 17)
 

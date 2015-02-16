@@ -140,7 +140,7 @@ class PhotoVerification(StatusModel):
     # user IDs or something too easily guessable.
     receipt_id = models.CharField(
         db_index=True,
-        default=lambda: generateUUID(),
+        default=generateUUID(),
         max_length=255,
     )
 
