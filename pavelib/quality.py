@@ -7,6 +7,8 @@ import re
 
 from .utils.envs import Env
 
+ALL_SYSTEMS = 'lms,cms,common'
+
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
@@ -18,7 +20,7 @@ def find_fixme(options):
     Run pylint on system code, only looking for fixme items.
     """
     num_fixme = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -72,7 +74,7 @@ def run_pylint(options):
     num_violations = 0
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -149,7 +151,7 @@ def run_pep8(options):
     fail the task if too many violations are found.
     """
     num_violations = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
     violations_limit = int(getattr(options, 'limit', -1))
 
     for system in systems:
