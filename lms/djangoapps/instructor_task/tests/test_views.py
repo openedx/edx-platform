@@ -115,12 +115,13 @@ class InstructorTaskReportTest(InstructorTaskTestCase):
 
     def _create_email_subtask_entry(self, total=5, attempted=3, succeeded=2, skipped=0, task_state=PROGRESS):
         """Create an InstructorTask with subtask defined and email argument."""
-        progress = {'attempted': attempted,
-                    'succeeded': succeeded,
-                    'skipped': skipped,
-                    'total': total,
-                    'action_name': 'emailed',
-                    }
+        progress = {
+            'attempted': attempted,
+            'succeeded': succeeded,
+            'skipped': skipped,
+            'total': total,
+            'action_name': 'emailed',
+        }
         instructor_task = self._create_entry(task_state=task_state, task_output=progress)
         instructor_task.subtasks = {}
         instructor_task.task_input = json.dumps({'email_id': 134})

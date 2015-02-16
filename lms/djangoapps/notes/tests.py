@@ -316,9 +316,15 @@ class ApiTest(TestCase):
                  {'limit': 0, 'offset': 0, 'uri': invalid_uri, 'expected_rows': 0, 'expected_total': 0}]
 
         for test in tests:
-            params = dict([(k, str(test[k]))
-                          for k in ('limit', 'offset', 'uri')
-                          if k in test])
+            params = {
+                key: str(test[key])
+                for key in [
+                    'limit',
+                    'offset',
+                    'uri',
+                ]
+                if key in test
+            }
             resp = self.client.get(self.url('notes_api_search'),
                                    params,
                                    content_type='application/json',

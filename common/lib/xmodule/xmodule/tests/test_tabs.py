@@ -92,12 +92,12 @@ class TabTestCase(unittest.TestCase):
         self.assertEquals(serialized_tab, deserialized_tab)
 
     def check_can_display_results(
-        self,
-        tab,
-        expected_value=True,
-        for_authenticated_users_only=False,
-        for_staff_only=False,
-        for_enrolled_users_only=False
+            self,
+            tab,
+            expected_value=True,
+            for_authenticated_users_only=False,
+            for_staff_only=False,
+            for_enrolled_users_only=False,
     ):
         """Checks can display results for various users"""
         if for_staff_only:
@@ -615,15 +615,15 @@ class CourseTabListTestCase(TabListTestCase):
 
         # enumerate the tabs using the CMS call
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable_cms(
-            self.course,
-            self.settings,
+                self.course,
+                self.settings,
         )):
             self.assertEquals(tab.type, self.course.tabs[i].type)
 
         # enumerate the tabs and verify textbooks and the instructor tab
         for i, tab in enumerate(tabs.CourseTabList.iterate_displayable(
-            self.course,
-            self.settings,
+                self.course,
+                self.settings,
         )):
             if getattr(tab, 'is_collection_item', False):
                 # a collection item was found as a result of a collection tab
@@ -688,12 +688,13 @@ class DiscussionLinkTestCase(TabTestCase):
         return reverse_discussion_link
 
     def check_discussion(
-        self, tab_list,
-        expected_discussion_link,
-        expected_can_display_value,
-        discussion_link_in_course="",
-        is_staff=True,
-        is_enrolled=True,
+            self,
+            tab_list,
+            expected_discussion_link,
+            expected_can_display_value,
+            discussion_link_in_course='',
+            is_staff=True,
+            is_enrolled=True,
     ):
         """Helper function to verify whether the discussion tab exists and can be displayed"""
         self.course.tabs = tab_list

@@ -293,8 +293,12 @@ class SymbolicResponseTest(ResponseTest):
             self.build_problem(math_display=True, expect="2*x+3*y", num_inputs=3)
 
     def _assert_symbolic_grade(
-        self, problem, student_input, dynamath_input, expected_correctness,
-        snuggletex_resp=""
+            self,
+            problem,
+            student_input,
+            dynamath_input,
+            expected_correctness,
+            snuggletex_resp='',
     ):
         """
         Assert that the symbolic response has a certain grade.
@@ -2225,10 +2229,23 @@ class ChoiceTextResponseTest(ResponseTest):
 
     def test_staff_answer_error(self):
         broken_problem = self._make_problem(
-            [("true", {"answer": "Platypus", "tolerance": "0"}),
-             ("true", {"answer": "edX", "tolerance": "0"})
-             ],
-            "checkboxtextgroup"
+            [
+                (
+                    'true',
+                    {
+                        'answer': 'Platypus',
+                        'tolerance': '0',
+                    },
+                ),
+                (
+                    'true',
+                    {
+                        'answer': 'edX',
+                        'tolerance': '0',
+                    },
+                ),
+            ],
+            'checkboxtextgroup',
         )
         with self.assertRaisesRegexp(
             StudentInputError,
@@ -2316,10 +2333,23 @@ class ChoiceTextResponseTest(ResponseTest):
         )
         # Two choice two input problem with both choices correct.
         checkbox_two_choices_two_inputs = self._make_problem(
-            [("true", {"answer": "123", "tolerance": "0"}),
-             ("true", {"answer": "456", "tolerance": "0"})
-             ],
-            "checkboxtextgroup"
+            [
+                (
+                    'true',
+                    {
+                        'answer': '123',
+                        'tolerance': '0',
+                    },
+                ),
+                (
+                    'true',
+                    {
+                        'answer': '456',
+                        'tolerance': '0',
+                    },
+                ),
+            ],
+            'checkboxtextgroup',
         )
 
         # Dictionary problem_name: problem

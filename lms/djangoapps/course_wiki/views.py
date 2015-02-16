@@ -100,13 +100,15 @@ def course_wiki_redirect(request, course_id):  # pylint: disable=unused-argument
             user_message=_("Course page automatically created."),
             user=None,
             ip_address=None,
-            article_kwargs={'owner': None,
-                            'group': None,
-                            'group_read': True,
-                            'group_write': True,
-                            'other_read': True,
-                            'other_write': True,
-                            })
+            article_kwargs={
+                'owner': None,
+                'group': None,
+                'group_read': True,
+                'group_write': True,
+                'other_read': True,
+                'other_write': True,
+            },
+        )
 
     return redirect("wiki:get", path=urlpath.path)
 

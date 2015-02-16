@@ -274,8 +274,13 @@ class CapaShuffleTest(unittest.TestCase):
         self.assertEqual(orig_html, problem.get_html(), 'should be able to call get_html() twice')
         html = orig_html.replace('\n', ' ')  # avoid headaches with .* matching
         print html
-        self.assertRegexpMatches(html, r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*" +
-                                       r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>")
+        self.assertRegexpMatches(
+            html,
+            (
+                r"<div>.*\[.*'Banana'.*'Apple'.*'Chocolate'.*'Donut'.*\].*</div>.*"
+                r"<div>.*\[.*'C'.*'A'.*'D'.*'B'.*\].*</div>"
+            ),
+        )
         # Look at the responses in their authored order
         responses = sorted(problem.responders.values(), key=lambda resp: int(resp.id[resp.id.rindex('_') + 1:]))
         self.assertFalse(responses[0].has_mask())

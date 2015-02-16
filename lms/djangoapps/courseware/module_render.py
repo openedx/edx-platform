@@ -175,13 +175,14 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
                           section.url_name == active_section)
 
                 if not section.hide_from_toc:
-                    sections.append({'display_name': section.display_name_with_default,
-                                     'url_name': section.url_name,
-                                     'format': section.format if section.format is not None else '',
-                                     'due': get_extended_due_date(section),
-                                     'active': active,
-                                     'graded': section.graded,
-                                     })
+                    sections.append({
+                        'display_name': section.display_name_with_default,
+                        'url_name': section.url_name,
+                        'format': section.format if section.format is not None else '',
+                        'due': get_extended_due_date(section),
+                        'active': active,
+                        'graded': section.graded,
+                    })
             chapters.append({'display_name': chapter.display_name_with_default,
                              'url_name': chapter.url_name,
                              'sections': sections,

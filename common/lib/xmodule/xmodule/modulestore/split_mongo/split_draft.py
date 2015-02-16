@@ -131,9 +131,16 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             return item
 
     def create_item(
-        self, user_id, course_key, block_type, block_id=None,
-        definition_locator=None, fields=None,
-        force=False, skip_auto_publish=False, **kwargs
+            self,
+            user_id,
+            course_key,
+            block_type,
+            block_id=None,
+            definition_locator=None,
+            fields=None,
+            force=False,
+            skip_auto_publish=False,
+            **kwargs
     ):
         """
         See :py:meth `ModuleStoreDraftAndPublished.create_item`

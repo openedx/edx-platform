@@ -77,10 +77,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+                content['status']
+                for _, content in users_state.items()
+            ])),
+            'success',
+        )
 
         # correct initial data:
         correct_initial_data = {
@@ -117,10 +118,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+                content['status']
+                for _, content in users_state.items()
+            ])),
+            'success',
+        )
 
         correct_state = {}
         for index, user in enumerate(self.users):
@@ -165,10 +167,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+                content['status']
+                for _, content in users_state.items()
+            ])),
+            'success',
+        )
 
         # 2.
         # Invcemental state per user.
@@ -176,10 +179,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state_after_post.items()
-                        ])),
-            'success')
+                content['status']
+                for _, content in users_state_after_post.items()
+            ])),
+            'success',
+        )
 
         # Final state after all posts.
         users_state_before_fail = self._get_users_state()
@@ -190,10 +194,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state_after_post.items()
-                        ])),
-            'fail')
+                content['status']
+                for _, content in users_state_after_post.items()
+            ])),
+            'fail',
+        )
 
         # 4.
         current_users_state = self._get_users_state()
@@ -207,10 +212,11 @@ class TestWordCloud(BaseTestXmodule):
 
         self.assertEqual(
             ''.join(set([
-                        content['status']
-                        for _, content in users_state.items()
-                        ])),
-            'success')
+                content['status']
+                for _, content in users_state.items()
+            ])),
+            'success',
+        )
 
         for user in self.users:
             self.assertListEqual(

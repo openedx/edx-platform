@@ -74,12 +74,12 @@ class CapaFactoryWithDelay(object):
 
     @classmethod
     def create(
-        cls,
-        max_attempts=None,
-        attempts=None,
-        correct=False,
-        last_submission_time=None,
-        submission_wait_seconds=None
+            cls,
+            max_attempts=None,
+            attempts=None,
+            correct=False,
+            last_submission_time=None,
+            submission_wait_seconds=None,
     ):
         """
         Optional parameters here are cut down to what we actually use vs. the regular CapaFactory.

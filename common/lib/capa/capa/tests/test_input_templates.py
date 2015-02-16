@@ -62,8 +62,12 @@ class TemplateTestCase(unittest.TestCase):
         try:
             xml = etree.fromstring("<test>" + xml_str + "</test>")
         except Exception as exc:
-            raise TemplateError("Could not parse XML from '{0}': {1}".format(
-                                xml_str, str(exc)))
+            raise TemplateError(
+                "Could not parse XML from '{0}': {1}".format(
+                    xml_str,
+                    str(exc),
+                ),
+            )
         else:
             return xml
 

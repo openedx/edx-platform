@@ -90,8 +90,11 @@ class Command(BaseCommand):
         )
 
         cert_data[course_id].update(
-            {status['status']: status['dcount']
-                for status in status_tally})
+            {
+                status['status']: status['dcount']
+                for status in status_tally
+            },
+        )
 
         mode_tally = GeneratedCertificate.objects.filter(
             course_id__exact=course_id,
@@ -100,21 +103,31 @@ class Command(BaseCommand):
             dcount=Count('mode')
         )
         cert_data[course_id].update(
-            {mode['mode']: mode['dcount']
-                for mode in mode_tally}
+            {
+                mode['mode']: mode['dcount']
+                for mode in mode_tally
+            },
         )
 
         # all states we have seen far all courses
-        status_headings = sorted(set(
-            [status for course in cert_data
-                for status in cert_data[course]])
+        status_headings = sorted(
+            set(
+                [
+                    [
+                        status
+                        for status in cert_data[course]
+                    ]
+                    for course in cert_data
+                ]
+            )
         )
 
         # print the heading for the report
         print "{:>26}".format("course ID"),
-        print ' '.join(["{:>16}".format(heading)
-                        for heading in status_headings]
-                       )
+        print ' '.join([
+            "{:>16}".format(heading)
+            for heading in status_headings
+        ])
 
         # print the report
         print "{0:>26}".format(course_id.to_deprecated_string()),

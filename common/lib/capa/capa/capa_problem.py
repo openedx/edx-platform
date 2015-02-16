@@ -77,22 +77,22 @@ class LoncapaSystem(object):
     See :class:`ModuleSystem` for documentation of other attributes.
 
     """
-    def __init__(                                       # pylint: disable=invalid-name
-        self,
-        ajax_url,
-        anonymous_student_id,
-        cache,
-        can_execute_unsafe_code,
-        get_python_lib_zip,
-        DEBUG,                                          # pylint: disable=invalid-name
-        filestore,
-        i18n,
-        node_path,
-        render_template,
-        seed,      # Why do we do this if we have self.seed?
-        STATIC_URL,                                     # pylint: disable=invalid-name
-        xqueue,
-        matlab_api_key=None
+    def __init__(  # pylint: disable=invalid-name
+            self,
+            ajax_url,
+            anonymous_student_id,
+            cache,
+            can_execute_unsafe_code,
+            get_python_lib_zip,
+            DEBUG,  # pylint: disable=invalid-name
+            filestore,
+            i18n,
+            node_path,
+            render_template,
+            seed,  # Why do we do this if we have self.seed?
+            STATIC_URL,  # pylint: disable=invalid-name
+            xqueue,
+            matlab_api_key=None,
     ):
         self.ajax_url = ajax_url
         self.anonymous_student_id = anonymous_student_id

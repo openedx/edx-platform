@@ -193,15 +193,14 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         courses = self.draft_store.get_courses()
         assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
-        for course_key in [
-
-            SlashSeparatedCourseKey(*fields)
-            for fields in [
-                ['edX', 'simple', '2012_Fall'], ['edX', 'simple_with_draft', '2012_Fall'],
-                ['edX', 'test_import_course', '2012_Fall'], ['edX', 'test_unicode', '2012_Fall'],
-                ['edX', 'toy', '2012_Fall']
-            ]
+        for fields in [
+                ['edX', 'simple', '2012_Fall'],
+                ['edX', 'simple_with_draft', '2012_Fall'],
+                ['edX', 'test_import_course', '2012_Fall'],
+                ['edX', 'test_unicode', '2012_Fall'],
+                ['edX', 'toy', '2012_Fall'],
         ]:
+            course_key = SlashSeparatedCourseKey(*fields)
             assert_in(course_key, course_ids)
             course = self.draft_store.get_course(course_key)
             assert_not_none(course)
@@ -216,14 +215,12 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         """
         Test get_course and has_course with ids which don't exist
         """
-        for course_key in [
-
-            SlashSeparatedCourseKey(*fields)
-            for fields in [
-                ['edX', 'simple', 'no_such_course'], ['edX', 'no_such_course', '2012_Fall'],
+        for fields in [
+                ['edX', 'simple', 'no_such_course'],
+                ['edX', 'no_such_course', '2012_Fall'],
                 ['NO_SUCH_COURSE', 'Test_iMport_courSe', '2012_Fall'],
-            ]
         ]:
+            course_key = SlashSeparatedCourseKey(*fields)
             course = self.draft_store.get_course(course_key)
             assert_is_none(course)
             assert_false(self.draft_store.has_course(course_key))

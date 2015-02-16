@@ -37,13 +37,14 @@ class CourseGradingModel(object):
 
         # return empty model
         else:
-            return {"id": index,
-                    "type": "",
-                    "min_count": 0,
-                    "drop_count": 0,
-                    "short_label": None,
-                    "weight": 0
-                    }
+            return {
+                'id': index,
+                'type': '',
+                'min_count': 0,
+                'drop_count': 0,
+                'short_label': None,
+                'weight': 0,
+            }
 
     @staticmethod
     def update_from_json(course_key, jsondict, user):
@@ -194,12 +195,13 @@ class CourseGradingModel(object):
     @staticmethod
     def parse_grader(json_grader):
         # manual to clear out kruft
-        result = {"type": json_grader["type"],
-                  "min_count": int(json_grader.get('min_count', 0)),
-                  "drop_count": int(json_grader.get('drop_count', 0)),
-                  "short_label": json_grader.get('short_label', None),
-                  "weight": float(json_grader.get('weight', 0)) / 100.0
-                  }
+        result = {
+            'type': json_grader['type'],
+            'min_count': int(json_grader.get('min_count', 0)),
+            'drop_count': int(json_grader.get('drop_count', 0)),
+            'short_label': json_grader.get('short_label', None),
+            'weight': float(json_grader.get('weight', 0)) / 100.0,
+        }
 
         return result
 

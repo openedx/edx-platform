@@ -465,8 +465,12 @@ class TestBulkWriteMixinFindMethods(TestBulkWriteMixin):
                 self.assertNotIn(structure, results)
         for structure in db_structures:
             if (
-                structure['previous_version'] in search_ids and  # We're searching for this document
-                not any(active.endswith(structure['_id']) for active in active_ids)  # This document doesn't match any active _ids
+                    structure['previous_version'] in search_ids  # We're searching for this document
+                    and
+                    not any([
+                        active.endswith(structure['_id'])
+                        for active in active_ids
+                    ])  # This document doesn't match any active _ids
             ):
                 self.assertIn(structure, results)
             else:

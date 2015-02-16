@@ -319,9 +319,9 @@ def videos_post(course, request):
         edx_video_id = unicode(uuid4())
         key = storage_service_key(bucket, file_name=edx_video_id)
         for metadata_name, value in [
-            ("course_video_upload_token", course_video_upload_token),
-            ("client_video_id", file_name),
-            ("course_key", unicode(course.id)),
+                ('course_video_upload_token', course_video_upload_token),
+                ('client_video_id', file_name),
+                ('course_key', unicode(course.id)),
         ]:
             key.set_metadata(metadata_name, value)
         upload_url = key.generate_url(

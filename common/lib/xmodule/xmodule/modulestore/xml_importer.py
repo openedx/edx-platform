@@ -940,8 +940,9 @@ def perform_xlint(
     print("\n")
     print("------------------------------------------")
     print("VALIDATION SUMMARY: {err} Errors   {warn} Warnings".format(
-        err=err_cnt, warn=warn_cnt)
-    )
+        err=err_cnt,
+        warn=warn_cnt,
+    ))
 
     if err_cnt > 0:
         print(

@@ -868,8 +868,13 @@ class MatlabInput(CodeInput):
             nothing
         """
         # check the queuekey against the saved queuekey
-        if('queuestate' in self.input_state and self.input_state['queuestate'] == 'queued'
-                and self.input_state['queuekey'] == queuekey):
+        if (
+                'queuestate' in self.input_state
+                and
+                self.input_state['queuestate'] == 'queued'
+                and
+                self.input_state['queuekey'] == queuekey
+        ):
             msg = self._parse_data(queue_msg)
             # save the queue message so that it can be rendered later
             self.input_state['queue_msg'] = msg
@@ -1085,9 +1090,10 @@ class Crystallography(InputTypeBase):
         """
         Note: height, width are required.
         """
-        return [Attribute('height'),
-                Attribute('width'),
-                ]
+        return [
+            Attribute('height'),
+            Attribute('width'),
+        ]
 
 # -------------------------------------------------------------------------
 
@@ -1107,11 +1113,12 @@ class VseprInput(InputTypeBase):
         """
         Note: height, width, molecules and geometries are required.
         """
-        return [Attribute('height'),
-                Attribute('width'),
-                Attribute('molecules'),
-                Attribute('geometries'),
-                ]
+        return [
+            Attribute('height'),
+            Attribute('width'),
+            Attribute('molecules'),
+            Attribute('geometries'),
+        ]
 
 #-------------------------------------------------------------------------
 
@@ -1433,10 +1440,11 @@ class DesignProtein2dInput(InputTypeBase):
         """
         Note: width, hight, and target_shape are required.
         """
-        return [Attribute('width'),
-                Attribute('height'),
-                Attribute('target_shape')
-                ]
+        return [
+            Attribute('width'),
+            Attribute('height'),
+            Attribute('target_shape'),
+        ]
 
     def _extra_context(self):
         context = {
@@ -1468,9 +1476,10 @@ class EditAGeneInput(InputTypeBase):
         """
         Note: width, height, and dna_sequencee are required.
         """
-        return [Attribute('genex_dna_sequence'),
-                Attribute('genex_problem_number')
-                ]
+        return [
+            Attribute('genex_dna_sequence'),
+            Attribute('genex_problem_number'),
+        ]
 
     def _extra_context(self):
         context = {
@@ -1537,11 +1546,14 @@ class AnnotationInput(InputTypeBase):
     def _find_options(self):
         """ Returns an array of dicts where each dict represents an option. """
         elements = self.xml.findall('./options/option')
-        return [{
+        return [
+            {
                 'id': index,
                 'description': option.text,
                 'choice': option.get('choice')
-                } for (index, option) in enumerate(elements)]
+            }
+            for (index, option) in enumerate(elements)
+        ]
 
     def _validate_options(self):
         """ Raises a ValueError if the choice attribute is missing or invalid. """

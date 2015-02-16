@@ -109,10 +109,32 @@ class HintManagerTest(ModuleStoreTestCase):
         out = view.get_hints(post, self.course_id, 'hints')
         print out
         self.assertTrue(out['other_field'] == 'mod_queue')
-        expected = {self.problem_id: [('1.0', {'1': ['Hint 1', 2],
-                                               '3': ['Hint 3', 12]}),
-                                      ('2.0', {'4': ['Hint 4', 3]})
-                                      ]}
+        expected = {
+            self.problem_id: [
+                (
+                    '1.0',
+                    {
+                        '1': [
+                            'Hint 1',
+                            2,
+                        ],
+                        '3': [
+                            'Hint 3',
+                            12,
+                        ],
+                    },
+                ),
+                (
+                    '2.0',
+                    {
+                        '4': [
+                            'Hint 4',
+                            3,
+                        ],
+                    },
+                ),
+            ],
+        }
         self.assertTrue(out['all_hints'] == expected)
 
     def test_deletehints(self):

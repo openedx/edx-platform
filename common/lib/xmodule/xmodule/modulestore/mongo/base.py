@@ -513,7 +513,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         super(MongoModuleStore, self).__init__(contentstore=contentstore, **kwargs)
 
         def do_connection(
-            db, collection, host, port=27017, tz_aware=True, user=None, password=None, asset_collection=None, **kwargs
+                db,
+                collection,
+                host,
+                port=27017,
+                tz_aware=True,
+                user=None,
+                password=None,
+                asset_collection=None,
+                **kwargs
         ):
             """
             Create & open the connection, authenticate, and provide pointers to the collection
@@ -1127,8 +1135,15 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
         return xblock
 
     def create_xblock(
-        self, runtime, course_key, block_type, block_id=None, fields=None,
-        metadata=None, definition_data=None, **kwargs
+            self,
+            runtime,
+            course_key,
+            block_type,
+            block_id=None,
+            fields=None,
+            metadata=None,
+            definition_data=None,
+            **kwargs
     ):
         """
         Create the new xblock but don't save it. Returns the new module.

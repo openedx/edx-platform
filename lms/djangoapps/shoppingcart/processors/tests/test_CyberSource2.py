@@ -283,9 +283,14 @@ class CyberSource2Test(TestCase):
             self.assertIn(error_msg, html)
 
     def _signed_callback_params(
-        self, order_id, order_amount, paid_amount,
-        decision='ACCEPT', signature=None, card_number='xxxxxxxxxxxx1111',
-        first_name='John'
+            self,
+            order_id,
+            order_amount,
+            paid_amount,
+            decision='ACCEPT',
+            signature=None,
+            card_number='xxxxxxxxxxxx1111',
+            first_name='John',
     ):
         """
         Construct parameters that could be returned from CyberSource

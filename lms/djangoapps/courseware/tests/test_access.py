@@ -134,12 +134,23 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
         def verify_access(student_should_have_access):
             """ Verify the expected result from _has_access_descriptor """
-            self.assertEqual(student_should_have_access, access._has_access_descriptor(
-                self.anonymous_user, 'load', mock_unit, course_key=self.course.course_key)
+            self.assertEqual(
+                student_should_have_access,
+                access._has_access_descriptor(
+                    self.anonymous_user,
+                    'load',
+                    mock_unit,
+                    course_key=self.course.course_key,
+                )
             )
             # staff always has access
-            self.assertTrue(access._has_access_descriptor(
-                self.course_staff, 'load', mock_unit, course_key=self.course.course_key)
+            self.assertTrue(
+                access._has_access_descriptor(
+                    self.course_staff,
+                    'load',
+                    mock_unit,
+                    course_key=self.course.course_key,
+                ),
             )
 
         # No start date, staff lock on

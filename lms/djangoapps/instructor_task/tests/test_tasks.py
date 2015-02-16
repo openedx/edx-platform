@@ -61,9 +61,11 @@ class TestInstructorTasks(InstructorTaskModuleTestCase):
         """
         Calculate dummy values for parameters needed for instantiating xmodule instances.
         """
-        return {'xqueue_callback_url_prefix': 'dummy_value',
-                'request_info': {},
-                }
+        return {
+            'xqueue_callback_url_prefix': 'dummy_value',
+            'request_info': {
+            },
+        }
 
     def _run_task_with_mock_celery(self, task_class, entry_id, task_id, expected_failure_message=None):
         """Submit a task and mock how celery provides a current_task."""

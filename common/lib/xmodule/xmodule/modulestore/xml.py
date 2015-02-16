@@ -432,11 +432,13 @@ class XMLModuleStore(ModuleStoreReadBase):
             course = course_data.get('course')
 
             if course is None:
-                msg = ("No 'course' attribute set for course in {dir}."
-                       " Using default '{default}'".format(dir=course_dir,
-                                                           default=course_dir
-                                                           )
-                       )
+                msg = (
+                    "No 'course' attribute set for course in {dir}."
+                    " Using default '{default}'".format(
+                        dir=course_dir,
+                        default=course_dir,
+                    )
+                )
                 log.warning(msg)
                 tracker(msg)
                 course = course_dir

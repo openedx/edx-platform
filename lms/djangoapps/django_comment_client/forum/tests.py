@@ -127,11 +127,11 @@ def make_mock_thread_data(text, thread_id, num_children, group_id=None, group_na
 
 
 def make_mock_request_impl(
-    text,
-    thread_id="dummy_thread_id",
-    group_id=None,
-    commentable_id=None,
-    num_thread_responses=1,
+        text,
+        thread_id='dummy_thread_id',
+        group_id=None,
+        commentable_id=None,
+        num_thread_responses=1,
 ):
     def mock_request_impl(*args, **kwargs):
         url = args[1]

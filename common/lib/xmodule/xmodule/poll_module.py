@@ -69,15 +69,23 @@ class PollModule(PollFields, XModule):
 
             self.voted = True
             self.poll_answer = dispatch
-            return json.dumps({'poll_answers': self.poll_answers,
-                               'total': sum(self.poll_answers.values()),
-                               'callback': {'objectName': 'Conditional'}
-                               })
+            return json.dumps(
+                {
+                    'poll_answers': self.poll_answers,
+                    'total': sum(self.poll_answers.values()),
+                    'callback': {
+                        'objectName': 'Conditional',
+                    },
+                },
+            )
         elif dispatch == 'get_state':
-            return json.dumps({'poll_answer': self.poll_answer,
-                               'poll_answers': self.poll_answers,
-                               'total': sum(self.poll_answers.values())
-                               })
+            return json.dumps(
+                {
+                    'poll_answer': self.poll_answer,
+                    'poll_answers': self.poll_answers,
+                    'total': sum(self.poll_answers.values()),
+                },
+            )
         elif dispatch == 'reset_poll' and self.voted and \
                 self.descriptor.xml_attributes.get('reset', 'True').lower() != 'false':
             self.voted = False

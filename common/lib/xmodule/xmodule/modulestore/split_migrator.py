@@ -92,7 +92,9 @@ class SplitMigrator(object):
         # iterate over published course elements. Wildcarding rather than descending b/c some elements are orphaned (e.g.,
         # course about pages, conditionals)
         for module in self.source_modulestore.get_items(
-            source_course_key, revision=ModuleStoreEnum.RevisionOption.published_only, **kwargs
+                source_course_key,
+                revision=ModuleStoreEnum.RevisionOption.published_only,
+                **kwargs
         ):
             # don't copy the course again.
             if module.location != old_course_loc:

@@ -653,8 +653,15 @@ def _create_or_rerun_course(request):
                 'course number so that it is unique.'),
         })
     except InvalidKeyError as error:
-        return JsonResponse({
-            "ErrMsg": _("Unable to create course '{name}'.\n\n{err}").format(name=display_name, err=error.message)}
+        return JsonResponse(
+            {
+                'ErrMsg': _(
+                    "Unable to create course '{name}'.\n\n{err}"
+                ).format(
+                    name=display_name,
+                    err=error.message,
+                ),
+            },
         )
 
 

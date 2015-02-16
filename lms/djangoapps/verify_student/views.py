@@ -219,10 +219,12 @@ class PayAndVerifyView(View):
 
     @method_decorator(login_required)
     def get(
-        self, request, course_id,
-        always_show_payment=False,
-        current_step=None,
-        message=FIRST_TIME_VERIFY_MSG
+            self,
+            request,
+            course_id,
+            always_show_payment=False,
+            current_step=None,
+            message=FIRST_TIME_VERIFY_MSG,
     ):
         """Render the pay/verify requirements page.
 
@@ -374,12 +376,12 @@ class PayAndVerifyView(View):
         return render_to_response("verify_student/pay_and_verify.html", context)
 
     def _redirect_if_necessary(
-        self,
-        message,
-        already_verified,
-        already_paid,
-        is_enrolled,
-        course_key
+            self,
+            message,
+            already_verified,
+            already_paid,
+            is_enrolled,
+            course_key,
     ):
         """Redirect the user to a more appropriate page if necessary.
 
@@ -598,8 +600,9 @@ def create_order(request):
     )
 
     if (
-        submit_photo and not
-        SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user)
+            submit_photo
+            and not
+            SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user)
     ):
         attempt = SoftwareSecurePhotoVerification(user=request.user)
         try:

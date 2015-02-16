@@ -14,12 +14,18 @@ from student.tests.factories import UserFactory, CourseEnrollmentFactory, AdminF
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
-from class_dashboard.dashboard_data import (get_problem_grade_distribution, get_sequential_open_distrib,
-                                            get_problem_set_grade_distrib, get_d3_problem_grade_distrib,
-                                            get_d3_sequential_open_distrib, get_d3_section_grade_distrib,
-                                            get_section_display_name, get_array_section_has_problem,
-                                            get_students_opened_subsection, get_students_problem_grades,
-                                            )
+from class_dashboard.dashboard_data import (
+    get_problem_grade_distribution,
+    get_sequential_open_distrib,
+    get_problem_set_grade_distrib,
+    get_d3_problem_grade_distrib,
+    get_d3_sequential_open_distrib,
+    get_d3_section_grade_distrib,
+    get_section_display_name,
+    get_array_section_has_problem,
+    get_students_opened_subsection,
+    get_students_problem_grades,
+)
 from class_dashboard.views import has_instructor_access_for_class
 
 USER_COUNT = 11
@@ -253,11 +259,14 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         course_id = self.course.id
         data_type = 'subsection'
 
-        data = json.dumps({'sections': sections,
-                           'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
-                           'data_type': data_type,
-                           })
+        data = json.dumps(
+            {
+                'sections': sections,
+                'tooltips': tooltips,
+                'course_id': course_id.to_deprecated_string(),
+                'data_type': data_type,
+            },
+        )
 
         response = self.client.post(url, {'data': data})
         # Check response contains 1 line for header, 1 line for Section and 1 line for Subsection
@@ -289,11 +298,14 @@ class TestGetProblemGradeDistribution(ModuleStoreTestCase):
         course_id = self.course.id
         data_type = 'problem'
 
-        data = json.dumps({'sections': sections,
-                           'tooltips': tooltips,
-                           'course_id': course_id.to_deprecated_string(),
-                           'data_type': data_type,
-                           })
+        data = json.dumps(
+            {
+                'sections': sections,
+                'tooltips': tooltips,
+                'course_id': course_id.to_deprecated_string(),
+                'data_type': data_type,
+            },
+        )
 
         response = self.client.post(url, {'data': data})
         # Check response contains 1 line for header, 1 line for Sections and 2 lines for problems

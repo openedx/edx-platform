@@ -369,18 +369,27 @@ def check_mongo_calls(num_finds=0, num_sends=None):
         the given int value.
     """
     with check_sum_of_calls(
-            pymongo.message,
-            ['query', 'get_more'],
-            num_finds,
-            num_finds
+        pymongo.message,
+        [
+            'query',
+            'get_more',
+        ],
+        num_finds,
+        num_finds,
     ):
         if num_sends is not None:
             with check_sum_of_calls(
-                    pymongo.message,
-                    # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
-                    ['insert', 'update', 'delete', '_do_batched_write_command', '_do_batched_insert', ],
-                    num_sends,
-                    num_sends
+                pymongo.message,
+                # mongo < 2.6 uses insert, update, delete and _do_batched_insert. >= 2.6 _do_batched_write
+                [
+                    'insert',
+                    'update',
+                    'delete',
+                    '_do_batched_write_command',
+                    '_do_batched_insert',
+                ],
+                num_sends,
+                num_sends,
             ):
                 yield
         else:

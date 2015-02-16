@@ -79,9 +79,10 @@ class InstructorTaskTestCase(TestCase):
     def _create_failure_entry(self):
         """Creates a InstructorTask entry representing a failed task."""
         # view task entry for task failure
-        progress = {'message': TEST_FAILURE_MESSAGE,
-                    'exception': TEST_FAILURE_EXCEPTION,
-                    }
+        progress = {
+            'message': TEST_FAILURE_MESSAGE,
+            'exception': TEST_FAILURE_EXCEPTION,
+        }
         return self._create_entry(task_state=FAILURE, task_output=progress)
 
     def _create_success_entry(self, student=None):
@@ -90,11 +91,12 @@ class InstructorTaskTestCase(TestCase):
 
     def _create_progress_entry(self, student=None, task_state=PROGRESS):
         """Creates a InstructorTask entry representing a task in progress."""
-        progress = {'attempted': 3,
-                    'succeeded': 2,
-                    'total': 5,
-                    'action_name': 'rescored',
-                    }
+        progress = {
+            'attempted': 3,
+            'succeeded': 2,
+            'total': 5,
+            'action_name': 'rescored',
+        }
         return self._create_entry(task_state=task_state, task_output=progress, student=student)
 
 
@@ -230,11 +232,12 @@ class InstructorTaskModuleTestCase(InstructorTaskCourseTestCase):
 
     def get_student_module(self, username, descriptor):
         """Get StudentModule object for test course, given the `username` and the problem's `descriptor`."""
-        return StudentModule.objects.get(course_id=self.course.id,
-                                         student=User.objects.get(username=username),
-                                         module_type=descriptor.location.category,
-                                         module_state_key=descriptor.location,
-                                         )
+        return StudentModule.objects.get(
+            course_id=self.course.id,
+            student=User.objects.get(username=username),
+            module_type=descriptor.location.category,
+            module_state_key=descriptor.location,
+        )
 
 
 class TestReportMixin(object):

@@ -138,13 +138,14 @@ class SequenceModule(SequenceFields, XModule):
                 childinfo['title'] = child.display_name_with_default
             contents.append(childinfo)
 
-        params = {'items': contents,
-                  'element_id': self.location.html_id(),
-                  'item_id': self.location.to_deprecated_string(),
-                  'position': self.position,
-                  'tag': self.location.category,
-                  'ajax_url': self.system.ajax_url,
-                  }
+        params = {
+            'items': contents,
+            'element_id': self.location.html_id(),
+            'item_id': self.location.to_deprecated_string(),
+            'position': self.position,
+            'tag': self.location.category,
+            'ajax_url': self.system.ajax_url,
+        }
 
         fragment.add_content(self.system.render_template('seq_module.html', params))
 

@@ -115,23 +115,25 @@ def my_sympify(expr, normphase=False, matrix=False, abcsym=False, do_qubit=False
     if symtab:
         varset = symtab
     else:
-        varset = {'p': sympy.Symbol('p'),
-                  'g': sympy.Symbol('g'),
-                  'e': sympy.E,			# for exp
-                  'i': sympy.I,			# lowercase i is also sqrt(-1)
-                  'Q': sympy.Symbol('Q'),	 # otherwise it is a sympy "ask key"
-                  'I': sympy.Symbol('I'),	 # otherwise it is sqrt(-1)
-                  'N': sympy.Symbol('N'),	 # or it is some kind of sympy function
-                  'ZZ': sympy.Symbol('ZZ'),	 # otherwise it is the PythonIntegerRing
-                  'XI': sympy.Symbol('XI'),	 # otherwise it is the capital \XI
-                  'hat': sympy.Function('hat'),	 # for unit vectors (8.02)
-                  }
+        varset = {
+            'p': sympy.Symbol('p'),
+            'g': sympy.Symbol('g'),
+            'e': sympy.E,  # for exp
+            'i': sympy.I,  # lowercase i is also sqrt(-1)
+            'Q': sympy.Symbol('Q'),  # otherwise it is a sympy "ask key"
+            'I': sympy.Symbol('I'),  # otherwise it is sqrt(-1)
+            'N': sympy.Symbol('N'),  # or it is some kind of sympy function
+            'ZZ': sympy.Symbol('ZZ'),  # otherwise it is the PythonIntegerRing
+            'XI': sympy.Symbol('XI'),  # otherwise it is the capital \XI
+            'hat': sympy.Function('hat'),  # for unit vectors (8.02)
+        }
     if do_qubit:		# turn qubit(...) into Qubit instance
-        varset.update({'qubit': Qubit,
-                       'Ket': Ket,
-                       'dot': dot,
-                       'bit': sympy.Function('bit'),
-                       })
+        varset.update({
+            'qubit': Qubit,
+            'Ket': Ket,
+            'dot': dot,
+            'bit': sympy.Function('bit'),
+        })
     if abcsym:			# consider all lowercase letters as real symbols, in the parsing
         for letter in string.lowercase:
             if letter in varset:	 # exclude those already done

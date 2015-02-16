@@ -27,10 +27,13 @@ class CodeMirrorWidget(forms.Widget):
 
         # TODO use the help_text field of edit form instead of rendering a template
 
-        return render_to_string('wiki/includes/editor_widget.html',
-                                {'attrs': mark_safe(flatatt(final_attrs)),
-                                 'content': conditional_escape(force_unicode(value)),
-                                 })
+        return render_to_string(
+            'wiki/includes/editor_widget.html',
+            {
+                'attrs': mark_safe(flatatt(final_attrs)),
+                'content': conditional_escape(force_unicode(value)),
+            },
+        )
 
 
 class CodeMirror(BaseEditor):
@@ -47,18 +50,20 @@ class CodeMirror(BaseEditor):
             'all': ("wiki/markitup/skins/simple/style.css",
                     "wiki/markitup/sets/admin/style.css",)
         }
-        js = ("wiki/markitup/admin.init.js",
-              "wiki/markitup/jquery.markitup.js",
-              "wiki/markitup/sets/admin/set.js",
-              )
+        js = (
+            'wiki/markitup/admin.init.js',
+            'wiki/markitup/jquery.markitup.js',
+            'wiki/markitup/sets/admin/set.js',
+        )
 
     class Media:
         css = {
             'all': ("js/vendor/CodeMirror/codemirror.css",)
         }
-        js = ("js/vendor/CodeMirror/codemirror.js",
-              "js/vendor/CodeMirror/addons/xml.js",
-              "js/vendor/CodeMirror/addons/edx_markdown.js",
-              "js/wiki/accessible.js",
-              "js/wiki/CodeMirror.init.js",
-              )
+        js = (
+            'js/vendor/CodeMirror/codemirror.js',
+            'js/vendor/CodeMirror/addons/xml.js',
+            'js/vendor/CodeMirror/addons/edx_markdown.js',
+            'js/wiki/accessible.js',
+            'js/wiki/CodeMirror.init.js',
+        )

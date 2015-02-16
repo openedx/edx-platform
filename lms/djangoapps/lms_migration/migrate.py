@@ -104,12 +104,16 @@ def manage_modulestores(request, reload_dir=None, commit_id=None):
 
             if (commit_id is not None) and (commit_id == current_commit_id):
                 html += "<h2>Already at commit id %s for %s</h2>" % (commit_id, reload_dir)
-                track.views.server_track(request,
-                                         'reload %s skipped already at %s (pid=%s)' % (reload_dir,
-                                                                                       commit_id,
-                                                                                       os.getpid(),
-                                                                                       ),
-                                         {}, page='migrate')
+                track.views.server_track(
+                    request,
+                    'reload %s skipped already at %s (pid=%s)' % (
+                        reload_dir,
+                        commit_id,
+                        os.getpid(),
+                    ),
+                    {},
+                    page='migrate',
+                )
             else:
                 html += '<h2>Reloaded course directory "%s"</h2>' % reload_dir
                 def_ms.try_load_course(reload_dir)

@@ -89,16 +89,18 @@ def _get_xmodule_instance_args(request, task_id):
     permit old-style xqueue callbacks directly to the appropriate module in the LMS.
     The `task_id` is also passed to the tracking log function.
     """
-    request_info = {'username': request.user.username,
-                    'ip': request.META['REMOTE_ADDR'],
-                    'agent': request.META.get('HTTP_USER_AGENT', ''),
-                    'host': request.META['SERVER_NAME'],
-                    }
+    request_info = {
+        'username': request.user.username,
+        'ip': request.META['REMOTE_ADDR'],
+        'agent': request.META.get('HTTP_USER_AGENT', ''),
+        'host': request.META['SERVER_NAME'],
+    }
 
-    xmodule_instance_args = {'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
-                             'request_info': request_info,
-                             'task_id': task_id,
-                             }
+    xmodule_instance_args = {
+        'xqueue_callback_url_prefix': get_xqueue_callback_url_prefix(request),
+        'request_info': request_info,
+        'task_id': task_id,
+    }
     return xmodule_instance_args
 
 

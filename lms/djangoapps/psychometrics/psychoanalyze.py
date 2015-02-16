@@ -196,12 +196,13 @@ def generate_plots_for_problem(problem):
         ghist = make_histogram(grades, np.linspace(0, max_grade, max_grade + 1))
         ghist_json = json.dumps(ghist.items())
 
-        plot = {'title': "Grade histogram for %s" % problem,
-                'id': 'histogram',
-                'info': '',
-                'data': "var dhist = %s;\n" % ghist_json,
-                'cmd': '[ {data: dhist, bars: { show: true, align: "center" }} ], %s' % axisopts,
-                }
+        plot = {
+            'title': 'Grade histogram for %s' % problem,
+            'id': 'histogram',
+            'info': '',
+            'data': 'var dhist = %s;\n' % ghist_json,
+            'cmd': '[ {data: dhist, bars: { show: true, align: "center" }} ], %s' % axisopts,
+        }
         plots.append(plot)
     else:
         msg += "<br/>Not generating histogram: max_grade=%s" % max_grade
@@ -233,12 +234,13 @@ def generate_plots_for_problem(problem):
 
         axisopts = """{ xaxes: [{ axisLabel: 'Time (min)'}], yaxes: [{position: 'left',axisLabel: 'Count'}]}"""
 
-        plot = {'title': "Histogram of time differences between checks",
-                'id': 'thistogram',
-                'info': '',
-                'data': "var thist = %s;\n" % thist_json,
-                'cmd': '[ {data: thist, bars: { show: true, align: "center", barWidth:%f }} ], %s' % (dbar, axisopts),
-                }
+        plot = {
+            'title': 'Histogram of time differences between checks',
+            'id': 'thistogram',
+            'info': '',
+            'data': 'var thist = %s;\n' % thist_json,
+            'cmd': '[ {data: thist, bars: { show: true, align: "center", barWidth:%f }} ], %s' % (dbar, axisopts),
+        }
         plots.append(plot)
 
     # one IRT plot curve for each grade received (TODO: this assumes integer grades)
@@ -301,12 +303,13 @@ def generate_plots_for_problem(problem):
             else:
                 irtinfo = ""
 
-            plots.append({'title': 'IRT Plot for grade=%s %s' % (grade, irtinfo),
-                          'id': "irt%s" % grade,
-                          'info': '',
-                          'data': jsdata,
-                          'cmd': '[%s], %s' % (','.join(jsplots), axisopts),
-                          })
+            plots.append({
+                'title': 'IRT Plot for grade=%s %s' % (grade, irtinfo),
+                'id': 'irt%s' % grade,
+                'info': '',
+                'data': jsdata,
+                'cmd': '[%s], %s' % (','.join(jsplots), axisopts),
+            })
 
     #log.debug('plots = %s' % plots)
     return msg, plots

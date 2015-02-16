@@ -1178,7 +1178,12 @@ class DescriptorSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # p
     """
 
     def __init__(
-        self, load_item, resources_fs, error_tracker, get_policy=None, **kwargs
+            self,
+            load_item,
+            resources_fs,
+            error_tracker,
+            get_policy=None,
+            **kwargs
     ):
         """
         load_item: Takes a Location and returns an XModuleDescriptor

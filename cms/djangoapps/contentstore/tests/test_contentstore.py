@@ -1728,8 +1728,10 @@ class RerunCourseTest(ContentStoreTestCase):
     def test_rerun_error(self):
         error_message = "Mock Error Message"
         with mock.patch(
-                'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
-                mock.Mock(side_effect=Exception(error_message))
+            'xmodule.modulestore.mixed.MixedModuleStore.clone_course',
+            mock.Mock(
+                side_effect=Exception(error_message),
+            ),
         ):
             source_course = CourseFactory.create()
             destination_course_key = self.post_rerun_request(source_course.id)

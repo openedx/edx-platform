@@ -386,8 +386,13 @@ def add_courseware_context(content_list, course):
             location = id_map[commentable_id]["location"].to_deprecated_string()
             title = id_map[commentable_id]["title"]
 
-            url = reverse('jump_to', kwargs={"course_id": course.id.to_deprecated_string(),
-                          "location": location})
+            url = reverse(
+                'jump_to',
+                kwargs={
+                    'course_id': course.id.to_deprecated_string(),
+                    'location': location,
+                },
+            )
 
             content.update({"courseware_url": url, "courseware_title": title})
 
@@ -426,15 +431,21 @@ def prepare_content(content, course_key, is_staff=False):
             try:
                 endorser = User.objects.get(pk=endorsement["user_id"])
             except User.DoesNotExist:
-                log.error("User ID {0} in endorsement for comment {1} but not in our DB.".format(
+                log.error(
+                    "User ID %s in endorsement for comment %s but not in our DB.",
                     content.get('user_id'),
-                    content.get('id'))
+                    content.get('id'),
                 )
 
         # Only reveal endorser if requester can see author or if endorser is staff
         if (
-            endorser and
-            ("username" in fields or cached_has_permission(endorser, "endorse_comment", course_key))
+                endorser
+                and
+                (
+                    "username" in fields
+                    or
+                    cached_has_permission(endorser, "endorse_comment", course_key)
+                )
         ):
             endorsement["username"] = endorser.username
         else:

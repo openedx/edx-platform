@@ -72,14 +72,14 @@ def update_hash(hasher, obj):
 
 @dog_stats_api.timed('capa.safe_exec.time')
 def safe_exec(
-    code,
-    globals_dict,
-    random_seed=None,
-    python_path=None,
-    extra_files=None,
-    cache=None,
-    slug=None,
-    unsafely=False,
+        code,
+        globals_dict,
+        random_seed=None,
+        python_path=None,
+        extra_files=None,
+        cache=None,
+        slug=None,
+        unsafely=False,
 ):
     """
     Execute python code safely.

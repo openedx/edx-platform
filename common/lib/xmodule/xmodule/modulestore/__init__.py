@@ -198,9 +198,11 @@ class BulkOperationsMixin(object):
         if ignore_case:
             for key, record in self._active_bulk_ops.records.iteritems():
                 if (
-                    key.org.lower() == course_key.org.lower() and
-                    key.course.lower() == course_key.course.lower() and
-                    key.run.lower() == course_key.run.lower()
+                        key.org.lower() == course_key.org.lower()
+                        and
+                        key.course.lower() == course_key.course.lower()
+                        and
+                        key.run.lower() == course_key.run.lower()
                 ):
                     return record
         return self._active_bulk_ops.records[course_key.for_branch(None)]
@@ -1043,15 +1045,23 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
 
     # pylint: disable=invalid-name
     def __init__(
-        self,
-        contentstore=None,
-        doc_store_config=None,  # ignore if passed up
-        metadata_inheritance_cache_subsystem=None, request_cache=None,
-        xblock_mixins=(), xblock_select=None,
-        # temporary parms to enable backward compatibility. remove once all envs migrated
-        db=None, collection=None, host=None, port=None, tz_aware=True, user=None, password=None,
-        # allow lower level init args to pass harmlessly
-        ** kwargs
+            self,
+            contentstore=None,
+            doc_store_config=None,  # ignore if passed up
+            metadata_inheritance_cache_subsystem=None,
+            request_cache=None,
+            xblock_mixins=(),
+            xblock_select=None,
+            # temporary parms to enable backward compatibility. remove once all envs migrated
+            db=None,
+            collection=None,
+            host=None,
+            port=None,
+            tz_aware=True,
+            user=None,
+            password=None,
+            # allow lower level init args to pass harmlessly
+            ** kwargs
     ):
         '''
         Set up the error-tracking logic.

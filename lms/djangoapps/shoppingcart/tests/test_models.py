@@ -455,8 +455,15 @@ class PaidCourseRegistrationTest(ModuleStoreTestCase):
         self.assertEqual(reg1.user, self.user)
         self.assertEqual(reg1.status, "cart")
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
-        self.assertFalse(PaidCourseRegistration.contained_in_order(
-            self.cart, CourseLocator(org="MITx", course="999", run="Robot_Super_Course_abcd"))
+        self.assertFalse(
+            PaidCourseRegistration.contained_in_order(
+                self.cart,
+                CourseLocator(
+                    org='MITx',
+                    course='999',
+                    run='Robot_Super_Course_abcd',
+                ),
+            ),
         )
 
         self.assertEqual(self.cart.total_cost, self.cost)

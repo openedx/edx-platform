@@ -29,11 +29,12 @@ from student.auth import has_course_author_access
 from django.utils.translation import ugettext as _
 from models.settings.course_grading import CourseGradingModel
 
-__all__ = ['OPEN_ENDED_COMPONENT_TYPES',
-           'ADVANCED_COMPONENT_POLICY_KEY',
-           'container_handler',
-           'component_handler'
-           ]
+__all__ = [
+    'OPEN_ENDED_COMPONENT_TYPES',
+    'ADVANCED_COMPONENT_POLICY_KEY',
+    'container_handler',
+    'component_handler'
+]
 
 log = logging.getLogger(__name__)
 

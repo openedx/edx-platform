@@ -45,8 +45,11 @@ def index(request):
         # In this case, we want to have the user stay on a course catalog
         # page to make it easier to browse for courses (and register)
         if microsite.get_value(
-            'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
-            settings.FEATURES.get('ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER', True)
+                'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
+                settings.FEATURES.get(
+                    'ALWAYS_REDIRECT_HOMEPAGE_TO_DASHBOARD_FOR_AUTHENTICATED_USER',
+                    True
+                )
         ):
             return redirect(reverse('dashboard'))
 

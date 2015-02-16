@@ -79,14 +79,15 @@ class CapaFactory(object):
         )
 
     @classmethod
-    def create(cls,
-               attempts=None,
-               problem_state=None,
-               correct=False,
-               xml=None,
-               override_get_score=True,
-               **kwargs
-               ):
+    def create(
+            cls,
+            attempts=None,
+            problem_state=None,
+            correct=False,
+            xml=None,
+            override_get_score=True,
+            **kwargs
+    ):
         """
         All parameters are optional, and are added to the created problem if specified.
 
@@ -1027,10 +1028,14 @@ class CapaModuleTest(unittest.TestCase):
         )
         self.assertEqual(module.check_button_name(), "Submit")
 
-        module = CapaFactory.create(attempts=9,
-                                    max_attempts=10,
-                                    text_customization={"custom_check": "Submit", "custom_final_check": "Final Submit"}
-                                    )
+        module = CapaFactory.create(
+            attempts=9,
+            max_attempts=10,
+            text_customization={
+                'custom_check': 'Submit',
+                'custom_final_check': 'Final Submit',
+            },
+        )
         self.assertEqual(module.check_button_name(), "Final Submit")
 
     def test_check_button_checking_name_customization(self):

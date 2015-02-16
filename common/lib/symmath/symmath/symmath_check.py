@@ -40,15 +40,18 @@ def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None)
         ans = ans.lower()
 
     try:
-        ret = check(expect, ans,
-                    matrix=options['__MATRIX__'],
-                    abcsym=options['__ABC__'],
-                    symtab=symtab,
-                    )
+        ret = check(
+            expect,
+            ans,
+            matrix=options['__MATRIX__'],
+            abcsym=options['__ABC__'],
+            symtab=symtab,
+        )
     except Exception, err:
-        return {'ok': False,
-                'msg': 'Error %s<br/>Failed in evaluating check(%s,%s)' % (err, expect, ans)
-                }
+        return {
+            'ok': False,
+            'msg': 'Error %s<br/>Failed in evaluating check(%s,%s)' % (err, expect, ans),
+        }
     return ret
 
 #-----------------------------------------------------------------------------

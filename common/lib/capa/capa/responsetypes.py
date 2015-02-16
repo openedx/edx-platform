@@ -338,9 +338,13 @@ class LoncapaResponse(object):
         #   </hintgroup>
         # </formularesponse>
 
-        if (self.hint_tag is not None
-            and hintgroup.find(self.hint_tag) is not None
-                and hasattr(self, 'check_hint_condition')):
+        if (
+                self.hint_tag is not None
+                and
+                hintgroup.find(self.hint_tag) is not None
+                and
+                hasattr(self, 'check_hint_condition')
+        ):
 
             rephints = hintgroup.findall(self.hint_tag)
             hints_to_show = self.check_hint_condition(
@@ -2803,11 +2807,14 @@ class AnnotationResponse(LoncapaResponse):
     def _find_options(self, inputfield):
         """Returns an array of dicts where each dict represents an option. """
         elements = inputfield.findall('./options/option')
-        return [{
+        return [
+            {
                 'id': index,
                 'description': option.text,
                 'choice': option.get('choice')
-                } for (index, option) in enumerate(elements)]
+            }
+            for (index, option) in enumerate(elements)
+        ]
 
     def _find_option_with_choice(self, inputfield, choice):
         """Returns the option with the given choice value, otherwise None. """
@@ -2854,10 +2861,11 @@ class ChoiceTextResponse(LoncapaResponse):
     human_name = _('Checkboxes With Text Input')
     tags = ['choicetextresponse']
     max_inputfields = 1
-    allowed_inputfields = ['choicetextgroup',
-                           'checkboxtextgroup',
-                           'radiotextgroup'
-                           ]
+    allowed_inputfields = [
+        'choicetextgroup',
+        'checkboxtextgroup',
+        'radiotextgroup',
+    ]
 
     def __init__(self, *args, **kwargs):
         self.correct_inputs = {}
@@ -2963,7 +2971,10 @@ class ChoiceTextResponse(LoncapaResponse):
         """
 
         for index, choice in enumerate(
-            self.xml.xpath('//*[@id=$id]//choice', id=self.xml.get('id'))
+                self.xml.xpath(
+                    '//*[@id=$id]//choice',
+                    id=self.xml.get('id'),
+                )
         ):
             # Set the name attribute for <choices>
             # "bc" is appended at the end to indicate that this is a

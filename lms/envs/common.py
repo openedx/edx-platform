@@ -90,8 +90,9 @@ FEATURES = {
     # university to use for branding purposes
     'SUBDOMAIN_BRANDING': False,
 
-    'FORCE_UNIVERSITY_DOMAIN': False,  # set this to the university domain to use, as an override to HTTP_HOST
-                                        # set to None to do no university selection
+    # Set this to the university domain to use, as an override to HTTP_HOST
+    # Set to None to do no university selection
+    'FORCE_UNIVERSITY_DOMAIN': False,
 
     # for consistency in user-experience, keep the value of the following 3 settings
     # in sync with the corresponding ones in cms/envs/common.py

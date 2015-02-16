@@ -339,12 +339,10 @@ def divide_chemical_expression(s1, s2, ignore_state=False):
         if treedic['1 phases'] != treedic['2 phases']:
             return False
 
-    if any(
-        [
+    if any([
             x / y - treedic['1 factors'][0] / treedic['2 factors'][0]
             for (x, y) in zip(treedic['1 factors'], treedic['2 factors'])
-        ]
-    ):
+    ]):
         # factors are not proportional
         return False
     else:

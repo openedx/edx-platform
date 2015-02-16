@@ -12,42 +12,111 @@ COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
 # Pattern to match a library key only
 LIBRARY_KEY_PATTERN = r'(?P<library_key_string>library-v1:[^/+]+\+[^/+]+)'
 
-urlpatterns = patterns('',  # nopep8
+urlpatterns = patterns(
+    '',
 
-    url(r'^transcripts/upload$', 'contentstore.views.upload_transcripts', name='upload_transcripts'),
-    url(r'^transcripts/download$', 'contentstore.views.download_transcripts', name='download_transcripts'),
-    url(r'^transcripts/check$', 'contentstore.views.check_transcripts', name='check_transcripts'),
-    url(r'^transcripts/choose$', 'contentstore.views.choose_transcripts', name='choose_transcripts'),
-    url(r'^transcripts/replace$', 'contentstore.views.replace_transcripts', name='replace_transcripts'),
-    url(r'^transcripts/rename$', 'contentstore.views.rename_transcripts', name='rename_transcripts'),
-    url(r'^transcripts/save$', 'contentstore.views.save_transcripts', name='save_transcripts'),
+    url(
+        r'^transcripts/upload$',
+        'contentstore.views.upload_transcripts',
+        name='upload_transcripts',
+    ),
+    url(
+        r'^transcripts/download$',
+        'contentstore.views.download_transcripts',
+        name='download_transcripts',
+    ),
+    url(
+        r'^transcripts/check$',
+        'contentstore.views.check_transcripts',
+        name='check_transcripts',
+    ),
+    url(
+        r'^transcripts/choose$',
+        'contentstore.views.choose_transcripts',
+        name='choose_transcripts',
+    ),
+    url(
+        r'^transcripts/replace$',
+        'contentstore.views.replace_transcripts',
+        name='replace_transcripts',
+    ),
+    url(
+        r'^transcripts/rename$',
+        'contentstore.views.rename_transcripts',
+        name='rename_transcripts',
+    ),
+    url(
+        r'^transcripts/save$',
+        'contentstore.views.save_transcripts',
+        name='save_transcripts',
+    ),
 
-    url(r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
-        'contentstore.views.preview_handler', name='preview_handler'),
+    url(
+        r'^preview/xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+        'contentstore.views.preview_handler',
+        name='preview_handler',
+    ),
 
-    url(r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
-        'contentstore.views.component_handler', name='component_handler'),
+    url(
+        r'^xblock/(?P<usage_key_string>.*?)/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$',
+        'contentstore.views.component_handler',
+        name='component_handler',
+    ),
 
-    url(r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
-        'contentstore.views.xblock.xblock_resource', name='xblock_resource_url'),
+    url(
+        r'^xblock/resource/(?P<block_type>[^/]*)/(?P<uri>.*)$',
+        'contentstore.views.xblock.xblock_resource',
+        name='xblock_resource_url',
+    ),
 
     # temporary landing page for a course
-    url(r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
-        'contentstore.views.landing', name='landing'),
+    url(
+        r'^edge/(?P<org>[^/]+)/(?P<course>[^/]+)/course/(?P<coursename>[^/]+)$',
+        'contentstore.views.landing',
+        name='landing',
+    ),
 
-    url(r'^not_found$', 'contentstore.views.not_found', name='not_found'),
-    url(r'^server_error$', 'contentstore.views.server_error', name='server_error'),
+    url(
+        r'^not_found$',
+        'contentstore.views.not_found',
+        name='not_found',
+    ),
+    url(
+        r'^server_error$',
+        'contentstore.views.server_error',
+        name='server_error',
+    ),
 
     # temporary landing page for edge
-    url(r'^edge$', 'contentstore.views.edge', name='edge'),
+    url(
+        r'^edge$',
+        'contentstore.views.edge',
+        name='edge',
+    ),
     # noop to squelch ajax errors
-    url(r'^event$', 'contentstore.views.event', name='event'),
+    url(
+        r'^event$',
+        'contentstore.views.event',
+        name='event',
+    ),
 
-    url(r'^xmodule/', include('pipeline_js.urls')),
-    url(r'^heartbeat$', include('heartbeat.urls')),
+    url(
+        r'^xmodule/',
+        include('pipeline_js.urls'),
+    ),
+    url(
+        r'^heartbeat$',
+        include('heartbeat.urls'),
+    ),
 
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
-    url(r'^lang_pref/', include('lang_pref.urls')),
+    url(
+        r'^user_api/',
+        include('openedx.core.djangoapps.user_api.urls'),
+    ),
+    url(
+        r'^lang_pref/',
+        include('lang_pref.urls'),
+    ),
 )
 
 # User creation and updating views

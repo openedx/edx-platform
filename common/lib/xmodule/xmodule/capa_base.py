@@ -268,11 +268,13 @@ class CapaMixin(CapaFields):
                     )
                 )
                 # create a dummy problem with error message instead of failing
-                problem_text = (u'<problem><text><span class="inline-error">'
-                                u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
-                                    url=self.location.to_deprecated_string(),
-                                    msg=msg)
-                                )
+                problem_text = (
+                    u'<problem><text><span class="inline-error">'
+                    u'Problem {url} has an error:</span>{msg}</text></problem>'.format(
+                        url=self.location.to_deprecated_string(),
+                        msg=msg,
+                    )
+                )
                 self.lcp = self.new_lcp(self.get_state_for_lcp(), text=problem_text)
             else:
                 # add extra info and raise

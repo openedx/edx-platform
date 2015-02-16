@@ -73,10 +73,15 @@ def update_certificate(request):
                             'xqueue_header: {1}'.format(
                                 xqueue_body, xqueue_header))
 
-            return HttpResponse(json.dumps({
-                'return_code': 1,
-                'content': 'unable to lookup key'}),
-                mimetype='application/json')
+            return HttpResponse(
+                json.dumps(
+                    {
+                        'return_code': 1,
+                        'content': 'unable to lookup key',
+                    },
+                ),
+                mimetype='application/json',
+            )
 
         if 'error' in xqueue_body:
             cert.status = status.error

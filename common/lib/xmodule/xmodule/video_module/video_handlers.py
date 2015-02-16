@@ -219,9 +219,9 @@ class VideoStudentViewHandlers(object):
                 # if no translation is required
                 return self.get_static_transcript(request)
             except (
-                TranscriptException,
-                UnicodeDecodeError,
-                TranscriptsGenerationException
+                    TranscriptException,
+                    UnicodeDecodeError,
+                    TranscriptsGenerationException,
             ) as ex:
                 log.info(ex.message)
                 response = Response(status=404)

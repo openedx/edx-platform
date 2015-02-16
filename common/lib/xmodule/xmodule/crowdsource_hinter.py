@@ -328,8 +328,11 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
             try:
                 hint_and_votes.append(temp_dict[answer][str(vote_pk)])
             except KeyError:
-                log.exception('In hinter tally_vote, couldn\'t find: {ans}, {vote_pk}'.format(
-                              ans=answer, vote_pk=str(vote_pk)))
+                log.exception(
+                    "In hinter tally_vote, couldn't find: %s, %s",
+                    answer,
+                    str(vote_pk),
+                )
 
         hint_and_votes.sort(key=lambda pair: pair[1], reverse=True)
         # Reset self.previous_answers and user_submissions.
@@ -351,8 +354,10 @@ class CrowdsourceHinterModule(CrowdsourceHinterFields, XModule):
         hint = escape(data['hint'])
         answer = data['answer']
         if not self.validate_answer(answer):
-            log.exception('Failure in hinter submit_hint: Unable to parse answer: {ans}'.format(
-                          ans=answer))
+            log.exception(
+                "Failure in hinter submit_hint: Unable to parse answer: %s",
+                answer,
+            )
             return {'error': 'Could not submit answer'}
         # Only allow a student to vote or submit a hint once.
         if self.user_voted:

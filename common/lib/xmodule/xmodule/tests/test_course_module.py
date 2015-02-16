@@ -60,7 +60,8 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
     advertised_start = to_attrb('advertised_start', advertised_start)
     end = to_attrb('end', end)
 
-    start_xml = '''
+    start_xml = (
+        '''
          <course org="{org}" course="{course}" display_organization="{org}_display" display_coursenumber="{course}_display"
                 graceperiod="1 day" url_name="test"
                 start="{start}"
@@ -73,7 +74,8 @@ def get_dummy_course(start, announcement=None, is_new=None, advertised_start=Non
                 <html url_name="h" display_name="H">Two houses, ...</html>
             </chapter>
          </course>
-     '''.format(
+        '''
+    ).format(
         org=ORG,
         course=COURSE,
         start=start,

@@ -172,8 +172,14 @@ def miller(points):
         Y = np.array([new_origin[0], 1 - new_origin[1], new_origin[2]])
         Z = np.array([new_origin[0], new_origin[1], 1 - new_origin[2]])
         new_Ccs = [X - new_origin, Y - new_origin, Z - new_origin]
-        segments = ([np.dot(P - new_origin, N) / np.dot(ort, N) if
-                    np.dot(ort, N) != 0 else np.nan for ort in new_Ccs])
+        segments = [
+            (
+                np.dot(P - new_origin, N) / np.dot(ort, N)
+                if np.dot(ort, N) != 0
+                else np.nan
+            )
+            for ort in new_Ccs
+        ]
         # fix signs of indices: 0 -> 1, 1 -> -1 (
         segments = (1 - 2 * new_origin) * segments
 
