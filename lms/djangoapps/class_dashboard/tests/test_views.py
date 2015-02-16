@@ -1,12 +1,10 @@
 """
 Tests for class dashboard (Metrics tab in instructor dashboard)
 """
-from django.test.utils import override_settings
 from django.test.client import RequestFactory
 from django.utils import simplejson
 from mock import patch
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import AdminFactory
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

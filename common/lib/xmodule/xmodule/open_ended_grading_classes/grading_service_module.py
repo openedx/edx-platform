@@ -1,5 +1,4 @@
 # This class gives a common interface for logging into the grading controller
-import json
 import logging
 import requests
 import dogstats_wrapper as dog_stats_api

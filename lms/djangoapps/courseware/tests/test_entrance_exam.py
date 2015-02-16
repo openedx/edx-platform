@@ -2,7 +2,6 @@
 Tests use cases related to LMS Entrance Exam behavior, such as gated content access (TOC)
 """
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module, toc_for_course
@@ -10,7 +9,7 @@ from courseware.tests.factories import UserFactory
 from milestones import api as milestones_api
 from milestones.models import MilestoneRelationshipType
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from util.milestones_helpers import generate_milestone_namespace, NAMESPACE_CHOICES
 

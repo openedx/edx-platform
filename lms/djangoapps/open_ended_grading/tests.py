@@ -11,7 +11,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import RequestFactory
-from django.test.utils import override_settings
 from edxmako.shortcuts import render_to_string
 from edxmako.tests import mako_middleware_process_request
 from mock import MagicMock, patch, Mock
@@ -29,7 +28,7 @@ from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
+    TEST_DATA_MIXED_TOY_MODULESTORE
 )
 from xmodule.modulestore.xml_importer import import_from_xml
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service

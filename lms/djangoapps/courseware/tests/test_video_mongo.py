@@ -1,22 +1,16 @@
 # -*- coding: utf-8 -*-
 """Video xmodule tests in mongo."""
 import json
-import unittest
 from collections import OrderedDict
 from mock import patch, PropertyMock, MagicMock
 
 from django.conf import settings
 
-from xblock.fields import ScopeIds
-from xblock.field_data import DictFieldData
-
-from xmodule.video_module import create_youtube_string, VideoDescriptor
+from xmodule.video_module import create_youtube_string
 from xmodule.x_module import STUDENT_VIEW
-from xmodule.tests import get_test_descriptor_system
 from xmodule.tests.test_video import VideoDescriptorTestBase
 
 from edxval.api import (
-    ValVideoNotFoundError,
     get_video_info,
     create_profile,
     create_video

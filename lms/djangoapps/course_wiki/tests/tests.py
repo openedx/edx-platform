@@ -1,5 +1,4 @@
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from courseware.tests.tests import LoginEnrollmentTestCase
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

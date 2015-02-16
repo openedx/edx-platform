@@ -12,7 +12,6 @@ import factory
 
 from django.conf import settings
 from django.core.management import call_command
-from django.test.utils import override_settings
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore

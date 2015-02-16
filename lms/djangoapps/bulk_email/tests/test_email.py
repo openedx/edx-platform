@@ -15,7 +15,6 @@ from django.test.utils import override_settings
 
 from bulk_email.models import Optout
 from courseware.tests.factories import StaffFactory, InstructorFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from instructor_task.subtasks import update_subtask_status
 from student.roles import CourseStaffRole
 from student.models import CourseEnrollment

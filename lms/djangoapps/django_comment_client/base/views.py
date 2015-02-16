@@ -1,6 +1,5 @@
 import functools
 import logging
-import os.path
 import random
 import time
 import urlparse

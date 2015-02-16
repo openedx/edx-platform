@@ -5,11 +5,9 @@ from pytz import UTC
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.utils import override_settings
 from edxmako import add_lookup
 import mock
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
 import django_comment_client.utils as utils

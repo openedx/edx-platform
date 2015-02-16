@@ -11,7 +11,7 @@ import ddt
 from django.test import RequestFactory
 
 from contentstore.views.course import _accessible_courses_list, _accessible_courses_list_from_groups, AccessListFallback
-from contentstore.utils import delete_course_and_groups, reverse_course_url
+from contentstore.utils import delete_course_and_groups
 from contentstore.tests.utils import AjaxEnabledTestClient
 from student.tests.factories import UserFactory
 from student.roles import CourseInstructorRole, CourseStaffRole, GlobalStaff, OrgStaffRole, OrgInstructorRole

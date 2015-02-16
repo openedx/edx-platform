@@ -11,7 +11,6 @@ from edxnotes import helpers
 from edxnotes.decorators import edxnotes
 from edxnotes.exceptions import EdxNotesParseError, EdxNotesServiceUnavailable
 from django.conf import settings
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from oauth2_provider.tests.factories import ClientFactory

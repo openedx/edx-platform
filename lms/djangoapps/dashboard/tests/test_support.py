@@ -5,9 +5,7 @@ import datetime
 
 from django.contrib.auth.models import Permission
 from django.test.client import Client
-from django.test.utils import override_settings
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_modes.models import CourseMode
 from shoppingcart.models import CertificateItem, Order
 from student.models import CourseEnrollment

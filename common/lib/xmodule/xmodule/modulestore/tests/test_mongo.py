@@ -21,7 +21,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
-from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location

@@ -10,7 +10,6 @@ from django.views.decorators.csrf import csrf_exempt
 from capa.xqueue_interface import XQUEUE_METRIC_NAME
 from certificates.models import certificate_status_for_student, CertificateStatuses, GeneratedCertificate
 from certificates.queue import XQueueCertInterface
-from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

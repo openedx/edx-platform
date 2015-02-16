@@ -1,7 +1,6 @@
 import json
-from textwrap import dedent
 from xmodule.modulestore.xml import XMLModuleStore
-from xmodule.tests import DATA_DIR, get_test_system
+from xmodule.tests import DATA_DIR
 
 from StringIO import StringIO
 

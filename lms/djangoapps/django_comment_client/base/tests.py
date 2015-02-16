@@ -2,7 +2,6 @@ import logging
 import json
 
 from django.test.client import Client, RequestFactory
-from django.test.utils import override_settings
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
@@ -10,7 +9,6 @@ from mock import patch, ANY, Mock
 from nose.tools import assert_true, assert_equal  # pylint: disable=no-name-in-module
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from django_comment_client.base import views
 from django_comment_client.tests.group_id import CohortedTopicGroupIdTestMixin, NonCohortedTopicGroupIdTestMixin, GroupIdAssertionMixin
 from django_comment_client.tests.utils import CohortedContentTestCase

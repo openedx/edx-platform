@@ -20,7 +20,7 @@ import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_XML_MODULESTORE
+    TEST_DATA_XML_MODULESTORE,
 )
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users

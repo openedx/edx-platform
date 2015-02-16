@@ -6,7 +6,6 @@ that the view is conditionally available when Course Auth is turned on.
 """
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from mock import patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 

@@ -6,7 +6,6 @@ import tempfile
 from uuid import uuid4
 import copy
 import textwrap
-from pymongo import MongoClient
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings

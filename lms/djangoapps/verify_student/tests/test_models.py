@@ -6,12 +6,10 @@ import pytz
 
 from django.conf import settings
 from django.test import TestCase
-from django.test.utils import override_settings
 from mock import patch
 from nose.tools import assert_is_none, assert_equals, assert_raises, assert_true, assert_false  # pylint: disable=E0611
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from reverification.tests.factories import MidcourseReverificationWindowFactory
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

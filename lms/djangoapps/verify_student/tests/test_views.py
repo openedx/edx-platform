@@ -13,7 +13,6 @@ from datetime import timedelta, datetime
 import ddt
 from django.test.client import Client
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -21,7 +20,7 @@ from django.core import mail
 from bs4 import BeautifulSoup
 
 from openedx.core.djangoapps.user_api.api import profile as profile_api
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, mixed_store_config
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum

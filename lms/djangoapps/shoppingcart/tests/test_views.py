@@ -25,7 +25,7 @@ from mock import patch, Mock
 import ddt
 
 from xmodule.modulestore.tests.django_utils import (
-    ModuleStoreTestCase, mixed_store_config
+    ModuleStoreTestCase,
 )
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.roles import CourseSalesAdminRole

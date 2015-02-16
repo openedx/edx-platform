@@ -10,12 +10,10 @@ from factory.django import DjangoModelFactory
 
 from django.test import TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from nose.tools import assert_true  # pylint: disable=no-name-in-module
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from licenses.models import CourseSoftware, UserLicense
 
 from student.tests.factories import UserFactory

@@ -5,7 +5,6 @@ for use by batch processes
 """
 from instructor.offline_gradecalc import offline_grade_calculation
 from courseware.courses import get_course_by_id
-from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey

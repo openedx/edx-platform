@@ -6,8 +6,6 @@ import re
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
-
 
 @override_settings(LANGUAGES=(('eo', 'Esperanto'),))
 class I18nTestCase(TestCase):

@@ -12,7 +12,6 @@ from mock import patch, Mock
 from edxmako.shortcuts import render_to_response
 
 from branding.views import index
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from edxmako.tests import mako_middleware_process_request
 import student.views
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

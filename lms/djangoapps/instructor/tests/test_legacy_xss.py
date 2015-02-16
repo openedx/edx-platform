@@ -4,10 +4,8 @@ Tests of various instructor dashboard features that include lists of students
 
 from django.conf import settings
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from markupsafe import escape
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from edxmako.tests import mako_middleware_process_request
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

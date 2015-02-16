@@ -31,8 +31,6 @@ import decimal
 from student import auth
 from student.roles import CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
-import datetime
-import pytz
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 

@@ -2,7 +2,6 @@
 Tests for the django comment client integration models
 """
 from django.test.testcases import TestCase
-from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTORE

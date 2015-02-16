@@ -3,7 +3,6 @@
 import json
 from contentstore.views import tabs
 from contentstore.tests.utils import CourseTestCase
-from django.test import TestCase
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

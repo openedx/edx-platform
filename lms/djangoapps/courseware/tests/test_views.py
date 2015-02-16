@@ -9,7 +9,7 @@ import unittest
 import ddt
 
 from django.conf import settings
-from django.contrib.auth.models import User, AnonymousUser
+from django.contrib.auth.models import AnonymousUser
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase
@@ -22,7 +22,7 @@ from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 import courseware.views as views
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
+    TEST_DATA_MIXED_TOY_MODULESTORE,
 )
 from course_modes.models import CourseMode
 import shoppingcart

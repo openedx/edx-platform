@@ -17,14 +17,12 @@ except ImportError:
     # pylint: disable=invalid-name
     dog_stats_api = None
 
-from pkg_resources import resource_string
-
 from capa.capa_problem import LoncapaProblem, LoncapaSystem
 from capa.responsetypes import StudentInputError, \
     ResponseError, LoncapaProblemError
 from capa.util import convert_files_to_filenames
 from .progress import Progress
-from xmodule.exceptions import NotFoundError, ProcessingError
+from xmodule.exceptions import NotFoundError
 from xblock.fields import Scope, String, Boolean, Dict, Integer, Float
 from .fields import Timedelta, Date
 from django.utils.timezone import UTC

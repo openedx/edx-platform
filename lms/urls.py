@@ -550,7 +550,6 @@ if settings.FEATURES.get('RUN_AS_ANALYTICS_SERVER_ENABLED'):
     urlpatterns += (
         url(r'^edinsights_service/', include('edinsights.core.urls')),
     )
-    import edinsights.core.registry
 
 # FoldIt views
 urlpatterns += (

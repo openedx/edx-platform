@@ -3,14 +3,12 @@ Tests for wiki middleware.
 """
 
 from django.test.client import Client
-from django.test.utils import override_settings
 from wiki.models import URLPath
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
 from courseware.tests.factories import InstructorFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from course_wiki.views import get_or_create_root
 
 

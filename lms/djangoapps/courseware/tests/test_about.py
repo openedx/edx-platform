@@ -12,7 +12,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from course_modes.models import CourseMode
 from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
+    TEST_DATA_MIXED_CLOSED_MODULESTORE,
 )
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseEnrollmentAllowedFactory
