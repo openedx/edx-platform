@@ -32,7 +32,7 @@ def circuit_line(circuit):
     return xml.etree.ElementTree.tostring(circuit_line)
 
 
-def edit_circuit(request, circuit):
+def edit_circuit(_request, circuit):
     try:
         server_circuit = ServerCircuit.objects.get(name=circuit)
     except Exception:
