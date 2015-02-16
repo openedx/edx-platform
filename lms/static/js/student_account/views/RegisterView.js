@@ -58,7 +58,22 @@ var edx = edx || {};
 
         saveSuccess: function() {
             this.trigger('auth-complete');
-        }
+        },
         
+        saveError: function( error ) {
+            this.errors = _.flatten(
+                _.map(
+                    JSON.parse(error.responseText),
+                    function(error_list) {
+                        return _.map(
+                            error_list,
+                            function(error) { return "<li>" + error.user_message + "</li>"; }
+                        );
+                    }
+                )
+            );
+            this.setErrors();
+            this.toggleDisableButton(false);
+        }
     });
 })(jQuery, _, gettext);
