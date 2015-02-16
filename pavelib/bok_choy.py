@@ -95,8 +95,9 @@ def run_bokchoy(**opts):
     msg = colorize(
         'green',
         'Running tests using {default_store} modulestore.'.format(
-            default_store=test_suite.default_store)
+            default_store=test_suite.default_store,
         )
+    )
     print(msg)
     test_suite.run()
 
