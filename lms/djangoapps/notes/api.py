@@ -148,7 +148,7 @@ def create(request, course_key):
     return ApiResponse(http_response=response, data=None)
 
 
-def read(request, course_key, note_id):  # pylint: disable=unused-argument (course_key)
+def read(request, _course_key, note_id):
     '''
     Returns a single annotation object.
     '''
