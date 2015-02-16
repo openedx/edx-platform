@@ -143,14 +143,14 @@ class CyberSourceTests(TestCase):
         """
         Tests the processor decline html message
         """
-        DECISION = 'REJECT'
+        decision = 'REJECT'
         for code, reason in REASONCODE_MAP.iteritems():
             params = {
-                'decision': DECISION,
+                'decision': decision,
                 'reasonCode': code,
             }
             html = get_processor_decline_html(params)
-            self.assertIn(DECISION, html)
+            self.assertIn(decision, html)
             self.assertIn(reason, html)
             self.assertIn(code, html)
             self.assertIn(settings.PAYMENT_SUPPORT_EMAIL, html)

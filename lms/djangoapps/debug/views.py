@@ -21,19 +21,19 @@ def run_python(request):
     """A page to allow testing the Python sandbox on a production server."""
     if not request.user.is_staff:
         raise Http404
-    c = {}
-    c['code'] = ''
-    c['results'] = None
+    code = {}
+    code['code'] = ''
+    code['results'] = None
     if request.method == 'POST':
-        py_code = c['code'] = request.POST.get('code')
+        py_code = code['code'] = request.POST.get('code')
         g = {}
         try:
             safe_exec(py_code, g)
-        except Exception as e:
-            c['results'] = traceback.format_exc()
+        except Exception:
+            code['results'] = traceback.format_exc()
         else:
-            c['results'] = pprint.pformat(g)
-    return render_to_response("debug/run_python_form.html", c)
+            code['results'] = pprint.pformat(g)
+    return render_to_response("debug/run_python_form.html", code)
 
 
 @login_required

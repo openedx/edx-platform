@@ -51,15 +51,15 @@ from shoppingcart.tests.payment_fake import PaymentFakeView
 def mock_render_purchase_form_html(*args, **kwargs):
     return render_purchase_form_html(*args, **kwargs)
 
-form_mock = Mock(side_effect=mock_render_purchase_form_html)
+MOCK_FORM = Mock(side_effect=mock_render_purchase_form_html)
 
 
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
-render_mock = Mock(side_effect=mock_render_to_response)
+MOCK_RENDER = Mock(side_effect=mock_render_to_response)
 
-postpay_mock = Mock()
+MOCK_POST_PAY = Mock()
 
 
 @patch.dict('django.conf.settings.FEATURES', {'ENABLE_PAID_COURSE_REGISTRATION': True})
@@ -155,7 +155,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.add_course_to_cart', args=[self.course_key.to_deprecated_string()]))
         self.assertEqual(resp.status_code, 403)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_billing_details(self):
         billing_url = reverse('billing_details')
         self.login_user()
@@ -170,7 +170,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the default currency in the context
         self.assertEqual(context['currency'], 'usd')
@@ -186,7 +186,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(billing_url, data)
         self.assertEqual(resp.status_code, 200)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_billing_details_with_override_currency_settings(self):
         billing_url = reverse('billing_details')
@@ -198,7 +198,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(billing_url)
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), __) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), __) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
 
         self.assertEqual(template, 'shoppingcart/billing_details.html')
         # check for the override currency settings in the context
@@ -719,8 +719,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(PaidCourseRegistration.contained_in_order(self.cart, self.course_key))
 
-    @patch('shoppingcart.views.render_purchase_form_html', form_mock)
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_purchase_form_html', MOCK_FORM)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_cart(self):
         self.login_user()
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -728,13 +728,13 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
+        ((purchase_form_arg_cart,), _) = MOCK_FORM.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
         self.assertIn(cert_item, purchase_form_arg_cart_items)
         self.assertEqual(len(purchase_form_arg_cart_items), 2)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/shopping_cart.html')
         self.assertEqual(len(context['shoppingcart_items']), 2)
         self.assertEqual(context['amount'], 80)
@@ -743,8 +743,8 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(context['currency'], 'usd')
         self.assertEqual(context['currency_symbol'], '$')
 
-    @patch('shoppingcart.views.render_purchase_form_html', form_mock)
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_purchase_form_html', MOCK_FORM)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
     def test_show_cart_with_override_currency_settings(self):
         self.login_user()
@@ -752,11 +752,11 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_cart', args=[]))
         self.assertEqual(resp.status_code, 200)
 
-        ((purchase_form_arg_cart,), _) = form_mock.call_args  # pylint: disable=redefined-outer-name
+        ((purchase_form_arg_cart,), _) = MOCK_FORM.call_args  # pylint: disable=redefined-outer-name
         purchase_form_arg_cart_items = purchase_form_arg_cart.orderitem_set.all().select_subclasses()
         self.assertIn(reg_item, purchase_form_arg_cart_items)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/shopping_cart.html')
         # check for the override currency settings in the context
         self.assertEqual(context['currency'], 'PKR')
@@ -801,25 +801,32 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             '-1'
         )
 
-    @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
+    @patch('shoppingcart.views.process_postpay_callback', MOCK_POST_PAY)
     def test_postpay_callback_success(self):
-        postpay_mock.return_value = {'success': True, 'order': self.cart}
+        MOCK_POST_PAY.return_value = {
+            'success': True,
+            'order': self.cart,
+        }
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.postpay_callback', args=[]))
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(urlparse(resp.__getitem__('location')).path,
                          reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
 
-    @patch('shoppingcart.views.process_postpay_callback', postpay_mock)
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.process_postpay_callback', MOCK_POST_PAY)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_postpay_callback_failure(self):
-        postpay_mock.return_value = {'success': False, 'order': self.cart, 'error_html': 'ERROR_TEST!!!'}
+        MOCK_POST_PAY.return_value = {
+            'success': False,
+            'order': self.cart,
+            'error_html': 'ERROR_TEST!!!',
+        }
         self.login_user()
         resp = self.client.post(reverse('shoppingcart.views.postpay_callback', args=[]))
         self.assertEqual(resp.status_code, 200)
         self.assertIn('ERROR_TEST!!!', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/error.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['error_html'], 'ERROR_TEST!!!')
@@ -959,7 +966,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         total_amount = PaidCourseRegistration.get_total_amount_of_purchased_item(self.course_key)
         self.assertEqual(total_amount, 76)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_with_valid_coupon_code(self):
         self.add_course_to_user_cart(self.course_key)
         self.add_coupon(self.course_key, True, self.coupon_code)
@@ -973,7 +980,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn(str(self.get_discount(self.cost)), resp.content)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_reg_code_and_course_registration_scenario(self):
         self.add_reg_code(self.course_key)
 
@@ -994,7 +1001,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         response = self.client.post(redeem_url)
         self.assertEquals(response.status_code, 200)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_reg_code_with_multiple_courses_and_checkout_scenario(self):
         self.add_reg_code(self.course_key)
 
@@ -1024,7 +1031,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertEqual(context['order'].total_cost, self.testing_cost)
@@ -1040,7 +1047,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIsNotNone(item2.course_enrollment)
         self.assertEqual(item2.course_enrollment.course_id, self.testing_course.id)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_with_valid_reg_code(self):
         self.add_course_to_user_cart(self.course_key)
         self.add_reg_code(self.course_key)
@@ -1053,7 +1060,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('0.00', resp.content)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success(self):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
@@ -1065,7 +1072,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -1076,7 +1083,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(context['currency'], 'usd')
 
     @override_settings(PAID_COURSE_REGISTRATION_CURRENCY=['PKR', 'Rs'])
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_with_override_currency_settings(self):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
@@ -1086,7 +1093,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
@@ -1095,7 +1102,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(context['currency_symbol'], 'Rs')
         self.assertEqual(context['currency'], 'PKR')
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_courseregcode_item_total_price(self):
         self.cart.order_type = 'business'
         self.cart.save()
@@ -1103,7 +1110,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.cart.purchase(first='FirstNameTesting123', street1='StreetTesting123')
         self.assertEquals(CourseRegCodeItem.get_total_amount_of_purchased_item(self.course_key), 80)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_with_order_type_business(self):
         self.cart.order_type = 'business'
         self.cart.save()
@@ -1130,7 +1137,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # fetch the newly generated registration codes
         course_registration_codes = CourseRegistrationCode.objects.filter(order=self.cart)
 
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
@@ -1162,14 +1169,14 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         # has been expired or not
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
         self.assertEqual(resp.status_code, 200)
-        ((template, context), _) = render_mock.call_args  # pylint: disable=redefined-outer-name
+        ((template, context), _) = MOCK_RENDER.call_args  # pylint: disable=redefined-outer-name
         self.assertEqual(template, 'shoppingcart/receipt.html')
         # now check for all the registration codes in the receipt
         # and one of code should be used at this point
         self.assertTrue(context['reg_code_info_list'][0]['is_redeemed'])
         self.assertFalse(context['reg_code_info_list'][1]['is_redeemed'])
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_with_upgrade(self):
 
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -1179,9 +1186,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.login_user()
 
         # When we come from the upgrade flow, we'll have a session variable showing that
-        s = self.client.session
-        s['attempting_upgrade'] = True
-        s.save()
+        session = self.client.session
+        session['attempting_upgrade'] = True
+        session.save()
 
         self.mock_tracker.emit.reset_mock()  # pylint: disable=maybe-no-member
         resp = self.client.get(reverse('shoppingcart.views.show_receipt', args=[self.cart.id]))
@@ -1194,7 +1201,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertIn('FirstNameTesting123', resp.content)
         self.assertIn('80.00', resp.content)
 
-        ((template, context), _) = render_mock.call_args
+        ((template, context), _) = MOCK_RENDER.call_args
 
         # When we come from the upgrade flow, we get these context variables
 
@@ -1215,7 +1222,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
             }
         )
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_refund(self):
         reg_item = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
         cert_item = CertificateItem.add_to_order(self.cart, self.verified_course_key, self.cost, 'honor')
@@ -1228,14 +1235,14 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn('40.00', resp.content)
 
-        ((template, context), _tmp) = render_mock.call_args
+        ((template, context), _tmp) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/receipt.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item, context['shoppingcart_items'][0])
         self.assertIn(cert_item, context['shoppingcart_items'][1])
         self.assertTrue(context['any_refunds'])
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_show_receipt_success_custom_receipt_page(self):
         cert_item = CertificateItem.add_to_order(self.cart, self.course_key, self.cost, 'honor')
         self.cart.purchase()
@@ -1243,7 +1250,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         receipt_url = reverse('shoppingcart.views.show_receipt', args=[self.cart.id])
         resp = self.client.get(receipt_url)
         self.assertEqual(resp.status_code, 200)
-        ((template, _context), _tmp) = render_mock.call_args
+        ((template, _context), _tmp) = MOCK_RENDER.call_args
         self.assertEqual(template, cert_item.single_item_receipt_template)
 
     def _assert_404(self, url, use_post=False):
@@ -1378,7 +1385,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         """
         self.client.login(username=self.user.username, password="password")
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_to_check_that_cart_item_enrollment_is_closed(self):
         self.login_user()
         reg_item1 = PaidCourseRegistration.add_to_order(self.cart, self.course_key)
@@ -1395,7 +1402,7 @@ class ShoppingcartViewsClosedEnrollment(ModuleStoreTestCase):
         self.assertEqual(resp.status_code, 200)
         self.assertIn("{course_name} has been removed because the enrollment period has closed.".format(course_name=self.testing_course.display_name), resp.content)
 
-        ((template, context), _tmp) = render_mock.call_args
+        ((template, context), _tmp) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/shopping_cart.html')
         self.assertEqual(context['order'], self.cart)
         self.assertIn(reg_item1, context['shoppingcart_items'][0])
@@ -1788,25 +1795,25 @@ class CSVReportViewsTest(ModuleStoreTestCase):
         response = self.client.put(reverse('payment_csv_report'))
         self.assertEqual(response.status_code, 400)
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_report_csv_get(self):
         self.login_user()
         self.add_to_download_group(self.user)
         response = self.client.get(reverse('payment_csv_report'))
 
-        ((template, context), unused_kwargs) = render_mock.call_args
+        ((template, context), unused_kwargs) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertFalse(context['date_fmt_error'])
         self.assertIn(_("Download CSV Reports"), response.content.decode('UTF-8'))
 
-    @patch('shoppingcart.views.render_to_response', render_mock)
+    @patch('shoppingcart.views.render_to_response', MOCK_RENDER)
     def test_report_csv_bad_date(self):
         self.login_user()
         self.add_to_download_group(self.user)
         response = self.client.post(reverse('payment_csv_report'), {'start_date': 'BAD', 'end_date': 'BAD', 'requested_report': 'itemized_purchase_report'})
 
-        ((template, context), unused_kwargs) = render_mock.call_args
+        ((template, context), unused_kwargs) = MOCK_RENDER.call_args
         self.assertEqual(template, 'shoppingcart/download_report.html')
         self.assertFalse(context['total_count_error'])
         self.assertTrue(context['date_fmt_error'])

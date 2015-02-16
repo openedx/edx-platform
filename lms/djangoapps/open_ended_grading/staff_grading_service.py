@@ -271,8 +271,8 @@ def get_next(request, course_id):
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
     grader_id = unique_id_for_user(request.user)
-    p = request.POST
-    location = course_key.make_usage_key_from_deprecated_string(p['location'])
+    post = request.POST
+    location = course_key.make_usage_key_from_deprecated_string(post['location'])
 
     return HttpResponse(json.dumps(_get_next(course_key, grader_id, location)),
                         mimetype="application/json")
@@ -380,36 +380,38 @@ def save_grade(request, course_id):
 
     if request.method != 'POST':
         raise Http404
-    p = request.POST
+    post = request.POST
     required = set(['score', 'feedback', 'submission_id', 'location', 'submission_flagged'])
-    skipped = 'skipped' in p
+    skipped = 'skipped' in post
     #If the instructor has skipped grading the submission, then there will not be any rubric scores.
     #Only add in the rubric scores if the instructor has not skipped.
     if not skipped:
         required.add('rubric_scores[]')
-    actual = set(p.keys())
+    actual = set(post.keys())
     missing = required - actual
     if len(missing) > 0:
         return _err_response('Missing required keys {0}'.format(
             ', '.join(missing)))
 
-    success, message = check_feedback_length(p)
+    success, message = check_feedback_length(post)
     if not success:
         return _err_response(message)
 
     grader_id = unique_id_for_user(request.user)
 
-    location = course_key.make_usage_key_from_deprecated_string(p['location'])
+    location = course_key.make_usage_key_from_deprecated_string(post['location'])
 
     try:
-        result = staff_grading_service().save_grade(course_key,
-                                                    grader_id,
-                                                    p['submission_id'],
-                                                    p['score'],
-                                                    p['feedback'],
-                                                    skipped,
-                                                    p.getlist('rubric_scores[]'),
-                                                    p['submission_flagged'])
+        result = staff_grading_service().save_grade(
+            course_key,
+            grader_id,
+            post['submission_id'],
+            post['score'],
+            post['feedback'],
+            skipped,
+            post.getlist('rubric_scores[]'),
+            post['submission_flagged'],
+        )
     except GradingServiceError:
         #This is a dev_facing_error
         log.exception(

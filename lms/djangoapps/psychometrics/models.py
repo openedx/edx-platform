@@ -34,10 +34,12 @@ class PsychometricData(models.Model):
     # location = studentmodule.module_state_key
 
     def __unicode__(self):
-        sm = self.studentmodule
-        return "[PsychometricData] %s url=%s, grade=%s, max=%s, attempts=%s, ct=%s" % (sm.student,
-                                                                                       sm.module_state_key,
-                                                                                       sm.grade,
-                                                                                       sm.max_grade,
-                                                                                       self.attempts,
-                                                                                       self.checktimes)
+        student_module = self.studentmodule
+        return "[PsychometricData] %s url=%s, grade=%s, max=%s, attempts=%s, ct=%s" % (
+            student_module.student,
+            student_module.module_state_key,
+            student_module.grade,
+            student_module.max_grade,
+            self.attempts,
+            self.checktimes,
+        )

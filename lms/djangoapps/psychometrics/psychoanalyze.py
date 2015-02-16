@@ -30,12 +30,12 @@ db = getattr(settings, 'DATABASE_FOR_PSYCHOMETRICS', 'default')
 # fit functions
 
 
-def func_2pl(x, a, b):
+def func_2pl(x_axis, a, b):
     """
     2-parameter logistic function
     """
     D = 1.7
-    edax = np.exp(D * a * (x - b))
+    edax = np.exp(D * a * (x_axis - b))
     return edax / (1 + edax)
 
 #-----------------------------------------------------------------------------
@@ -54,21 +54,21 @@ class StatVar(object):
         self.min = None
         self.max = None
 
-    def add(self, x):
-        if x is None:
+    def add(self, x_axis):
+        if x_axis is None:
             return
         if self.min is None:
-            self.min = x
+            self.min = x_axis
         else:
-            if x < self.min:
-                self.min = x
+            if x_axis < self.min:
+                self.min = x_axis
         if self.max is None:
-            self.max = x
+            self.max = x_axis
         else:
-            if x > self.max:
-                self.max = x
-        self.sum += x
-        self.sum2 += x ** 2
+            if x_axis > self.max:
+                self.max = x_axis
+        self.sum += x_axis
+        self.sum2 += x_axis ** 2
         self.cnt += 1
 
     def avg(self):
@@ -82,17 +82,17 @@ class StatVar(object):
         return (self.sum2 / 1.0 / self.cnt / (self.unit ** 2)) - (self.avg() ** 2)
 
     def sdv(self):
-        v = self.var()
-        if v > 0:
-            return math.sqrt(v)
+        value = self.var()
+        if value > 0:
+            return math.sqrt(value)
         else:
             return 0
 
     def __str__(self):
         return 'cnt=%d, avg=%f, sdv=%f' % (self.cnt, self.avg(), self.sdv())
 
-    def __add__(self, x):
-        self.add(x)
+    def __add__(self, x_axis):
+        self.add(x_axis)
         return self
 
 #-----------------------------------------------------------------------------
@@ -112,9 +112,9 @@ def make_histogram(ydata, bins=None):
 
     nbins = len(bins)
     hist = dict(zip(bins, [0] * nbins))
-    for y in ydata:
+    for y_axis in ydata:
         for b in bins[::-1]:  # in reverse order
-            if y > b:
+            if y_axis > b:
                 hist[b] += 1
                 break
     # hist['bins'] = bins
@@ -171,8 +171,8 @@ def generate_plots_for_problem(problem):
     # compute grade statistics
     grades = [pmd.studentmodule.grade for pmd in pmdset]
     gsv = StatVar()
-    for g in grades:
-        gsv += g
+    for grade in grades:
+        gsv += grade
     msg += "<br><p><font color='blue'>Grade distribution: %s</font></p>" % gsv
 
     # generate grade histogram
@@ -218,18 +218,18 @@ def generate_plots_for_problem(problem):
         if len(checktimes) < 2:
             continue
         ct0 = checktimes[0]
-        for ct in checktimes[1:]:
-            dt = (ct - ct0).total_seconds() / 60.0
-            if dt < 20:  # ignore if dt too long
-                dtset.append(dt)
-                dtsv += dt
-            ct0 = ct
+        for check_time in checktimes[1:]:
+            delta = (check_time - ct0).total_seconds() / 60.0
+            if delta < 20:  # ignore if delta too long
+                dtset.append(delta)
+                dtsv += delta
+            ct0 = check_time
     if dtsv.cnt > 2:
         msg += "<br/><p><font color='brown'>Time differences between checks: %s</font></p>" % dtsv
         bins = np.linspace(0, 1.5 * dtsv.sdv(), 30)
         dbar = bins[1] - bins[0]
         thist = make_histogram(dtset, bins)
-        thist_json = json.dumps(sorted(thist.items(), key=lambda(x): x[0]))
+        thist_json = json.dumps(sorted(thist.items(), key=lambda(x_axis): x_axis[0]))
 
         axisopts = """{ xaxes: [{ axisLabel: 'Time (min)'}], yaxes: [{position: 'left',axisLabel: 'Count'}]}"""
 
@@ -250,10 +250,10 @@ def generate_plots_for_problem(problem):
             continue
         ydat = []
         ylast = 0
-        for x in xdat:
-            y = gset.filter(attempts=x).count() / ngset
-            ydat.append(y + ylast)
-            ylast = y + ylast
+        for x_axis in xdat:
+            y_axis = gset.filter(attempts=x_axis).count() / ngset
+            ydat.append(y_axis + ylast)
+            ylast = y_axis + ylast
         yset['ydat'] = ydat
 
         if len(ydat) > 3:  # try to fit to logistic function if enough data points
@@ -316,7 +316,7 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     Construct and return a procedure which may be called to update
     the PsychometricData instance for the given StudentModule instance.
     """
-    sm, status = StudentModule.objects.get_or_create(
+    student_module, status = StudentModule.objects.get_or_create(
         course_id=course_id,
         student=user,
         module_state_key=module_state_key,
@@ -324,9 +324,9 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
     )
 
     try:
-        pmd = PsychometricData.objects.using(db).get(studentmodule=sm)
+        pmd = PsychometricData.objects.using(db).get(studentmodule=student_module)
     except PsychometricData.DoesNotExist:
-        pmd = PsychometricData(studentmodule=sm)
+        pmd = PsychometricData(studentmodule=student_module)
 
     def psychometrics_data_update_handler(state):
         """
@@ -336,17 +336,25 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
         state = instance state (a nice, uniform way to interface - for more future psychometric feature extraction)
         """
         try:
-            state = json.loads(sm.state)
+            state = json.loads(student_module.state)
             done = state['done']
         except:
-            log.exception("Oops, failed to eval state for %s (state=%s)" % (sm, sm.state))
+            log.exception(
+                "Oops, failed to eval state for %s (state=%s)",
+                student_module,
+                student_module.state,
+            )
             return
 
         pmd.done = done
         try:
             pmd.attempts = state.get('attempts', 0)
         except:
-            log.exception("no attempts for %s (state=%s)" % (sm, sm.state))
+            log.exception(
+                "no attempts for %s (state=%s)",
+                student_module,
+                student_module.state,
+            )
 
         try:
             checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
@@ -357,6 +365,9 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
         try:
             pmd.save()
         except:
-            log.exception("Error in updating psychometrics data for %s" % sm)
+            log.exception(
+                "Error in updating psychometrics data for %s",
+                student_module,
+            )
 
     return psychometrics_data_update_handler

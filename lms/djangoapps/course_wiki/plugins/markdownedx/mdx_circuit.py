@@ -50,9 +50,9 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
 
     def run(self, lines):
         def convertLine(line):
-            m = self.preRegex.match(line)
-            if m:
-                return 'processed-schematic:{0}processed-schematic-end'.format(m.group('data'))
+            match = self.preRegex.match(line)
+            if match:
+                return 'processed-schematic:{0}processed-schematic-end'.format(match.group('data'))
             else:
                 return line
 
@@ -60,8 +60,8 @@ class CircuitPreprocessor(markdown.preprocessors.Preprocessor):
 
 
 class CircuitLink(markdown.inlinepatterns.Pattern):
-    def handleMatch(self, m):
-        data = m.group('data')
+    def handleMatch(self, match):
+        data = match.group('data')
         data = escape(data)
         return etree.fromstring("<div align='center'><input type='hidden' parts='' value='" + data + "' analyses='' class='schematic ctrls' width='400' height='220'/></div>")
 

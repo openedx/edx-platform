@@ -71,7 +71,9 @@ from util.views import ensure_valid_course_key
 
 log = logging.getLogger("edx.courseware")
 
-template_imports = {'urllib': urllib}
+TEMPLATE_IMPORTS = {
+    'urllib': urllib,
+}
 
 CONTENT_DEPTH = 2
 
@@ -135,7 +137,7 @@ def render_accordion(request, course, chapter, section, field_data_cache):
         ('course_id', course.id.to_deprecated_string()),
         ('csrf', csrf(request)['csrf_token']),
         ('due_date_display_format', course.due_date_display_format)
-    ] + template_imports.items())
+    ] + TEMPLATE_IMPORTS.items())
     return render_to_string('courseware/accordion.html', context)
 
 
@@ -221,8 +223,8 @@ def save_child_position(seq_module, child_name):
     """
     child_name: url_name of the child
     """
-    for position, c in enumerate(seq_module.get_display_items(), start=1):
-        if c.location.name == child_name:
+    for position, child in enumerate(seq_module.get_display_items(), start=1):
+        if child.location.name == child_name:
             # Only save if position changed
             if position != seq_module.position:
                 seq_module.position = position

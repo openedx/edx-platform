@@ -316,10 +316,10 @@ def take_action_on_flags(request, course_id):
             }
             return HttpResponse(json.dumps(response), mimetype="application/json")
 
-    p = request.POST
-    submission_id = p['submission_id']
-    action_type = p['action_type']
-    student_id = p['student_id']
+    post = request.POST
+    submission_id = post['submission_id']
+    action_type = post['action_type']
+    student_id = post['student_id']
     student_id = student_id.strip(' \t\n\r')
     submission_id = submission_id.strip(' \t\n\r')
     action_type = action_type.lower().strip(' \t\n\r')

@@ -15,8 +15,8 @@ def circuit_line(circuit):
     if not circuit.isalnum():
         raise Http404()
     try:
-        sc = ServerCircuit.objects.get(name=circuit)
-        schematic = sc.schematic
+        server_circuit = ServerCircuit.objects.get(name=circuit)
+        schematic = server_circuit.schematic
     except:
         schematic = ''
 
@@ -33,9 +33,9 @@ def circuit_line(circuit):
 
 def edit_circuit(request, circuit):
     try:
-        sc = ServerCircuit.objects.get(name=circuit)
+        server_circuit = ServerCircuit.objects.get(name=circuit)
     except:
-        sc = None
+        server_circuit = None
 
     if not circuit.isalnum():
         raise Http404()
@@ -52,13 +52,13 @@ def save_circuit(request, circuit):
     schematic = request.POST['schematic']
     print schematic
     try:
-        sc = ServerCircuit.objects.get(name=circuit)
+        server_circuit = ServerCircuit.objects.get(name=circuit)
     except:
-        sc = ServerCircuit()
-        sc.name = circuit
-    sc.schematic = schematic
-    print ":", sc.schematic
-    sc.save()
+        server_circuit = ServerCircuit()
+        server_circuit.name = circuit
+    server_circuit.schematic = schematic
+    print ":", server_circuit.schematic
+    server_circuit.save()
     json_str = json.dumps({'results': 'success'})
     response = HttpResponse(json_str, mimetype='application/json')
     response['Cache-Control'] = 'no-cache'

@@ -40,7 +40,7 @@ from reverification.tests.factories import MidcourseReverificationWindowFactory
 def mock_render_to_response(*args, **kwargs):
     return render_to_response(*args, **kwargs)
 
-render_mock = Mock(side_effect=mock_render_to_response)
+MOCK_RENDER = Mock(side_effect=mock_render_to_response)
 
 
 class StartView(TestCase):
@@ -1367,21 +1367,21 @@ class TestReverifyView(ModuleStoreTestCase):
         self.course = CourseFactory.create(org='MITx', number='999', display_name='Robot Super Course')
         self.course_key = self.course.id
 
-    @patch('verify_student.views.render_to_response', render_mock)
+    @patch('verify_student.views.render_to_response', MOCK_RENDER)
     def test_reverify_get(self):
         url = reverse('verify_student_reverify')
         response = self.client.get(url)
         self.assertEquals(response.status_code, 200)
-        ((_template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
+        ((_template, context), _kwargs) = MOCK_RENDER.call_args  # pylint: disable=unpacking-non-sequence
         self.assertFalse(context['error'])
 
-    @patch('verify_student.views.render_to_response', render_mock)
+    @patch('verify_student.views.render_to_response', MOCK_RENDER)
     def test_reverify_post_failure(self):
         url = reverse('verify_student_reverify')
         response = self.client.post(url, {'face_image': '',
                                           'photo_id_image': ''})
         self.assertEquals(response.status_code, 200)
-        ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _kwargs) = MOCK_RENDER.call_args  # pylint: disable=unpacking-non-sequence
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
 
@@ -1396,7 +1396,7 @@ class TestReverifyView(ModuleStoreTestCase):
             self.assertIsNotNone(verification_attempt)
         except ObjectDoesNotExist:
             self.fail('No verification object generated')
-        ((template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
+        ((template, context), _kwargs) = MOCK_RENDER.call_args  # pylint: disable=unpacking-non-sequence
         self.assertIn('photo_reverification', template)
         self.assertTrue(context['error'])
 
@@ -1417,7 +1417,7 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
 
-    @patch('verify_student.views.render_to_response', render_mock)
+    @patch('verify_student.views.render_to_response', MOCK_RENDER)
     def test_midcourse_reverify_get(self):
         url = reverse('verify_student_midcourse_reverify',
                       kwargs={"course_id": self.course_key.to_deprecated_string()})
@@ -1447,7 +1447,7 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         self.mock_tracker.emit.reset_mock()  # pylint: disable=no-member
 
         self.assertEquals(response.status_code, 200)
-        ((_template, context), _kwargs) = render_mock.call_args  # pylint: disable=unpacking-non-sequence
+        ((_template, context), _kwargs) = MOCK_RENDER.call_args  # pylint: disable=unpacking-non-sequence
         self.assertFalse(context['error'])
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
@@ -1500,7 +1500,7 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         with self.assertRaises(ObjectDoesNotExist):
             SoftwareSecurePhotoVerification.objects.get(user=self.user, window=window)
 
-    @patch('verify_student.views.render_to_response', render_mock)
+    @patch('verify_student.views.render_to_response', MOCK_RENDER)
     def test_midcourse_reverify_dash(self):
         url = reverse('verify_student_midcourse_reverify_dash')
         response = self.client.get(url)
@@ -1514,7 +1514,7 @@ class TestMidCourseReverifyView(ModuleStoreTestCase):
         # enrolled in a verified course, and the window is open
         self.assertEquals(response.status_code, 200)
 
-    @patch('verify_student.views.render_to_response', render_mock)
+    @patch('verify_student.views.render_to_response', MOCK_RENDER)
     def test_midcourse_reverify_invalid_course_id(self):
         # if course id is invalid return 400
         invalid_course_key = CourseLocator('edx', 'not', 'valid')

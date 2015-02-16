@@ -14,7 +14,7 @@ from xmodule.course_module import CourseDescriptor
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -37,7 +37,7 @@ def request_certificate(request):
             status = certificate_status_for_student(student, course_key)['status']
             if status in [CertificateStatuses.unavailable, CertificateStatuses.notpassing, CertificateStatuses.error]:
                 log_msg = u'Grading and certification requested for user %s in course %s via /request_certificate call'
-                logger.info(log_msg, username, course_key)
+                LOGGER.info(log_msg, username, course_key)
                 status = xqci.add_cert(student, course_key, course=course)
             return HttpResponse(json.dumps({'add_status': status}), mimetype='application/json')
         return HttpResponse(json.dumps({'add_status': 'ERRORANONYMOUSUSER'}), mimetype='application/json')
@@ -69,7 +69,7 @@ def update_certificate(request):
                 key=xqueue_header['lms_key'])
 
         except GeneratedCertificate.DoesNotExist:
-            logger.critical('Unable to lookup certificate\n'
+            LOGGER.critical('Unable to lookup certificate\n'
                             'xqueue_body: {0}\n'
                             'xqueue_header: {1}'.format(
                                 xqueue_body, xqueue_header))
@@ -103,7 +103,7 @@ def update_certificate(request):
             elif cert.status in [status.deleting]:
                 cert.status = status.deleted
             else:
-                logger.critical('Invalid state for cert update: {0}'.format(
+                LOGGER.critical('Invalid state for cert update: {0}'.format(
                     cert.status))
                 return HttpResponse(
                     json.dumps({

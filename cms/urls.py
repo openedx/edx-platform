@@ -114,16 +114,20 @@ urlpatterns += patterns(
     url(r'^api/val/v0/', include('edxval.urls')),
 )
 
-js_info_dict = {
-    'domain': 'djangojs',
-    # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
-    'packages': ('openassessment',),
-}
-
-urlpatterns += patterns(
-    '',
+urlpatterns += (
     # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(
+        r'^jsi18n/$',
+        'django.views.i18n.javascript_catalog',
+        {
+            'domain': 'djangojs',
+            # We need to explicitly include external Django apps that
+            # are not in LOCALE_PATHS.
+            'packages': (
+                'openassessment',
+            ),
+        },
+    ),
 )
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):

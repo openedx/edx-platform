@@ -115,16 +115,20 @@ urlpatterns += (
     url(r'^course_modes/', include('course_modes.urls')),
 )
 
-
-js_info_dict = {
-    'domain': 'djangojs',
-    # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
-    'packages': ('openassessment',),
-}
-
 urlpatterns += (
     # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(
+        r'^jsi18n/$',
+        'django.views.i18n.javascript_catalog',
+        {
+            'domain': 'djangojs',
+            # We need to explicitly include external Django apps that
+            # are not in LOCALE_PATHS.
+            'packages': (
+                'openassessment',
+            ),
+        },
+    ),
 )
 
 # sysadmin dashboard, to see what courses are loaded, to delete & load courses
@@ -143,13 +147,22 @@ urlpatterns += (
         {'template': '404.html'}, name="404"),
 )
 
-# Favicon
-favicon_path = microsite.get_value('favicon_path', settings.FAVICON_PATH)
-urlpatterns += ((
-    r'^favicon\.ico$',
-    'django.views.generic.simple.redirect_to',
-    {'url': settings.STATIC_URL + favicon_path}
-),)
+urlpatterns += (
+    # Favicon: give precedence to `microsite` over `settings`
+    (
+        r'^favicon\.ico$',
+        'django.views.generic.simple.redirect_to',
+        {
+            'url': "{url_static}{path_favicon}".format(
+                url_static=settings.STATIC_URL,
+                path_favicon=microsite.get_value(
+                    'favicon_path',
+                    settings.FAVICON_PATH,
+                ),
+            ),
+        },
+    ),
+)
 
 # Semi-static views only used by edX, not by themes
 if not settings.FEATURES["USE_CUSTOM_THEME"]:
@@ -583,12 +596,8 @@ if settings.DEBUG:
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
     urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
 
-#Custom error pages
-handler404 = 'static_template_view.views.render_404'
-handler500 = 'static_template_view.views.render_500'
-
 # display error page templates, for testing purposes
 urlpatterns += (
-    url(r'404', handler404),
-    url(r'500', handler500),
+    url(r'404', 'static_template_view.views.render_404'),
+    url(r'500', 'static_template_view.views.render_500'),
 )

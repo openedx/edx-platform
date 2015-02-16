@@ -313,9 +313,9 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_get_next_submission_missing_location(self):
         data = {}
-        d = self.peer_module.get_next_submission(data)
-        self.assertFalse(d['success'])
-        self.assertEqual(d['error'], "Missing required keys: location")
+        response = self.peer_module.get_next_submission(data)
+        self.assertFalse(response['success'])
+        self.assertEqual(response['error'], 'Missing required keys: location')
 
     def test_save_grade_success(self):
         data = {
@@ -345,9 +345,9 @@ class TestPeerGradingService(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_save_grade_missing_keys(self):
         data = {}
-        d = self.peer_module.save_grade(data)
-        self.assertFalse(d['success'])
-        self.assertTrue(d['error'].find('Missing required keys:') > -1)
+        response = self.peer_module.save_grade(data)
+        self.assertFalse(response['success'])
+        self.assertTrue(response['error'].find('Missing required keys:') > -1)
 
     def test_is_calibrated_success(self):
         data = {'location': self.location_string}

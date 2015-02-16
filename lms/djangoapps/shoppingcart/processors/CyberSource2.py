@@ -401,9 +401,9 @@ def _record_purchase(params, order):
     # Parse the string to retrieve the digits.
     # If we can't find any digits, use placeholder values instead.
     ccnum_str = params.get('req_card_number', '')
-    mm = re.search("\d", ccnum_str)
-    if mm:
-        ccnum = ccnum_str[mm.start():]
+    match = re.search('\d', ccnum_str)
+    if match:
+        ccnum = ccnum_str[match.start():]
     else:
         ccnum = "####"
 

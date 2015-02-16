@@ -219,9 +219,9 @@ def record_purchase(params, order):
     Record the purchase and run purchased_callbacks
     """
     ccnum_str = params.get('card_accountNumber', '')
-    m = re.search("\d", ccnum_str)
-    if m:
-        ccnum = ccnum_str[m.start():]
+    match = re.search('\d', ccnum_str)
+    if match:
+        ccnum = ccnum_str[match.start():]
     else:
         ccnum = "####"
 

@@ -81,7 +81,7 @@ class Command(BaseCommand):
 
         # Print update after this many students
 
-        STATUS_INTERVAL = 500
+        status_interval = 500
 
         if options['course']:
             # try to parse out the course from the serialized form
@@ -108,21 +108,21 @@ class Command(BaseCommand):
                 courseenrollment__course_id=course_key
             )
 
-            xq = XQueueCertInterface()
+            xqueue = XQueueCertInterface()
             if options['insecure']:
-                xq.use_https = False
+                xqueue.use_https = False
             total = enrolled_students.count()
             count = 0
             start = datetime.datetime.now(UTC)
 
             for student in enrolled_students:
                 count += 1
-                if count % STATUS_INTERVAL == 0:
+                if count % status_interval == 0:
                     # Print a status update with an approximation of
                     # how much time is left based on how long the last
                     # interval took
                     diff = datetime.datetime.now(UTC) - start
-                    timeleft = diff * (total - count) / STATUS_INTERVAL
+                    timeleft = diff * (total - count) / status_interval
                     hours, remainder = divmod(timeleft.seconds, 3600)
                     minutes, seconds = divmod(remainder, 60)
                     print "{0}/{1} completed ~{2:02}:{3:02}m remaining".format(
@@ -144,7 +144,7 @@ class Command(BaseCommand):
 
                     if not options['noop']:
                         # Add the certificate request to the queue
-                        ret = xq.add_cert(student, course_key, course=course)
+                        ret = xqueue.add_cert(student, course_key, course=course)
 
                         if ret == 'generating':
                             LOGGER.info(

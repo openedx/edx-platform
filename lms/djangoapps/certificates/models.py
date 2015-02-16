@@ -165,14 +165,16 @@ def certificate_status_for_student(student, course_id):
     try:
         generated_certificate = GeneratedCertificate.objects.get(
             user=student, course_id=course_id)
-        d = {'status': generated_certificate.status,
-             'mode': generated_certificate.mode}
+        data = {
+            'status': generated_certificate.status,
+            'mode': generated_certificate.mode,
+        }
         if generated_certificate.grade:
-            d['grade'] = generated_certificate.grade
+            data['grade'] = generated_certificate.grade
         if generated_certificate.status == CertificateStatuses.downloadable:
-            d['download_url'] = generated_certificate.download_url
+            data['download_url'] = generated_certificate.download_url
 
-        return d
+        return data
     except GeneratedCertificate.DoesNotExist:
         pass
     return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
