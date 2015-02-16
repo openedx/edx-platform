@@ -79,7 +79,7 @@ def peer_grading_notifications(course, user):
         if notifications['success']:
             if notifications['student_needs_to_peer_grade']:
                 pending_grading = True
-    except:
+    except Exception:
         #Non catastrophic error, so no real action
         notifications = {}
         #This is a dev_facing_error
