@@ -45,7 +45,7 @@ class CodeMirror(BaseEditor):
     def get_widget(self, instance=None):
         return CodeMirrorWidget()
 
-    class AdminMedia:
+    class AdminMedia(object):
         css = {
             'all': ("wiki/markitup/skins/simple/style.css",
                     "wiki/markitup/sets/admin/style.css",)
@@ -56,7 +56,7 @@ class CodeMirror(BaseEditor):
             'wiki/markitup/sets/admin/set.js',
         )
 
-    class Media:
+    class Media(object):
         css = {
             'all': ("js/vendor/CodeMirror/codemirror.css",)
         }

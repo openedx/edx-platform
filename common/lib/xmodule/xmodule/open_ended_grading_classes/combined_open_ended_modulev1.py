@@ -67,7 +67,7 @@ HUMAN_STATES = {
 SKIP_BASIC_CHECKS = False
 
 
-class CombinedOpenEndedV1Module():
+class CombinedOpenEndedV1Module(object):
     """
     This is a module that encapsulates all open ended grading (self assessment, peer assessment, etc).
     It transitions between problems, and support arbitrary ordering.
@@ -1185,7 +1185,7 @@ class CombinedOpenEndedV1Module():
         return declaration
 
 
-class CombinedOpenEndedV1Descriptor():
+class CombinedOpenEndedV1Descriptor(object):
     """
     Module for adding combined open ended questions
     """
