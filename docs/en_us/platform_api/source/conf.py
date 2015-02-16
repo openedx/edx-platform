@@ -42,7 +42,7 @@ MOCK_MODULES = [
     'Location',
 ]
 
-for mod_name in MOCK_MODULES: 
+for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
