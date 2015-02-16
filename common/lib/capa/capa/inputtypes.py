@@ -1013,8 +1013,6 @@ class Schematic(InputTypeBase):
         ]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'setup_script': '{static_url}js/capa/schematicinput.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1407,8 +1405,6 @@ class EditAMoleculeInput(InputTypeBase):
                 Attribute('missing', None)]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1443,8 +1439,6 @@ class DesignProtein2dInput(InputTypeBase):
                 ]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1479,8 +1473,6 @@ class EditAGeneInput(InputTypeBase):
                 ]
 
     def _extra_context(self):
-        """
-            """
         context = {
             'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
                 static_url=self.capa_system.STATIC_URL),
