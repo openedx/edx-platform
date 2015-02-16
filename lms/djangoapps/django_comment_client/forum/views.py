@@ -178,26 +178,31 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     )
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
-
-    # If not provided with a discussion id, filter threads by commentable ids
-    # which are accessible to the current user.
-    if discussion_id is None:
-        discussion_category_ids = set(utils.get_discussion_categories_ids(course, request.user))
-        threads = [
-            thread for thread in threads
-            if thread.get('commentable_id') in discussion_category_ids
-        ]
-
-    for thread in threads:
-        # patch for backward compatibility to comments service
-        if 'pinned' not in thread:
-            thread['pinned'] = False
+    threads = _set_group_names(course.id, threads, discussion_id=discussion_id)
 
     query_params['page'] = page
     query_params['num_pages'] = num_pages
     query_params['corrected_text'] = corrected_text
 
     return threads, query_params
+
+def _set_group_names(course_id, threads):
+    """ Adds group name if the thread has a group id"""
+
+    for thread in threads:
+        if thread.get('group_id'):
+            thread['group_name'] = get_cohort_by_id(course_id, thread.get('group_id')).name
+            thread['group_string'] = "This post visible only to Group %s." % (thread['group_name'])
+        else:
+            thread['group_name'] = ""
+            thread['group_string'] = "This post visible to everyone."
+
+        #patch for backward compatibility to comments service
+        if 'pinned' not in thread:
+            thread['pinned'] = False
+
+    return threads
+
 
 
 def use_bulk_ops(view_func):
@@ -462,6 +467,7 @@ def user_profile(request, course_key, user_id):
             profiled_user = cc.User(id=user_id, course_id=course_key)
 
         threads, page, num_pages = profiled_user.active_threads(query_params)
+        threads = _set_group_names(course.id, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
@@ -543,6 +549,7 @@ def followed_threads(request, course_key, user_id):
             query_params['group_id'] = group_id
 
         threads, page, num_pages = profiled_user.subscribed_threads(query_params)
+        threads = _set_group_names(course.id, threads)
         query_params['page'] = page
         query_params['num_pages'] = num_pages
         user_info = cc.User.from_django_user(request.user).to_dict()
