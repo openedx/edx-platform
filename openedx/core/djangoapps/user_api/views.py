@@ -8,10 +8,10 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS, ValidationError
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect
+from django.views.decorators.csrf import ensure_csrf_cookie, csrf_protect, csrf_exempt
 from opaque_keys.edx import locator
 from rest_framework import authentication
 from rest_framework import filters
@@ -227,8 +227,7 @@ class RegistrationView(APIView):
 
         return HttpResponse(form_desc.to_json(), content_type="application/json")
 
-    @method_decorator(require_post_params(DEFAULT_FIELDS))
-    @method_decorator(csrf_protect)
+    @method_decorator(csrf_exempt)
     def post(self, request):
         """Create the user's account.
 
@@ -254,31 +253,23 @@ class RegistrationView(APIView):
         # Handle duplicate email/username
         conflicts = account_api.check_account_exists(email=email, username=username)
         if conflicts:
-            if all(conflict in conflicts for conflict in ['email', 'username']):
-                # Translators: This message is shown to users who attempt to create a new
-                # account using both an email address and a username associated with an
-                # existing account.
-                error_msg = _(
-                    u"It looks like {email_address} and {username} belong to an existing account. Try again with a different email address and username."
-                ).format(email_address=email, username=username)
-            elif 'email' in conflicts:
+            conflict_messages = {
                 # Translators: This message is shown to users who attempt to create a new
                 # account using an email address associated with an existing account.
-                error_msg = _(
+                "email": _(
                     u"It looks like {email_address} belongs to an existing account. Try again with a different email address."
-                ).format(email_address=email)
-            else:
+                ).format(email_address=email),
                 # Translators: This message is shown to users who attempt to create a new
                 # account using a username associated with an existing account.
-                error_msg = _(
+                "username": _(
                     u"It looks like {username} belongs to an existing account. Try again with a different username."
-                ).format(username=username)
-
-            return HttpResponse(
-                status=409,
-                content=error_msg,
-                content_type="text/plain"
-            )
+                ).format(username=username),
+            }
+            errors = {
+                field: [{"user_message": conflict_messages[field]}]
+                for field in conflicts
+            }
+            return JsonResponse(errors, status=409)
 
         # Backwards compatibility: the student view expects both
         # terms of service and honor code values.  Since we're combining
@@ -293,12 +284,14 @@ class RegistrationView(APIView):
         try:
             create_account_with_params(request, data)
         except ValidationError as err:
-            error_list = next(err.message_dict.itervalues())
-            return HttpResponse(
-                status=400,
-                content=error_list[0],
-                content_type="text/plain"
-            )
+            # Should only get non-field errors from this function
+            assert NON_FIELD_ERRORS not in err.message_dict
+            # Only return first error for each field
+            errors = {
+                field: [{"user_message": error} for error in error_list]
+                for field, error_list in err.message_dict.items()
+            }
+            return JsonResponse(errors, status=400)
 
         response = JsonResponse({"success": True})
         set_marketing_cookie(request, response)
