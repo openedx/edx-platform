@@ -74,7 +74,7 @@ class Command(BaseCommand):
             else:
                 user = User.objects.get(username=user_str)
 
-            cert_whitelist, created = \
+            cert_whitelist, _created = \
                 CertificateWhitelist.objects.get_or_create(
                     user=user, course_id=course)
             if options['add']:

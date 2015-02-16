@@ -946,7 +946,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
-            response = views.user_profile(
+            views.user_profile(
                 request,
                 self.course.id.to_deprecated_string(),
                 -999
@@ -956,7 +956,7 @@ class UserProfileTestCase(ModuleStoreTestCase):
         request = RequestFactory().get("dummy_url")
         request.user = self.student
         with self.assertRaises(Http404):
-            response = views.user_profile(
+            views.user_profile(
                 request,
                 "non/existent/course",
                 self.profiled_user.id

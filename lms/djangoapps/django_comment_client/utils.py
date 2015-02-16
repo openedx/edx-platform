@@ -137,8 +137,6 @@ def _sort_map_entries(category_map, sort_alpha):
 
 
 def get_discussion_category_map(course):
-    course_id = course.id
-
     unexpanded_category_map = defaultdict(list)
 
     modules = _get_discussion_modules(course)
