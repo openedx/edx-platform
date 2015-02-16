@@ -1294,13 +1294,13 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             blackout_periods = [(date_proxy.from_json(start),
                                  date_proxy.from_json(end))
                                 for start, end
-                                in self.discussion_blackouts]
+                                in filter(None, self.discussion_blackouts)]
             now = datetime.now(UTC())
             for start, end in blackout_periods:
                 if start <= now <= end:
                     return False
         except:
-            log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
+            log.exception("Error parsing discussion_blackouts %s for course %s", self.discussion_blackouts, self.id)
 
         return True
 
