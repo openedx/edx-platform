@@ -91,16 +91,6 @@ describe 'Calculator', ->
       $('#calculator_input_help').trigger(e);
       expect($('.help')).toHaveClass 'shown'
 
-  describe 'handleKeyUp', ->
-    it 'on key up of tab button on hint popup it does not hide', ->
-      calc = @calculator
-      calc.showHint()
-      e = jQuery.Event('keyup',{ keyCode: KEY.TAB })
-      $(document).activeElement = $('#hint-moreinfo')
-      calc.handleKeyUpOnHint(e)
-      expect($('.help')).toHaveClass 'shown'
-      expect(calc.active_element).toBe($('#hint-moreinfo a:first'))
-
   describe 'selectHint', ->
     it 'select correct hint item', ->
       spyOn($.fn, 'focus')
