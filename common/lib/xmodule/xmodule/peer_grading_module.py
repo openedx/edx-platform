@@ -616,7 +616,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         elif data.get('location') is not None:
             problem_location = self.course_id.make_usage_key_from_deprecated_string(data.get('location'))
 
-        module = self._find_corresponding_module_for_location(problem_location)  # pylint: disable-unused-variable
+        self._find_corresponding_module_for_location(problem_location)
 
         ajax_url = self.ajax_url
         html = self.system.render_template('peer_grading/peer_grading_problem.html', {
