@@ -52,6 +52,7 @@ from django.dispatch import receiver
 from django.conf import settings
 from datetime import datetime
 from model_utils import Choices
+from config_models.models import ConfigurationModel
 from xmodule_django.models import CourseKeyField, NoneToEmptyManager
 from util.milestones_helpers import fulfill_course_milestone
 
@@ -176,3 +177,8 @@ def certificate_status_for_student(student, course_id):
     except GeneratedCertificate.DoesNotExist:
         pass
     return {'status': CertificateStatuses.unavailable, 'mode': GeneratedCertificate.MODES.honor}
+
+
+class CertificateGenerationConfiguration(ConfigurationModel):
+    """Configure certificate generation."""
+    pass

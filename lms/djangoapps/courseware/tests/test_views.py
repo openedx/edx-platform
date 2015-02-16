@@ -11,13 +11,15 @@ import ddt
 from django.conf import settings
 from django.contrib.auth.models import User, AnonymousUser
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
+from certificates.tests.factories import GeneratedCertificateFactory
 from edxmako.middleware import MakoMiddleware
 from edxmako.tests import mako_middleware_process_request
-from mock import MagicMock, patch, create_autospec
+from mock import MagicMock, patch, create_autospec, Mock
 from opaque_keys.edx.locations import Location, SlashSeparatedCourseKey
 
 import courseware.views as views
@@ -675,6 +677,11 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
+    def test_resp_with_generate_cert_config_enabled(self):
+        CertificateGenerationConfiguration(enabled=True).save()
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertEqual(resp.status_code, 200)
+
 
 class VerifyCourseKeyDecoratorTests(TestCase):
     """
@@ -699,3 +706,126 @@ class VerifyCourseKeyDecoratorTests(TestCase):
         view_function = ensure_valid_course_key(mocked_view)
         self.assertRaises(Http404, view_function, self.request, course_id=self.invalid_course_id)
         self.assertFalse(mocked_view.called)
+
+
+class IsCoursePassedTests(ModuleStoreTestCase):
+    """
+    Tests for the is_course_passed helper function
+    """
+
+    def setUp(self):
+        super(IsCoursePassedTests, self).setUp()
+
+        self.student = UserFactory()
+        self.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course',
+            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
+        )
+        self.request = RequestFactory()
+
+    def test_user_fails_if_not_clear_exam(self):
+        # If user has not grade then false will return
+        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.9}))
+    def test_user_pass_if_percent_appears_above_passing_point(self):
+        # Mocking the grades.grade
+        # If user has above passing marks then True will return
+        self.assertTrue(views.is_course_passed(self.course, None, self.student, self.request))
+
+    @patch('courseware.grades.grade', Mock(return_value={'percent': 0.2}))
+    def test_user_fail_if_percent_appears_below_passing_point(self):
+        # Mocking the grades.grade
+        # If user has below passing marks then False will return
+        self.assertFalse(views.is_course_passed(self.course, None, self.student, self.request))
+
+
+class GenerateUserCertTests(ModuleStoreTestCase):
+    """
+    Tests for the view function Generated User Certs
+    """
+
+    def setUp(self):
+        super(GenerateUserCertTests, self).setUp()
+
+        self.student = UserFactory(username='dummy', password='123456', email='test@mit.edu')
+        self.course = CourseFactory.create(
+            org='edx',
+            number='verified',
+            display_name='Verified Course',
+            grade_cutoffs={'cutoff': 0.75, 'Pass': 0.5}
+        )
+        self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
+        self.request = RequestFactory()
+        self.client.login(username=self.student, password='123456')
+        self.url = reverse('generate_user_cert', kwargs={'course_id': unicode(self.course.id)})
+
+    def test_user_with_out_passing_grades(self):
+        # If user has no grading then json will return failed message and badrequest code
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Your certificate will be available when you pass the course.", resp.content)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    @override_settings(CERT_QUEUE='certificates')
+    def test_user_with_passing_grade(self):
+        # If user has above passing grading then json will return cert generating message and
+        # status valid code
+        # mocking xqueue
+
+        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
+            mock_send_to_queue.return_value = (0, "Successfully queued")
+            resp = self.client.post(self.url)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Creating certificate", resp.content)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    def test_user_with_passing_existing_generating_cert(self):
+        # If user has passing grade but also has existing generating cert
+        # then json will return cert generating message with bad request code
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.generating,
+            mode='verified'
+        )
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Creating certificate", resp.content)
+
+    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
+    def test_user_with_passing_existing_downloadable_cert(self):
+        # If user has passing grade but also has existing downloadable cert
+        # then json will return cert generating message with bad request code
+        GeneratedCertificateFactory.create(
+            user=self.student,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified'
+        )
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Creating certificate", resp.content)
+
+    def test_user_with_non_existing_course(self):
+        # If try to access a course with valid key pattern then it will return
+        # bad request code with course is not valid message
+        resp = self.client.post('/courses/def/abc/in_valid/generate_user_cert')
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("Course is not valid", resp.content)
+
+    def test_user_with_invalid_course_id(self):
+        # If try to access a course with invalid key pattern then 404 will return
+        resp = self.client.post('/courses/def/generate_user_cert')
+        self.assertEqual(resp.status_code, 404)
+
+    def test_user_without_login_return_error(self):
+        # If user try to access without login should see a bad request status code with message
+        self.client.logout()
+        resp = self.client.post(self.url)
+        self.assertEqual(resp.status_code, HttpResponseBadRequest.status_code)
+        self.assertIn("You must be signed in to {platform_name} to create a certificate.".format(
+            platform_name=settings.PLATFORM_NAME
+        ), resp.content)
