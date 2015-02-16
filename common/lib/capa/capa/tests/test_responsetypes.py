@@ -2195,7 +2195,6 @@ class ChoiceTextResponseTest(ResponseTest):
         Test that `build_problem` builds valid xml
         """
         self.build_problem()
-        self.assertTrue(True)
 
     def test_unchecked_input_not_validated(self):
         """
