@@ -57,7 +57,10 @@ class PortalSynchronizerMiddleware(object):
                     log.warning(err)
                     return
 
-                body = r.json()
+                try:
+                    body = r.json()
+                except ValueError:
+                    body = None
 
                 if r.status_code != 200:
                     if body and u'error' in body and u'redirectTo' in body[u'error']:
