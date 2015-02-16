@@ -34,10 +34,6 @@ class RoleClassTestCase(ModuleStoreTestCase):
         self.TA_role_2 = models.Role.objects.get_or_create(name="Community TA",
                                                            course_id=self.course_id_2)[0]
 
-        class Dummy():
-            def render_template():
-                pass
-
     def test_has_permission(self):
         # Whenever you add a permission to student_role,
         # Roles with the same FORUM_ROLE in same class also receives the same
