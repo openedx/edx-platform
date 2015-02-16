@@ -258,7 +258,8 @@ class EditableMetadataFieldsTest(unittest.TestCase):
         return system.construct_xblock_from_class(TestModuleDescriptor, field_data=field_data, scope_ids=Mock())
 
     def assert_field_values(self, editable_fields, name, field, explicitly_set, value, default_value,
-                            type='Generic', options=[]):
+                            type='Generic', options=None):
+        options = options or []
         test_field = editable_fields[name]
 
         self.assertEqual(field.name, test_field['field_name'])

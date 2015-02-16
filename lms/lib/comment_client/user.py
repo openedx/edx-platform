@@ -83,7 +83,8 @@ class User(models.Model):
         )
         voteable._update_from_response(response)
 
-    def active_threads(self, query_params={}):
+    def active_threads(self, query_params=None):
+        query_params = query_params or {}
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving active threads for the user")
         url = _url_for_user_active_threads(self.id)
@@ -99,7 +100,8 @@ class User(models.Model):
         )
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1)
 
-    def subscribed_threads(self, query_params={}):
+    def subscribed_threads(self, query_params=None):
+        query_params = query_params or {}
         if not self.course_id:
             raise CommentClientRequestError("Must provide course_id when retrieving subscribed threads for the user")
         url = _url_for_user_subscribed_threads(self.id)

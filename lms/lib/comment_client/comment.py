@@ -31,14 +31,16 @@ class Comment(models.Model):
         return Thread(id=self.thread_id, type='thread')
 
     @classmethod
-    def url_for_comments(cls, params={}):
+    def url_for_comments(cls, params=None):
+        params = params or {}
         if params.get('thread_id'):
             return _url_for_thread_comments(params['thread_id'])
         else:
             return _url_for_comment(params['parent_id'])
 
     @classmethod
-    def url(cls, action, params={}):
+    def url(cls, action, params=None):
+        params = params or {}
         if action in ['post']:
             return cls.url_for_comments(params)
         else:

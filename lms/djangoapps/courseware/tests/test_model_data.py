@@ -29,7 +29,8 @@ def mock_field(scope, name):
     return field
 
 
-def mock_descriptor(fields=[]):
+def mock_descriptor(fields=None):
+    fields = fields or []
     descriptor = Mock(entry_point=XBlock.entry_point)
     descriptor.scope_ids = ScopeIds('user1', 'mock_problem', location('def_id'), location('usage_id'))
     descriptor.module_class.fields.values.return_value = fields

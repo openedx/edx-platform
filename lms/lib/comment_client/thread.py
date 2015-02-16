@@ -92,19 +92,21 @@ class Thread(models.Model):
         return response.get('collection', []), response.get('page', 1), response.get('num_pages', 1), response.get('corrected_text')
 
     @classmethod
-    def url_for_threads(cls, params={}):
+    def url_for_threads(cls, params=None):
+        params = params or {}
         if params.get('commentable_id'):
             return u"{prefix}/{commentable_id}/threads".format(prefix=settings.PREFIX, commentable_id=params['commentable_id'])
         else:
             return u"{prefix}/threads".format(prefix=settings.PREFIX)
 
     @classmethod
-    def url_for_search_threads(cls, params={}):
+    def url_for_search_threads(cls, params=None):
+        params = params or {}
         return "{prefix}/search/threads".format(prefix=settings.PREFIX)
 
     @classmethod
-    def url(cls, action, params={}):
-
+    def url(cls, action, params=None):
+        params = params or {}
         if action in ['get_all', 'post']:
             return cls.url_for_threads(params)
         elif action == 'search':

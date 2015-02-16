@@ -95,14 +95,17 @@ class MockCommentServiceServer(HTTPServer):
     A mock Comment Service server that responds
     to POST requests to localhost.
     '''
-    def __init__(self, port_num,
-                 response={'username': 'new', 'external_id': 1}):
+    def __init__(self, port_num, response=None):
         '''
         Initialize the mock Comment Service server instance.
         *port_num* is the localhost port to listen to
         *response* is a dictionary that will be JSON-serialized
             and sent in response to comment service requests.
         '''
+        response = response or {
+            'username': 'new',
+            'external_id': 1,
+        }
         self._response_str = json.dumps(response)
 
         handler = MockCommentServiceRequestHandler

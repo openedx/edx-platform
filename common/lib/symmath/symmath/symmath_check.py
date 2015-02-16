@@ -20,12 +20,13 @@ log = logging.getLogger(__name__)
 # This is one of the main entry points to call.
 
 
-def symmath_check_simple(expect, ans, adict={}, symtab=None, extra_options=None):
+def symmath_check_simple(expect, ans, adict=None, symtab=None, extra_options=None):
     """
     Check a symbolic mathematical expression using sympy.
     The input is an ascii string (not MathML) converted to math using sympy.sympify.
     """
 
+    adict = adict or {}
     options = {'__MATRIX__': False, '__ABC__': False, '__LOWER__': False}
     if extra_options:
         options.update(extra_options)

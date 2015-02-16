@@ -90,7 +90,8 @@ class ApiTest(TestCase):
 
         self.client.login(username=username, password=password)
 
-    def url(self, name, args={}):
+    def url(self, name, args=None):
+        args = args or {}
         args.update({'course_id': self.course_key.to_deprecated_string()})
         return reverse(name, kwargs=args)
 

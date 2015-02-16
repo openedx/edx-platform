@@ -155,15 +155,18 @@ class Model(object):
         self._update_from_response(response)
 
     @classmethod
-    def url_with_id(cls, params={}):
+    def url_with_id(cls, params=None):
+        params = params or {}
         return cls.base_url + '/' + str(params['id'])
 
     @classmethod
-    def url_without_id(cls, params={}):
+    def url_without_id(cls, params=None):
+        params = params or {}
         return cls.base_url
 
     @classmethod
-    def url(cls, action, params={}):
+    def url(cls, action, params=None):
+        params = params or {}
         if cls.base_url is None:
             raise CommentClientRequestError("Must provide base_url when using default url function")
         if action not in cls.DEFAULT_ACTIONS:

@@ -37,7 +37,7 @@ class Score(models.Model):
         return (-score) * 10 + 8000 * sum_of
 
     @staticmethod
-    def get_tops_n(n, puzzles=['994559'], course_list=None):
+    def get_tops_n(n, puzzles=None, course_list=None):
         """
         Arguments:
             puzzles: a list of puzzle ids that we will use. If not specified,
@@ -54,6 +54,9 @@ class Score(models.Model):
                    score: 12000} ...]
         """
 
+        puzzles = puzzles or [
+            '994559',
+        ]
         if not isinstance(puzzles, list):
             puzzles = [puzzles]
         if course_list is None:
