@@ -37,7 +37,7 @@ class Command(BaseCommand):
         self.stdout.write("Importing.  Data_dir={data}, course_dirs={courses}\n".format(
             data=data_dir,
             courses=course_dirs,
-            dis=do_import_static))
+        ))
         mstore = modulestore()
 
         course_items = import_from_xml(
