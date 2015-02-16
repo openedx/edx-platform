@@ -13,6 +13,7 @@ from student.models import UserProfile
 
 TEST_PASSWORD = "test"
 
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPI(APITestCase):
