@@ -61,7 +61,7 @@ class TestMixedModuleStore(CourseComparisonTest):
     ASSET_COLLECTION = 'assetstore'
     FS_ROOT = DATA_DIR
     DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
     MONGO_COURSEID = 'MITx/999/2013_Spring'
     XML_COURSEID1 = 'edX/toy/2012_Fall'

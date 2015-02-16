@@ -54,7 +54,7 @@ COLLECTION = 'modulestore'
 ASSET_COLLECTION = 'assetstore'
 FS_ROOT = DATA_DIR  # TODO (vshnayder): will need a real fs_root for testing load_item
 DEFAULT_CLASS = 'xmodule.raw_module.RawDescriptor'
-RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
+RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
 
 class ReferenceTestXBlock(XBlock, XModuleMixin):
