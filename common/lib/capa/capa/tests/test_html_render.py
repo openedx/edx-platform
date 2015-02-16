@@ -27,8 +27,6 @@ class CapaHtmlRenderTest(unittest.TestCase):
 
         # Render the HTML
         etree.XML(problem.get_html())
-        # expect that we made it here without blowing up
-        self.assertTrue(True)
 
     def test_include_html(self):
         # Create a test file to include
