@@ -119,14 +119,6 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         is_entrance_exam=True
     )
 
-    # Create the entrance exam section item.
-    create_xblock(
-        parent_locator=unicode(created_block.location),
-        user=request.user,
-        category='sequential',
-        display_name=_('Entrance Exam - Subsection')
-    )
-
     # Set the entrance exam metadata flags for this course
     # Reload the course so we don't overwrite the new child reference
     course = modulestore().get_course(course_key)
@@ -136,6 +128,14 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
         'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)
+
+    # Create the entrance exam section item.
+    create_xblock(
+        parent_locator=unicode(created_block.location),
+        user=request.user,
+        category='sequential',
+        display_name=_('Entrance Exam - Subsection')
+    )
 
     # Add an entrance exam milestone if one does not already exist
     milestone_namespace = generate_milestone_namespace(
