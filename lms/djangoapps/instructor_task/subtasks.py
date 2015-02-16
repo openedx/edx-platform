@@ -165,7 +165,7 @@ class SubtaskStatus(object):
         self.state = state if state is not None else QUEUING
 
     @classmethod
-    def from_dict(self, d):
+    def from_dict(cls, d):
         """Construct a SubtaskStatus object from a dict representation."""
         options = dict(d)
         task_id = options['task_id']
@@ -173,9 +173,9 @@ class SubtaskStatus(object):
         return SubtaskStatus.create(task_id, **options)
 
     @classmethod
-    def create(self, task_id, **options):
+    def create(cls, task_id, **options):
         """Construct a SubtaskStatus object."""
-        return self(task_id, **options)
+        return cls(task_id, **options)
 
     def to_dict(self):
         """
