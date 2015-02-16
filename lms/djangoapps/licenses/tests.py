@@ -184,7 +184,10 @@ class CommandTest(ModuleStoreTestCase):
         software_count = CourseSoftware.objects.all().count()
         self.assertEqual(2, software_count)
 
-        log.debug('Now we should have 3 sets of 20 serials'.format(size))
+        log.debug(
+            "Now we should have 3 sets of %s serials",
+            size,
+        )
         licenses_count = UserLicense.objects.all().count()
         self.assertEqual(3 * size, licenses_count)
 
