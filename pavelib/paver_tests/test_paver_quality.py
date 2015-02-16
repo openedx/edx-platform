@@ -31,9 +31,11 @@ class TestPaverQualityViolations(unittest.TestCase):
 
     @file_data('pylint_test_list.json')
     def test_pylint_parser_count_violations(self, value):
-    # Tests:
-    #     * Different types of violations
-    #     * One violation covering multiple lines
+        """
+        Tests:
+        - Different types of violations
+        - One violation covering multiple lines
+        """
         with open(self.f.name, 'w') as f:
             f.write(value)
         num = pavelib.quality._count_pylint_violations(f.name)
