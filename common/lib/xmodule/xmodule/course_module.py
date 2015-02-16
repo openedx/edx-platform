@@ -54,7 +54,7 @@ class StringOrDate(Date):
         """
         try:
             result = super(StringOrDate, self).to_json(value)
-        except:
+        except Exception:
             return value
         if result is None:
             return value
@@ -150,7 +150,7 @@ class TextbookList(List):
         for title, book_url in values:
             try:
                 textbooks.append(Textbook(title, book_url))
-            except:
+            except Exception:
                 # If we can't get to S3 (e.g. on a train with no internet), don't break
                 # the rest of the courseware.
                 log.exception("Couldn't load textbook ({0}, {1})".format(title, book_url))
@@ -1302,7 +1302,7 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
             for start, end in blackout_periods:
                 if start <= now <= end:
                     return False
-        except:
+        except Exception:
             log.exception("Error parsing discussion_blackouts for course {0}".format(self.id))
 
         return True

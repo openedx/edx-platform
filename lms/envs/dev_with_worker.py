@@ -12,7 +12,7 @@ django_admin.py celery worker
 # want to import all variables from base settings files
 # pylint: disable=wildcard-import, unused-wildcard-import
 
-from dev import *
+from lms.envs.dev import *
 
 ################################# CELERY ######################################
 

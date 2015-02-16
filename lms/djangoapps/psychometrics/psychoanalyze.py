@@ -214,7 +214,7 @@ def generate_plots_for_problem(problem):
     for pmd in pmdset:
         try:
             checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
-        except:
+        except Exception:
             continue
         if len(checktimes) < 2:
             continue
@@ -344,7 +344,7 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
         try:
             state = json.loads(student_module.state)
             done = state['done']
-        except:
+        except Exception:
             log.exception(
                 "Oops, failed to eval state for %s (state=%s)",
                 student_module,
@@ -355,7 +355,7 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
         pmd.done = done
         try:
             pmd.attempts = state.get('attempts', 0)
-        except:
+        except Exception:
             log.exception(
                 "no attempts for %s (state=%s)",
                 student_module,
@@ -364,13 +364,13 @@ def make_psychometrics_data_update_handler(course_id, user, module_state_key):
 
         try:
             checktimes = eval(pmd.checktimes)  # update log of attempt timestamps
-        except:
+        except Exception:
             checktimes = []
         checktimes.append(datetime.datetime.now(UTC))
         pmd.checktimes = checktimes
         try:
             pmd.save()
-        except:
+        except Exception:
             log.exception(
                 "Error in updating psychometrics data for %s",
                 student_module,

@@ -78,7 +78,7 @@ class Command(BaseCommand):
             # get name from kerberos
             try:
                 kname = os.popen("finger %s | grep 'name:'" % email).read().strip().split('name: ')[1].strip()
-            except:
+            except Exception:
                 kname = ''
             name = raw_input('Full name: [%s] ' % kname).strip()
             if name == '':

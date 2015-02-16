@@ -186,7 +186,7 @@ class VersionInteger(Integer):
                 version_error_string = "Could not find version {0}, using version {1} instead"
                 log.error(version_error_string.format(value, DEFAULT_VERSION))
                 value = DEFAULT_VERSION
-        except:
+        except Exception:
             value = DEFAULT_VERSION
         return value
 

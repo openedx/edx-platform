@@ -232,8 +232,7 @@ def get_module(user, request, usage_key, field_data_cache,
         if log_if_not_found:
             log.debug("Error in get_module: ItemNotFoundError")
         return None
-
-    except:
+    except Exception:
         # Something has gone terribly wrong, but still not letting it turn into a 500.
         log.exception("Error in get_module")
         return None

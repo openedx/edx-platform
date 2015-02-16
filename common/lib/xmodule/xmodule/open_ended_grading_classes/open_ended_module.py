@@ -170,7 +170,7 @@ class OpenEndedModule(openendedchild.OpenEndedChild):
             grader_id = int(survey_responses['grader_id'])
             feedback = str(survey_responses['feedback'].encode('ascii', 'ignore'))
             score = int(survey_responses['score'])
-        except:
+        except Exception:
             # This is a dev_facing_error
             error_message = (
                 "Could not parse submission id, grader id, "

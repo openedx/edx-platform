@@ -261,7 +261,7 @@ class PeerGradingModule(PeerGradingFields, XModule):
         try:
             count_graded = self.student_data_for_location['count_graded']
             count_required = self.student_data_for_location['count_required']
-        except:
+        except Exception:
             success, response = self.query_data_for_location(self.link_to_location)
             if not success:
                 log.exception(

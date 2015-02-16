@@ -281,7 +281,7 @@ class SelfAssessmentModule(openendedchild.OpenEndedChild):
         latest_post_assessment = super(SelfAssessmentModule, self).latest_post_assessment(system)
         try:
             rubric_scores = json.loads(latest_post_assessment)
-        except:
+        except Exception:
             rubric_scores = []
         return [rubric_scores]
 

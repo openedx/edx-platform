@@ -811,7 +811,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     elif request.method == 'DELETE':
         try:
             return JsonResponse(delete_course_update(usage_key, request.json, provided_id, request.user))
-        except:
+        except Exception:
             return HttpResponseBadRequest(
                 "Failed to delete",
                 content_type="text/plain"
@@ -820,7 +820,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     elif request.method in ('POST', 'PUT'):
         try:
             return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
-        except:
+        except Exception:
             return HttpResponseBadRequest(
                 "Failed to save",
                 content_type="text/plain"

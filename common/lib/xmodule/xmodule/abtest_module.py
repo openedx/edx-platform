@@ -113,7 +113,7 @@ class ABTestDescriptor(ABTestFields, RawDescriptor, XmlDescriptor):
                 try:
                     child_block = system.process_xml(etree.tostring(child))
                     child_content_urls.append(child_block.scope_ids.usage_id)
-                except:
+                except Exception:
                     log.exception("Unable to load child when parsing ABTest. Continuing...")
                     continue
 

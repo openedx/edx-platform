@@ -44,7 +44,7 @@ def staff_grading_notifications(course, user):
         if notifications['success']:
             if notifications['staff_needs_to_grade']:
                 pending_grading = True
-    except:
+    except Exception:
         #Non catastrophic error, so no real action
         notifications = {}
         #This is a dev_facing_error
@@ -143,7 +143,7 @@ def combined_notifications(course, user):
             if (notifications.get('staff_needs_to_grade') or
                     notifications.get('student_needs_to_peer_grade')):
                 pending_grading = True
-    except:
+    except Exception:
         #Non catastrophic error, so no real action
         #This is a dev_facing_error
         log.exception(
@@ -190,7 +190,7 @@ def _get_value_from_cache(key_name):
     try:
         value = json.loads(value)
         success = True
-    except:
+    except Exception:
         pass
     return success, value
 

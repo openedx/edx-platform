@@ -412,7 +412,7 @@ class LoncapaResponse(object):
 
         # If we can't do that, create the <div> and set the message
         # as the text of the <div>
-        except:
+        except Exception:
             response_msg_div = etree.Element('div')
             response_msg_div.text = str(response_msg)
 

@@ -107,7 +107,7 @@ def send_user_notification_callback(sender, **kwargs):
 
     try:
         user.email_user(subject, message, studio_request_email)
-    except:
+    except Exception:
         log.warning("Unable to send course creator status e-mail to %s", user.email)
 
 

@@ -239,7 +239,7 @@ class ConditionalDescriptor(ConditionalFields, SequenceDescriptor):
                 try:
                     descriptor = system.process_xml(etree.tostring(child))
                     children.append(descriptor.scope_ids.usage_id)
-                except:
+                except Exception:
                     msg = "Unable to load child when parsing Conditional."
                     log.exception(msg)
                     system.error_tracker(msg)

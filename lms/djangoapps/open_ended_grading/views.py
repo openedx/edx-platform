@@ -10,7 +10,7 @@ from xmodule.open_ended_grading_classes.grading_service_module import GradingSer
 import json
 from student.models import unique_id_for_user
 
-import open_ended_notifications
+from open_ended_grading import open_ended_notifications
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import search

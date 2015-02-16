@@ -38,7 +38,7 @@ def export(course, export_dir):
             root.write(f)
 
         return True
-    except:
+    except Exception:
         print 'Export failed!'
         traceback.print_exc()
 

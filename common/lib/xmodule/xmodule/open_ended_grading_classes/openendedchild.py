@@ -113,7 +113,7 @@ class OpenEndedChild(object):
         if instance_state is not None:
             try:
                 instance_state = json.loads(instance_state)
-            except:
+            except Exception:
                 log.error(
                     "Could not load instance state for open ended.  Setting it to nothing.: {0}".format(instance_state))
                 instance_state = {}
@@ -158,7 +158,7 @@ class OpenEndedChild(object):
         self.location_string = location
         try:
             self.location_string = self.location_string.to_deprecated_string()
-        except:
+        except Exception:
             pass
 
         self.setup_response(system, location, definition, descriptor)

@@ -16,9 +16,10 @@ def circuit_line(circuit):
         raise Http404()
     try:
         server_circuit = ServerCircuit.objects.get(name=circuit)
-        schematic = server_circuit.schematic
-    except:
+    except Exception:
         schematic = ''
+    else:
+        schematic = server_circuit.schematic
 
     circuit_line = xml.etree.ElementTree.Element('input')
     circuit_line.set('type', 'hidden')
@@ -34,7 +35,7 @@ def circuit_line(circuit):
 def edit_circuit(request, circuit):
     try:
         server_circuit = ServerCircuit.objects.get(name=circuit)
-    except:
+    except Exception:
         server_circuit = None
 
     if not circuit.isalnum():
@@ -53,7 +54,7 @@ def save_circuit(request, circuit):
     print schematic
     try:
         server_circuit = ServerCircuit.objects.get(name=circuit)
-    except:
+    except Exception:
         server_circuit = ServerCircuit()
         server_circuit.name = circuit
     server_circuit.schematic = schematic

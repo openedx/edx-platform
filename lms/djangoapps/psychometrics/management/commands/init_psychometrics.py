@@ -37,7 +37,7 @@ class Command(BaseCommand):
             try:
                 state = json.loads(sm.state)
                 done = state['done']
-            except:
+            except Exception:
                 print "Oops, failed to eval state for %s (state=%s)" % (sm, sm.state)
                 continue
 

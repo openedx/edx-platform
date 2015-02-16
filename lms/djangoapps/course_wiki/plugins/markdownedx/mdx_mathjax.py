@@ -5,7 +5,7 @@ try:
     # Markdown 2.1.0 changed from 2.0.3. We try importing the new version first,
     # but import the 2.0.3 version if it fails
     from markdown.util import etree, AtomicString
-except:
+except Exception:
     from markdown import etree, AtomicString
 
 

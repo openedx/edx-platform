@@ -99,11 +99,11 @@ def my_evalf(expr, chop=False):
     if type(expr) == list:
         try:
             return [x.evalf(chop=chop) for x in expr]
-        except:
+        except Exception:
             return expr
     try:
         return expr.evalf(chop=chop)
-    except:
+    except Exception:
         return expr
 
 
