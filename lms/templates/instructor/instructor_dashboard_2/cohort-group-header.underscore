@@ -18,9 +18,4 @@
             <a href="http://edx.readthedocs.org/projects/edx-partner-course-staff/en/latest/cohorts/cohorts_overview.html#all-automated-assignment" class="incontext-help action-secondary action-help"><%- gettext("What does this mean?") %></a>
         <% } %>
     </div>
-    <div class="setup-actions">
-        <% if (studioAdvancedSettingsUrl !== "None") { %>
-            <a href="<%= studioAdvancedSettingsUrl %>" class="action-secondary action-edit"><%- gettext("Edit settings in Studio") %></a>
-        <% } %>
-    </div>
 </div>

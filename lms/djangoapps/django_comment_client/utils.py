@@ -66,7 +66,7 @@ def _get_discussion_modules(course):
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key) is None:
+            if getattr(module, key, None) is None:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 return False
         return True
@@ -134,9 +134,47 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course):
-    course_id = course.id
+def get_discussion_category_map(course, cohorted_if_in_list=False, exclude_unstarted=True):
+    """
+    Returns the category map for course-wide and inline discussions.
 
+    Args:
+        course : course object.
+        cohorted_if_in_list (bool): Specify that inline topic marked is_cohorted, if it's in discussion_topics list.
+
+    Example:
+        >>> example = {
+        >>>               "entries": {
+        >>>                   "General": {
+        >>>                       "sort_key": "General",
+        >>>                       "is_cohorted": True,
+        >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>                   }
+        >>>               },
+        >>>               "children": ["General", "Getting Started"],
+        >>>               "subcategories": {
+        >>>                   "Getting Started": {
+        >>>                       "subcategories": {},
+        >>>                       "children": [
+        >>>                           "Working with Videos",
+        >>>                           "Videos on edX"
+        >>>                       ],
+        >>>                       "entries": {
+        >>>                           "Working with Videos": {
+        >>>                               "sort_key": None,
+        >>>                               "is_cohorted": False,
+        >>>                               "id": "d9f970a42067413cbb633f81cfb12604"
+        >>>                           },
+        >>>                           "Videos on edX": {
+        >>>                               "sort_key": None,
+        >>>                               "is_cohorted": False,
+        >>>                               "id": "98d8feb5971041a085512ae22b398613"
+        >>>                           }
+        >>>                       }
+        >>>                   }
+        >>>               }
+        >>>          }
+    """
     unexpanded_category_map = defaultdict(list)
 
     modules = _get_discussion_modules(course)
@@ -148,7 +186,7 @@ def get_discussion_category_map(course):
         title = module.discussion_target
         sort_key = module.sort_key
         category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
-        #Handle case where module.start is None
+        # Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
@@ -184,12 +222,22 @@ def get_discussion_category_map(course):
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
 
+        # pylint: disable=invalid-name
+        always_cohort_inline_discussions = (
+            not cohorted_if_in_list and course_cohort_settings.always_cohort_inline_discussions
+        )
         for entry in entries:
+            is_entry_cohorted = (
+                course_cohort_settings.is_cohorted and (
+                    always_cohort_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
+                )
+            )
+
             node[level]["entries"][entry["title"]] = {
                 "id": entry["id"],
                 "sort_key": entry["sort_key"],
                 "start_date": entry["start_date"],
-                "is_cohorted": course_cohort_settings.is_cohorted
+                "is_cohorted": is_entry_cohorted
             }
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
@@ -206,15 +254,15 @@ def get_discussion_category_map(course):
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    return _filter_unstarted_categories(category_map)
+    return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
 
 
-def get_discussion_categories_ids(course):
+def get_discussion_categories_ids(course, cohorted_if_in_list=False, exclude_unstarted=False):
     """
     Returns a list of available ids of categories for the course.
     """
     ids = []
-    queue = [get_discussion_category_map(course)]
+    queue = [get_discussion_category_map(course, cohorted_if_in_list, exclude_unstarted)]
     while queue:
         category_map = queue.pop()
         for child in category_map["children"]:

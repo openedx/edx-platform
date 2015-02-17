@@ -725,18 +725,17 @@
       vertical-align: middle;
     }
 
-    .form-submit {
-      @include idashbutton($blue);
-      @include font-size(14);
-      @include line-height(14);
-      margin-right: ($baseline/2);
-      margin-bottom: 0;
-      text-shadow: none;
-    }
-
     .form-cancel {
       @extend %t-copy-sub1;
     }
+  }
+  .form-submit {
+    @include idashbutton($blue);
+    @include font-size(14);
+    @include line-height(14);
+    margin-right: ($baseline/2);
+    margin-bottom: 0;
+    text-shadow: none;
   }
 
   .cohort-management-nav {
@@ -924,8 +923,9 @@
     }
   }
 
-  // CSV-based file upload for auto cohort assigning
-  .toggle-cohort-management-secondary {
+  // CSV-based file upload for auto cohort assigning and
+  // cohort the discussion topics.
+  .toggle-cohort-management-secondary, .toggle-cohort-management-discussions {
     @extend %t-copy-sub1;
   }
 
@@ -1070,6 +1070,49 @@
       }
     }
   }
+
+  // cohort discussions interface.
+  .cohort-discussions-nav {
+
+    .cohort-course-wide-discussions-form {
+
+      .form-actions {
+        padding-top: ($baseline/2);
+      }
+    }
+
+    .category-title,
+    .topic-name,
+    .all-inline-discussions,
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
+      padding-left: ($baseline/2);
+    }
+
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
+      padding-top: ($baseline/2);
+    }
+
+    .category-item,
+    .subcategory-item {
+      padding-top: ($baseline/2);
+    }
+
+    .cohorted-text {
+      color: $link-color;
+    }
+
+    .discussions-wrapper {
+      @extend %ui-no-list;
+      padding: 0 ($baseline/2);
+
+      .subcategories {
+        padding: 0 ($baseline*1.5);
+      }
+    }
+  }
+
 
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
     @extend %ui-no-list;

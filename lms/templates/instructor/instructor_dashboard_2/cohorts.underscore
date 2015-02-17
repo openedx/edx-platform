@@ -47,5 +47,15 @@
                 ) %>
             </p>
         </div>
+
+        <hr class="divider divider-lv1" />
+
+        <!-- Discussion Topics. -->
+        <a class="toggle-cohort-management-discussions" href="#cohort-discussions-management"><%- gettext('Specify whether discussion topics are divided by cohort') %></a>
+        <div class="cohort-discussions-nav is-hidden" id="cohort-management-discussion-topics">
+            <div class="cohort-course-wide-discussions-nav"></div>
+            <div class="cohort-inline-discussions-nav"></div>
+        </div>
+
     </div>
 <% } %>

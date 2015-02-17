@@ -6,20 +6,22 @@ Tests for course group views
 import json
 
 from collections import namedtuple
+from datetime import datetime
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-
+import django_test_client_utils  # monkey-patch for PATCH request method.
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from xmodule.modulestore.tests.factories import ItemFactory
 
 from ..models import CourseUserGroup, CourseCohort
 from ..views import (
     course_cohort_settings_handler, cohort_handler, users_in_cohort, add_users_to_cohort, remove_user_from_cohort,
-    link_cohort_to_partition_group
+    link_cohort_to_partition_group, cohort_discussion_topics
 )
 from ..cohorts import (
     get_cohort, get_cohort_by_name, get_cohort_by_id,
@@ -91,6 +93,33 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         view_args.insert(0, request)
         self.assertRaises(Http404, view, *view_args)
 
+    def create_cohorted_discussions(self):
+        cohorted_inline_discussions = ['Topic A']
+        cohorted_course_wide_discussions = ["Topic B"]
+        cohorted_discussions = cohorted_inline_discussions + cohorted_course_wide_discussions
+
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id=topic_name_to_id(self.course, "Topic A"),
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=datetime.now()
+        )
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(
+            self.course,
+            is_cohorted=True,
+            discussion_topics=discussion_topics,
+            cohorted_discussions=cohorted_discussions
+        )
+        return cohorted_inline_discussions, cohorted_course_wide_discussions
+
     def get_handler(self, course, cohort=None, expected_response_code=200, handler=cohort_handler):
         """
         Call a GET on `handler` for a given `course` and return its response as a dict.
@@ -121,56 +150,143 @@ class CohortViewsTestCase(ModuleStoreTestCase):
         self.assertEqual(response.status_code, expected_response_code)
         return json.loads(response.content)
 
+    def patch_handler(self, course, cohort=None, data=None, expected_response_code=200, handler=cohort_handler):
+        """
+        Call a PATCH on `handler` for a given `course` and return its response as a dict.
+        Raise an exception if response status code is not as expected.
+        """
+        if not isinstance(data, basestring):
+            data = json.dumps(data or {})
+
+        request = RequestFactory().patch(path="dummy path", data=data, content_type="application/json")
+        request.user = self.staff_user
+        if cohort:
+            response = handler(request, unicode(course.id), cohort.id)
+        else:
+            response = handler(request, unicode(course.id))
+        self.assertEqual(response.status_code, expected_response_code)
+        return json.loads(response.content)
+
 
 class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
     """
     Tests the `course_cohort_settings_handler` view.
     """
+
+    def get_expected_response(self):
+        """
+        Returns the static response dict.
+        """
+        return {
+            'is_cohorted': True,
+            'always_cohort_inline_discussions': True,
+            'cohorted_inline_discussions': [],
+            'cohorted_course_wide_discussions': [],
+            'id': 1
+        }
+
     def test_non_staff(self):
         """
         Verify that we cannot access course_cohort_settings_handler if we're a non-staff user.
         """
         self._verify_non_staff_cannot_access(course_cohort_settings_handler, "GET", [unicode(self.course.id)])
-        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PUT", [unicode(self.course.id)])
+        self._verify_non_staff_cannot_access(course_cohort_settings_handler, "PATCH", [unicode(self.course.id)])
 
     def test_get_settings(self):
         """
         Verify that course_cohort_settings_handler is working for HTTP GET.
         """
-        cohorted_discussions = ['Topic A', 'Topic B']
-        config_course_cohorts(self.course, is_cohorted=True, cohorted_discussions=cohorted_discussions)
+        cohorted_inline_discussions, cohorted_course_wide_discussions = self.create_cohorted_discussions()
 
         response = self.get_handler(self.course, handler=course_cohort_settings_handler)
-        response['cohorted_discussions'].sort()
+        expected_response = self.get_expected_response()
 
-        expected_response = {
-            'is_cohorted': True,
-            'always_cohort_inline_discussions': True,
-            'cohorted_discussions': [topic_name_to_id(self.course, name) for name in cohorted_discussions],
-            'id': 1
-        }
-        expected_response['cohorted_discussions'].sort()
+        expected_response['cohorted_inline_discussions'] = [topic_name_to_id(self.course, name)
+                                                            for name in cohorted_inline_discussions]
+        expected_response['cohorted_course_wide_discussions'] = [topic_name_to_id(self.course, name)
+                                                                 for name in cohorted_course_wide_discussions]
 
         self.assertEqual(response, expected_response)
 
-    def test_update_settings(self):
+    def test_update_is_cohorted_settings(self):
         """
-        Verify that course_cohort_settings_handler is working for HTTP POST.
+        Verify that course_cohort_settings_handler is working for is_cohorted via HTTP PATCH.
         """
         config_course_cohorts(self.course, is_cohorted=True)
 
         response = self.get_handler(self.course, handler=course_cohort_settings_handler)
 
-        expected_response = {
-            'is_cohorted': True,
-            'always_cohort_inline_discussions': True,
-            'cohorted_discussions': [],
-            'id': 1
-        }
+        expected_response = self.get_expected_response()
+
         self.assertEqual(response, expected_response)
 
         expected_response['is_cohorted'] = False
-        response = self.put_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_always_cohort_inline_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for always_cohort_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+
+        self.assertEqual(response, expected_response)
+
+        expected_response['always_cohort_inline_discussions'] = False
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_course_wide_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for cohorted_course_wide_discussions via HTTP PATCH.
+        """
+        # course-wide discussion
+        discussion_topics = {
+            "Topic B": {"id": "Topic B"},
+        }
+
+        config_course_cohorts(self.course, is_cohorted=True, discussion_topics=discussion_topics)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        expected_response['cohorted_course_wide_discussions'] = [topic_name_to_id(self.course, "Topic B")]
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
+
+        self.assertEqual(response, expected_response)
+
+    def test_update_inline_discussion_settings(self):
+        """
+        Verify that course_cohort_settings_handler is working for cohorted_inline_discussions via HTTP PATCH.
+        """
+        config_course_cohorts(self.course, is_cohorted=True)
+
+        response = self.get_handler(self.course, handler=course_cohort_settings_handler)
+
+        expected_response = self.get_expected_response()
+        self.assertEqual(response, expected_response)
+
+        now = datetime.now()
+        # inline discussion
+        ItemFactory.create(
+            parent_location=self.course.location,
+            category="discussion",
+            discussion_id="Topic_A",
+            discussion_category="Chapter",
+            discussion_target="Discussion",
+            start=now
+        )
+
+        expected_response['cohorted_inline_discussions'] = ["Topic_A"]
+        response = self.patch_handler(self.course, data=expected_response, handler=course_cohort_settings_handler)
 
         self.assertEqual(response, expected_response)
 
@@ -180,7 +296,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         config_course_cohorts(self.course, is_cohorted=True)
 
-        response = self.put_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
+        response = self.patch_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
         self.assertEqual("Bad Request", response.get("error"))
 
     def test_update_settings_with_invalid_field_data_type(self):
@@ -189,7 +305,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         config_course_cohorts(self.course, is_cohorted=True)
 
-        response = self.put_handler(
+        response = self.patch_handler(
             self.course,
             data={'is_cohorted': ''},
             expected_response_code=400,
@@ -1075,3 +1191,58 @@ class RemoveUserFromCohortTestCase(CohortViewsTestCase):
         cohort = CohortFactory(course_id=self.course.id, users=[user])
         response_dict = self.request_remove_user_from_cohort(user.username, cohort)
         self.verify_removed_user_from_cohort(user.username, response_dict, cohort)
+
+
+class CourseCohortDiscussionTopicsTestCase(CohortViewsTestCase):
+    """
+    Tests the `cohort_discussion_topics` view.
+    """
+
+    def test_non_staff(self):
+        """
+        Verify that we cannot access cohort_discussion_topics if we're a non-staff user.
+        """
+        self._verify_non_staff_cannot_access(cohort_discussion_topics, "GET", [unicode(self.course.id)])
+
+    def test_get_discussion_topics(self):
+        """
+        Verify that course_cohort_settings_handler is working for HTTP GET.
+        """
+        # create inline & course-wide discussion to verify the different map.
+        self.create_cohorted_discussions()
+
+        response = self.get_handler(self.course, handler=cohort_discussion_topics)
+        start_date = response['inline_discussions']['subcategories']['Chapter']['start_date']
+        expected_response = {
+            "course_wide_discussions": {
+                'children': ['Topic B'],
+                'entries': {
+                    'Topic B': {
+                        'sort_key': 'A',
+                        'is_cohorted': True,
+                        'id': topic_name_to_id(self.course, "Topic B"),
+                        'start_date': response['course_wide_discussions']['entries']['Topic B']['start_date']
+                    }
+                }
+            },
+            "inline_discussions": {
+                'subcategories': {
+                    'Chapter': {
+                        'subcategories': {},
+                        'children': ['Discussion'],
+                        'entries': {
+                            'Discussion': {
+                                'sort_key': None,
+                                'is_cohorted': True,
+                                'id': topic_name_to_id(self.course, "Topic A"),
+                                'start_date': start_date
+                            }
+                        },
+                        'sort_key': 'Chapter',
+                        'start_date': start_date
+                    }
+                },
+                'children': ['Chapter']
+            }
+        }
+        self.assertEqual(response, expected_response)

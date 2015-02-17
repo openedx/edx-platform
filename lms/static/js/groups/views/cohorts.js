@@ -1,7 +1,8 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext, interpolate_text, CohortModel, CohortEditorView, CohortFormView,
-          CourseCohortSettingsNotificationView, NotificationModel, NotificationView, FileUploaderView) {
+          CourseCohortSettingsNotificationView, NotificationModel, NotificationView, FileUploaderView,
+          InlineDiscussionsView, CourseWideDiscussionsView) {
     'use strict';
 
     var hiddenClass = 'is-hidden',
@@ -17,7 +18,8 @@ var edx = edx || {};
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
             'click .link-cross-reference': 'showSection',
-            'click .toggle-cohort-management-secondary': 'showCsvUpload'
+            'click .toggle-cohort-management-secondary': 'showCsvUpload',
+            'click .toggle-cohort-management-discussions': 'showDiscussionTopics'
         },
 
         initialize: function(options) {
@@ -120,7 +122,7 @@ var edx = edx || {};
                 fieldData = {is_cohorted: this.getCohortsEnabled()};
             cohortSettings = this.cohortSettings;
             cohortSettings.save(
-                fieldData, {wait: true}
+                fieldData, {patch: true, wait: true}
             ).done(function() {
                 self.render();
                 self.renderCourseCohortSettingsNotificationView();
@@ -277,6 +279,27 @@ var edx = edx || {};
                 this.$('#file-upload-form-file').focus();
             }
         },
+        showDiscussionTopics: function(event) {
+            event.preventDefault();
+
+            $(event.currentTarget).addClass(hiddenClass);
+            var cohortDiscussionsElement = this.$('.cohort-discussions-nav').removeClass(hiddenClass);
+
+            if (!this.CourseWideDiscussionsView) {
+                this.CourseWideDiscussionsView = new CourseWideDiscussionsView({
+                    el: cohortDiscussionsElement,
+                    model: this.context.discussionTopicsSettingsModel,
+                    cohortSettings: this.cohortSettings
+                }).render();
+            }
+            if(!this.InlineDiscussionsView) {
+                this.InlineDiscussionsView = new InlineDiscussionsView({
+                    el: cohortDiscussionsElement,
+                    model: this.context.discussionTopicsSettingsModel,
+                    cohortSettings: this.cohortSettings
+                }).render();
+            }
+        },
 
         getSectionCss: function (section) {
             return ".instructor-nav .nav-item a[data-section='" + section + "']";
@@ -284,4 +307,4 @@ var edx = edx || {};
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
     edx.groups.CohortFormView, edx.groups.CourseCohortSettingsNotificationView, NotificationModel, NotificationView,
-    FileUploaderView);
+    FileUploaderView, edx.groups.InlineDiscussionsView, edx.groups.CourseWideDiscussionsView);
