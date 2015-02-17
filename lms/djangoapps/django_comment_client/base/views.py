@@ -27,7 +27,8 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids
+    get_discussion_categories_ids,
+    get_discussion_category_map
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
@@ -643,3 +644,16 @@ def users(request, course_id):
     except User.DoesNotExist:
         pass
     return JsonResponse({"users": user_objs})
+
+
+@require_GET
+@login_required
+def discussion_topics(request, course_id):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        course = get_course_by_id(course_key)
+    except Http404:
+        # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+
+    return JsonResponse(get_discussion_category_map(course))
