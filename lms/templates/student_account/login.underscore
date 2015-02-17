@@ -32,6 +32,7 @@
 
     <button type="submit" class="action action-primary action-update js-login login-button"><%- gettext("Sign in") %></button>
 
+    <% if ( context.providers.length > 0 && !context.currentProvider ) { %>
     <div class="login-providers">
         <div class="section-title lines">
             <h2>
@@ -48,6 +49,7 @@
             <% }
         }); %>
     </div>
+    <% } %>
 </form>
 
 <div class="toggle-form">
