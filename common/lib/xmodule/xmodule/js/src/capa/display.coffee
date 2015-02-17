@@ -336,7 +336,7 @@ class @Problem
               @$("label[for='input_#{key}_#{choice}']").attr correct_answer: 'true'
               answer_text.push('<p>' + gettext('Answer:') + ' ' + value + '</p>')
           else
-            answer = @$("#answer_#{key}, #solution_#{key}")
+            answer = @$('[id="answer_'+key+'"],[id="solution_'+key+'"]')
             answer.html(value)
             Collapsible.setCollapsibles(answer)
 
