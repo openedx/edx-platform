@@ -56,6 +56,7 @@
 # mohammad hamdi <babrica@hotmail.com>, 2014
 # may <may@qordoba.com>, 2014
 # Nabeel El-Dughailib <nabeel@qordoba.com>, 2014-2015
+# omarithawi <oithawi@qrf.org>, 2015
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2015 edX
@@ -71,7 +72,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"POT-Creation-Date: 2015-02-17 16:01+0000\n"
 "PO-Revision-Date: 2015-02-05 11:21+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -1690,11 +1691,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
-"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"نأسف لحدوث خطأ في التسلسل! لا يمكنك الانتقال إلى علامة التبويب %(tab_name)s "
-"في النموذج التسلسلي الحالي. لذا يُرجى منك الاتصال بطاقم المساق."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
@@ -4572,7 +4571,7 @@ msgstr "(حقل مطلوب)"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "e.g. johndoe@example.com, JaneDoe, joeydoe@example.com"
-msgstr "مثلًا: johndoe@example.com، جين دو، joeydoe@example.com"
+msgstr "مثلًا: ahafiz@example.com، عبد الحليم حافظ، halim@example.com"
 
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid ""

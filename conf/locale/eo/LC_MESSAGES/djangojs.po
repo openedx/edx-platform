@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:47+0000\n"
-"PO-Revision-Date: 2015-02-11 15:48:11.991475\n"
+"POT-Creation-Date: 2015-02-17 16:12+0000\n"
+"PO-Revision-Date: 2015-02-17 16:13:47.760661\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -1632,12 +1632,12 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
-"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"Séqüénçé érrör! Çännöt nävïgäté tö täß %(tab_name)s ïn thé çürrént "
+"Séqüénçé érrör! Çännöt nävïgäté tö %(tab_name)s ïn thé çürrént "
 "SéqüénçéMödülé. Pléäsé çöntäçt thé çöürsé stäff. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢ση#"
+"αмєт, ¢σ#"
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js

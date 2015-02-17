@@ -82,7 +82,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"POT-Creation-Date: 2015-02-17 16:01+0000\n"
 "PO-Revision-Date: 2015-02-05 09:52+0000\n"
 "Last-Translator: Weyedide <weyedide@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/projects/p/edx-platform/language/ru/)\n"
@@ -1652,7 +1652,7 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
-"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
 

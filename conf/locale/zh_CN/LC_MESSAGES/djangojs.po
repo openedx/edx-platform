@@ -84,6 +84,7 @@
 # This file is distributed under the GNU AFFERO GENERAL PUBLIC LICENSE.
 # 
 # Translators:
+# Changyue Wang <peterwang.dut@gmail.com>, 2015
 # jsgang <jsgang9@gmail.com>, 2014-2015
 # Lionel Chen <chenlinchuan@me.com>, 2014
 # louyihua <supermouselyh@hotmail.com>, 2014
@@ -107,7 +108,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"POT-Creation-Date: 2015-02-17 16:01+0000\n"
 "PO-Revision-Date: 2015-02-04 12:42+0000\n"
 "Last-Translator: Changyue Wang <peterwang.dut@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/projects/p/edx-platform/language/zh_CN/)\n"
@@ -1627,9 +1628,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
-"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
-msgstr "序列错误！ 不能在当前SequenceModule中导航到%(tab_name)s页面请联系课程工作人员。"
+msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js

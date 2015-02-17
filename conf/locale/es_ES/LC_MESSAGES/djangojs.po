@@ -5,6 +5,7 @@
 # 
 # Translators:
 # Alicia P. <pericia@gmail.com>, 2014
+# AWS <aws@posiziona.eu>, 2015
 # birrafria <cervecitafresquita@gmail.com>, 2014
 # Elena Clavijo Vicent <elena.onil@gmail.com>, 2014
 # i_cruzado <ignacio.cruzado@gmail.com>, 2014
@@ -58,6 +59,7 @@
 # 
 # Translators:
 # Alicia P. <pericia@gmail.com>, 2014
+# AWS <aws@posiziona.eu>, 2015
 # Enrique Centelles <ecentelles2003@yahoo.es>, 2014-2015
 # Iago Enjo <enjo@ub.edu>, 2015
 # spentamanyu <i.delamo@gmail.com>, 2015
@@ -88,7 +90,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:33+0000\n"
+"POT-Creation-Date: 2015-02-17 16:01+0000\n"
 "PO-Revision-Date: 2015-02-02 13:52+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Spanish (Spain) (http://www.transifex.com/projects/p/edx-platform/language/es_ES/)\n"
@@ -1683,12 +1685,9 @@ msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/sequence/display.js
 msgid ""
-"Sequence error! Cannot navigate to tab %(tab_name)s in the current "
+"Sequence error! Cannot navigate to %(tab_name)s in the current "
 "SequenceModule. Please contact the course staff."
 msgstr ""
-"¡Error de secuencia! No se puede acceder a la pestaña %(tab_name)s en el "
-"módulo de secuencia -SequenceModule- actual. Por favor, contacta con el "
-"administrador del curso."
 
 #: common/lib/xmodule/xmodule/js/src/video/00_i18n.js
 #: common/lib/xmodule/xmodule/js/src/video/04_video_control.js
@@ -2016,6 +2015,7 @@ msgstr ""
 
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: lms/static/js/edxnotes/views/tabs/search_results.js
+#: lms/templates/courseware_search/search_list.underscore
 msgid "Search Results"
 msgstr "Resultados de la búsqueda"
 
@@ -3149,8 +3149,6 @@ msgstr ""
 msgid ""
 "Please enter a term in the %(anchor_start)s search field%(anchor_end)s."
 msgstr ""
-"Por favor, introduce un término en el %(anchor_start)s campo de búsqueda "
-"%(anchor_start)s."
 
 #: lms/static/js/edxnotes/views/tab_item.js
 msgid "Current tab"
