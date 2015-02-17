@@ -17,8 +17,6 @@ from .mailchimp_sync_course import (connect_mailchimp, get_subscribed,
                                     get_unsubscribed, get_cleaned,
                                     subscribe_with_data)
 
-BATCH_SIZE = 5000
-
 log = logging.getLogger('edx.mailchimp')
 
 
