@@ -33,7 +33,7 @@ class CountMongoCallsXMLRoundtrip(TestCase):
         self.addCleanup(rmtree, self.export_dir, ignore_errors=True)
 
     @ddt.data(
-        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 287, 780, 702, 702),
+        (MIXED_OLD_MONGO_MODULESTORE_BUILDER, 287, 779, 702, 702),
         (MIXED_SPLIT_MODULESTORE_BUILDER, 37, 16, 190, 189),
     )
     @ddt.unpack

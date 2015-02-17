@@ -1,5 +1,6 @@
 """HTTP end-points for the User API. """
 import copy
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 from opaque_keys import InvalidKeyError
 import third_party_auth
 
@@ -15,7 +16,6 @@ from opaque_keys.edx import locator
 from rest_framework import authentication
 from rest_framework import filters
 from rest_framework import generics
-from rest_framework import permissions
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -30,23 +30,6 @@ from .api import account as account_api, profile as profile_api
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
 from .serializers import UserSerializer, UserPreferenceSerializer
-
-
-class ApiKeyHeaderPermission(permissions.BasePermission):
-    def has_permission(self, request, view):
-        """
-        Check for permissions by matching the configured API key and header
-
-        If settings.DEBUG is True and settings.EDX_API_KEY is not set or None,
-        then allow the request. Otherwise, allow the request if and only if
-        settings.EDX_API_KEY is set and the X-Edx-Api-Key HTTP header is
-        present in the request and matches the setting.
-        """
-        api_key = getattr(settings, "EDX_API_KEY", None)
-        return (
-            (settings.DEBUG and api_key is None) or
-            (api_key is not None and request.META.get("HTTP_X_EDX_API_KEY") == api_key)
-        )
 
 
 class LoginSessionView(APIView):

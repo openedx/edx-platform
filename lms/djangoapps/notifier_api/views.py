@@ -3,7 +3,7 @@ from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from notification_prefs import NOTIFICATION_PREF_KEY
 from notifier_api.serializers import NotifierUserSerializer
-from openedx.core.djangoapps.user_api.views import ApiKeyHeaderPermission
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission
 
 
 class NotifierUsersViewSet(ReadOnlyModelViewSet):
