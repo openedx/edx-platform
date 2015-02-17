@@ -815,6 +815,7 @@ def course_about(request, course_id):
                 reg_url=reverse('register_user'), course_id=course.id.to_deprecated_string())
 
         course_price = get_cosmetic_display_price(course, registration_price)
+        can_add_course_to_cart = _is_shopping_cart_enabled and registration_price
 
         # Used to provide context to message to student if enrollment not allowed
         can_enroll = has_access(request.user, 'enroll', course)
@@ -851,7 +852,7 @@ def course_about(request, course_id):
             # We do not want to display the internal courseware header, which is used when the course is found in the
             # context. This value is therefor explicitly set to render the appropriate header.
             'disable_courseware_header': True,
-            'is_shopping_cart_enabled': _is_shopping_cart_enabled,
+            'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses
         })
