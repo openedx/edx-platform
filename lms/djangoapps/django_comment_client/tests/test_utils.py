@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
+import datetime
 import json
 import mock
 from pytz import UTC
+from django.utils.timezone import UTC as django_utc
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
@@ -179,7 +180,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             # This test needs to use a course that has already started --
             # discussion topics only show up if the course has already started,
             # and the default start date for courses is Jan 1, 2030.
-            start=datetime(2012, 2, 3, tzinfo=UTC)
+            start=datetime.datetime(2012, 2, 3, tzinfo=UTC)
         )
         # Courses get a default discussion topic on creation, so remove it
         self.course.discussion_topics = {}
@@ -196,6 +197,15 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             discussion_category=discussion_category,
             discussion_target=discussion_target,
             **kwargs
+        )
+
+    def assert_category_map_equals(self, expected, cohorted_if_in_list=False, exclude_unstarted=True):
+        """
+        Asserts the expected map with the map returned by get_discussion_category_map method.
+        """
+        self.assertEqual(
+            utils.get_discussion_category_map(self.course, cohorted_if_in_list, exclude_unstarted),
+            expected
         )
 
     def test_empty(self):
@@ -274,6 +284,85 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 },
                 "children": ["Chapter"]
             }
+        )
+
+    def test_inline_with_always_cohort_inline_discussion_flag(self):
+        self.create_discussion("Chapter", "Discussion")
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
+
+        self.assert_category_map_equals(
+            {
+                "entries": {},
+                "subcategories": {
+                    "Chapter": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_cohorted": True,
+                            }
+                        },
+                        "subcategories": {},
+                        "children": ["Discussion"]
+                    }
+                },
+                "children": ["Chapter"]
+            }
+        )
+
+    def test_inline_without_always_cohort_inline_discussion_flag(self):
+        self.create_discussion("Chapter", "Discussion")
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, always_cohort_inline_discussions=False)
+
+        self.assert_category_map_equals(
+            {
+                "entries": {},
+                "subcategories": {
+                    "Chapter": {
+                        "entries": {
+                            "Discussion": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                            }
+                        },
+                        "subcategories": {},
+                        "children": ["Discussion"]
+                    }
+                },
+                "children": ["Chapter"]
+            },
+            cohorted_if_in_list=True
+        )
+
+    def test_get_unstarted_discussion_modules(self):
+        later = datetime.datetime(datetime.MAXYEAR, 1, 1, tzinfo=django_utc())
+
+        self.create_discussion("Chapter 1", "Discussion 1", start=later)
+
+        self.assert_category_map_equals(
+            {
+                "entries": {},
+                "subcategories": {
+                    "Chapter 1": {
+                        "entries": {
+                            "Discussion 1": {
+                                "id": "discussion1",
+                                "sort_key": None,
+                                "is_cohorted": False,
+                                "start_date": later
+                            }
+                        },
+                        "subcategories": {},
+                        "children": ["Discussion 1"],
+                        "start_date": later,
+                        "sort_key": "Chapter 1"
+                    }
+                },
+                "children": ["Chapter 1"]
+            },
+            cohorted_if_in_list=True,
+            exclude_unstarted=False
         )
 
     def test_tree(self):
@@ -401,8 +490,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.assertEqual(set(subsection1["entries"].keys()), subsection1_discussions)
 
     def test_start_date_filter(self):
-        now = datetime.now()
-        later = datetime.max
+        now = datetime.datetime.now()
+        later = datetime.datetime.max
         self.create_discussion("Chapter 1", "Discussion 1", start=now)
         self.create_discussion("Chapter 1", "Discussion 2 обсуждение", start=later)
         self.create_discussion("Chapter 2", "Discussion", start=now)
@@ -440,6 +529,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
                 "children": ["Chapter 1", "Chapter 2"]
             }
         )
+        self.maxDiff = None
 
     def test_sort_inline_explicit(self):
         self.create_discussion("Chapter", "Discussion 1", sort_key="D")

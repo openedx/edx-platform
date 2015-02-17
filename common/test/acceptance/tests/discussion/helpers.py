@@ -62,9 +62,8 @@ class CohortTestMixin(object):
         """
         url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
         data = json.dumps({'is_cohorted': False})
-        response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
+        response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to disable cohorts")
-
 
     def add_manual_cohort(self, course_fixture, cohort_name):
         """

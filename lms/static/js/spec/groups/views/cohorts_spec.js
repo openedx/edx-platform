@@ -1,10 +1,13 @@
 define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
-        'js/groups/models/course_cohort_settings', 'js/utils/animation',
-        'js/groups/views/course_cohort_settings_notification'
+        'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
+        'js/groups/views/course_cohort_settings_notification', 'js/groups/models/cohort_discussions',
+        'js/groups/views/cohort_discussions', 'js/groups/views/cohort_discussions_course_wide',
+        'js/groups/views/cohort_discussions_inline'
         ],
     function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
-              CourseCohortSettingsModel, AnimationUtil, CourseCohortSettingsNotificationView) {
+              CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView, DiscussionTopicsSettingsModel,
+              CohortDiscussionsView, CohortCourseWideDiscussionsView, CohortInlineDiscussionsView) {
         'use strict';
 
         describe("Cohorts View", function () {
@@ -14,7 +17,16 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 verifyDetailedMessage, verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup,
                 clearContentGroup, saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
+                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT, createMockCohortDiscussionsJson,
+                createMockCohortDiscussions, showAndAssertDiscussionTopics;
+
+            // Selectors
+            var discussionsToggle ='.toggle-cohort-management-discussions',
+                inlineDiscussionsFormCss = '.cohort-inline-discussions-form',
+                courseWideDiscussionsFormCss = '.cohort-course-wide-discussions-form',
+                courseWideDiscussionsSaveButtonCss = '.cohort-course-wide-discussions-form .action-save',
+                inlineDiscussionsSaveButtonCss = '.cohort-inline-discussions-form .action-save',
+                inlineDiscussionsForm, courseWideDiscussionsForm;
 
             MOCK_MANUAL_ASSIGNMENT = 'manual';
             MOCK_RANDOM_ASSIGNMENT = 'random';
@@ -54,23 +66,71 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 ];
             };
 
-            createMockCohortSettingsJson = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettingsJson = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return {
                     id: 0,
                     is_cohorted: isCohorted || false,
-                    cohorted_discussions: cohortedDiscussions || [],
+                    cohorted_inline_discussions: cohortedInlineDiscussions || [],
+                    cohorted_course_wide_discussions: cohortedCourseWideDiscussions || [],
                     always_cohort_inline_discussions: alwaysCohortInlineDiscussions || true
                 };
             };
 
-            createMockCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettings = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return new CourseCohortSettingsModel(
-                    createMockCohortSettingsJson(isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions)
+                    createMockCohortSettingsJson(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions)
+                );
+            };
+
+            createMockCohortDiscussionsJson = function (allCohorted) {
+                return {
+                    course_wide_discussions: {
+                        children: ['Topic_C_1', 'Topic_C_2'],
+                        entries: {
+                            Topic_C_1: {
+                               sort_key: null,
+                               is_cohorted: true,
+                               id: 'Topic_C_1'
+                            },
+                            Topic_C_2: {
+                                sort_key: null,
+                                is_cohorted: false,
+                                id: 'Topic_C_2'
+                            }
+                        }
+                    },
+                    inline_discussions: {
+                        subcategories: {
+                            Topic_I_1: {
+                                subcategories: {},
+                                children: ['Inline_Discussion_1', 'Inline_Discussion_2'],
+                                entries: {
+                                    Inline_Discussion_1: {
+                                        sort_key: null,
+                                        is_cohorted: true,
+                                        id: 'Inline_Discussion_1'
+                                    },
+                                    Inline_Discussion_2: {
+                                        sort_key: null,
+                                        is_cohorted: allCohorted || false,
+                                        id: 'Inline_Discussion_2'
+                                    }
+                                }
+                            }
+                        },
+                        children: ['Topic_I_1']
+                    }
+                };
+            };
+
+            createMockCohortDiscussions = function (allCohorted) {
+                return new DiscussionTopicsSettingsModel(
+                    createMockCohortDiscussionsJson(allCohorted)
                 );
             };
 
             createCohortsView = function (test, options) {
-                var cohortsJson, cohorts, contentGroups, cohortSettings;
+                var cohortsJson, cohorts, contentGroups, cohortSettings, cohortDiscussions;
                 options = options || {};
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
                 cohorts = new CohortCollection(cohortsJson, {parse: true});
@@ -78,17 +138,23 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 cohortSettings = options.cohortSettings || createMockCohortSettings(true);
                 cohortSettings.url = '/mock_service/cohorts/settings';
                 cohorts.url = '/mock_service/cohorts';
+
+                cohortDiscussions = options.cohortDiscussions || createMockCohortDiscussions();
+                cohortDiscussions.url = '/mock_service/cohorts/discussion/topics';
+
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
                     model: cohorts,
                     contentGroups: contentGroups,
                     cohortSettings: cohortSettings,
                     context: {
+                        discussionTopicsSettingsModel: cohortDiscussions,
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                         studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL
                     }
                 });
+
                 cohortsView.render();
                 if (options && options.selectCohort) {
                     cohortsView.$('.cohort-select').val(options.selectCohort.toString()).change();
@@ -195,6 +261,41 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 verifyDetailedMessage(expectedTitle, 'error', errors);
             };
 
+            showAndAssertDiscussionTopics = function(that) {
+
+                createCohortsView(that);
+
+                // Should see the control to toggle cohort discussions.
+                expect(cohortsView.$(discussionsToggle)).not.toHaveClass('is-hidden');
+                // But discussions form should not be visible until toggle is clicked.
+                expect(cohortsView.$(inlineDiscussionsFormCss).length).toBe(0);
+                expect(cohortsView.$(courseWideDiscussionsFormCss).length).toBe(0);
+
+                expect(cohortsView.$(discussionsToggle).text()).
+                    toContain('Specify whether discussion topics are divided by cohort');
+
+                cohortsView.$(discussionsToggle).click();
+                // After toggle is clicked, it should be hidden.
+                expect(cohortsView.$(discussionsToggle)).toHaveClass('is-hidden');
+
+                // Should see the course wide discussions form and its content
+                courseWideDiscussionsForm = cohortsView.$(courseWideDiscussionsFormCss);
+                expect(courseWideDiscussionsForm.length).toBe(1);
+
+                expect(courseWideDiscussionsForm.text()).
+                    toContain('Course-Wide Discussion Topics');
+                expect(courseWideDiscussionsForm.text()).
+                    toContain('Select the course-wide discussion topics that you want to divide by cohort.');
+
+                // Should see the inline discussions form and its content
+                inlineDiscussionsForm = cohortsView.$(inlineDiscussionsFormCss);
+                expect(inlineDiscussionsForm.length).toBe(1);
+                expect(inlineDiscussionsForm.text()).
+                    toContain('Content-Specific Discussion Topics');
+                expect(inlineDiscussionsForm.text()).
+                    toContain('Specify whether content-specific discussion topics are divided by cohort.');
+            };
+
             unknownUserMessage = function (name) {
                 return "Unknown user: " +  name;
             };
@@ -208,6 +309,10 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-group-header');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-state');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-category');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-inline');
                 TemplateHelpers.installTemplate('templates/file-upload');
             });
 
@@ -221,6 +326,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                 // If no cohorts have been created, can't upload a CSV file.
                 expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('is-hidden');
+                // if no cohorts have been created, can't show the link to discussion topics.
+                expect(cohortsView.$('.cohort-discussions-nav')).toHaveClass('is-hidden');
             });
 
             it("syncs data when membership tab is clicked", function() {
@@ -260,6 +367,10 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     .toBe("Your file 'upload_file.txt' has been uploaded. Allow a few minutes for processing.");
             });
 
+            it('can show discussion topics if cohort exists', function () {
+                showAndAssertDiscussionTopics(this);
+            });
+
             describe("Cohort Selector", function () {
                 it('has no initial selection', function () {
                     createCohortsView(this);
@@ -287,23 +398,23 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(true, [], true)
+                        requests, 'PATCH', '/mock_service/cohorts/settings',
+                        {is_cohorted: true}
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettingsJson(true)
+                        {is_cohorted: true}
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeTruthy();
 
                     cohortsView.$('.cohorts-state').prop('checked', false).change();
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(false, [], true)
+                        requests, 'PATCH', '/mock_service/cohorts/settings',
+                        {is_cohorted: false}
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettingsJson(false)
+                        {is_cohorted: false}
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                 });
@@ -959,6 +1070,380 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         expect(cohortsView.$('.tab-settings')).not.toHaveClass('is-selected');
                     });
                 });
+            });
+
+            describe("Discussion Topics", function() {
+                var createCourseWideView, createInlineView,
+                    inlineView, courseWideView, assertCohortedTopics;
+
+                createCourseWideView = function(that) {
+                    createCohortsView(that);
+
+                    courseWideView = new CohortCourseWideDiscussionsView({
+                        el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
+                        model: cohortsView.context.discussionTopicsSettingsModel,
+                        cohortSettings: cohortsView.cohortSettings
+                    });
+                    courseWideView.render();
+                };
+
+                createInlineView = function(that, discussionTopicsSettingsModel) {
+                    createCohortsView(that);
+
+                    inlineView = new CohortInlineDiscussionsView({
+                        el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
+                        model: discussionTopicsSettingsModel || cohortsView.context.discussionTopicsSettingsModel,
+                        cohortSettings: cohortsView.cohortSettings
+                    });
+                    inlineView.render();
+                };
+
+                assertCohortedTopics = function(view, type) {
+                    expect(view.$('.check-discussion-subcategory-' + type).length).toBe(2);
+                    expect(view.$('.check-discussion-subcategory-' + type + ':checked').length).toBe(1);
+                };
+
+                it('renders the view properly', function() {
+                    showAndAssertDiscussionTopics(this);
+                });
+
+                describe("Course Wide", function() {
+
+                    it('shows the "Save" button as disabled initially', function() {
+                        createCourseWideView(this);
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                    });
+
+                    it('has one cohorted and one non-cohorted topic', function() {
+                        createCourseWideView(this);
+
+                        assertCohortedTopics(courseWideView, 'course-wide');
+
+                        expect(courseWideView.$('.cohorted-text').length).toBe(2);
+                        expect(courseWideView.$('.cohorted-text.hidden').length).toBe(1);
+                    });
+
+                    it('enables the "Save" button after changing checkbox', function() {
+                        createCourseWideView(this);
+
+                        // save button is disabled.
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[0]).prop('checked', false).change();
+
+                        // save button is enabled.
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
+                    });
+
+                    it('saves the topic successfully', function() {
+                        createCourseWideView(this);
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
+
+                        // Save the updated settings
+                        courseWideView.$('.action-save').click();
+
+                        // fake requests for cohort settings with PATCH method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'PATCH', '/mock_service/cohorts/settings',
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        );
+
+                        // fake request for discussion/topics with GET method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            createMockCohortDiscussions()
+                        );
+
+                        // verify the success message.
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                        verifyMessage('Your changes have been saved.', 'confirmation');
+                    });
+
+                    it('shows an appropriate message when subsequent "GET" returns HTTP500', function() {
+                        createCourseWideView(this);
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
+
+                        // Save the updated settings
+                        courseWideView.$('.action-save').click();
+
+                        // fake requests for cohort settings with PATCH method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'PATCH', '/mock_service/cohorts/settings',
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
+                        );
+
+                        // fake request for discussion/topics with GET method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
+                        );
+                        AjaxHelpers.respondWithError(requests, 500);
+
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
+                        expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
+                    });
+
+                    it('shows an appropriate error message for HTTP500', function () {
+                        createCourseWideView(this);
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
+                        courseWideView.$('.action-save').click();
+
+                        AjaxHelpers.respondWithError(requests, 500);
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
+                        expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
+                    });
+                });
+
+                describe("Inline", function() {
+                    var enableSaveButton, mockGetRequest, verifySuccess, mockPatchRequest;
+
+                    enableSaveButton = function() {
+                        // enable the inline discussion topics.
+                        inlineView.$('.check-cohort-inline-discussions').prop('checked', 'checked').change();
+
+                        $(inlineView.$('.check-discussion-subcategory-inline')[0]).prop('checked', 'checked').change();
+
+                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
+                    };
+
+                    verifySuccess = function() {
+                        // verify the success message.
+                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                        verifyMessage('Your changes have been saved.', 'confirmation');
+                    };
+
+                    mockPatchRequest = function(cohortedInlineDiscussions) {
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'PATCH', '/mock_service/cohorts/settings',
+                            {
+                                cohorted_inline_discussions: cohortedInlineDiscussions,
+                                always_cohort_inline_discussions: false
+                            }
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            {
+                                cohorted_inline_discussions: cohortedInlineDiscussions,
+                                always_cohort_inline_discussions: false
+                            }
+                        );
+                    };
+
+                    mockGetRequest = function(allCohorted) {
+                        // fake request for discussion/topics with GET method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            createMockCohortDiscussions(allCohorted)
+                        );
+                    };
+
+                    it('shows the "Save" button as disabled initially', function() {
+                        createInlineView(this);
+                        expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                    });
+
+                    it('shows always cohort radio button as selected', function() {
+                        createInlineView(this);
+                        inlineView.$('.check-all-inline-discussions').prop('checked', 'checked').change();
+
+                        // verify always cohort inline discussions is being selected.
+                        expect(inlineView.$('.check-all-inline-discussions').prop('checked')).toBeTruthy();
+
+                        // verify that inline topics are disabled
+                        expect(inlineView.$('.check-discussion-subcategory-inline').prop('disabled')).toBeTruthy();
+                        expect(inlineView.$('.check-discussion-category').prop('disabled')).toBeTruthy();
+
+                        // verify that cohort some topics are not being selected.
+                        expect(inlineView.$('.check-cohort-inline-discussions').prop('checked')).toBeFalsy();
+                    });
+
+                    it('shows cohort some topics radio button as selected', function() {
+                        createInlineView(this);
+                        inlineView.$('.check-cohort-inline-discussions').prop('checked', 'checked').change();
+
+                        // verify some cohort inline discussions radio is being selected.
+                        expect(inlineView.$('.check-cohort-inline-discussions').prop('checked')).toBeTruthy();
+
+                        // verify always cohort radio is not selected.
+                        expect(inlineView.$('.check-all-inline-discussions').prop('checked')).toBeFalsy();
+
+                        // verify that inline topics are enabled
+                        expect(inlineView.$('.check-discussion-subcategory-inline').prop('disabled')).toBeFalsy();
+                        expect(inlineView.$('.check-discussion-category').prop('disabled')).toBeFalsy();
+                    });
+
+                    it('has cohorted and non-cohorted topics', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+                        assertCohortedTopics(inlineView, 'inline');
+                    });
+
+                    it('enables "Save" button after changing from always inline option', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+                    });
+
+                    it('saves the topic', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        // Save the updated settings
+                        inlineView.$('.action-save').click();
+
+                        mockPatchRequest(['Inline_Discussion_1']);
+                        mockGetRequest();
+
+                        verifySuccess();
+                    });
+
+                    it('selects the parent category when all children are selected', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        // parent category should be indeterminate.
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
+                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
+
+                        inlineView.$('.check-discussion-subcategory-inline').prop('checked', 'checked').change();
+                        // parent should be checked as we checked all children
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
+                    });
+
+                    it('selects/deselects all children when a parent category is selected/deselected', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
+
+                        inlineView.$('.check-discussion-category').prop('checked', 'checked').change();
+
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
+                        expect(inlineView.$('.check-discussion-subcategory-inline:checked').length).toBe(2);
+
+                        // un-check the parent, all children should be unchecd.
+                        inlineView.$('.check-discussion-category').prop('checked', false).change();
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
+                        expect(inlineView.$('.check-discussion-subcategory-inline:checked').length).toBe(0);
+                    });
+
+                    it('saves correctly when a subset of topics are selected within a category', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        // parent category should be indeterminate.
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
+                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
+
+                        // Save the updated settings
+                        inlineView.$('.action-save').click();
+
+                        mockPatchRequest(['Inline_Discussion_1']);
+                        mockGetRequest();
+
+                        verifySuccess();
+                        // parent category should be indeterminate.
+                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
+                    });
+
+                    it('saves correctly when all child topics are selected within a category', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        // parent category should be indeterminate.
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(0);
+                        expect(inlineView.$('.check-discussion-category:indeterminate').length).toBe(1);
+
+                        inlineView.$('.check-discussion-subcategory-inline').prop('checked', 'checked').change();
+                        // Save the updated settings
+                        inlineView.$('.action-save').click();
+
+                        mockPatchRequest(['Inline_Discussion_1', 'Inline_Discussion_2']);
+                        mockGetRequest(true);
+
+                        verifySuccess();
+                        // parent category should be checked.
+                        expect(inlineView.$('.check-discussion-category:checked').length).toBe(1);
+                    });
+
+                    it('shows an appropriate message when no inline topics exist', function() {
+
+                        var topicsJson, discussionTopicsSettingsModel;
+
+                        topicsJson = {
+                            course_wide_discussions: {
+                                children: ['Topic_C_1'],
+                                entries: {
+                                    Topic_C_1: {
+                                       sort_key: null,
+                                       is_cohorted: true,
+                                       id: 'Topic_C_1'
+                                    }
+                                }
+                            },
+                            inline_discussions: {
+                                subcategories: {},
+                                children: []
+                            }
+                        };
+                        discussionTopicsSettingsModel = new DiscussionTopicsSettingsModel(topicsJson);
+
+                        createInlineView(this, discussionTopicsSettingsModel);
+
+                        var expectedTitle = "No content-specific discussion topics exist.";
+                        expect(inlineView.$('.no-topics').text().trim()).toBe(expectedTitle);
+                    });
+
+                    it('shows an appropriate message when subsequent "GET" returns HTTP500', function() {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        // Save the updated settings
+                        inlineView.$('.action-save').click();
+
+                        mockPatchRequest(['Inline_Discussion_1']);
+
+                        // fake request for discussion/topics with GET method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
+                        );
+                        AjaxHelpers.respondWithError(requests, 500);
+
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
+                        expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
+                    });
+
+                    it('shows an appropriate error message for HTTP500', function () {
+                        createInlineView(this);
+                        enableSaveButton();
+
+                        $(inlineView.$('.check-discussion-subcategory-inline')[1]).prop('checked', 'checked').change();
+                        inlineView.$('.action-save').click();
+
+                        AjaxHelpers.respondWithError(requests, 500);
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again.";
+                        expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
+                    });
+
+                });
+
             });
         });
     });

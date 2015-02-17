@@ -105,6 +105,10 @@ class CohortManagementSection(PageObject):
     no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
     select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
     assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
+    discussion_form_selectors = {
+        'course-wide': '.cohort-course-wide-discussions-form',
+        'inline': '.cohort-inline-discussions-form'
+    }
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management').present
@@ -465,6 +469,123 @@ class CohortManagementSection(PageObject):
         """
         if state != self.is_cohorted:
             self.q(css=self._bounded_selector('.cohorts-state')).first.click()
+
+    def toggles_showing_of_discussion_topics(self):
+        """
+        Shows the discussion topics.
+        """
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector('.toggle-cohort-management-discussions')).results != 0,
+            "Waiting for discussion section to show"
+        ).fulfill()
+
+        # If the discussion topic section has not yet been toggled on, click on the toggle link.
+        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).click()
+
+    def discussion_topics_visible(self):
+        """
+        Returns the visibility status of cohort discussion controls.
+        """
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector('.cohort-discussions-nav')).results != 0,
+            "Waiting for discussion section to show"
+        ).fulfill()
+
+        return (self.q(css=self._bounded_selector('.cohort-course-wide-discussions-nav')).visible and
+                self.q(css=self._bounded_selector('.cohort-inline-discussions-nav')).visible)
+
+    def select_discussion_topic(self, key):
+        """
+        Selects discussion topic checkbox by clicking on it.
+        """
+        self.q(css=self._bounded_selector(".check-discussion-subcategory-%s" % key)).first.click()
+
+    def select_always_inline_discussion(self):
+        """
+        Selects the always_cohort_inline_discussions radio button.
+        """
+        self.q(css=self._bounded_selector(".check-all-inline-discussions")).first.click()
+
+    def always_inline_discussion_selected(self):
+        """
+        Returns the checked always_cohort_inline_discussions radio button.
+        """
+        return self.q(css=self._bounded_selector(".check-all-inline-discussions:checked"))
+
+    def cohort_some_inline_discussion_selected(self):
+        """
+        Returns the checked some_cohort_inline_discussions radio button.
+        """
+        return self.q(css=self._bounded_selector(".check-cohort-inline-discussions:checked"))
+
+    def select_cohort_some_inline_discussion(self):
+        """
+        Selects the cohort_some_inline_discussions radio button.
+        """
+        self.q(css=self._bounded_selector(".check-cohort-inline-discussions")).first.click()
+
+    def inline_discussion_topics_disabled(self):
+        """
+        Returns the status of inline discussion topics, enabled or disabled.
+        """
+        inline_topics = self.q(css=self._bounded_selector('.check-discussion-subcategory-inline'))
+        return all(topic.get_attribute('disabled') == 'true' for topic in inline_topics)
+
+    def is_save_button_disabled(self, key):
+        """
+        Returns the status for form's save button, enabled or disabled.
+        """
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        disabled = self.q(css=self._bounded_selector(save_button_css)).attrs('disabled')
+        return disabled[0] == 'true'
+
+    def is_category_selected(self):
+        """
+        Returns the status for category checkboxes.
+        """
+        return self.q(css=self._bounded_selector('.check-discussion-category:checked')).is_present()
+
+    def get_cohorted_topics_count(self, key):
+        """
+        Returns the count for cohorted topics.
+        """
+        cohorted_topics = self.q(css=self._bounded_selector('.check-discussion-subcategory-%s:checked' % key))
+        return len(cohorted_topics.results)
+
+    def save_discussion_topics(self, key):
+        """
+        Saves the discussion topics.
+        """
+        save_button_css = '%s %s' % (self.discussion_form_selectors[key], '.action-save')
+        self.q(css=self._bounded_selector(save_button_css)).first.click()
+
+    def get_cohort_discussions_message(self, key, msg_type="confirmation"):
+        """
+        Returns the message related to modifying discussion topics.
+        """
+        title_css = "%s .message-%s .message-title" % (self.discussion_form_selectors[key], msg_type)
+
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector(title_css)),
+            "Waiting for message to appear"
+        ).fulfill()
+
+        message_title = self.q(css=self._bounded_selector(title_css))
+
+        if len(message_title.results) == 0:
+            return ''
+        return message_title.first.text[0]
+
+    def cohort_discussion_heading_is_visible(self, key):
+        """
+        Returns the visibility of discussion topic headings.
+        """
+        form_heading_css = '%s %s' % (self.discussion_form_selectors[key], '.subsection-title')
+        discussion_heading = self.q(css=self._bounded_selector(form_heading_css))
+
+        if len(discussion_heading) == 0:
+            return False
+        return discussion_heading.first.text[0]
 
     def cohort_management_controls_visible(self):
         """

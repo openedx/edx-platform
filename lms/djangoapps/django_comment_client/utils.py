@@ -61,8 +61,7 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-# pylint: disable=invalid-name
-def get_accessible_discussion_modules(course, user):
+def get_accessible_discussion_modules(course, user, include_all=False):  # pylint: disable=invalid-name
     """
     Return a list of all valid discussion modules in this course that
     are accessible to the given user.
@@ -71,14 +70,14 @@ def get_accessible_discussion_modules(course, user):
 
     def has_required_keys(module):
         for key in ('discussion_id', 'discussion_category', 'discussion_target'):
-            if getattr(module, key) is None:
+            if getattr(module, key, None) is None:
                 log.warning("Required key '%s' not in discussion %s, leaving out of category map" % (key, module.location))
                 return False
         return True
 
     return [
         module for module in all_modules
-        if has_required_keys(module) and has_access(user, 'load', module, course.id)
+        if has_required_keys(module) and (include_all or has_access(user, 'load', module, course.id))
     ]
 
 
@@ -146,10 +145,50 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course, user):
+def get_discussion_category_map(course, user, cohorted_if_in_list=False, exclude_unstarted=True):
     """
     Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
     to render the discussion category map in the discussion tab sidebar for a given user.
+
+    Args:
+        course: Course for which to get the ids.
+        user:  User to check for access.
+        cohorted_if_in_list (bool): If True, inline topics are marked is_cohorted only if they are
+            in course_cohort_settings.discussion_topics.
+
+    Example:
+        >>> example = {
+        >>>               "entries": {
+        >>>                   "General": {
+        >>>                       "sort_key": "General",
+        >>>                       "is_cohorted": True,
+        >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>                   }
+        >>>               },
+        >>>               "children": ["General", "Getting Started"],
+        >>>               "subcategories": {
+        >>>                   "Getting Started": {
+        >>>                       "subcategories": {},
+        >>>                       "children": [
+        >>>                           "Working with Videos",
+        >>>                           "Videos on edX"
+        >>>                       ],
+        >>>                       "entries": {
+        >>>                           "Working with Videos": {
+        >>>                               "sort_key": None,
+        >>>                               "is_cohorted": False,
+        >>>                               "id": "d9f970a42067413cbb633f81cfb12604"
+        >>>                           },
+        >>>                           "Videos on edX": {
+        >>>                               "sort_key": None,
+        >>>                               "is_cohorted": False,
+        >>>                               "id": "98d8feb5971041a085512ae22b398613"
+        >>>                           }
+        >>>                       }
+        >>>                   }
+        >>>               }
+        >>>          }
+
     """
     unexpanded_category_map = defaultdict(list)
 
@@ -162,7 +201,7 @@ def get_discussion_category_map(course, user):
         title = module.discussion_target
         sort_key = module.sort_key
         category = " / ".join([x.strip() for x in module.discussion_category.split("/")])
-        #Handle case where module.start is None
+        # Handle case where module.start is None
         entry_start_date = module.start if module.start else datetime.max.replace(tzinfo=pytz.UTC)
         unexpanded_category_map[category].append({"title": title, "id": id, "sort_key": sort_key, "start_date": entry_start_date})
 
@@ -198,8 +237,17 @@ def get_discussion_category_map(course, user):
             if node[level]["start_date"] > category_start_date:
                 node[level]["start_date"] = category_start_date
 
+        always_cohort_inline_discussions = (  # pylint: disable=invalid-name
+            not cohorted_if_in_list and course_cohort_settings.always_cohort_inline_discussions
+        )
         dupe_counters = defaultdict(lambda: 0)  # counts the number of times we see each title
         for entry in entries:
+            is_entry_cohorted = (
+                course_cohort_settings.is_cohorted and (
+                    always_cohort_inline_discussions or entry["id"] in course_cohort_settings.cohorted_discussions
+                )
+            )
+
             title = entry["title"]
             if node[level]["entries"][title]:
                 # If we've already seen this title, append an incrementing number to disambiguate
@@ -209,7 +257,7 @@ def get_discussion_category_map(course, user):
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
-                                             "is_cohorted": course_cohort_settings.is_cohorted}
+                                             "is_cohorted": is_entry_cohorted}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
@@ -225,16 +273,22 @@ def get_discussion_category_map(course, user):
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
-    return _filter_unstarted_categories(category_map)
+    return _filter_unstarted_categories(category_map) if exclude_unstarted else category_map
 
 
-def get_discussion_categories_ids(course, user):
+def get_discussion_categories_ids(course, user, include_all=False):
     """
     Returns a list of available ids of categories for the course that
     are accessible to the given user.
+
+    Args:
+        course: Course for which to get the ids.
+        user:  User to check for access.
+        include_all (bool): If True, return all ids. Used by configuration views.
+
     """
     accessible_discussion_ids = [
-        module.discussion_id for module in get_accessible_discussion_modules(course, user)
+        module.discussion_id for module in get_accessible_discussion_modules(course, user, include_all=include_all)
     ]
     return course.top_level_discussion_topic_ids + accessible_discussion_ids
 

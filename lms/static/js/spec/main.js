@@ -60,6 +60,7 @@
             'history': 'js/vendor/history',
             'js/verify_student/photocapture': 'js/verify_student/photocapture',
             'js/staff_debug_actions': 'js/staff_debug_actions',
+            'js/vendor/jquery.qubit': 'js/vendor/jquery.qubit',
 
             // Backbone classes loaded explicitly until they are converted to use RequireJS
             'js/models/notification': 'js/models/notification',
@@ -68,6 +69,10 @@
             'js/groups/models/cohort': 'js/groups/models/cohort',
             'js/groups/models/content_group': 'js/groups/models/content_group',
             'js/groups/models/course_cohort_settings': 'js/groups/models/course_cohort_settings',
+            'js/groups/models/cohort_discussions': 'js/groups/models/cohort_discussions',
+            'js/groups/views/cohort_discussions': 'js/groups/views/cohort_discussions',
+            'js/groups/views/cohort_discussions_course_wide': 'js/groups/views/cohort_discussions_course_wide',
+            'js/groups/views/cohort_discussions_inline': 'js/groups/views/cohort_discussions_inline',
             'js/groups/views/course_cohort_settings_notification': 'js/groups/views/course_cohort_settings_notification',
             'js/groups/collections/cohort': 'js/groups/collections/cohort',
             'js/groups/views/cohort_editor': 'js/groups/views/cohort_editor',
@@ -299,6 +304,22 @@
             'js/groups/models/course_cohort_settings': {
                 exports: 'edx.groups.CourseCohortSettingsModel',
                 deps: ['backbone']
+            },
+            'js/groups/models/cohort_discussions': {
+                exports: 'edx.groups.DiscussionTopicsSettingsModel',
+                deps: ['backbone']
+            },
+            'js/groups/views/cohort_discussions': {
+                exports: 'edx.groups.CohortDiscussionConfigurationView',
+                deps: ['backbone']
+            },
+            'js/groups/views/cohort_discussions_course_wide': {
+                exports: 'edx.groups.CourseWideDiscussionsView',
+                deps: ['backbone', 'js/groups/views/cohort_discussions']
+            },
+            'js/groups/views/cohort_discussions_inline': {
+                exports: 'edx.groups.InlineDiscussionsView',
+                deps: ['backbone', 'js/groups/views/cohort_discussions', 'js/vendor/jquery.qubit']
             },
             'js/groups/views/course_cohort_settings_notification': {
                 exports: 'edx.groups.CourseCohortSettingsNotificationView',

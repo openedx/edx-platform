@@ -1,0 +1,19 @@
+<h3 class="subsection-title"><%- gettext('Specify whether discussion topics are divided by cohort') %></h3>
+<form action="" method="post" id="cohort-course-wide-discussions-form" class="cohort-course-wide-discussions-form">
+    <div class="wrapper cohort-management-supplemental">
+        <div class="form-fields">
+            <div class="form-field">
+                <div class="course-wide-discussion-topics">
+                    <h3 class="subsection-title"><%- gettext('Course-Wide Discussion Topics') %></h3>
+                    <p><%- gettext('Select the course-wide discussion topics that you want to divide by cohort.') %></p>
+                    <div class="field">
+                        <ul class="discussions-wrapper"><%= courseWideTopics %></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-save"><%- gettext('Save') %></button>
+        </div>
+    </div>
+</form>
