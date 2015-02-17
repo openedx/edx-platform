@@ -34,6 +34,7 @@ var edx = edx || {};
             this.$el.html(this.template({
                 coursewideTopics: this.model.get('entries')
             }));
+            return this;
         },
 
         showDiscussionTopics: function(event) {
