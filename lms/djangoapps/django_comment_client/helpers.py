@@ -5,7 +5,7 @@ import os
 
 
 def include_mustache_templates():
-    mustache_dir = settings.PROJECT_ROOT / 'templates' / 'discussion' / 'mustache'
+    mustache_dir = settings.COMMON_ROOT / 'templates' / 'discussion' / 'mustache'
 
     def is_valid_file_name(file_name):
         return file_name.endswith('.mustache')

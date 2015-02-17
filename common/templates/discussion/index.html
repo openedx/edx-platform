@@ -19,6 +19,13 @@
 <%block name="js_extra">
 <%include file="_js_body_dependencies.html" />
 <%static:js group='discussion'/>
+<script language="javascript">
+    $(function () {
+        $("section.discussion").each(function (index, elem) {
+            DiscussionApp.start(elem, true);
+        });
+    });
+</script>
 </%block>
 
 <%include file="_discussion_course_navigation.html" args="active_page='discussion'" />
@@ -44,4 +51,5 @@
 </section>
 
 <%include file="_underscore_templates.html" />
+<%include file="_course_underscore_templates.html" />
 <%include file="_thread_list_template.html" />

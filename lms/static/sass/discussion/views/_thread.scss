@@ -2,7 +2,7 @@
 // ====================
 
 // general thread layout
-body.discussion, .discussion-module {
+body.discussion, .discussion-module, div.discussion-course {
 
   // post layout
   .discussion-post {
@@ -122,7 +122,7 @@ body.discussion, .discussion-module {
   background-color: $white;
 }
 
-body.discussion, .discussion-thread.expanded {
+body.discussion, .discussion-thread.expanded, div.discussion-course  {
   .forum-thread-main-wrapper {
     box-shadow: 0 1px 3px $shadow;
   }

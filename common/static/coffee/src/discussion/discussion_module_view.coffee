@@ -11,7 +11,7 @@ if Backbone?
 
     paginationTemplate: -> DiscussionUtil.getTemplate("_pagination")
     page_re: /\?discussion_page=(\d+)/
-    initialize: ->
+    initialize: (options) =>
       @toggleDiscussionBtn = @$(".discussion-show")
       # Set the page if it was set in the URL. This is used to allow deep linking to pages
       match = @page_re.exec(window.location.href)
@@ -19,6 +19,7 @@ if Backbone?
         @page = parseInt(match[1])
       else
         @page = 1
+      @options = options
 
     toggleNewPost: (event) =>
       event.preventDefault()
@@ -98,6 +99,7 @@ if Backbone?
         @$el.append($discussion)
 
       @newPostForm = this.$el.find('.new-post-article')
+      async = @options.async_thread_views
       @threadviews = @discussion.map (thread) =>
         view = new DiscussionThreadView(
           el: @$("article#thread_#{thread.id}"),

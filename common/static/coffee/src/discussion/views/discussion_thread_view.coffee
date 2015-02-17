@@ -34,6 +34,8 @@ if Backbone?
       if @isQuestion()
         @markedAnswers = new Comments()
 
+      @options = options
+
     rerender: () ->
       if @showView?
         @showView.undelegateEvents()
@@ -43,7 +45,7 @@ if Backbone?
         mode: @mode
         model: @model
         el: @el
-        course_settings: @course_settings
+        course_settings: @options.course_settings
         topicId: @topicId
       )
       @render()

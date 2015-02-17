@@ -1,7 +1,9 @@
+import json
 import logging
 import os
 import sys
 import yaml
+import xml.sax.saxutils as saxutils
 
 from contracts import contract, new_contract
 from functools import partial
@@ -1422,6 +1424,89 @@ class XMLParsingSystem(DescriptorSystem):
                     setattr(xblock, field.name, field_value)
 
 
+# pylint: disable=fixme
+# TODO should be refactored/removed. Maybe the xblock could use directly the django_comment_client app.
+class DiscussionService(object):
+    """
+    This is a temporary service that provides everything needed to render the discussion template.
+
+    Used by xblock-discussion
+    """
+
+    def __init__(self, runtime):
+        self.runtime = runtime
+
+    @staticmethod
+    def _escape_json(value):
+        return saxutils.escape(json.dumps(value), {'"': '&quot;'})
+
+    def get_course_template_context(self):
+        """
+        Returns the context to render the course-level discussion templates.
+
+        """
+        # for some reason pylint reports courseware.access, courseware.courses and django_comment_client.forum.views
+        # pylint: disable=import-error
+        from django.http import HttpRequest
+        import lms.lib.comment_client as cc
+        from courseware.access import has_access
+        from courseware.courses import get_course_with_access
+        from django_comment_client.forum.views import get_threads, make_course_settings
+        from django_comment_client.permissions import cached_has_permission
+        import django_comment_client.utils as utils
+        from openedx.core.djangoapps.course_groups.cohorts import get_cohort_id
+
+        request = HttpRequest()
+        user = self.runtime.user
+        request.user = user
+        user_info = cc.User.from_django_user(self.runtime.user).to_dict()
+        course_id = self.runtime.course_id
+        course = get_course_with_access(self.runtime.user, 'load_forum', course_id)
+        user_cohort_id = get_cohort_id(user, course_id)
+
+        unsafethreads, query_params = get_threads(request, course_id)
+        threads = [utils.prepare_content(thread, course_id) for thread in unsafethreads]
+
+        flag_moderator = cached_has_permission(user, 'openclose_thread', course_id) or has_access(user, 'staff', course)
+
+        annotated_content_info = utils.get_metadata_for_threads(course_id, threads, user, user_info)
+
+        course_settings = make_course_settings(course)
+
+        context = {
+            'user': user,
+            'course': course,
+            'course_id': course_id,
+            'staff_access': has_access(user, 'staff', course),
+            'threads': self._escape_json(threads),
+            'thread_pages': query_params['num_pages'],
+            'user_info': self._escape_json(user_info),
+            'flag_moderator': flag_moderator,
+            'annotated_content_info': self._escape_json(annotated_content_info),
+            'category_map': course_settings['category_map'],
+            'roles': self._escape_json(utils.get_role_ids(course_id)),
+            'is_moderator': cached_has_permission(user, "see_all_cohorts", course_id),
+            'cohorts': course_settings['cohorts'],
+            'user_cohort': user_cohort_id,
+            'sort_preference': user_info['default_sort_key'],
+            'course_settings': self._escape_json(course_settings)
+        }
+
+        return context
+
+    def get_inline_template_context(self):
+        """
+        Returns the context to render inline discussion templates.
+        """
+        # for some reason pylint reports courseware.courses and django_comment_client.forum.views
+        # pylint: disable=import-error
+        from courseware.courses import get_course_with_access
+
+        return {
+            'course': get_course_with_access(self.runtime.user, 'load_forum', self.runtime.course_id),
+        }
+
+
 class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylint: disable=abstract-method
     """
     This is an abstraction such that x_modules can function independent
@@ -1511,6 +1596,10 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
            modules, which have an anonymous handler, to set legitimate users' data
         """
+
+        # Add the DiscussionService for the LMS and Studio.
+        services = kwargs.setdefault('services', {})
+        services['discussion'] = DiscussionService(self)
 
         # Usage_store is unused, and field_data is often supplanted with an
         # explicit field_data during construct_xblock.

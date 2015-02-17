@@ -20,7 +20,9 @@ class @DiscussionSpecHelper
         )
 
     @makeEventSpy = () ->
-        jasmine.createSpyObj('event', ['preventDefault', 'target'])
+        obj = jasmine.createSpyObj('event', ['preventDefault'])
+        obj.target = document.createElement('div');
+        obj
 
     @makeCourseSettings = (is_cohorted=true) ->
         new DiscussionCourseSettings(
@@ -301,7 +303,7 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="search-alert-template">
-    <div class="search-alert" id="search-alert-<%- cid %>">
+    <div class="search-alert <%= css_class %>" id="search-alert-<%- cid %>">
         <div class="search-alert-content">
           <p class="message"><%= message %></p>
         </div>

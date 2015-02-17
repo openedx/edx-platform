@@ -15,6 +15,7 @@ if Backbone?
       "change .forum-nav-filter-cohort-control": "chooseCohort"
 
     initialize: (options) ->
+      @active_thread_id = null
       @courseSettings = options.courseSettings
       @displayedCollection = new Discussion(@collection.models, pages: @collection.pages)
       @collection.on "change", @reloadDisplayedCollection
@@ -29,8 +30,9 @@ if Backbone?
         # if target.length > 0
         #   @filterTopic($.Event("filter", {'target': target[0]}))
       @collection.on "add", @addAndSelectThread
+      @collection.on "thread:remove", @threadRemoved
       @sidebar_padding = 10
-      @boardName
+      @boardName = null
       @template = _.template($("#thread-list-template").html())
       @current_search = ""
       @mode = 'all'
@@ -40,8 +42,12 @@ if Backbone?
       @searchAlertCollection.on "add", (searchAlert) =>
         content = _.template(
           $("#search-alert-template").html(),
-          {'message': searchAlert.attributes.message, 'cid': searchAlert.cid}
-          )
+          {
+            'message': searchAlert.attributes.message,
+            'cid': searchAlert.cid,
+            'css_class': searchAlert.attributes.css_class
+          }
+        )
         @$(".search-alerts").append(content)
         @$("#search-alert-" + searchAlert.cid + " a.dismiss").bind "click", searchAlert, (event) =>
           @removeSearchAlert(event.data.cid)
@@ -52,8 +58,8 @@ if Backbone?
       @searchAlertCollection.on "reset", =>
         @$(".search-alerts").empty()
 
-    addSearchAlert: (message) =>
-      m = new Backbone.Model({"message": message})
+    addSearchAlert: (message, css_class="") =>
+      m = new Backbone.Model({"message": message, "css_class": css_class})
       @searchAlertCollection.add(m)
       m
 
@@ -239,10 +245,12 @@ if Backbone?
       @trigger("thread:selected", thread_id)  # This triggers a callback in the DiscussionRouter which calls the line above...
       false
 
-    threadRemoved: (thread_id) =>
-      @trigger("thread:removed", thread_id)
+    threadRemoved: (thread) =>
+      if @active_thread_id == thread.id
+        @trigger("thread:deselected", thread.id)
 
     setActiveThread: (thread_id) ->
+      @active_thread_id = thread_id
       @$(".forum-nav-thread-link").find(".sr").remove()
       @$(".forum-nav-thread[data-id!='#{thread_id}'] .forum-nav-thread-link").removeClass("is-active")
       @$(".forum-nav-thread[data-id='#{thread_id}'] .forum-nav-thread-link").addClass("is-active").find(".forum-nav-thread-wrapper-1").prepend('<span class="sr">' + gettext("Current conversation") + '</span>')
@@ -254,15 +262,13 @@ if Backbone?
       $("input.email-setting").bind "click", @updateEmailNotifications
       url = DiscussionUtil.urlFor("notifications_status",window.user.get("id"))
       DiscussionUtil.safeAjax
-          url: url
-          type: "GET"
-          success: (response, textStatus) =>
-            if response.status
-              $('input.email-setting').attr('checked','checked')
-            else
-              $('input.email-setting').removeAttr('checked')
-      thread_id = null
-      @trigger("thread:removed")
+        url: url
+        type: "GET"
+        success: (response, textStatus) =>
+          if response.status
+            $('input.email-setting').attr('checked','checked')
+          else
+            $('input.email-setting').removeAttr('checked')
       #select all threads
 
     isBrowseMenuVisible: =>
@@ -498,7 +504,7 @@ if Backbone?
               },
               true
             )
-            @addSearchAlert(message)
+            @addSearchAlert(message, 'search-by-user')
 
     clearSearch: ->
       @$(".forum-nav-search-input").val("")

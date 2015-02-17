@@ -27,12 +27,12 @@ except:
     % endfor
   %endif
 </%def>
-<%def name='js(group)'>
+<%def name='js(group, raw=False)'>
   % if settings.FEATURES['USE_DJANGO_PIPELINE']:
-    ${compressed_js(group)}
+    ${compressed_js(group, raw=raw)}
   % else:
     % for filename in settings.PIPELINE_JS[group]['source_filenames']:
-      <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}"></script>
+      <script type="text/javascript" src="${staticfiles_storage.url(filename.replace('.coffee', '.js'))}${"?raw" if raw else ""}"></script>
     % endfor
   %endif
 </%def>
