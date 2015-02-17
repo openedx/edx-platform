@@ -90,6 +90,10 @@ class InheritanceMixin(XBlockMixin):
         help="Amount of time after the due date that submissions will be accepted",
         scope=Scope.settings,
     )
+    group_access = Dict(
+        help=_("Enter the ids for the content groups this problem belongs to."),
+        scope=Scope.settings,
+    )
     showanswer = String(
         display_name=_("Show Answer"),
         help=_("Specify when the Show Answer button appears for each problem. Valid values are \"always\", \"answered\", \"attempted\", \"closed\", \"finished\", \"past_due\", and \"never\"."),
