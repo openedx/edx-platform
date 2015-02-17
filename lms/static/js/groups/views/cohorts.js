@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext, interpolate_text, CohortModel, CohortEditorView, CohortFormView,
-          NotificationModel, NotificationView, FileUploaderView) {
+          NotificationModel, NotificationView, FileUploaderView, DiscussionTopicsView) {
     'use strict';
 
     var hiddenClass = 'is-hidden',
@@ -17,7 +17,8 @@ var edx = edx || {};
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
             'click .link-cross-reference': 'showSection',
-            'click .toggle-cohort-management-secondary': 'showCsvUpload'
+            'click .toggle-cohort-management-secondary': 'showCsvUpload',
+            'click .toggle-cohort-management-discussions': 'showDiscussionTopics'
         },
 
         initialize: function(options) {
@@ -261,10 +262,39 @@ var edx = edx || {};
                 this.$('#file-upload-form-file').focus();
             }
         },
+        showDiscussionTopics: function(event) {
+            event.preventDefault();
+
+            $(event.currentTarget).addClass(hiddenClass);
+            var topicsElement = this.$('.discussion-topics').removeClass(hiddenClass);
+
+            //this.template('cohort-discussion-topics').render();
+            if (!this.topicsView) {
+                this.topicsView = new DiscussionTopicsView({
+                    el: topicsElement,
+                    model: this.context.discussionTopicsModel
+                    //title: gettext("Assign students to cohorts by uploading a CSV file."),
+                    //inputLabel: gettext("Choose a .csv file"),
+                    //inputTip: gettext("Only properly formatted .csv files will be accepted."),
+                    //submitButtonText: gettext("Upload File and Assign Students"),
+                    //extensions: ".csv",
+                    //url: this.context.uploadCohortsCsvUrl,
+                    //successNotification: function (file, event, data) {
+                    //    var message = interpolate_text(gettext(
+                    //        "Your file '{file}' has been uploaded. Allow a few minutes for processing."
+                    //    ), {file: file});
+                    //    return new NotificationModel({
+                    //        type: "confirmation",
+                    //        title: message
+                    //    });
+                    //}
+                }).render();
+            }
+        },
 
         getSectionCss: function (section) {
             return ".instructor-nav .nav-item a[data-section='" + section + "']";
         }
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
-    edx.groups.CohortFormView, NotificationModel, NotificationView, FileUploaderView);
+    edx.groups.CohortFormView, NotificationModel, NotificationView, FileUploaderView, edx.discussions.DiscussionTopicsView);
