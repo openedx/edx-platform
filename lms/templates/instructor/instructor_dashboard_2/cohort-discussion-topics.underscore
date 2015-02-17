@@ -1,0 +1,14 @@
+<label><%- gettext('Coursewide Discussion Topics') %></label>
+
+% for topic in coursewideTopics:
+    <div class="cohorts-state-section">
+        <input type="checkbox" class="cohorts-state" value="Cohorts-State" />
+        <label for="cohorts-state">${{topic}}</label>
+    </div>
+% endfor
+
+
+<div class="cohorts-state-section">
+    <input type="checkbox" class="cohorts-state" value="Cohorts-State" />
+    <label for="cohorts-state"><%- gettext('Cohorts Enabled') %></label>
+</div>
