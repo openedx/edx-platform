@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-11 15:48+0000\n"
-"PO-Revision-Date: 2015-02-11 15:48:11.643591\n"
+"POT-Creation-Date: 2015-02-17 16:13+0000\n"
+"PO-Revision-Date: 2015-02-17 16:13:47.403570\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -289,6 +289,30 @@ msgstr "Éléméntärý/prïmärý sçhööl Ⱡ'σяєм#"
 #: common/lib/xmodule/xmodule/course_module.py cms/templates/settings.html
 msgid "None"
 msgstr "Nöné Ⱡ'σяєм#"
+
+#: common/djangoapps/student/models.py
+msgid "{platform_name} Honor Code Certificate for {course_name}"
+msgstr "{platform_name} Hönör Çödé Çértïfïçäté för {course_name} Ⱡ'σяєм ιρ#"
+
+#: common/djangoapps/student/models.py
+msgid "{platform_name} Verified Certificate for {course_name}"
+msgstr "{platform_name} Vérïfïéd Çértïfïçäté för {course_name} Ⱡ'σяєм ι#"
+
+#: common/djangoapps/student/models.py
+msgid "{platform_name} Professional Certificate for {course_name}"
+msgstr "{platform_name} Pröféssïönäl Çértïfïçäté för {course_name} Ⱡ'σяєм ιρ#"
+
+#: common/djangoapps/student/models.py
+msgid ""
+"The company identifier for the LinkedIn Add-to-Profile button e.g "
+"0_0dPSPyS070e0HsE9HNz_13_d11_"
+msgstr ""
+"Thé çömpäný ïdéntïfïér för thé LïnkédÌn Àdd-tö-Pröfïlé ßüttön é.g "
+"0_0dPSPýS070é0HsÉ9HNz_13_d11_ Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: common/djangoapps/student/models.py
+msgid "{platform_name} Certificate for {course_name}"
+msgstr "{platform_name} Çértïfïçäté för {course_name} Ⱡ'σяє#"
 
 #: common/djangoapps/student/views.py
 msgid "Course id not specified"
@@ -3783,6 +3807,12 @@ msgstr ""
 "Éntér thé séçrét strïng för ännötätïön störägé. Thé téxtännötätïön, "
 "vïdéöännötätïön, änd ïmägéännötätïön ädvänçéd mödülés réqüïré thïs strïng. "
 "Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: common/lib/xmodule/xmodule/modulestore/inheritance.py
+msgid "Enter the ids for the content groups this problem belongs to."
+msgstr ""
+"Éntér thé ïds för thé çöntént gröüps thïs prößlém ßélöngs tö. Ⱡ'σяєм ιρѕυм "
+"∂σłσя#"
 
 #: common/lib/xmodule/xmodule/modulestore/inheritance.py
 msgid ""
@@ -11436,9 +11466,16 @@ msgid "This link will open/download a PDF document"
 msgstr "Thïs lïnk wïll öpén/döwnlöäd ä PDF döçümént Ⱡ'σяєм ιρѕυм#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Download {cert_name_short} (PDF)"
+msgstr "Döwnlöäd {cert_name_short} (PDF) Ⱡ'σ#"
+
 #: lms/templates/dashboard/_dashboard_certificate_information.html
-msgid "Download Your {cert_name_short} (PDF)"
-msgstr "Döwnlöäd Ýöür {cert_name_short} (PDF) Ⱡ'σяє#"
+msgid "Add Certificate to LinkedIn Profile"
+msgstr "Àdd Çértïfïçäté tö LïnkédÌn Pröfïlé Ⱡ'σяєм ιρ#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Share on LinkedIn"
+msgstr "Shäré ön LïnkédÌn Ⱡ'σ#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -11450,6 +11487,10 @@ msgstr ""
 "{cert_name_long} wäs générätéd, wé çöüld nöt gränt ýöü ä vérïfïéd "
 "{cert_name_short}. Àn hönör çödé {cert_name_short} häs ßéén gräntéd ïnstéäd."
 " Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#"
+
+#: lms/templates/dashboard/_dashboard_certificate_information.html
+msgid "Download Your {cert_name_short} (PDF)"
+msgstr "Döwnlöäd Ýöür {cert_name_short} (PDF) Ⱡ'σяє#"
 
 #: lms/templates/dashboard/_dashboard_certificate_information.html
 msgid ""
@@ -11468,6 +11509,9 @@ msgid "Complete our course feedback survey"
 msgstr "Çömplété öür çöürsé féédßäçk sürvéý Ⱡ'σяєм ιρ#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "{course_number} {course_name} Home Page"
+msgstr "{course_number} {course_name} Hömé Pägé Ⱡ'σ#"
+
 #: lms/templates/dashboard/_dashboard_course_listing.html
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "{course_number} {course_name} Cover Image"
@@ -11585,6 +11629,23 @@ msgstr "Thänks för ýöür pätïénçé äs wé pröçéss ýöür réqüést
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Your verification status is good until {date}."
 msgstr "Ýöür vérïfïçätïön stätüs ïs gööd üntïl {date}. Ⱡ'σяєм ιρѕυм#"
+
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid "Your verification will expire soon!"
+msgstr "Ýöür vérïfïçätïön wïll éxpïré söön! Ⱡ'σяєм ιρ#"
+
+#. Translators: start_link and end_link will be replaced with HTML tags;
+#. please do not translate these.
+#: lms/templates/dashboard/_dashboard_course_listing.html
+msgid ""
+"Your current verification will expire before the verification deadline for "
+"this course. {start_link}Re-verify your identity now{end_link} using a "
+"webcam and a government-issued ID."
+msgstr ""
+"Ýöür çürrént vérïfïçätïön wïll éxpïré ßéföré thé vérïfïçätïön déädlïné för "
+"thïs çöürsé. {start_link}Ré-vérïfý ýöür ïdéntïtý nöw{end_link} üsïng ä "
+"wéßçäm änd ä gövérnmént-ïssüéd ÌD. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
+"α∂ιριѕι¢ιηg#"
 
 #: lms/templates/dashboard/_dashboard_course_listing.html
 msgid "Challenge Yourself!"
@@ -15512,19 +15573,22 @@ msgid "Change my name"
 msgstr "Çhängé mý nämé Ⱡ'#"
 
 #: lms/templates/verify_student/_reverification_support.html
-msgid "Why Do I Need to Re-Verify?"
-msgstr "Whý Dö Ì Nééd tö Ré-Vérïfý? Ⱡ'σяєм#"
+msgid "Why Do I Need to Re-Verify My Identity?"
+msgstr "Whý Dö Ì Nééd tö Ré-Vérïfý Mý Ìdéntïtý? Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid ""
-"At key points in a course, the professor will ask you to re-verify your "
-"identity. We will send the new photo to be matched up with the photo of the "
-"original ID you submitted when you signed up for the course."
+"You may need to re-verify your identity if an error occurs with your "
+"verification or if your verification has expired. All verifications expire "
+"after one year.  The re-verification process is the same as the original "
+"verification process. You need a webcam and a government-issued photo ID."
 msgstr ""
-"Àt kéý pöïnts ïn ä çöürsé, thé pröféssör wïll äsk ýöü tö ré-vérïfý ýöür "
-"ïdéntïtý. Wé wïll sénd thé néw phötö tö ßé mätçhéd üp wïth thé phötö öf thé "
-"örïgïnäl ÌD ýöü süßmïttéd whén ýöü sïgnéd üp för thé çöürsé. Ⱡ'σяєм ιρѕυм "
-"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ #"
+"Ýöü mäý nééd tö ré-vérïfý ýöür ïdéntïtý ïf än érrör öççürs wïth ýöür "
+"vérïfïçätïön ör ïf ýöür vérïfïçätïön häs éxpïréd. Àll vérïfïçätïöns éxpïré "
+"äftér öné ýéär.  Thé ré-vérïfïçätïön pröçéss ïs thé sämé äs thé örïgïnäl "
+"vérïfïçätïön pröçéss. Ýöü nééd ä wéßçäm änd ä gövérnmént-ïssüéd phötö ÌD. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂υηт υ#"
 
 #: lms/templates/verify_student/_reverification_support.html
 msgid "Having Technical Trouble?"
@@ -15997,19 +16061,23 @@ msgid "Re-Verification"
 msgstr "Ré-Vérïfïçätïön Ⱡ'#"
 
 #: lms/templates/verify_student/photo_reverification.html
-msgid "Please Resubmit Your Verification Information"
-msgstr "Pléäsé Résüßmït Ýöür Vérïfïçätïön Ìnförmätïön Ⱡ'σяєм ιρѕυм#"
+msgid "Verify Your Identity"
+msgstr "Vérïfý Ýöür Ìdéntïtý Ⱡ'σя#"
 
+#. Translators: {start_bold} and {end_bold} will be replaced with HTML tags.
+#. Please do not translate these variables.
 #: lms/templates/verify_student/photo_reverification.html
 msgid ""
-"There was an error with your previous verification. In order proceed in the "
-"verified certificate of achievement track of your current courses, please "
-"complete the following steps."
+"To verify your identity and continue as a verified student in this course, "
+"complete the following steps {start_bold}before the course verification "
+"deadline{end_bold}. If you do not verify your identity, you can still "
+"receive an honor code certificate for the course."
 msgstr ""
-"Théré wäs än érrör wïth ýöür prévïöüs vérïfïçätïön. Ìn ördér pröçééd ïn thé "
-"vérïfïéd çértïfïçäté öf äçhïévémént träçk öf ýöür çürrént çöürsés, pléäsé "
-"çömplété thé föllöwïng stéps. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
-"α∂ιριѕι¢ιηg єłιт#"
+"Tö vérïfý ýöür ïdéntïtý änd çöntïnüé äs ä vérïfïéd stüdént ïn thïs çöürsé, "
+"çömplété thé föllöwïng stéps {start_bold}ßéföré thé çöürsé vérïfïçätïön "
+"déädlïné{end_bold}. Ìf ýöü dö nöt vérïfý ýöür ïdéntïtý, ýöü çän stïll "
+"réçéïvé än hönör çödé çértïfïçäté för thé çöürsé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя#"
 
 #: lms/templates/verify_student/photo_reverification.html
 #: lms/templates/verify_student/reverification_confirmation.html
@@ -18787,22 +18855,14 @@ msgid ""
 "These dates impact <strong>when your courseware can be viewed</strong>, but "
 "they are <strong>not the dates shown on your course summary page</strong>. "
 "To provide the course start and registration dates as shown on your course "
-"summary page, follow the instructions provided by your {manager}."
+"summary page, follow the instructions provided by your Program Manager."
 msgstr ""
 "Thésé dätés ïmpäçt <strong>whén ýöür çöürséwäré çän ßé vïéwéd</strong>, ßüt "
 "théý äré <strong>nöt thé dätés shöwn ön ýöür çöürsé sümmärý pägé</strong>. "
 "Tö prövïdé thé çöürsé stärt änd régïsträtïön dätés äs shöwn ön ýöür çöürsé "
-"sümmärý pägé, föllöw thé ïnstrüçtïöns prövïdéd ßý ýöür {manager}. Ⱡ'σяєм "
-"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя "
-"ιη¢#"
-
-#: cms/templates/settings.html
-msgid "Program Manager"
-msgstr "Prögräm Mänägér Ⱡ'#"
-
-#: cms/templates/settings.html
-msgid "PM"
-msgstr "PM Ⱡ'#"
+"sümmärý pägé, föllöw thé ïnstrüçtïöns prövïdéd ßý ýöür Prögräm Mänägér. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ "
+"тємρσя ιη¢ι∂ι∂#"
 
 #: cms/templates/settings.html
 msgid "Introducing Your Course"
