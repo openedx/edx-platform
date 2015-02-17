@@ -979,6 +979,7 @@ MIDDLEWARE_CLASSES = (
     'request_cache.middleware.RequestCache',
     'microsite_configuration.middleware.MicrositeMiddleware',
     'django_comment_client.middleware.AjaxExceptionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
@@ -1500,6 +1501,9 @@ INSTALLED_APPS = (
     'djcelery',
     'south',
 
+    # CORS middleware
+    'corsheaders',
+
     # Database-backed configuration
     'config_models',
 
@@ -1657,6 +1661,18 @@ MOBILE_STORE_URLS = {
     'apple': '#',
     'google': '#'
 }
+
+
+################# CORS #################################
+
+# By default, don't allow any cross-origin requests
+# This can be overridden in configuration.
+CORS_ORIGIN_WHITELIST = tuple()
+CORS_ORIGIN_ALLOW_ALL = False
+
+# Enable CORS only to API calls
+CORS_URLS_REGEX = r'^/api/.*$'
+
 
 ################# Student Verification #################
 VERIFY_STUDENT = {
