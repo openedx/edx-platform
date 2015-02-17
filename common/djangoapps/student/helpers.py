@@ -53,6 +53,7 @@ VERIFY_STATUS_NEED_TO_VERIFY = "verify_need_to_verify"
 VERIFY_STATUS_SUBMITTED = "verify_submitted"
 VERIFY_STATUS_APPROVED = "verify_approved"
 VERIFY_STATUS_MISSED_DEADLINE = "verify_missed_deadline"
+VERIFY_STATUS_NEED_TO_REVERIFY = "verify_need_to_reverify"
 
 
 def check_verify_status_by_course(user, course_enrollment_pairs, all_course_modes):
@@ -64,6 +65,8 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
           but has have not yet been approved.
         * VERIFY_STATUS_APPROVED: The student has been successfully verified.
         * VERIFY_STATUS_MISSED_DEADLINE: The student did not submit photos within the course's deadline.
+        * VERIFY_STATUS_NEED_TO_REVERIFY: The student has an active verification, but it is
+            set to expire before the verification deadline for the course.
 
     It is is also possible that a course does NOT have a verification status if:
         * The user is not enrolled in a verified mode, meaning that the user didn't pay.
@@ -142,12 +145,12 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
             )
             if status is None and not submitted:
                 if deadline is None or deadline > datetime.now(UTC):
-                    # If a user already has an active or pending verification,
-                    # but it will expire by the deadline, the we do NOT show the
-                    # verification message.  This is because we don't currently
-                    # allow users to resubmit an attempt before their current
-                    # attempt expires.
-                    if not has_active_or_pending:
+                    if has_active_or_pending:
+                        # The user has an active verification, but the verification
+                        # is set to expire before the deadline.  Tell the student
+                        # to reverify.
+                        status = VERIFY_STATUS_NEED_TO_REVERIFY
+                    else:
                         status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
                     status = VERIFY_STATUS_MISSED_DEADLINE

@@ -10,7 +10,8 @@ from student.helpers import (
   VERIFY_STATUS_NEED_TO_VERIFY,
   VERIFY_STATUS_SUBMITTED,
   VERIFY_STATUS_APPROVED,
-  VERIFY_STATUS_MISSED_DEADLINE
+  VERIFY_STATUS_MISSED_DEADLINE,
+  VERIFY_STATUS_NEED_TO_REVERIFY
 )
 %>
 
@@ -134,7 +135,7 @@ from student.helpers import (
       <%include file='_dashboard_certificate_information.html' args='cert_status=cert_status,course=course, enrollment=enrollment'/>
       % endif
 
-      % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED] and not is_course_blocked:
+      % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
       <div class="message message-status is-shown">
         % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
           <div class="verification-reminder">
@@ -161,6 +162,11 @@ from student.helpers import (
           % if verification_status['verification_good_until'] is not None:
             <p class="message-copy">${_('Your verification status is good until {date}.').format(date=verification_status['verification_good_until'])}
           % endif
+        % elif verification_status['status'] == VERIFY_STATUS_NEED_TO_REVERIFY:
+          <h4 class="message-title">${_('Your verification will expire soon!')}</h4>
+          ## Translators: start_link and end_link will be replaced with HTML tags;
+          ## please do not translate these.
+          <p class="message-copy">${_('Your current verification will expire before the verification deadline for this course. {start_link}Re-verify your identity now{end_link} using a webcam and a government-issued ID.').format(start_link='<a href="{href}">'.format(href=reverse('verify_student_reverify')), end_link='</a>')}</p>
         % endif
       </div>
       % endif

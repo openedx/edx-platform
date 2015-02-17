@@ -13,7 +13,8 @@ from student.helpers import (
     VERIFY_STATUS_NEED_TO_VERIFY,
     VERIFY_STATUS_SUBMITTED,
     VERIFY_STATUS_APPROVED,
-    VERIFY_STATUS_MISSED_DEADLINE
+    VERIFY_STATUS_MISSED_DEADLINE,
+    VERIFY_STATUS_NEED_TO_REVERIFY
 )
 
 from xmodule.modulestore.tests.factories import CourseFactory
@@ -209,7 +210,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # Expect that the "verify now" message is hidden
         # (since the user isn't allowed to submit another attempt while
         # a verification is active).
-        self._assert_course_verification_status(None)
+        self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_REVERIFY)
 
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
@@ -235,7 +236,8 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_NEED_TO_VERIFY: "ID verification pending",
         VERIFY_STATUS_SUBMITTED: "ID verification pending",
         VERIFY_STATUS_APPROVED: "ID Verified Ribbon/Badge",
-        VERIFY_STATUS_MISSED_DEADLINE: "Honor"
+        VERIFY_STATUS_MISSED_DEADLINE: "Honor",
+        VERIFY_STATUS_NEED_TO_REVERIFY: "Honor"
     }
 
     NOTIFICATION_MESSAGES = {
@@ -245,6 +247,7 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         ],
         VERIFY_STATUS_SUBMITTED: ["Thanks for your patience as we process your request."],
         VERIFY_STATUS_APPROVED: ["You have already verified your ID!"],
+        VERIFY_STATUS_NEED_TO_REVERIFY: ["Your verification will expire soon!"]
     }
 
     MODE_CLASSES = {
@@ -252,7 +255,8 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         VERIFY_STATUS_NEED_TO_VERIFY: "verified",
         VERIFY_STATUS_SUBMITTED: "verified",
         VERIFY_STATUS_APPROVED: "verified",
-        VERIFY_STATUS_MISSED_DEADLINE: "honor"
+        VERIFY_STATUS_MISSED_DEADLINE: "honor",
+        VERIFY_STATUS_NEED_TO_REVERIFY: "honor"
     }
 
     def _assert_course_verification_status(self, status):

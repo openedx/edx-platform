@@ -60,9 +60,11 @@
     <div class="wrapper-reverification">
       <section class="reverification">
         <div class="message">
-          <h3 class="title">${_("Please Resubmit Your Verification Information")}</h3>
+          <h3 class="title">${_("Verify Your Identity")}</h3>
           <div class="copy">
-            <p>${_("There was an error with your previous verification. In order proceed in the verified certificate of achievement track of your current courses, please complete the following steps.")}</p>
+          ## Translators: {start_bold} and {end_bold} will be replaced with HTML tags.
+          ## Please do not translate these variables.
+            <p>${_("To verify your identity and continue as a verified student in this course, complete the following steps {start_bold}before the course verification deadline{end_bold}. If you do not verify your identity, you can still receive an honor code certificate for the course.").format(start_bold="<b>", end_bold="</b>")}</p>
           </div>
         </div>
 
