@@ -361,6 +361,7 @@ def _cert_info(user, course, cert_status, course_mode):
             linkedin_config = LinkedInAddToProfileConfiguration.current()
             if linkedin_config.enabled:
                 status_dict['linked_in_url'] = linkedin_config.add_to_profile_url(
+                    course.id,
                     course.display_name,
                     cert_status.get('mode'),
                     cert_status['download_url']
