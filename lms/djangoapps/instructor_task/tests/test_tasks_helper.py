@@ -6,10 +6,21 @@ Unit tests for LMS instructor-initiated background tasks helper functions.
 Tests that CSV grade report generation works with unicode emails.
 
 """
+
+import os
+import shutil
+from datetime import datetime
+import urllib
+
 import ddt
+from freezegun import freeze_time
 from mock import Mock, patch
 import tempfile
 import unicodecsv
+
+from django.conf import settings
+from django.test.testcases import TestCase
+from pytz import UTC
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory
@@ -23,6 +34,11 @@ from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartiti
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv
 from instructor_task.tests.test_base import InstructorTaskCourseTestCase, TestReportMixin
+from instructor_task.tasks_helper import (
+    push_ora2_responses_to_s3,
+    UPDATE_STATUS_FAILED,
+    UPDATE_STATUS_SUCCEEDED,
+)
 
 
 @ddt.ddt
@@ -538,3 +554,50 @@ class TestCohortStudents(TestReportMixin, InstructorTaskCourseTestCase):
             ],
             verify_order=False
         )
+
+
+class TestInstructorOra2Report(TestCase):
+    """
+    Tests that ORA2 response report generation works.
+    """
+    def setUp(self):
+        self.course = CourseFactory.create()
+
+        self.current_task = Mock()
+        self.current_task.update_state = Mock()
+
+    def tearDown(self):
+        if os.path.exists(settings.ORA2_RESPONSES_DOWNLOAD['ROOT_PATH']):
+            shutil.rmtree(settings.ORA2_RESPONSES_DOWNLOAD['ROOT_PATH'])
+
+    def test_report_fails_if_error(self):
+        with patch('instructor_task.tasks_helper.collect_ora2_data') as mock_collect_data:
+            mock_collect_data.side_effect = KeyError
+
+            with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+                mock_current_task.return_value = self.current_task
+
+                response = push_ora2_responses_to_s3(None, None, self.course.id, None, 'generated')
+                self.assertEqual(response, UPDATE_STATUS_FAILED)
+
+    @freeze_time('2001-01-01 00:00:00')
+    def test_report_stores_results(self):
+        test_header = ['field1', 'field2']
+        test_rows = [['row1_field1', 'row1_field2'], ['row2_field1', 'row2_field2']]
+
+        with patch('instructor_task.tasks_helper._get_current_task') as mock_current_task:
+            mock_current_task.return_value = self.current_task
+
+            with patch('instructor_task.tasks_helper.collect_ora2_data') as mock_collect_data:
+                mock_collect_data.return_value = (test_header, test_rows)
+
+                with patch('instructor_task.models.LocalFSReportStore.store_rows') as mock_store_rows:
+                    return_val = push_ora2_responses_to_s3(None, None, self.course.id, None, 'generated')
+
+                    # pylint: disable=maybe-no-member
+                    timestamp_str = datetime.now(UTC).strftime('%Y-%m-%d-%H%M')
+                    course_id_string = urllib.quote(self.course.id.to_deprecated_string().replace('/', '_'))
+                    filename = u'{}_ORA2_responses_{}.csv'.format(course_id_string, timestamp_str)
+
+                    self.assertEqual(return_val, UPDATE_STATUS_SUCCEEDED)
+                    mock_store_rows.assert_called_once_with(self.course.id, filename, [test_header] + test_rows)
