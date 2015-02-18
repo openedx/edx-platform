@@ -125,7 +125,7 @@ header.global {
         > a {
           @include border-radius(0, 4px, 4px, 0);
           @include border-left(none);
-          padding: 5px 8px 7px 8px;
+          padding: 3px 8px 9px 8px;
 
           &.shopping-cart {
             border-radius: 4px;
