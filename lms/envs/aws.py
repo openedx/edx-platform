@@ -436,6 +436,11 @@ GRADES_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 GRADES_DOWNLOAD = ENV_TOKENS.get("GRADES_DOWNLOAD", GRADES_DOWNLOAD)
 
+###### CORS ###########
+
+CORS_ORIGIN_WHITELIST = AUTH_TOKENS.get('CORS_ORIGIN_WHITELIST', CORS_ORIGIN_WHITELIST)
+CORS_ORIGIN_ALLOW_ALL = AUTH_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', CORS_ORIGIN_ALLOW_ALL)
+
 ##### ORA2 ######
 # Prefix for uploads of example-based assessment AI classifiers
 # This can be used to separate uploads for different environments
