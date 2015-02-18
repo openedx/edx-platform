@@ -76,6 +76,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
         first_cohort, second_cohort = [
             CohortFactory(course_id=self.course_key) for _ in range(2)
         ]
+
         # place student 0 into first cohort
         add_user_to_cohort(first_cohort, self.student.username)
         self.assert_student_in_group(None)

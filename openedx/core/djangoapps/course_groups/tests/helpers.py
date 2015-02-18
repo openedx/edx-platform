@@ -1,13 +1,14 @@
 """
 Helper methods for testing cohorts.
 """
+import factory
 from factory import post_generation, Sequence
 from factory.django import DjangoModelFactory
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-from ..models import CourseUserGroup
+from ..models import CourseUserGroup, CourseCohort
 
 
 class CohortFactory(DjangoModelFactory):
@@ -27,6 +28,16 @@ class CohortFactory(DjangoModelFactory):
         """
         if extracted:
             self.users.add(*extracted)
+
+
+class CourseCohortFactory(DjangoModelFactory):
+    """
+    Factory for constructing mock course cohort.
+    """
+    FACTORY_FOR = CourseCohort
+
+    course_user_group = factory.SubFactory(CohortFactory)
+    assignment_type = 'manual'
 
 
 def topic_name_to_id(course, name):
