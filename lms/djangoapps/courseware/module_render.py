@@ -256,7 +256,7 @@ def get_xqueue_callback_url_prefix(request):
 
 def get_module_for_descriptor(user, request, descriptor, field_data_cache, course_key,
                               position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                              static_asset_path=''):
+                              static_asset_path='', early=False):
     """
     Implements get_module, extracting out the request-specific functionality.
 
@@ -280,6 +280,7 @@ def get_module_for_descriptor(user, request, descriptor, field_data_cache, cours
         static_asset_path=static_asset_path,
         user_location=user_location,
         request_token=request_token(request),
+        early=early
     )
 
 
@@ -678,7 +679,7 @@ def get_module_system_for_user(user, field_data_cache,
 def get_module_for_descriptor_internal(user, descriptor, field_data_cache, course_id,  # pylint: disable=invalid-name
                                        track_function, xqueue_callback_url_prefix, request_token,
                                        position=None, wrap_xmodule_display=True, grade_bucket_type=None,
-                                       static_asset_path='', user_location=None):
+                                       static_asset_path='', user_location=None, early=False):
     """
     Actually implement get_module, without requiring a request.
 
@@ -709,6 +710,8 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token=request_token
     )
 
+    if early:
+        return descriptor
     descriptor.bind_for_student(system, field_data)  # pylint: disable=protected-access
     descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
     return descriptor
