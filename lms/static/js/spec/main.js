@@ -423,6 +423,16 @@
             },
             'js/verify_student/views/webcam_photo_view': {
                 exports: 'edx.verify_student.WebcamPhotoView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'js/verify_student/views/image_input_view'
+                ]
+            },
+            'js/verify_student/views/image_input_view': {
+                exports: 'edx.verify_student.ImageInputView',
                 deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
             },
             'js/verify_student/views/step_view': {
@@ -540,6 +550,7 @@
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
+        'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
         'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',

@@ -1141,6 +1141,7 @@ verify_student_js = [
     'js/src/string_utils.js',
     'js/verify_student/models/verification_model.js',
     'js/verify_student/views/error_view.js',
+    'js/verify_student/views/image_input_view.js',
     'js/verify_student/views/webcam_photo_view.js',
     'js/verify_student/views/step_view.js',
     'js/verify_student/views/intro_step_view.js',
