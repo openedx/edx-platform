@@ -1097,6 +1097,9 @@ class OptionResponse(LoncapaResponse):
                 cmap.set(aid, 'correct')
             else:
                 cmap.set(aid, 'incorrect')
+            answer_variable = self.get_student_answer_variable_name(student_answers, aid)
+            if answer_variable:
+                cmap.set_property(aid, 'answervariable', answer_variable)
         return cmap
 
     def get_answers(self):
@@ -1104,6 +1107,18 @@ class OptionResponse(LoncapaResponse):
             'correct'), self.context)) for af in self.answer_fields])
         # log.debug('%s: expected answers=%s' % (unicode(self),amap))
         return amap
+
+    def get_student_answer_variable_name(self, student_answers, aid):
+        """
+        Return student answers variable name if exist in context else None.
+        """
+        if aid in student_answers:
+            for key, val in self.context.iteritems():
+                # convert val into unicode because student answer always be a unicode string
+                # even it is a list, dict etc.
+                if unicode(val) == student_answers[aid]:
+                    return '$' + key
+        return None
 
 #-----------------------------------------------------------------------------
 
