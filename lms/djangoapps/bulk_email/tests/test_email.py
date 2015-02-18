@@ -179,6 +179,7 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
         response = self.client.post(self.send_mail_url, test_email)
         self.assertEquals(json.loads(response.content), self.success_content)
 
+        # the 1 is for the instructor
         self.assertEquals(len(mail.outbox), 1 + len(self.staff) + len(self.students))
         self.assertItemsEqual(
             [e.to[0] for e in mail.outbox],
@@ -195,10 +196,23 @@ class TestEmailSendFromDashboardMockedHtmlToText(EmailSendFromDashboardTestCase)
 
     def test_no_duplicate_emails_enrolled_staff(self):
         """
-        Test that no duplicate emials are sent to a course instructor that is
+        Test that no duplicate emails are sent to a course instructor that is
         also enrolled in the course
         """
         CourseEnrollment.enroll(self.instructor, self.course.id)
+        self.test_send_to_all()
+
+    def test_no_duplicate_emails_unenrolled_staff(self):
+        """
+        Test that no duplicate emails are sent to a course staff that is
+        not enrolled in the course, but is enrolled in other courses
+        """
+        course_1 = CourseFactory.create()
+        course_2 = CourseFactory.create()
+        # make sure self.instructor isn't enrolled in the course
+        self.assertFalse(CourseEnrollment.is_enrolled(self.instructor, self.course.id))
+        CourseEnrollment.enroll(self.instructor, course_1.id)
+        CourseEnrollment.enroll(self.instructor, course_2.id)
         self.test_send_to_all()
 
     def test_unicode_subject_send_to_all(self):
