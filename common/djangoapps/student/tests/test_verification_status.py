@@ -212,6 +212,19 @@ class TestCourseVerificationStatus(UrlResetMixin, ModuleStoreTestCase):
         # a verification is active).
         self._assert_course_verification_status(VERIFY_STATUS_NEED_TO_REVERIFY)
 
+    def test_verification_occurred_after_deadline(self):
+        # Expiration date in the past
+        self._setup_mode_and_enrollment(self.PAST, "verified")
+
+        # The deadline has passed, and we've asked the student
+        # to reverify (through the support team).
+        attempt = SoftwareSecurePhotoVerification.objects.create(user=self.user)
+        attempt.mark_ready()
+        attempt.submit()
+
+        # Expect that the user's displayed enrollment mode is verified.
+        self._assert_course_verification_status(VERIFY_STATUS_APPROVED)
+
     def _setup_mode_and_enrollment(self, deadline, enrollment_mode):
         """Create a course mode and enrollment.
 
