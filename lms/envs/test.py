@@ -177,7 +177,7 @@ CACHES = {
     # This is the cache used for most things.
     # In staging/prod envs, the sessions also live here.
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': 'edx_loc_mem_cache',
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
@@ -195,13 +195,13 @@ CACHES = {
     },
 
     'mongo_metadata_inheritance': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': os.path.join(tempfile.gettempdir(), 'mongo_metadata_inheritance'),
         'TIMEOUT': 300,
         'KEY_FUNCTION': 'util.memcache.safe_key',
     },
     'loc_cache': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': 'edx_location_mem_cache',
     },
 
