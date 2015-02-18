@@ -238,6 +238,11 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{course_key}/xblock/{usage_key}/handler/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.handle_xblock_callback',
             name='xblock_handler'),
+        url(r'^courses/{course_key}/xblock/{usage_key}/view/(?P<view_name>[^/]*)$'.format(
+            course_key=settings.COURSE_ID_PATTERN,
+            usage_key=settings.USAGE_ID_PATTERN),
+            'courseware.module_render.xblock_view',
+            name='xblock_view'),
         url(r'^courses/{course_key}/xblock/{usage_key}/handler_noauth/(?P<handler>[^/]*)(?:/(?P<suffix>.*))?$'.format(course_key=settings.COURSE_ID_PATTERN, usage_key=settings.USAGE_ID_PATTERN),
             'courseware.module_render.handle_xblock_callback_noauth',
             name='xblock_handler_noauth'),
