@@ -341,7 +341,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//div[@aria-labelledby='%s']" % self.context['label']
+        xpath = "//div[@aria-label='%s']" % self.context['label']
         self.assert_has_xpath(xml, xpath, self.context)
 
 

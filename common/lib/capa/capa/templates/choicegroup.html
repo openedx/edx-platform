@@ -17,9 +17,9 @@
     % endif
     </div>
     % if input_type == 'checkbox':
-        <div class="choicegroup-choices" role="group" aria-labelledby="${label}">
+        <div class="choicegroup-choices" role="group" aria-label="${label}">
     % else:
-        <div class="choicegroup-choices" role="${input_type}group" aria-labelledby="${label}">
+        <div class="choicegroup-choices" role="${input_type}group" aria-label="${label}">
     % endif
         % for choice_id, choice_description in choices:
         <label for="input_${id}_${choice_id}"
