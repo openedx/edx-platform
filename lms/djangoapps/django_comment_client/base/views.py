@@ -5,6 +5,7 @@ import random
 import time
 import urlparse
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core import exceptions
@@ -16,6 +17,12 @@ from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from courseware.access import has_access
+from edx_notifications.lib.publisher import (
+    register_notification_type,
+    publish_notification_to_user,
+    get_notification_type
+)
+from edx_notifications.data import NotificationMessage
 from util.file import store_uploaded_file
 from courseware.courses import get_course_with_access, get_course_by_id
 import django_comment_client.settings as cc_settings
@@ -27,7 +34,8 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids
+    get_discussion_categories_ids,
+    permalink
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
@@ -197,6 +205,28 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
     if post.get('auto_subscribe', 'false').lower() == 'true':
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
+    # Feature Flag to check that notifications are enabled or not.
+    # parent_id is None: publish notification only when creating the comment on
+    # the thread not replying on the comment. When the user replied on the comment
+    # the parent_id is not None at that time
+    if settings.FEATURES.get("NOTIFICATIONS_ENABLED", False) and parent_id is None:
+        thread = cc.Thread.find(thread_id)
+        action_user_id = request.user.id
+        original_poster_id = int(thread.user_id)
+
+        # we have to only send the notifications when
+        # the user commenting the thread is not
+        # the same user who created the thread
+        if not action_user_id == original_poster_id:
+            register_and_publish_notifications(
+                msg_type_name='open-edx.lms.discussions.reply-to-thread',
+                course_id=course_key.to_deprecated_string(),
+                original_poster_id=original_poster_id,
+                action_user_id=action_user_id,
+                action_username=request.user.username,
+                thread_title=thread.title,
+                link_to_thread=permalink(thread)
+            )
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
@@ -356,7 +386,24 @@ def vote_for_thread(request, course_id, thread_id, value):
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.vote(thread, value)
+    # Feature Flag to check that notifications are enabled or not.
+    if settings.FEATURES.get("NOTIFICATIONS_ENABLED", False):
+        action_user_id = request.user.id
+        original_poster_id = int(thread.user_id)
 
+        # we have to only send the notifications when
+        # the user voting the thread is not
+        # the same user who created the thread
+        if not action_user_id == original_poster_id:
+            register_and_publish_notifications(
+                msg_type_name='open-edx.lms.discussions.post-upvoted',
+                course_id=course_id,
+                original_poster_id=original_poster_id,
+                action_user_id=action_user_id,
+                action_username=request.user.username,
+                thread_title=thread.title,
+                link_to_thread=permalink(thread)
+            )
     return JsonResponse(prepare_content(thread.to_dict(), course_key))
 
 
@@ -478,10 +525,54 @@ def un_pin_thread(request, course_id, thread_id):
 @login_required
 @permitted
 def follow_thread(request, course_id, thread_id):
+    """
+    given a course id and thread id, follow this thread
+    ajax only
+    """
     user = cc.User.from_django_user(request.user)
     thread = cc.Thread.find(thread_id)
     user.follow(thread)
+    # Feature Flag to check that notifications are enabled or not.
+    if settings.FEATURES.get("NOTIFICATIONS_ENABLED", False):
+        # only send notifications when the user
+        # who is following the thread is not the same
+        # who created the thread
+        action_user_id = request.user.id
+        original_poster_id = int(thread.user_id)
+        if not original_poster_id == action_user_id:
+            register_and_publish_notifications(
+                msg_type_name='open-edx.lms.discussions.thread-followed',
+                course_id=course_id,
+                original_poster_id=original_poster_id,
+                action_user_id=action_user_id,
+                action_username=request.user.username,
+                thread_title=thread.title,
+                link_to_thread=permalink(thread)
+            )
     return JsonResponse({})
+
+
+def register_and_publish_notifications(msg_type_name, course_id, original_poster_id,  # pylint: disable=invalid-name
+                                       action_user_id, action_username, thread_title, link_to_thread):
+    """
+    registers and publish the notification to the original
+    poster of the thread.
+    """
+    msg_type = get_notification_type(msg_type_name)
+    register_notification_type(msg_type)
+    msg = NotificationMessage(
+        namespace=course_id,
+        msg_type=msg_type,
+        payload={
+            '_schema_version': '1',
+            'action_user_id': action_user_id,
+            'action_username': action_username,
+            'thread_title': thread_title,
+            'link_to_thread': link_to_thread
+        }
+    )
+
+    publish_notification_to_user(original_poster_id, msg)
 
 
 @require_POST
