@@ -13,7 +13,8 @@ import logging
 log = logging.getLogger('VideoPage')
 
 VIDEO_BUTTONS = {
-    'CC': '.hide-subtitles',
+    'CC': '.hide-closed-captions',
+    'transcripts': '.hide-captions',
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
@@ -282,13 +283,13 @@ class VideoPage(PageObject):
         states = {True: 'Shown', False: 'Hidden'}
         state = states[captions_new_state]
 
-        # Make sure that the CC button is there
-        EmptyPromise(lambda: self.is_button_shown('CC'),
-                     "CC button is shown").fulfill()
+        # Make sure that the transcripts button is there
+        EmptyPromise(lambda: self.is_button_shown('transcripts'),
+                     "transcripts button is shown").fulfill()
 
         # toggle captions visibility state if needed
         if self.is_captions_visible() != captions_new_state:
-            self.click_player_button('CC')
+            self.click_player_button('transcripts')
 
             # Verify that captions state is toggled/changed
             EmptyPromise(lambda: self.is_captions_visible() == captions_new_state,
@@ -511,8 +512,8 @@ class VideoPage(PageObject):
         """
         self.wait_for_ajax()
 
-        # mouse over to CC button
-        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["CC"])
+        # mouse over to transcripts button
+        cc_button_selector = self.get_element_selector(VIDEO_BUTTONS["transcripts"])
         element_to_hover_over = self.q(css=cc_button_selector).results[0]
         ActionChains(self.browser).move_to_element(element_to_hover_over).perform()
 

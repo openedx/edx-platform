@@ -1,4 +1,4 @@
-(function (define) {
+(function (define, Draggabilly) {
 
 // VideoCaption module.
 define(
@@ -10,6 +10,9 @@ function (Sjson, AsyncProcess) {
      *
      * @type {function}
      * @access public
+     *
+     *
+     * TODO: How to include Draggabilly correctly?
      *
      * @param {object} state - The object containing the state of the video
      *     player. All other modules, their parameters, public variables, etc.
@@ -31,6 +34,7 @@ function (Sjson, AsyncProcess) {
         return $.Deferred().resolve().promise();
     };
 
+    // TODO: Make the difference clear between captions and transcripts
     VideoCaption.prototype = {
         /**
         * @desc Initiate rendering of elements, and set their initial configuration.
@@ -41,20 +45,28 @@ function (Sjson, AsyncProcess) {
                 languages = this.state.config.transcriptLanguages;
 
             this.loaded = false;
-            this.subtitlesEl = state.el.find('ol.subtitles');
             this.container = state.el.find('.lang');
-            this.hideSubtitlesEl = state.el.find('a.hide-subtitles');
+
+            this.hideCaptionsEl = state.el.find('.hide-captions');
+            this.subtitlesEl = state.el.find('.subtitles');
+
+            this.hideClosedCaptionsEl = state.el.find('.hide-closed-captions');
+            this.closedCaptionsEl = state.el.find('.closed-caption');
 
             if (_.keys(languages).length) {
                 this.renderLanguageMenu(languages);
 
                 if (!this.fetchCaption()) {
                     this.hideCaptions(true);
-                    this.hideSubtitlesEl.hide();
+                    this.hideClosedCaptions(true);
+                    this.hideClosedCaptionsEl.hide();
+                    this.hideCaptionsEl.hide();
                 }
             } else {
                 this.hideCaptions(true, false);
-                this.hideSubtitlesEl.hide();
+                this.hideClosedCaptions(true, false);
+                this.hideClosedCaptionsEl.hide();
+                this.hideCaptionsEl.hide();
             }
         },
 
@@ -72,7 +84,7 @@ function (Sjson, AsyncProcess) {
                 ].join(' ');
 
             // Change context to VideoCaption of event handlers using `bind`.
-            this.hideSubtitlesEl.on('click', this.toggle.bind(this));
+            this.hideClosedCaptionsEl.on('click', this.toggleClosedCaptions.bind(this));
             this.subtitlesEl
                 .on({
                     mouseenter: this.onMouseEnter.bind(this),
@@ -128,6 +140,16 @@ function (Sjson, AsyncProcess) {
             if ((state.videoType === 'html5') && (state.config.autohideHtml5)) {
                 this.subtitlesEl.on('scroll', state.videoControl.showControls);
             }
+
+            // Make the captions draggable
+            new Draggabilly(this.closedCaptionsEl.find('.text').get(0), {
+                axis: 'y',
+                containment: state.el.find('.video-wrapper').get(0)
+            });
+
+            // Bind the captions toggle icon
+            this.hideCaptionsEl
+                .on('click', this.toggleCaptions.bind(this));
         },
 
 
@@ -215,8 +237,10 @@ function (Sjson, AsyncProcess) {
 
             if (this.loaded) {
                 this.hideCaptions(false);
+                this.hideClosedCaptions(false);
             } else {
                 this.hideCaptions(state.hide_captions, false);
+                this.hideClosedCaptions(state.hide_closed_captions, false);
             }
 
             if (this.fetchXHR && this.fetchXHR.abort) {
@@ -282,7 +306,9 @@ function (Sjson, AsyncProcess) {
                         self.fetchAvailableTranslations();
                     } else {
                         self.hideCaptions(true, false);
-                        self.hideSubtitlesEl.hide();
+                        self.hideClosedCaptions(true, false);
+                        self.hideClosedCaptionsEl.hide();
+                        self.hideCaptionsEl.hide();
                     }
                 }
             });
@@ -320,7 +346,9 @@ function (Sjson, AsyncProcess) {
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     self.hideCaptions(true, false);
-                    self.hideSubtitlesEl.hide();
+                    self.hideClosedCaptions(true, false);
+                    self.hideClosedCaptionsEl.hide();
+                    self.hideCaptionsEl.hide();
                 }
             });
         },
@@ -677,6 +705,12 @@ function (Sjson, AsyncProcess) {
                         .find("li[data-index='" + newIndex + "']")
                         .addClass('current');
 
+
+                    var captions = this.sjson.getCaptions();
+                    this.closedCaptionsEl
+                        .find('.text')
+                        .text(captions[newIndex]);
+
                     this.currentIndex = newIndex;
                     this.scrollCaption();
                 }
@@ -744,33 +778,91 @@ function (Sjson, AsyncProcess) {
         },
 
         /**
-        * @desc Shows/Hides captions on click `CC` button
+        * @desc Shows/Hides closed captions on click `CC` button
         *
         * @param {jquery Event} event
         *
         */
-        toggle: function (event) {
+        toggleClosedCaptions: function (event) {
             event.preventDefault();
 
-            if (this.state.el.hasClass('closed')) {
-                this.hideCaptions(false);
+            var hide_closed_captions = this.closedCaptionsEl.is(':visible');
+            this.hideClosedCaptions(hide_closed_captions);
+        },
+
+        /**
+        * @desc Shows/Hides closed captions and updates the cookie.
+        *
+        * @param {boolean} hide_closed_captions if `true` hides the caption,
+        *     otherwise - show.
+        *
+        * @param {boolean} update_cookie Flag to update or not the cookie.
+        *
+        */
+        hideClosedCaptions: function (hide_closed_captions, update_cookie) {
+            var hideClosedCaptionsEl = this.hideClosedCaptionsEl,
+                state = this.state,
+                type, text;
+
+            if (typeof update_cookie === 'undefined') {
+                update_cookie = true;
+            }
+
+            if (hide_closed_captions) {
+                type = 'hide_closed_captions';
+                state.closedCaptionsHidden = true;
+                this.closedCaptionsEl.fadeOut(0);
+                text = gettext('Turn on closed captions');
             } else {
-                this.hideCaptions(true);
+                type = 'show_closed_captions';
+                state.closedCaptionsHidden = false;
+                this.closedCaptionsEl.fadeIn(0);
+                text = gettext('Turn off closed captions');
+            }
+
+            hideClosedCaptionsEl
+                .attr('title', text)
+                .text(gettext(text));
+
+            if (state.videoPlayer) {
+                state.videoPlayer.log(type, {
+                    currentTime: state.videoPlayer.currentTime
+                });
+            }
+
+            if (update_cookie) {
+                $.cookie('hide_closed_captions', hide_closed_captions, {
+                    expires: 3650,
+                    path: '/'
+                });
             }
         },
 
         /**
-        * @desc Shows/Hides captions and updates the cookie.
+        * @desc Shows/Hides captions on click `arrow` button
         *
-        * @param {boolean} hide_captions if `true` hides the caption,
-        *     otherwise - show.
-        * @param {boolean} update_cookie Flag to update or not the cookie.
+        * @param {jquery Event} event
         *
         */
+        toggleCaptions: function (e) {
+            e.preventDefault();
+            var hide_captions = !this.state.el.hasClass('closed');
+            this.hideCaptions(hide_captions);
+        },
+
+        /**
+        * @desc Shows/Hides the captions and updates the cookie.
+        *
+        * @param {boolean} hide_captions if `true` hides the transcript,
+        *     otherwise - show.
+        *
+        * @param {boolean} update_cookie Flag to update or not the cookie.        *
+        */
         hideCaptions: function (hide_captions, update_cookie) {
-            var hideSubtitlesEl = this.hideSubtitlesEl,
-                state = this.state,
-                type, text;
+            var  hideClosedCaptionsEl = this.hideClosedCaptionsEl,
+                 state = this.state,
+                 type, text;
+
 
             if (typeof update_cookie === 'undefined') {
                 update_cookie = true;
@@ -780,18 +872,19 @@ function (Sjson, AsyncProcess) {
                 type = 'hide_transcript';
                 state.captionsHidden = true;
                 state.el.addClass('closed');
-                text = gettext('Turn on captions');
+                text = gettext('Turn on transcripts');
             } else {
                 type = 'show_transcript';
                 state.captionsHidden = false;
                 state.el.removeClass('closed');
                 this.scrollCaption();
-                text = gettext('Turn off captions');
+                text = gettext('Turn off transcripts');
             }
 
-            hideSubtitlesEl
+
+            this.hideCaptionsEl
                 .attr('title', text)
-                .text(gettext(text));
+                .attr('aria-label', gettext(text));
 
             if (state.videoPlayer) {
                 state.videoPlayer.log(type, {
@@ -808,6 +901,7 @@ function (Sjson, AsyncProcess) {
             }
 
             this.setSubtitlesHeight();
+
             if (update_cookie) {
                 $.cookie('hide_captions', hide_captions, {
                     expires: 3650,
@@ -834,7 +928,7 @@ function (Sjson, AsyncProcess) {
 
         /**
         * @desc Sets the height of the caption container element.
-        *
+        * TODO: Make the difference clear between captions and transcripts i.e. shouldn't this be just `caption` instead of `subtitle`.
         */
         setSubtitlesHeight: function () {
             var height = 0,
@@ -861,4 +955,4 @@ function (Sjson, AsyncProcess) {
     return VideoCaption;
 });
 
-}(RequireJS.define));
+}(RequireJS.define, Draggabilly));

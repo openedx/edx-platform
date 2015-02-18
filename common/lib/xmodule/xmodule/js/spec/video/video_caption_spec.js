@@ -36,15 +36,15 @@
 
                 it('add caption control to video player', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.video')).toContain('a.hide-subtitles');
+                    expect($('.video')).toContain('a.hide-captions');
                 });
 
                 it('add ARIA attributes to caption control', function () {
                     state = jasmine.initializePlayer();
-                    var captionControl = $('a.hide-subtitles');
+                    var captionControl = $('a.hide-captions');
                     expect(captionControl).toHaveAttrs({
                         'role': 'button',
-                        'title': 'Turn off captions',
+                        'title': 'Turn off transcripts',
                         'aria-disabled': 'false'
                     });
                 });
@@ -123,7 +123,7 @@
 
                 it('bind the hide caption button', function () {
                     state = jasmine.initializePlayer();
-                    expect($('.hide-subtitles')).toHandle('click');
+                    expect($('.hide-captions')).toHandle('click');
                 });
 
                 it('bind the mouse movement', function () {
@@ -371,7 +371,7 @@
                 });
 
                 it('captions panel is not shown', function () {
-                    expect(state.videoCaption.hideSubtitlesEl).toBeHidden();
+                    expect(state.videoCaption.hideCaptionsEl).toBeHidden();
                 });
             });
         });
@@ -604,7 +604,7 @@
                 expect(Caption.fetchAvailableTranslations).not.toHaveBeenCalled();
                 expect(Caption.hideCaptions.mostRecentCall.args)
                     .toEqual([true, false]);
-                expect(Caption.hideSubtitlesEl).toBeHidden();
+                expect(Caption.hideCaptionsEl).toBeHidden();
             });
 
             msg = 'on error: fetch available translations if there are ' +
@@ -696,7 +696,7 @@
 
                 expect($.ajaxWithPrefix).toHaveBeenCalled();
                 expect(Caption.hideCaptions).toHaveBeenCalledWith(true, false);
-                expect(Caption.hideSubtitlesEl).toBeHidden();
+                expect(Caption.hideCaptionsEl).toBeHidden();
             });
         });
 
@@ -897,7 +897,7 @@
                             controlHeight, shouldBeHeight;
 
                         state.captionsHidden = true;
-                        state.videoCaption.setSubtitlesHeight();
+                        state.videoCaption.setCaptionsHeight();
 
                         realHeight = parseInt(
                             $('.subtitles').css('maxHeight'), 10
@@ -1046,7 +1046,7 @@
             describe('when the caption is visible', function () {
                 beforeEach(function () {
                     state.el.removeClass('closed');
-                    state.videoCaption.toggle(jQuery.Event('click'));
+                    state.videoCaption.toggleCaptions(jQuery.Event('click'));
                 });
 
                 it('log the hide_transcript event', function () {
@@ -1063,15 +1063,15 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn on captions');
+                    expect($('a.hide-captions'))
+                        .toHaveAttr('title', 'Turn on transcripts');
                 });
             });
 
             describe('when the caption is hidden', function () {
                 beforeEach(function () {
                     state.el.addClass('closed');
-                    state.videoCaption.toggle(jQuery.Event('click'));
+                    state.videoCaption.toggleCaptions(jQuery.Event('click'));
                     jasmine.Clock.useMock();
                 });
 
@@ -1089,12 +1089,12 @@
                 });
 
                 it('changes ARIA attribute of caption control', function () {
-                    expect($('a.hide-subtitles'))
-                        .toHaveAttr('title', 'Turn off captions');
+                    expect($('a.hide-captions'))
+                        .toHaveAttr('title', 'Turn off transcripts');
                 });
 
                 // Test turned off due to flakiness (11/25/13)
-                xit('scroll the caption', function () {
+                it('scroll the caption', function () {
                     // After transcripts are shown, and the video plays for a
                     // bit.
                     jasmine.Clock.tick(1000);

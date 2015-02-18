@@ -222,7 +222,7 @@ function (Iterator) {
             if (!this.speedLinks.list.is(':focus')) {
                 this.closeMenu();
             }
-                    
+
             return false;
         },
 
@@ -250,7 +250,7 @@ function (Iterator) {
             // We do not stop propagation and default behavior on a TAB
             // keypress.
             return event.keyCode === KEY.TAB;
-        },
+        },
 
         /**
          * Keydown event handler for speed links.
@@ -318,7 +318,7 @@ function (Iterator) {
             }
 
             return true;
-        }
+        }
     };
 
     return SpeedControl;

@@ -85,6 +85,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     """
     XML source example:
         <video show_captions="true"
+               show_closed_captions="true"
             youtube="0.75:jNCf2gIqpeE,1.0:ZwkTiUPN0mg,1.25:rsq9auxASqI,1.50:kMyNdzVHHgg"
             url_name="lecture_21_3" display_name="S19V3: Vacancies"
         >
@@ -101,6 +102,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
     module = __name__.replace('.video_module', '', 2)
     js = {
         'js': [
+            resource_string(module, 'js/common_static/js/vendor/draggabilly.pkgd.js'),
             resource_string(module, 'js/src/video/00_component.js'),
             resource_string(module, 'js/src/video/00_video_storage.js'),
             resource_string(module, 'js/src/video/00_resizer.js'),
@@ -244,6 +246,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'handout': self.handout,
             'id': self.location.html_id(),
             'show_captions': json.dumps(self.show_captions),
+            'show_closed_captions': json.dumps(self.show_closed_captions),
             'download_video_link': download_video_link,
             'sources': json.dumps(sources),
             'speed': json.dumps(self.speed),
@@ -425,6 +428,7 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
         attrs = {
             'display_name': self.display_name,
             'show_captions': json.dumps(self.show_captions),
+            'show_closed_captions': json.dumps(self.show_closed_captions),
             'start_time': self.start_time,
             'end_time': self.end_time,
             'sub': self.sub,

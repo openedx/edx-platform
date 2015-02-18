@@ -260,9 +260,13 @@ function () {
     }
 
     /** Toggle fullscreen mode. */
+    // Also change the transcript toggle icon color
     function toggleFullScreen() {
         var fullScreenClassNameEl = this.el.add(document.documentElement),
-            win = $(window), text;
+            win = $(window),
+            $transcriptIcon = this.el.find('span.transcript-toggle i'),
+            $transcriptIconParent = $transcriptIcon.parent(),
+            text;
 
         if (this.videoControl.fullScreenState) {
             this.videoControl.fullScreenState = this.isFullScreen = false;

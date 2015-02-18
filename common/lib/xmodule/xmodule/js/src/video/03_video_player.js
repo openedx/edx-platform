@@ -954,7 +954,7 @@ function (HTML5Video, Resizer) {
             logInfo.code = 'html5';
         }
 
-        Logger.log(eventName, logInfo);
+                Logger.log(eventName, logInfo);
     }
 
     function onVolumeChange(volume) {

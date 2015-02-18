@@ -39,7 +39,8 @@ HTML5_SOURCES_INCORRECT = [
 ]
 
 VIDEO_BUTTONS = {
-    'CC': '.hide-subtitles',
+    'CC': '.hide-closed-captions',
+    'transcripts': '.hide-captions',
     'volume': '.volume',
     'play': '.video_control.play',
     'pause': '.video_control.pause',
@@ -441,10 +442,10 @@ def set_captions_visibility_state(_step, captions_state):
     SELECTOR = '.closed .subtitles'
     if world.is_css_not_present(SELECTOR):
         if captions_state == 'closed':
-            world.css_click('.hide-subtitles')
+            world.css_click('.hide-captions')
     else:
         if captions_state != 'closed':
-            world.css_click('.hide-subtitles')
+            world.css_click('.hide-captions')
 
 
 @step('I see video menu "([^"]*)" with correct items$')
@@ -491,7 +492,7 @@ def select_language(_step, code):
         code=code
     )
 
-    world.css_find(VIDEO_BUTTONS["CC"])[0].mouse_over()
+    world.css_find(VIDEO_BUTTONS["transcripts"])[0].mouse_over()
     world.wait_for_present('.lang.open')
     world.css_click(selector)
 

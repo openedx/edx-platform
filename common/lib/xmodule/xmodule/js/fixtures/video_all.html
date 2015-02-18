@@ -5,6 +5,7 @@
         id="video_id"
         class="video closed"
         data-show-captions="true"
+        data-show-closed-captions="true"
         data-save-state-url="/save_user_state"
         data-speed="1.5"
         data-start=""
@@ -32,7 +33,14 @@
             <section class="video-player">
               <div id="id"></div>
             </section>
+            <a href="#" tabindex="0" class="hide-captions" role="button" aria-disabled="false"
+                  title="${_('Turn off transcripts')}">
+              <i class="fa fa-caret-right" aria-hidden="true"></i>
+            </a>
             <div class="video-player-post"></div>
+            <section class="closed-caption">
+                <p class="text"></p>
+            </section>
             <section class="video-controls is-hidden">
               <div class="slider"></div>
               <div>
