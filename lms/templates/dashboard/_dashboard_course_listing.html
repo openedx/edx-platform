@@ -43,7 +43,7 @@ from student.helpers import (
     <% mode_class = "" %>
   % endif
 
-  <div role="region" aria-labelledby="${course.id}" class="course${mode_class}">
+  <div role="region" aria-label="${course.display_name_with_default}" class="course${mode_class}">
 
     <%
       course_target = reverse('info', args=[course.id.to_deprecated_string()])
