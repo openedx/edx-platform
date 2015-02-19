@@ -1,7 +1,8 @@
 ;(function (define, undefined) {
     'use strict';
     define(['jquery', 'js/groups/collections/cohort','js/groups/models/cohort_settings',
-            'js/discussion_topics/collections/topics', 'js/discussion_topics/models/topic' ],
+            'js/discussion_topics/models/topics', 'js/discussion_topics/collections/topics'
+        ],
         function($) {
 
             return function(contentGroups, studioGroupConfigurationsUrl) {
