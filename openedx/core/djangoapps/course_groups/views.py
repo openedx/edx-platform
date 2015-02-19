@@ -7,7 +7,8 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_http_methods
 from util.json_request import expect_json, JsonResponse
 from django.contrib.auth.decorators import login_required
-import json
+from django.utils.translation import ugettext
+
 import logging
 import re
 
@@ -54,19 +55,56 @@ def unlink_cohort_partition_group(cohort):
     CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort).delete()
 
 
+def _get_cohort_settings_representation(course_cohort_settings):
+    """
+    Returns a JSON representation of a course cohort settings.
+    """
+    return {
+        'id': course_cohort_settings.id,
+        'is_cohorted': course_cohort_settings.is_cohorted,
+        'cohorted_discussions': course_cohort_settings.cohorted_discussions,
+        'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
+    }
+
+
 def _get_cohort_representation(cohort, course):
     """
     Returns a JSON representation of a cohort.
     """
     group_id, partition_id = cohorts.get_group_info_for_cohort(cohort)
+    assignment_type = cohorts.get_assignment_type(cohort)
     return {
         'name': cohort.name,
         'id': cohort.id,
         'user_count': cohort.users.count(),
-        'assignment_type': cohorts.CohortAssignmentType.get(cohort, course),
+        'assignment_type': assignment_type,
         'user_partition_id': partition_id,
-        'group_id': group_id
+        'group_id': group_id,
     }
+
+
+@require_http_methods(("GET", "PATCH"))
+@ensure_csrf_cookie
+@expect_json
+@login_required
+def cohort_settings_handler(request, course_key_string):
+    """
+    The restful handler for cohort setting requests. Requires JSON.
+    GET
+        Returns the JSON representation of cohort settings for the course.
+    PUT or POST or PATCH
+        Updates the cohort settings for the course. Returns the JSON representation of updated settings.
+    """
+    if request.method == 'GET':
+        cohort_settings = cohorts.get_cohort_settings(course_key_string)
+        return JsonResponse(_get_cohort_settings_representation(cohort_settings))
+    else:
+        is_cohorted = request.json.get('is_cohorted')
+        if is_cohorted is None:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": "Bad Request"}, 400)
+        cohort_settings = cohorts.set_cohort_state(course_key_string, is_cohorted=is_cohorted)
+        return JsonResponse(_get_cohort_settings_representation(cohort_settings))
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
@@ -102,25 +140,30 @@ def cohort_handler(request, course_key_string, cohort_id=None):
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
             return JsonResponse(_get_cohort_representation(cohort, course))
     else:
+        name = request.json.get('name')
+        assignment_type = request.json.get('assignment_type')
+        if not name:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": "Cohort name must be specified."}, 400)
+        if not assignment_type:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": "Assignment type must be specified."}, 400)
         # If cohort_id is specified, update the existing cohort. Otherwise, create a new cohort.
         if cohort_id:
             cohort = cohorts.get_cohort_by_id(course_key, cohort_id)
-            name = request.json.get('name')
             if name != cohort.name:
-                if cohorts.CohortAssignmentType.get(cohort, course) == cohorts.CohortAssignmentType.RANDOM:
-                    return JsonResponse(
-                        # Note: error message not translated because it is not exposed to the user (UI prevents).
-                        {"error": "Renaming of random cohorts is not supported at this time."}, 400
-                    )
+                if cohorts.is_cohort_exists(course_key, name):
+                    err_msg = ugettext("A cohort with the same name already exists.")
+                    return JsonResponse({"error": unicode(err_msg)}, 400)
                 cohort.name = name
                 cohort.save()
-        else:
-            name = request.json.get('name')
-            if not name:
-                # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-                return JsonResponse({"error": "In order to create a cohort, a name must be specified."}, 400)
             try:
-                cohort = cohorts.add_cohort(course_key, name)
+                cohorts.set_assignment_type(cohort, assignment_type)
+            except ValueError as err:
+                return JsonResponse({"error": unicode(err)}, 400)
+        else:
+            try:
+                cohort = cohorts.add_cohort(course_key, name, assignment_type)
             except ValueError as err:
                 return JsonResponse({"error": unicode(err)}, 400)
 

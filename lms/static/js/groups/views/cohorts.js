@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext, interpolate_text, CohortModel, CohortEditorView, CohortFormView,
-          NotificationModel, NotificationView, FileUploaderView) {
+          NotificationModel, NotificationView, FileUploaderView, DiscussionTopicsView) {
     'use strict';
 
     var hiddenClass = 'is-hidden',
@@ -12,11 +12,13 @@ var edx = edx || {};
     edx.groups.CohortsView = Backbone.View.extend({
         events : {
             'change .cohort-select': 'onCohortSelected',
+            'change .cohorts-state': 'onCohortStateChanged',
             'click .action-create': 'showAddCohortForm',
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
             'click .link-cross-reference': 'showSection',
-            'click .toggle-cohort-management-secondary': 'showCsvUpload'
+            'click .toggle-cohort-management-secondary': 'showCsvUpload',
+            'click .toggle-cohort-management-discussions': 'showDiscussionTopics'
         },
 
         initialize: function(options) {
@@ -26,19 +28,21 @@ var edx = edx || {};
             this.selectorTemplate = _.template($('#cohort-selector-tpl').text());
             this.context = options.context;
             this.contentGroups = options.contentGroups;
+            this.cohortSettings = options.cohortSettings;
             model.on('sync', this.onSync, this);
 
-            // Update cohort counts when the user clicks back on the membership tab
+            // Update cohort counts when the user clicks back on the cohort management tab
             // (for example, after uploading a csv file of cohort assignments and then
             // checking results on data download tab).
-            $(this.getSectionCss('membership')).click(function () {
+            $(this.getSectionCss('cohort_management')).click(function () {
                 model.fetch();
             });
         },
 
         render: function() {
             this.$el.html(this.template({
-                cohorts: this.model.models
+                cohorts: this.model.models,
+                cohortsEnabled: this.cohortSettings.get('is_cohorted')
             }));
             this.onSync();
             return this;
@@ -96,6 +100,28 @@ var edx = edx || {};
             var selectedCohort = this.getSelectedCohort();
             this.lastSelectedCohortId = selectedCohort.get('id');
             this.showCohortEditor(selectedCohort);
+        },
+
+        onCohortStateChanged: function(event) {
+            event.preventDefault();
+            this.cohortsEnabled = this.getCohortState();
+            this.saveCohortSettings();
+        },
+
+        saveCohortSettings: function() {
+            var self = this,
+                cohortSettings,
+                fieldData = {is_cohorted: this.getCohortState()};
+            cohortSettings = this.cohortSettings;
+            cohortSettings.save(
+                fieldData, {patch: true, wait: true}
+            ).done(function() {
+                self.render();
+            });
+        },
+
+        getCohortState: function() {
+            return this.$('.cohorts-state').prop('checked');
         },
 
         showCohortEditor: function(cohort) {
@@ -236,10 +262,39 @@ var edx = edx || {};
                 this.$('#file-upload-form-file').focus();
             }
         },
+        showDiscussionTopics: function(event) {
+            event.preventDefault();
+
+            $(event.currentTarget).addClass(hiddenClass);
+            var topicsElement = this.$('.discussion-topics').removeClass(hiddenClass);
+
+            //this.template('cohort-discussion-topics').render();
+            if (!this.topicsView) {
+                this.topicsView = new DiscussionTopicsView({
+                    el: topicsElement,
+                    model: this.context.discussionTopicsModel
+                    //title: gettext("Assign students to cohorts by uploading a CSV file."),
+                    //inputLabel: gettext("Choose a .csv file"),
+                    //inputTip: gettext("Only properly formatted .csv files will be accepted."),
+                    //submitButtonText: gettext("Upload File and Assign Students"),
+                    //extensions: ".csv",
+                    //url: this.context.uploadCohortsCsvUrl,
+                    //successNotification: function (file, event, data) {
+                    //    var message = interpolate_text(gettext(
+                    //        "Your file '{file}' has been uploaded. Allow a few minutes for processing."
+                    //    ), {file: file});
+                    //    return new NotificationModel({
+                    //        type: "confirmation",
+                    //        title: message
+                    //    });
+                    //}
+                }).render();
+            }
+        },
 
         getSectionCss: function (section) {
             return ".instructor-nav .nav-item a[data-section='" + section + "']";
         }
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
-    edx.groups.CohortFormView, NotificationModel, NotificationView, FileUploaderView);
+    edx.groups.CohortFormView, NotificationModel, NotificationView, FileUploaderView, edx.discussions.DiscussionTopicsView);
