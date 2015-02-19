@@ -1,8 +1,14 @@
 <label><%- gettext('Coursewide Discussion Topics') %></label>
-<div class="coursewide-discussion-topics">
-    <% _.each(coursewideTopics, function(topic) { %>
-        <input type="checkbox" class="cohorts-state" value="Cohorts-State" />
-        <label for="cohorts-state"><%- topic.get('name') %></label>
 
-    <% }); %>
+<div class="coursewide-discussion-topics">
+    <ul>
+        <% _.each(coursewideTopics, function(topic) { %>
+            <li>
+                <input type="checkbox" class="discussion-topic" />
+                <label for="cohorts-state"><%- topic.name %></label>
+
+            <label><%- topic.is_cohorted %></label>
+            </li>
+        <% }); %>
+    </ul>
 </div>
