@@ -227,12 +227,12 @@ def subscribe_with_data(mailchimp, list_id, user_data):
 
     # send the updates in batches of a fixed size
     for batch in batches(formated_data, SUBSCRIBE_BATCH_SIZE):
-        log.debug("Sending batch: {}".format(list(batch)))
         result = mailchimp.listBatchSubscribe(id=list_id,
                                               batch=batch,
                                               double_optin=False,
                                               update_existing=True)
-        log.debug(result)
+        log.debug("Added: {} Error on: {}".format(
+            result['add_count'], resurt['error_count']))
 
 
 def make_segments(mailchimp, list_id, count, emails):
