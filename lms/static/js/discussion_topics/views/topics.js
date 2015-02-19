@@ -13,6 +13,7 @@ var edx = edx || {};
         initialize: function(options) {
             this.template = _.template($('#cohort-discussion-topics-tpl').text());
             this.context = options.context;
+            _.bindAll(this, 'toggleTopicCheck');
         },
 
         render: function() {
@@ -25,8 +26,10 @@ var edx = edx || {};
         toggleTopicCheck: function (event) {
             event.preventDefault();
 
-            var $cohortedText = $('.cohorted-text'),
-                isTopicChecked = this.getTopicState();
+            var $selectedTopic = $(event.currentTarget),
+                $cohortedText = $selectedTopic.siblings('span.cohorted-text'),
+                isTopicChecked = $selectedTopic.prop('checked'),
+                id = $selectedTopic.data('id');
 
             if(isTopicChecked) {
                 this.element.show($cohortedText);
@@ -34,10 +37,10 @@ var edx = edx || {};
             else {
                 this.element.hide($cohortedText);
             }
-            this.model.set({'is_cohorted': isTopicChecked})
-        },
-        getTopicState: function() {
-            return this.$('.discussion-topic').prop('checked');
+
+            var currentModel = this.model.get('entries').get(id);
+            currentModel.set({'is_cohorted': isTopicChecked});
+            return;
         },
         element: {
             hide: function( $el ) {
