@@ -899,6 +899,15 @@ def mktg_course_about(request, course_id):
         'course_modes': course_modes,
     }
 
+    # The edx.org marketing site currently displays only in English.
+    # To avoid displaying a different language in the register / access button,
+    # we force the language to English.
+    # However, OpenEdX installations with a different marketing front-end
+    # may want to respect the language specified by the user or the site settings.
+    force_english = settings.FEATURES.get('IS_EDX_DOMAIN', False)
+    if force_english:
+        translation.activate('en-us')
+
     if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
         # Drupal will pass organization names using a GET parameter, as follows:
         #     ?org=Harvard
@@ -931,15 +940,6 @@ def mktg_course_about(request, course_id):
                 "I would like to receive email from {institution_series} and learn about their other programs.",
                 len(org_list)
             ).format(institution_series=org_name_string)
-
-    # The edx.org marketing site currently displays only in English.
-    # To avoid displaying a different language in the register / access button,
-    # we force the language to English.
-    # However, OpenEdX installations with a different marketing front-end
-    # may want to respect the language specified by the user or the site settings.
-    force_english = settings.FEATURES.get('IS_EDX_DOMAIN', False)
-    if force_english:
-        translation.activate('en-us')
 
     try:
         return render_to_response('courseware/mktg_course_about.html', context)
