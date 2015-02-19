@@ -7,7 +7,7 @@ from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, Studen
 from instructor_email_widget.models import GroupedTempQueryForSubquery
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
 from django.contrib.auth.models import User
-from instructor.views.data_access_constants import INCLUSION_MAP, QueryType
+from instructor.views.data_access_constants import INCLUSION_MAP, QueryType, QueryOrigin, QUERYORIGIN_MAP
 from instructor.views.data_access_constants import DatabaseFields, TEMPORARY_QUERY_LIFETIME
 import random
 import datetime
@@ -15,7 +15,7 @@ from instructor.tasks_helper import get_problem_users, get_section_users
 
 
 @task(base=EmailWidgetTask)  # pylint: disable=not-callable
-def make_single_query(course_id, query, associate_group=None):
+def make_single_query(course_id, query, associate_group=None, origin=QueryOrigin.WIDGET):
     """
     Make a single query for student information
     """
@@ -26,6 +26,7 @@ def make_single_query(course_id, query, associate_group=None):
         filter_on=query.filter,
         entity_name=query.entity_name,
         query_type=query.query_type,
+        origin=QUERYORIGIN_MAP[origin],
         done=False,
     )
     temp_query.save()
@@ -74,7 +75,7 @@ def make_subqueries(course_id, group_id, queries):
             query.filter_on,
             query.entity_name,
         )
-        make_single_query.apply_async(args=(course_id, query, group_id))
+        make_single_query.apply_async(args=(course_id, query, group_id), kwargs={'origin': QueryOrigin.EMAIL})
 
 
 def purge_temporary_queries():
