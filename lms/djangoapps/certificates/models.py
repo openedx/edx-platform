@@ -46,9 +46,12 @@ Eligibility:
        unless he has allow_certificate set to False.
 """
 from datetime import datetime
+import json
 import uuid
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -503,3 +506,44 @@ class CertificateGenerationConfiguration(ConfigurationModel):
 
     """
     pass
+
+
+class CertificateHtmlViewConfiguration(ConfigurationModel):
+    """
+    Static values for certificate HTML view context parameters.
+    Default values will be applied across all certificate types (course modes)
+    Matching 'mode' overrides will be used instead of defaults, where applicable
+    Example configuration :
+        {
+            "default": {
+                "url": "http://www.edx.org",
+                "logo_src": "http://www.edx.org/static/images/logo.png",
+                "logo_alt": "Valid Certificate"
+            },
+            "honor": {
+                "logo_src": "http://www.edx.org/static/images/honor-logo.png",
+                "logo_alt": "Honor Certificate"
+            }
+        }
+    """
+    configuration = models.TextField(
+        help_text="Certificate HTML View Parameters (JSON)"
+    )
+
+    def clean(self):
+        """
+        Ensures configuration field contains valid JSON.
+        """
+        try:
+            json.loads(self.configuration)
+        except ValueError:
+            raise ValidationError('Must be valid JSON string.')
+
+    @classmethod
+    def get_config(cls):
+        """
+        Retrieves the configuration field value from the database
+        """
+        instance = cls.current()
+        json_data = json.loads(instance.configuration) if instance.enabled else {}
+        return json_data

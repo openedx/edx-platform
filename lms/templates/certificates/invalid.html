@@ -1,0 +1,25 @@
+<%! from django.utils.translation import ugettext as _ %>
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title></title>
+ <link rel="stylesheet" href="/stylesheets/base.css">
+</head>
+<body>
+  <header>
+    <h1>edX and MITX</h1>
+  </header>
+
+  <section>
+    <header class="invalid">
+      <h1>${_("This is an invalid edX certificate number")}</h1>
+      <p>${_("Please check the number to make sure that it is the exact same as on the certificate.")}</p>
+    </header>
+
+    <section>
+      <p>${_("This is an unknown certificate number and therefore is a potential forgery.")}</p>
+    </section>
+  </section>
+</body>
+</html>
