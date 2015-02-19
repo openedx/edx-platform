@@ -284,26 +284,10 @@ var edx = edx || {};
             $(event.currentTarget).addClass(hiddenClass);
             var topicsElement = this.$('.discussion-topics').removeClass(hiddenClass);
 
-            //this.template('cohort-discussion-topics').render();
             if (!this.topicsView) {
                 this.topicsView = new DiscussionTopicsView({
                     el: topicsElement,
                     model: this.context.discussionTopicsModel
-                    //title: gettext("Assign students to cohorts by uploading a CSV file."),
-                    //inputLabel: gettext("Choose a .csv file"),
-                    //inputTip: gettext("Only properly formatted .csv files will be accepted."),
-                    //submitButtonText: gettext("Upload File and Assign Students"),
-                    //extensions: ".csv",
-                    //url: this.context.uploadCohortsCsvUrl,
-                    //successNotification: function (file, event, data) {
-                    //    var message = interpolate_text(gettext(
-                    //        "Your file '{file}' has been uploaded. Allow a few minutes for processing."
-                    //    ), {file: file});
-                    //    return new NotificationModel({
-                    //        type: "confirmation",
-                    //        title: message
-                    //    });
-                    //}
                 }).render();
             }
         },

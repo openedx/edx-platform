@@ -1,7 +1,7 @@
 ;(function (define, undefined) {
     'use strict';
     define(['jquery', 'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/course_cohort_settings',
-            'js/discussion_topics/collections/topics', 'js/discussion_topics/models/topics'],
+            'js/discussion_topics/models/topics', 'js/discussion_topics/collections/topics'],
         function($) {
 
             return function(contentGroups, studioGroupConfigurationsUrl) {
@@ -26,16 +26,6 @@
                         uploadCohortsCsvUrl: cohortManagementElement.data('upload_cohorts_csv_url'),
                         studioAdvancedSettingsUrl: cohortManagementElement.data('advanced-settings-url'),
                         studioGroupConfigurationsUrl: studioGroupConfigurationsUrl
-                    }
-                });
-
-                var discussionTopicsView = new edx.discussions.DiscussionTopicsView({
-                    el: cohortManagementElement,
-                    model: discussionTopics,
-                    //discussionsTopics: discussionsTopics ,
-                    //cohortSettings: cohortSettings,
-                    context: {
-                        discussionsTopicsUrl: cohortManagementElement.data('discussion_topics_url')
                     }
                 });
 
