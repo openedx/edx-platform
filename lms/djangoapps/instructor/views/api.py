@@ -88,7 +88,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
 from student.models import UserProfile, Registration
 import instructor.views.data_access as data_access
-from instructor.views.data_access_constants import QueryType, StudentQuery
+from instructor.views.data_access_constants import QueryType, StudentQuery, QUERYORIGIN_MAP, QueryOrigin
 from instructor.views.data_access_constants import REVERSE_INCLUSION_MAP, INCLUDE_SECTION_PATTERN
 from instructor.views.data_access_constants import INCLUDE_PROBLEM_PATTERN, ALL_PROBLEM_FILTERS, ALL_SECTION_FILTERS
 from instructor.tasks import make_single_query
@@ -886,17 +886,19 @@ def get_temp_queries(request, course_id):  # pylint: disable=unused-argument
     course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
     saved_temp = data_access.get_temp_queries(course_id)
     cleaned_queries = []
+
     for query in saved_temp:
-        cleaned_queries.append({
-            'id': query.id,
-            'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
-            'block_type': query.module_state_key.block_type,
-            'block_id': query.module_state_key.block_id,
-            'filter_on': query.filter_on,
-            'display_name': query.entity_name,
-            'type': query.query_type,
-            'done': query.done,
-        })
+        if query.origin == QUERYORIGIN_MAP[QueryOrigin.WIDGET]:
+            cleaned_queries.append({
+                'id': query.id,
+                'inclusion': REVERSE_INCLUSION_MAP[query.inclusion],
+                'block_type': query.module_state_key.block_type,
+                'block_id': query.module_state_key.block_id,
+                'filter_on': query.filter_on,
+                'display_name': query.entity_name,
+                'type': query.query_type,
+                'done': query.done,
+            })
     response_payload = {
         'course_id': course_id.to_deprecated_string(),
         'queries': cleaned_queries,

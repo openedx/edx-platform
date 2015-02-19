@@ -77,24 +77,39 @@ def get_group_query_students(course_id, group_id):
     Asynchronously makes the subqueries for a group and then aggregates them once the subqueries are finished.
     """
     _group, queries, _relation = get_saved_queries(course_id, group_id)
-    #wait for the queries to finish before proceeding
+    # wait for the queries to finish before proceeding
     make_subqueries.apply_async(args=(course_id, group_id, queries)).get()
-    queried_students = retrieve_grouped_query(course_id, group_id)
-    return queried_students
+    # forcing evaluation here because we will be deleting stuff afterward
+    subqueries_qs = GroupedTempQueryForSubquery.objects.filter(grouped_id=group_id).distinct().values_list('query',
+                                                                                                           flat=True)
+    if subqueries_qs:
+        queried_students = retrieve_grouped_query(course_id, group_id)
+        return queried_students
+    # return empty otherwise
+    return StudentsForQuery.objects.none()
 
 
 def retrieve_grouped_query(course_id, group_id):
     """
     For a grouped query where its subqueries have already been executed, return the students associated
+    To optimize this in the future, we can use the read-only DB instead after making sure all previous
+    data has been written
     """
     subqueries = GroupedTempQueryForSubquery.objects.filter(grouped_id=group_id).distinct()
     existing = []
     for sub in subqueries:
         existing.append(sub.query_id)
     student_info = make_existing_query(course_id, existing)
-    if student_info is None:
-        return None
+    if not student_info:
+        return StudentsForQuery.objects.none()
     students = student_info.distinct()
+    #forcing evaluation on students because we'll be deleting the intermediate queries
+    len(students)
+    subqueries_ids = subqueries.values_list('query', flat=True)
+    old_queries = TemporaryQuery.objects.filter(id__in=list(subqueries_ids))
+    saved_students = StudentsForQuery.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
+    saved_students.delete()
+    old_queries.delete()
     subqueries.delete()
     return students
 
@@ -124,11 +139,12 @@ def get_temp_queries(course_id):
 
 def purge_temporary_queries():
     """
-#Delete queries made more than TEMPORARY_QUERY_LIFETIME minutes ago along with the saved students from those queries
+    Delete queries made more than TEMPORARY_QUERY_LIFETIME minutes ago along with the saved students from those queries
+    Subsequently delete orphaned students in StudentForQuery
     """
     minutes_ago = datetime.datetime.now() - datetime.timedelta(minutes=TEMPORARY_QUERY_LIFETIME)
     old_queries = TemporaryQuery.objects.filter(created__lt=minutes_ago)
-    saved_students = StudentsForQuery.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
+    saved_students = StudentsForQuery.objects.exclude(query_id__in=old_queries.values_list(DatabaseFields.ID))
     saved_students.delete()
     old_queries.delete()
 

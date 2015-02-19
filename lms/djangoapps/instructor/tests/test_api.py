@@ -434,6 +434,9 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         saved_queries = self._get_saved_queries()
         self.assertEquals(len(saved_queries), 2)
         query_group = saved_queries[0]['group']
+        #purge these temporary queries to have a clean table
+        TemporaryQuery.objects.all().delete()
+        self.assertEquals(0, len(TemporaryQuery.objects.all()))
         students = get_group_query_students(self.course_key, query_group)
         correct_students = set()
         for student in [self.open_user, self.completed_user, self.not_opened_user]:
@@ -442,6 +445,32 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for student in students:
             check_students.add(student.profile.name)
         self.assertSetEqual(correct_students, check_students)
+        students_left = StudentsForQuery.objects.all()
+        queries_left = TemporaryQuery.objects.all()
+        self.assertEquals(len(students_left), 0)
+        self.assertEquals(len(queries_left), 0)
+
+    def test_get_group_query_no_delete(self):
+        """
+        Ensures that regular temp queries don't get deleted when making group queries
+        """
+
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        temp_ids = self._get_temp_query_ids()
+        self._save_query(temp_ids)
+        saved_queries = self._get_saved_queries()
+        self.assertEquals(len(saved_queries), 2)
+        query_group = saved_queries[0]['group']
+        queries_left = len(TemporaryQuery.objects.all())
+        students_left = len(StudentsForQuery.objects.all())
+        students = get_group_query_students(self.course_key, query_group)
+        correct_students = set([self.open_user, self.completed_user, self.not_opened_user])
+        check_students = set(list(students))
+        self.assertSetEqual(correct_students, check_students)
+        self.assertEquals(len(TemporaryQuery.objects.all()), queries_left)
+        self.assertEquals(len(StudentsForQuery.objects.all()), students_left)
+
 
     def test_purge(self):
         """
