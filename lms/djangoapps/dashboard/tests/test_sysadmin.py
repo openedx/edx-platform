@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import unittest
+from uuid import uuid4
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -30,6 +31,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
+from instructor_task.tests.factories import InstructorTaskFactory
 
 from xmodule.modulestore.tests.django_utils import xml_store_config
 TEST_DATA_XML_MODULESTORE = xml_store_config(TEST_DATA_DIR, ['empty'])
@@ -403,6 +405,95 @@ class TestSysadmin(SysadminBaseTestCase):
         response = self.client.get(reverse('sysadmin_staffing'))
         self.assertIn('edx4edx', response.content)
         self._rm_edx4edx()
+
+    def test_task_queue(self):
+        """Kill an InstructorTask"""
+
+        self._setstaff_login()
+        self.client.login(username=self.user.username, password='foo')
+
+        # Missing ID.
+        response = self.client.post(
+            reverse(
+                'sysadmin_task_queue'
+            ),
+            {
+                'action': 'kill_task',
+            }
+        )
+        self.assertIn('Must provide an ID', response.content.decode('utf-8'))
+
+        # ID not an integer.
+        response = self.client.post(
+            reverse(
+                'sysadmin_task_queue'
+            ),
+            {
+                'action': 'kill_task',
+                'row_id': 'abc',
+            }
+        )
+        self.assertIn('ID must be an integer', response.content.decode('utf-8'))
+
+        # InstructorTask with this ID doesn't exist.
+        response = self.client.post(
+            reverse(
+                'sysadmin_task_queue'
+            ),
+            {
+                'action': 'kill_task',
+                'row_id': '123',
+            }
+        )
+        self.assertIn('Cannot find task with ID 123 and task_state QUEUING - InstructorTask matching query does not exist.', response.content.decode('utf-8'))
+
+        # Create InstructorTask with incorrect task_state.
+        instructor_task = InstructorTaskFactory.create(
+            task_key='dummy value',
+            task_id=str(uuid4()),
+            task_state='SUCCESS',
+        )
+        response = self.client.post(
+            reverse(
+                'sysadmin_task_queue'
+            ),
+            {
+                'action': 'kill_task',
+                'row_id': instructor_task.id,
+            }
+        )
+        self.assertIn(
+            'Cannot find task with ID {instructor_task_id} and task_state QUEUING - InstructorTask matching query does not exist.'.format(
+                instructor_task_id=instructor_task.id,
+            ),
+            response.content.decode(
+                'utf-8',
+            )
+        )
+
+        # Create InstructorTask with correct task_state
+        instructor_task = InstructorTaskFactory.create(
+            task_key='dummy value',
+            task_id=str(uuid4()),
+            task_state='QUEUING',
+        )
+        response = self.client.post(
+            reverse(
+                'sysadmin_task_queue'
+            ),
+            {
+                'action': 'kill_task',
+                'row_id': instructor_task.id,
+            }
+        )
+        self.assertIn(
+            'Task with id {instructor_task_id} was successfully killed!'.format(
+                instructor_task_id=instructor_task.id,
+            ),
+            response.content.decode(
+                'utf-8',
+            )
+        )
 
 
 @override_settings(MONGODB_LOG=TEST_MONGODB_LOG)

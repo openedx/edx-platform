@@ -766,6 +766,10 @@ ADVANCED_COMPONENT_TYPES = [
     'notes',
 ]
 
+# XBlock types listed here will _always_ be selectable as Studio components
+XBLOCKS_ALWAYS_IN_STUDIO = [
+]
+
 # Specify xblocks that should be treated as advanced problems. Each entry is a tuple
 # specifying the xblock name and an optional YAML template to be used.
 ADVANCED_PROBLEM_TYPES = [
