@@ -68,7 +68,8 @@ site_status_msg = get_site_status_msg(course_id)
     <ol class="user">
       <li class="primary">
         <a href="${reverse('dashboard')}" class="user-link">
-          <img alt='${_("Dashboard for:")}' class="avatar" src="${settings.STATIC_URL}images/small-header-home-icon.png">
+          <i class="icon fa fa-home" aria-hidden="true"></i>
+          <span class="sr">${_("Dashboard for:")}</span>
           <div>
           ${user.username}
           </div>
