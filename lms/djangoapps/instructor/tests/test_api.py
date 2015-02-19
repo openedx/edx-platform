@@ -434,7 +434,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         saved_queries = self._get_saved_queries()
         self.assertEquals(len(saved_queries), 2)
         query_group = saved_queries[0]['group']
-        #purge these temporary queries to have a clean table
+        # purge these temporary queries to have a clean table
         TemporaryQuery.objects.all().delete()
         self.assertEquals(0, len(TemporaryQuery.objects.all()))
         students = get_group_query_students(self.course_key, query_group)
