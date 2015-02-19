@@ -17,8 +17,12 @@ Usage:
     above other modules in the dependency tree and acts like a global var.
     Then we can call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-        - LMS: Bulk emails and emails on enrollment
-        - CMS: Sending test email on enrollment
+        - LMS:
+            - Bulk email
+            - emails on enrollment
+            - course announcements
+        - CMS:
+            - Test emails on enrollment
 """
 
 from collections import namedtuple
