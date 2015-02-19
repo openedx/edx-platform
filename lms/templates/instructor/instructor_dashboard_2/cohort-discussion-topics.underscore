@@ -8,10 +8,11 @@
                 <li>
                     <input type="checkbox" class="discussion-topic" />
                     <label for="cohorts-state"><%- topic.name %></label>
-
-                    <% if (topic.is_cohorted) { %>
-                        - <%- gettext('COHORTED') %>
-                    <% } %>
+                    <span class="cohorted-text">
+                        <% if (topic.is_cohorted) { %>
+                            - <%- gettext('COHORTED') %>
+                        <% } %>
+                    </span>
                 </li>
             <% }); %>
         </ul>
