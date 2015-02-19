@@ -23,7 +23,7 @@ from verify_student.views import PayAndVerifyView
 <%block name="header_extras">
     <%
       template_names = (
-          ["webcam_photo", "error"] +
+          ["webcam_photo", "image_input", "error"] +
           [step['templateName'] for step in display_steps]
       )
     %>

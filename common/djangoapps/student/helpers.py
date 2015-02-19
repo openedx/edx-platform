@@ -153,7 +153,21 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
                     else:
                         status = VERIFY_STATUS_NEED_TO_VERIFY
                 else:
-                    status = VERIFY_STATUS_MISSED_DEADLINE
+                    # If a user currently has an active or pending verification,
+                    # then they may have submitted an additional attempt after
+                    # the verification deadline passed.  This can occur,
+                    # for example, when the support team asks a student
+                    # to reverify after the deadline so they can receive
+                    # a verified certificate.
+                    # In this case, we still want to show them as "verified"
+                    # on the dashboard.
+                    if has_active_or_pending:
+                        status = VERIFY_STATUS_APPROVED
+
+                    # Otherwise, the student missed the deadline, so show
+                    # them as "honor" (the kind of certificate they will receive).
+                    else:
+                        status = VERIFY_STATUS_MISSED_DEADLINE
 
             # Set the status for the course only if we're displaying some kind of message
             # Otherwise, leave the course out of the dictionary.

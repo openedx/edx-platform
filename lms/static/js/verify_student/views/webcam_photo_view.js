@@ -1,6 +1,6 @@
 /**
  * Interface for retrieving webcam photos.
- * Supports both HTML5 and Flash.
+ * Supports HTML5 and Flash.
  */
  var edx = edx || {};
 
@@ -13,8 +13,8 @@
 
         template: "#webcam_photo-tpl",
 
-        backends: [
-            {
+        backends: {
+            "html5": {
                 name: "html5",
 
                 initialize: function( obj ) {
@@ -24,18 +24,21 @@
                     this.stream = null;
 
                     // Start the capture
-                    this.getUserMediaFunc()(
-                        {
-                            video: true,
+                    var getUserMedia = this.getUserMediaFunc();
+                    if ( getUserMedia ) {
+                        getUserMedia(
+                            {
+                                video: true,
 
-                            // Specify the `fake` constraint if we detect we are running in a test
-                            // environment. In Chrome, this will do nothing, but in Firefox, it will
-                            // instruct the browser to use a fake video device.
-                            fake: window.location.hostname === 'localhost'
-                        },
-                        _.bind( this.getUserMediaCallback, this ),
-                        _.bind( this.handleVideoFailure, this )
-                    );
+                                // Specify the `fake` constraint if we detect we are running in a test
+                                // environment. In Chrome, this will do nothing, but in Firefox, it will
+                                // instruct the browser to use a fake video device.
+                                fake: window.location.hostname === 'localhost'
+                            },
+                            _.bind( this.getUserMediaCallback, this ),
+                            _.bind( this.handleVideoFailure, this )
+                        );
+                    }
                 },
 
                 isSupported: function() {
@@ -98,15 +101,13 @@
                 }
             },
 
-            {
+            "flash": {
+
                 name: "flash",
 
                 initialize: function( obj ) {
                     this.wrapper = obj.wrapper || "";
                     this.imageData = "";
-
-                    // Replace the camera section with the flash object
-                    $( this.wrapper ).html( this.flashObjectTag() );
 
                     // Wait for the player to load, then verify camera support
                     // Trigger an error if no camera is available.
@@ -203,36 +204,26 @@
                     // so we don't need to keep checking.
                 }
             }
-        ],
+        },
 
         initialize: function( obj ) {
             this.submitButton = obj.submitButton || "";
             this.modelAttribute = obj.modelAttribute || "";
             this.errorModel = obj.errorModel || null;
-            this.backend = _.find(
-                obj.backends || this.backends,
-                function( backend ) {
-                    return backend.isSupported();
-                }
-            );
+            this.backend = this.backends[obj.backendName] || obj.backend;
 
-            if ( !this.backend ) {
-                this.handleError(
-                    gettext( "Flash Not Detected" ),
-                    gettext( "You don't seem to have Flash installed." ) + "  " +
-                    _.sprintf(
-                        gettext( "%(a_start)s Get Flash %(a_end)s to continue your enrollment." ),
-                        {
-                            a_start: '<a rel="external" href="http://get.adobe.com/flashplayer/">',
-                            a_end: '</a>'
-                        }
-                    )
-                );
-            }
-            else {
-                _.extend( this.backend, Backbone.Events );
-                this.listenTo( this.backend, 'error', this.handleError );
-            }
+            this.backend.initialize({
+                wrapper: "#camera",
+                video: '#photo_id_video',
+                canvas: '#photo_id_canvas'
+            });
+
+            _.extend( this.backend, Backbone.Events );
+            this.listenTo( this.backend, 'error', this.handleError );
+        },
+
+        isSupported: function() {
+            return this.backend.isSupported();
         },
 
         render: function() {
@@ -242,26 +233,18 @@
             this.setSubmitButtonEnabled( false );
 
             // Load the template for the webcam into the DOM
-            renderedHtml = _.template( $( this.template ).html(), {} );
+            renderedHtml = _.template(
+                $( this.template ).html(),
+                { backendName: this.backend.name }
+            );
             $( this.el ).html( renderedHtml );
 
-            // Initialize the video capture backend
-            // We need to do this after rendering the template
-            // so that the backend has the opportunity to modify the DOM.
-            if ( this.backend ) {
-                this.backend.initialize({
-                    wrapper: "#camera",
-                    video: '#photo_id_video',
-                    canvas: '#photo_id_canvas'
-                });
+            // Install event handlers
+            $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
+            $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
 
-                // Install event handlers
-                $( "#webcam_reset_button", this.el ).on( 'click', _.bind( this.reset, this ) );
-                $( "#webcam_capture_button", this.el ).on( 'click', _.bind( this.capture, this ) );
-
-                // Show the capture button
-                $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
-            }
+            // Show the capture button
+            $( "#webcam_capture_button", this.el ).removeClass('is-hidden');
 
             return this;
         },
@@ -324,5 +307,39 @@
                 .attr('aria-disabled', !isEnabled);
         }
     });
+
+    /**
+     * Retrieve a supported webcam view implementation.
+     *
+     * The priority order from most to least preferable is:
+     * 1) HTML5
+     * 2) Flash
+     * 3) File input
+     *
+     * @param  {Object} obj Parameters to the webcam view.
+     * @return {Object}     A Backbone view.
+     */
+    edx.verify_student.getSupportedWebcamView = function( obj ) {
+        var view = null;
+
+        // First choice is HTML5, supported by most web browsers
+        obj.backendName = "html5";
+        view = new edx.verify_student.WebcamPhotoView( obj );
+        if ( view.isSupported() ) {
+            return view;
+        }
+
+        // Second choice is Flash, required for older versions of IE
+        obj.backendName = "flash";
+        view = new edx.verify_student.WebcamPhotoView( obj );
+        if ( view.isSupported() ) {
+            return view;
+        }
+
+        // Last resort is HTML file input with image capture.
+        // This will work everywhere, and on iOS it will
+        // allow users to take a photo with the camera.
+        return new edx.verify_student.ImageInputView( obj );
+    };
 
  })( jQuery, _, Backbone, gettext );
