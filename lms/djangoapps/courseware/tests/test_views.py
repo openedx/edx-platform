@@ -370,13 +370,17 @@ class ViewsTestCase(ModuleStoreTestCase):
         # in the label escaped as expected.
         self._email_opt_in_checkbox(response, cgi.escape(self.org_html))
 
-    @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': True})
+    @patch.dict(settings.FEATURES, {
+        'IS_EDX_DOMAIN': True,
+        'ENABLE_MKTG_EMAIL_OPT_IN': True
+    })
     def test_mktg_about_language_edx_domain(self):
         # Since we're in an edx-controlled domain, and our marketing site
         # supports only English, override the language setting
         # and use English.
-        response = self._load_mktg_about(language='eo')
+        response = self._load_mktg_about(language='eo', org=self.org_html)
         self.assertContains(response, "Enroll in")
+        self.assertContains(response, "and learn about its other programs")
 
     @patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': False})
     def test_mktg_about_language_openedx(self):
