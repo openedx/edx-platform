@@ -2190,12 +2190,6 @@ class ChoiceTextResponseTest(ResponseTest):
         with self.assertRaises(Exception):
             self.build_problem(type="invalidtextgroup")
 
-    def test_valid_xml(self):
-        """
-        Test that `build_problem` builds valid xml
-        """
-        self.build_problem()
-
     def test_unchecked_input_not_validated(self):
         """
         Test that a student can have a non numeric answer in an unselected
