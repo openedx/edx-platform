@@ -32,6 +32,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives, get_connection
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from bulk_email.models import (
     CourseEmail, Optout, CourseEmailTemplate,
@@ -92,47 +93,39 @@ BULK_EMAIL_FAILURE_ERRORS = (
 )
 
 
-def _get_recipient_queryset(user_id, to_option, course_id, course_location):
+def _get_recipient_queryset(user_id, to_option, course_id):
     """
-    Returns a query set of email recipients corresponding to the requested to_option category.
+    Returns query set of unique email recipients even if they are present in
+    more than one category (e.g. enrolled in the course and are staff or self)
+    corresponding to the requested "to_option" category.
 
-    `to_option` is either SEND_TO_MYSELF, SEND_TO_STAFF, or SEND_TO_ALL.
-
-    Recipients who are in more than one category (e.g. enrolled in the course and are staff or self)
-    will be properly deduped.
+    :param user_id: the user id to get the username of
+    :param to_option: Bulk email to_options [SEND_TO_MYSELF, SEND_TO_STAFF SEND_TO_ALL]
+    :param course_id: CourseLocator of the course we are interested in
     """
     if to_option not in TO_OPTIONS:
         log.error("Unexpected bulk email TO_OPTION found: %s", to_option)
         raise Exception("Unexpected bulk email TO_OPTION found: {0}".format(to_option))
 
     if to_option == SEND_TO_MYSELF:
-        recipient_qset = User.objects.filter(id=user_id)
+        recipient_queryset = User.objects.filter(id=user_id)
     else:
-        staff_qset = CourseStaffRole(course_id).users_with_role()
-        instructor_qset = CourseInstructorRole(course_id).users_with_role()
-        recipient_qset = (staff_qset | instructor_qset).distinct()
+        staff_queryset = CourseStaffRole(course_id).users_with_role()
+        instructor_queryset = CourseInstructorRole(course_id).users_with_role()
+
+        # Select users which are staff/instructor of the course
+        recipient_queryset = (staff_queryset | instructor_queryset).distinct()
         if to_option == SEND_TO_ALL:
-            # We also require students to have activated their accounts to
-            # provide verification that the provided email address is valid.
-            enrollment_qset = User.objects.filter(
-                is_active=True,
-                courseenrollment__course_id=course_id,
-                courseenrollment__is_active=True
-            )
-            # Now we do some queryset sidestepping to avoid doing a DISTINCT
-            # query across the course staff and the enrolled students, which
-            # forces the creation of a temporary table in the db.
-            unenrolled_staff_qset = recipient_qset.exclude(
-                courseenrollment__course_id=course_id, courseenrollment__is_active=True
-            )
-            # use read_replica if available:
-            unenrolled_staff_qset = use_read_replica_if_available(unenrolled_staff_qset)
+            # Select users which are staff/instructor of the course or students
+            # of this course which have activated their accounts to verify that
+            # their provided email addresses are valid
+            recipient_queryset = User.objects.filter(
+                Q(is_active=True, courseenrollment__course_id=course_id, courseenrollment__is_active=True) |
+                Q(id__in=recipient_queryset.values_list('id', flat=True))
+            ).distinct()
 
-            unenrolled_staff_ids = [user.id for user in unenrolled_staff_qset]
-            recipient_qset = enrollment_qset | User.objects.filter(id__in=unenrolled_staff_ids)
-
-    # again, use read_replica if available to lighten the load for large queries
-    return use_read_replica_if_available(recipient_qset)
+    # use read_replica if available to lighten the load for large queries
+    return use_read_replica_if_available(recipient_queryset)
 
 
 def _get_course_email_context(course):
@@ -230,7 +223,7 @@ def perform_delegate_email_batches(entry_id, course_id, task_input, action_name)
         )
         return new_subtask
 
-    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id, course.location)
+    recipient_qset = _get_recipient_queryset(user_id, to_option, course_id)
     recipient_fields = ['profile__name', 'email']
 
     log.info(u"Task %s: Preparing to queue subtasks for sending emails for course %s, email %s, to_option %s",
