@@ -67,6 +67,7 @@
             "ova": 'js/vendor/ova/ova',
             "catch": 'js/vendor/ova/catch/js/catch',
             "handlebars": 'js/vendor/ova/catch/js/handlebars-1.1.2',
+            "mathjax": 'https://cdn.mathjax.org/mathjax/2.4-latest/MathJax.js?config=TeX-MML-AM_HTMLorMML-full'
             // end of files needed by OVA
         },
         shim: {
