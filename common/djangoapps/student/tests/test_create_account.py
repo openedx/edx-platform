@@ -14,6 +14,7 @@ import mock
 
 from openedx.core.djangoapps.user_api.models import UserPreference
 from lang_pref import LANGUAGE_KEY
+from notification_prefs import NOTIFICATION_PREF_KEY
 
 from edxmako.tests import mako_middleware_process_request
 from external_auth.models import ExternalAuthMap
@@ -50,8 +51,8 @@ class TestCreateAccount(TestCase):
     @ddt.data("en", "eo")
     def test_header_lang_pref_saved(self, lang):
         response = self.client.post(self.url, self.params, HTTP_ACCEPT_LANGUAGE=lang)
-        self.assertEqual(response.status_code, 200)
         user = User.objects.get(username=self.username)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(UserPreference.get_preference(user, LANGUAGE_KEY), lang)
 
     def base_extauth_bypass_sending_activation_email(self, bypass_activation_email_for_extauth_setting):
@@ -97,6 +98,18 @@ class TestCreateAccount(TestCase):
         settings.FEATURES['BYPASS_ACTIVATION_EMAIL_FOR_EXTAUTH']=False and doing external auth
         """
         self.base_extauth_bypass_sending_activation_email(False)
+
+    @ddt.data(True, False)
+    def test_discussions_email_digest_pref(self, digest_enabled):
+        with mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_EMAIL_DIGEST": digest_enabled}):
+            response = self.client.post(self.url, self.params)
+            self.assertEqual(response.status_code, 200)
+            user = User.objects.get(username=self.username)
+            preference = UserPreference.get_preference(user, NOTIFICATION_PREF_KEY)
+            if digest_enabled:
+                self.assertIsNotNone(preference)
+            else:
+                self.assertIsNone(preference)
 
 
 @mock.patch.dict("student.models.settings.FEATURES", {"ENABLE_DISCUSSION_SERVICE": True})
