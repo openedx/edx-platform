@@ -61,7 +61,7 @@ git clean -qxfd
 source scripts/jenkins-common.sh
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=6300
+PYLINT_THRESHOLD=6100
 PEP8_THRESHOLD=0
 
 # If the environment variable 'SHARD' is not set, default to 'all'.

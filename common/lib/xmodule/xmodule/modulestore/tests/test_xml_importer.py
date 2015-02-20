@@ -28,7 +28,7 @@ class ModuleStoreNoSettings(unittest.TestCase):
     COLLECTION = 'modulestore'
     FS_ROOT = DATA_DIR
     DEFAULT_CLASS = 'xmodule.modulestore.tests.test_xml_importer.StubXBlock'
-    RENDER_TEMPLATE = lambda t_n, d, ctx = None, nsp = 'main': ''
+    RENDER_TEMPLATE = lambda t_n, d, ctx=None, nsp='main': ''
 
     modulestore_options = {
         'default_class': DEFAULT_CLASS,
