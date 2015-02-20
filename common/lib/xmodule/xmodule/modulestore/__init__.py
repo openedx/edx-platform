@@ -777,10 +777,8 @@ class ModuleStoreRead(ModuleStoreAssetBase):
 
         for key, criteria in qualifiers.iteritems():
             is_set, value = _is_set_on(key)
-
             if isinstance(criteria, dict) and '$exists' in criteria and criteria['$exists'] == is_set:
                 continue
-
             if not is_set:
                 return False
             if not self._value_matches(value, criteria):

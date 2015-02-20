@@ -167,8 +167,11 @@ class GroupConfiguration(object):
         return self.find_css('.actions .delete.is-disabled').present
 
     @property
-    def delete_button_is_absent(self):
-        return not self.find_css('.actions .delete').present
+    def delete_button_is_present(self):
+        """
+        Returns whether or not the delete icon is present.
+        """
+        return self.find_css('.actions .delete').present
 
     def delete(self):
         """
