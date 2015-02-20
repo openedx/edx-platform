@@ -119,7 +119,8 @@ Feature: LMS.Answer problems
         #| string            | incorrect     | never           |
         | numerical         | incorrect     | never           |
         | formula           | incorrect     | never           |
-        | script            | incorrect     | never           |
+        # TE-572 failing intermittently
+        #| script            | incorrect     | never           |
         | radio_text        | incorrect     | never           |
         | checkbox_text     | incorrect     | never           |
         | image             | incorrect     | never           |
