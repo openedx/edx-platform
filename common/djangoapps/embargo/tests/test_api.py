@@ -166,6 +166,16 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         with self.assertNumQueries(0):
             embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
+    def test_caching_no_restricted_courses(self):
+        RestrictedCourse.objects.all().delete()
+        cache.clear()
+
+        with self.assertNumQueries(1):
+            embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+
+        with self.assertNumQueries(0):
+            embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
+
 
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
