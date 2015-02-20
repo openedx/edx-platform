@@ -91,6 +91,24 @@ textarea {
     </div>
 
 	<hr />
+	<ul class="list-input">
+	  <li class="field text">
+	    <label for="username_old">${_('Old Username')}</label>
+	    <input type="text" name="username_old" size=40 />
+	  </li>
+	  <li class="field text">
+	    <label for="username_new">${_('New Username')}</label>
+	    <input type="text" name="username_new" size=40 />
+	  </li>
+	</ul>
+
+	<div class="form-actions">
+	  <p>
+	    <button type="submit" name="action" value="rename_user">${_('Rename user')}</button>
+	  </p>
+	</div>
+
+	<hr />
     <p>
       <button type="submit" name="action" value="download_users" style="width: 350px;">
 		${_('Download list of all users (csv file)')}

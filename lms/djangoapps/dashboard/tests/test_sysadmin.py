@@ -7,6 +7,8 @@ import re
 import shutil
 import unittest
 from uuid import uuid4
+from mock import patch
+from pymongo.errors import PyMongoError
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
@@ -161,6 +163,86 @@ class TestSysadmin(SysadminBaseTestCase):
 
         response = self.client.get(reverse('gitlogs'))
         self.assertTrue(response.status_code, 200)
+
+    def test_rename_user(self):
+        """
+        Tests the rename user feature
+        """
+        self._setstaff_login()
+        self.client.login(username=self.user.username, password='foo')
+
+        user1 = UserFactory.create(
+            username='test_rename_user',
+            email='test_rename_user@edx.org',
+            password='foo',
+        )
+        user2 = UserFactory.create(
+            username=user1.username + '_second',
+            email=user1.username + '_second@edx.org',
+            password='foo',
+        )
+
+        username_new = 'targetName'
+        username_nonexistent = 'notFoundName'
+
+        # ensures that the test database doesn't have a user with username `notFoundName`
+        self.assertEqual(0, len(User.objects.filter(
+            username=username_nonexistent,
+        )))
+
+        # tests response when one field is blank
+        response = self.client.post(reverse('sysadmin'), {
+            'action': 'rename_user',
+            'username_old': '',
+            'username_new': username_new,
+        })
+        self.assertIn("Usernames cannot be blank", response.content.decode('utf-8'))
+
+        # tests response when user is not found
+        response = self.client.post(reverse('sysadmin'), {
+            'action': 'rename_user',
+            'username_old': username_nonexistent,
+            'username_new': username_new,
+        })
+        self.assertIn("User '{user}' does not exist".format(
+            user=username_nonexistent,
+        ), response.content.decode('utf-8'))
+
+        # tests response when rename fails due to integrity error
+        response = self.client.post(reverse('sysadmin'), {
+            'action': 'rename_user',
+            'username_old': user1.username,
+            'username_new': user2.username,
+        })
+        self.assertIn("User '{user}' already exists".format(
+            user=user2.username,
+        ), response.content.decode('utf-8'))
+
+        # tests response when rename is successful
+        response = self.client.post(reverse('sysadmin'), {
+            'action': 'rename_user',
+            'username_old': user1.username,
+            'username_new': username_new,
+        })
+        self.assertIn("Changed username of user '{user}'".format(
+            user=user1.username,
+        ), response.content.decode('utf-8'))
+
+        # tests response when PyMongoError is raised
+        with patch('dashboard.sysadmin.rename_user_util') as mock_rename_user_util:
+            mock_rename_user_util.side_effect = PyMongoError()
+            response = self.client.post(reverse('sysadmin'), {
+                'action': 'rename_user',
+                'username_old': user1.username,
+                'username_new': user2.username,
+            })
+        self.assertIn("Failed to modify username for user '{user}'".format(
+            user=user1.username,
+        ), response.content.decode('utf-8'))
+
+        # cleanup users
+        user1.delete()
+        user2.delete()
 
     def test_user_mod(self):
         """Create and delete a user"""
