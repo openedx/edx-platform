@@ -151,28 +151,37 @@
   </ul>
 </div>
 % if cdn_eval;
-<script>
-  function sendMetricToGraphite(metricName, value) {
-    var apiKey = YOUR-API-KEY;
-    var url = "https://" + apiKey + "@www.hostedgraphite.com/api/v1/sink";
-    var request = new XMLHttpRequest();
-    request.open("POST", url, true);
-    request.send(metricName + " " + value);
-  };
-  var sampleRate = 1.0;
-  var experimentBranch = false;
-  // TODO: replace with hardcoded video url.
-  var videoURLs = ["http://cloudfront/video.mp4", "http://netease/video.mp4", "http://xuetang/video.mp4"];
-  if (Math.random() > 1e-6 // due to a bug in Chrome 30
-       && Math.random() <= sampleRate) {
-    experimentBranch = Math.floor(Math.random() * 3);
-  }
-  var timeInit = Date.now();
-  movie.addEventListener('canplaythrough', function() {
-    var timeElapsed = Date.now() - timeInit;
-    // if experimentBranch !== false, send a beacon back containing timeElapsed and experimentBranch.
-    sendMetricToGraphite("loadtime_" + experimentBranch, timeElapsed);
-  });
-  movie.src = videoURLs[experimentBranch || 0];
-</script>
+    <script>
+        function sendMetricToGraphite(metricName, value) {
+            // TODO: add real API Key
+            var apiKey = YOUR-API-KEY;
+            var url = "https://" + apiKey + "@www.hostedgraphite.com/api/v1/sink";
+            var request = new XMLHttpRequest();
+            request.open("POST", url, true);  // send asynchronously
+            request.send(metricName + " " + value);
+        };
+
+        var movie = document.getElementById("vid1");
+        var experimentBranch = false;
+        var sampleRate = 1.0;
+        // TODO: replace with hardcoded video urls
+        var videoURLs = ["http://cloudfront/video.mp4", "http://netease/video.mp4", "http://xuetang/video.mp4"];
+
+        if (Math.random() > 1e-6 // due to a bug in Chrome 30
+            && Math.random() <= sampleRate) {
+            experimentBranch = Math.floor(Math.random() * 3);
+        }
+
+        movie.src = videoURLs[experimentBranch || 0];
+
+        var timeInit = Date.now();
+
+        movie.addEventListener("canplaythrough", function() {
+            var timeElapsed = Date.now() - timeInit;
+            // if sampled, send a beacon back containing timeElapsed and experimentBranch.
+            if experimentBranch !== false {
+                sendMetricToGraphite("loadtime_" + experimentBranch, timeElapsed);
+            {
+        });
+    </script>
 % endif;
