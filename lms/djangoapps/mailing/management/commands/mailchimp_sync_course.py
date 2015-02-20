@@ -58,12 +58,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         key, list_id, course_id, nsegments = self.parse_options(options)
 
-        log.info('Syncronizing email list for {0}'.format(course_id))
+        log.info('Syncronizing email list for %s', course_id)
 
         mailchimp = connect_mailchimp(key)
-
-        # if not verify_list(mailchimp, list_id, course_id):
-        #     raise CommandError('course_id does not match list name')
 
         subscribed = get_subscribed(mailchimp, list_id)
         unsubscribed = get_unsubscribed(mailchimp, list_id)
