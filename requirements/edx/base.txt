@@ -149,3 +149,6 @@ testtools==0.9.34
 
 # Used for Segment.io analytics
 analytics-python==0.4.4
+
+# Needed for mailchimp(mailing djangoapp)
+mailsnake==1.6.2

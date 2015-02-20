@@ -1722,6 +1722,9 @@ INSTALLED_APPS = (
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
 
+    # Mailchimp Syncing
+    'mailing',
+
     # CORS and cross-domain CSRF
     'corsheaders',
     'cors_csrf',
