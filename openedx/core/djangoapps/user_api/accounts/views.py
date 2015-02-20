@@ -10,6 +10,7 @@ from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
+from rest_framework import status
 
 
 class AccountView(APIView):
@@ -78,11 +79,21 @@ class AccountView(APIView):
         """
         existing_user, existing_user_profile = self._get_user_and_profile(username)
 
-        user_serializer = AccountUserSerializer(existing_user, data=request.DATA)
+        # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
+        update = request.DATA
+        read_only_fields = set(update.keys()).intersection(
+            AccountUserSerializer.Meta.read_only_fields + AccountLegacyProfileSerializer.Meta.read_only_fields
+        )
+        if read_only_fields:
+            response_data = {}
+            response_data['message'] = "The following fields are not editable: " + ", ".join(str(e) for e in read_only_fields)
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+        user_serializer = AccountUserSerializer(existing_user, data=update)
         user_serializer.is_valid()
         user_serializer.save()
 
-        legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=request.DATA)
+        legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
         legacy_profile_serializer.is_valid()
         legacy_profile_serializer.save()
 
