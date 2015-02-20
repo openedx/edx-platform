@@ -16,6 +16,16 @@ class StudentQuery(object):
         self.entity_name = entity_name
 
 
+class QueryOrigin:
+    """
+    Where a query issued originated
+    """
+    EMAIL = "EMAIL"
+    WIDGET = "WIDGET"
+
+QUERYORIGIN_MAP = {QueryOrigin.EMAIL: 'E',
+                   QueryOrigin.WIDGET: 'W'}
+
 class Inclusion:
     """
     Options for combining queries

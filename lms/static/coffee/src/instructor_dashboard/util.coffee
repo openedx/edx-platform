@@ -303,7 +303,13 @@ class PendingInstructorTasks
 class KeywordValidator
 
     @keyword_regex = /%%+[^%]+%%/g
-    @keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%']
+    @keywords = [
+      '%%USER_ID%%',
+      '%%USER_FULLNAME%%',
+      '%%COURSE_DISPLAY_NAME%%',
+      '%%COURSE_START_DATE%%',
+      '%%COURSE_END_DATE%%'
+    ]
 
     @validate_string: (string) =>
       regex_match = string.match(@keyword_regex)

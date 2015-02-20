@@ -1928,6 +1928,16 @@ ADVANCED_SECURITY_CONFIG = {}
 SHIBBOLETH_DOMAIN_PREFIX = 'shib:'
 OPENID_DOMAIN_PREFIX = 'openid:'
 
+### SHIB
+# For SHIB backup register and login URLs
+SHIB_ONLY_SITE = False
+# Mapping of hosts to a list of safe redirect domains from that host (not including itself)
+# For example:
+# SHIB_REDIRECT_DOMAIN_WHITELIST = {
+#    'suclass.stanford.edu': ['studio.suclass.stanford.edu']
+# }
+SHIB_REDIRECT_DOMAIN_WHITELIST = {}
+
 ### Analytics Data API + Dashboard (Insights) settings
 ANALYTICS_DATA_URL = ""
 ANALYTICS_DATA_TOKEN = ""
@@ -1962,9 +1972,14 @@ COURSE_CATALOG_VISIBILITY_PERMISSION = 'see_exists'
 # visible. We default this to the legacy permission 'see_exists'.
 COURSE_ABOUT_VISIBILITY_PERMISSION = 'see_exists'
 
-# Analytics Data API Client settings
-ANALYTICS_SERVER_URL = ''
-ANALYTICS_API_KEY = ''
-
 # Metrics tab data source setting
 MAX_ENROLLEES_FOR_METRICS_USING_DB = 100
+
+# MONGO Connection parameters for the forum servers.  Bypassing cs_comment_client
+FORUM_MONGO_PARAMS = {
+    'host': 'localhost',
+    'port': 27017,
+    'password': '',
+    'user': '',
+    'database': 'forum',
+}

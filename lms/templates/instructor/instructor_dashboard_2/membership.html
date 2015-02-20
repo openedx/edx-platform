@@ -252,6 +252,7 @@
   %endif
 </div>
 
+<hr class="divider" />
 
 <div
     class="email-lists-management"
@@ -266,14 +267,13 @@
     <div class="header">
         <h2 class="title">${_("Email Distribution")}</h2>
     </div>
-    <label for="beginning_specific">
+    <div>
         ${_("Select criteria on which to generate a list of student emails. "
         "Please clear the active queries or load your saved work if you "
         "are inactive for more than 15 minutes, otherwise queries might "
         "be inaccurate. If the status gets stuck at 'working' for a long "
         "time, you may come back to the page later.")}
-
-    </label>
+    </div>
     <div class="email-list">
         <div class="email-list-container"
              data-label="${_("Inclusion")}"
@@ -366,7 +366,7 @@
         <div>${_("NOT, Problem 3, Opened")}</div>
         <div>${_("OR, Problem 2, Not Opened")}</div>
         <div>${_("Returns: Students who have opened Problem 1 and not completed Problem 2, but have not opened Problem"
-            " 3 in addition to students who have not opened Problem 4")}<br/><br/>
+            " 3 in addition to students who have not opened Problem 2")}<br/><br/>
             ${_("The intersection of <i>AND</i> queries is taken.")}<br/>
             ${_("The union of <i>NOT</i> queries is taken")} <br/>
             ${_("The union of <i>OR</i> queries is taken")} <br/>

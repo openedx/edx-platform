@@ -9,6 +9,7 @@ Supported:
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
+        - %%COURSE_START_DATE%% => start date of the course
         - %%COURSE_END_DATE%% => end date of the course
 
 Usage:
@@ -16,13 +17,20 @@ Usage:
     above other modules in the dependency tree and acts like a global var.
     Then we can call substitute_keywords_with_data where substitution is
     needed. Currently called in:
-        - LMS: Bulk emails and emails on enrollment
-        - CMS: Sending test email on enrollment
+        - LMS:
+            - Bulk email
+            - emails on enrollment
+            - course announcements
+        - CMS:
+            - Test emails on enrollment
 """
+
+from collections import namedtuple
 
 from django.contrib.auth.models import User
 from xmodule.modulestore.django import modulestore
 
+Keyword = namedtuple('Keyword', 'func desc')
 KEYWORD_FUNCTION_MAP = {}
 
 
@@ -57,9 +65,9 @@ def substitute_keywords(string, user=None, course=None):
         # Cannot proceed without course and user information
         return string
 
-    for key, func in KEYWORD_FUNCTION_MAP.iteritems():
+    for key, value in KEYWORD_FUNCTION_MAP.iteritems():
         if key in string:
-            substitutor = func(user, course)
+            substitutor = value.func(user, course)
             string = string.replace(key, substitutor)
 
     return string

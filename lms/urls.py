@@ -78,6 +78,12 @@ urlpatterns = ('',  # nopep8
 
 )
 
+if settings.SHIB_ONLY_SITE:
+    urlpatterns += (
+        url(r'^backup_login$', 'student.views.signin_user', name="backup_signin_user"),
+        url(r'^backup_register$', 'student.views.register_user', name="backup_register_user"),
+    )
+
 if settings.FEATURES["ENABLE_MOBILE_REST_API"]:
     urlpatterns += (
         url(r'^api/mobile/v0.5/', include('mobile_api.urls')),

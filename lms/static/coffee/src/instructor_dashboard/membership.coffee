@@ -146,7 +146,7 @@ class AuthListWidget extends MemberListWidget
       data: rolename: @rolename
       success: (data) => cb? null, data[@rolename]
       error: std_ajax_err =>
-        `// Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".`
+        # Translators: A rolename appears this sentence. A rolename is something like "staff" or "beta tester".
         cb? gettext("Error fetching list for role") + " '#{@rolename}'"
 
   # send ajax request to modify access
@@ -350,24 +350,24 @@ class BetaTesterBulkAddition
       @$task_response.append task_res_section
 
     if successes.length and data_from_server.action is 'add'
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("These users were successfully added as beta testers:"), (sr.identifier for sr in successes)
 
     if successes.length and data_from_server.action is 'remove'
-      `// Translators: A list of users appears after this sentence`
+      #Translators: A list of users appears after this sentence
       render_list gettext("These users were successfully removed as beta testers:"), (sr.identifier for sr in successes)
 
     if errors.length and data_from_server.action is 'add'
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("These users were not added as beta testers:"), (sr.identifier for sr in errors)
 
     if errors.length and data_from_server.action is 'remove'
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("These users were not removed as beta testers:"), (sr.identifier for sr in errors)
 
     if no_users.length
       no_users.push $ gettext("Users must create and activate their account before they can be promoted to beta tester.")
-      `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
+      # Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence
       render_list gettext("Could not find users associated with the following identifiers:"), (sr.identifier for sr in no_users)
 
 # Wrapper for the batch enrollment subsection.
@@ -523,45 +523,45 @@ class BatchEnrollment
       render_list gettext("Successfully enrolled and sent email to the following users:"), (sr.identifier for sr in enrolled)
 
     if enrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("Successfully enrolled the following users:"), (sr.identifier for sr in enrolled)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:"),
         (sr.identifier for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("These users will be allowed to enroll once they register:"),
         (sr.identifier for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("Successfully sent enrollment emails to the following users. They will be enrolled once they register:"),
         (sr.identifier for sr in autoenrolled)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("These users will be enrolled once they register:"),
         (sr.identifier for sr in autoenrolled)
 
     if notenrolled.length and emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("Emails successfully sent. The following users are no longer enrolled in the course:"),
         (sr.identifier for sr in notenrolled)
 
     if notenrolled.length and not emailStudents
-      `// Translators: A list of users appears after this sentence`
+      # Translators: A list of users appears after this sentence
       render_list gettext("The following users are no longer enrolled in the course:"),
         (sr.identifier for sr in notenrolled)
 
     if notunenrolled.length
-      `// Translators: A list of users appears after this sentence. This situation arises when a staff member tries to unenroll a user who is not currently enrolled in this course.`
+      # Translators: A list of users appears after this sentence. This situation arises when a staff member tries to unenroll a user who is not currently enrolled in this course.
       render_list gettext("These users were not affiliated with the course so could not be unenrolled:"),
         (sr.identifier for sr in notunenrolled)
 
@@ -768,22 +768,22 @@ class EmailWidget
     for emailList in emailLists
       emailList.$container.addClass('active')
 
-    @$getEstBtn = $section.find("input[name='getest']'")
+    @$getEstBtn = $section.find("input[name='getest']")
     @$getEstBtn.click () =>
       @reload_estimated()
 
-    @$startoverBtn = $section.find("input[name='startover']'")
+    @$startoverBtn = $section.find("input[name='startover']")
     @$startoverBtn.click () =>
       @delete_temporary()
       $('.emailWidget.queryTableBody tr').remove()
       @reload_estimated()
 
-    @$saveQueryBtn = $section.find("input[name='savequery']'")
+    @$saveQueryBtn = $section.find("input[name='savequery']")
     @$saveQueryBtn.click () =>
       @send_save_query()
 
-    @$emailCsvBtn = $section.find("input[name='getcsv']'")
-    @$emailCsvBtn.click () =>
+    @$emailCsvBtn = $section.find("input[name='getcsv']")
+    @$emailCsvBtn.click (event) =>
       rows = $('.emailWidget.queryTableBody tr')
       sendingQuery = _.map (rows), (row) =>
           row.getAttribute('query')
@@ -805,7 +805,7 @@ class EmailWidget
     )
     poller.start()
 
-    $('.emailWidget.addQuery').click =>
+    $('.emailWidget.addQuery').click (event) =>
       $selected = @$emailListContainers.find('select.single-email-selector option:selected')
         #.children('option:selected')
       # check to see if stuff has been filled out
@@ -929,8 +929,8 @@ class EmailWidget
         time = ''
         for query in savedQs
           cells = query.children
-          types.push(cells[0].innerText)
-          names.push(cells[2].innerText)
+          types.push(jQuery(cells[0]).text())
+          names.push(jQuery(cells[2]).text())
           time = query.getAttribute('created')
         savedQueryDisplayName = ''
         for i in [0..types.length-1]
@@ -982,7 +982,7 @@ class EmailWidget
         cell.id = item['id']
     $loadBtn = $ _.template('<div class="loadQuery"><i class="icon-upload">
       </i> <%= label %></div>', {label: 'Load'})
-    $loadBtn.click =>
+    $loadBtn.click (event) =>
       @delete_temporary()
       $('.emailWidget.queryTableBody tr').remove()
       targ = event.target
@@ -995,14 +995,14 @@ class EmailWidget
       rowsToAdd = $('.saved' + groupedQueryId)
       for row in rowsToAdd
         cells = row.children
-        savedQueryOptions = [{'text':cells[0].innerText},
-                {'text':cells[1].innerText},
-                {'text':cells[2].innerText, 'id':cells[2].id},
-                {'text':cells[3].innerText}]
+        savedQueryOptions = [{'text': jQuery(cells[0]).text()},
+                {'text': jQuery(cells[1]).text()},
+                {'text': jQuery(cells[2]).text(), 'id':cells[2].id},
+                {'text': jQuery(cells[3]).text()}]
 
-        savedQueryOptionsText = [cells[0].innerText, cells[1].innerText,
-                     cells[2].innerText, cells[3].innerText]
-        @tr = @start_row(cells[0].innerText.toLowerCase(),
+        savedQueryOptionsText = [jQuery(cells[0]).text(), jQuery(cells[1]).text(),
+                     jQuery(cells[2]).text(), jQuery(cells[3]).text()]
+        @tr = @start_row( jQuery(cells[0]).text().toLowerCase(),
           savedQueryOptions,'', $('.emailWidget.queryTableBody'))
         # todo:this feels too hacky. suggestions?
         @useQueryEndpoint = [
@@ -1022,7 +1022,8 @@ class EmailWidget
     row.appendChild($td[0])
     $deleteBtn = $(_.template('<div class="deleteSaved">
       <i class="icon-remove-sign"></i> <%= label %></div>', {label: 'Delete'}))
-    $deleteBtn.click =>
+
+    $deleteBtn.click (event) =>
       targ = event.target
       while (!targ.classList.contains('deleteSaved'))
         targ = targ.parentNode
@@ -1162,7 +1163,7 @@ class EmailWidget
         progressCell.innerHTML = $progress_icon[0].outerHTML
     $removeBtn = $(_.template('<div class="remove"><i class="icon-remove-sign">
       </i> <%= label %></div>', {label: 'Remove'}))
-    $removeBtn.click =>
+    $removeBtn.click (event) =>
       targ = event.target
       while (!targ.classList.contains('remove'))
         targ = targ.parentNode
