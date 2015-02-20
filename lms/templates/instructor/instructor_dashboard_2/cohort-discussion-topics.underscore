@@ -1,32 +1,48 @@
 <div class="cohort-discussions-nav">
+    <form action="" method="post" name="" id="cohort-management-settings-form" class="cohort-management-settings-form">
+        <h3 class="subsection-title"><%- gettext('Designate discussion topics as divided by cohort') %></h3>
+            <div class="coursewide-discussion-topics cohort-management-supplemental">
+                <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
+                <span><%- gettext('You can optionally designate coursewide discussions topics to be cohorted.') %></span>
 
-    <div class="coursewide-discussion-topics">
-        <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
-        <ul class="wrapper-tabs">
-            <% _.each(coursewideTopics.models, function(topic) { %>
-                <li>
-                    <input data-id="<%- topic.get('id') %>" type="checkbox" class="discussion-topic" <%- topic.get('is_cohorted') ? 'checked="checked"' : '' %>/>
-                    <label for="cohorts-state"><%- topic.get('name') %></label>
+                <ul class="wrapper-tabs">
+                    <% _.each(coursewideTopics.models, function(topic) { %>
+                        <div>
+                        <li>
+                            <label class=class="discussion-topic topic-name" data-id="<%- topic.get('id') %>">
+                                <input type="checkbox" <%- topic.get('is_cohorted') ? 'checked="checked"' : '' %> />
+                                <%- topic.get('name') %>
+                            </label>
+                            <span class="cohorted-text <%- !topic.get('is_cohorted') ? 'hidden' : '' %>">- <%- gettext('Cohorted') %></span>
+                        </li>
 
-                    <span class="cohorted-text <%- !topic.get('is_cohorted') ? 'hidden' : '' %>">
-                        - <%- gettext('COHORTED') %>
-                    </span>
-                </li>
-            <% }); %>
-        </ul>
-    </div>
+                    <% }); %>
+                </ul>
+                <button class="form-submit button action-primary action-save">
+                    <%- gettext('Save') %>
+                </button>
+            </div>
+    </form>
 
     <hr class="divider divider-lv1" />
 
-    <div class="inline-discussion-topics">
+    <div class="inline-discussion-topics cohort-management-supplemental">
         <h3 class="form-title subsection-title"><%- gettext('Content Specific Discussion Topics') %></h3>
         <span>
             <%- gettext('All other content-specific discussion topics, defined through inline discussion components, can also be designated as cohorted. You can cohort all discussion topics, or control specific areas below.') %>
         </span>
-        <div class="cohort-management-supplemental">
-                <input type="checkbox" class="discussion-topic" />
+        <div class="">
+                <input type="checkbox" class="" />
                 <%= interpolate('Cohort all content specific discussion topics') %>
         </div>
+        <hr class="divider divider-lv1" />
+
+        <div>
+            <button class="form-submit button action-primary action-save">
+                <%- gettext('Save') %>
+            </button>
+        </div>
+
     </div>
 
 
