@@ -8,9 +8,6 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'LinkedInAddToProfileConfiguration.dashboard_tracking_code'
-        db.delete_column('student_linkedinaddtoprofileconfiguration', 'dashboard_tracking_code')
-
         # Adding field 'LinkedInAddToProfileConfiguration.company_identifier'
         db.add_column('student_linkedinaddtoprofileconfiguration', 'company_identifier',
                       self.gf('django.db.models.fields.TextField')(default=''),
@@ -18,11 +15,6 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        # Adding field 'LinkedInAddToProfileConfiguration.dashboard_tracking_code'
-        db.add_column('student_linkedinaddtoprofileconfiguration', 'dashboard_tracking_code',
-                      self.gf('django.db.models.fields.TextField')(default='', blank=True),
-                      keep_default=False)
-
         # Deleting field 'LinkedInAddToProfileConfiguration.company_identifier'
         db.delete_column('student_linkedinaddtoprofileconfiguration', 'company_identifier')
 
@@ -109,6 +101,7 @@ class Migration(SchemaMigration):
             'change_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'changed_by': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']", 'null': 'True', 'on_delete': 'models.PROTECT'}),
             'company_identifier': ('django.db.models.fields.TextField', [], {}),
+            'dashboard_tracking_code': ('django.db.models.fields.TextField', [], {'default': "''", 'blank': 'True'}),
             'enabled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
