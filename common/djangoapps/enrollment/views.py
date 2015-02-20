@@ -17,7 +17,9 @@ from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
 from enrollment import api
-from enrollment.errors import CourseNotFoundError, CourseEnrollmentError, CourseModeNotFoundError
+from enrollment.errors import (
+    CourseNotFoundError, CourseEnrollmentError, CourseModeNotFoundError, CourseEnrollmentExistsError
+)
 from embargo import api as embargo_api
 from util.authentication import SessionAuthenticationAllowInactiveUser
 from util.disable_rate_limit import can_disable_rate_limit
@@ -339,6 +341,8 @@ class EnrollmentListView(APIView):
                     "message": u"No course '{course_id}' found for enrollment".format(course_id=course_id)
                 }
             )
+        except CourseEnrollmentExistsError as error:
+            return Response(data=error.enrollment)
         except CourseEnrollmentError:
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
