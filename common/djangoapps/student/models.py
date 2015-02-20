@@ -1464,6 +1464,9 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
     )
 
+    # Deprecated
+    dashboard_tracking_code = models.TextField(default="", blank=True)
+
     def add_to_profile_url(self, course_name, enrollment_mode, cert_url, source="o"):
         """Construct the URL for the "add to profile" button.
 
