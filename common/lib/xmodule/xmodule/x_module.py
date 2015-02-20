@@ -281,6 +281,8 @@ class XModuleMixin(XBlockMixin):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._child_instances = None
+
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
     @property
@@ -410,7 +412,7 @@ class XModuleMixin(XBlockMixin):
         if not self.has_children:
             return []
 
-        if getattr(self, '_child_instances', None) is None:
+        if self._child_instances is None:
             self._child_instances = []  # pylint: disable=attribute-defined-outside-init
             for child_loc in self.children:
                 # Skip if it doesn't satisfy the filter function
@@ -534,6 +536,10 @@ class XModuleMixin(XBlockMixin):
             field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
         """
         # pylint: disable=attribute-defined-outside-init
+        self._child_instances = None
+        self._field_data_cache.clear()
+        self._dirty_fields.clear()
+
         self.xmodule_runtime = xmodule_runtime
         self._field_data = field_data
 

@@ -922,7 +922,7 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
         location = course_id.make_usage_key('dummy_category', 'dummy_name')
         descriptor = Mock(
             spec=xblock_class,
-            _field_data=Mock(spec=FieldData),
+            _field_data=Mock(spec=FieldData, name='field_data'),
             location=location,
             static_asset_path=None,
             _runtime=Mock(
@@ -932,7 +932,9 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
                 name='runtime',
             ),
             scope_ids=Mock(spec=ScopeIds),
-            name='descriptor'
+            name='descriptor',
+            _field_data_cache={},
+            _dirty_fields={},
         )
         descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
         # Use the xblock_class's bind_for_student method
