@@ -106,7 +106,7 @@ from student.helpers import (
 
     <section class="info" id="${course.number}">
       <div class="course-item-info">
-        <h3>
+        <h3 class="course-title">
           % if show_courseware_link:
              % if not is_course_blocked:
             <a href="${course_target}">${course.display_number_with_default | h} ${course.display_name_with_default}</a>
@@ -219,7 +219,7 @@ from student.helpers import (
           )}
         </p>
       %endif
-
+      <div class="course-actions">
       % if show_courseware_link:
         % if course.has_ended():
          % if not is_course_blocked:
@@ -309,7 +309,8 @@ from student.helpers import (
           ${_('Email Settings')} <span class="sr">${_('for {course_number} {course_name}').format(course_number=course.number, course_name=course.display_name_with_default) |h}</span>
         </a>
         % endif
-% endif
+        % endif
+        </div>
 
 
 

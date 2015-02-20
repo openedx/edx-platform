@@ -385,10 +385,32 @@
         @include padding(0, 10px, 0, 230px);
 
          .course-item-info {
-          padding: 0;
-          width: 100%;
+           position: relative;
+           padding: 0;
+           width: 100%;
+           .course-title {
+            a,
+            span {
+              position: relative;
+              top: ($baseline*1.5);
+              display: block;
+              margin-bottom: ($baseline/3);
+              font-family: $sans-serif;
+              font-size: 34px;
+              line-height: 42px;
+              font-weight: 300;
+
+              &:hover,
+              &:focus {
+                text-decoration: none;
+              }
+            }
+          }
 
           .university {
+            position: absolute;
+            top: 0;
+            @include left(0);
             color: $lighter-base-font-color;
             font-family: $sans-serif;
             font-size: 16px;
@@ -399,6 +421,7 @@
           }
 
           .date-block {
+            position: absolute;
             top: 0;
             @include right(0);
             font-family: $sans-serif;
@@ -452,6 +475,11 @@
               font-weight: bold;
             }
           }
+        }
+
+        .course-actions {
+          @include clearfix();
+          padding-top: ($baseline);
         }
 
         .enter-course {
