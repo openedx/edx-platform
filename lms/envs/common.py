@@ -1643,6 +1643,9 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
+
+    # Mailchimp Syncing
+    'mailing',
 )
 
 ######################### MARKETING SITE ###############################

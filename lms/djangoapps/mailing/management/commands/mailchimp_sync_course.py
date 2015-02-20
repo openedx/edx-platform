@@ -13,6 +13,7 @@ from django.core.management.base import BaseCommand, CommandError
 from mailsnake import MailSnake
 
 from student.models import UserProfile, unique_id_for_user
+from opaque_keys.edx.keys import CourseKey
 
 
 BATCH_SIZE = 15000
@@ -122,7 +123,7 @@ def verify_list(mailchimp, list_id, course_id):
 def get_student_data(students, exclude=None):
     # To speed the query, we won't retrieve the full User object, only
     # two of its values. The namedtuple simulates the User object.
-    FakeUser = namedtuple('Fake', 'id username')
+    FakeUser = namedtuple('Fake', 'id username is_anonymous')
 
     exclude = exclude if exclude else set()
 
@@ -130,8 +131,9 @@ def get_student_data(students, exclude=None):
         e = {'EMAIL': v['user__email'],
              'FULLNAME': v['name'].title()}
 
-        e['EDX_ID'] = unique_id_for_user(FakeUser(v['user_id'],
-                                                  v['user__username']))
+        fake_user = FakeUser(v['user_id'], v['user__username'], lambda:True)
+        e['EDX_ID'] = unique_id_for_user(fake_user)
+
         return e
 
     fields = 'user__email', 'name', 'user_id', 'user__username'
@@ -143,7 +145,8 @@ def get_student_data(students, exclude=None):
 
 def get_enrolled_students(course_id):
     objects = UserProfile.objects
-    students = objects.filter(user__courseenrollment__course_id=course_id,
+    course_key = CourseKey.from_string(course_id)
+    students = objects.filter(user__courseenrollment__course_id=course_key,
                               user__courseenrollment__is_active=True)
     return students
 
@@ -232,7 +235,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               double_optin=False,
                                               update_existing=True)
         log.debug("Added: {} Error on: {}".format(
-            result['add_count'], resurt['error_count']))
+            result['add_count'], result['error_count']))
 
 
 def make_segments(mailchimp, list_id, count, emails):
