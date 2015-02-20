@@ -7,7 +7,8 @@ define(
     ],
 function ($, _, Utils, MessageManager, FileUploader, sinon) {
 
-    describe('Transcripts.MessageManager', function () {
+    // TODO: fix TNL-559 Intermittent failures of Transcript FileUploader JS tests
+    xdescribe('Transcripts.MessageManager', function () {
         var videoListEntryTemplate = readFixtures(
                 'video/transcripts/metadata-videolist-entry.underscore'
             ),
