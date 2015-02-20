@@ -145,6 +145,14 @@ header.global {
       font-weight: bold;
       letter-spacing: 0;
 
+      .icon {
+        display: inline-block;
+        @include float(left);
+        margin: 3px 0 -3px 0;
+        font-size: 1.2em;
+        color: $m-gray;
+      }
+
       .avatar {
 
         // CASE: right to left layout
