@@ -1,6 +1,7 @@
 import logging
 import math
 import random
+import time
 import itertools
 from itertools import chain
 from optparse import make_option
@@ -14,7 +15,10 @@ from mailsnake import MailSnake
 from student.models import UserProfile, unique_id_for_user
 
 
-BATCH_SIZE = 5000
+BATCH_SIZE = 15000
+# If you try to subscribe with too many users at once
+# the transaction times out on the mailchimp side.
+SUBSCRIBE_BATCH_SIZE = 1000
 
 log = logging.getLogger('edx.mailchimp')
 
@@ -222,12 +226,13 @@ def subscribe_with_data(mailchimp, list_id, user_data):
     formated_data = list(format_entry(e) for e in user_data)
 
     # send the updates in batches of a fixed size
-    for batch in batches(formated_data, BATCH_SIZE):
+    for batch in batches(formated_data, SUBSCRIBE_BATCH_SIZE):
         result = mailchimp.listBatchSubscribe(id=list_id,
                                               batch=batch,
                                               double_optin=False,
                                               update_existing=True)
-        log.debug(result)
+        log.debug("Added: {} Error on: {}".format(
+            result['add_count'], result['error_count']))
 
 
 def make_segments(mailchimp, list_id, count, emails):
