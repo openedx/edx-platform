@@ -497,10 +497,8 @@ def get_module_system_for_user(user, field_data_cache,
         # rebinds module to a different student.  We'll change system, student_data, and scope_ids
         module.descriptor.bind_for_student(
             inner_system,
-            LmsFieldData(module.descriptor._field_data, inner_student_data)  # pylint: disable=protected-access
-        )
-        module.descriptor.scope_ids = (
-            module.descriptor.scope_ids._replace(user_id=real_user.id)  # pylint: disable=protected-access
+            LmsFieldData(module.descriptor._field_data, inner_student_data),  # pylint: disable=protected-access
+            real_user.id,
         )
         module.scope_ids = module.descriptor.scope_ids  # this is needed b/c NamedTuples are immutable
         # now bind the module to the new ModuleSystem instance and vice-versa
@@ -688,8 +686,7 @@ def get_module_for_descriptor_internal(user, descriptor, field_data_cache, cours
         request_token=request_token
     )
 
-    descriptor.bind_for_student(system, field_data)  # pylint: disable=protected-access
-    descriptor.scope_ids = descriptor.scope_ids._replace(user_id=user.id)  # pylint: disable=protected-access
+    descriptor.bind_for_student(system, field_data, user.id)  # pylint: disable=protected-access
     return descriptor
 
 

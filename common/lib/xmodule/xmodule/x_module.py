@@ -17,8 +17,11 @@ from webob import Response
 from webob.multidict import MultiDict
 
 from xblock.core import XBlock, XBlockAside
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict, ScopeIds, Reference, \
-    ReferenceList, ReferenceValueDict
+from xblock.fields import (
+    Scope, Integer, Float, List, XBlockMixin,
+    String, Dict, ScopeIds, Reference, ReferenceList,
+    ReferenceValueDict, UserScope
+)
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule.fields import RelativeTime
@@ -281,6 +284,8 @@ class XModuleMixin(XBlockMixin):
 
     def __init__(self, *args, **kwargs):
         self.xmodule_runtime = None
+        self._child_instances = None
+
         super(XModuleMixin, self).__init__(*args, **kwargs)
 
     @property
@@ -410,7 +415,7 @@ class XModuleMixin(XBlockMixin):
         if not self.has_children:
             return []
 
-        if getattr(self, '_child_instances', None) is None:
+        if self._child_instances is None:
             self._child_instances = []  # pylint: disable=attribute-defined-outside-init
             for child_loc in self.children:
                 # Skip if it doesn't satisfy the filter function
@@ -525,15 +530,39 @@ class XModuleMixin(XBlockMixin):
         """
         return None
 
-    def bind_for_student(self, xmodule_runtime, field_data):
+    def bind_for_student(self, xmodule_runtime, field_data, user_id):
         """
         Set up this XBlock to act as an XModule instead of an XModuleDescriptor.
 
         Arguments:
             xmodule_runtime (:class:`ModuleSystem'): the runtime to use when accessing student facing methods
             field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
+            user_id: The user_id to set in scope_ids
         """
         # pylint: disable=attribute-defined-outside-init
+
+        # Skip rebinding if we're already bound a user, and it's this user.
+        if self.scope_ids.user_id is not None and user_id == self.scope_ids.user_id:
+            return
+
+        # If we are switching users mid-request, save the data from the old user.
+        self.save()
+
+        # Update scope_ids to point to the new user.
+        self.scope_ids = self.scope_ids._replace(user_id=user_id)
+
+        # Clear out any cached instantiated children.
+        self._child_instances = None
+
+        # Clear out any cached field data scoped to the old user.
+        for field in self.fields.values():
+            if field.scope in (Scope.parent, Scope.children):
+                continue
+
+            if field.scope.user == UserScope.ONE:
+                field._del_cached_value(self)
+
+        # Set the new xmodule_runtime and field_data (which are user-specific)
         self.xmodule_runtime = xmodule_runtime
         self._field_data = field_data
 

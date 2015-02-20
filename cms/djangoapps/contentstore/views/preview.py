@@ -213,7 +213,8 @@ def _load_preview_module(request, descriptor):
         field_data = LmsFieldData(descriptor._field_data, student_data)  # pylint: disable=protected-access
     descriptor.bind_for_student(
         _preview_module_system(request, descriptor, field_data),
-        field_data
+        field_data,
+        request.user.id
     )
     return descriptor
 
