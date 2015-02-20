@@ -150,3 +150,28 @@
     % endif
   </ul>
 </div>
+% if cdn_eval:
+<script>
+  function sendMetricToGraphite(metricName, value) {
+    var url = "${cdn_eval_endpoint}";
+    var request = new XMLHttpRequest();
+    request.open("POST", url, true);  // send asynchronously
+    request.send(metricName + " " + value);
+  };
+  var cdnStartTime, beaconSent = false;
+  function initializeCDNExperiment() {
+    cdnStartTime = Date.now();
+    $("#video_${id}").bind("html5:canplaythrough", null, function() {
+      if (!beaconSent) {
+        timeElapsed = Date.now() - cdnStartTime;
+        sendMetricToGraphite("loadtime_${cdn_exp_group}", timeElapsed);
+      }
+      beaconSent = true;
+    });
+  }
+  $("#video_${id}").bind("initialize", null, initializeCDNExperiment);
+  if ($("#video_${id}").hasClass("is-initialized")) {
+    initializeCDNExperiment();
+  }
+</script>
+% endif;
