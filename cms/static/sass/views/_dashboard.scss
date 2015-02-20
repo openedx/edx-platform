@@ -55,7 +55,7 @@
 
         }
 
-        .action-create-course {
+        .action-create-course, .action-create-library {
           @extend %btn-primary-green;
           @extend %t-action3;
         }
