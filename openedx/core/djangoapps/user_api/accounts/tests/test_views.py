@@ -93,12 +93,33 @@ class TestAccountAPI(APITestCase):
     @ddt.unpack
     def test_patch_account(self, api_client, user):
         client = self.login_client(api_client, user)
-        response = client.patch(self.accounts_base_uri, data={"usernamae": "willbeignored", "gender": "f"})
+        response = client.patch(self.accounts_base_uri, data={"gender": "f"})
         self.assert_status_code(200, response)
         data = response.data
-        # Note that username is read-only, so passing it in patch is ignored. We want to change this behavior so it throws an exception.
-        self.assertEqual(self.user.username, data["username"])
         self.assertEqual("f", data["gender"])
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_patch_account_noneditable(self, api_client, user):
+        client = self.login_client(api_client, user)
+
+        for field_name in ["username", "email", "date_joined", "name"]:
+            response = client.patch(self.accounts_base_uri, data={field_name: "willbeignored", "gender": "f"})
+            self.assert_status_code(400, response)
+            data = response.data
+            self.assertEqual("The following fields are not editable: " + field_name, data["message"])
+
+        # Make sure that gender did not change.
+        response = client.get(self.accounts_base_uri)
+        self.assertEqual("m", response.data["gender"])
+
+        # Test error message with multiple read-only items
+        response = client.patch(self.accounts_base_uri, data={"username": "willbeignored", "email": "xx"})
+        self.assert_status_code(400, response)
+        self.assertEqual("The following fields are not editable: username, email", response.data["message"])
 
     def assert_status_code(self, expected_status_code, response):
         """Assert that the given response has the expected status code"""
