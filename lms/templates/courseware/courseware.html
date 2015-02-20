@@ -243,9 +243,7 @@ ${fragment.foot_html()}
   </div>
 </div>
 
-<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}">
-  <h2 class="sr nav-utilities-title">${_('Course Utilities Navigation')}</h2>
-
+<nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" area-label="${_('Course Utilities')}">
   ## Utility: Chat
   % if show_chat:
     <%include file="/chat/toggle_chat.html" />
