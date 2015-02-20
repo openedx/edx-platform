@@ -8,6 +8,7 @@ import logging
 import ddt
 import itertools
 import mimetypes
+from unittest import skip
 from uuid import uuid4
 
 # Mixed modulestore depends on django, so we'll manually configure some django settings
@@ -1963,6 +1964,7 @@ class TestMixedModuleStore(CourseComparisonTest):
             dest_store = self.store._get_modulestore_by_type(ModuleStoreEnum.Type.split)
             self.assertCoursesEqual(source_store, source_course_key, dest_store, dest_course_id)
 
+    @skip("PLAT-449 XModule TestMixedModuleStore intermittent test failure")
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_course_publish_signal_firing(self, default):
         with MongoContentstoreBuilder().build() as contentstore:
