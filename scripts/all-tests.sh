@@ -159,27 +159,22 @@ END
 
             "all")
                 paver test_bokchoy
-                paver bokchoy_coverage
                 ;;
 
             "1")
                 paver test_bokchoy --extra_args="-a shard_1"
-                paver bokchoy_coverage
                 ;;
 
             "2")
                 paver test_bokchoy --extra_args="-a 'shard_2'"
-                paver bokchoy_coverage
                 ;;
 
             "3")
                 paver test_bokchoy --extra_args="-a 'shard_3'"
-                paver bokchoy_coverage
                 ;;
 
             "4")
                 paver test_bokchoy --extra_args="-a shard_1=False,shard_2=False,shard_3=False"
-                paver bokchoy_coverage
                 ;;
 
             # Default case because if we later define another bok-choy shard on Jenkins
