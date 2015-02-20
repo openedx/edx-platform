@@ -2,20 +2,21 @@
 """
 Test for lms courseware app, module render unit
 """
-from functools import partial
+import ddt
+import itertools
 import json
 
 from bson import ObjectId
-import ddt
 from django.http import Http404, HttpResponse
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.contrib.auth.models import AnonymousUser
+from functools import partial
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.module_render import hash_resource
+from courseware.module_render import hash_resource, get_module_for_descriptor
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -1241,3 +1242,169 @@ class LMSXBlockServiceBindingTest(ModuleStoreTestCase):
         )
         service = runtime.service(descriptor, expected_service)
         self.assertIsNotNone(service)
+
+
+class PureXBlockWithChildren(PureXBlock):
+    """
+    Pure XBlock with children to use in tests.
+    """
+    has_children = True
+
+
+class EmptyXModuleWithChildren(EmptyXModule):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    has_children = True
+
+
+class EmptyXModuleDescriptorWithChildren(EmptyXModuleDescriptor):  # pylint: disable=abstract-method
+    """
+    Empty XModule for testing with no dependencies.
+    """
+    module_class = EmptyXModuleWithChildren
+    has_children = True
+
+
+BLOCK_TYPES = ['xblock', 'xmodule']
+USER_NUMBERS = range(2)
+
+
+@ddt.ddt
+class TestFilteredChildren(ModuleStoreTestCase):
+    """
+    Tests that verify access to XBlock/XModule children work correctly
+    even when those children are filtered by the runtime when loaded.
+    """
+    # pylint: disable=attribute-defined-outside-init, no-member
+    def setUp(self):
+        super(TestFilteredChildren, self).setUp()
+        self.users = {number: UserFactory() for number in USER_NUMBERS}
+        self.course = CourseFactory()
+
+        self._old_has_access = render.has_access
+        patcher = patch('courseware.module_render.has_access', self._has_access)
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    @ddt.data(*BLOCK_TYPES)
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound(self, block_type):
+        block = self._load_block(block_type)
+        self.assertUnboundChildren(block)
+
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound_then_bound_as_descriptor(self, block_type, user_number):
+        user = self.users[user_number]
+        block = self._load_block(block_type)
+        self.assertUnboundChildren(block)
+        self._bind_block(block, user)
+        self.assertBoundChildren(block, user)
+
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_unbound_then_bound_as_xmodule(self, block_type, user_number):
+        user = self.users[user_number]
+        block = self._load_block(block_type)
+        self.assertUnboundChildren(block)
+        self._bind_block(block, user)
+
+        # Validate direct XModule access as well
+        if isinstance(block, XModuleDescriptor):
+            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
+        else:
+            self.assertBoundChildren(block, user)
+
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_bound_only_as_descriptor(self, block_type, user_number):
+        user = self.users[user_number]
+        block = self._load_block(block_type)
+        self._bind_block(block, user)
+        self.assertBoundChildren(block, user)
+
+    @ddt.data(*itertools.product(BLOCK_TYPES, USER_NUMBERS))
+    @ddt.unpack
+    @XBlock.register_temp_plugin(PureXBlockWithChildren, identifier='xblock')
+    @XBlock.register_temp_plugin(EmptyXModuleDescriptorWithChildren, identifier='xmodule')
+    def test_bound_only_as_xmodule(self, block_type, user_number):
+        user = self.users[user_number]
+        block = self._load_block(block_type)
+        self._bind_block(block, user)
+
+        # Validate direct XModule access as well
+        if isinstance(block, XModuleDescriptor):
+            self.assertBoundChildren(block._xmodule, user)  # pylint: disable=protected-access
+        else:
+            self.assertBoundChildren(block, user)
+
+    def _load_block(self, block_type):
+        """
+        Instantiate an XBlock of `block_type` with the appropriate set of children.
+        """
+        self.parent = ItemFactory(category=block_type, parent=self.course)
+
+        # Create a child of each block type for each user
+        self.children_for_user = {
+            user: [
+                ItemFactory(category=child_type, parent=self.parent).scope_ids.usage_id
+                for child_type in BLOCK_TYPES
+            ]
+            for user in self.users.itervalues()
+        }
+
+        self.all_children = sum(self.children_for_user.values(), [])
+
+        return modulestore().get_item(self.parent.scope_ids.usage_id)
+
+    def _bind_block(self, block, user):
+        """
+        Bind `block` to the supplied `user`.
+        """
+        course_id = self.course.id
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            course_id,
+            user,
+            block,
+        )
+        return get_module_for_descriptor(
+            user,
+            Mock(name='request', user=user),
+            block,
+            field_data_cache,
+            course_id,
+        )
+
+    def _has_access(self, user, action, obj, course_key=None):
+        """
+        Mock implementation of `has_access` used to control which blocks
+        have access to which children during tests.
+        """
+        if action != 'load':
+            return self._old_has_access(user, action, obj, course_key)
+
+        if isinstance(obj, XBlock):
+            key = obj.scope_ids.usage_id
+        elif isinstance(obj, UsageKey):
+            key = obj
+
+        if key == self.parent.scope_ids.usage_id:
+            return True
+        return key in self.children_for_user[user]
+
+    def assertBoundChildren(self, block, user):
+        self.assertChildren(block, self.children_for_user[user])
+
+    def assertUnboundChildren(self, block):
+        self.assertChildren(block, self.all_children)
+
+    def assertChildren(self, block, child_usage_ids):
+        self.assertEquals(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
