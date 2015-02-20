@@ -97,7 +97,7 @@ define(["jquery", "underscore", "gettext", "js/views/xblock", "js/views/metadata
                     data = null;
                 if (xblock.save) {
                     data = xblock.save();
-                    if (metadataEditor) {
+                    if (data && metadataEditor) {
                         data.metadata = _.extend(data.metadata || {}, this.getChangedMetadata());
                     }
                 } else {
