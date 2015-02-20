@@ -8,8 +8,11 @@ A microsite enables the following features:
 """
 import threading
 import os.path
+import json
 
 from django.conf import settings
+
+from .models import Microsite
 
 CURRENT_REQUEST_CONFIGURATION = threading.local()
 CURRENT_REQUEST_CONFIGURATION.data = {}
@@ -89,6 +92,16 @@ def get_value_for_org(org, val_name, default=None):
     if not has_configuration_set():
         return default
 
+    if "microsite_configuration.middleware.DatabaseMicrositeMiddleware" in settings.MIDDLEWARE_CLASSES:
+        # Filter at the db
+        candidates = Microsite.objects.all()
+        for microsite in candidates:
+            current = json.loads(microsite.values)
+            org_filter = current.get('course_org_filter')
+            if org_filter:
+                return current.get(val_name, default)
+
+    # Filter at the setting file
     for value in settings.MICROSITE_CONFIGURATION.values():
         org_filter = value.get('course_org_filter', None)
         if org_filter == org:
@@ -105,6 +118,16 @@ def get_all_orgs():
     if not has_configuration_set():
         return org_filter_set
 
+    if "microsite_configuration.middleware.DatabaseMicrositeMiddleware" in settings.MIDDLEWARE_CLASSES:
+        # Get the orgs in the db
+        candidates = Microsite.objects.all()
+        for microsite in candidates:
+            current = json.loads(microsite.values)
+            org_filter = current.get('course_org_filter')
+            if org_filter:
+                org_filter_set.add(org_filter)
+
+    # Get the orgs in the settings file
     for value in settings.MICROSITE_CONFIGURATION.values():
         org_filter = value.get('course_org_filter')
         if org_filter:
@@ -149,3 +172,32 @@ def set_by_domain(domain):
     # if so, then use that
     if 'default' in settings.MICROSITE_CONFIGURATION:
         _set_current_microsite('default', subdomain, domain)
+
+
+def set_from_db_by_domain(domain):
+    """
+    For a given request domain, find a match in our microsite configuration and then assign
+    it to the thread local so that it is available throughout the entire
+    Django request processing
+    """
+    if not has_configuration_set() or not domain:
+        return
+
+    candidates = Microsite.objects.all()
+    for microsite in candidates:
+        subdomain = microsite.subdomain
+        if subdomain and domain.startswith(subdomain):
+            _set_current_microsite_from_obj(subdomain, domain, json.loads(microsite.values))
+            return
+
+    set_by_domain(domain)
+
+
+def _set_current_microsite_from_obj(subdomain, domain, microsite_object):
+    """
+    Helper internal method to actually put a microsite on the threadlocal
+    """
+    config = microsite_object.copy()
+    config['subdomain'] = subdomain
+    config['site_domain'] = domain
+    CURRENT_REQUEST_CONFIGURATION.data = config

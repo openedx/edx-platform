@@ -83,3 +83,20 @@ class MicrositeSessionCookieDomainMiddleware():
             response.set_cookie = _set_cookie_wrapper
 
         return response
+
+
+class DatabaseMicrositeMiddleware(MicrositeMiddleware):
+    """
+    Middleware class which will bind configuration information regarding 'microsites' on a per request basis.
+    The actual configuration information is taken from the microsite model in the database
+    """
+
+    def process_request(self, request):
+        """
+        Middleware entry point on every request processing. This will associate a request's domain name
+        with a 'University' and any corresponding microsite configuration information
+        """
+        microsite.clear()
+        domain = request.META.get('HTTP_HOST', None)
+        microsite.set_from_db_by_domain(domain)
+        return None
