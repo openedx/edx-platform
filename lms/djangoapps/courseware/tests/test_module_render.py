@@ -461,7 +461,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - it loads the active version at the start of the bulk operation
     #     - it loads the course definition for inheritance, because it's outside
     #     the bulk-operation marker that loaded the course descriptor
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -499,7 +499,7 @@ class TestTOC(ModuleStoreTestCase):
     #     - it loads the active version at the start of the bulk operation
     #     - it loads the course definition for inheritance, because it's outside
     #     the bulk-operation marker that loaded the course descriptor
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):

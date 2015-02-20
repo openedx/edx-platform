@@ -576,7 +576,20 @@ class TestCourseGrader(TestSubmittingProblems):
 
         self.assertEqual(self.score_for_hw('homework1'), [1.0, 0.0])
         self.assertEqual(self.score_for_hw('homework2'), [1.0, 1.0])
-        self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
+        #self.assertEqual(self.score_for_hw('homework3'), [1.0, 0.0])
+
+        from courseware.model_data import FieldDataCache
+        from courseware.module_render import get_module_for_descriptor
+        fake_request = self.factory.get(
+            reverse('progress', kwargs={'course_id': self.course.id.to_deprecated_string()})
+        )
+        field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.student_user, self.course, depth=None
+        )
+        # Uncommenting this line will cause the next assert to pass.
+        # self.assertEqual(self.earned_hw_scores(), [])
+        course_module = get_module_for_descriptor(self.student_user, fake_request, self.course, field_data_cache, self.course.id, early=False)
+
         self.assertEqual(self.earned_hw_scores(), [1.0, 2.0, 1.0])  # Order matters
         self.check_grade_percent(0.75)
 

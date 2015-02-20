@@ -537,6 +537,9 @@ class XModuleMixin(XBlockMixin):
         self.xmodule_runtime = xmodule_runtime
         self._field_data = field_data
 
+        if hasattr(self, '_child_instances'):
+            delattr(self, '_child_instances')
+
 
 class ProxyAttribute(object):
     """

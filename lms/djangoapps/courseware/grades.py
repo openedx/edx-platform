@@ -2,6 +2,7 @@
 from __future__ import division
 from collections import defaultdict
 import json
+import nose
 import random
 import logging
 
@@ -224,6 +225,7 @@ def _grade(student, request, course, keep_raw_scores):
                             correct = total
 
                     graded = module_descriptor.graded
+                    from nose.tools import set_trace; set_trace();
                     if not total > 0:
                         #We simply cannot grade a problem that is 12/0, because we might need it as a percentage
                         graded = False

@@ -207,3 +207,9 @@ class CourseNavPage(PageObject):
         """
         sequential_position_css = '#tab_{0}'.format(sequential_position - 1)
         self.q(css=sequential_position_css).first.click()
+
+    def sequence_bar_tooltips(self):
+        """
+        Return sequence bar tooltips.
+        """
+        return self.q(css='#tab_0').attrs('title')[0].split('\n')
