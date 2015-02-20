@@ -94,6 +94,8 @@ function () {
         this.videoProgressSlider.slider = this.videoProgressSlider.el
             .slider({
                 range: 'min',
+                min: this.config.startTime,
+                max: this.config.endTime,
                 slide: this.videoProgressSlider.onSlide,
                 stop: this.videoProgressSlider.onStop
             });
@@ -147,25 +149,6 @@ function () {
         // with actual starting and ending point of the video.
 
         rangeParams = getRangeParams(start, end, duration);
-
-        if (!this.videoProgressSlider.sliderRange) {
-            this.videoProgressSlider.sliderRange = $('<div />', {
-                    'class': 'ui-slider-range ' +
-                             'ui-widget-header ' +
-                             'ui-corner-all ' +
-                             'slider-range'
-                })
-                .css({
-                    left: rangeParams.left,
-                    width: rangeParams.width
-                });
-
-            this.videoProgressSlider.sliderProgress
-                .after(this.videoProgressSlider.sliderRange);
-        } else {
-            this.videoProgressSlider.sliderRange
-                .css(rangeParams);
-        }
     }
 
     function getRangeParams(startTime, endTime, duration) {
@@ -182,6 +165,10 @@ function () {
     function onSlide(event, ui) {
         var time = ui.value,
             duration = this.videoPlayer.duration();
+
+        if (this.config.endTime !== null) {
+            duration = Math.min(this.config.endTime, duration);
+        }
 
         this.videoProgressSlider.frozen = true;
 
@@ -235,8 +222,15 @@ function () {
     }
 
     function updatePlayTime(params) {
-        var time = Math.floor(params.time),
-            duration = Math.floor(params.duration);
+        var time = Math.floor(params.time);
+        // params.duration could accidentally be construed as a floating
+        // point double. Since we're displaying this number, round down
+        // to nearest second
+        var duration = Math.floor(params.duration);
+
+        if (this.config.endTime !== null) {
+            duration = Math.min(this.config.endTime, duration);
+        }
 
         if (
             this.videoProgressSlider.slider &&

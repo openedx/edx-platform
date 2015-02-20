@@ -1261,7 +1261,7 @@ def process_analytics_answer_dist(data, question_types_by_part, num_options_by_p
 
     # Determine the last updated date, convert to client TZ and format
     created_date = data[0]['created']
-    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H:%M:%S')
+    obj_date = datetime.strptime(created_date, '%Y-%m-%dT%H%M%S')
     obj_date = timezone('UTC').localize(obj_date)
     formatted_date_string = get_time_display(obj_date, None, coerce_tz=settings.TIME_ZONE_DISPLAYED_FOR_DEADLINES)
 

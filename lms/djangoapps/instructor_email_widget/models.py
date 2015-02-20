@@ -14,7 +14,7 @@ ASSUMPTIONS: modules have unique IDs, even across different module_types
 """
 from django.contrib.auth.models import User
 from django.db import models
-from instructor.views.data_access_constants import Inclusion
+from instructor.views.data_access_constants import Inclusion, QueryOrigin, QUERYORIGIN_MAP
 from xmodule_django.models import CourseKeyField, LocationKeyField
 
 
@@ -75,6 +75,11 @@ class TemporaryQuery(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, db_index=True)
     entity_name = models.CharField(max_length=255)
     query_type = models.CharField(max_length=255)
+    ORIGIN = (
+        ('E', QueryOrigin.EMAIL),
+        ('W', QueryOrigin.WIDGET),
+    )
+    origin = models.CharField(default=QUERYORIGIN_MAP[QueryOrigin.WIDGET], max_length=1, choices=ORIGIN)
     done = models.NullBooleanField()
 
     def __unicode__(self):

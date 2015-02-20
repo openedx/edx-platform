@@ -23,7 +23,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from external_auth.models import ExternalAuthMap
-from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii
+from external_auth.views import shib_login, course_specific_login, course_specific_register, _flatten_to_ascii, _safe_postlogin_redirect
 
 from student.views import create_account, change_enrollment
 from student.models import UserProfile, Registration, CourseEnrollment
@@ -596,3 +596,9 @@ class ShibUtilFnTest(TestCase):
         str_test = _flatten_to_ascii(STR_DIACRI)
         self.assertEqual(str_test, FLATTENED)
         self.assertIsInstance(str_test, str)
+
+    @override_settings(SHIB_REDIRECT_DOMAIN_WHITELIST={'www.test.com': ['www.other.com']})
+    def test__safe_postlogin_redirect(self):
+        self.assertEqual(_safe_postlogin_redirect('http://www.test.com', 'www.test.com')['Location'], 'http://www.test.com')
+        self.assertEqual(_safe_postlogin_redirect('http://www.other.com', 'www.test.com')['Location'], 'http://www.other.com')
+        self.assertEqual(_safe_postlogin_redirect('http://www.unsafe.com', 'www.test.com')['Location'], '/')

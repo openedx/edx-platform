@@ -1,5 +1,6 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
+<%include file='keyword_sub_modal.html' args="keywords_supported=section_data['keywords_supported']" />
 
 <div class="vert-left send-email" id="section-send-email">
   <h2> ${_("Send Email")} </h2>

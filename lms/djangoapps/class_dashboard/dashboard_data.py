@@ -77,7 +77,7 @@ def get_problem_grade_distribution(course_id, enrollment):
         course = modulestore().get_course(course_id, depth=4)
 
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_SERVER_URL, auth_token=settings.ANALYTICS_API_KEY)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
 
         for section in course.get_children():
             for subsection in section.get_children():
@@ -138,7 +138,7 @@ def get_sequential_open_distrib(course_id, enrollment):
         course = modulestore().get_course(course_id, depth=2)
 
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_SERVER_URL, auth_token=settings.ANALYTICS_API_KEY)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
 
         for section in course.get_children():
             for subsection in section.get_children():
@@ -201,7 +201,7 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
                 curr_grade_distrib['max_grade'] = row['max_grade']
     else:
         # Connect to analytics data client
-        client = Client(base_url=settings.ANALYTICS_SERVER_URL, auth_token=settings.ANALYTICS_API_KEY)
+        client = Client(base_url=settings.ANALYTICS_DATA_URL, auth_token=settings.ANALYTICS_DATA_TOKEN)
 
         for problem in problem_set:
             module = client.modules(course_id, problem)

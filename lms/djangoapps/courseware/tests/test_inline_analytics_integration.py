@@ -101,7 +101,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
             {
                 "course_id": "A/B/C",
@@ -113,7 +113,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
         ]
 
@@ -168,7 +168,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
         ]
 
@@ -218,7 +218,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
                 "variant": "123",
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
             {
                 "course_id": "A/B/C",
@@ -230,7 +230,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
         ]
 
@@ -281,7 +281,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
                 "variant": "123",
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
             {
                 "course_id": "A/B/C",
@@ -293,7 +293,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
         ]
 
@@ -332,7 +332,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 1",
                 "answer_value_numeric": "null",
                 "variant": "123",
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
             {
                 "course_id": "A/B/C",
@@ -344,7 +344,7 @@ class InlineAnalyticsTest(ModuleStoreTestCase):
                 "answer_value_text": "Option 2",
                 "answer_value_numeric": "null",
                 "variant": None,
-                "created": "2014-10-15T10:13:51",
+                "created": "2014-10-15T101351",
             },
         ]
 

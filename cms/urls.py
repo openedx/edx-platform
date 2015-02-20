@@ -114,6 +114,12 @@ urlpatterns += patterns('',
 )
 
 
+if settings.SHIB_ONLY_SITE:
+    urlpatterns += (
+        url(r'^backup_signup$', 'signup', name='backup_signup'),
+        url(r'^backup_signin$', 'login_page', name='backup_login'),
+    )
+
 if settings.FEATURES.get('ENABLE_EXPORT_GIT'):
     urlpatterns += (url(r'^export_git/{}$'.format(settings.COURSE_KEY_PATTERN),
                         'contentstore.views.export_git', name='export_git'),)

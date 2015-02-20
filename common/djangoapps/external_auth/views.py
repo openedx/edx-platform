@@ -546,17 +546,26 @@ def shib_login(request):
     )
 
 
-def _safe_postlogin_redirect(redirect_to, safehost, default_redirect='/'):
+def _safe_postlogin_redirect(redirect_to, localhost, default_redirect='/'):
     """
     If redirect_to param is safe (not off this host), then perform the redirect.
+    If a redirect whitelist is defined, check that redirect_to is safe to a host 
+    in that list or localhost (you don't need to include the host itself in the whitelist).
     Otherwise just redirect to '/'.
-    Basically copied from django.contrib.auth.views.login
     @param redirect_to: user-supplied redirect url
-    @param safehost: which host is safe to redirect to
+    @param localhost: the host that is safe to redirect to (this host)
     @return: an HttpResponseRedirect
     """
-    if is_safe_url(url=redirect_to, host=safehost):
-        return redirect(redirect_to)
+    if localhost in settings.SHIB_REDIRECT_DOMAIN_WHITELIST:
+        # make a copy so as not to change the actual whitelist
+        safehosts = list(settings.SHIB_REDIRECT_DOMAIN_WHITELIST[localhost])
+        safehosts.append(localhost)
+        for host in safehosts:
+            if is_safe_url(url=redirect_to, host=host):
+                return redirect(redirect_to)
+    else:
+        if is_safe_url(url=redirect_to, host=localhost):
+            return redirect(redirect_to)
     return redirect(default_redirect)
 
 
