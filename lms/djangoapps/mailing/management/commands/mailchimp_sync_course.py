@@ -232,7 +232,7 @@ def subscribe_with_data(mailchimp, list_id, user_data):
                                               double_optin=False,
                                               update_existing=True)
         log.debug("Added: {} Error on: {}".format(
-            result['add_count'], resurt['error_count']))
+            result['add_count'], result['error_count']))
 
 
 def make_segments(mailchimp, list_id, count, emails):
