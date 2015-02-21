@@ -26,7 +26,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentTest, self).setUp('embargo')
@@ -134,7 +134,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         else:
             self.assertFalse(mock_update_email_opt_in.called)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restrict(self):
         # When accessing the course from an embargoed country,
         # we should be blocked.
@@ -147,7 +147,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         is_enrolled = CourseEnrollment.is_enrolled(self.user, self.course.id)
         self.assertFalse(is_enrolled)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_allow(self):
         response = self._change_enrollment('enroll')
         self.assertEqual(response.status_code, 200)

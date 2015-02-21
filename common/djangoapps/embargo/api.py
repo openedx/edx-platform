@@ -27,7 +27,7 @@ def redirect_if_blocked(course_key, access_point='enrollment', **kwargs):
         Same as `check_course_access` and `message_url_path`
 
     """
-    if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+    if settings.FEATURES.get('EMBARGO'):
         is_blocked = not check_course_access(course_key, **kwargs)
         if is_blocked:
             return message_url_path(course_key, access_point)
@@ -52,7 +52,7 @@ def check_course_access(course_key, user=None, ip_address=None, url=None):
 
     """
     # No-op if the country access feature is not enabled
-    if not settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+    if not settings.FEATURES.get('EMBARGO'):
         return True
 
     # First, check whether there are any restrictions on the course.

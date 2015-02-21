@@ -74,7 +74,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
     YESTERDAY = NOW - timedelta(days=1)
     TOMORROW = NOW + timedelta(days=1)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(TestPayAndVerifyView, self).setUp('embargo')
         self.user = UserFactory.create(username=self.USERNAME, password=self.PASSWORD)
@@ -625,7 +625,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         self.assertContains(response, "verification deadline")
         self.assertContains(response, "Jan 02, 1999 at 00:00 UTC")
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_restrict(self):
         course = self._create_course("verified")
         with restrict_course(course.id) as redirect_url:
@@ -634,7 +634,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             response = self._get_page('verify_student_start_flow', course.id, expected_status_code=302)
             self.assertRedirects(response, redirect_url)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_allow(self):
         course = self._create_course("verified")
         self._get_page('verify_student_start_flow', course.id)

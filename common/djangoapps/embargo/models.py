@@ -37,6 +37,8 @@ log = logging.getLogger(__name__)
 class EmbargoedCourse(models.Model):
     """
     Enable course embargo on a course-by-course basis.
+
+    Deprecated by `RestrictedCourse`
     """
     objects = NoneToEmptyManager()
 
@@ -70,6 +72,8 @@ class EmbargoedCourse(models.Model):
 class EmbargoedState(ConfigurationModel):
     """
     Register countries to be embargoed.
+
+    Deprecated by `Country`.
     """
     # The countries to embargo
     embargoed_countries = models.TextField(

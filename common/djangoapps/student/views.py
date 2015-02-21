@@ -168,21 +168,6 @@ def index(request, extra_context=None, user=AnonymousUser()):
     return render_to_response('index.html', context)
 
 
-def embargo(_request):
-    """
-    Render the embargo page.
-
-    Explains to the user why they are not able to access a particular embargoed course.
-    Tries to use the themed version, but fall back to the default if not found.
-    """
-    try:
-        if settings.FEATURES["USE_CUSTOM_THEME"]:
-            return render_to_response("static_templates/theme-embargo.html")
-    except TopLevelLookupException:
-        pass
-    return render_to_response("static_templates/embargo.html")
-
-
 def process_survey_link(survey_link, user):
     """
     If {UNIQUE_ID} appears in the link, replace it with a unique id for the user.
