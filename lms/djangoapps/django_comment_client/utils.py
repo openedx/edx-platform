@@ -19,8 +19,9 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 
 from courseware.access import has_access
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, \
-    is_course_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 
 
@@ -154,8 +155,7 @@ def get_discussion_category_map(course, user):
 
     modules = get_accessible_discussion_modules(course, user)
 
-    is_course_cohorted = course.is_cohorted
-    cohorted_discussion_ids = course.cohorted_discussions
+    course_cohort_settings = get_course_cohort_settings(course.id)
 
     for module in modules:
         id = module.discussion_id
@@ -209,16 +209,19 @@ def get_discussion_category_map(course, user):
             node[level]["entries"][title] = {"id": entry["id"],
                                              "sort_key": entry["sort_key"],
                                              "start_date": entry["start_date"],
-                                             "is_cohorted": is_course_cohorted}
+                                             "is_cohorted": course_cohort_settings.is_cohorted}
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
     # in the backend.
     for topic, entry in course.discussion_topics.items():
-        category_map['entries'][topic] = {"id": entry["id"],
-                                          "sort_key": entry.get("sort_key", topic),
-                                          "start_date": datetime.now(UTC()),
-                                          "is_cohorted": is_course_cohorted and entry["id"] in cohorted_discussion_ids}
+        category_map['entries'][topic] = {
+            "id": entry["id"],
+            "sort_key": entry.get("sort_key", topic),
+            "start_date": datetime.now(UTC()),
+            "is_cohorted": (course_cohort_settings.is_cohorted and
+                            entry["id"] in course_cohort_settings.cohorted_discussions)
+        }
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 

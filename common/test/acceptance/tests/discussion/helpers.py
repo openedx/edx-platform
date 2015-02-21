@@ -60,13 +60,11 @@ class CohortTestMixin(object):
         """
         Disables cohorting for the current course fixture.
         """
-        course_fixture._update_xblock(course_fixture._course_location, {
-            "metadata": {
-                u"cohort_config": {
-                    "cohorted": False
-                },
-            },
-        })
+        url = LMS_BASE_URL + "/courses/" + course_fixture._course_key + '/cohorts/settings'  # pylint: disable=protected-access
+        data = json.dumps({'is_cohorted': False})
+        response = course_fixture.session.post(url, data=data, headers=course_fixture.headers)
+        self.assertTrue(response.ok, "Failed to disable cohorts")
+
 
     def add_manual_cohort(self, course_fixture, cohort_name):
         """

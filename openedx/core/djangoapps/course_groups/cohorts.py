@@ -71,12 +71,9 @@ def _cohort_membership_changed(sender, **kwargs):
         tracker.emit(event_name, event)
 
 
-# A 'default cohort' is an auto-cohort that is automatically created for a course if no auto_cohort_groups have been
-# specified. It is intended to be used in a cohorted-course for users who have yet to be assigned to a cohort.
-# Note 1: If an administrator chooses to configure a cohort with the same name, the said cohort will be used as
-#         the "default cohort".
-# Note 2: If auto_cohort_groups are configured after the 'default cohort' has been created and populated, the
-#         stagnant 'default cohort' will still remain (now as a manual cohort) with its previously assigned students.
+# A 'default cohort' is an auto-cohort that is automatically created for a course if no cohort with automatic
+# assignment have been specified. It is intended to be used in a cohorted-course for users who have yet to be assigned
+# to a cohort.
 # Translation Note: We are NOT translating this string since it is the constant identifier for the "default group"
 #                   and needed across product boundaries.
 DEFAULT_COHORT_NAME = "Default Group"
@@ -110,7 +107,7 @@ def is_course_cohorted(course_key):
     Raises:
        Http404 if the course doesn't exist.
     """
-    return courses.get_course_by_id(course_key).is_cohorted
+    return get_course_cohort_settings(course_key).is_cohorted
 
 
 def get_cohort_id(user, course_key):
@@ -135,18 +132,19 @@ def is_commentable_cohorted(course_key, commentable_id):
         Http404 if the course doesn't exist.
     """
     course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
 
-    if not course.is_cohorted:
+    if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = False
     elif (
             commentable_id in course.top_level_discussion_topic_ids or
-            course.always_cohort_inline_discussions is False
+            course_cohort_settings.always_cohort_inline_discussions is False
     ):
         # top level discussions have to be manually configured as cohorted
         # (default is not).
         # Same thing for inline discussions if the default is explicitly set to False in settings
-        ans = commentable_id in course.cohorted_discussions
+        ans = commentable_id in course_cohort_settings.cohorted_discussions
     else:
         # inline discussions are cohorted by default
         ans = True
@@ -162,13 +160,13 @@ def get_cohorted_commentables(course_key):
     Given a course_key return a set of strings representing cohorted commentables.
     """
 
-    course = courses.get_course_by_id(course_key)
+    course_cohort_settings = get_course_cohort_settings(course_key)
 
-    if not course.is_cohorted:
+    if not course_cohort_settings.is_cohorted:
         # this is the easy case :)
         ans = set()
     else:
-        ans = course.cohorted_discussions
+        ans = set(course_cohort_settings.cohorted_discussions)
 
     return ans
 
@@ -193,12 +191,10 @@ def get_cohort(user, course_key, assign=True):
     """
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
-    try:
-        course = courses.get_course_by_id(course_key)
-    except Http404:
-        raise ValueError("Invalid course_key")
+    course = courses.get_course(course_key)
+    course_cohort_settings = get_course_cohort_settings(course.id)
 
-    if not course.is_cohorted:
+    if not course_cohort_settings.is_cohorted:
         return None
 
     try:
@@ -232,9 +228,8 @@ def migrate_cohort_settings(course):
     Migrate all the cohort settings associated with this course from modulestore to mysql.
     After that we will never touch modulestore for any cohort related settings.
     """
-    course_id = course.location.course_key
     cohort_settings, created = CourseCohortsSettings.objects.get_or_create(
-        course_id=course_id,
+        course_id=course.id,
         defaults={
             'is_cohorted': course.is_cohorted,
             'cohorted_discussions': list(course.cohorted_discussions),
@@ -246,14 +241,14 @@ def migrate_cohort_settings(course):
     if created:
         # Update the manual cohorts already present in CourseUserGroup
         manual_cohorts = CourseUserGroup.objects.filter(
-            course_id=course_id,
+            course_id=course.id,
             group_type=CourseUserGroup.COHORT
         ).exclude(name__in=course.auto_cohort_groups)
         for cohort in manual_cohorts:
             CourseCohort.create(course_user_group=cohort)
 
         for group_name in course.auto_cohort_groups:
-            CourseCohort.create(cohort_name=group_name, course_id=course_id, assignment_type=CourseCohort.RANDOM)
+            CourseCohort.create(cohort_name=group_name, course_id=course.id, assignment_type=CourseCohort.RANDOM)
 
     return cohort_settings
 
@@ -454,7 +449,7 @@ def set_course_cohort_settings(course_key, **kwargs):
         A CourseCohortSettings object.
 
     Raises:
-        ValueError if course_key is invalid.
+        Http404 if course_key is invalid.
     """
     fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
     course_cohort_settings = get_course_cohort_settings(course_key)
@@ -478,11 +473,11 @@ def get_course_cohort_settings(course_key):
         A CourseCohortSettings object.
 
     Raises:
-        ValueError if course_key is invalid.
+        Http404 if course_key is invalid.
     """
     try:
         course_cohort_settings = CourseCohortsSettings.objects.get(course_id=course_key)
     except CourseCohortsSettings.DoesNotExist:
-        course = courses.get_course(course_key)
+        course = courses.get_course_by_id(course_key)
         course_cohort_settings = migrate_cohort_settings(course)
     return course_cohort_settings
