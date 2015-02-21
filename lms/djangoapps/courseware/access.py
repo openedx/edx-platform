@@ -301,6 +301,7 @@ NONREGISTERED_CATEGORY_WHITELIST = [
 #    "error",
     "hidden",
     "image",
+    "imagemodal",
     "problemset",
     "randomize",
     "raw",
