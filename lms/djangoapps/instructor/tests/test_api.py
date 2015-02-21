@@ -58,6 +58,8 @@ from instructor.views.api import generate_unique_password
 from instructor.views.api import _split_input_list, common_exceptions_400
 from instructor_task.api_helper import AlreadyRunningError
 
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
+
 from .test_tools import msk_from_problem_urlname
 from ..views.tools import get_extended_due
 
@@ -2008,8 +2010,7 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
         cohorted, and does not when the course is not cohorted.
         """
         url = reverse('get_students_features', kwargs={'course_id': unicode(self.course.id)})
-        self.course.cohort_config = {'cohorted': is_cohorted}
-        self.store.update_item(self.course, self.instructor.id)
+        set_course_cohort_settings(self.course.id, is_cohorted=is_cohorted)
 
         response = self.client.get(url, {})
         res_json = json.loads(response.content)

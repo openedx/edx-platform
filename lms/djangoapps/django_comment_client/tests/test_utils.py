@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 import json
+import mock
 from pytz import UTC
 
+from django_comment_client.tests.factories import RoleFactory
+from django_comment_client.tests.unicode import UnicodeTestMixin
+import django_comment_client.utils as utils
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from edxmako import add_lookup
-import mock
 
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
-from django_comment_client.tests.factories import RoleFactory
-from django_comment_client.tests.unicode import UnicodeTestMixin
-import django_comment_client.utils as utils
+from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -212,20 +213,35 @@ class CategoryMapTestCase(ModuleStoreTestCase):
 
         check_cohorted_topics([])  # default (empty) cohort config
 
-        self.course.cohort_config = {"cohorted": False, "cohorted_discussions": []}
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False, cohorted_discussions=[])
         check_cohorted_topics([])
 
-        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": []}
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True, cohorted_discussions=[])
         check_cohorted_topics([])
 
-        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": ["Topic_B", "Topic_C"]}
+        set_course_cohort_settings(
+            course_key=self.course.id,
+            is_cohorted=True,
+            cohorted_discussions=["Topic_B", "Topic_C"],
+            always_cohort_inline_discussions=False,
+        )
         check_cohorted_topics(["Topic_B", "Topic_C"])
 
-        self.course.cohort_config = {"cohorted": True, "cohorted_discussions": ["Topic_A", "Some_Other_Topic"]}
+        set_course_cohort_settings(
+            course_key=self.course.id,
+            is_cohorted=True,
+            cohorted_discussions=["Topic_A", "Some_Other_Topic"],
+            always_cohort_inline_discussions=False,
+        )
         check_cohorted_topics(["Topic_A"])
 
         # unlikely case, but make sure it works.
-        self.course.cohort_config = {"cohorted": False, "cohorted_discussions": ["Topic_A"]}
+        set_course_cohort_settings(
+            course_key=self.course.id,
+            is_cohorted=False,
+            cohorted_discussions=["Topic_A"],
+            always_cohort_inline_discussions=False,
+        )
         check_cohorted_topics([])
 
     def test_single_inline(self):
@@ -346,11 +362,11 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         check_cohorted(False)
 
         # explicitly disabled cohorting
-        self.course.cohort_config = {"cohorted": False}
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=False)
         check_cohorted(False)
 
         # explicitly enabled cohorting
-        self.course.cohort_config = {"cohorted": True}
+        set_course_cohort_settings(course_key=self.course.id, is_cohorted=True)
         check_cohorted(True)
 
     def test_start_date_filter(self):

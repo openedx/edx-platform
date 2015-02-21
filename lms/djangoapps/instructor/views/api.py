@@ -100,6 +100,8 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
+
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
 from student.models import UserProfile, Registration
 
 log = logging.getLogger(__name__)
@@ -985,7 +987,7 @@ def get_students_features(request, course_id, csv=False):  # pylint: disable=red
         'goals': _('Goals'),
     }
 
-    if course.is_cohorted:
+    if is_course_cohorted(course.id):
         # Translators: 'Cohort' refers to a group of students within a course.
         query_features.append('cohort')
         query_features_names['cohort'] = _('Cohort')

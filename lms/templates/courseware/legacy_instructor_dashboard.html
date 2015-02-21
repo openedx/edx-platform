@@ -372,7 +372,7 @@ function goto( mode)
 
 %if modeflag.get('Manage Groups'):
   %if instructor_access:
-    %if course.is_cohorted:
+    %if course_is_cohorted:
       <p class="is-deprecated">${_("To manage beta tester roles and cohorts, visit the Membership section of the Instructor Dashboard.")}</p>
     %else:
       <p class="is-deprecated">${_("To manage beta tester roles, visit the Membership section of the Instructor Dashboard.")}</p>

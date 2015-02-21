@@ -41,7 +41,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
 
         self.course_key = SlashSeparatedCourseKey("edX", "toy", "2012_Fall")
         self.course = modulestore().get_course(self.course_key)
-        config_course_cohorts(self.course, [], cohorted=True)
+        config_course_cohorts(self.course, is_cohorted=True)
 
         self.groups = [Group(10, 'Group 10'), Group(20, 'Group 20')]
         self.user_partition = UserPartition(

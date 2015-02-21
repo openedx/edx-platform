@@ -19,7 +19,8 @@ from xmodule.modulestore.tests.django_utils import TEST_DATA_MIXED_TOY_MODULESTO
 from ..models import CourseUserGroup, CourseCohort, CourseUserGroupPartitionGroup
 from .. import cohorts
 from ..tests.helpers import (
-    topic_name_to_id, config_course_cohorts, CohortFactory, CourseCohortFactory, CourseCohortSettingsFactory
+    topic_name_to_id, config_course_cohorts, config_course_cohorts_legacy,
+    CohortFactory, CourseCohortFactory, CourseCohortSettingsFactory
 )
 
 @patch("openedx.core.djangoapps.course_groups.cohorts.tracker")
@@ -146,12 +147,10 @@ class TestCohorts(ModuleStoreTestCase):
         Make sure cohorts.is_course_cohorted() correctly reports if a course is cohorted or not.
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
         self.assertFalse(cohorts.is_course_cohorted(course.id))
 
-        config_course_cohorts(course, [], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True)
 
-        self.assertTrue(course.is_cohorted)
         self.assertTrue(cohorts.is_course_cohorted(course.id))
 
         # Make sure we get a Http404 if there's no course
@@ -164,12 +163,12 @@ class TestCohorts(ModuleStoreTestCase):
         invalid course key.
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         user = UserFactory(username="test", email="a@b.com")
         self.assertIsNone(cohorts.get_cohort_id(user, course.id))
 
-        config_course_cohorts(course, discussions=[], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True)
         cohort = CohortFactory(course_id=course.id, name="TestCohort")
         cohort.users.add(user)
         self.assertEqual(cohorts.get_cohort_id(user, course.id), cohort.id)
@@ -221,7 +220,7 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         self.assertEqual(course.id, self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         user = UserFactory(username="test", email="a@b.com")
         other_user = UserFactory(username="test2", email="a2@b.com")
@@ -237,7 +236,7 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
         # Make the course cohorted...
-        config_course_cohorts(course, discussions=[], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True)
 
         self.assertEquals(
             cohorts.get_cohort(user, course.id).id,
@@ -256,16 +255,15 @@ class TestCohorts(ModuleStoreTestCase):
         assigned to a user instead of assigning/creating a group automatically
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         user = UserFactory(username="test", email="a@b.com")
 
         # Add an auto_cohort_group to the course...
         config_course_cohorts(
             course,
-            discussions=[],
-            cohorted=True,
-            auto_cohort_groups=["AutoGroup"]
+            is_cohorted=True,
+            auto_cohorts=["AutoGroup"]
         )
 
         # get_cohort should return None as no group is assigned to user
@@ -274,13 +272,13 @@ class TestCohorts(ModuleStoreTestCase):
         # get_cohort should return a group for user
         self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
 
-    def test_cohorting_with_auto_cohort_groups(self):
+    def test_cohorting_with_auto_cohorts(self):
         """
-        Make sure cohorts.get_cohort() does the right thing with auto_cohort_groups.
+        Make sure cohorts.get_cohort() does the right thing.
         If there are auto cohort groups then a user should be assigned one.
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         user1 = UserFactory(username="test", email="a@b.com")
         user2 = UserFactory(username="test2", email="a2@b.com")
@@ -293,9 +291,8 @@ class TestCohorts(ModuleStoreTestCase):
         # Add an auto_cohort_group to the course...
         config_course_cohorts(
             course,
-            discussions=[],
-            cohorted=True,
-            auto_cohort_groups=["AutoGroup"]
+            is_cohorted=True,
+            auto_cohorts=["AutoGroup"]
         )
 
         self.assertEquals(cohorts.get_cohort(user1, course.id).id, cohort.id, "user1 should stay put")
@@ -315,16 +312,15 @@ class TestCohorts(ModuleStoreTestCase):
         # Add an auto_cohort_group to the course...
         config_course_cohorts(
             course,
-            discussions=[],
-            cohorted=True,
-            auto_cohort_groups=["AutoGroup"]
+            is_cohorted=True,
+            auto_cohorts=["AutoGroup"]
         )
 
         self.assertEquals(cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should be auto-cohorted")
 
         # Now set the auto_cohort_group to something different
         # This will have no effect on lms side as we are already done with migrations
-        config_course_cohorts(
+        config_course_cohorts_legacy(
             course,
             discussions=[],
             cohorted=True,
@@ -339,15 +335,15 @@ class TestCohorts(ModuleStoreTestCase):
             cohorts.get_cohort(user1, course.id).name, "AutoGroup", "user1 should still be in originally placed cohort"
         )
 
-    def test_cohorting_with_no_auto_cohort_groups(self):
+    def test_cohorting_with_no_auto_cohorts(self):
         """
-        Make sure cohorts.get_cohort() does the right thing with auto_cohort_groups.
-        If there are not auto cohort groups then a user should be assigned to Default Cohort Group.
+        Make sure cohorts.get_cohort() does the right thing.
+        If there are not auto cohorts then a user should be assigned to Default Cohort Group.
         Also verifies that cohort config changes on studio/moduletore side will
         not be reflected on lms after the migrations are done.
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         user1 = UserFactory(username="test", email="a@b.com")
         user2 = UserFactory(username="test2", email="a2@b.com")
@@ -355,9 +351,8 @@ class TestCohorts(ModuleStoreTestCase):
         # Make the auto_cohort_group list empty
         config_course_cohorts(
             course,
-            discussions=[],
-            cohorted=True,
-            auto_cohort_groups=[]
+            is_cohorted=True,
+            auto_cohorts=[]
         )
 
         self.assertEquals(
@@ -368,7 +363,7 @@ class TestCohorts(ModuleStoreTestCase):
 
         # Add an auto_cohort_group to the course
         # This will have no effect on lms side as we are already done with migrations
-        config_course_cohorts(
+        config_course_cohorts_legacy(
             course,
             discussions=[],
             cohorted=True,
@@ -393,11 +388,11 @@ class TestCohorts(ModuleStoreTestCase):
         Make sure cohorts.get_cohort() randomizes properly.
         """
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         groups = ["group_{0}".format(n) for n in range(5)]
         config_course_cohorts(
-            course, discussions=[], cohorted=True, auto_cohort_groups=groups
+            course, is_cohorted=True, auto_cohorts=groups
         )
 
         # Assign 100 users to cohorts
@@ -423,7 +418,7 @@ class TestCohorts(ModuleStoreTestCase):
         Tests get_course_cohorts returns an empty list when no cohorts exist.
         """
         course = modulestore().get_course(self.toy_course_key)
-        config_course_cohorts(course, [], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True)
         self.assertEqual([], cohorts.get_course_cohorts(course))
 
     def test_get_course_cohorts(self):
@@ -432,8 +427,9 @@ class TestCohorts(ModuleStoreTestCase):
         """
         course = modulestore().get_course(self.toy_course_key)
         config_course_cohorts(
-            course, [], cohorted=True,
-            auto_cohort_groups=["AutoGroup1", "AutoGroup2"]
+            course,
+            is_cohorted=True,
+            auto_cohorts=["AutoGroup1", "AutoGroup2"]
         )
 
         # add manual cohorts to course 1
@@ -445,7 +441,7 @@ class TestCohorts(ModuleStoreTestCase):
 
     def test_is_commentable_cohorted(self):
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         def to_id(name):
             return topic_name_to_id(course, name)
@@ -457,7 +453,7 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
         # not cohorted
-        config_course_cohorts(course, ["General", "Feedback"], cohorted=False)
+        config_course_cohorts(course, is_cohorted=False, discussion_topics=["General", "Feedback"])
 
         self.assertFalse(
             cohorts.is_commentable_cohorted(course.id, to_id("General")),
@@ -465,9 +461,9 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
         # cohorted, but top level topics aren't
-        config_course_cohorts(course, ["General", "Feedback"], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True, discussion_topics=["General", "Feedback"])
 
-        self.assertTrue(course.is_cohorted)
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
             cohorts.is_commentable_cohorted(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
@@ -475,12 +471,13 @@ class TestCohorts(ModuleStoreTestCase):
 
         # cohorted, including "Feedback" top-level topics aren't
         config_course_cohorts(
-            course, ["General", "Feedback"],
-            cohorted=True,
+            course,
+            is_cohorted=True,
+            discussion_topics= ["General", "Feedback"],
             cohorted_discussions=["Feedback"]
         )
 
-        self.assertTrue(course.is_cohorted)
+        self.assertTrue(cohorts.is_course_cohorted(course.id))
         self.assertFalse(
             cohorts.is_commentable_cohorted(course.id, to_id("General")),
             "Course is cohorted, but 'General' isn't."
@@ -492,14 +489,15 @@ class TestCohorts(ModuleStoreTestCase):
 
     def test_is_commentable_cohorted_inline_discussion(self):
         course = modulestore().get_course(self.toy_course_key)
-        self.assertFalse(course.is_cohorted)
+        self.assertFalse(cohorts.is_course_cohorted(course.id))
 
         def to_id(name):  # pylint: disable=missing-docstring
             return topic_name_to_id(course, name)
 
         config_course_cohorts(
-            course, ["General", "Feedback"],
-            cohorted=True,
+            course,
+            is_cohorted=True,
+            discussion_topics =["General", "Feedback"],
             cohorted_discussions=["Feedback", "random_inline"]
         )
         self.assertTrue(
@@ -510,8 +508,9 @@ class TestCohorts(ModuleStoreTestCase):
         # if always_cohort_inline_discussions is set to False, non-top-level discussion are always
         # non cohorted unless they are explicitly set in cohorted_discussions
         config_course_cohorts(
-            course, ["General", "Feedback"],
-            cohorted=True,
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
             cohorted_discussions=["Feedback", "random_inline"],
             always_cohort_inline_discussions=False
         )
@@ -538,12 +537,13 @@ class TestCohorts(ModuleStoreTestCase):
 
         self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
 
-        config_course_cohorts(course, [], cohorted=True)
+        config_course_cohorts(course, is_cohorted=True)
         self.assertEqual(cohorts.get_cohorted_commentables(course.id), set())
 
         config_course_cohorts(
-            course, ["General", "Feedback"],
-            cohorted=True,
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
             cohorted_discussions=["Feedback"]
         )
         self.assertItemsEqual(
@@ -552,8 +552,9 @@ class TestCohorts(ModuleStoreTestCase):
         )
 
         config_course_cohorts(
-            course, ["General", "Feedback"],
-            cohorted=True,
+            course,
+            is_cohorted=True,
+            discussion_topics=["General", "Feedback"],
             cohorted_discussions=["General", "Feedback"]
         )
         self.assertItemsEqual(

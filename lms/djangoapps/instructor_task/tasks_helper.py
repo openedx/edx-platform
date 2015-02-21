@@ -33,7 +33,7 @@ from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from lms.djangoapps.lms_xblock.runtime import LmsPartitionService
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
-from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort
+from openedx.core.djangoapps.course_groups.cohorts import add_user_to_cohort, is_course_cohorted
 from student.models import CourseEnrollment
 
 
@@ -552,7 +552,8 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     course = get_course_by_id(course_id)
-    cohorts_header = ['Cohort Name'] if course.is_cohorted else []
+    course_is_cohorted = is_course_cohorted(course.id)
+    cohorts_header = ['Cohort Name'] if course_is_cohorted else []
 
     experiment_partitions = get_split_user_partitions(course.user_partitions)
     group_configs_header = [u'Experiment Group ({})'.format(partition.name) for partition in experiment_partitions]
@@ -584,7 +585,7 @@ def upload_grades_csv(_xmodule_instance_args, _entry_id, course_id, _task_input,
             }
 
             cohorts_group_name = []
-            if course.is_cohorted:
+            if course_is_cohorted:
                 group = get_cohort(student, course_id, assign=False)
                 cohorts_group_name.append(group.name if group else '')
 
