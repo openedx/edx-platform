@@ -29,14 +29,14 @@ THIRD_PARTY_AUTH_CONFIGURED = (
 
 
 @unittest.skipUnless(THIRD_PARTY_AUTH_CONFIGURED, "Third party auth must be configured")
-@patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+@patch.dict(settings.FEATURES, {'EMBARGO': True})
 @ddt.ddt
 class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
     """Test that the pipeline auto-enrolls students upon successful authentication. """
 
     BACKEND_NAME = "google-oauth2"
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """Create a test course and user. """
         super(PipelineEnrollmentTest, self).setUp('embargo')
@@ -129,7 +129,7 @@ class PipelineEnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertEqual(result, {})
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_blocked_by_embargo(self):
         strategy = self._fake_strategy()
         strategy.session_set('enroll_course_id', unicode(self.course.id))
