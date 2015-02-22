@@ -5,7 +5,8 @@ This test will run for annotator_mixin.py
 import unittest
 from lxml import etree
 
-from xmodule.annotator_mixin import get_instructions, get_extension, html_to_text
+from xmodule.annotator_mixin import get_instructions, get_extension
+from html_to_text import html_to_text
 
 
 class HelperFunctionTest(unittest.TestCase):

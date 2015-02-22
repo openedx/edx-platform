@@ -6,6 +6,7 @@ import sys
 from lxml import etree
 from path import path
 
+from html_to_text import html_to_text
 from pkg_resources import resource_string
 from xblock.fields import Scope, String, Boolean, List
 from xmodule.editing_module import EditingDescriptor
@@ -17,7 +18,6 @@ import textwrap
 from xmodule.contentstore.content import StaticContent
 from xblock.core import XBlock
 from xmodule.edxnotes_utils import edxnotes
-from xmodule.annotator_mixin import html_to_text
 import re
 
 log = logging.getLogger("edx.courseware")

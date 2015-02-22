@@ -26,30 +26,3 @@ def get_extension(srcurl):
         disassembled = urlparse(srcurl)
         file_ext = splitext(basename(disassembled.path))[1]
         return 'video/' + file_ext.replace('.', '')
-
-
-class MLStripper(HTMLParser):
-    "helper function for html_to_text below"
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.reset()
-        self.fed = []
-
-    def handle_data(self, data):
-        """takes the data in separate chunks"""
-        self.fed.append(data)
-
-    def handle_entityref(self, name):
-        """appends the reference to the body"""
-        self.fed.append('&%s;' % name)
-
-    def get_data(self):
-        """joins together the seperate chunks into one cohesive string"""
-        return ''.join(self.fed)
-
-
-def html_to_text(html):
-    "strips the html tags off of the text to return plaintext"
-    htmlstripper = MLStripper()
-    htmlstripper.feed(html)
-    return htmlstripper.get_data()
