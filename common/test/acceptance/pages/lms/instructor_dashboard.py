@@ -161,6 +161,11 @@ class MembershipPageCohortManagementSection(PageObject):
         self._get_cohort_options().filter(
             lambda el: self._cohort_name(el.text) == cohort_name
         ).first.click()
+        # wait for cohort to render as selected on screen
+        EmptyPromise(
+            lambda: self.q(css='.title-value').text[0] == cohort_name,
+            "Waiting to confirm cohort has been selected"
+        ).fulfill()
 
     def add_cohort(self, cohort_name, content_group=None):
         """
