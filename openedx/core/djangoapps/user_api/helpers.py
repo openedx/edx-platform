@@ -374,16 +374,6 @@ def shim_student_view(view_func, check_logged_in=False):
                     )
                 )
 
-        # Backwards compatibility: the student view expects both
-        # terms of service and honor code values.  Since we're combining
-        # these into a single checkbox, the only value we may get
-        # from the new view is "honor_code".
-        # Longer term, we will need to make this more flexible to support
-        # open source installations that may have separate checkboxes
-        # for TOS, privacy policy, etc.
-        if request.POST.get("honor_code") is not None and request.POST.get("terms_of_service") is None:
-            request.POST["terms_of_service"] = request.POST.get("honor_code")
-
         # Call the original view to generate a response.
         # We can safely modify the status code or content
         # of the response, but to be safe we won't mess

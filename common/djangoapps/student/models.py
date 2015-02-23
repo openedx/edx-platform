@@ -1464,34 +1464,91 @@ class LinkedInAddToProfileConfiguration(ConfigurationModel):
         )
     )
 
-    def add_to_profile_url(self, course_name, enrollment_mode, cert_url, source="o"):
+    # Deprecated
+    dashboard_tracking_code = models.TextField(default="", blank=True)
+
+    trk_partner_name = models.CharField(
+        max_length=10,
+        default="",
+        blank=True,
+        help_text=ugettext_lazy(
+            u"Short identifier for the LinkedIn partner used in the tracking code.  "
+            u"(Example: 'edx')  "
+            u"If no value is provided, tracking codes will not be sent to LinkedIn."
+        )
+    )
+
+    def add_to_profile_url(self, course_key, course_name, cert_mode, cert_url, source="o", target="dashboard"):
         """Construct the URL for the "add to profile" button.
 
         Arguments:
+            course_key (CourseKey): The identifier for the course.
             course_name (unicode): The display name of the course.
-            enrollment_mode (str): The enrollment mode of the user (e.g. "verified", "honor", "professional")
+            cert_mode (str): The course mode of the user's certificate (e.g. "verified", "honor", "professional")
             cert_url (str): The download URL for the certificate.
 
         Keyword Arguments:
             source (str): Either "o" (for onsite/UI), "e" (for emails), or "m" (for mobile)
+            target (str): An identifier for the occurrance of the button.
 
         """
         params = OrderedDict([
             ('_ed', self.company_identifier),
-            ('pfCertificationName', self._cert_name(course_name, enrollment_mode).encode('utf-8')),
+            ('pfCertificationName', self._cert_name(course_name, cert_mode).encode('utf-8')),
             ('pfCertificationUrl', cert_url),
             ('source', source)
         ])
+
+        tracking_code = self._tracking_code(course_key, cert_mode, target)
+        if tracking_code is not None:
+            params['trk'] = tracking_code
+
         return u'http://www.linkedin.com/profile/add?{params}'.format(
             params=urlencode(params)
         )
 
-    def _cert_name(self, course_name, enrollment_mode):
+    def _cert_name(self, course_name, cert_mode):
         """Name of the certification, for display on LinkedIn. """
         return self.MODE_TO_CERT_NAME.get(
-            enrollment_mode,
+            cert_mode,
             _(u"{platform_name} Certificate for {course_name}")
         ).format(
             platform_name=settings.PLATFORM_NAME,
             course_name=course_name
+        )
+
+    def _tracking_code(self, course_key, cert_mode, target):
+        """Create a tracking code for the button.
+
+        Tracking codes are used by LinkedIn to collect
+        analytics about certifications users are adding
+        to their profiles.
+
+        The tracking code format is:
+            &trk=[partner name]-[certificate type]-[date]-[target field]
+
+        In our case, we're sending:
+            &trk=edx-{COURSE ID}_{COURSE MODE}-{TARGET}
+
+        If no partner code is configured, then this will
+        return None, indicating that tracking codes are disabled.
+
+        Arguments:
+
+            course_key (CourseKey): The identifier for the course.
+            cert_mode (str): The enrollment mode for the course.
+            target (str): Identifier for where the button is located.
+
+        Returns:
+            unicode or None
+
+        """
+        return (
+            u"{partner}-{course_key}_{cert_mode}-{target}".format(
+                partner=self.trk_partner_name,
+                course_key=unicode(course_key),
+                cert_mode=cert_mode,
+                target=target
+            )
+            if self.trk_partner_name else None
         )

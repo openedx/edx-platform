@@ -367,6 +367,8 @@ function (VideoPlayer) {
             beforeEach(function () {
                 state = jasmine.initializePlayer();
                 state.videoEl = $('video, iframe');
+                jasmine.Clock.useMock();
+                spyOn(state.videoPlayer, 'duration').andReturn(120);
             });
 
             describe('when the video is playing', function () {
@@ -376,9 +378,7 @@ function (VideoPlayer) {
                     });
 
                     waitsFor(function () {
-                        var duration = state.videoPlayer.duration();
-
-                        return duration > 0 && state.videoPlayer.isPlaying();
+                        return state.videoPlayer.isPlaying();
                     }, 'video didn\'t start playing', WAIT_TIMEOUT);
                 });
 
@@ -388,125 +388,13 @@ function (VideoPlayer) {
                         spyOn(state.videoPlayer, 'stopTimer');
                         spyOn(state.videoPlayer, 'runTimer');
                         state.videoPlayer.seekTo(10);
+                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                        // That's why we have to do this tick(300).
+                        jasmine.Clock.tick(300);
+                        expect(state.videoPlayer.currentTime).toBe(10);
+                        expect(state.videoPlayer.stopTimer).toHaveBeenCalled();
+                        expect(state.videoPlayer.runTimer).toHaveBeenCalled();
                     });
-
-                    waitsFor(function () {
-                        return state.videoPlayer.currentTime >= 10;
-                    }, 'currentTime is less than 10 seconds', WAIT_TIMEOUT);
-
-                    runs(function () {
-                        expect(state.videoPlayer.stopTimer)
-                            .toHaveBeenCalled();
-                        expect(state.videoPlayer.runTimer)
-                            .toHaveBeenCalled();
-                    });
-                });
-
-                // as per TNL-439 this test is deemed flaky and needs to be fixed.
-                // disabled 09/18/2014
-                xit('slider event causes log update', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer, 'log');
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 2 }
-                        );
-                    });
-
-                    waitsFor(function () {
-                        return state.videoPlayer.currentTime >= 2;
-                    }, 'currentTime is less than 2 seconds', WAIT_TIMEOUT);
-
-                    runs(function () {
-                        // Depending on the browser, the object of arrays may list the
-                        // arrays in a different order. Find the array that is relevent
-                        // to onSeek. Fail if that is not found.
-                        var seekVideoArgIndex
-                        for(var i = 0; i < state.videoPlayer.log.calls.length; i++){
-                            if (state.videoPlayer.log.calls[i].args[0] == 'seek_video') {
-                                seekVideoArgIndex = i
-                                break;
-                            }
-                        }
-
-                        expect(seekVideoArgIndex).toBeDefined;
-
-                        var args = state.videoPlayer.log.calls[seekVideoArgIndex].args;
-
-                        expect(args[1].old_time).toBeLessThan(2);
-                        expect(args[1].new_time).toBe(2);
-                        expect(args[1].type).toBe('onSlideSeek');
-                    });
-                });
-
-                // as per TNL-439 this test is deemed flaky and needs to be fixed.
-                // disabled 09/18/2014
-                xit('seek the player', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer.player, 'seekTo')
-                            .andCallThrough();
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 30 }
-                        );
-                    });
-
-                    waitsFor(function () {
-                        return state.videoPlayer.currentTime >= 30;
-                    }, 'currentTime is less than 30 seconds', WAIT_TIMEOUT);
-
-                    runs(function () {
-                        expect(state.videoPlayer.player.seekTo)
-                            .toHaveBeenCalledWith(30, true);
-                    });
-                });
-
-                // as per TNL-439 this test is deemed flaky and needs to be fixed.
-                // disabled 09/18/2014
-                xit('call updatePlayTime on player', function () {
-                    runs(function () {
-                        spyOn(state.videoPlayer, 'updatePlayTime')
-                            .andCallThrough();
-                        state.videoProgressSlider.onSlide(
-                            jQuery.Event('slide'), { value: 30 }
-                        );
-                    });
-
-                    waitsFor(function () {
-                        return state.videoPlayer.currentTime >= 30;
-                    }, 'currentTime is less than 30 seconds', WAIT_TIMEOUT);
-
-                    runs(function () {
-                        expect(state.videoPlayer.updatePlayTime)
-                            .toHaveBeenCalledWith(30, true);
-                    });
-                });
-            });
-
-            // Disabled 10/25/13 due to flakiness in master
-            xit(
-                'when the player is not playing: set the current time',
-                function ()
-            {
-                runs(function () {
-                    state.videoProgressSlider.onSlide(
-                        jQuery.Event('slide'), { value: 20 }
-                    );
-                    state.videoPlayer.pause();
-                    state.videoProgressSlider.onSlide(
-                        jQuery.Event('slide'), { value: 10 }
-                    );
-
-                    waitsFor(function () {
-                        return Math.round(state.videoPlayer.currentTime) === 10;
-                    }, 'currentTime got updated', 10000);
-                });
-            });
-
-            // as per TNL-439 these tests are deemed flaky and needs to be fixed.
-            // disabled 09/18/2014
-            xdescribe('when the video is not playing', function () {
-                beforeEach(function () {
-                    spyOn(state.videoPlayer, 'setPlaybackRate')
-                        .andCallThrough();
                 });
 
                 it('slider event causes log update', function () {
@@ -515,21 +403,88 @@ function (VideoPlayer) {
                         state.videoProgressSlider.onSlide(
                             jQuery.Event('slide'), { value: 2 }
                         );
+                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                        // That's why we have to do this tick(300).
+                        jasmine.Clock.tick(300);
+                        expect(state.videoPlayer.currentTime).toBe(2);
+
+                        expect(state.videoPlayer.log).toHaveBeenCalledWith('seek_video', {
+                            old_time: jasmine.any(Number),
+                            new_time: 2,
+                            type: 'onSlideSeek'
+                        });
                     });
+                });
 
-                    waitsFor(function () {
-                        return state.videoPlayer.currentTime >= 2;
-                    }, 'currentTime is less than 2 seconds', WAIT_TIMEOUT);
-
+                it('seek the player', function () {
                     runs(function () {
-                        expect(state.videoPlayer.log).toHaveBeenCalledWith(
-                            'seek_video', {
-                                old_time: 0,
-                                new_time: 2,
-                                type: 'onSlideSeek'
-                            }
+                        spyOn(state.videoPlayer.player, 'seekTo').andCallThrough();
+                        state.videoProgressSlider.onSlide(
+                            jQuery.Event('slide'), { value: 30 }
                         );
+                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                        // That's why we have to do this tick(300).
+                        jasmine.Clock.tick(300);
+                        expect(state.videoPlayer.currentTime).toBe(30);
+                        expect(state.videoPlayer.player.seekTo).toHaveBeenCalledWith(30, true);
                     });
+                });
+
+                it('call updatePlayTime on player', function () {
+                    runs(function () {
+                        spyOn(state.videoPlayer, 'updatePlayTime').andCallThrough();
+                        state.videoProgressSlider.onSlide(
+                            jQuery.Event('slide'), { value: 30 }
+                        );
+                        // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                        // That's why we have to do this tick(300).
+                        jasmine.Clock.tick(300);
+                        expect(state.videoPlayer.currentTime).toBe(30);
+                        expect(state.videoPlayer.updatePlayTime).toHaveBeenCalledWith(30, true);
+                    });
+                });
+            });
+
+            it('when the player is not playing: set the current time', function () {
+                state.videoProgressSlider.onSlide(
+                    jQuery.Event('slide'), { value: 20 }
+                );
+                // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                // That's why we have to do this tick(300).
+                jasmine.Clock.tick(300);
+                state.videoPlayer.pause();
+                expect(state.videoPlayer.currentTime).toBe(20);
+                state.videoProgressSlider.onSlide(
+                    jQuery.Event('slide'), { value: 10 }
+                );
+                // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                // That's why we have to do this tick(300).
+                jasmine.Clock.tick(300);
+                expect(state.videoPlayer.currentTime).toBe(10);
+            });
+
+            describe('when the video is not playing', function () {
+                beforeEach(function () {
+                    spyOn(state.videoPlayer, 'setPlaybackRate')
+                        .andCallThrough();
+                });
+
+                it('slider event causes log update', function () {
+                    spyOn(state.videoPlayer, 'log');
+                    state.videoProgressSlider.onSlide(
+                        jQuery.Event('slide'), { value: 2 }
+                    );
+                    // Video player uses _.debounce (with a wait time in 300 ms) for seeking.
+                    // That's why we have to do this tick(300).
+                    jasmine.Clock.tick(300);
+                    expect(state.videoPlayer.currentTime).toBe(2);
+                    expect(state.videoPlayer.log).toHaveBeenCalledWith(
+                        'seek_video', {
+                            old_time: 0,
+                            new_time: 2,
+                            type: 'onSlideSeek'
+                        }
+                    );
                 });
 
                 it('video has a correct speed', function () {

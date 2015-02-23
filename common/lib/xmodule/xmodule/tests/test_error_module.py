@@ -119,8 +119,8 @@ class TestErrorModuleConstruction(unittest.TestCase):
     """
     Test that error module construction happens correctly
     """
-
     def setUp(self):
+        # pylint: disable=abstract-class-instantiated
         super(TestErrorModuleConstruction, self).setUp()
         field_data = Mock(spec=FieldData)
         self.descriptor = BrokenDescriptor(

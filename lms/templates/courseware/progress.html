@@ -8,6 +8,7 @@
 <%static:css group='style-course'/>
 </%block>
 
+
 <%namespace name="progress_graph" file="/courseware/progress_graph.js"/>
 
 <%block name="pagetitle">${_("{course_number} Progress").format(course_number=course.display_number_with_default) | h}</%block>
@@ -27,6 +28,7 @@ from django.utils.http import urlquote_plus
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.stack.js')}"></script>
 <script type="text/javascript" src="${static.url('js/vendor/flot/jquery.flot.symbol.js')}"></script>
+<script type="text/javascript" src="${static.url('js/courseware/certificates_api.js')}"></script>
 <script>
   ${progress_graph.body(grade_summary, course.grade_cutoffs, "grade-detail-graph", not course.no_grade, not course.no_grade)}
 </script>
@@ -50,23 +52,27 @@ from django.utils.http import urlquote_plus
         <h1>${_("Course Progress for Student '{username}' ({email})").format(username=student.username, email=student.email)}</h1>
       </header>
 
-      %if settings.FEATURES.get("SHOW_PROGRESS_SUCCESS_BUTTON"):
-        <%
-          SUCCESS_BUTTON_URL = settings.PROGRESS_SUCCESS_BUTTON_URL.format(
-            course_id=urlquote_plus(unicode(course.id)),
-            student_id=urlquote_plus(student.id)
-          )
-          nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
-          success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
-        %>
-        %if success_cutoff and grade_summary['percent'] > success_cutoff:
-          <div id="course-success">
-            <a href="${SUCCESS_BUTTON_URL}">
-              ${settings.PROGRESS_SUCCESS_BUTTON_TEXT_OVERRIDE or _("Download your certificate")}
-            </a>
-          </div>
-        %endif
-      %endif
+       %if show_generate_cert_btn:
+           <div id="course-success">
+             %if passed:
+                % if is_downloadable and download_url:
+                    <a class="btn" href="${download_url}" target="_blank"
+                    title="${_('You can download your certificate as a PDF. You can then print your certificate or share it with others.')}">
+                    ${_("Download Your Certificate")}
+                    </a>
+                %elif is_generating:
+                    <button disabled="disabled">${_('Create Your Certificate')}</button>
+                    <p class="text-center">${_("Creating certificate")}</p>
+                %else:
+                    <button data-endpoint="${reverse('generate_user_cert', args=[unicode(course.id)])}" id="btn_generate_cert">${_('Create Your Certificate')}</button>
+                %endif
+             %else:
+                <button disabled="disabled">${_('Create Your Certificate')}</button>
+                <p class="text-center">${_("Your certificate will be available when you pass the course.")}</p>
+             %endif
+           </div>
+           <div id="errors-info" class="text-center"></div>
+       %endif
 
       %if not course.disable_progress_graph:
         <div id="grade-detail-graph" aria-hidden="true"></div>
@@ -138,3 +144,4 @@ from django.utils.http import urlquote_plus
     </div>
   </div>
 </div>
+

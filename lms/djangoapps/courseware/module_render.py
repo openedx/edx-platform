@@ -823,7 +823,7 @@ def xblock_resource(request, block_type, uri):  # pylint: disable=unused-argumen
     except IOError:
         log.info('Failed to load xblock resource', exc_info=True)
         raise Http404
-    except Exception:  # pylint: disable-msg=broad-except
+    except Exception:  # pylint: disable=broad-except
         log.error('Failed to load xblock resource', exc_info=True)
         raise Http404
     mimetype, _ = mimetypes.guess_type(uri)

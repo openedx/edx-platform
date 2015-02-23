@@ -331,7 +331,6 @@ def get_component_templates(courselike, library=False):
                         "Advanced component %s does not exist. It will not be added to the Studio new component menu.",
                         category
                     )
-                    pass
     else:
         log.error(
             "Improper format for course advanced keys! %s",

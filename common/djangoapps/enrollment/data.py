@@ -97,7 +97,8 @@ def create_course_enrollment(username, course_id, mode, is_active):
     except CourseFullError as err:
         raise CourseEnrollmentFullError(err.message)
     except AlreadyEnrolledError as err:
-        raise CourseEnrollmentExistsError(err.message)
+        enrollment = get_course_enrollment(username, course_id)
+        raise CourseEnrollmentExistsError(err.message, enrollment)
 
 
 def update_course_enrollment(username, course_id, mode=None, is_active=None):

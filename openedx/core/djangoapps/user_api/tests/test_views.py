@@ -1233,6 +1233,7 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertHttpOK(response)
+        self.assertIn(settings.EDXMKTG_COOKIE_NAME, self.client.cookies)
 
         # Verify that the user exists
         self.assertEqual(
@@ -1367,11 +1368,19 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
         self.assertEqual(
-            response.content,
-            "It looks like {} belongs to an existing account. Try again with a different email address.".format(
-                self.EMAIL
-            )
+            response_json,
+            {
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
         )
 
     def test_register_duplicate_username(self):
@@ -1394,11 +1403,19 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
         self.assertEqual(
-            response.content,
-            "It looks like {} belongs to an existing account. Try again with a different username.".format(
-                self.USERNAME
-            )
+            response_json,
+            {
+                "username": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
+                    ).format(
+                        self.USERNAME
+                    )
+                }]
+            }
         )
 
     def test_register_duplicate_username_and_email(self):
@@ -1421,11 +1438,46 @@ class RegistrationViewTest(ApiTestCase):
             "honor_code": "true",
         })
         self.assertEqual(response.status_code, 409)
+        response_json = json.loads(response.content)
         self.assertEqual(
-            response.content,
-            "It looks like {} and {} belong to an existing account. Try again with a different email address and username.".format(
-                self.EMAIL, self.USERNAME
-            )
+            response_json,
+            {
+                "username": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different username."
+                    ).format(
+                        self.USERNAME
+                    )
+                }],
+                "email": [{
+                    "user_message": (
+                        "It looks like {} belongs to an existing account. "
+                        "Try again with a different email address."
+                    ).format(
+                        self.EMAIL
+                    )
+                }]
+            }
+        )
+
+    def test_missing_fields(self):
+        response = self.client.post(
+            self.url,
+            {
+                "email": self.EMAIL,
+                "name": self.NAME,
+                "honor_code": "true",
+            }
+        )
+        self.assertEqual(response.status_code, 400)
+        response_json = json.loads(response.content)
+        self.assertEqual(
+            response_json,
+            {
+                "username": [{"user_message": "Username must be minimum of two characters long"}],
+                "password": [{"user_message": "A valid password is required"}],
+            }
         )
 
     def _assert_reg_field(self, extra_fields_setting, expected_field):

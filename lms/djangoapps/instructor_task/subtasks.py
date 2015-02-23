@@ -7,8 +7,8 @@ from uuid import uuid4
 import math
 import psutil
 from contextlib import contextmanager
+import logging
 
-from celery.utils.log import get_task_logger
 from celery.states import SUCCESS, READY_STATES, RETRY
 import dogstats_wrapper as dog_stats_api
 
@@ -17,7 +17,7 @@ from django.core.cache import cache
 
 from instructor_task.models import InstructorTask, PROGRESS, QUEUING
 
-TASK_LOG = get_task_logger(__name__)
+TASK_LOG = logging.getLogger('edx.celery.task')
 
 # Lock expiration should be long enough to allow a subtask to complete.
 SUBTASK_LOCK_EXPIRE = 60 * 10  # Lock expires in 10 minutes
@@ -165,7 +165,7 @@ class SubtaskStatus(object):
         self.state = state if state is not None else QUEUING
 
     @classmethod
-    def from_dict(self, d):
+    def from_dict(cls, d):
         """Construct a SubtaskStatus object from a dict representation."""
         options = dict(d)
         task_id = options['task_id']
@@ -173,9 +173,9 @@ class SubtaskStatus(object):
         return SubtaskStatus.create(task_id, **options)
 
     @classmethod
-    def create(self, task_id, **options):
+    def create(cls, task_id, **options):
         """Construct a SubtaskStatus object."""
-        return self(task_id, **options)
+        return cls(task_id, **options)
 
     def to_dict(self):
         """

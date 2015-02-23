@@ -255,6 +255,11 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
             self.assertTrue(data['is_active'])
         return resp
 
+    def test_enrollment_already_enrolled(self):
+        response = self._create_enrollment()
+        repeat_response = self._create_enrollment()
+        self.assertEqual(json.loads(response.content), json.loads(repeat_response.content))
+
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(
             reverse('courseenrollments'),
