@@ -27,19 +27,19 @@ class AccountView(APIView):
 
         **Response Values for GET**
 
-            * username: The username associated with the account (not editable).
+            * username: username associated with the account (not editable)
 
-            * name: The full name of the user (not editable through this API).
+            * name: full name of the user (not editable through this API)
 
-            * email: The email for the user (not editable through this API).
+            * email: email for the user (not editable through this API)
 
-            * date_joined: The date this account was created (not editable).
+            * date_joined: date this account was created (not editable)
 
-            * gender: null, "m", "f", or "o":
+            * gender: null or "" (not set), "m", "f", or "o"
 
-            * year_of_birth: null or integer year:
+            * year_of_birth: null or integer year
 
-            * level_of_education: null or one of the following choices:
+            * level_of_education: null or "" (not set), or one of the following choices:
 
                 * "p" signifying "Doctorate"
                 * "m" signifying "Master's or professional degree"
@@ -55,7 +55,7 @@ class AccountView(APIView):
 
              * city: null or name of city
 
-             * country: null or a Country corresponding to one of the ISO 3166-1 countries
+             * country: null or "" (not set), or a Country corresponding to one of the ISO 3166-1 countries
 
              * mailing_address: null or textual representation of mailing address
 
@@ -119,7 +119,7 @@ class AccountView(APIView):
             existing_user = User.objects.get(username=username)
         except ObjectDoesNotExist:
             return Response({}, status=status.HTTP_404_NOT_FOUND)
-        existing_user_profile = UserProfile.objects.get(id=existing_user.id)
+        existing_user_profile = UserProfile.objects.get(user=existing_user)
 
         return existing_user, existing_user_profile
 
