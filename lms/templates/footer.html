@@ -6,8 +6,8 @@
 
 <div class="wrapper wrapper-footer">
   <footer>
-    <div class="colophon">
-      <nav class="nav-colophon">
+    <nav class="colophon">
+      <div class="nav-colophon" aria-label="${_('Colophon')}">
       <ol>
           <li class="nav-colophon-01">
           <a id="about" href="${marketing_link('ABOUT')}">
@@ -39,7 +39,7 @@
           </a>
           </li>
       </ol>
-      </nav>
+      </div>
 
       <div class="wrapper-logo">
         <p>
@@ -61,7 +61,7 @@
 	    link_end=u"</a>"
 	)}
       </p>
-        <nav class="nav-legal">
+        <nav class="nav-legal" aria-label="${_('Legal Documents')}">
           <ul>
 	    %if marketing_link('HONOR') and marketing_link('HONOR') != '#':
             <li class="nav-legal-01">
@@ -89,7 +89,7 @@
             </li>
           </ul>
         </nav>
-    </div>
+    </nav>
 
     ## please leave this link and use one of the logos provided
     <div class="powered-by">
