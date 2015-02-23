@@ -1,27 +1,28 @@
 <div class="cohort-discussions-nav">
-    <form action="" method="post" name="" id="cohort-management-settings-form" class="cohort-management-settings-form">
-        <h3 class="subsection-title"><%- gettext('Designate discussion topics as divided by cohort') %></h3>
-            <div class="coursewide-discussion-topics cohort-management-supplemental">
-                <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
-                <span><%- gettext('You can optionally designate coursewide discussions topics to be cohorted.') %></span>
-
-                <ul class="wrapper-tabs">
-                    <% _.each(coursewideTopics.models, function(topic) { %>
-                        <div>
-                        <li>
-                            <label class=class="discussion-topic topic-name" data-id="<%- topic.get('id') %>">
-                                <input type="checkbox" <%- topic.get('is_cohorted') ? 'checked="checked"' : '' %> />
-                                <%- topic.get('name') %>
-                            </label>
-                            <span class="cohorted-text <%- !topic.get('is_cohorted') ? 'hidden' : '' %>">- <%- gettext('Cohorted') %></span>
-                        </li>
-
-                    <% }); %>
-                </ul>
-                <button class="form-submit button action-primary action-save">
-                    <%- gettext('Save') %>
-                </button>
+    <form action="" method="post" id="cohort-coursewide-discussions-form" class="cohort-coursewide-discussions-form">
+        <div class="form-fields">
+            <div class="form-field">
+                <h3 class="subsection-title"><%- gettext('Designate discussion topics as divided by cohort') %></h3>
+                <div class="coursewide-discussion-topics cohort-management-supplemental">
+                    <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
+                    <span><%- gettext('You can optionally designate coursewide discussions topics to be cohorted.') %></span>
+                    <div class="field">
+                        <ul class="wrapper-tabs">
+                            <% _.each(coursewideTopics, function(topic) { %>
+                                <li>
+                                    <input data-id="<%- topic.get('id') %>" class="check-discussion-topic" type="checkbox" <%- topic.get('is_cohorted') ? 'checked="checked"' : '' %> />
+                                    <label class="inline topic-name"><%- topic.get('name') %></label>
+                                    <span class="inline cohorted-text <%- !topic.get('is_cohorted') ? 'hidden' : '' %>">- <%- gettext('Cohorted') %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="form-actions">
+            <button class="form-submit button action-primary action-save"><%- gettext('Save') %></button>
+        </div>
     </form>
 
     <hr class="divider divider-lv1" />
