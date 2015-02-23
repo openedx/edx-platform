@@ -415,6 +415,11 @@ if settings.COURSEWARE_ENABLED:
                 'courseware.masquerade.handle_ajax', name="masquerade_update"),
         )
 
+    urlpatterns += (
+        url(r'^courses/{}/generate_user_cert'.format(settings.COURSE_ID_PATTERN),
+            'courseware.views.generate_user_cert', name="generate_user_cert"),
+    )
+
     # discussion forums live within courseware, so courseware must be enabled first
     if settings.FEATURES.get('ENABLE_DISCUSSION_SERVICE'):
         urlpatterns += (
