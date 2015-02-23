@@ -45,8 +45,12 @@ ANALYTICS_DASHBOARD_URL = None
 ################################ DEBUG TOOLBAR ################################
 
 INSTALLED_APPS += ('debug_toolbar', 'debug_toolbar_mongo')
-MIDDLEWARE_CLASSES += ('django_comment_client.utils.QueryCountDebugMiddleware',
-                       'debug_toolbar.middleware.DebugToolbarMiddleware',)
+MIDDLEWARE_CLASSES = (
+    (
+        'django_comment_client.utils.QueryCountDebugMiddleware',
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ) + MIDDLEWARE_CLASSES
+)
 INTERNAL_IPS = ('127.0.0.1',)
 
 DEBUG_TOOLBAR_PANELS = (
