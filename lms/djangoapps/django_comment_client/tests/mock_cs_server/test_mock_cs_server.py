@@ -2,7 +2,7 @@ import unittest
 import threading
 import json
 import urllib2
-from mock_cs_server import MockCommentServiceServer
+from django_comment_client.tests.mock_cs_server.mock_cs_server import MockCommentServiceServer
 from nose.plugins.skip import SkipTest
 
 

@@ -1,6 +1,6 @@
 """Provides base Commentable model class"""
-import models
-import settings
+from lms.lib.comment_client import models
+from lms.lib.comment_client import settings
 
 
 class Commentable(models.Model):
