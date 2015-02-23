@@ -41,7 +41,12 @@ def export_to_xml(modulestore, contentstore, course_key, root_dir, course_dir):
 
     with modulestore.bulk_operations(course_key):
 
-        course = modulestore.get_course(course_key, depth=None)  # None means infinite
+        # depth = None: Traverses down the entire course structure.
+        # lazy = False: Loads and caches all block definitions during traversal for fast access later
+        #               -and- to eliminate many round-trips to read individual definitions.
+        # Why these parameters? Because a course export needs to access all the course block information
+        # eventually. Accessing it all now at the beginning increases performance of the export.
+        course = modulestore.get_course(course_key, depth=None, lazy=False)
         fsm = OSFS(root_dir)
         export_fs = course.runtime.export_fs = fsm.makeopendir(course_dir)
         root_course_dir = root_dir + '/' + course_dir
