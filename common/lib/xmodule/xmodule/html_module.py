@@ -270,7 +270,7 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
             xblock_body["content"].update(html_body)
         else:
             xblock_body["content"] = html_body
-        xblock_body["content_type"] = "HTML Content"
+        xblock_body["content_type"] = "Text"
         return xblock_body
 
 
