@@ -114,6 +114,11 @@ def login_and_registration_form(request, initial_mode="login"):
         'login_form_desc': form_descriptions['login'],
         'registration_form_desc': form_descriptions['registration'],
         'password_reset_form_desc': form_descriptions['password_reset'],
+
+        # We need to pass these parameters so that the header's
+        # "Sign In" button preserves the querystring params.
+        'enrollment_action': request.GET.get('enrollment_action'),
+        'course_id': request.GET.get('course_id')
     }
 
     return render_to_response('student_account/login_and_register.html', context)
