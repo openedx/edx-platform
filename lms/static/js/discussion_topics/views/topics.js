@@ -15,7 +15,6 @@ var edx = edx || {};
             this.template = _.template($('#cohort-discussion-topics-tpl').text());
             this.context = options.context;
             this.model.get('entries').on("change", this.render, this);
-            //_.bindAll(this, 'toggleTopicCheck');
             this.cohortedDiscussionTopics = [];
         },
         render: function() {
@@ -79,7 +78,7 @@ var edx = edx || {};
             //};
             //this.removeNotification();
             fieldData = {
-                cohortedDiscussionTopics: this.cohortedDiscussionTopics
+                coursewide_discussions: this.cohortedDiscussionTopics
             };
             //errorMessages = this.validate(fieldData);
 

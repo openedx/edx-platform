@@ -291,7 +291,7 @@ def _section_cohort_management(course, access):
         'cohorts_url': reverse('cohorts', kwargs={'course_key_string': unicode(course_key)}),
         'advanced_settings_url': get_studio_url(course, 'settings/advanced'),
         'upload_cohorts_csv_url': reverse('add_users_to_cohorts', kwargs={'course_id': unicode(course_key)}),
-        'discussion_topics_url': reverse('discussion_topics', kwargs={'course_id': unicode(course_key)}),
+        'discussion_topics_url': reverse('cohort_discussion_topics', kwargs={'course_key_string': unicode(course_key)}),
     }
     return section_data
 

@@ -1,6 +1,7 @@
 """
 Views related to course groups functionality.
 """
+from copy import deepcopy
 
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
@@ -22,6 +23,8 @@ from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
 from . import cohorts
+from lms.djangoapps.courseware.courses import get_course_by_id
+from lms.djangoapps.django_comment_client.utils import JsonError, get_discussion_category_map
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 
 log = logging.getLogger(__name__)
@@ -362,3 +365,33 @@ def debug_cohort_mgmt(request, course_key_string):
         kwargs={'course_key': course_key.to_deprecated_string()}
     )}
     return render_to_response('/course_groups/debug.html', context)
+
+
+@expect_json
+@login_required
+def cohort_discussion_topics(request, course_key_string):
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    try:
+        course = get_course_by_id(course_key)
+    except Http404:
+        # course didn't exist, or requesting user does not have access to it.
+        return JsonError(status=404)
+
+    discussions_category = get_discussion_category_map(course)
+    if request.method == 'POST':
+        cohort_settings_obj = cohorts.get_course_cohort_settings(course_key)
+        copy_cohorted_discussions = deepcopy(cohort_settings_obj.cohorted_discussions)
+
+        if request.json.get('coursewide_discussions'):
+            coursewide_discussions = discussions_category['entries']
+            coursewide_ids = [topic.get('id') for topic_name, topic in coursewide_discussions.iteritems()]
+
+            copy_cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if discussion_id not in coursewide_ids]
+            copy_cohorted_discussions.extend(request.json.get('coursewide_discussions'))
+        elif request.json.get('cohortedDiscussionTopics'):
+            pass
+
+        cohort_settings_obj.cohorted_discussions = copy_cohorted_discussions
+        cohort_settings_obj.save()
+
+    return JsonResponse(discussions_category)
