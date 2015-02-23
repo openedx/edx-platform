@@ -236,6 +236,23 @@ class MembershipPageCohortManagementSection(PageObject):
             return None
         return get_selected_option_text(self.q(css=self._bounded_selector(self.content_group_selector_css)))
 
+    def verify_cohort_content_group_selected(self, content_group=None):
+        """
+        Waits for the expected content_group (or none) to show as selected for
+        cohort associated content group.
+        """
+        if content_group:
+            self.wait_for(
+                lambda: unicode(
+                    self.q(css='select.input-cohort-group-association option:checked').text[0]
+                ) == content_group,
+                "Cohort group has been selected."
+            )
+        else:
+            self.wait_for_element_visibility(
+                '.cohort-management-details-association-course input.radio-no:checked',
+                'Radio button "No content group" has been selected.')
+
     def set_cohort_associated_content_group(self, content_group=None, select_settings=True):
         """
         Sets the content group associated with the cohort currently being edited.
@@ -249,6 +266,7 @@ class MembershipPageCohortManagementSection(PageObject):
         else:
             self._select_associated_content_group(content_group)
         self.q(css=self._bounded_selector("div.form-actions .action-save")).first.click()
+        self.verify_cohort_content_group_selected(content_group)
 
     def _select_associated_content_group(self, content_group):
         """
