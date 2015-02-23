@@ -9,7 +9,7 @@
 numpy==1.6.2
 
 # Needed to make sure that options in base.txt are allowed
-pip==6.0.7
+pip==6.0.8
 
 # Needed for meliae
 Cython==0.21.2
