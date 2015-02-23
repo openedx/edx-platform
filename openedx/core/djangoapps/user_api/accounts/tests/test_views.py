@@ -71,7 +71,7 @@ class TestAccountAPI(APITestCase):
         self.assertEqual("m", data["level_of_education"])
         self.assertEqual("world peace", data["goals"])
         # Default value for mailing address is None, nothing assigned in setup.
-        self.assertIsNone(None, data['mailing_address'])
+        self.assertIsNone(data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
 
