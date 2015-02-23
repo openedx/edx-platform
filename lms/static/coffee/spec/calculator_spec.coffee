@@ -72,7 +72,7 @@ describe 'Calculator', ->
       expect($('.help')).toHaveAttr('aria-hidden', 'true')
 
   describe 'handleClickOnHintButton', ->
-    it 'on click hint button hint popup becomes shown ', ->
+    it 'on click hint button hint popup becomes visible ', ->
       e = jQuery.Event('click');
       $('#calculator_hint').trigger(e);
       expect($('.help')).toHaveClass 'shown'
@@ -129,7 +129,7 @@ describe 'Calculator', ->
 
       expect(@calculator.activeHint.attr('id')).toBe($('.hint-item').eq(2).attr('id'))
 
-    it 'if this was the last item, select the second one', ->
+    it 'if this was the last item, select the second last', ->
       @calculator.activeHint = $('.hint-item').eq(2)
       @calculator.prevHint()
 
