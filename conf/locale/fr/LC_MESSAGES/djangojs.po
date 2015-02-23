@@ -76,6 +76,7 @@
 # Marie-Andrée Coulombe <coulombe.ma@gmail.com>, 2014
 # moocit-france <contact@moocit.fr>, 2015
 # rafcha <raphael.chay@gmail.com>, 2014-2015
+# Sébastien Viallemonteil <sebastien.viallemonteil@educagri.fr>, 2015
 # Steven BERNARD <steven.bernard@u-paris2.fr>, 2014
 # #-#-#-#-#  underscore-studio.po (edx-platform)  #-#-#-#-#
 # edX translation file
@@ -93,9 +94,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-17 16:01+0000\n"
-"PO-Revision-Date: 2015-02-08 17:51+0000\n"
-"Last-Translator: moocit-france <contact@moocit.fr>\n"
+"POT-Creation-Date: 2015-02-23 18:30+0000\n"
+"PO-Revision-Date: 2015-02-20 21:40+0000\n"
+"Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/edx-platform/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,7 +108,6 @@ msgstr ""
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: cms/static/coffee/src/views/tabs.js cms/static/js/factories/manage_users.js
-#: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: cms/static/js/views/course_info_update.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
@@ -149,8 +149,6 @@ msgstr ""
 #: cms/static/js/factories/manage_users.js
 #: cms/static/js/factories/manage_users_lib.js
 #: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
-#: lms/static/coffee/src/instructor_dashboard/util.js
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -158,16 +156,13 @@ msgstr "Inconnu"
 #: cms/static/js/factories/manage_users_lib.js cms/static/js/views/asset.js
 #: cms/static/js/views/list_item.js cms/static/js/views/show_textbook.js
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/js/vendor/ova/catch/js/catch.js
-#: cms/templates/js/course-outline.underscore
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course_grade_policy.underscore
 #: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-details.underscore
-#: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/group-configuration-editor.underscore
 #: cms/templates/js/show-textbook.underscore
-#: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 msgid "Delete"
 msgstr "Supprimer"
@@ -267,13 +262,11 @@ msgstr[0] "(%(num_points)s point possible)"
 msgstr[1] "(%(num_points)s points possibles)"
 
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Answer:"
 msgstr "Réponse:"
 
 #. Translators: the word Answer here refers to the answer to a problem the
 #. student must solve.;
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "Hide Answer"
 msgstr "Masquer la réponse"
@@ -295,7 +288,6 @@ msgstr "Réponse cachée"
 #. Translators: the word unanswered here is about answering a problem the
 #. student must solve.;
 #: common/lib/xmodule/xmodule/js/src/capa/display.js
-#: common/lib/xmodule/xmodule/js/src/capa/display.js
 msgid "unanswered"
 msgstr "sans réponse"
 
@@ -313,7 +305,6 @@ msgstr "Vous devez choisir une appréciation avant de pouvoir envoyer. "
 #. grading
 #. types (i.e. self assesment to peer assessment). Sometimes, if a student
 #. did not perform well at one step, they cannot move on to the next one.
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Your score did not meet the criteria to move to the next step."
 msgstr "Votre résultat n'est pas suffisant pour passer à l'étape suivante."
@@ -388,18 +379,15 @@ msgstr ""
 #. question's
 #. content that had been hidden
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Show Question"
 msgstr "Afficher la question"
 
-#: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 #: common/lib/xmodule/xmodule/js/src/combinedopenended/display.js
 msgid "Hide Question"
 msgstr "Cacher la question"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Paragraph"
 msgstr "Paragraphe"
@@ -411,20 +399,17 @@ msgstr "Préformaté"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 1"
 msgstr "Entête 1"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 2"
 msgstr "Entête 2"
 
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Heading 3"
 msgstr "Entête 3"
@@ -1299,7 +1284,6 @@ msgstr "Supprimer le lien"
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 msgid "Replace all"
 msgstr "Remplacer tout"
 
@@ -1312,7 +1296,6 @@ msgstr "Remplacer avec"
 #. #-#-#-#-#  djangojs-partial.po (edx-platform)  #-#-#-#-#
 #. Translators: this is a message from the raw HTML editor displayed in the
 #. browser when a user needs to edit HTML
-#: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: common/lib/xmodule/xmodule/js/src/html/edit.js
 #: cms/templates/js/metadata-file-uploader-item.underscore
 #: cms/templates/js/video/metadata-translations-item.underscore
@@ -1667,17 +1650,13 @@ msgid ""
 msgstr ""
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "incorrect"
 msgstr "incorrect"
 
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "correct"
 msgstr "correct"
 
-#: common/lib/xmodule/xmodule/js/src/problem/edit.js
 #: common/lib/xmodule/xmodule/js/src/problem/edit.js
 msgid "answer"
 msgstr "réponse"
@@ -1800,7 +1779,6 @@ msgid "HD off"
 msgstr "HD désactivée"
 
 #: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
-#: common/lib/xmodule/xmodule/js/src/video/06_video_progress_slider.js
 msgid "Video position"
 msgstr "Position de la vidéo"
 
@@ -1847,7 +1825,6 @@ msgid "Creating missing groups"
 msgstr "Création des groupes manquants"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
-#: common/static/coffee/src/discussion/discussion_module_view.js
 msgid "Hide Discussion"
 msgstr "Masquer la discussion"
 
@@ -1856,12 +1833,8 @@ msgid "Show Discussion"
 msgstr "Afficher la discussion"
 
 #: common/static/coffee/src/discussion/discussion_module_view.js
-#: common/static/coffee/src/discussion/discussion_module_view.js
-#: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/utils.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
-#: common/static/coffee/src/discussion/views/discussion_thread_view.js
-#: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_view.js
 #: common/static/coffee/src/discussion/views/discussion_user_profile_view.js
 #: common/static/coffee/src/discussion/views/response_comment_view.js
@@ -1901,8 +1874,6 @@ msgstr ""
 "tard. "
 
 #: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/utils.js
-#: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_thread_list_view.js
 #: common/static/coffee/src/discussion/views/discussion_topic_menu_view.js
 msgid "…"
@@ -2243,11 +2214,9 @@ msgid "All flags have been removed. To undo, uncheck the box."
 msgstr "Tous les drapeaux ont été supprimés. Pour annuler, décochez la case."
 
 #: common/static/js/vendor/ova/flagging-annotator.js
-#: common/static/js/vendor/ova/flagging-annotator.js
 msgid "You have already reported this annotation."
 msgstr "Vous avez déjà signalé cette annotation."
 
-#: common/static/js/vendor/ova/flagging-annotator.js
 #: common/static/js/vendor/ova/flagging-annotator.js
 msgid "Report annotation as inappropriate or offensive."
 msgstr "Signaler une annotation comme inappropriée ou offensante."
@@ -2289,7 +2258,6 @@ msgid "More"
 msgstr "Plus"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 msgid "My Notes"
 msgstr "Mes Notes"
 
@@ -2298,31 +2266,25 @@ msgid "Instructor"
 msgstr "Enseignant"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Public"
 msgstr "Public"
 
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Search"
 msgstr "Recherche"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Tags"
 msgstr "Balises"
 
 #: common/static/js/vendor/ova/catch/js/catch.js
-#: common/static/js/vendor/ova/catch/js/catch.js
 msgid "Annotation Text"
 msgstr "Texte de l'annotation"
 
-#: common/static/js/vendor/ova/catch/js/catch.js
 #: common/static/js/vendor/ova/catch/js/catch.js
 #: cms/templates/js/metadata-dict-entry.underscore
 #: cms/templates/js/metadata-file-uploader-entry.underscore
@@ -2426,7 +2388,6 @@ msgid "Email"
 msgstr "E-mail"
 
 #: lms/static/coffee/src/instructor_dashboard/membership.js
-#: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Revoke access"
 msgstr "Retirer l'accès"
 
@@ -2438,7 +2399,6 @@ msgstr "Veuillez saisir un nom d'utilisateur ou un e-mail."
 msgid "Please enter a username or email."
 msgstr "Veuillez saisir un nom d'utilisateur ou un e-mail."
 
-#: lms/static/coffee/src/instructor_dashboard/membership.js
 #: lms/static/coffee/src/instructor_dashboard/membership.js
 msgid "Error changing user's permissions."
 msgstr "Erreur lors du changement des permissions de l'utilisateur."
@@ -2667,7 +2627,6 @@ msgid "Error sending email."
 msgstr "Erreur lors de l’envoi de l’e-mail."
 
 #: lms/static/coffee/src/instructor_dashboard/send_email.js
-#: lms/static/coffee/src/instructor_dashboard/send_email.js
 msgid "There is no email history for this course."
 msgstr "Il n'y a pas d'historique de courriel pour ce cours"
 
@@ -2684,10 +2643,6 @@ msgstr ""
 "e-mails pour ce cours."
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a student email address or username."
 msgstr ""
 "Merci d’entrer le nom d’utilisateur ou l’adresse e-mail d’un étudiant."
@@ -2700,12 +2655,6 @@ msgstr ""
 "Erreur dans l'obtention de l'url de progression de l'étudiant <%= student_id"
 " %>'. Vérifiez qu'il n'y a pas d'erreur dans l'identifiant de l'étudiant. "
 
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
-#: lms/static/coffee/src/instructor_dashboard/student_admin.js
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Please enter a problem location."
 msgstr "Merci d'introduire la localisation d'un exercice."
@@ -3001,7 +2950,6 @@ msgid "System got into invalid state for submission: "
 msgstr "Le système est entré dans un état invalide pour la soumission : "
 
 #: lms/static/coffee/src/staff_grading/staff_grading.js
-#: lms/static/coffee/src/staff_grading/staff_grading.js
 msgid "(Hide)"
 msgstr "(Cacher)"
 
@@ -3094,7 +3042,7 @@ msgstr "saisir une description de l’image ici"
 msgid "enter link description here"
 msgstr "saisir une description du lien ici"
 
-#: lms/static/js/Markdown.Editor.js lms/static/js/Markdown.Editor.js
+#: lms/static/js/Markdown.Editor.js
 msgid "enter code here"
 msgstr "saisir du code ici"
 
@@ -3164,6 +3112,10 @@ msgid ""
 "email to confirm your email address change."
 msgstr ""
 
+#: lms/static/js/edxnotes/plugins/accessibility.js
+msgid "Focus grabber"
+msgstr ""
+
 #: lms/static/js/edxnotes/views/search_box.js
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid ""
@@ -3189,16 +3141,16 @@ msgid "Hide notes"
 msgstr "Masquer les notes"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Showing notes"
-msgstr "Affichage des notes en cours"
+msgid "Notes visible"
+msgstr ""
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
 msgid "Show notes"
 msgstr "Afficher les notes"
 
 #: lms/static/js/edxnotes/views/toggle_notes_factory.js
-msgid "Hiding notes"
-msgstr "Masquage des notes en cours"
+msgid "Notes hidden"
+msgstr ""
 
 #: lms/static/js/edxnotes/views/tabs/course_structure.js
 msgid "Location in Course"
@@ -3341,11 +3293,11 @@ msgstr ""
 
 #: lms/static/js/student_account/account.js
 msgid "Please enter a valid email address"
-msgstr ""
+msgstr "Veuillez entrer une adresse email valide"
 
 #: lms/static/js/student_account/account.js
 msgid "Please enter a valid password"
-msgstr ""
+msgstr "Veuillez entrer un mot de passe valide"
 
 #: lms/static/js/student_account/account.js
 msgid ""
@@ -3376,6 +3328,14 @@ msgstr "Nous n’avons pas pu afficher la liste des langues."
 #: lms/static/js/student_profile/profile.js
 msgid "Saved"
 msgstr "Enregistré"
+
+#: lms/static/js/verify_student/views/image_input_view.js
+msgid "Image Upload Error"
+msgstr ""
+
+#: lms/static/js/verify_student/views/image_input_view.js
+msgid "Please verify that you have uploaded a valid image (PNG and JPEG)."
+msgstr ""
 
 #: lms/static/js/verify_student/views/make_payment_step_view.js
 msgid "An error has occurred. Please try again."
@@ -3413,7 +3373,7 @@ msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "No Webcam Detected"
-msgstr ""
+msgstr "Aucune Webcam détectée"
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "You don't seem to have a webcam connected."
@@ -3421,18 +3381,6 @@ msgstr ""
 
 #: lms/static/js/verify_student/views/webcam_photo_view.js
 msgid "Double-check that your webcam is connected and working to continue."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "Flash Not Detected"
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "You don't seem to have Flash installed."
-msgstr ""
-
-#: lms/static/js/verify_student/views/webcam_photo_view.js
-msgid "%(a_start)s Get Flash %(a_end)s to continue your enrollment."
 msgstr ""
 
 #: lms/static/js/views/file_uploader.js
@@ -3443,7 +3391,6 @@ msgstr ""
 msgid "Your upload of '{file}' failed."
 msgstr ""
 
-#: lms/templates/class_dashboard/all_section_metrics.js
 #: lms/templates/class_dashboard/all_section_metrics.js
 msgid "Unable to retrieve data, please try again later."
 msgstr "Impossible de récupérer les données, merci de réessayer plus tard."
@@ -3483,7 +3430,7 @@ msgstr ""
 msgid "Studio's having trouble saving your work"
 msgstr "Studio a des problèmes pour sauvegarder votre travail"
 
-#: cms/static/coffee/src/views/tabs.js cms/static/coffee/src/views/tabs.js
+#: cms/static/coffee/src/views/tabs.js
 #: cms/static/coffee/src/xblock/cms.runtime.v1.js
 #: cms/static/js/models/section.js cms/static/js/utils/drag_and_drop.js
 #: cms/static/js/views/asset.js cms/static/js/views/container.js
@@ -3493,7 +3440,6 @@ msgstr "Studio a des problèmes pour sauvegarder votre travail"
 #: cms/static/js/views/list_item_editor.js cms/static/js/views/overview.js
 #: cms/static/js/views/overview_assignment_grader.js
 #: cms/static/js/views/modals/edit_xblock.js
-#: cms/static/js/views/utils/xblock_utils.js
 #: cms/static/js/views/utils/xblock_utils.js
 msgid "Saving"
 msgstr "Sauvegarde en cours"
@@ -3595,8 +3541,8 @@ msgstr ""
 msgid "Your import has failed."
 msgstr ""
 
-#: cms/static/js/factories/import.js cms/static/js/factories/import.js
-#: cms/static/js/views/import.js cms/static/js/views/import.js.c
+#: cms/static/js/factories/import.js cms/static/js/views/import.js
+#: cms/static/js/views/import.js.c
 msgid "Choose new file"
 msgstr "Choisir un nouveau fichier"
 
@@ -3820,7 +3766,6 @@ msgid "Grace period must be specified in HH:MM format."
 msgstr "Le délai doit être au format HH: MM."
 
 #: cms/static/js/spec/views/assets_spec.js
-#: cms/static/js/spec/views/paging_spec.js
 #: cms/static/js/spec/views/paging_spec.js cms/static/js/views/assets.js
 #: cms/templates/js/asset-library.underscore
 msgid "Type"
@@ -3886,8 +3831,36 @@ msgstr ""
 msgid "Load Another File"
 msgstr "Envoyer un autre fichier"
 
+#: cms/static/js/views/content_group_details.js
+#: cms/static/js/views/group_configuration_details.js
+msgid "Not in Use"
+msgstr "Non utilisé"
+
+#. Translators: 'count' is number of units that the group
+#. configuration is used in.
+#: cms/static/js/views/content_group_details.js
+#: cms/static/js/views/group_configuration_details.js
+msgid "Used in %(count)s unit"
+msgid_plural "Used in %(count)s units"
+msgstr[0] "utilisée par %(count) unité."
+msgstr[1] "utilisée par %(count)s unités."
+
+#. Translators: 'outlineAnchor' is an anchor pointing to
+#. the course outline page.
+#: cms/static/js/views/content_group_details.js
+msgid ""
+"This content group is not in use. Add a content group to any unit from the "
+"%(outlineAnchor)s."
+msgstr ""
+
+#: cms/static/js/views/content_group_details.js
+#: cms/static/js/views/group_configuration_details.js
+msgid "Course Outline"
+msgstr "Plan du Cours"
+
 #. Translators: This refers to a content group that can be linked to a student
 #. cohort.
+#: cms/static/js/views/content_group_item.js
 #: cms/static/js/views/content_group_list.js
 msgid "content group"
 msgstr ""
@@ -3928,18 +3901,6 @@ msgid_plural "Contains %(count)s groups"
 msgstr[0] "Contient %(count)s groupe"
 msgstr[1] "Contient %(count)s groupes"
 
-#: cms/static/js/views/group_configuration_details.js
-msgid "Not in Use"
-msgstr "Non utilisé"
-
-#. Translators: 'count' is number of units that the group
-#. configuration is used in.
-#: cms/static/js/views/group_configuration_details.js
-msgid "Used in %(count)s unit"
-msgid_plural "Used in %(count)s units"
-msgstr[0] "utilisée par %(count) unité."
-msgstr[1] "utilisée par %(count)s unités."
-
 #. Translators: 'outlineAnchor' is an anchor pointing to
 #. the course outline page.
 #: cms/static/js/views/group_configuration_details.js
@@ -3949,10 +3910,6 @@ msgid ""
 msgstr ""
 "Cette configuration de groupe n'est pas utilisée. Commencez par ajouter une "
 "expérience de contenu à l'une des unités à l'aide de %(outlineAnchor)s."
-
-#: cms/static/js/views/group_configuration_details.js
-msgid "Course Outline"
-msgstr "Plan du Cours"
 
 #. Translators: this refers to a collection of groups.
 #: cms/static/js/views/group_configuration_item.js
@@ -4030,8 +3987,7 @@ msgstr ""
 #. "Showing 0-9 out of 25 total, sorted by Date Added ascending"
 #. Translators: sample result:
 #. "Showing 0-9 out of 25 total, sorted by Date Added descending"
-#: cms/static/js/views/paging_header.js cms/static/js/views/paging_header.js
-#: cms/static/js/views/paging_header.js cms/static/js/views/paging_header.js
+#: cms/static/js/views/paging_header.js
 msgid "Showing %(current_item_range)s out of %(total_items_count)s, "
 msgstr ""
 
@@ -4145,7 +4101,6 @@ msgstr "Publier toutes les modifications non publiées pour cet %(item)s ?"
 
 #: cms/static/js/views/modals/course_outline_modals.js
 #: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/publish-xblock.underscore
 msgid "Publish"
 msgstr "Publier"
@@ -4185,7 +4140,6 @@ msgid "Publishing"
 msgstr ""
 
 #: cms/static/js/views/pages/container_subviews.js
-#: cms/static/js/views/pages/container_subviews.js
 #: cms/templates/js/publish-xblock.underscore
 msgid "Discard Changes"
 msgstr "Supprimer les changements"
@@ -4214,7 +4168,6 @@ msgstr ""
 msgid "Inheriting Student Visibility"
 msgstr ""
 
-#: cms/static/js/views/pages/container_subviews.js
 #: cms/static/js/views/pages/container_subviews.js
 msgid "Make Visible to Students"
 msgstr "Rendre visible aux étudiants"
@@ -4341,13 +4294,8 @@ msgstr ""
 msgid "Upload translation"
 msgstr "Envoyer une traduction"
 
-#: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course-outline.underscore cms/templates/js/list.underscore
-#: cms/templates/js/list.underscore cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/xblock-outline.underscore
-#: cms/templates/js/xblock-outline.underscore
 #: cms/templates/js/xblock-outline.underscore
 #: lms/templates/courseware_search/search_list.underscore
 msgid "gettext("
@@ -4458,7 +4406,6 @@ msgid ""
 "addresses or usernames on this page."
 msgstr ""
 
-#: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 #: lms/templates/instructor/instructor_dashboard_2/cohort-editor.underscore
 msgid "What does this mean?"
 msgstr "Qu'est ce que cela signifie?"
@@ -4636,7 +4583,6 @@ msgid "We couldn't sign you in."
 msgstr "Nous n'avons pas pu vous connecter."
 
 #: lms/templates/student_account/login.underscore
-#: lms/templates/student_account/login.underscore
 #: lms/templates/student_account/register.underscore
 msgid "Sign in"
 msgstr "Se connecter"
@@ -4693,6 +4639,10 @@ msgstr ""
 
 #: lms/templates/student_account/register.underscore
 msgid "or create a new one here"
+msgstr ""
+
+#: lms/templates/student_account/register.underscore
+msgid "Create a new account"
 msgstr ""
 
 #: lms/templates/student_account/register.underscore
@@ -4864,6 +4814,14 @@ msgstr ""
 
 #: lms/templates/verify_student/id_photo_step.underscore
 msgid "Once in position, use the camera button %(icon)s to capture your ID"
+msgstr ""
+
+#: lms/templates/verify_student/image_input.underscore
+msgid "Preview of uploaded image"
+msgstr ""
+
+#: lms/templates/verify_student/image_input.underscore
+msgid "Upload an image or capture one with your web or phone camera."
 msgstr ""
 
 #: lms/templates/verify_student/intro_step.underscore
@@ -5145,7 +5103,6 @@ msgid "List of uploaded files and assets in this course"
 msgstr "Liste des fichiers et des activités téléchargés dans ce cours"
 
 #: cms/templates/js/asset-library.underscore
-#: cms/templates/js/asset-library.underscore
 msgid "- Sortable"
 msgstr ""
 
@@ -5214,6 +5171,20 @@ msgstr ""
 "Attention: la dernière version publiée de cette unité est active. En "
 "publiant des modifications vous allez changer l'expérience des étudiants."
 
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/group-configuration-details.underscore
+msgid "ID"
+msgstr "Identifiant"
+
+#: cms/templates/js/content-group-details.underscore
+#: cms/templates/js/content-group-editor.underscore
+msgid "Cannot delete when in use by a unit"
+msgstr ""
+
+#: cms/templates/js/content-group-details.underscore
+msgid "This content group is used in:"
+msgstr ""
+
 #: cms/templates/js/content-group-editor.underscore
 #: cms/templates/js/edit-textbook.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -5225,7 +5196,15 @@ msgid "Content Group Name"
 msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
+msgid "Content Group ID"
+msgstr ""
+
+#: cms/templates/js/content-group-editor.underscore
 msgid "This is the name of the group"
+msgstr ""
+
+#: cms/templates/js/content-group-editor.underscore
+msgid "This content group is used in one or more units."
 msgstr ""
 
 #: cms/templates/js/content-group-editor.underscore
@@ -5256,11 +5235,9 @@ msgid "Display Name"
 msgstr "Nom d'affichage"
 
 #: cms/templates/js/course-outline.underscore
-#: cms/templates/js/course-outline.underscore
 msgid "Configure"
 msgstr "Configurer"
 
-#: cms/templates/js/course-outline.underscore
 #: cms/templates/js/course-outline.underscore
 msgid "Drag to reorder"
 msgstr "Glissez pour modifier l'ordre"
@@ -5361,7 +5338,6 @@ msgid "Due Time in UTC:"
 msgstr "Horaire de rendu en UTC :"
 
 #: cms/templates/js/due-date-editor.underscore
-#: cms/templates/js/due-date-editor.underscore
 msgid "Clear Grading Due Date"
 msgstr "Effacer la date limite d'évaluation :"
 
@@ -5435,10 +5411,6 @@ msgstr "Évaluation"
 #: cms/templates/js/grading-editor.underscore
 msgid "Grade as:"
 msgstr "Noter comme :"
-
-#: cms/templates/js/group-configuration-details.underscore
-msgid "ID"
-msgstr "Identifiant"
 
 #: cms/templates/js/group-configuration-details.underscore
 #: cms/templates/js/group-configuration-editor.underscore
@@ -5579,7 +5551,6 @@ msgstr "Dernière publication %(last_published_date)s par %(publish_username)s"
 
 #: cms/templates/js/publish-history.underscore
 #: cms/templates/js/publish-xblock.underscore
-#: cms/templates/js/publish-xblock.underscore
 #: cms/templates/js/staff-lock-editor.underscore
 msgid "message"
 msgstr "message"
@@ -5659,7 +5630,6 @@ msgid "Release Time in UTC:"
 msgstr "Horaire de diffusion en UTC :"
 
 #: cms/templates/js/release-date-editor.underscore
-#: cms/templates/js/release-date-editor.underscore
 msgid "Clear Release Date/Time"
 msgstr "Effacer Date/Horaire"
 
@@ -5728,7 +5698,6 @@ msgstr ""
 "Veuillez vérifier les commentaires de validation suivants et en tenir compte"
 " dans les paramètres de votre cours:"
 
-#: cms/templates/js/xblock-string-field-editor.underscore
 #: cms/templates/js/xblock-string-field-editor.underscore
 msgid "Edit the name"
 msgstr "Modifier le nom"
@@ -5861,15 +5830,9 @@ msgstr ""
 "transcription, téléversez un nouveau fichier srt."
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Upload New Transcript"
 msgstr "Téléverser une nouvelle transcription"
@@ -5880,10 +5843,7 @@ msgid "Upload New .srt Transcript"
 msgstr "Téléverser une nouvelle transcription .srt"
 
 #: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-found.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-not-found.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-uploaded.underscore
 msgid "Download Transcript for Editing"
 msgstr "Télécharger la transcrition pour l'éditer"
@@ -5903,7 +5863,6 @@ msgstr ""
 "transcription Youtube ou téléversez votre propre fichier de transcription "
 "srt."
 
-#: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-import.underscore
 msgid "Import YouTube Transcript"
 msgstr "Importer une transcription YouTube"
@@ -5932,8 +5891,6 @@ msgstr ""
 msgid "Do you want to replace the edX transcript with the YouTube transcript?"
 msgstr "Souhaitez-vous remplacer la transcription EdX par celle de YouTube?"
 
-#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-replace.underscore
 msgid "Yes, replace the edX transcript with the YouTube transcript"
 msgstr "Oui, remplacer la transcription EdX par celle de YouTube"
@@ -5967,8 +5924,6 @@ msgstr ""
 " synchronisée. Souhaitez-vous utiliser le fichier courant de transcription "
 "synchronisée ou téléverser un nouveau fichier srt de transcription ?"
 
-#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
-#: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 #: cms/templates/js/video/transcripts/messages/transcripts-use-existing.underscore
 msgid "Use Current Transcript"
 msgstr "Utiliser la transcription courante"
