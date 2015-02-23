@@ -73,14 +73,12 @@ from student.roles import (
 from student import auth
 from course_action_state.models import CourseRerunState, CourseRerunUIStateManager
 from course_action_state.managers import CourseActionStateItemNotFoundError
-from student.models import CourseEnrollment
 from microsite_configuration import microsite
 from xmodule.course_module import CourseFields
 from xmodule.split_test_module import get_split_user_partitions
 from student.auth import has_course_author_access
 
-
-from contentstore.tasks import publish_bulk_notifications_task
+from student.tasks import publish_course_notifications_task
 from edx_notifications.data import NotificationMessage
 from edx_notifications.lib.publisher import get_notification_type
 
@@ -830,18 +828,12 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                 course = modulestore().get_course(course_key, depth=0)
                 notification_msg = NotificationMessage(
                     msg_type=notification_type,
-                    namespace=course_key.to_deprecated_string(),
+                    namespace=unicode(course_key),
                     payload={'course_name': course.display_name}
                 )
 
-                # get the enrolled and active user_id list for this course.
-                user_ids = CourseEnrollment.objects.values_list('user_id', flat=True).filter(
-                    is_active=1,
-                    course_id=course_key
-                )
-                if user_ids.exists():
-                    # publish bulk notifications to user as a new celery task
-                    publish_bulk_notifications_task.delay(user_ids, notification_msg)
+                # Send the notification_msg to the Celery task
+                publish_course_notifications_task.delay(course_key, notification_msg)
 
             return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
         except:

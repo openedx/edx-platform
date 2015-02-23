@@ -10,12 +10,10 @@ from xmodule.modulestore.django import modulestore
 
 from student.tests.factories import CourseEnrollmentFactory, UserFactory
 from edx_notifications.lib.consumer import get_notifications_count_for_user
-from lms import startup
 from mock import patch
 
 
 class CourseUpdateTest(CourseTestCase):
-
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
             course_key = self.course.id
@@ -38,9 +36,6 @@ class CourseUpdateTest(CourseTestCase):
             self.assertContains(resp, '', status_code=200)
 
             return json.loads(resp.content)
-
-        # initialize the Notification subsystem
-        startup.startup_notification_subsystem()
 
         resp = self.client.get_html(
             reverse_course_url('course_info_handler', self.course.id)
@@ -132,9 +127,6 @@ class CourseUpdateTest(CourseTestCase):
 
     @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
     def test_notifications_enabled_when_new_updates_in_course(self):
-        # initialize the Notification subsystem
-        startup.startup_notification_subsystem()
-
         # create new users and enroll them in the course.
         test_user_1 = UserFactory.create(password='test_pass')
         CourseEnrollmentFactory(user=test_user_1, course_id=self.course.id)
@@ -160,8 +152,6 @@ class CourseUpdateTest(CourseTestCase):
         Test that course updates doesn't break on old data (content in 'data' field).
         Note: new data will save as list in 'items' field.
         '''
-        # initialize the Notification subsystem
-        startup.startup_notification_subsystem()
         # get the updates and populate 'data' field with some data.
         location = self.course.id.make_usage_key('course_info', 'updates')
         course_updates = modulestore().create_item(
@@ -241,8 +231,6 @@ class CourseUpdateTest(CourseTestCase):
 
     def test_no_ol_course_update(self):
         '''Test trying to add to a saved course_update which is not an ol.'''
-        # initialize the Notification subsystem
-        startup.startup_notification_subsystem()
         # get the updates and set to something wrong
         location = self.course.id.make_usage_key('course_info', 'updates')
         modulestore().create_item(
