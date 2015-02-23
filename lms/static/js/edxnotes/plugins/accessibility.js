@@ -8,7 +8,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
         _.bindAll(this,
             'addAriaAttributes', 'onHighlightKeyDown', 'onViewerKeyDown',
             'onEditorKeyDown', 'addDescriptions', 'removeDescription',
-            'saveCurrentHighlight', 'focusOnGrabber', 'showViewer', 'onClose'
+            'focusOnGrabber', 'showViewer', 'onClose', 'focusOnHighlightedText'
         );
         // Call the Annotator.Plugin constructor this sets up the element and
         // options properties.
@@ -20,6 +20,7 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             this.annotator.subscribe('annotationViewerTextField', this.addAriaAttributes);
             this.annotator.subscribe('annotationsLoaded', this.addDescriptions);
             this.annotator.subscribe('annotationCreated', this.addDescriptions);
+            this.annotator.subscribe('annotationCreated', this.focusOnHighlightedText);
             this.annotator.subscribe('annotationDeleted', this.removeDescription);
             this.annotator.element.on('keydown.accessibility.hl', '.annotator-hl', this.onHighlightKeyDown);
             this.annotator.element.on('keydown.accessibility.viewer', '.annotator-viewer', this.onViewerKeyDown);
@@ -32,10 +33,10 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             this.annotator.unsubscribe('annotationViewerTextField', this.addAriaAttributes);
             this.annotator.unsubscribe('annotationsLoaded', this.addDescriptions);
             this.annotator.unsubscribe('annotationCreated', this.addDescriptions);
+            this.annotator.unsubscribe('annotationCreated', this.focusOnHighlightedText);
             this.annotator.unsubscribe('annotationDeleted', this.removeDescription);
             this.annotator.element.off('.accessibility');
             this.removeFocusGrabber();
-            this.savedHighlights = null;
         },
 
         addTabIndex: function () {
@@ -98,17 +99,19 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
             });
         },
 
-        saveCurrentHighlight: function (annotation) {
-            if (annotation && annotation.highlights) {
-                this.savedHighlights = annotation.highlights[0];
-            }
-        },
-
         focusOnHighlightedText: function () {
-            if (this.savedHighlights) {
-                this.savedHighlights.focus();
-                this.savedHighlights = null;
-            }
+            var viewer = this.annotator.viewer,
+                editor = this.annotator.editor,
+                highlight;
+
+            try {
+                if (viewer.isShown()) {
+                    highlight = viewer.annotations[0].highlights[0];
+                } else if (editor.isShown()) {
+                    highlight = editor.annotation.highlights[0];
+                }
+                highlight.focus();
+            } catch (err) {}
         },
 
         getViewerTabControls: function () {
@@ -168,7 +171,6 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
 
         showViewer: function (position, annotation) {
             annotation = $.makeArray(annotation);
-            this.saveCurrentHighlight(annotation[0]);
             this.annotator.showViewer(annotation, position);
             this.annotator.element.find('.annotator-listing').focus();
             this.annotator.subscribe('annotationDeleted', this.focusOnGrabber);
@@ -190,6 +192,8 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     // This happens only when coming from notes page
                     if (this.annotator.viewer.isShown()) {
                         this.annotator.element.find('.annotator-listing').focus();
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
                     break;
                 case KEY.ENTER:
@@ -197,16 +201,15 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     if (!this.annotator.viewer.isShown()) {
                         position = target.position();
                         this.showViewer(position, target.data('annotation'));
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
                     break;
                 case KEY.ESCAPE:
                     this.annotator.viewer.hide();
+                    event.preventDefault();
+                    event.stopPropagation();
                     break;
-            }
-            // We do not stop propagation and default behavior on a TAB keypress
-            if (event.keyCode !== KEY.TAB || (event.keyCode === KEY.TAB && this.annotator.viewer.isShown())) {
-                event.preventDefault();
-                event.stopPropagation();
             }
         },
 
@@ -241,14 +244,14 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                 case KEY.ENTER:
                 case KEY.SPACE:
                     if (target.hasClass('annotator-close')) {
-                        this.annotator.viewer.hide();
                         this.onClose();
+                        this.annotator.viewer.hide();
                         event.preventDefault();
                     }
                     break;
                 case KEY.ESCAPE:
-                    this.annotator.viewer.hide();
                     this.onClose();
+                    this.annotator.viewer.hide();
                     event.preventDefault();
                     break;
             }
@@ -288,29 +291,31 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                     break;
                 case KEY.ENTER:
                     if (target.is(save) || event.metaKey || event.ctrlKey) {
+                        this.onClose();
                         this.annotator.editor.submit();
                     } else if (target.is(cancel)) {
+                        this.onClose();
                         this.annotator.editor.hide();
                     } else {
                         break;
                     }
-                    this.onClose();
                     event.preventDefault();
                     break;
                 case KEY.SPACE:
                     if (target.is(save)) {
+                        this.onClose();
                         this.annotator.editor.submit();
                     } else if (target.is(cancel)) {
+                        this.onClose();
                         this.annotator.editor.hide();
                     } else {
                         break;
                     }
-                    this.onClose();
                     event.preventDefault();
                     break;
                 case KEY.ESCAPE:
-                    this.annotator.editor.hide();
                     this.onClose();
+                    this.annotator.editor.hide();
                     event.preventDefault();
                     break;
             }
