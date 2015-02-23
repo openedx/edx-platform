@@ -14,17 +14,6 @@ TEST_PASSWORD = "test"
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPI(APITestCase):
-    USERNAME = "Christina"
-    EMAIL = "christina@example.com"
-    PASSWORD = TEST_PASSWORD
-
-    BAD_USERNAME = "Bad"
-    BAD_EMAIL = "bad@example.com"
-    BAD_PASSWORD = TEST_PASSWORD
-
-    STAFF_USERNAME = "Staff"
-    STAFF_EMAIL = "staff@example.com"
-    STAFF_PASSWORD = TEST_PASSWORD
 
     def setUp(self):
         super(TestAccountAPI, self).setUp()
@@ -45,7 +34,6 @@ class TestAccountAPI(APITestCase):
         legacy_profile.year_of_birth = 1900
         legacy_profile.level_of_education = "m"
         legacy_profile.goals = "world peace"
-        legacy_profile.mailing_address = "North Pole"
         legacy_profile.save()
         
         self.accounts_base_uri = reverse("accounts_api", kwargs={'username': self.user.username})
@@ -82,21 +70,61 @@ class TestAccountAPI(APITestCase):
         self.assertEqual(1900, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
         self.assertEqual("world peace", data["goals"])
-        self.assertEqual("North Pole", data['mailing_address'])
+        # Default value for mailing address is None, nothing assigned in setup.
+        self.assertIsNone(None, data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
 
     @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
+        (
+            "client", "user", "gender", "f", "not a gender",
+            "Select a valid choice. not a gender is not one of the available choices."
+        ),
+        (
+            "client", "user", "level_of_education", "none", "x",
+            "Select a valid choice. x is not one of the available choices."
+        ),
+        ("client", "user", "country", "GB", "UK", "Select a valid choice. UK is not one of the available choices."),
+        ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
+        ("client", "user", "city", "Knoxville"),
+        ("client", "user", "language", "Creole"),
+        ("client", "user", "goals", "Smell the roses"),
+        ("client", "user", "mailing_address", "Sesame Street"),
+        # All of the fields can be edited by is_staff, but iterating through all of them again seems like overkill.
+        # Just test a representative field.
+        ("staff_client", "staff_user", "goals", "Smell the roses"),
     )
     @ddt.unpack
-    def test_patch_account(self, api_client, user):
+    def test_patch_account(
+            self, api_client, user, field, value, fails_validation_value=None, developer_validation_message=None
+    ):
         client = self.login_client(api_client, user)
-        response = client.patch(self.accounts_base_uri, data={"gender": "f"})
-        self.assert_status_code(200, response)
-        data = response.data
-        self.assertEqual("f", data["gender"])
+        patch_response = client.patch(self.accounts_base_uri, data={field: value})
+        self.assert_status_code(204, patch_response)
+
+        get_response = client.get(self.accounts_base_uri)
+        self.assert_status_code(200, get_response)
+        self.assertEqual(value, get_response.data[field])
+
+        if fails_validation_value:
+            error_response = client.patch(self.accounts_base_uri, data={field: fails_validation_value})
+            self.assert_status_code(400, error_response)
+            self.assertEqual(
+                "Value '{0}' is not valid for field '{1}'.".format(fails_validation_value, field),
+                error_response.data["field_errors"][field]["user_message"]
+            )
+            self.assertEqual(
+                developer_validation_message,
+                error_response.data["field_errors"][field]["developer_message"]
+            )
+        else:
+            # If there are no values that would fail validation, then empty string should be supported.
+            patch_response = client.patch(self.accounts_base_uri, data={field: ""})
+            self.assert_status_code(204, patch_response)
+
+            get_response = client.get(self.accounts_base_uri)
+            self.assert_status_code(200, get_response)
+            self.assertEqual("", get_response.data[field])
 
     @ddt.data(
         ("client", "user"),
@@ -106,20 +134,29 @@ class TestAccountAPI(APITestCase):
     def test_patch_account_noneditable(self, api_client, user):
         client = self.login_client(api_client, user)
 
+        def verify_error_response(field_name, data):
+            self.assertEqual(
+                "This field is not editable via this API", data["field_errors"][field_name]["developer_message"]
+            )
+            self.assertEqual(
+                "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
+            )
+
         for field_name in ["username", "email", "date_joined", "name"]:
-            response = client.patch(self.accounts_base_uri, data={field_name: "willbeignored", "gender": "f"})
+            response = client.patch(self.accounts_base_uri, data={field_name: "will_error", "gender": "f"})
             self.assert_status_code(400, response)
-            data = response.data
-            self.assertEqual("The following fields are not editable: " + field_name, data["message"])
+            verify_error_response(field_name, response.data)
 
         # Make sure that gender did not change.
         response = client.get(self.accounts_base_uri)
         self.assertEqual("m", response.data["gender"])
 
         # Test error message with multiple read-only items
-        response = client.patch(self.accounts_base_uri, data={"username": "willbeignored", "email": "xx"})
+        response = client.patch(self.accounts_base_uri, data={"username": "will_error", "email": "xx"})
         self.assert_status_code(400, response)
-        self.assertEqual("The following fields are not editable: username, email", response.data["message"])
+        self.assertEqual(2, len(response.data["field_errors"]))
+        verify_error_response("username", response.data)
+        verify_error_response("email", response.data)
 
     def assert_status_code(self, expected_status_code, response):
         """Assert that the given response has the expected status code"""
