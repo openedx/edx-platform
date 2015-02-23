@@ -222,6 +222,10 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
                 if new_url:
                     sources[index] = new_url
 
+        # TODO - add a feature flag to turn this off
+        # TODO - make sure the id is of a video we want to launch the experiment for
+        cdn_eval = request.session.get('country_code') and self.edx_video_id == 37
+
         # If there was no edx_video_id, or if there was no download specified
         # for it, we fall back on whatever we find in the VideoDescriptor
         if not download_video_link and self.download_video:
@@ -236,6 +240,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'ajax_url': self.system.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'branding_info': branding_info,
+            'cdn_eval': cdn_eval,
             # This won't work when we move to data that
             # isn't on the filesystem
             'data_dir': getattr(self, 'data_dir', None),
