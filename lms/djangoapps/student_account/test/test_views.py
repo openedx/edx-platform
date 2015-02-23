@@ -408,6 +408,26 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         response = self.client.get(reverse(url_name))
         self.assertRedirects(response, reverse("dashboard"))
 
+    @ddt.data(
+        (False, "account_login"),
+        (False, "account_login"),
+        (True, "account_login"),
+        (True, "account_register"),
+    )
+    @ddt.unpack
+    def test_login_and_registration_form_signin_preserves_params(self, is_edx_domain, url_name):
+        params = {
+            'enrollment_action': 'enroll',
+            'course_id': 'edX/DemoX/Demo_Course'
+        }
+
+        with mock.patch.dict(settings.FEATURES, {'IS_EDX_DOMAIN': is_edx_domain}):
+            response = self.client.get(reverse(url_name), params)
+
+        # The response should have a "Sign In" button with the URL
+        # that preserves the querystring params
+        self.assertContains(response, "login?course_id=edX%2FDemoX%2FDemo_Course&enrollment_action=enroll")
+
     @mock.patch.dict(settings.FEATURES, {"ENABLE_THIRD_PARTY_AUTH": False})
     @ddt.data("account_login", "account_register")
     def test_third_party_auth_disabled(self, url_name):
