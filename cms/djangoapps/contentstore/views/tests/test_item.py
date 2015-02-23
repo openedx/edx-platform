@@ -1416,8 +1416,24 @@ class TestXBlockInfo(ItemTest):
             include_child_info=True,
             include_children_predicate=ALWAYS,
         )
-        self.assertEqual(xblock_info['override_type'], {'is_entrance_exam': True})
+        self.assertEqual(xblock_info['override_type']['is_entrance_exam_section'], True)
         self.assertEqual(xblock_info['display_name'], 'Entrance Exam')
+
+    def test_sequential_entrance_exam_xblock_info(self):
+        self.chapter.is_entrance_exam = True
+        subsection = ItemFactory.create(
+            parent_location=self.chapter.location, category='sequential', display_name="Subsection - Entrance Exam",
+            user_id=self.user.id
+        )
+        subsection = modulestore().get_item(subsection.location)
+        xblock_info = create_xblock_info(
+            subsection,
+            include_child_info=True,
+            include_children_predicate=ALWAYS,
+            parent_xblock=self.chapter
+        )
+        self.assertEqual(xblock_info['override_type']['is_entrance_exam_subsection'], True)
+        self.assertEqual(xblock_info['display_name'], 'Subsection - Entrance Exam')
 
     def test_chapter_xblock_info(self):
         chapter = modulestore().get_item(self.chapter.location)

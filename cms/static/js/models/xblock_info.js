@@ -172,13 +172,17 @@ function(Backbone, _, str, ModuleUtils) {
             return !this.get('published') || this.get('has_changes');
         },
 
-        canBeDeleted: function(){
+        /**
+         * Return true if section content is required to show.
+         * currently, check section for an entrance exam.
+        */
+        showSectionContent: function(){
             //get the type of xblock
-            if(this.get('override_type') != null) {
-                var type = this.get('override_type');
+            var type = this.getOverrideType();
 
-                //hide/remove the delete trash icon if type is entrance exam.
-                if (_.has(type, 'is_entrance_exam') && type['is_entrance_exam']) {
+            if(type !=null) {
+                //hide the delete/drag icon if type is entrance exam.
+                if (_.has(type, 'is_entrance_exam_section') && type['is_entrance_exam_section']) {
                     return false;
                 }
             }
@@ -186,10 +190,50 @@ function(Backbone, _, str, ModuleUtils) {
         },
 
         /**
+         * Return true if subsection content is required to show.
+         * currently, check subsection for an entrance exam.
+        */
+        showSubSectionContent: function() {
+           var type = this.getOverrideType();
+
+           if(type !=null) {
+               //hide the subsection if block is an entrance exam.
+               if (_.has(type, 'is_entrance_exam_subsection') && type['is_entrance_exam_subsection']) {
+                   return false;
+               }
+           }
+           return true;
+       },
+
+        /**
+         * Return the type of xblock.
+        */
+       getOverrideType: function() {
+           var type = null;
+           if(this.get('override_type') != null) {
+               var type = this.get('override_type');
+           }
+           return type;
+        },
+
+       getExamScore: function() {
+            var type = this.getOverrideType();
+            var score = null;
+
+            //if module is entrance exam section/chapter then fetch its minimum passing score.
+            if(type !=null) {
+                if (_.has(type, 'is_entrance_exam_section') && type['is_entrance_exam_section']) {
+                    score = type['exam_min_score']
+                }
+            }
+            return score;
+       },
+
+        /**
          * Return a list of convenience methods to check affiliation to the category.
          * @return {Array}
-         */
-        getCategoryHelpers: function () {
+        */
+       getCategoryHelpers: function () {
             var categories = ['course', 'chapter', 'sequential', 'vertical'],
                 helpers = {};
 
@@ -200,15 +244,15 @@ function(Backbone, _, str, ModuleUtils) {
             }, this);
 
             return helpers;
-        },
+       },
 
-        /**
-         * Check if we can edit current XBlock or not on Course Outline page.
-         * @return {Boolean}
-         */
-        isEditableOnCourseOutline: function() {
-            return this.isSequential() || this.isChapter() || this.isVertical();
-        }
+       /**
+        * Check if we can edit current XBlock or not on Course Outline page.
+        * @return {Boolean}
+        */
+       isEditableOnCourseOutline: function() {
+           return this.isSequential() || this.isChapter() || this.isVertical();
+       }
     });
     return XBlockInfo;
 });
