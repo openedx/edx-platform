@@ -17,7 +17,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory, Client
-from django.test.utils import override_settings
 from mock import Mock, patch
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
@@ -48,13 +47,6 @@ log = logging.getLogger(__name__)
 @ddt.ddt
 class CourseEndingTest(TestCase):
     """Test things related to course endings: certificates, surveys, etc"""
-
-    def setUp(self):
-        super(CourseEndingTest, self).setUp()
-
-        # Clear the model-based config cache to avoid
-        # interference between tests.
-        cache.clear()
 
     def test_process_survey_link(self):
         username = "fred"
@@ -197,118 +189,6 @@ class CourseEndingTest(TestCase):
             'mode': 'honor'
         }
         self.assertIsNone(_cert_info(user, course2, cert_status, course_mode))
-
-    def test_linked_in_url_with_unicode_course_display_name(self):
-        """Test with unicode display name values."""
-
-        user = Mock(username="fred")
-        survey_url = "http://a_survey.com"
-        course = Mock(
-            end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end',
-            display_name=u'edx/abc/courseregisters®'
-        )
-        download_url = 'http://s3.edx/cert'
-
-        cert_status = {
-            'status': 'downloadable', 'grade': '67',
-            'download_url': download_url,
-            'mode': 'honor'
-        }
-        LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        ).save()
-
-        status_dict = _cert_info(user, course, cert_status, 'honor')
-        expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName=edX+Honor+Code+Certificate+for+edx%2Fabc%2Fcourseregisters%C2%AE&'
-            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
-            'source=o'
-        )
-        self.assertEqual(expected_url, status_dict['linked_in_url'])
-
-    def test_linked_in_url_not_exists_without_config(self):
-        user = Mock(username="fred")
-        survey_url = "http://a_survey.com"
-        course = Mock(
-            display_name="Demo Course",
-            end_of_course_survey_url=survey_url,
-            certificates_display_behavior='end'
-        )
-
-        download_url = 'http://s3.edx/cert'
-        cert_status = {
-            'status': 'downloadable', 'grade': '67',
-            'download_url': download_url,
-            'mode': 'verified'
-        }
-
-        self.assertEqual(
-            _cert_info(user, course, cert_status, 'verified'),
-            {
-                'status': 'ready',
-                'show_disabled_download_button': False,
-                'show_download_url': True,
-                'download_url': download_url,
-                'show_survey_button': True,
-                'survey_url': survey_url,
-                'grade': '67',
-                'mode': 'verified',
-                'linked_in_url': None
-            }
-        )
-
-        # Enabling the configuration will cause the LinkedIn
-        # "add to profile" button to appear.
-        # We need to clear the cache again to make sure we
-        # pick up the modified configuration.
-        cache.clear()
-        LinkedInAddToProfileConfiguration(
-            company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',
-            enabled=True
-        ).save()
-
-        status_dict = _cert_info(user, course, cert_status, 'honor')
-        expected_url = (
-            'http://www.linkedin.com/profile/add'
-            '?_ed=0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9&'
-            'pfCertificationName=edX+Verified+Certificate+for+Demo+Course&'
-            'pfCertificationUrl=http%3A%2F%2Fs3.edx%2Fcert&'
-            'source=o'
-        )
-        self.assertEqual(expected_url, status_dict['linked_in_url'])
-
-    @ddt.data(
-        ('honor', 'edX Honor Code Certificate for DemoX'),
-        ('verified', 'edX Verified Certificate for DemoX'),
-        ('professional', 'edX Professional Certificate for DemoX'),
-        ('default_mode', 'edX Certificate for DemoX')
-    )
-    @ddt.unpack
-    def test_linked_in_url_certificate_types(self, cert_mode, cert_name):
-        user = Mock(username="fred")
-        course = Mock(
-            display_name='DemoX',
-            end_of_course_survey_url='http://example.com',
-            certificates_display_behavior='end'
-        )
-        cert_status = {
-            'status': 'downloadable',
-            'grade': '67',
-            'download_url': 'http://edx.org',
-            'mode': cert_mode
-        }
-
-        LinkedInAddToProfileConfiguration(
-            company_identifier="abcd123",
-            enabled=True
-        ).save()
-
-        status_dict = _cert_info(user, course, cert_status, cert_mode)
-        self.assertIn(cert_name.replace(' ', '+'), status_dict['linked_in_url'])
 
 
 class DashboardTest(ModuleStoreTestCase):
@@ -518,10 +398,7 @@ class DashboardTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_not_appearing_without_config(self):
-
-        """
-         without linked-in config don't show Add Certificate to LinkedIn button
-        """
+        # Without linked-in config don't show Add Certificate to LinkedIn button
         self.client.login(username="jack", password="test")
 
         CourseModeFactory.create(
@@ -557,12 +434,8 @@ class DashboardTest(ModuleStoreTestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_linked_in_add_to_profile_btn_with_certificate(self):
-
-        """
-        If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
-        should be visible. and it has URL value with valid parameters.
-        """
-
+        # If user has a certificate with valid linked-in config then Add Certificate to LinkedIn button
+        # should be visible. and it has URL value with valid parameters.
         self.client.login(username="jack", password="test")
         LinkedInAddToProfileConfiguration(
             company_identifier='0_mC_o2MizqdtZEmkVXjH4eYwMj4DnkCWrZP_D9',

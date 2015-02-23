@@ -51,6 +51,21 @@
         // Track clicks of the "verify now" button.
         window.analytics.trackLink(verifyButtonLinks, 'edx.bi.user.verification.resumed', generateProperties);
 
+        // Track clicks of the LinkedIn "Add to Profile" button
+        window.analytics.trackLink(
+            $('.action-linkedin-profile'),
+            'edx.bi.user.linkedin_add_to_profile',
+            function( element ) {
+                var $el = $( element );
+                return {
+                    category: 'linkedin',
+                    label: $el.data('course-id'),
+                    mode: $el.data('certificate-mode')
+                };
+            }
+        );
+
+
         // Generate the properties object to be passed along with business intelligence events.
         function generateProperties(element) {
             var $el = $(element),
