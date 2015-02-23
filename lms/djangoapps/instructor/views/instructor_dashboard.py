@@ -304,8 +304,15 @@ def _section_student_admin(course, access):
         'get_student_progress_url_url': reverse('get_student_progress_url', kwargs={'course_id': unicode(course_key)}),
         'enrollment_url': reverse('students_update_enrollment', kwargs={'course_id': unicode(course_key)}),
         'reset_student_attempts_url': reverse('reset_student_attempts', kwargs={'course_id': unicode(course_key)}),
+        'reset_student_attempts_for_entrance_exam_url': reverse(
+            'reset_student_attempts_for_entrance_exam',
+            kwargs={'course_id': unicode(course_key)},
+        ),
         'rescore_problem_url': reverse('rescore_problem', kwargs={'course_id': unicode(course_key)}),
+        'rescore_entrance_exam_url': reverse('rescore_entrance_exam', kwargs={'course_id': unicode(course_key)}),
         'list_instructor_tasks_url': reverse('list_instructor_tasks', kwargs={'course_id': unicode(course_key)}),
+        'list_entrace_exam_instructor_tasks_url': reverse('list_entrance_exam_instructor_tasks',
+                                                          kwargs={'course_id': unicode(course_key)}),
         'spoc_gradebook_url': reverse('spoc_gradebook', kwargs={'course_id': unicode(course_key)}),
     }
     return section_data

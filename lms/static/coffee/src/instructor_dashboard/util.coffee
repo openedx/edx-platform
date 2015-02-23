@@ -19,7 +19,7 @@ find_and_assert = ($root, selector) ->
 #
 # wraps a `handler` function so that first
 # it prints basic error information to the console.
-std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
+@std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
   console.warn """ajax error
                   textStatus: #{textStatus}
                   errorThrown: #{errorThrown}"""
@@ -29,7 +29,7 @@ std_ajax_err = (handler) -> (jqXHR, textStatus, errorThrown) ->
 # render a task list table to the DOM
 # `$table_tasks` the $element in which to put the table
 # `tasks_data`
-create_task_list_table = ($table_tasks, tasks_data) ->
+@create_task_list_table = ($table_tasks, tasks_data) ->
   $table_tasks.empty()
 
   options =
@@ -264,7 +264,7 @@ class IntervalManager
     @intervalID = null
 
 
-class PendingInstructorTasks
+class @PendingInstructorTasks
   ### Pending Instructor Tasks Section ####
   constructor: (@$section) ->
     # Currently running tasks
