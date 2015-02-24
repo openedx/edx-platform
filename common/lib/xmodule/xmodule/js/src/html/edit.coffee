@@ -996,6 +996,7 @@ class @HTMLEditingDescriptor
       '%%USER_ID%%',
       '%%USER_FULLNAME%%',
       '%%COURSE_DISPLAY_NAME%%',
+      '%%COURSE_ID%%',
       '%%COURSE_START_DATE%%',
       '%%COURSE_END_DATE%%',
     ]

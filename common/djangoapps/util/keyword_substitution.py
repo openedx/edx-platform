@@ -9,6 +9,7 @@ Supported:
         - %%USER_ID%% => anonymous user id
         - %%USER_FULLNAME%% => User's full name
         - %%COURSE_DISPLAY_NAME%% => display name of the course
+        - %%COURSE_ID%% => course identifier
         - %%COURSE_START_DATE%% => start date of the course
         - %%COURSE_END_DATE%% => end date of the course
 
