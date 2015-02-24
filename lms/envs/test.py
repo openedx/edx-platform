@@ -460,3 +460,8 @@ FEATURES['ENTRANCE_EXAMS'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+# Facebook app creds so jenkins tests succeed
+FACEBOOK_APP_SECRET = "6c26348ef355f53a531890e980ddc731"
+FACEBOOK_APP_ID = "735343629893573"
+FACEBOOK_API_VERSION = "v2.2"
