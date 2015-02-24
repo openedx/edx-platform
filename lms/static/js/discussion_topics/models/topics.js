@@ -19,6 +19,9 @@ var edx = edx || {};
                 entriesList.push(entry);
             });
 
+            _.each(attrs.subcategories, function() {
+
+            });
             attrs.entries = new topicCollection(entriesList);
             return attrs;
         }
