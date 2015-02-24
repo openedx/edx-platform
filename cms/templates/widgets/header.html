@@ -43,7 +43,7 @@
         </a>
       </h2>
 
-      <nav class="nav-course nav-dd ui-left">
+      <nav class="nav-course nav-dd ui-left" aria-label="${_('{course_name}').format(course_name=context_course.display_name_with_default)}">
         <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_course.display_name_with_default)}</h2>
         <ol>
           <li class="nav-item nav-course-courseware">
@@ -141,7 +141,7 @@
         </a>
       </h2>
 
-      <nav class="nav-course nav-dd ui-left">
+      <nav class="nav-course nav-dd ui-left" aria-label="${_('{course_name}').format(course_name=context_library.display_name_with_default)}">
         <h2 class="sr">${_("Navigation for {course_name}").format(course_name=context_library.display_name_with_default)}</h2>
         <ol>
 
@@ -165,7 +165,7 @@
 
     <div class="wrapper wrapper-r">
       % if user.is_authenticated():
-      <nav class="nav-account nav-is-signedin nav-dd ui-right">
+      <nav class="nav-account nav-is-signedin nav-dd ui-right" aria-label="${_('Account')}">
         <h2 class="sr">${_("Help &amp; Account Navigation")}</h2>
         <ol>
           <li class="nav-item nav-account-help">
@@ -192,7 +192,7 @@
       </nav>
 
       % else:
-      <nav class="nav-not-signedin nav-pitch">
+      <nav class="nav-not-signedin nav-pitch" aria-label="${_('Account')}">
         <h2 class="sr">${_("You're not currently signed in")}</h2>
         <ol>
           <li class="nav-item nav-not-signedin-help">
