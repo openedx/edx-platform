@@ -7,23 +7,25 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
+from rest_framework import parsers
 
 from student.models import UserProfile
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer, AccountUserSerializer
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
+from openedx.core.lib.api.parsers import MergePatchParser
 
 
 class AccountView(APIView):
     """
         **Use Cases**
 
-            Get or update the user's account information.
+            Get or update the user's account information. Updates are only supported through merge patch.
 
         **Example Requests**:
 
             GET /api/user/v0/accounts/{username}/
 
-            PATCH /api/user/v0/accounts/{username}/
+            PATCH /api/user/v0/accounts/{username}/ with content_type "application/merge-patch+json"
 
         **Response Values for GET**
 
@@ -64,10 +66,12 @@ class AccountView(APIView):
         **Response for PATCH**
 
              Returns a 204 status if successful, with no additional content.
+             If "application/merge-patch+json" is not the specified content_type, returns a 415 status.
 
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
+    parser_classes = (MergePatchParser,)
 
     def get(self, request, username):
         """
@@ -82,6 +86,10 @@ class AccountView(APIView):
     def patch(self, request, username):
         """
         PATCH /api/user/v0/accounts/{username}/
+
+        Note that this implementation is the "merge patch" implementation proposed in
+        https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
+        else an error response with status code 415 will be returned.
         """
         existing_user, existing_user_profile = self._get_user_and_profile(username)
 
