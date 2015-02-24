@@ -68,7 +68,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " Hello World! ", "display_name": "Text"},
-            "content_type": "HTML Content"
+            "content_type": "Text"
         })
 
         sample_xml_cdata = '''
@@ -80,7 +80,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml_cdata)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " This has CDATA in it. ", "display_name": "Text"},
-            "content_type": "HTML Content"
+            "content_type": "Text"
         })
 
         sample_xml_tab_spaces = '''
@@ -91,7 +91,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml_tab_spaces)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " Text has spaces :) ", "display_name": "Text"},
-            "content_type": "HTML Content"
+            "content_type": "Text"
         })
 
         sample_xml_comment = '''
@@ -103,7 +103,7 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml_comment)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " This has HTML comment in it. ", "display_name": "Text"},
-            "content_type": "HTML Content"
+            "content_type": "Text"
         })
 
         sample_xml_mix_comment_cdata = '''
@@ -118,5 +118,5 @@ class HtmlDescriptorIndexingTestCase(unittest.TestCase):
         descriptor = instantiate_descriptor(data=sample_xml_mix_comment_cdata)
         self.assertEqual(descriptor.index_dictionary(), {
             "content": {"html_content": " This has HTML comment in it. HTML end. ", "display_name": "Text"},
-            "content_type": "HTML Content"
+            "content_type": "Text"
         })
