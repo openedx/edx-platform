@@ -2092,6 +2092,30 @@ def get_ora2_responses(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_course_forums_usage(request, course_id):
+    """
+    Pushes a Celery task which will aggregate course forums statistics into a .csv
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_course_forums_usage_task(request, course_key)
+        success_status = _("The course forums usage report is being generated.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A course forums usage report task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 @require_post_params(send_to="sending to whom", subject="subject line", message="message text")
 def send_email(request, course_id):
     """
