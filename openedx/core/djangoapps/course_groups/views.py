@@ -387,6 +387,7 @@ def cohort_discussion_topics(request, course_key_string):
         if 'coursewide_discussions' in request.json.keys() and request.json.get('coursewide_discussions'):
             cohorted_coursewide_ids = [topic.get('id') for topic in request.json.get('entries') if topic['is_cohorted']]
             coursewide_ids = [topic.get('id') for topic_name, topic in coursewide_discussions.iteritems()]
+
             cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if
                                     discussion_id not in coursewide_ids]
 

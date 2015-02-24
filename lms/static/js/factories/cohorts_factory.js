@@ -33,7 +33,6 @@
                     courseCohortSettings.fetch().done(function() {
                         discussionTopics.fetch().done(function() {
                             cohortsView.render();
-                            //discussionTopicsView.render();
                         });
                     });
                 });
