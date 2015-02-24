@@ -24,7 +24,7 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["search_item", "search_list", "search_loading", "search_error"]:
+% for template_name in ["search_item", "search_item_seq", "search_list", "search_loading", "search_error"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="courseware_search/${template_name}.underscore" />
 </script>
