@@ -161,25 +161,25 @@
         };
 
         var movie = document.getElementById("vid1");
-        var experimentBranch = false;
+        var experimentGroup = false;
         var sampleRate = 1.0;
         // TODO: replace with hardcoded video urls
         var videoURLs = ["http://cloudfront/video.mp4", "http://netease/video.mp4", "http://xuetang/video.mp4"];
 
         if (Math.random() > 1e-6 // due to a bug in Chrome 30
             && Math.random() <= sampleRate) {
-                experimentBranch = Math.floor(Math.random() * 3);
+                experimentGroup = Math.floor(Math.random() * 3);
         }
 
-        movie.src = videoURLs[experimentBranch || 0];
+        movie.src = videoURLs[experimentGroup || 0];
 
         var timeInit = Date.now();
 
         movie.addEventListener("canplaythrough", function() {
             var timeElapsed = Date.now() - timeInit;
-            // if sampled, send a beacon back containing timeElapsed and experimentBranch.
-            if experimentBranch !== false {
-                sendMetricToGraphite("loadtime_" + experimentBranch, timeElapsed);
+            // if sampled, send a beacon back containing timeElapsed and experimentGroup
+            if experimentGroup !== false {
+                sendMetricToGraphite("loadtime_" + experimentGroup, timeElapsed);
             {
         });
     </script>
