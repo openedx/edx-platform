@@ -1,6 +1,6 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext, interpolate_text, DiscussionTopicItemView, NotificationModel, NotificationView) {
+(function($, _, Backbone, gettext, interpolate_text, NotificationModel, NotificationView) {
     'use strict';
 
     edx.discussions = edx.discussions || {};
@@ -12,7 +12,7 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            this.template = _.template($('#cohort-discussion-topics-tpl').text());
+            this.template = _.template($('#cohort-topics-tpl').text());
             this.context = options.context;
             this.model.get('entries').on("change", this.render, this);
             this.cohortedDiscussionTopics = [];
@@ -22,13 +22,6 @@ var edx = edx || {};
                 coursewideTopics: this.model.get('entries').models,
                 inlineTopics: this.model.get('subcategories')
             }));
-
-            //var topicsList = this.model.get('entries'),
-            //    self = this;
-            //topicsList.each(function(topic) {
-            //    var topicItem = new DiscussionTopicItemView({ model: topic });
-            //    self.$el.append(topicItem.render().el);
-            //});
         },
         toggleSaveButton: function(event) {
             $('.cohort-coursewide-discussions-form .action-save').prop('disabled', '');
@@ -46,20 +39,17 @@ var edx = edx || {};
         },
 
         saveCoursewideDiscussionsForm: function(event) {
-            var self = this,
-                cohortedTopics = this.$('.check-discussion-topic:checked');
-
+            var self = this;
             event.preventDefault();
+
             this.removeNotification();
             this.saveForm()
                 .done(function() {
                     self.model.fetch().done(function() {
-                        self.showNotification({
-                            type: 'confirmation',
-                            title: interpolate_text(
-                                gettext('The cohort has been created. You can manually add students to this cohort below.')
-                            )
-                        });
+                        self.showMessage(
+                            gettext('The discussion topic(s) has been cohorted.'),
+                            self.$('.coursewide-discussion-topics')
+                        );
                     });
                 });
         },
@@ -67,29 +57,20 @@ var edx = edx || {};
             var self = this,
                 coursewideDiscussions = this.model,
                 saveOperation = $.Deferred(),
-                //isUpdate = !_.isUndefined(this.model.id),
                 fieldData, errorMessages, showErrorMessage;
-            //showErrorMessage = function(message, details) {
-            //    self.showMessage(message, 'error', details);
-            //};
+            showErrorMessage = function(message) {
+                self.showMessage(message, self.$('.coursewide-discussion-topics'), 'error');
+            };
             this.removeNotification();
             fieldData = {
                 coursewide_discussions: true
             };
-            //errorMessages = this.validate(fieldData);
 
-            //if (errorMessages.length > 0) {
-            //    showErrorMessage(
-            //        isUpdate ? gettext("The cohort cannot be saved") : gettext("The cohort cannot be added"),
-            //        errorMessages
-            //    );
-            //    saveOperation.reject();
-            //} else {
             coursewideDiscussions.save(
-                fieldData, {wait: true, patch:true}
+                fieldData, {wait: true}
             ).done(function(result) {
                 //cohort.id = result.id;
-                //self.render();    // re-render to remove any now invalid error messages
+                self.render();    // re-render to remove any now invalid error messages
                 saveOperation.resolve();
             }).fail(function(result) {
                 var errorMessage = null;
@@ -105,8 +86,14 @@ var edx = edx || {};
                 showErrorMessage(errorMessage);
                 saveOperation.reject();
             });
-            //}
             return saveOperation.promise();
+        },
+
+        showMessage: function(message, element, type) {
+            this.showNotification(
+                {type: type || 'confirmation', title: message},
+                element
+            );
         },
         showNotification: function(options, beforeElement) {
             var model = new NotificationModel(options);
@@ -121,13 +108,6 @@ var edx = edx || {};
             if (this.notification) {
                 this.notification.remove();
             }
-        },
-        getCohortedTopics: function(){
-            var self=this,
-                cohortedTopics=this.$('.check-discussion-topic:checked');
-            _.each(cohortedTopics, function(topic){
-                self.cohortedDiscussionTopics.push(topic.data('id'));
-            });
         }
     });
-}).call(this, $, _, Backbone, gettext, interpolate_text, edx.discussions.DiscussionTopicItemView, NotificationModel, NotificationView);
+}).call(this, $, _, Backbone, gettext, interpolate_text, NotificationModel, NotificationView);
