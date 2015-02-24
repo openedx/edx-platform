@@ -21,6 +21,7 @@ Usage:
             - Bulk email
             - emails on enrollment
             - course announcements
+            - HTML components
         - CMS:
             - Test emails on enrollment
 """
