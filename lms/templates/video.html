@@ -153,8 +153,7 @@
 % if cdn_eval:
     <script>
         function sendMetricToGraphite(metricName, value) {
-            // TODO: add real API Key
-            var apiKey = YOUR-API-KEY;
+            var apiKey = "ec86b07c-cc30-4adb-9f30-6473b403769c";
             var url = "https://" + apiKey + "@www.hostedgraphite.com/api/v1/sink";
             var request = new XMLHttpRequest();
             request.open("POST", url, true);  // send asynchronously
