@@ -1,13 +1,13 @@
 var edx = edx || {};
 
-(function($, _, Backbone, gettext, interpolate_text, DiscussionTopicItemView) {
+(function($, _, Backbone, gettext, interpolate_text, DiscussionTopicItemView, NotificationModel, NotificationView) {
     'use strict';
 
     edx.discussions = edx.discussions || {};
 
     edx.discussions.DiscussionTopicsView = Backbone.View.extend({
         events : {
-            'change .discussion-topic': 'toggleTopicCheck',
+            'change .check-discussion-topic': 'toggleTopicCheck',
             'click .cohort-coursewide-discussions-form .action-save': 'saveCoursewideDiscussionsForm'
         },
 
@@ -40,21 +40,17 @@ var edx = edx || {};
 
             var $selectedTopic = $(event.currentTarget),
                 isTopicChecked = $selectedTopic.prop('checked'),
-                id = $selectedTopic.data('id');
-
-            //isTopicChecked ? this.cohortedDiscussionTopics.push(id): this.cohortedDiscussionTopics;
-            var currentModel = this.model.get('entries').get(id);
+                id = $selectedTopic.data('id'),
+                currentModel = this.model.get('entries').get(id);
             currentModel.set({'is_cohorted': isTopicChecked});
         },
 
         saveCoursewideDiscussionsForm: function(event) {
             var self = this,
-                cohortedTopics=this.$('.check-discussion-topic:checked');
-            _.each(cohortedTopics, function(topic){
-                self.cohortedDiscussionTopics.push($(topic).data('id'))
-            });
+                cohortedTopics = this.$('.check-discussion-topic:checked');
+
             event.preventDefault();
-            //this.removeNotification();
+            this.removeNotification();
             this.saveForm()
                 .done(function() {
                     self.model.fetch().done(function() {
@@ -76,9 +72,9 @@ var edx = edx || {};
             //showErrorMessage = function(message, details) {
             //    self.showMessage(message, 'error', details);
             //};
-            //this.removeNotification();
+            this.removeNotification();
             fieldData = {
-                coursewide_discussions: this.cohortedDiscussionTopics
+                coursewide_discussions: true
             };
             //errorMessages = this.validate(fieldData);
 
@@ -112,6 +108,20 @@ var edx = edx || {};
             //}
             return saveOperation.promise();
         },
+        showNotification: function(options, beforeElement) {
+            var model = new NotificationModel(options);
+            this.removeNotification();
+            this.notification = new NotificationView({
+                model: model
+            });
+            beforeElement.before(this.notification.$el);
+            this.notification.render();
+        },
+        removeNotification: function() {
+            if (this.notification) {
+                this.notification.remove();
+            }
+        },
         getCohortedTopics: function(){
             var self=this,
                 cohortedTopics=this.$('.check-discussion-topic:checked');
@@ -120,4 +130,4 @@ var edx = edx || {};
             });
         }
     });
-}).call(this, $, _, Backbone, gettext, interpolate_text, edx.discussions.DiscussionTopicItemView);
+}).call(this, $, _, Backbone, gettext, interpolate_text, edx.discussions.DiscussionTopicItemView, NotificationModel, NotificationView);
