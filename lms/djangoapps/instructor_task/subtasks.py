@@ -71,7 +71,7 @@ def track_memory_usage(metric, course_id):
 
 
 def _generate_items_for_subtask(
-    item_querysets,
+    item_querysets,  # pylint: disable=bad-continuation
     item_fields,
     total_num_items,
     items_per_task,
