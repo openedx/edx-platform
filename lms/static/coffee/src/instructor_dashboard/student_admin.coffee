@@ -46,6 +46,7 @@ class @StudentAdmin
     @$btn_reset_entrance_exam_attempts   = @$section.find "input[name='reset-entrance-exam-attempts']"
     @$btn_delete_entrance_exam_state     = @$section.find "input[name='delete-entrance-exam-state']"
     @$btn_rescore_entrance_exam          = @$section.find "input[name='rescore-entrance-exam']"
+    @$btn_skip_entrance_exam             = @$section.find "input[name='skip-entrance-exam']"
     @$btn_entrance_exam_task_history     = @$section.find "input[name='entrance-exam-task-history']"
     @$table_entrance_exam_task_history   = @$section.find ".entrance-exam-task-history-table"
 
@@ -222,6 +223,31 @@ class @StudentAdmin
           error_message = gettext("Error starting a task to rescore entrance exam for student '{student_id}'. Make sure that entrance exam has problems in it and student identifier is correct.")
           full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
           @$request_response_error_ee.text full_error_message
+
+  # Mark a student to skip entrance exam
+    @$btn_skip_entrance_exam.click =>
+      unique_student_identifier = @$field_entrance_exam_student_select_grade.val()
+      if not unique_student_identifier
+        return @$request_response_error_ee.text gettext("Please enter a student email address or username.")
+      confirm_message = gettext("Mark student '{student_id}' to skip entrance exam?")
+      full_confirm_message = interpolate_text(confirm_message, {student_id: unique_student_identifier})
+      if window.confirm full_confirm_message
+        send_data =
+          unique_student_identifier: unique_student_identifier
+
+        $.ajax
+          dataType: 'json'
+          url: @$btn_skip_entrance_exam.data 'endpoint'
+          data: send_data
+          type: 'POST'
+          success: @clear_errors_then ->
+            success_message = gettext("Student '{student_id}' is marked to skip entrance exam.")
+            full_success_message = interpolate_text(success_message, {student_id: unique_student_identifier})
+            alert full_success_message
+          error: std_ajax_err =>
+            error_message = gettext("Error marking student '{student_id}' to skip entrance exam. Make sure student identifier is correct.")
+            full_error_message = interpolate_text(error_message, {student_id: unique_student_identifier})
+            @$request_response_error_ee.text full_error_message
 
    # delete student state for entrance exam
     @$btn_delete_entrance_exam_state.click =>
