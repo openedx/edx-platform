@@ -14,6 +14,9 @@ from mock import patch
 
 
 class CourseUpdateTest(CourseTestCase):
+    """
+    Test for course updates
+    """
     def create_update_url(self, provided_id=None, course_key=None):
         if course_key is None:
             course_key = self.course.id

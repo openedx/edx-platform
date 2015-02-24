@@ -78,4 +78,8 @@ def startup_notification_subsystem():
     """
     Initialize the Notification subsystem
     """
-    startup.initialize()
+    try:
+        startup.initialize()
+    except Exception as e:
+        print str(e)
+        pass

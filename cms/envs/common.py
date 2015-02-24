@@ -804,6 +804,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # edx_notifications
+    'edx_notifications'
 )
 
 
