@@ -2118,16 +2118,21 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 if BlockKey.from_usage_key(subtree_root) != source_structure['root']:
                     # find the parents and put root in the right sequence
                     parents = self._get_parents_from_structure(BlockKey.from_usage_key(subtree_root), source_structure)
+                    parent_found = False
                     for parent in parents:
-                        if parent not in destination_blocks:
-                            raise ItemNotFoundError(parent)
-                        orphans.update(
-                            self._sync_children(
-                                source_structure['blocks'][parent],
-                                destination_blocks[parent],
-                                BlockKey.from_usage_key(subtree_root)
+                        # If a parent isn't found in the destination_blocks, it's possible it was renamed
+                        # in the course export. Continue and only throw an exception if *no* parents are found.
+                        if parent in destination_blocks:
+                            parent_found = True
+                            orphans.update(
+                                self._sync_children(
+                                    source_structure['blocks'][parent],
+                                    destination_blocks[parent],
+                                    BlockKey.from_usage_key(subtree_root)
+                                )
                             )
-                        )
+                    if len(parents) and not parent_found:
+                        raise ItemNotFoundError(parents)
                 # update/create the subtree and its children in destination (skipping blacklist)
                 orphans.update(
                     self._copy_subdag(
