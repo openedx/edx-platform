@@ -61,7 +61,7 @@ git clean -qxfd
 source scripts/jenkins-common.sh
 
 # Violations thresholds for failing the build
-PYLINT_THRESHOLD=6100
+PYLINT_THRESHOLD=6000
 PEP8_THRESHOLD=0
 
 # If the environment variable 'SHARD' is not set, default to 'all'.
@@ -93,7 +93,7 @@ END
         ;;
 
     "unit")
-        case "$SHARD" in        
+        case "$SHARD" in
             "lms")
                 paver test_system -s lms
                 paver coverage
