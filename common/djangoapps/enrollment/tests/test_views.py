@@ -147,7 +147,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.client.logout()
 
         # Try to enroll, this should fail.
-        self._create_enrollment(expected_status=status.HTTP_403_FORBIDDEN)
+        self._create_enrollment(expected_status=status.HTTP_401_UNAUTHORIZED)
 
     def test_user_not_activated(self):
         # Log out the default user, Bob.
