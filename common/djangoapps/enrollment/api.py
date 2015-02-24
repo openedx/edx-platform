@@ -45,7 +45,8 @@ def get_enrollments(user_id):
                             "suggested_prices": "",
                             "currency": "usd",
                             "expiration_datetime": null,
-                            "description": null
+                            "description": null,
+                            "sku": null
                         }
                     ],
                     "enrollment_start": 2014-10-15T20:18:00Z,
@@ -68,7 +69,8 @@ def get_enrollments(user_id):
                             "suggested_prices": "",
                             "currency": "usd",
                             "expiration_datetime": null,
-                            "description": null
+                            "description": null,
+                            "sku": null
                         }
                     ],
                     "enrollment_start": 2014-10-15T20:18:00Z,
@@ -111,7 +113,8 @@ def get_enrollment(user_id, course_id):
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
-                        "description": null
+                        "description": null,
+                        "sku": null
                     }
                 ],
                 "enrollment_start": 2014-10-15T20:18:00Z,
@@ -157,7 +160,8 @@ def add_enrollment(user_id, course_id, mode='honor', is_active=True):
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
-                        "description": null
+                        "description": null,
+                        "sku": null
                     }
                 ],
                 "enrollment_start": 2014-10-15T20:18:00Z,
@@ -201,7 +205,8 @@ def update_enrollment(user_id, course_id, mode=None, is_active=None):
                         "suggested_prices": "",
                         "currency": "usd",
                         "expiration_datetime": null,
-                        "description": null
+                        "description": null,
+                        "sku": null
                     }
                 ],
                 "enrollment_start": 2014-10-15T20:18:00Z,
@@ -243,7 +248,8 @@ def get_course_enrollment_details(course_id):
                     "suggested_prices": "",
                     "currency": "usd",
                     "expiration_datetime": null,
-                    "description": null
+                    "description": null,
+                    "sku": null
                 }
             ],
             "enrollment_start": 2014-10-15T20:18:00Z,
