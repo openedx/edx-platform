@@ -7,12 +7,17 @@ from datetime import datetime
 
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from mock import patch, Mock
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure, update_course_structure
+from opaque_keys.edx.locator import CourseLocator
+from xmodule.error_module import ErrorDescriptor
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
+from xmodule.modulestore.xml import CourseLocationManager
+from xmodule.tests import get_test_system
 
 from courseware.tests.factories import GlobalStaffFactory, StaffFactory
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure, update_course_structure
 
 
 TEST_SERVER_HOST = 'http://testserver'
@@ -259,6 +264,24 @@ class CourseListTests(CourseViewTestsMixin, ModuleStoreTestCase):
         response = self.http_get(url, HTTP_AUTHORIZATION=auth_header)
         self.assertEqual(response.status_code, 200)
         self.assertDictContainsSubset({'count': 0, u'results': []}, response.data)
+
+    def test_course_error(self):
+        """
+        Ensure the view still returns results even if get_courses() returns an ErrorDescriptor. The ErrorDescriptor
+        should be filtered out.
+        """
+
+        error_descriptor = ErrorDescriptor.from_xml(
+            '<course></course>',
+            get_test_system(),
+            CourseLocationManager(CourseLocator(org='org', course='course', run='run')),
+            None
+        )
+
+        descriptors = [error_descriptor, self.empty_course, self.course]
+
+        with patch('xmodule.modulestore.mixed.MixedModuleStore.get_courses', Mock(return_value=descriptors)):
+            self.test_get()
 
 
 class CourseDetailTests(CourseDetailMixin, CourseViewTestsMixin, ModuleStoreTestCase):
