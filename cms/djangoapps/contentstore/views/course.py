@@ -819,7 +819,7 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
-            if request.method == 'POST':
+            if settings.FEATURES.get('NOTIFICATIONS_ENABLED', False) and request.method == 'POST':
                 # only send bulk notifications to users when there is
                 # new update/announcement in the course.
 
