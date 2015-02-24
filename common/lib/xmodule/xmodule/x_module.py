@@ -1266,7 +1266,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
             cache=None, can_execute_unsafe_code=None, replace_course_urls=None,
             replace_jump_to_id_urls=None, error_descriptor_class=None, get_real_user=None,
             field_data=None, get_user_role=None, rebind_noauth_module_to_user=None,
-            user_location=None, get_python_lib_zip=None, **kwargs):
+            user_location=None, get_python_lib_zip=None, substitute_keywords_with_data=None, **kwargs):
         """
         Create a closure around the system environment.
 
@@ -1331,6 +1331,8 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
 
         rebind_noauth_module_to_user - rebinds module bound to AnonymousUser to a real user...used in LTI
            modules, which have an anonymous handler, to set legitimate users' data
+
+        substitute_keywords_with_data - A partial function used to render HTML modules with keyword substitution
         """
 
         # Usage_store is unused, and field_data is often supplanted with an
@@ -1372,6 +1374,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         self.get_user_role = get_user_role
         self.descriptor_runtime = descriptor_runtime
         self.rebind_noauth_module_to_user = rebind_noauth_module_to_user
+        self.substitute_keywords_with_data = substitute_keywords_with_data
 
     def get(self, attr):
         """	provide uniform access to attributes (like etree)."""
