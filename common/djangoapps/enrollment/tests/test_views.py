@@ -206,6 +206,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
             course_id=self.course.id,
             mode_slug='honor',
             mode_display_name='Honor',
+            sku='123',
         )
         resp = self.client.get(
             reverse('courseenrollmentdetails', kwargs={"course_id": unicode(self.course.id)})
@@ -214,6 +215,10 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
 
         data = json.loads(resp.content)
         self.assertEqual(unicode(self.course.id), data['course_id'])
+        mode = data['course_modes'][0]
+        self.assertEqual(mode['slug'], 'honor')
+        self.assertEqual(mode['sku'], '123')
+        self.assertEqual(mode['name'], 'Honor')
 
     def test_with_invalid_course_id(self):
         self._create_enrollment(course_id='entirely/fake/course', expected_status=status.HTTP_400_BAD_REQUEST)
