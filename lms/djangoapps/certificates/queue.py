@@ -1,25 +1,50 @@
-from certificates.models import GeneratedCertificate
-from certificates.models import certificate_status_for_student
-from certificates.models import CertificateStatuses as status
-from certificates.models import CertificateWhitelist
-
-from courseware import grades, courses
-from django.test.client import RequestFactory
-from capa.xqueue_interface import XQueueInterface
-from capa.xqueue_interface import make_xheader, make_hashkey
-from django.conf import settings
-from requests.auth import HTTPBasicAuth
-from student.models import UserProfile, CourseEnrollment
-from verify_student.models import SoftwareSecurePhotoVerification
-
+"""Interface for adding certificate generation tasks to the XQueue. """
 import json
 import random
 import logging
 import lxml.html
-from lxml.etree import XMLSyntaxError, ParserError
+from lxml.etree import XMLSyntaxError, ParserError  # pylint:disable=no-name-in-module
+
+from django.test.client import RequestFactory
+from django.conf import settings
+from django.core.urlresolvers import reverse
+from requests.auth import HTTPBasicAuth
+
+from courseware import grades
+from xmodule.modulestore.django import modulestore
+from capa.xqueue_interface import XQueueInterface
+from capa.xqueue_interface import make_xheader, make_hashkey
+from student.models import UserProfile, CourseEnrollment
+from verify_student.models import SoftwareSecurePhotoVerification
+
+from certificates.models import (
+    GeneratedCertificate,
+    certificate_status_for_student,
+    CertificateStatuses as status,
+    CertificateWhitelist,
+    ExampleCertificate
+)
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+class XQueueAddToQueueError(Exception):
+    """An error occurred when adding a certificate task to the queue. """
+
+    def __init__(self, error_code, error_msg):
+        self.error_code = error_code
+        self.error_msg = error_msg
+        super(XQueueAddToQueueError, self).__init__(unicode(self))
+
+    def __unicode__(self):
+        return (
+            u"Could not add certificate to the XQueue.  "
+            u"The error code was '{code}' and the message was '{msg}'."
+        ).format(
+            code=self.error_code,
+            msg=self.error_msg
+        )
 
 
 class XQueueCertInterface(object):
@@ -205,7 +230,7 @@ class XQueueCertInterface(object):
             # re-use the course passed in optionally so we don't have to re-fetch everything
             # for every student
             if course is None:
-                course = courses.get_course_by_id(course_id)
+                course = modulestore().get_course(course_id, depth=0)
             profile = UserProfile.objects.get(user=student)
             profile_name = profile.name
 
@@ -213,7 +238,7 @@ class XQueueCertInterface(object):
             self.request.user = student
             self.request.session = {}
 
-            course_name = course.display_name or course_id.to_deprecated_string()
+            course_name = course.display_name or unicode(course_id)
             is_whitelisted = self.whitelist.filter(user=student, course_id=course_id, whitelist=True).exists()
             grade = grades.grade(student, self.request, course)
             enrollment_mode, __ = CourseEnrollment.enrollment_mode_for_user(student, course_id)
@@ -297,7 +322,7 @@ class XQueueCertInterface(object):
                     contents = {
                         'action': 'create',
                         'username': student.username,
-                        'course_id': course_id.to_deprecated_string(),
+                        'course_id': unicode(course_id),
                         'course_name': course_name,
                         'name': profile_name,
                         'grade': grade_contents,
@@ -337,20 +362,106 @@ class XQueueCertInterface(object):
 
         return new_status
 
-    def _send_to_xqueue(self, contents, key):
-        """Create a new task on the XQueue. """
+    def add_example_cert(self, example_cert):
+        """Add a task to create an example certificate.
 
-        if self.use_https:
-            proto = "https"
-        else:
-            proto = "http"
+        Unlike other certificates, an example certificate is
+        not associated with any particular user and is never
+        shown to students.
 
-        xheader = make_xheader(
-            '{0}://{1}/update_certificate?{2}'.format(
-                proto, settings.SITE_NAME, key), key, settings.CERT_QUEUE)
+        If an error occurs when adding the example certificate
+        to the queue, the example certificate status
+        will be set to "error".
+
+        Arguments:
+            example_cert (ExampleCertificate)
+
+        """
+        contents = {
+            'action': 'create',
+            'course_id': unicode(example_cert.course_key),
+            'name': example_cert.full_name,
+            'template_pdf': example_cert.template,
+
+            # Example certificates are not associated with a particular user.
+            # However, we still need to find the example certificate when
+            # we receive a response from the queue.  For this reason,
+            # we use the example certificate's unique identifier as a username.
+            # Note that the username is *not* displayed on the certificate;
+            # it is used only to identify the certificate task in the queue.
+            'username': example_cert.uuid,
+
+            # We send this extra parameter to differentiate
+            # example certificates from other certificates.
+            # This is not used by the certificates workers or XQueue.
+            'example_certificate': True,
+        }
+
+        # The callback for example certificates is different than the callback
+        # for other certificates.  Although both tasks use the same queue,
+        # we can distinguish whether the certificate was an example cert based
+        # on which end-point XQueue uses once the task completes.
+        callback_url_path = reverse('certificates.views.update_example_certificate')
+
+        try:
+            self._send_to_xqueue(
+                contents,
+                example_cert.access_key,
+                task_identifier=example_cert.uuid,
+                callback_url_path=callback_url_path
+            )
+        except XQueueAddToQueueError as exc:
+            example_cert.update_status(
+                ExampleCertificate.STATUS_ERROR,
+                error_reason=unicode(exc)
+            )
+
+    def _send_to_xqueue(self, contents, key, task_identifier=None, callback_url_path='update_certificate'):
+        """Create a new task on the XQueue.
+
+        Arguments:
+            contents (dict): The contents of the XQueue task.
+            key (str): An access key for the task.  This will be sent
+                to the callback end-point once the task completes,
+                so that we can validate that the sender is the same
+                entity that received the task.
+
+        Keyword Arguments:
+            callback_url_path (str): The path of the callback URL.
+                If not provided, use the default end-point for student-generated
+                certificates.
+
+        """
+        callback_url = u'{protocol}://{base_url}{path}'.format(
+            protocol=("https" if self.use_https else "http"),
+            base_url=settings.SITE_NAME,
+            path=callback_url_path
+        )
+
+        # Append the key to the URL
+        # This is necessary because XQueue assumes that only one
+        # submission is active for a particular URL.
+        # If it receives a second submission with the same callback URL,
+        # it "retires" any other submission with the same URL.
+        # This was a hack that depended on the URL containing the user ID
+        # and courseware location; an assumption that does not apply
+        # to certificate generation.
+        # XQueue also truncates the callback URL to 128 characters,
+        # but since our key lengths are shorter than that, this should
+        # not affect us.
+        callback_url += "?key={key}".format(
+            key=(
+                task_identifier
+                if task_identifier is not None
+                else key
+            )
+        )
+
+        xheader = make_xheader(callback_url, key, settings.CERT_QUEUE)
 
         (error, msg) = self.xqueue_interface.send_to_queue(
             header=xheader, body=json.dumps(contents))
         if error:
-            LOGGER.critical(u'Unable to add a request to the queue: %s %s', unicode(error), msg)
-            raise Exception('Unable to send queue message')
+            exc = XQueueAddToQueueError(error, msg)
+            LOGGER.critical(unicode(exc))
+            raise exc
