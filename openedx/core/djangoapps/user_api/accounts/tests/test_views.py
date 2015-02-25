@@ -1,6 +1,7 @@
 import unittest
 import ddt
 import json
+from datetime import datetime
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
@@ -28,31 +29,42 @@ class TestAccountAPI(APITestCase):
         self.staff_client = APIClient()
 
         self.user = UserFactory.create(password=TEST_PASSWORD)
-        # Create some test profile values.
-        legacy_profile = UserProfile.objects.get(id=self.user.id)
-        legacy_profile.city = "Indi"
-        legacy_profile.country = "US"
-        legacy_profile.year_of_birth = 1900
-        legacy_profile.level_of_education = "m"
-        legacy_profile.goals = "world peace"
-        legacy_profile.save()
         
-        self.accounts_base_uri = reverse("accounts_api", kwargs={'username': self.user.username})
+        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     def test_get_account_anonymous_user(self):
         """
         Test that an anonymous client (not logged in) cannot call get.
         """
-        response = self.anonymous_client.get(self.accounts_base_uri)
-        self.assert_status_code(401, response)
+        self.send_get(self.anonymous_client, expected_status=401)
 
     def test_get_account_different_user(self):
         """
         Test that a client (logged in) cannot get the account information for a different client.
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
-        response = self.different_client.get(self.accounts_base_uri)
-        self.assert_status_code(404, response)
+        self.send_get(self.different_client, expected_status=404)
+
+    def test_get_account_default(self):
+        """
+        Test that a client (logged in) can get her own account information (using default legacy profile information,
+        as created by the test UserFactory).
+        """
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        response = self.send_get(self.client)
+        data = response.data
+        self.assertEqual(11, len(data))
+        self.assertEqual(self.user.username, data["username"])
+        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+        for empty_field in ("year_of_birth", "level_of_education", "mailing_address"):
+            self.assertIsNone(data[empty_field])
+        self.assertIsNone(data["country"])
+        # TODO: what should the format of this be?
+        self.assertEqual("", data["language"])
+        self.assertEqual("m", data["gender"])
+        self.assertEqual("World domination", data["goals"])
+        self.assertEqual(self.user.email, data["email"])
+        self.assertIsNotNone(data["date_joined"])
 
     @ddt.data(
         ("client", "user"),
@@ -64,27 +76,45 @@ class TestAccountAPI(APITestCase):
         Test that a client (logged in) can get her own account information. Also verifies that a "is_staff"
         user can get the account information for other users.
         """
-        client = self.login_client(api_client, user)
+        # Create some test profile values.
+        legacy_profile = UserProfile.objects.get(id=self.user.id)
+        legacy_profile.country = "US"
+        legacy_profile.level_of_education = "m"
+        legacy_profile.year_of_birth = 1900
+        legacy_profile.goals = "world peace"
+        legacy_profile.mailing_address = "Park Ave"
+        legacy_profile.save()
 
-        response = client.get(self.accounts_base_uri)
-        self.assert_status_code(200, response)
+        client = self.login_client(api_client, user)
+        response = self.send_get(client)
         data = response.data
-        self.assertEqual(12, len(data))
+        self.assertEqual(11, len(data))
         self.assertEqual(self.user.username, data["username"])
-        # TODO: should we rename this "full_name"?
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-        self.assertEqual("Indi", data["city"])
         self.assertEqual("US", data["country"])
-        # TODO: what should the format of this be?
         self.assertEqual("", data["language"])
         self.assertEqual("m", data["gender"])
         self.assertEqual(1900, data["year_of_birth"])
         self.assertEqual("m", data["level_of_education"])
         self.assertEqual("world peace", data["goals"])
-        # Default value for mailing address is None, nothing assigned in setup.
-        self.assertIsNone(data['mailing_address'])
+        self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
+
+    def test_get_account_empty_string(self):
+        """
+        Test the conversion of empty strings to None for certain fields.
+        """
+        legacy_profile = UserProfile.objects.get(id=self.user.id)
+        legacy_profile.country = ""
+        legacy_profile.level_of_education = ""
+        legacy_profile.gender = ""
+        legacy_profile.save()
+
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        response = self.send_get(self.client)
+        for empty_field in ("level_of_education", "gender", "country"):
+            self.assertIsNone(response.data[empty_field])
 
     @ddt.data(
         (
@@ -95,9 +125,8 @@ class TestAccountAPI(APITestCase):
             "client", "user", "level_of_education", "none", "x",
             "Select a valid choice. x is not one of the available choices."
         ),
-        ("client", "user", "country", "GB", "UK", "Select a valid choice. UK is not one of the available choices."),
+        ("client", "user", "country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
         ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
-        ("client", "user", "city", "Knoxville"),
         ("client", "user", "language", "Creole"),
         ("client", "user", "goals", "Smell the roses"),
         ("client", "user", "mailing_address", "Sesame Street"),
@@ -115,8 +144,7 @@ class TestAccountAPI(APITestCase):
         client = self.login_client(api_client, user)
         self.send_patch(client, {field: value})
 
-        get_response = client.get(self.accounts_base_uri)
-        self.assert_status_code(200, get_response)
+        get_response = self.send_get(client)
         self.assertEqual(value, get_response.data[field])
 
         if fails_validation_value:
@@ -133,8 +161,7 @@ class TestAccountAPI(APITestCase):
             # If there are no values that would fail validation, then empty string should be supported.
             self.send_patch(client, {field: ""})
 
-            get_response = client.get(self.accounts_base_uri)
-            self.assert_status_code(200, get_response)
+            get_response = self.send_get(client)
             self.assertEqual("", get_response.data[field])
 
     @ddt.data(
@@ -161,7 +188,7 @@ class TestAccountAPI(APITestCase):
             verify_error_response(field_name, response.data)
 
         # Make sure that gender did not change.
-        response = client.get(self.accounts_base_uri)
+        response = self.send_get(client)
         self.assertEqual("m", response.data["gender"])
 
         # Test error message with multiple read-only items
@@ -178,9 +205,23 @@ class TestAccountAPI(APITestCase):
         self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
         self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
-    def assert_status_code(self, expected_status_code, response):
-        """Assert that the given response has the expected status code"""
-        self.assertEqual(expected_status_code, response.status_code)
+    def test_patch_account_empty_string(self):
+        """
+        Tests the behavior of patch when attempting to set fields with a select list of options to the empty string.
+        Also verifies the behaviour when setting to None.
+        """
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        for field_name in ["gender", "level_of_education", "country"]:
+            self.send_patch(self.client, {field_name: ""})
+            response = self.send_get(self.client)
+            # Although throwing a 400 might be reasonable, the default DRF behavior with ModelSerializer
+            # is to convert to None, which also seems acceptable (and is difficult to override).
+            self.assertIsNone(response.data[field_name])
+
+            # Verify that the behavior is the same for sending None.
+            self.send_patch(self.client, {field_name: ""})
+            response = self.send_get(self.client)
+            self.assertIsNone(response.data[field_name])
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
@@ -194,6 +235,14 @@ class TestAccountAPI(APITestCase):
         Helper method for sending a patch to the server, defaulting to application/merge-patch+json content_type.
         Verifies the expected status and returns the response.
         """
-        response = client.patch(self.accounts_base_uri, data=json.dumps(json_data), content_type=content_type)
-        self.assert_status_code(expected_status, response)
+        response = client.patch(self.url, data=json.dumps(json_data), content_type=content_type)
+        self.assertEqual(expected_status, response.status_code)
+        return response
+
+    def send_get(self, client, expected_status=200):
+        """
+        Helper method for sending a GET to the server. Verifies the expected status and returns the response.
+        """
+        response = client.get(self.url)
+        self.assertEqual(expected_status, response.status_code)
         return response
