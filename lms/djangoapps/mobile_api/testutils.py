@@ -105,7 +105,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
     """
     def test_invalid_user(self):
         self.login_and_enroll()
-        self.api_response(expected_response_code=403, username='no_user')
+        self.api_response(expected_response_code=404, username='no_user')
 
     def test_other_user(self):
         # login and enroll as the test user
@@ -120,7 +120,7 @@ class MobileAuthUserTestMixin(MobileAuthTestMixin):
 
         # now login and call the API as the test user
         self.login()
-        self.api_response(expected_response_code=403, username=other.username)
+        self.api_response(expected_response_code=404, username=other.username)
 
 
 @ddt.ddt

@@ -10,6 +10,7 @@ from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2Au
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from courseware.courses import get_course_with_access
+from openedx.core.lib.api.permissions import IsUserInUrl
 
 
 def mobile_course_access(depth=0, verify_enrolled=True):
@@ -42,13 +43,6 @@ def mobile_view(is_user=False):
     """
     Function and class decorator that abstracts the authentication and permission checks for mobile api views.
     """
-    class IsUser(permissions.BasePermission):
-        """
-        Permission that checks to see if the request user matches the user in the URL.
-        """
-        def has_permission(self, request, view):
-            return request.user.username == request.parser_context.get('kwargs', {}).get('username', None)
-
     def _decorator(func_or_class):
         """
         Requires either OAuth2 or Session-based authentication.
@@ -60,6 +54,6 @@ def mobile_view(is_user=False):
         )
         func_or_class.permission_classes = (permissions.IsAuthenticated,)
         if is_user:
-            func_or_class.permission_classes += (IsUser,)
+            func_or_class.permission_classes += (IsUserInUrl,)
         return func_or_class
     return _decorator
