@@ -71,6 +71,8 @@ import survey.utils
 import survey.views
 
 from util.views import ensure_valid_course_key
+from eventtracking import tracker
+import analytics
 
 log = logging.getLogger("edx.courseware")
 
@@ -1303,6 +1305,7 @@ def generate_user_cert(request, course_id):
 
     if not certificate_status["is_downloadable"] and not certificate_status["is_generating"]:
         generate_user_certificates(student, course)
+        _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse(_("Creating certificate"))
 
     # if certificate_status is not is_downloadable and is_generating or
@@ -1311,3 +1314,32 @@ def generate_user_cert(request, course_id):
     # at backend debug the issue and re-submit the task.
 
     return HttpResponseBadRequest(_("Creating certificate"))
+
+
+def _track_successful_certificate_generation(user_id, course_id):  # pylint: disable=invalid-name
+    """Track an successfully certificate generation event.
+
+    Arguments:
+        user_id (str): The ID of the user generting the certificate.
+        course_id (unicode):  id associated with the course
+    Returns:
+        None
+
+    """
+    if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+        event_name = 'edx.bi.user.certificate.generate'  # pylint: disable=no-member
+        tracking_context = tracker.get_tracker().resolve_context()  # pylint: disable=no-member
+
+        analytics.track(
+            user_id,
+            event_name,
+            {
+                'category': 'certificates',
+                'label': unicode(course_id)
+            },
+            context={
+                'Google Analytics': {
+                    'clientId': tracking_context.get('client_id')
+                }
+            }
+        )
