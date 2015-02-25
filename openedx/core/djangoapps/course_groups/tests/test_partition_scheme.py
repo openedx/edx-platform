@@ -63,6 +63,7 @@ class TestCohortPartitionScheme(ModuleStoreTestCase):
                 self.course_key,
                 self.student,
                 partition or self.user_partition,
+                use_cached=False
             ),
             group
         )

@@ -10,8 +10,7 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
 
-import json
-from ..cohorts import get_course_cohort_settings, set_course_cohort_settings
+from ..cohorts import set_course_cohort_settings
 from ..models import CourseUserGroup, CourseCohort, CourseCohortsSettings
 
 
@@ -126,6 +125,7 @@ def config_course_cohorts_legacy(
         pass
 
 
+# pylint: disable=dangerous-default-value
 def config_course_cohorts(
         course,
         is_cohorted,
@@ -154,13 +154,14 @@ def config_course_cohorts(
         Nothing -- modifies course in place.
     """
     def to_id(name):
+        """Convert name to id."""
         return topic_name_to_id(course, name)
 
     set_course_cohort_settings(
         course.id,
-        is_cohorted = is_cohorted,
-        cohorted_discussions = [to_id(name) for name in cohorted_discussions],
-        always_cohort_inline_discussions = always_cohort_inline_discussions
+        is_cohorted=is_cohorted,
+        cohorted_discussions=[to_id(name) for name in cohorted_discussions],
+        always_cohort_inline_discussions=always_cohort_inline_discussions
     )
 
     for cohort_name in auto_cohorts:
