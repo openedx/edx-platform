@@ -212,6 +212,29 @@ class LoginTest(TestCase):
         # client1 will be logged out
         self.assertEqual(response.status_code, 302)
 
+    @patch.dict("django.conf.settings.FEATURES", {'PREVENT_CONCURRENT_LOGINS': True})
+    def test_single_session_with_url_not_having_login_required_decorator(self):
+        # accessing logout url as it does not have login-required decorator it will avoid redirect
+        # and go inside the enforce_single_login
+
+        creds = {'email': 'test@edx.org', 'password': 'test_password'}
+        client1 = Client()
+        client2 = Client()
+
+        response = client1.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        self.assertEqual(self.user.profile.get_meta()['session_id'], client1.session.session_key)
+
+        # second login should log out the first
+        response = client2.post(self.url, creds)
+        self._assert_response(response, success=True)
+
+        url = reverse('logout')
+
+        response = client1.get(url)
+        self.assertEqual(response.status_code, 302)
+
     def test_change_enrollment_400(self):
         """
         Tests that a 400 in change_enrollment doesn't lead to a 404
