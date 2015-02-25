@@ -6,10 +6,12 @@ import unittest
 import functools
 import requests
 import os
+from datetime import datetime
 from path import path
 from bok_choy.javascript import js_defined
 from bok_choy.web_app_test import WebAppTest
 from opaque_keys.edx.locator import CourseLocator
+from pymongo import MongoClient
 from xmodule.partitions.partitions import UserPartition
 from xmodule.partitions.tests.test_partitions import MockUserPartitionScheme
 from selenium.webdriver.support.select import Select
@@ -236,24 +238,6 @@ def element_has_text(page, css_selector, text):
     return text_present
 
 
-def assert_event_emitted_num_times(event_collection, event_name, event_time, event_user_id, num_times_emitted):
-    """
-    Tests the number of times a particular event was emitted.
-    :param event_collection: MongoClient instance to query.
-    :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
-    :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
-    """
-    assert(
-        event_collection.find(
-            {
-                "name": event_name,
-                "time": {"$gt": event_time},
-                "event.user_id": int(event_user_id),
-            }
-        ).count() == num_times_emitted
-    )
-
-
 def get_modal_alert(browser):
     """
     Returns instance of modal alert box shown in browser after waiting
@@ -261,6 +245,35 @@ def get_modal_alert(browser):
     """
     WebDriverWait(browser, 4).until(EC.alert_is_present())
     return browser.switch_to.alert
+
+
+class EventsTestMixin(object):
+    """
+    Helpers and setup for running tests that evaluate events emitted
+    """
+    def setUp(self):
+        super(EventsTestMixin, self).setUp()
+        self.event_collection = MongoClient()["test"]["events"]
+        self.event_collection.drop()
+        self.start_time = datetime.now()
+
+    def assert_event_emitted_num_times(self, event_name, event_time, event_user_id, num_times_emitted):
+        """
+        Tests the number of times a particular event was emitted.
+        :param event_name: Expected event name (e.g., "edx.course.enrollment.activated")
+        :param event_time: Latest expected time, after which the event would fire (e.g., the beginning of the test case)
+        :param event_user_id: user_id expected in the event
+        :param num_times_emitted: number of times the event is expected to appear since the event_time
+        """
+        self.assertEqual(
+            self.event_collection.find(
+                {
+                    "name": event_name,
+                    "time": {"$gt": event_time},
+                    "event.user_id": int(event_user_id),
+                }
+            ).count(), num_times_emitted
+        )
 
 
 class UniqueCourseTest(WebAppTest):

@@ -3,21 +3,19 @@
 End-to-end tests for the LMS.
 """
 
-from datetime import datetime
 from textwrap import dedent
 from unittest import skip
 from nose.plugins.attrib import attr
-from pymongo import MongoClient
 
 from bok_choy.promise import EmptyPromise
 from bok_choy.web_app_test import WebAppTest
 from ..helpers import (
     UniqueCourseTest,
+    EventsTestMixin,
     load_data_str,
     generate_course_key,
     select_option_by_value,
-    element_has_text,
-    assert_event_emitted_num_times
+    element_has_text
 )
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.create_mode import ModeCreationPage
@@ -201,7 +199,7 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
 
 
 @attr('shard_1')
-class PayAndVerifyTest(UniqueCourseTest):
+class PayAndVerifyTest(EventsTestMixin, UniqueCourseTest):
     """Test that we can proceed through the payment and verification flow."""
     def setUp(self):
         """Initialize the test.
@@ -217,8 +215,6 @@ class PayAndVerifyTest(UniqueCourseTest):
         self.upgrade_page = PaymentAndVerificationFlow(self.browser, self.course_id, entry_point='upgrade')
         self.fake_payment_page = FakePaymentPage(self.browser, self.course_id)
         self.dashboard_page = DashboardPage(self.browser)
-        self.event_collection = MongoClient()["test"]["events"]
-        self.start_time = datetime.now()
 
         # Create a course
         CourseFixture(
@@ -252,8 +248,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         self.fake_payment_page.submit_payment()
 
         # Expect enrollment activated event
-        assert_event_emitted_num_times(
-            self.event_collection,
+        self.assert_event_emitted_num_times(
             "edx.course.enrollment.activated",
             self.start_time,
             student_id,
@@ -261,8 +256,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         )
 
         # Expect that one mode_changed enrollment event fired as part of the upgrade
-        assert_event_emitted_num_times(
-            self.event_collection,
+        self.assert_event_emitted_num_times(
             "edx.course.enrollment.mode_changed",
             self.start_time,
             student_id,
@@ -307,8 +301,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         self.fake_payment_page.submit_payment()
 
         # Expect enrollment activated event
-        assert_event_emitted_num_times(
-            self.event_collection,
+        self.assert_event_emitted_num_times(
             "edx.course.enrollment.activated",
             self.start_time,
             student_id,
@@ -346,8 +339,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         self.fake_payment_page.submit_payment()
 
         # Expect that one mode_changed enrollment event fired as part of the upgrade
-        assert_event_emitted_num_times(
-            self.event_collection,
+        self.assert_event_emitted_num_times(
             "edx.course.enrollment.mode_changed",
             self.start_time,
             student_id,
@@ -355,8 +347,7 @@ class PayAndVerifyTest(UniqueCourseTest):
         )
 
         # Expect no enrollment activated event
-        assert_event_emitted_num_times(
-            self.event_collection,
+        self.assert_event_emitted_num_times(
             "edx.course.enrollment.activated",
             self.start_time,
             student_id,
