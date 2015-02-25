@@ -82,4 +82,3 @@ def startup_notification_subsystem():
         startup.initialize()
     except Exception as e:
         print str(e)
-        pass

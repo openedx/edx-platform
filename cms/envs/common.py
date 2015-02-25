@@ -927,6 +927,10 @@ NOTIFICATION_STORE_PROVIDER = {
 # to prevent run-away queries from happening
 MAX_NOTIFICATION_LIST_SIZE = 100
 
+SOUTH_MIGRATION_MODULES = {
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+}
+
 # list all known channel providers
 NOTIFICATION_CHANNEL_PROVIDERS = {
     'durable': {
