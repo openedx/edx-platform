@@ -184,6 +184,10 @@ def get_keyword_function_map():
         """ Returns the course's display name """
         return course.display_name
 
+    def get_course_id_string(user, course):
+        """ Returns the serialized course id """
+        return unicode(course.id)
+
     def course_start_date_sub(user, course):
         """ Returns the course start date in the default display """
         return get_default_time_display(course.start)
@@ -198,6 +202,7 @@ def get_keyword_function_map():
         '%%USER_ID%%': Keyword(user_id_sub, 'anonymous_user_id (for use in survey links)'),
         '%%USER_FULLNAME%%': Keyword(user_fullname_sub, 'user profile name'),
         '%%COURSE_DISPLAY_NAME%%': Keyword(course_display_name_sub, 'display name of the course'),
+        '%%COURSE_ID%%': Keyword(get_course_id_string, 'course identifier'),
         '%%COURSE_START_DATE%%': Keyword(course_start_date_sub, 'start date of the course'),
         '%%COURSE_END_DATE%%': Keyword(course_end_date_sub, 'end date of the course'),
     }
