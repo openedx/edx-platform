@@ -70,6 +70,7 @@ class CourseMode(models.Model):
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = ["verified", "professional"]
+    NO_ID_PROFESSIONAL_MODE = ["no-id-professional"]
 
     class Meta:
         """ meta attributes of this model """
