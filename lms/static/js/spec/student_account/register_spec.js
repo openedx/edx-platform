@@ -50,16 +50,17 @@ define([
                 submit_url: '/user_api/v1/account/registration/',
                 fields: [
                     {
+                        placeholder: 'username@domain.com',
                         name: 'email',
                         label: 'Email',
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
                     {
+                        placeholder: 'Jane Doe',
                         name: 'name',
                         label: 'Full Name',
                         defaultValue: '',
@@ -69,6 +70,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: 'JaneDoe',
                         name: 'username',
                         label: 'Username',
                         defaultValue: '',
@@ -78,6 +80,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'password',
                         label: 'Password',
                         defaultValue: '',
@@ -87,6 +90,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'level_of_education',
                         label: 'Highest Level of Education Completed',
                         defaultValue: '',
@@ -102,6 +106,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'gender',
                         label: 'Gender',
                         defaultValue: '',
@@ -117,6 +122,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'year_of_birth',
                         label: 'Year of Birth',
                         defaultValue: '',
@@ -132,6 +138,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'mailing_address',
                         label: 'Mailing Address',
                         defaultValue: '',
@@ -141,6 +148,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'goals',
                         label: 'Goals',
                         defaultValue: '',
@@ -150,6 +158,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'honor_code',
                         label: 'I agree to the <a href="/honor">Terms of Service and Honor Code</a>',
                         defaultValue: '',
@@ -228,7 +237,7 @@ define([
             createRegisterView(this);
 
             // Submit the form, with successful validation
-            submitForm( true );
+            submitForm(true);
 
             // Verify that the client contacts the server with the expected data
             AjaxHelpers.expectRequest(
@@ -247,7 +256,7 @@ define([
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
-            createRegisterView( this );
+            createRegisterView(this);
 
             // Simulate that the user is attempting to enroll in a course
             // by setting the course_id query string param.

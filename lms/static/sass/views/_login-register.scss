@@ -3,21 +3,6 @@
 @import '../base/grid-settings';
 @import "neat/neat"; // lib - Neat
 
-%heading-4 {
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0 !important;
-    color: $m-gray-d2;
-}
-
-%body-text {
-    font-size: 15px;
-    margin: 0 0 $baseline 0;
-    color: $base-font-color;
-    line-height: lh(1);
-}
-
 $sm-btn-google: #dd4b39;
 $sm-btn-facebook: #3b5998;
 $sm-btn-linkedin: #0077b5;
@@ -26,13 +11,14 @@ $sm-btn-linkedin: #0077b5;
     @include box-sizing(border-box);
     @include outer-container;
     $grid-columns: 12;
-    background: white;
+    background: $white;
     min-height: 100%;
     width: 100%;
 
     h2 {
-        line-height: 16px;
+        @extend %t-title5;
         margin: 0;
+        letter-spacing: normal;
         font-family: $sans-serif;
     }
 
@@ -95,67 +81,59 @@ $sm-btn-linkedin: #0077b5;
             margin-bottom: 20px;
 
             &:after {
-                content: '';
-                width: 100%;
-                height: 1px;
-                background: $gray-l4;
                 position: absolute;
                 left: 0;
                 top: 12px;
+                width: 100%;
+                height: 1px;
+                background: $gray-l4;
+                content: '';
                 z-index: 5;
+            }
+
+            .text {
+                position: relative;
+                top: -2px; // Aligns center of text with center of line (CR)
+                z-index: 6;
+                padding: 0 $baseline;
+                background: $white;
             }
         }
 
         h2 {
             text-align: center;
-
-            .text {
-                position: relative;
-                background: white;
-                padding: 0 10px;
-                z-index: 6;
-                text-transform: none;
-                font-size: 0.7em;
-                font-weight: 600;
-            }
+            text-transform: none;
         }
     }
 
     .nav-btn {
-        margin: 0 28px;
-        padding: 7px 0;
-        width: calc( 100% - 56px );
-        border: 3px solid $m-blue-d5;
-        border-radius: 5px;
-        color: $m-blue-d5;
-        box-shadow: none;
-        text-shadow: none;
+        @extend %btn-secondary-blue-outline;
+        width: 100%;
+        height: ($baseline*2);
         text-transform: none;
-        background: white;
-
-        &:hover {
-            background: white;
-            border-color: $m-blue-d6;
-            color: $m-blue-d6;
-        }
-
-        &:active {
-            box-shadow: none;
-        }
+        text-shadow: none;
+        font-weight: 600;
+        letter-spacing: normal;
     }
 
-    .form-type {
+    .form-type,
+    .toggle-form {
         @include box-sizing(border-box);
-        width: 330px;
+        max-width: 650px;
+        min-width: 400px;
         margin: 0 auto;
+        padding-left: $baseline; // Don't want to override any top or bottom (CR)
+        padding-right: $baseline // Don't want to override any top or bottom (CR)
+    }
+
+    .toggle-form {
+        text-align: center // Centers the text and buttons
     }
 
     .note {
         @extend %t-copy-sub2;
         display: block;
-        font-weight: normal;
-        color: $gray;
-        margin: 10px 10px 0px 10px;
+        margin: ($baseline/2) ($baseline/2) 0 ($baseline/2);
         color: $m-gray-l1;
         text-align: center;
     }
@@ -163,7 +141,7 @@ $sm-btn-linkedin: #0077b5;
 
     /** The forms **/
     .form-wrapper {
-        padding-top: 25px;
+        padding-top: ($baseline + 5);
 
         form {
             @include clearfix();
@@ -180,7 +158,7 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .password-reset-form {
-        padding-bottom: 25px;
+        padding-bottom: ($baseline + 5);
 
         &:focus {
             outline: none;
@@ -197,22 +175,16 @@ $sm-btn-linkedin: #0077b5;
         @include font-size(16);
         font-family: $sans-serif;
         font-weight: $font-semibold;
-        font-style: normal;
-        text-transform: none;
     }
 
     .form-label {
         @extend %bold-label;
-        padding: 0 0 0 5px;
-        letter-spacing: 1px;
+        padding: 0 0 0 ($baseline/4);
     }
 
     .action-label {
         @include font-size(13);
         font-family: $sans-serif;
-        font-weight: regular;
-        font-style: normal;
-        text-transform: none;
     }
 
     .form-field {
@@ -220,7 +192,7 @@ $sm-btn-linkedin: #0077b5;
         clear: both;
         position: relative;
         width: 100%;
-        margin: 0 0 5px 0;
+        margin: ($baseline/2) 0 ($baseline/4) 0;
 
         &.select-year_of_birth {
             @include margin-left(15px);
@@ -236,22 +208,17 @@ $sm-btn-linkedin: #0077b5;
         label,
         input,
         textarea {
-            border-radius: 0;
             height: auto;
+            line-height: 1.5em;
+            border-radius: 0;
             font-family: $sans-serif;
             font-style: normal;
             font-weight: 500;
-            font-size: 0.8em;
-            line-height: 1.5em;
-            color: $base-font-color;
         }
 
         label {
-            @include transition(color 0.15s ease-in-out 0s);
             display: block;
             margin: 0 0 6px 0;
-            color: tint($black, 20%);
-            font-weight: $font-semibold;
 
             &.inline {
                 display: inline;
@@ -274,6 +241,7 @@ $sm-btn-linkedin: #0077b5;
         }
 
         .field-link {
+            @extend %t-copy-sub2;
             display: block;
             margin-bottom: ($baseline/2);
             margin-top: ($baseline/4);
@@ -281,7 +249,6 @@ $sm-btn-linkedin: #0077b5;
             font-weight: $font-regular;
             text-decoration: none !important; // needed but nasty
             font-family: $sans-serif;
-            font-size: 0.8em;
         }
 
         input,
@@ -330,6 +297,13 @@ $sm-btn-linkedin: #0077b5;
                 border-color: tint($red,50%);
             }
         }
+
+        .tip {
+            @extend %t-copy-sub2;
+            display: block;
+            margin: 0 0 ($baseline/2) 0;
+            color: $m-gray-l1;
+        }
         /** FROM _accounts.scss - end **/
     }
 
@@ -350,25 +324,13 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .action-primary {
+        @extend %btn-primary-blue;
         width: 100%;
-        height: 38px;
+        height: ($baseline*2);
+        margin-top: 1em; // Breathing room above (CR)
         text-transform: none;
-        color: white;
-        background: $m-blue-d5;
-        border: 3px solid $m-blue-d6;
-        border-radius: 5px;
-        box-shadow: none;
         font-weight: 600;
-        text-shadow: none;
-
-        &:hover,
-        &:focus {
-            background: $m-blue-l6;
-        }
-
-        &:active {
-            box-shadow: none;
-        }
+        letter-spacing: normal;
     }
 
     .login-provider {
@@ -479,16 +441,16 @@ $sm-btn-linkedin: #0077b5;
         background: tint($yellow,20%);
 
         .message-title {
-            @extend %heading-4;
+            @extend %t-title4;
             font-family: $sans-serif;
             margin: 0 0 ($baseline/4) 0;
-            font-size: em(14);
             font-weight: 600;
+            text-transform: uppercase;
         }
 
         .message-copy,
         .message-copy p {
-            @extend %body-text;
+            @extend %t-copy-base;
             font-family: $sans-serif;
             margin: 0 !important;
             padding: 0;
