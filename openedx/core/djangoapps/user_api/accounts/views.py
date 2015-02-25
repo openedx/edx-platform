@@ -1,3 +1,9 @@
+"""
+NOTE: this API is WIP and has not yet been approved. Do not use this API without talking to Christina or Andy.
+
+For more information, see:
+https://openedx.atlassian.net/wiki/display/TNL/User+API
+"""
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
@@ -35,13 +41,14 @@ class AccountView(APIView):
 
             * email: email for the user (not editable through this API)
 
-            * date_joined: date this account was created (not editable)
+            * date_joined: date this account was created (not editable), in the string format provided by
+                datetime (for example, "2014-08-26T17:52:11Z")
 
-            * gender: null or "" (not set), "m", "f", or "o"
+            * gender: null (not set), "m", "f", or "o"
 
             * year_of_birth: null or integer year
 
-            * level_of_education: null or "" (not set), or one of the following choices:
+            * level_of_education: null (not set), or one of the following choices:
 
                 * "p" signifying "Doctorate"
                 * "m" signifying "Master's or professional degree"
@@ -55,9 +62,7 @@ class AccountView(APIView):
 
              * language: null or name of preferred language
 
-             * city: null or name of city
-
-             * country: null or "" (not set), or a Country corresponding to one of the ISO 3166-1 countries
+             * country: null (not set), or a Country corresponding to one of the ISO 3166-1 countries
 
              * mailing_address: null or textual representation of mailing address
 

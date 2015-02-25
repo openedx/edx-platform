@@ -20,7 +20,23 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserProfile
         fields = (
-            "name", "gender", "goals", "year_of_birth", "level_of_education", "language", "city", "country",
-            "mailing_address"
+            "name", "gender", "goals", "year_of_birth", "level_of_education", "language", "country", "mailing_address"
         )
         read_only_fields = ("name",)
+
+    def transform_gender(self, obj, value):
+        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
+    def transform_country(self, obj, value):
+        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
+    def transform_level_of_education(self, obj, value):
+        """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """
+        return AccountLegacyProfileSerializer.convert_empty_to_None(value)
+
+    @staticmethod
+    def convert_empty_to_None(value):
+        """ Helper method to convert empty string to None (other values pass through). """
+        return None if value == "" else value
