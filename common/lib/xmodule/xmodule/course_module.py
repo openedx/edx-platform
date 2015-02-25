@@ -790,7 +790,7 @@ class CourseFields(object):
     entrance_exam_enabled = Boolean(
         display_name=_("Entrance Exam Enabled"),
         help=_(
-            "Specify whether students must complete an entrance exam before they can view your course content."
+            "Specify whether students must complete an entrance exam before they can view your course content. "
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=False,
@@ -800,7 +800,7 @@ class CourseFields(object):
     entrance_exam_minimum_score_pct = Float(
         display_name=_("Entrance Exam Minimum Score (%)"),
         help=_(
-            "Specify a minimum percentage score for an entrance exam before students can view your course content."
+            "Specify a minimum percentage score for an entrance exam before students can view your course content. "
             "Note, you must enable Entrance Exams for this course setting to take effect."
         ),
         default=65,
