@@ -6,6 +6,7 @@ var edx = edx || {};
     edx.discussions = edx.discussions || {};
 
     edx.discussions.DiscussionTopicsCollection = Backbone.Collection.extend({
+        comparator:'name',
         model : topicModel
 
     });
