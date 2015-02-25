@@ -6,24 +6,38 @@ var edx = edx || {};
     edx.discussions = edx.discussions || {};
 
     edx.discussions.DiscussionTopicsModel = Backbone.Model.extend({
-        defaults: {
-            subcategories: '',
-            entries: []
-        },
-        parse: function(response) {
-            var attrs = $.extend(true, {}, response),
-                entriesList = [];
+        //defaults: function() {
+        //    return {
+        //        subcategories: '',
+        //        entries: [],
+        //        children:[]
+        //    };
+        //},
 
-            _.each(attrs.entries, function(entry, entry_name) {
-                entry.name = entry_name;
-                entriesList.push(entry);
-            });
-
-            _.each(attrs.subcategories, function() {
-
-            });
-            attrs.entries = new topicCollection(entriesList);
-            return attrs;
-        }
+        //parse: function(response) {
+        //    var attrs = $.extend(true, {}, response),
+        //        entriesList = [];
+        //
+        //    var makeInlineCategories = function(that, subcategories) {
+        //         _.each(subcategories, function(subcategory, name) {
+        //            subcategory.name=name;
+        //            subcategory.allCohorted=false;
+        //             subcategory = new edx.discussions.DiscussionTopicsModel(subcategory);
+        //             if (!subcategories) {
+        //                return;
+        //            }
+        //            return makeInlineCategories(that, subcategory.get('subcategories'));
+        //        });
+        //    };
+        //    makeInlineCategories(this, attrs.subcategories);
+        //
+        //    _.each(attrs.entries, function(entry, entry_name) {
+        //        entry.name = entry_name;
+        //        entriesList.push(entry);
+        //    });
+        //
+        //    attrs.entries = new topicCollection(entriesList);
+        //    return attrs;
+        //}
     });
 }).call(this, Backbone, edx.discussions.DiscussionTopicsCollection);

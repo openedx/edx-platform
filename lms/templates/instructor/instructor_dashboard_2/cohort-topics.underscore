@@ -7,15 +7,7 @@
                     <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
                     <span><%- gettext('You can optionally designate coursewide discussions topics to be cohorted.') %></span>
                     <div class="field">
-                        <ul class="wrapper-tabs">
-                            <% _.each(coursewideTopics, function(topic) { %>
-                                <li>
-                                    <input data-id="<%- topic.get('id') %>" class="check-discussion-topic" type="checkbox" <%- topic.get('is_cohorted') ? 'checked="checked"' : '' %> />
-                                    <label class="inline topic-name"><%- topic.get('name') %></label>
-                                    <span class="inline cohorted-text <%- !topic.get('is_cohorted') ? 'hidden' : '' %>">- <%- gettext('Cohorted') %></span>
-                                </li>
-                            <% }); %>
-                        </ul>
+                        <ul class="inline-cohorts wrapper-tabs"><%= coursewideTopics %></ul>
                     </div>
                 </div>
             </div>
@@ -36,6 +28,10 @@
                 <input type="checkbox" class="" />
                 <%= interpolate('Cohort all content specific discussion topics') %>
         </div>
+        <hr class="divider divider-lv1" />
+
+        <ul class="inline-cohorts wrapper-tabs"><%= inlineTopicsHtml %></ul>
+
         <hr class="divider divider-lv1" />
 
         <div>
