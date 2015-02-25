@@ -10,6 +10,8 @@ import subprocess
 import time
 import StringIO
 
+from pymongo.errors import PyMongoError
+
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
@@ -43,7 +45,7 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor_task.models import InstructorTask
-
+from django_comment_client.management_utils import rename_user as rename_user_util
 
 log = logging.getLogger(__name__)
 
@@ -256,6 +258,37 @@ class Users(SysadminDashboardView):
         user.delete()
         return _('Deleted user {username}').format(username=uname)
 
+    def rename_user(self, username_old, username_new):
+        """
+        helper method that processes a username rename request
+        :param username_old: the old username
+        :param username_new: the new username
+        :return: status message to display after the rename command is attempted
+        """
+        if not (username_old and username_new):
+            message = _('Usernames cannot be blank')
+        else:
+            try:
+                rename_user_util(username_old, username_new)
+            except User.DoesNotExist:
+                message = _("User '{username_old}' does not exist").format(
+                    username_old=username_old,
+                )
+            except IntegrityError:
+                message = _("User '{username_new}' already exists").format(
+                    username_new=username_new,
+                )
+            except PyMongoError:
+                message = _("Failed to modify username for user '{username_old}'").format(
+                    username_old=username_old,
+                )
+            else:
+                message = _("Changed username of user '{username_old}' to '{username_new}'").format(
+                    username_old=username_old,
+                    username_new=username_new,
+                )
+        return message
+
     def make_common_context(self):
         """Returns the datatable used for this view"""
 
@@ -324,6 +357,14 @@ class Users(SysadminDashboardView):
             uname = request.POST.get('student_uname', '').strip()
             self.msg = u'<h4>{0}</h4><p>{1}</p><hr />{2}'.format(
                 _('Delete User Results'), self.delete_user(uname), self.msg)
+        elif action == 'rename_user':
+            username_old = request.POST.get('username_old', '').strip()
+            username_new = request.POST.get('username_new', '').strip()
+            self.msg = u"<h4>{title}</h4><p>{message}</p><hr />{message_previous}".format(
+                title=_('Rename User Results'),
+                message=self.rename_user(username_old, username_new),
+                message_previous=self.msg,
+            )
 
         context = {
             'datatable': self.datatable,

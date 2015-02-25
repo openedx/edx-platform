@@ -67,8 +67,8 @@ class HtmlModule(HtmlFields, XModule):
     css = {'scss': [resource_string(__name__, 'css/html/display.scss')]}
 
     def get_html(self):
-        if self.system.anonymous_student_id:
-            return self.data.replace("%%USER_ID%%", self.system.anonymous_student_id)
+        if self.system.substitute_keywords_with_data:
+            return self.system.substitute_keywords_with_data(self.data)
         return self.data
 
 

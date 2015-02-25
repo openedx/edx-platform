@@ -52,6 +52,7 @@ from xmodule.lti_module import LTIModule
 from xmodule.x_module import XModuleDescriptor
 
 from util.json_request import JsonResponse
+from util.keyword_substitution import substitute_keywords_with_data
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 
 
@@ -552,6 +553,7 @@ def get_module_system_for_user(user, field_data_cache,
         descriptor_runtime=descriptor.runtime,
         rebind_noauth_module_to_user=rebind_noauth_module_to_user,
         user_location=user_location,
+        substitute_keywords_with_data=partial(substitute_keywords_with_data, user_id=user.id, course_id=course_id),
     )
     if settings.FEATURES.get('SEND_USERS_EMAILADDR_WITH_CODERESPONSE', False):
         system.set('send_users_emailaddr_with_coderesponse', True)

@@ -990,6 +990,28 @@ class @HTMLEditingDescriptor
     ###
     return @visualEditor
 
+  _validateString = (string) ->
+    regexp = /%%[^%\s]+%%/g
+    keywordsSupported = [
+      '%%USER_ID%%',
+      '%%USER_FULLNAME%%',
+      '%%COURSE_DISPLAY_NAME%%',
+      '%%COURSE_ID%%',
+      '%%COURSE_START_DATE%%',
+      '%%COURSE_END_DATE%%',
+    ]
+
+    keywordsFound = string.match(regexp) || []
+    keywordsInvalid = $.map(keywordsFound, (keyword) ->
+      if $.inArray(keyword, keywordsSupported) == -1
+        keyword
+      else
+        null
+    )
+
+    'isValid': keywordsInvalid.length == 0
+    'keywordsInvalid': keywordsInvalid
+
   save: ->
     text = undefined
     if @editor_choice == 'visual'
@@ -1000,5 +1022,12 @@ class @HTMLEditingDescriptor
 
     if text == undefined
       text = @advanced_editor.getValue()
+
+    validation = _validateString(text)
+    if not validation.isValid
+      message = gettext('There are invalid keywords in your email. Please check the following keywords and try again:')
+      message += '\n' + validation.keywordsInvalid.join('\n')
+      alert(message)
+      return null
 
     data: text
