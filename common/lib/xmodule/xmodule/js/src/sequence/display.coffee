@@ -32,10 +32,10 @@ class @Sequence
     $('.problems-wrapper').bind 'progressChanged', @updateProgress
 
   mergeProgress: (p1, p2) ->
-    # if either is "NA", return the other one
-    if p1 == "NA"
+    # if either is "0", return the other one
+    if p1 == "0"
       return p2
-    if p2 == "NA"
+    if p2 == "0"
       return p1
 
     # Both real progresses
@@ -51,7 +51,7 @@ class @Sequence
     return "none"
 
   updateProgress: =>
-    new_progress = "NA"
+    new_progress = "0"
     _this = this
     $('.problems-wrapper').each (index) ->
       progress = $(this).data 'progress_status'
@@ -61,7 +61,7 @@ class @Sequence
     @setProgress(new_progress, @link_for(@position))
 
   setProgress: (progress, element) ->
-      # If progress is "NA", don't add any css class
+      # If progress is "0", don't add any css class
       element.removeClass('progress-none')
              .removeClass('progress-some')
              .removeClass('progress-done')
