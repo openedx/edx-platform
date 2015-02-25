@@ -2,13 +2,14 @@
 Tests for cohorts
 """
 # pylint: disable=no-member
+import ddt
+from mock import call, patch
 
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.http import Http404
 from django.test import TestCase
 from django.test.utils import override_settings
-from mock import call, patch
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from student.models import CourseEnrollment
@@ -121,6 +122,7 @@ class TestCohortSignals(TestCase):
         self.assertFalse(mock_tracker.emit.called)
 
 
+@ddt.ddt
 class TestCohorts(ModuleStoreTestCase):
     """
     Test the cohorts feature
@@ -243,11 +245,32 @@ class TestCohorts(ModuleStoreTestCase):
             cohort.id,
             "user should be assigned to the correct cohort"
         )
+
         self.assertEquals(
             cohorts.get_cohort(other_user, course.id).id,
             cohorts.get_cohort_by_name(course.id, cohorts.DEFAULT_COHORT_NAME).id,
             "other_user should be assigned to the default cohort"
         )
+
+    @ddt.data(
+        (True, 2),
+        (False, 6),
+    )
+    @ddt.unpack
+    def test_get_cohort_sql_queries(self, use_cached, num_sql_queries):
+        """
+        Test number of queries by cohorts.get_cohort() with and without caching.
+        """
+        course = modulestore().get_course(self.toy_course_key)
+        config_course_cohorts(course, is_cohorted=True)
+        cohort = CohortFactory(course_id=course.id, name="TestCohort")
+
+        user = UserFactory(username="test", email="a@b.com")
+        cohort.users.add(user)
+
+        with self.assertNumQueries(num_sql_queries):
+            for __ in range(3):
+                cohorts.get_cohort(user, course.id, use_cached=use_cached)
 
     def test_get_cohort_with_assign(self):
         """
@@ -473,7 +496,7 @@ class TestCohorts(ModuleStoreTestCase):
         config_course_cohorts(
             course,
             is_cohorted=True,
-            discussion_topics= ["General", "Feedback"],
+            discussion_topics=["General", "Feedback"],
             cohorted_discussions=["Feedback"]
         )
 
@@ -497,7 +520,7 @@ class TestCohorts(ModuleStoreTestCase):
         config_course_cohorts(
             course,
             is_cohorted=True,
-            discussion_topics =["General", "Feedback"],
+            discussion_topics=["General", "Feedback"],
             cohorted_discussions=["Feedback", "random_inline"]
         )
         self.assertTrue(
@@ -741,6 +764,7 @@ class TestCohorts(ModuleStoreTestCase):
             )
 
 
+@ddt.ddt
 class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """
     Test Cohorts and Partitions Groups.
@@ -802,6 +826,25 @@ class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
             cohorts.get_group_info_for_cohort(self.first_cohort),
             (None, None),
         )
+
+    @ddt.data(
+        (True, 1),
+        (False, 3),
+    )
+    @ddt.unpack
+    def test_get_group_info_for_cohort_queries(self, use_cached, num_sql_queries):
+        """
+        Basic test of the partition_group_info accessor function
+        """
+        # create a link for the cohort in the db
+        self._link_cohort_partition_group(
+            self.first_cohort,
+            self.partition_id,
+            self.group1_id
+        )
+        with self.assertNumQueries(num_sql_queries):
+            for __ in range(3):
+                self.assertIsNotNone(cohorts.get_group_info_for_cohort(self.first_cohort, use_cached=use_cached))
 
     def test_multiple_cohorts(self):
         """

@@ -110,12 +110,12 @@ def is_course_cohorted(course_key):
     return get_course_cohort_settings(course_key).is_cohorted
 
 
-def get_cohort_id(user, course_key):
+def get_cohort_id(user, course_key, use_cached=False):
     """
     Given a course key and a user, return the id of the cohort that user is
     assigned to in that course.  If they don't have a cohort, return None.
     """
-    cohort = get_cohort(user, course_key)
+    cohort = get_cohort(user, course_key, use_cached=use_cached)
     return None if cohort is None else cohort.id
 
 
@@ -172,7 +172,7 @@ def get_cohorted_commentables(course_key):
 
 
 @transaction.commit_on_success
-def get_cohort(user, course_key, assign=True):
+def get_cohort(user, course_key, assign=True, use_cached=False):
     """
     Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
@@ -181,6 +181,7 @@ def get_cohort(user, course_key, assign=True):
         user: a Django User object.
         course_key: CourseKey
         assign (bool): if False then we don't assign a group to user
+        use_cached (bool): Whether to use the cached value or fetch from database.
 
     Returns:
         A CourseUserGroup object if the course is cohorted and the User has a
@@ -189,23 +190,33 @@ def get_cohort(user, course_key, assign=True):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
+    # pylint: disable=protected-access
+    # We cache the cohort on the user object so that we do not have to repeatedly
+    # query the database during a request. If the cached value exists, just return it.
+    if use_cached and hasattr(user, '_cohort'):
+        return user._cohort
+
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
     course = courses.get_course(course_key)
     course_cohort_settings = get_course_cohort_settings(course.id)
 
     if not course_cohort_settings.is_cohorted:
-        return None
+        user._cohort = None
+        return user._cohort
 
     try:
-        return CourseUserGroup.objects.get(
+        user._cohort = CourseUserGroup.objects.get(
             course_id=course_key,
             group_type=CourseUserGroup.COHORT,
             users__id=user.id,
         )
+        return user._cohort
     except CourseUserGroup.DoesNotExist:
         # Didn't find the group.  We'll go on to create one if needed.
         if not assign:
+            # Do not cache the cohort here, because in the next call assign
+            # may be True, and we will have to assign the user a cohort.
             return None
 
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
@@ -220,7 +231,8 @@ def get_cohort(user, course_key, assign=True):
 
     user.course_groups.add(cohort)
 
-    return cohort
+    user._cohort = cohort
+    return user._cohort
 
 
 def migrate_cohort_settings(course):
@@ -387,7 +399,7 @@ def add_user_to_cohort(cohort, username_or_email):
     return (user, previous_cohort_name)
 
 
-def get_group_info_for_cohort(cohort):
+def get_group_info_for_cohort(cohort, use_cached=False):
     """
     Get the ids of the group and partition to which this cohort has been linked
     as a tuple of (int, int).
@@ -395,9 +407,21 @@ def get_group_info_for_cohort(cohort):
     If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
     """
-    res = CourseUserGroupPartitionGroup.objects.filter(course_user_group=cohort)
-    if len(res):
-        return res[0].group_id, res[0].partition_id
+    # pylint: disable=protected-access
+    # We cache the partition group on the cohort object so that we do not have to repeatedly
+    # query the database during a request.
+    if not use_cached and hasattr(cohort, '_partition_group'):
+        delattr(cohort, '_partition_group')
+
+    if not hasattr(cohort, '_partition_group'):
+        try:
+            cohort._partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
+        except CourseUserGroupPartitionGroup.DoesNotExist:
+            cohort._partition_group = None
+
+    if cohort._partition_group:
+        return cohort._partition_group.group_id, cohort._partition_group.partition_id
+
     return None, None
 
 
