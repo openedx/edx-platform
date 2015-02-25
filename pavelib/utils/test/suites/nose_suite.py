@@ -161,7 +161,7 @@ class LibTestSuite(NoseTestSuite):
     def cmd(self):
         cmd = (
             "nosetests --id-file={test_ids} {test_id} {test_opts} "
-            "--with-xunit --xunit-file={xunit_report} {extra}"
+            "--with-xunit --xunit-file={xunit_report} {extra} "
             "--verbosity={verbosity}".format(
                 test_ids=self.test_ids,
                 test_id=self.test_id,
