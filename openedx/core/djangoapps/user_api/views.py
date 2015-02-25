@@ -341,13 +341,16 @@ class RegistrationView(APIView):
         # meant to hold the user's full name.
         name_label = _(u"Full name")
 
+        name_placeholder = _(u"Jane Doe")
+
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's full name.
-        name_instructions = _(u"The name that will appear on your certificates")
+        name_instructions = _(u"Needed for any certificates you may earn")
 
         form_desc.add_field(
             "name",
             label=name_label,
+            placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
                 "max_length": profile_api.FULL_NAME_MAX_LENGTH,
@@ -372,13 +375,16 @@ class RegistrationView(APIView):
         # Translators: These instructions appear on the registration form, immediately
         # below a field meant to hold the user's public username.
         username_instructions = _(
-            u"The name that will identify you in your courses"
+            u"The name that will identify you in your courses - {bold_start}(cannot be changed later){bold_end}").format(bold_start=u'<strong>', bold_end=u'</strong>'
         )
+
+        username_placeholder = _(u"JaneDoe")
 
         form_desc.add_field(
             "username",
             label=username_label,
             instructions=username_instructions,
+            placeholder=username_placeholder,
             restrictions={
                 "min_length": account_api.USERNAME_MIN_LENGTH,
                 "max_length": account_api.USERNAME_MAX_LENGTH,
