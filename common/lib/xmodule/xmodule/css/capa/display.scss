@@ -78,6 +78,10 @@ div.problem {
     display: inline;
   }
 
+  .exceeded-time-limit-message {
+    color: $gray; 
+  }
+
   .choicegroup {
     @include clearfix;
     min-width: 100px;
