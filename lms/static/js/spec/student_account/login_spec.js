@@ -43,16 +43,17 @@ define([
                 submit_url: '/user_api/v1/account/login_session/',
                 fields: [
                     {
+                        placeholder: 'username@domain.com',
                         name: 'email',
                         label: 'Email',
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'password',
                         label: 'Password',
                         defaultValue: '',
@@ -62,6 +63,7 @@ define([
                         restrictions: {}
                     },
                     {
+                        placeholder: '',
                         name: 'remember',
                         label: 'Remember me',
                         defaultValue: '',
@@ -150,7 +152,7 @@ define([
             AjaxHelpers.expectRequest(
                 requests, 'POST',
                 FORM_DESCRIPTION.submit_url,
-                $.param( USER_DATA )
+                $.param(USER_DATA)
             );
 
             // Respond with status code 200
@@ -161,7 +163,7 @@ define([
         });
 
         it('sends analytics info containing the enrolled course ID', function() {
-            createLoginView( this );
+            createLoginView(this);
 
             // Simulate that the user is attempting to enroll in a course
             // by setting the course_id query string param.

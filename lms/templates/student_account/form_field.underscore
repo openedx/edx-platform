@@ -49,8 +49,10 @@
                     data-errormsg-<%= type %>="<%= msg %>"
             <%  });
             } %>
+            <% if ( placeholder ) { %> placeholder="<%= placeholder %>"<% } %>
             value="<%- defaultValue %>"
         />
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>-instructions"><%= instructions %></span><% } %>
     <% } %>
 
     <% if ( type === 'checkbox' ) { %>
