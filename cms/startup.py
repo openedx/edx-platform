@@ -80,5 +80,5 @@ def startup_notification_subsystem():
     """
     try:
         startup.initialize()
-    except Exception as e:
-        print str(e)
+    except Exception as exception:  # pylint: disable=broad-except
+        print str(exception)
