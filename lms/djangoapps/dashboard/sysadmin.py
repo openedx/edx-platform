@@ -46,7 +46,6 @@ from xmodule.modulestore.xml import XMLModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from instructor_task.models import InstructorTask
 from django_comment_client.management_utils import rename_user as rename_user_util
-from dashboard.sysadmin_extensions import sysadmin_course_tabs
 
 log = logging.getLogger(__name__)
 
@@ -590,7 +589,6 @@ class Courses(SysadminDashboardView):
                                  page='courses_sysdashboard')
 
         courses = {course.id: course for course in self.get_courses()}
-
         if action == 'add_course':
             gitloc = request.POST.get('repo_location', '').strip().replace(' ', '').replace(';', '')
             branch = request.POST.get('repo_branch', '').strip().replace(' ', '').replace(';', '')
@@ -638,9 +636,6 @@ class Courses(SysadminDashboardView):
                 self.msg += \
                     u"<font color='red'>{0} {1} = {2} ({3})</font>".format(
                         _('Deleted'), course.location.to_deprecated_string(), course.id.to_deprecated_string(), course.display_name)
-
-        elif action in ['get_current_tabs', 'delete_tab', 'insert_tab']:
-            self.msg = sysadmin_course_tabs.process_request(action, request)
 
         context = {
             'datatable': self.make_datatable(),

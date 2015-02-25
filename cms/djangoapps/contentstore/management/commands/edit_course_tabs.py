@@ -12,7 +12,7 @@ from .prompt import query_yes_no
 
 from courseware.courses import get_course_by_id
 
-from xmodule.tabs import primitive_insert, primitive_delete
+from contentstore.views import tabs
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.keys import CourseKey
@@ -24,6 +24,7 @@ def print_course(course):
     print 'num type name'
     for index, item in enumerate(course.tabs):
         print index + 1, '"' + item.get('type') + '"', '"' + item.get('name', '') + '"'
+
 
 # course.tabs looks like this
 # [{u'type': u'courseware'}, {u'type': u'course_info', u'name': u'Course Info'}, {u'type': u'textbooks'},
@@ -83,7 +84,7 @@ command again, adding --insert or --delete to edit the list.
                     raise CommandError(Command.delete_option.help)
                 num = int(args[0])
                 if query_yes_no('Deleting tab {0} Confirm?'.format(num), default='no'):
-                    primitive_delete(course, num - 1)  # -1 for 0-based indexing
+                    tabs.primitive_delete(course, num - 1)  # -1 for 0-based indexing
             elif options['insert']:
                 if len(args) != 3:
                     raise CommandError(Command.insert_option.help)
@@ -91,7 +92,7 @@ command again, adding --insert or --delete to edit the list.
                 tab_type = args[1]
                 name = args[2]
                 if query_yes_no('Inserting tab {0} "{1}" "{2}" Confirm?'.format(num, tab_type, name), default='no'):
-                    primitive_insert(course, num - 1, tab_type, name)  # -1 as above
+                    tabs.primitive_insert(course, num - 1, tab_type, name)  # -1 as above
         except ValueError as e:
             # Cute: translate to CommandError so the CLI error prints nicely.
             raise CommandError(e)
