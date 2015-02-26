@@ -15,15 +15,13 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
-from rest_framework import parsers
 
+from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer, AccountUserSerializer
+from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
+from openedx.core.lib.api.parsers import MergePatchParser
+from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from student.models import UserProfile
 from student.views import do_email_change_request
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer, AccountUserSerializer
-from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
-from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
 
 
 class AccountView(APIView):
@@ -89,14 +87,34 @@ class AccountView(APIView):
         GET /api/user/v0/accounts/{username}/
         """
         try:
-            existing_user, existing_user_profile = self._get_user_and_profile(username)
+            account_settings = AccountView.get_serialized_account(username)
         except AccountUserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        return Response(account_settings)
+
+    @staticmethod
+    def get_serialized_account(username):
+        """Returns the user's account information serialized as JSON.
+
+        Note:
+          This method does not perform authentication so it is up to the caller
+          to ensure that only the user themselves or staff can access the account.
+
+        Args:
+          username (str): The username for the desired account.
+
+        Returns:
+           A dict containing each of the account's fields.
+
+        Raises:
+           AccountUserNotFound: raised if there is no account for the specified username.
+        """
+        existing_user, existing_user_profile = AccountView._get_user_and_profile(username)
         user_serializer = AccountUserSerializer(existing_user)
         legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile)
 
-        return Response(dict(user_serializer.data, **legacy_profile_serializer.data))
+        return dict(user_serializer.data, **legacy_profile_serializer.data)
 
     def patch(self, request, username):
         """
