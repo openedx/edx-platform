@@ -1,11 +1,11 @@
-var studio_dest = '';
-var studio_src = '';
-var lms_dest = '';
-var lms_src = '';
+var studioSrc  = './cms',
+    studioDest = './cms',
+    lmsSrc     = './lms',
+    lmsDest    = './lms';
 
 module.exports = {
-  studio_styles: {
-    src: '',
-    dest: ''
-  }
+    stylesStudio: {
+        src: studioSrc + '/static/sass/',
+        dest: studioDest + '/static/sass/'
+    }
 };
