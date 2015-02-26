@@ -1,6 +1,5 @@
 import functools
 import logging
-import os.path
 import random
 import time
 import urlparse
@@ -27,12 +26,16 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids
+    get_discussion_categories_ids,
+    get_discussion_id_map,
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
+from eventtracking import tracker
 import lms.lib.comment_client as cc
 
 log = logging.getLogger(__name__)
+
+TRACKING_MAX_FORUM_BODY = 2000
 
 
 def permitted(fn):
@@ -61,6 +64,37 @@ def ajax_content_response(request, course_key, content):
         'content': prepare_content(content, course_key),
         'annotated_content_info': annotated_content_info,
     })
+
+
+def track_forum_event(request, event_name, course, obj, data, id_map=None):
+    """
+    Send out an analytics event when a forum event happens. Works for threads,
+    responses to threads, and comments on those responses.
+    """
+    user = request.user
+    data['id'] = obj.id
+    if id_map is None:
+        id_map = get_discussion_id_map(course, user)
+
+    commentable_id = data['commentable_id']
+    if commentable_id in id_map:
+        data['category_name'] = id_map[commentable_id]["title"]
+        data['category_id'] = commentable_id
+    if len(obj.body) > TRACKING_MAX_FORUM_BODY:
+        data['truncated'] = True
+    else:
+        data['truncated'] = False
+
+    data['body'] = obj.body[:TRACKING_MAX_FORUM_BODY]
+    data['url'] = request.META.get('HTTP_REFERER', '')
+    data['user_forums_roles'] = [
+        role.name for role in user.roles.filter(course_id=course.id)
+    ]
+    data['user_course_roles'] = [
+        role.role for role in user.courseaccessrole_set.filter(course_id=course.id)
+    ]
+
+    tracker.emit(event_name, data)
 
 
 @require_POST
@@ -116,11 +150,36 @@ def create_thread(request, course_id, commentable_id):
     if 'pinned' not in thread.attributes:
         thread['pinned'] = False
 
-    if post.get('auto_subscribe', 'false').lower() == 'true':
+    follow = post.get('auto_subscribe', 'false').lower() == 'true'
+
+    if follow:
         user = cc.User.from_django_user(request.user)
         user.follow(thread)
+
+    event_data = {
+        'title': thread.title,
+        'commentable_id': commentable_id,
+        'options': {'followed': follow},
+        'anonymous': anonymous,
+        'thread_type': thread.thread_type,
+        'group_id': group_id,
+        'anonymous_to_peers': anonymous_to_peers,
+        # There is a stated desire for an 'origin' property that will state
+        # whether this thread was created via courseware or the forum.
+        # However, the view does not contain that data, and including it will
+        # likely require changes elsewhere.
+    }
     data = thread.to_dict()
-    add_courseware_context([data], course, request.user)
+
+    # Calls to id map are expensive, but we need this more than once.
+    # Prefetch it.
+    id_map = get_discussion_id_map(course, request.user)
+
+    add_courseware_context([data], course, request.user, id_map=id_map)
+
+    track_forum_event(request, 'edx.forum.thread.created',
+                      course, thread, event_data, id_map=id_map)
+
     if request.is_ajax():
         return ajax_content_response(request, course_key, data)
     else:
@@ -194,9 +253,25 @@ def _create_comment(request, course_key, thread_id=None, parent_id=None):
         body=post["body"]
     )
     comment.save()
-    if post.get('auto_subscribe', 'false').lower() == 'true':
+
+    followed = post.get('auto_subscribe', 'false').lower() == 'true'
+
+    if followed:
         user = cc.User.from_django_user(request.user)
         user.follow(comment.thread)
+
+    event_data = {'discussion': {'id': comment.thread_id}, 'options': {'followed': followed}}
+
+    if parent_id:
+        event_data['response'] = {'id': comment.parent_id}
+        event_name = 'edx.forum.comment.created'
+    else:
+        event_name = 'edx.forum.response.created'
+
+    event_data['commentable_id'] = comment.thread.commentable_id
+
+    track_forum_event(request, event_name, course, comment, event_data)
+
     if request.is_ajax():
         return ajax_content_response(request, course_key, comment.to_dict())
     else:
@@ -220,7 +295,7 @@ def create_comment(request, course_id, thread_id):
 @require_POST
 @login_required
 @permitted
-def delete_thread(request, course_id, thread_id):
+def delete_thread(request, course_id, thread_id):  # pylint: disable=unused-argument
     """
     given a course_id and thread_id, delete this thread
     this is ajax only
