@@ -1,7 +1,7 @@
 // Open edX: LMS footer
 // ====================
 @import '../base/grid-settings';
-@import 'neat/neat'; // lib - Neat
+@import '../vendor/neat/neat'; // lib - Neat
 
 .wrapper-footer {
   box-shadow: 0 -1px 5px 0 $shadow-l1;
