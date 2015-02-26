@@ -25,7 +25,7 @@ def url_class(is_active):
 %>
 
 % if show_preview_menu:
-    <nav class="wrapper-preview-menu">
+    <nav class="wrapper-preview-menu" aria-label="${_('Course View')}">
         <div class="preview-menu">
             <ol class="preview-actions">
                 <li class="action-preview">
@@ -51,7 +51,7 @@ def url_class(is_active):
 % endif
 
 % if disable_tabs is UNDEFINED or not disable_tabs:
-<nav class="${active_page} wrapper-course-material">
+<nav class="${active_page} wrapper-course-material" aria-label="${_('Course Material')}">
   <div class="course-material">
     <ol class="course-tabs">
       % for tab in get_course_tab_list(course, user):
