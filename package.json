@@ -10,11 +10,13 @@
     "uglify-js": "2.4.15"
   },
   "devDependencies": {
+    "del": "^1.1.1",
     "gulp": "^3.8.11",
     "gulp-notify": "latest",
     "gulp-ruby-sass": "^1.0.0-alpha.3",
     "gulp-util": "latest",
     "node-bourbon": "^1.2.3",
-    "require-dir": "latest"
+    "require-dir": "latest",
+    "run-sequence": "^1.0.2"
   }
 }
