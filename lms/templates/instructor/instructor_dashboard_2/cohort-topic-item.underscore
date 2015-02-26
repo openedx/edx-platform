@@ -1,5 +1,0 @@
-<li role="menuitem" class="topic-menu-item">
-    <input class="check-discussion-topic" type="checkbox" />
-    <span class="topic-title"><%- name %></span>
-    <ul role="menu" class="wrapper-tabs"><%= entries %></ul>
-</li>

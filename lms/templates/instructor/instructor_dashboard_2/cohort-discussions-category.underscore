@@ -1,0 +1,5 @@
+<li class="discussion-category-item">
+    <input type="checkbox" class="check-discussion-category" />
+    <span class="category-title"><%- name %></span>
+    <ul class="wrapper-tabs subcategories"><%= entries %></ul>
+</li>

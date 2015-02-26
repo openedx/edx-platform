@@ -371,6 +371,12 @@ def debug_cohort_mgmt(request, course_key_string):
 @expect_json
 @login_required
 def cohort_discussion_topics(request, course_key_string):
+    """
+
+    :param request:
+    :param course_key_string:
+    :return:
+    """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     try:
         course = get_course_by_id(course_key)
@@ -379,22 +385,22 @@ def cohort_discussion_topics(request, course_key_string):
         return JsonError(status=404)
 
     discussions_category = get_discussion_category_map(course)
+
+    # get the children that are only related to inline discussions.
     discussions_category['children'] = [name for name in discussions_category['children']
                                         if name not in discussions_category['entries']]
-
     cohorted_discussions = []
     if request.method == 'POST':
         cohort_settings_obj = cohorts.get_course_cohort_settings(course_key)
         coursewide_discussions = discussions_category['entries']
 
         if 'coursewide_discussions' in request.json.keys() and request.json.get('coursewide_discussions'):
-            cohorted_topics_ids = request.json.get('cohorted_topics')
             coursewide_ids = [topic.get('id') for topic_name, topic in coursewide_discussions.iteritems()]
 
             cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if
                                     discussion_id not in coursewide_ids]
 
-            cohorted_discussions.extend(cohorted_topics_ids)
+            cohorted_discussions.extend(request.json.get('cohorted_discussion_ids'))
         elif request.json.get('inline_discussions') in request.json.keys() and request.json.get('inline_discussions'):
             cohorted_discussions = []
 
