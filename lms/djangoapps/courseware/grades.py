@@ -31,6 +31,19 @@ from xblock.core import XBlock
 
 log = logging.getLogger("edx.courseware")
 
+GRADED_LOCATION_CATEGORIES = set(
+    cat for (cat, xblock_class) in XBlock.load_classes() if getattr(xblock_class, 'has_score', True)
+)
+
+
+def descriptor_filter(descriptor):
+    """
+    Pass a location filter to the field data cache so that we don't
+    instantiate descriptors that are never graded (like video descriptors)
+    during grading
+    """
+    return descriptor.location.category in GRADED_LOCATION_CATEGORIES
+
 
 class MaxScoresCache(object):
     """docstring for MaxScoresCache"""
@@ -199,7 +212,7 @@ def _grade(student, request, course, keep_raw_scores, field_data_cache):
     if field_data_cache is None:
         with manual_transaction():
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course.id, student, course, depth=None
+                course.id, student, course, depth=None, descriptor_filter=descriptor_filter
             )
 
     max_scores_cache = MaxScoresCache(
@@ -384,7 +397,7 @@ def _progress_summary(student, request, course):
     """
     with manual_transaction():
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-            course.id, student, course, depth=None
+            course.id, student, course, depth=None, descriptor_filter=descriptor_filter
         )
         # TODO: We need the request to pass into here. If we could
         # forego that, our arguments would be simpler

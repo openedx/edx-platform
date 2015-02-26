@@ -163,3 +163,40 @@ class TestMaxScoresCache(ModuleStoreTestCase):
         max_scores_cache.fetch_from_remote()
         # see cache is populated
         self.assertEqual(len(max_scores_cache._max_scores_cache), 1)
+
+
+class TestDescriptorFilter(ModuleStoreTestCase):
+
+    def setUp(self):
+        super(TestDescriptorFilter, self).setUp()
+        self.student = UserFactory.create()
+        self.course = CourseFactory.create()
+        chapter = ItemFactory.create(category='chapter', parent=self.course)
+        sequential = ItemFactory.create(category='sequential', parent=chapter)
+        vertical = ItemFactory.create(category='vertical', parent=sequential)
+        ItemFactory.create(category='video', parent=vertical)
+        ItemFactory.create(category='html', parent=vertical)
+        ItemFactory.create(category='discussion', parent=vertical)
+        ItemFactory.create(category='problem', parent=vertical)
+
+        CourseEnrollment.enroll(self.student, self.course.id)
+
+    def test_field_data_cache_no_filter(self):
+        field_data_cache_no_filter = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.student, self.course, depth=None
+        )
+        categories = set(descriptor.category for descriptor in field_data_cache_no_filter.descriptors)
+        self.assertIn('video', categories)
+        self.assertIn('html', categories)
+        self.assertIn('discussion', categories)
+        self.assertIn('problem', categories)
+
+    def test_field_data_cache_filter(self):
+        field_data_cache_filter = FieldDataCache.cache_for_descriptor_descendents(
+            self.course.id, self.student, self.course, depth=None, descriptor_filter=descriptor_filter
+        )
+        categories = set(descriptor.category for descriptor in field_data_cache_filter.descriptors)
+        self.assertNotIn('video', categories)
+        self.assertNotIn('html', categories)
+        self.assertNotIn('discussion', categories)
+        self.assertIn('problem', categories)
