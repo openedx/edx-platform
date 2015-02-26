@@ -1,12 +1,12 @@
 var gulp          = require( 'gulp' ),
-    config        = require( '../config' ).studio_styles,
+    config        = require( '../config' ).stylesStudio,
     handleErrors  = require( '../util/handleErrors' ),
     sass          = require( 'gulp-ruby-sass' );
 
 
-gulp.task('styles-studio', function () {
+gulp.task('stylesStudio', function () {
     return sass( config.src, {
-            loadPath: require('node-bourbon').includePaths,
+            // loadPath: require('node-bourbon').includePaths,
             lineNumbers: true,
             verbose: true,
             trace: true

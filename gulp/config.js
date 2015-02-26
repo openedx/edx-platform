@@ -1,11 +1,11 @@
-var studio-src  = './cms',
-    studio-dest = './cms',
-    lms-src     = './lms',
-    lms-dest    = './lms';
+var studioSrc  = './cms',
+    studioDest = './cms',
+    lmsSrc     = './lms',
+    lmsDest    = './lms';
 
 module.exports = {
-    styles-studio: {
-        src: studio-src + '/static/sass/',
-        dest: studio-dest + '/static/sass/'
+    stylesStudio: {
+        src: studioSrc + '/static/sass/',
+        dest: studioDest + '/static/sass/'
     }
 };

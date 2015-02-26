@@ -45,6 +45,6 @@
 
 // +Xmodule
 // ====================
-/*@import 'xmodule/modules/css/module-styles.scss';*/
-/*@import 'xmodule/descriptors/css/module-styles.scss';*/
-/*@import 'elements/xmodules'; // styling for Studio-specific contexts*/
+@import '../../../common/static/xmodule/modules/css/module-styles.scss';
+@import '../../../common/static/xmodule/descriptors/css/module-styles.scss';
+@import 'elements/xmodules'; // styling for Studio-specific contexts
