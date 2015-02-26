@@ -4,7 +4,9 @@ import django.db
 import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
-from student.views import reactivation_email_for_user, change_email_request, confirm_email_change
+from student.views import (
+    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change
+)
 from student.models import UserProfile, PendingEmailChange
 from django.contrib.auth.models import User, AnonymousUser
 from django.test import TestCase, TransactionTestCase
@@ -174,6 +176,11 @@ class EmailChangeRequestTests(TestCase):
             self.request.POST['new_email'] = email
             self.assertFailedRequest(self.run_request(), 'Valid e-mail address required.')
 
+    def test_change_email_to_existing_value(self):
+        """ Test the error message if user attempts to change email to the existing value. """
+        self.request.POST['new_email'] = self.user.email
+        self.assertFailedRequest(self.run_request(), 'Old email is the same as the new email.')
+
     def check_duplicate_email(self, email):
         """Test that a request to change a users email to `email` fails"""
         request = self.req_factory.post('unused_url', data={
@@ -192,7 +199,33 @@ class EmailChangeRequestTests(TestCase):
         UserFactory.create(email=self.new_email)
         self.check_duplicate_email(self.new_email.capitalize())
 
-    # TODO: Finish testing the rest of change_email_request
+    @patch('django.core.mail.send_mail')
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_email_failure(self, send_mail):
+        """ Test the return value if sending the email for the user to click fails. """
+        send_mail.side_effect = [Exception, None]
+        self.request.POST['new_email'] = "valid@email.com"
+        self.assertFailedRequest(self.run_request(), 'Unable to send email activation link. Please try again later.')
+
+    @patch('django.core.mail.send_mail')
+    @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
+    def test_email_success(self, send_mail):
+        """ Test email was sent if no errors encountered. """
+        old_email = self.user.email
+        new_email = "valid@example.com"
+        registration_key = "test registration key"
+        do_email_change_request(self.user, new_email, registration_key)
+        context = {
+            'key': registration_key,
+            'old_email': old_email,
+            'new_email': new_email
+        }
+        send_mail.assert_called_with(
+            mock_render_to_string('emails/email_change_subject.txt', context),
+            mock_render_to_string('emails/email_change.txt', context),
+            settings.DEFAULT_FROM_EMAIL,
+            [new_email]
+        )
 
 
 @patch('django.contrib.auth.models.User.email_user')

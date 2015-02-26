@@ -33,6 +33,8 @@ from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
 from .serializers import UserSerializer, UserPreferenceSerializer
 
+from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
+
 
 class LoginSessionView(APIView):
     """HTTP end-points for logging in users. """
@@ -353,7 +355,7 @@ class RegistrationView(APIView):
             placeholder=name_placeholder,
             instructions=name_instructions,
             restrictions={
-                "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                "max_length": NAME_MIN_LENGTH,
             },
             required=required
         )
