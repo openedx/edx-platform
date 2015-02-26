@@ -1,5 +1,5 @@
 @import '../base/grid-settings';
-@import 'neat/neat'; // lib - Neat
+@import '../vendor/neat/neat'; // lib - Neat
 
 header.global {
   @extend %ui-depth1;

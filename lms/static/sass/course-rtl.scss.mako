@@ -1,4 +1,4 @@
-@import 'bourbon/bourbon';
+@import 'vendor/bourbon/bourbon';
 @import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 @import 'base/reset';
