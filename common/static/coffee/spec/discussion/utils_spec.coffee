@@ -25,3 +25,18 @@ describe 'DiscussionUtil', ->
       # if the ajax call ends in failure, the model state should be reverted
       deferred.reject()
       expect(model.attributes).toEqual({hello: false, number: 42})
+
+  describe 'getHistoryPath', ->
+    it "returns pathname as is if no match detected", ->
+      expect(DiscussionUtil.getHistoryPath("/some_path", "/other_path")).toEqual("/some_path")
+      expect(DiscussionUtil.getHistoryPath("/some/path", "/other_path")).toEqual("/some/path")
+
+    it "removes current history root from start", ->
+      expect(DiscussionUtil.getHistoryPath("/some_path", "/")).toEqual("some_path")
+      expect(DiscussionUtil.getHistoryPath("/other_path", "/")).toEqual("other_path")
+      expect(DiscussionUtil.getHistoryPath("/even/longer/path", "/")).toEqual("even/longer/path")
+
+    it "removes selected thread part if present", ->
+      expect(DiscussionUtil.getHistoryPath("/some_path/123/threads/456", "/")).toEqual("some_path")
+      expect(DiscussionUtil.getHistoryPath("/some_path/iddqd-idkfa/threads/16def", "/")).toEqual("some_path")
+      expect(DiscussionUtil.getHistoryPath("/discussion/i4x-edX-D101-course-T1/threads/54d37d9056c02cc221000005", "/")).toEqual("discussion")
