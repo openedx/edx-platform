@@ -30,6 +30,10 @@ class GitExportError(Exception):
     Convenience exception class for git export error conditions.
     """
 
+    def __init__(self, message):
+        # Force the lazy i18n values to turn into actual unicode objects
+        super(GitExportError, self).__init__(unicode(message))
+
     NO_EXPORT_DIR = _("GIT_REPO_EXPORT_DIR not set or path {0} doesn't exist, "
                       "please create it, or configure a different path with "
                       "GIT_REPO_EXPORT_DIR").format(GIT_REPO_EXPORT_DIR)
