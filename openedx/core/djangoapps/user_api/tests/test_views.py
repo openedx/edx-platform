@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse
 from django.core import mail
 from django.test import TestCase
 from django.test.utils import override_settings
-from unittest import SkipTest, skipUnless
+from unittest import skipUnless
 import ddt
 from pytz import UTC
 import mock
@@ -23,6 +23,7 @@ from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from third_party_auth.tests.testutil import simulate_running_pipeline
 
+from ..accounts.views import AccountView
 from ..api import account as account_api, profile as profile_api
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
@@ -1247,8 +1248,8 @@ class RegistrationViewTest(ApiTestCase):
         )
 
         # Verify that the user's full name is set
-        profile_info = profile_api.profile_info(self.USERNAME)
-        self.assertEqual(profile_info["full_name"], self.NAME)
+        account_settings = AccountView.get_serialized_account(self.USERNAME)
+        self.assertEqual(account_settings["name"], self.NAME)
 
         # Verify that we've been logged in
         # by trying to access a page that requires authentication
@@ -1261,7 +1262,6 @@ class RegistrationViewTest(ApiTestCase):
         "year_of_birth": "optional",
         "mailing_address": "optional",
         "goals": "optional",
-        "city": "optional",
         "country": "required",
     })
     def test_register_with_profile_info(self):
@@ -1275,20 +1275,18 @@ class RegistrationViewTest(ApiTestCase):
             "mailing_address": self.ADDRESS,
             "year_of_birth": self.YEAR_OF_BIRTH,
             "goals": self.GOALS,
-            "city": self.CITY,
             "country": self.COUNTRY,
             "honor_code": "true",
         })
         self.assertHttpOK(response)
 
-        # Verify the profile information
-        profile_info = profile_api.profile_info(self.USERNAME)
-        self.assertEqual(profile_info["level_of_education"], self.EDUCATION)
-        self.assertEqual(profile_info["mailing_address"], self.ADDRESS)
-        self.assertEqual(profile_info["year_of_birth"], int(self.YEAR_OF_BIRTH))
-        self.assertEqual(profile_info["goals"], self.GOALS)
-        self.assertEqual(profile_info["city"], self.CITY)
-        self.assertEqual(profile_info["country"], self.COUNTRY)
+        # Verify the user's account
+        account_settings = AccountView.get_serialized_account(self.USERNAME)
+        self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
+        self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
+        self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))
+        self.assertEqual(account_settings["goals"], self.GOALS)
+        self.assertEqual(account_settings["country"], self.COUNTRY)
 
     def test_activation_email(self):
         # Register, which should trigger an activation email

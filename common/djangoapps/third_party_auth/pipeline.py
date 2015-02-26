@@ -103,8 +103,6 @@ from . import provider
 # `AUTH_ENROLL_COURSE_ID_KEY` provides the course ID that a student
 # is trying to enroll in, used to generate analytics events
 # and auto-enroll students.
-from openedx.core.djangoapps.user_api.api import profile
-
 AUTH_ENTRY_KEY = 'auth_entry'
 AUTH_REDIRECT_KEY = 'next'
 AUTH_ENROLL_COURSE_ID_KEY = 'enroll_course_id'
@@ -671,6 +669,8 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
         # If the email opt in parameter is found, set the preference.
         email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
         if email_opt_in:
+            # TODO: remove circular dependency on openedx from common
+            from openedx.core.djangoapps.user_api.api import profile
             opt_in = email_opt_in.lower() == 'true'
             profile.update_email_opt_in(user.username, course_id.org, opt_in)
 
