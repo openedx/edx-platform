@@ -6,6 +6,7 @@ var gulp          = require( 'gulp' ),
 
 gulp.task('styles-studio', function () {
     return sass( config.src, {
+            loadPath: require('node-bourbon').includePaths,
             lineNumbers: true,
             verbose: true,
             trace: true
