@@ -302,9 +302,9 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices courses-tab active">
         <div class="notice-item">
           <div class="msg">
-            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=settings.STUDIO_SHORT_NAME)}</h3>
+            <h3 class="title">${_("Are you staff on an existing {studio_name} course?").format(studio_name=set)}</h3>
             <div class="copy">
-              <p>${_('You will need to be added to the course in {studio_name} by the course creator. Please get in touch with the course creator or administrator for the specific course you are helping to author.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+              <p>${_('The course creator must give you access to the course. Contact the course creator or administrator for the course you are helping to author.')}</p>
             </div>
           </div>
         </div>
@@ -443,11 +443,28 @@
       <div class="notice notice-incontext notice-instruction notice-instruction-nocourses list-notices libraries-tab">
         <div class="notice-item">
           <div class="msg">
-            <div class="copy">
-              <p>${_("You don't have any content libraries yet.")}</p>
-            </div>
+              <h3 class="title">${_("Were you expecting to see a particular library here?")}</h3>
+              <div class="copy">
+                  <p>${_('The library creator must give you access to the library. Contact the library creator or administrator for the library you are helping to author.')}</p>
+              </div>
           </div>
         </div>
+        %if course_creator_status == "granted":
+        <div class="notice-item has-actions">
+          <div class="msg">
+              <h3 class="title">${_('Create Your First Library')}</h3>
+              <div class="copy">
+                  <p>${_('Libraries hold a pool of components that can be re-used across multiple courses. Create your first library with the click of a button!')}</p>
+              </div>
+          </div>
+
+        <ul class="list-actions">
+          <li class="action-item">
+              <a href="#" class="action-primary action-create new-button action-create-library new-library-button"><i class="icon fa fa-plus icon-inline"></i> ${_('Create Your First Library')}</a>
+          </li>
+        </ul>
+        </div>
+        %endif
       </div>
       %endif
 
