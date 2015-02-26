@@ -79,4 +79,3 @@ def startup_notification_subsystem():
     Initialize the Notification subsystem
     """
     startup.initialize()
-

@@ -829,7 +829,11 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
                 notification_msg = NotificationMessage(
                     msg_type=notification_type,
                     namespace=unicode(course_key),
-                    payload={'course_name': course.display_name}
+                    payload={
+                        '_schema_version': '1',
+                        'course_name': course.display_name,
+
+                    }
                 )
 
                 # Send the notification_msg to the Celery task
