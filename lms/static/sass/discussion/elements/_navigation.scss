@@ -2,7 +2,7 @@
 // ====================
 
 .forum-nav {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include float(left);
   position: relative;
   width: 31%;
@@ -14,7 +14,7 @@
 // Header
 // ------
 .forum-nav-header {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: table;
   border-bottom: 1px solid $gray-l2;
   width: 100%;
@@ -22,7 +22,7 @@
 }
 
 .forum-nav-browse {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: table-cell;
   vertical-align: middle;
   width: 50%;
@@ -47,7 +47,7 @@
 }
 
 .forum-nav-search {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: table-cell;
   position: relative;
   vertical-align: middle;
@@ -132,14 +132,14 @@
 }
 
 .forum-nav-filter-main {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: inline-block;
   width: 50%;
   @include text-align(left);
 }
 
 .forum-nav-filter-cohort, .forum-nav-sort {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   display: inline-block;
   width: 50%;
   @include text-align(right);

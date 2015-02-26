@@ -183,7 +183,7 @@
     // TYPE: enumerated video lists of metadata sets
     .metadata-videolist-enum {
       * {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
       }
     }
 
@@ -227,7 +227,7 @@
     .list-input.settings-list {
       .metadata-video-translations {
         * {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
         }
 
         // label

@@ -81,7 +81,7 @@
     }
 
     .jobs-sidebar {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border: 1px solid rgb(220,220,220);
       float: left;
       padding: 20px;

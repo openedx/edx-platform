@@ -23,7 +23,7 @@ $sm-btn-facebook: #3b5998;
 $sm-btn-linkedin: #0077b5;
 
 .login-register {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include outer-container;
     $grid-columns: 12;
     background: white;
@@ -38,7 +38,7 @@ $sm-btn-linkedin: #0077b5;
 
     /* Temp. fix until applied globally */
     > {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
     }
 
 
@@ -62,7 +62,7 @@ $sm-btn-linkedin: #0077b5;
         overflow: hidden;
 
         .headline {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             @include font-size(35);
             padding: 0 10px;
             font-family: $sans-serif;
@@ -73,7 +73,7 @@ $sm-btn-linkedin: #0077b5;
         }
 
         .tagline {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             @include font-size(24);
             padding: 0 10px;
             font-family: $sans-serif;
@@ -145,7 +145,7 @@ $sm-btn-linkedin: #0077b5;
     }
 
     .form-type {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         width: 330px;
         margin: 0 auto;
     }
@@ -472,7 +472,7 @@ $sm-btn-linkedin: #0077b5;
 
     /** Error Container - from _account.scss **/
     .status {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         margin: 0 0 25px 0;
         border-bottom: 3px solid shade($yellow, 10%);
         padding: 25px;

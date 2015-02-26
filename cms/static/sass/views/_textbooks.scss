@@ -4,7 +4,7 @@
 .view-textbooks {
 
   .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -113,7 +113,7 @@
       }
 
     .edit-textbook {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         border-radius: 2px;
         width: 100%;
         background: $white;

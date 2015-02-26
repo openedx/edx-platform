@@ -57,7 +57,7 @@ div.calc-main {
 
     form {
       @extend .clearfix;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       padding: lh();
 
       input#calculator_button {
@@ -65,7 +65,7 @@ div.calc-main {
         border: 1px solid $black;
         border-radius: 0;
         box-shadow: none;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         color: $white;
         float: left;
         font-size: 30px;
@@ -86,7 +86,7 @@ div.calc-main {
         background: #111;
         border: 0;
         box-shadow: none;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         color: $white;
         float: left;
         font-size: 16px;
@@ -107,7 +107,7 @@ div.calc-main {
         input#calculator_input {
           border: none;
           box-shadow: none;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           font-size: 16px;
           padding: 10px;
           -webkit-appearance: none;

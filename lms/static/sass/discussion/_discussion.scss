@@ -22,7 +22,7 @@ body.discussion {
     @include clearfix();
     margin-bottom: ($baseline*2);
     width: 100%;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     h1 {
       font-size: 20px;
@@ -51,7 +51,7 @@ body.discussion {
     }
 
     .edit-post-title {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border: 1px solid #aaa;
       border-radius: 3px;
       padding: 0 ($baseline/2);
@@ -242,7 +242,7 @@ body.discussion {
 
   .discussion-column {
     @include float(right);
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     width: 68%;
     max-width: 800px;
     min-height: 500px;
@@ -493,7 +493,7 @@ body.discussion {
         width: 100%;
         height: 14px;
         padding: 1px 5px;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         border-radius: 2px 2px 0 0;
         background: #009fe2;
         font-size: 9px;
@@ -509,7 +509,7 @@ body.discussion {
         width: 100%;
         height: 14px;
         padding: 1px 5px;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         border-radius: 2px 2px 0 0;
         background: $forum-color-community-ta;
         font-size: 9px;
@@ -528,7 +528,7 @@ body.discussion {
     }
 
     .discussion-response {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border-radius: 3px 3px 0 0;
       padding: $baseline;
       background-color: $white;
@@ -603,7 +603,7 @@ body.discussion {
     width: 100%;
     height: 31px;
     padding: 0 ($baseline/2);
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     border: 1px solid #b2b2b2;
     border-radius: 3px;
     box-shadow: 0 1px 3px $shadow-l1 inset;
@@ -966,7 +966,7 @@ body.discussion {
     width: 100%;
     margin-bottom: $baseline;
     @include clearfix();
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .form-row {
       margin-top: $baseline;
@@ -994,7 +994,7 @@ body.discussion {
       width: 100%;
       height: 40px;
       padding: 0 $baseline/2;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border-radius: 3px;
       border: 1px solid #aaa;
       font-size: 16px;

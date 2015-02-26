@@ -44,7 +44,7 @@
 
     // UI: support text for input fields
     .field-help {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       display: inline-block;
       @include padding-left($baseline);
       width: 50%;
@@ -88,7 +88,7 @@
 
   .post-type-label {
     @extend %cont-truncated;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include white-button;
     @include font-size(14);
     display: inline-block;
@@ -116,7 +116,7 @@
   }
 
   input[type=text].field-input {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     border: 1px solid $gray-l2;
     border-radius: 3px;
     padding: 0 $baseline/2;
@@ -129,7 +129,7 @@
   }
 
   .post-option {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     display: inline-block;
     @include margin-right($baseline);
     border: 1px solid transparent;
@@ -207,7 +207,7 @@
   position: relative;
 
   .topic-menu-wrapper {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @extend %ui-depth4;
     position: absolute;
     top: 40px;
@@ -224,7 +224,7 @@
   }
 
   .topic-filter-input {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     border: 1px solid $gray-l3;
     padding: 0 15px;
     width: 100%;

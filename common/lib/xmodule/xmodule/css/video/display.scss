@@ -771,7 +771,7 @@ div.video {
     }
 
     ol.subtitles {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       @include transition(none);
       background: $black;
       height: 100%;

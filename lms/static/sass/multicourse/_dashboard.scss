@@ -14,7 +14,7 @@
     box-shadow: 0 0 1px $shadow-l1;
 
     header.profile {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       border: 1px solid $border-color-2;
       border-radius: ($baseline/4) ($baseline/4) 0 0;
       width: flex-grid(12);
@@ -36,7 +36,7 @@
       @include clearfix();
 
       > ul {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include clearfix();
         margin: 0;
         border: 1px solid $border-color-2;
@@ -313,7 +313,7 @@
         border: 1px solid $border-color-2;
         border-radius: 4px;
         box-shadow: 0 1px 8px 0 $shadow-l1;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         color: $base-font-color;
         font-family: $sans-serif;
         display: inline-block;
@@ -352,14 +352,14 @@
 
     // UI: individual course item
     .course {
-      @include box-sizing(box);
       @include transition(all 0.15s linear 0s);
       @include clearfix();
       @extend %ui-depth2;
+      box-sizing: border-box;
       position: relative;
 
       .cover {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include transition(all 0.15s linear 0s);
         overflow: hidden;
         position: relative;
@@ -431,7 +431,7 @@
           padding: ($baseline/4);
           width: flex-grid(8);
           float: left;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           p {
             color: $lighter-base-font-color;
@@ -456,7 +456,7 @@
 
         .enter-course {
           @include button-bourbon(simple, $button-color);
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           border-radius: 3px;
           display: block;
           @include float(left);
@@ -808,7 +808,7 @@
           }
 
           .btn {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             border-radius: 3px;
             float: left;
             font: normal 0.8rem/1.2rem $sans-serif;
@@ -931,7 +931,7 @@
 
           .action-certificate .btn {
             @extend %btn-inherited-primary;
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             float: none;
             border-radius: 3px;
             display: block;
@@ -963,7 +963,7 @@
 
         .cta {
           @include button-bourbon(simple, $green-d1);
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include float(right);
           border-radius: 3px;
           display: block;
@@ -1185,7 +1185,7 @@
   }
   .enter-course-blocked{
 
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     display: block;
     float: left;
     font: normal 15px/1.6rem $sans-serif;

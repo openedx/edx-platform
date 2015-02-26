@@ -11,7 +11,7 @@
   background: $white;
 
   header.primary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include clearfix();
     max-width: $fg-max-width;
     min-width: $fg-min-width;
@@ -38,7 +38,7 @@
   }
 
   .branding, .info-course, .nav-course, .nav-account, .nav-pitch {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     display: inline-block;
     vertical-align: middle;
   }
