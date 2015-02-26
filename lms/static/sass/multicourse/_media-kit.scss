@@ -3,14 +3,14 @@ $baseline: 20px;
 $white: rgb(255,255,255);
 
 .mediakit {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   margin: 0 auto;
   padding: ($baseline*3) 0;
   width: 980px;
 
   .wrapper-mediakit {
     border-radius: 4px;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     box-shadow: 0 1px 10px 0 $shadow-l1;
     margin: ($baseline*3) 0 0 0;
     border: 1px solid $border-color;
@@ -106,7 +106,7 @@ $white: rgb(255,255,255);
     }
 
     article {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       width: 500px;
       margin-right: $baseline;
       float: left;
@@ -114,7 +114,7 @@ $white: rgb(255,255,255);
 
     aside {
       border-radius: 2px;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 4px 0 $shadow;
       width: 330px;
       float: left;
@@ -147,7 +147,7 @@ $white: rgb(255,255,255);
       }
 
       figure {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         background: $white;
         width: 100%;
 
@@ -172,7 +172,7 @@ $white: rgb(255,255,255);
   // library section
   .library {
     border-radius: 2px;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     box-shadow: 0 1px 4px 0 $shadow;
     border: 3px solid tint($light-gray,50%);
     padding: 0;
@@ -206,7 +206,7 @@ $white: rgb(255,255,255);
       list-style: none;
 
       li {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         overflow-y: auto;
         float: left;
         width: 350px;
@@ -221,7 +221,7 @@ $white: rgb(255,255,255);
 
         a {
           border-radius: 2px;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           box-shadow: 0 1px 2px 0 $shadow-l1;
           display: block;
           min-height: 380px;

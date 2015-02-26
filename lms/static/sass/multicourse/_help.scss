@@ -5,7 +5,7 @@
 
     nav.categories {
       border: 1px solid rgb(220,220,220);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       float: left;
       margin-left: flex-gutter();
       padding: 20px;

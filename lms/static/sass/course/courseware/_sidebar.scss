@@ -83,7 +83,7 @@
 
     .chapter {
       width: 100% !important;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       padding: 11px 14px;
       @include linear-gradient(top, $sidebar-chapter-bg-top, $sidebar-chapter-bg-bottom);
       background-color: $sidebar-chapter-bg;

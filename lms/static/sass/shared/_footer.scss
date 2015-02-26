@@ -12,7 +12,7 @@
 
   footer {
     @include clearfix();
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     max-width: grid-width(12);
     min-width: 760px;
     width: flex-grid(12);
@@ -212,7 +212,7 @@ $edx-footer-link-color: rgb(0, 158, 231);
 $edx-footer-bg-color: rgb(252,252,252);
 
 %edx-footer-reset {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 %edx-footer-section {
@@ -412,7 +412,7 @@ $edx-footer-bg-color: rgb(252,252,252);
   }
 
   &.rwd {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include outer-container;
 
     &.wrapper-footer footer {

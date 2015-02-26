@@ -395,7 +395,7 @@
 // +existing/misc buttons (CLEANUP!)
 // --------------------
 %btn {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include transition(color $tmg-f2 ease-in-out, background $tmg-f2 ease-in-out, box-shadow $tmg-f2 ease-in-out);
   display: inline-block;
   cursor: pointer;

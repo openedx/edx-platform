@@ -82,7 +82,7 @@ header.global {
       background-color: $button-bg-color;
       border: 1px solid $border-color-2;
       border-radius: 3px;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
       display: inline-block;
@@ -221,7 +221,7 @@ header.global {
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           color: $link-color;
           cursor: pointer;
           display: block;
@@ -329,7 +329,7 @@ header.global {
 header.global-new {
   @extend %ui-depth1;
   /* Temp. fix until applied globally */
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   position: relative;
   width: 100%;
   border-bottom: 4px solid $courseware-border-bottom-color;
@@ -338,7 +338,7 @@ header.global-new {
 
   nav {
     @include clearfix();
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     width: grid-width(12);
     height: 74px;
     margin: 0 auto;
@@ -406,7 +406,7 @@ header.global-new {
       background-color: $button-bg-color;
       border: 1px solid $border-color-2;
       border-radius: 3px;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $base-font-color;
       font-family: $header-sans-serif;
@@ -538,7 +538,7 @@ header.global-new {
         > a {
           border: 1px solid transparent;
           border-radius: 3px;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           color: $link-color;
           cursor: pointer;
           display: block;

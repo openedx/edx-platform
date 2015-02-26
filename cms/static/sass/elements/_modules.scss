@@ -142,7 +142,7 @@
         }
 
         .name {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           display: block;
           color: $white;
         }

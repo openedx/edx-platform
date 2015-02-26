@@ -45,7 +45,7 @@
 
       .logo {
         border-right: 1px solid rgb(200,200,200);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         float: left;
         height: 115px;
         margin-right: flex-gutter();
@@ -60,7 +60,7 @@
       }
 
       h2.mission-quote {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         float: right;
         font-style: italic;
         line-height: 1.4;
@@ -92,7 +92,7 @@
       }
 
       .photo {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         background: rgb(255,255,255);
         border: 1px solid rgb(210,210,210);
         margin-top: 37px;
@@ -107,7 +107,7 @@
       }
 
       > article {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         float: left;
         padding-left: $baseline;
         width: flex-grid(9);
@@ -152,7 +152,7 @@
 
     nav.categories {
       border: 1px solid rgb(220,220,220);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       float: left;
       margin-left: flex-gutter();
       padding: 20px;
@@ -218,7 +218,7 @@
       .article-cover {
         background: rgb(255,255,255);
         border: 1px solid rgb(120,120,120);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         float: left;
         height: 140px;
         margin-right: flex-gutter();
@@ -259,7 +259,7 @@
     margin: 0 auto;
 
     .photo {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       background: rgb(255,255,255);
       border: 1px solid rgb(210,210,210);
       padding: 1px;
@@ -272,7 +272,7 @@
     }
 
     .contacts {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       float: left;
       padding-left: 40px;
       width: flex-grid(9);

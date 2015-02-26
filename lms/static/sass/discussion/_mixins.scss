@@ -57,7 +57,7 @@
 }
 
 @mixin discussion-wmd-input {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   margin-top: 0;
   border: 1px solid #aaa;
   border-radius: 3px 3px 0 0;
@@ -72,7 +72,7 @@
 }
 
 @mixin discussion-wmd-preview-container {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   border: 1px solid #aaa;
   border-top: none;
   border-radius: 0 0 3px 3px;
@@ -114,7 +114,7 @@
 
 // extends - content - text overflow by ellipsis
 %cont-truncated {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

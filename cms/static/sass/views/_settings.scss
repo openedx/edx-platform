@@ -6,7 +6,7 @@
   @include direction();
 
   .content-primary, .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   .content-primary {
@@ -23,7 +23,7 @@
 
   .message-status {
     @include border-top-radius(2px);
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @extend %t-strong;
     display: none;
     border-bottom: 2px solid $yellow;
@@ -239,7 +239,7 @@
       &.enum {
 
         .field-group {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           border-radius: 3px;
           background: $gray-l5;
           padding: $baseline;
@@ -342,7 +342,7 @@
 
           .link-courseURL {
             @extend %t-copy-lead1;
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             display: block;
             width: 100%;
             overflow: hidden;
@@ -434,7 +434,7 @@
     #field-course-introduction-video {
 
       .input-existing {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         border-radius: 3px;
         background: $gray-l5;
         padding: ($baseline/2);
@@ -531,7 +531,7 @@
       }
 
       .new-grade-button {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include linear-gradient(top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
         box-shadow: 0 1px 0 rgba(255, 255, 255, .3) inset;
         width: flex-grid(1,9);
@@ -556,7 +556,7 @@
       }
 
       .grade-slider {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         width: flex-grid(8,9);
         display: inline-block;
         vertical-align: middle;
@@ -888,7 +888,7 @@
       // specific to code mirror instance in JSON policy editing, need to sync up with other similar code mirror UIs
       .CodeMirror {
         @extend %t-copy-base;
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         box-shadow: 0 1px 2px $shadow-l1 inset;
         @include linear-gradient($lightGrey, tint($lightGrey, 90%));
         padding: 5px 8px;
