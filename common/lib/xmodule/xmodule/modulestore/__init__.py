@@ -920,6 +920,18 @@ class ModuleStoreRead(ModuleStoreAssetBase):
         """
         pass
 
+    @abstractmethod
+    def get_course_structure(self, course_id, version=None):
+        """
+        Returns the course structure as a CourseStructure object.
+
+        Args:
+            course_id (CourseKey):
+            version (string): some modulestores hold different versions of courses. A specific version
+                can be specified; otherwise, the latest published version will be returned.
+        """
+        pass
+
 
 # pylint: disable=abstract-method
 class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
@@ -1041,9 +1053,9 @@ class ModuleStoreWrite(ModuleStoreRead, ModuleStoreAssetWriteInterface):
 
 # pylint: disable=abstract-method
 class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
-    '''
+    """
     Implement interface functionality that can be shared.
-    '''
+    """
 
     # pylint: disable=invalid-name
     def __init__(
@@ -1057,9 +1069,9 @@ class ModuleStoreReadBase(BulkOperationsMixin, ModuleStoreRead):
         # allow lower level init args to pass harmlessly
         ** kwargs
     ):
-        '''
+        """
         Set up the error-tracking logic.
-        '''
+        """
         super(ModuleStoreReadBase, self).__init__(**kwargs)
         self._course_errors = defaultdict(make_error_tracker)  # location -> ErrorLog
         # pylint: disable=fixme

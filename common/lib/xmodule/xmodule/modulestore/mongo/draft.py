@@ -6,21 +6,25 @@ returns the i4x://org/course/cat/name@draft object if that exists,
 and otherwise returns i4x://org/course/cat/name).
 """
 
-import pymongo
 import logging
 
+from bson.son import SON
+import pymongo
 from opaque_keys.edx.locations import Location
+from opaque_keys.edx.locator import BlockUsageLocator
 from xmodule.exceptions import InvalidVersionError
 from xmodule.modulestore import ModuleStoreEnum
+from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
 from xmodule.modulestore.courseware_index import CoursewareSearchIndexer
 from xmodule.modulestore.exceptions import (
     ItemNotFoundError, DuplicateItemError, DuplicateCourseError, InvalidBranchSetting
 )
+from xmodule.modulestore.models import Block, CourseStructure
 from xmodule.modulestore.mongo.base import (
     MongoModuleStore, MongoRevisionKey, as_draft, as_published, SORT_REVISION_FAVOR_DRAFT
 )
 from xmodule.modulestore.store_utilities import rewrite_nonportable_content_links
-from xmodule.modulestore.draft_and_published import UnsupportedRevisionError, DIRECT_ONLY_CATEGORIES
+
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +51,7 @@ class DraftModuleStore(MongoModuleStore):
     This module also includes functionality to promote DRAFT modules (and their children)
     to published modules.
     """
+
     def get_item(self, usage_key, depth=0, revision=None, **kwargs):
         """
         Returns an XModuleDescriptor instance for the item at usage_key.
@@ -77,6 +82,7 @@ class DraftModuleStore(MongoModuleStore):
             xmodule.modulestore.exceptions.ItemNotFoundError if no object
             is found at that usage_key
         """
+
         def get_published():
             return wrap_draft(super(DraftModuleStore, self).get_item(usage_key, depth=depth))
 
@@ -123,6 +129,7 @@ class DraftModuleStore(MongoModuleStore):
                     if branch setting is ModuleStoreEnum.Branch.published_only, checks for the published item only
                     if branch setting is ModuleStoreEnum.Branch.draft_preferred, checks whether draft or published item exists
         """
+
         def has_published():
             return super(DraftModuleStore, self).has_item(usage_key)
 
@@ -335,6 +342,7 @@ class DraftModuleStore(MongoModuleStore):
                     if the branch setting is ModuleStoreEnum.Branch.draft_preferred,
                         returns either Draft or Published, preferring Draft items.
         """
+
         def base_get_items(key_revision):
             return super(DraftModuleStore, self).get_items(course_key, key_revision=key_revision, **kwargs)
 
@@ -855,6 +863,89 @@ class DraftModuleStore(MongoModuleStore):
                 expected_setting=expected_branch_setting,
                 actual_setting=actual_branch_setting
             )
+
+    def _compute_course_structure(self, course_id):
+        """
+        Computes the course structure.
+
+        The graded and format fields are inherited from their parents if values are not set on the children.
+        """
+        course_id = self.fill_in_run(course_id)
+        query = SON([
+            ('_id.tag', 'i4x'),
+            ('_id.org', course_id.org),
+            ('_id.course', course_id.course)
+        ])
+        # if we're only dealing in the published branch, then only get published containers
+        if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:
+            query['_id.revision'] = None
+
+        # Limit the fields returned to only those we actually need.
+        fields = ['_id', 'definition.children', 'metadata.display_name', 'metadata.graded', 'metadata.format']
+        record_filter = {}
+        for field in fields:
+            record_filter[field] = 1
+
+        resultset = self.collection.find(query, record_filter)
+
+        root = None
+        blocks = {}
+
+        for result in resultset:
+            location = as_published(Location._from_deprecated_son(result['_id'], course_id.run))
+            metadata = result['metadata']
+            children = result.get('definition', {}).get('children', [])
+
+            # TODO This level of detail should not be here. It is necessary because the display name for certain modules
+            # defaults to a set value. We should find a better method of setting this value.
+            if not metadata.get('display_name'):
+                if location.category == 'video':
+                    metadata['display_name'] = 'Video'
+                elif location.category == 'html':
+                    metadata['display_name'] = 'Text'
+
+            block = Block(unicode(location),
+                          location.category,
+                          display_name=metadata.get('display_name', None),
+                          format=metadata.get('format', None),
+                          graded=metadata.get('graded', None),
+                          children=children)
+
+            if location.category == 'course':
+                root = block.usage_key
+                course = self.get_course(course_id, depth=0)
+                block.display_name = course.display_name
+                block.graded = block.graded or False
+
+            blocks[block.usage_key] = block
+
+        # Ensure any referenced children are actually present (https://openedx.atlassian.net/browse/TNL-1075)
+        keys = blocks.keys()
+        for block in blocks.values():
+            block.children = [child for child in block.children if child in keys]
+
+        # Inherit a few fields
+        inherited_fields = ['format', 'graded']
+
+        def _bequeath_fields(parent_block):
+            if not parent_block.children:
+                return
+
+            for child_key in parent_block.children:
+                child_block = blocks[child_key]
+
+                for field in inherited_fields:
+                    if getattr(child_block, field) is None:
+                        setattr(child_block, field, getattr(parent_block, field))
+
+                _bequeath_fields(child_block)
+
+        _bequeath_fields(blocks[root])
+
+        return CourseStructure(root, blocks, version=self.get_branch_setting())
+
+    def get_course_structure(self, course_id, version=None):  # pylint: disable=unused-argument
+        return self._compute_course_structure(course_id)
 
 
 def _verify_revision_is_published(location):

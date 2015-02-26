@@ -3,6 +3,7 @@ Helper classes and methods for running modulestore tests without Django.
 """
 from importlib import import_module
 from opaque_keys.edx.keys import UsageKey
+from opaque_keys.edx.locator import BlockUsageLocator
 from unittest import TestCase
 from xblock.fields import XBlockMixin
 from xmodule.modulestore import ModuleStoreEnum
@@ -10,6 +11,7 @@ from xmodule.modulestore.draft_and_published import ModuleStoreDraftAndPublished
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.mixed import MixedModuleStore
+from xmodule.modulestore.models import Block, CourseStructure
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.tests import DATA_DIR
@@ -134,3 +136,58 @@ class MixedSplitTestCase(TestCase):
             modulestore=self.store,
             **extra
         )
+
+
+class CourseStructureTestMixin(object):
+    """
+    Mixin used to help test implementations of implementation of ModuleStoreRead.get_course_structure.
+    """
+    def _add_item_to_structure(self, modulestore, locator, structure):
+        item = modulestore.get_item(locator)
+        locator_string = unicode(locator)
+        block = {
+            u'id': locator_string,
+            u'block_type': item.category,
+            u'display_name': item.display_name or item.name,
+            u'format': getattr(item, 'format', None),
+            u'graded': getattr(item, 'graded', False),
+            u'children': []
+        }
+
+        if item.has_children:
+            block[u'children'] = [unicode(child) for child in item.children]
+
+        structure[locator_string] = Block.from_dict(block)
+
+        if item.has_children:
+            for child in item.children:
+                self._add_item_to_structure(modulestore, child, structure)
+
+    def _get_course_version(self, course_key, modulestore):  # pylint: disable=unused-argument
+        return modulestore.get_branch_setting()
+
+    def assertValidCourseStructure(self, course_key, modulestore):
+        """
+        Verifies that the course structure returned by a module store is valid.
+        """
+        actual = modulestore.get_course_structure(course_key)
+
+        course = modulestore.get_course(course_key, depth=None)
+        course_locator_string = unicode(BlockUsageLocator(course_key, 'course', course.scope_ids.usage_id.block_id))
+        blocks = {
+            course_locator_string: Block.from_dict({
+                u'id': course_locator_string,
+                u'block_type': u'course',
+                u'display_name': course.display_name,
+                u'format': None,
+                u'graded': False,
+                u'children': [unicode(child) for child in course.children]
+            })
+        }
+
+        for child in course.children:
+            self._add_item_to_structure(modulestore, child, blocks)
+
+        expected = CourseStructure(course_locator_string, blocks,
+                                   version=self._get_course_version(course_key, modulestore))
+        self.assertEqual(actual, expected)

@@ -29,6 +29,7 @@ from xmodule.modulestore.tests.test_modulestore import check_has_course_method
 from xmodule.modulestore.split_mongo import BlockKey
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.modulestore.tests.utils import CourseStructureTestMixin
 
 
 BRANCH_NAME_DRAFT = ModuleStoreEnum.BranchName.draft
@@ -37,11 +38,11 @@ BRANCH_NAME_PUBLISHED = ModuleStoreEnum.BranchName.published
 
 @attr('mongo')
 class SplitModuleTest(unittest.TestCase):
-    '''
+    """
     The base set of tests manually populates a db w/ courses which have
     versions. It creates unique collection names and removes them after all
     tests finish.
-    '''
+    """
     # Snippets of what would be in the django settings envs file
     DOC_STORE_CONFIG = {
         'host': MONGO_HOST,
@@ -478,9 +479,9 @@ class SplitModuleTest(unittest.TestCase):
 
     @staticmethod
     def bootstrapDB(split_store):  # pylint: disable=invalid-name
-        '''
+        """
         Sets up the initial data into the db
-        '''
+        """
         for _course_id, course_spec in SplitModuleTest.COURSE_CONTENT.iteritems():
             course = split_store.create_course(
                 course_spec['org'],
@@ -590,10 +591,10 @@ class TestHasChildrenAtDepth(SplitModuleTest):
         self.assertFalse(ch3.has_children_at_depth(1))
 
 
-class SplitModuleCourseTests(SplitModuleTest):
-    '''
+class SplitModuleCourseTests(CourseStructureTestMixin, SplitModuleTest):
+    """
     Course CRUD operation tests
-    '''
+    """
 
     def test_get_courses(self):
         courses = modulestore().get_courses(branch=BRANCH_NAME_DRAFT)
@@ -648,9 +649,9 @@ class SplitModuleCourseTests(SplitModuleTest):
         )
 
     def test_get_course(self):
-        '''
+        """
         Test the various calling forms for get_course
-        '''
+        """
         locator = CourseLocator(org='testx', course='GreekHero', run="run", branch=BRANCH_NAME_DRAFT)
         head_course = modulestore().get_course(locator)
         self.assertNotEqual(head_course.location.version_guid, head_course.previous_version)
@@ -743,16 +744,28 @@ class SplitModuleCourseTests(SplitModuleTest):
         self.assertEqual(len(result.children[0].children), 1)
         self.assertEqual(result.children[0].children[0].locator.version_guid, versions[0])
 
+    def _get_course_version(self, course_key, ms):
+        course_index = ms.get_course_index(course_key)
+        versions = course_index[u'versions']
+        return versions.get(ModuleStoreEnum.BranchName.published) or versions.get(ModuleStoreEnum.BranchName.draft)
+
+    def test_get_course_structure(self):
+        """
+        Tests the implementation of ModuleStoreRead.get_course_structure.
+        """
+        course_key = CourseLocator(org='testx', course='wonderful', run="run", branch=BRANCH_NAME_PUBLISHED)
+        self.assertValidCourseStructure(course_key, modulestore())
+
 
 class SplitModuleItemTests(SplitModuleTest):
-    '''
+    """
     Item read tests including inheritance
-    '''
+    """
 
     def test_has_item(self):
-        '''
+        """
         has_item(BlockUsageLocator)
-        '''
+        """
         org = 'testx'
         course = 'GreekHero'
         run = 'run'

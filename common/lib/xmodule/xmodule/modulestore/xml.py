@@ -794,3 +794,8 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         log.warning("get_all_asset_metadata request of XML modulestore - not implemented.")
         return []
+
+    def get_course_structure(self, course_id, version=None):
+        # This method will not be implemented for this modulestore. If you need this method, consider using
+        # a supported modulestore.
+        raise NotImplementedError

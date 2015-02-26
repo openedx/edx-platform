@@ -21,7 +21,6 @@ from xblock.core import XBlock
 from xblock.fields import Scope, Reference, ReferenceList, ReferenceValueDict
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import InvalidScopeError
-from xblock.plugin import Plugin
 
 from xmodule.tests import DATA_DIR
 from opaque_keys.edx.locations import Location
@@ -29,7 +28,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.mongo import MongoKeyValueStore
 from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
-from opaque_keys.edx.locator import LibraryLocator, CourseLocator
+from opaque_keys.edx.locator import LibraryLocator, CourseLocator, BlockUsageLocator
 from opaque_keys.edx.keys import UsageKey
 from xmodule.modulestore.xml_exporter import export_to_xml
 from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
@@ -43,6 +42,7 @@ from xmodule.modulestore.mongo.base import as_draft
 from xmodule.modulestore.tests.mongo_connection import MONGO_PORT_NUM, MONGO_HOST
 from xmodule.modulestore.edit_info import EditInfoMixin
 from xmodule.modulestore.exceptions import ItemNotFoundError
+from xmodule.modulestore.tests.utils import CourseStructureTestMixin
 
 
 log = logging.getLogger(__name__)
@@ -68,9 +68,9 @@ class ReferenceTestXBlock(XBlock, XModuleMixin):
 
 
 class TestMongoModuleStoreBase(unittest.TestCase):
-    '''
+    """
     Basic setup for all tests
-    '''
+    """
     # Explicitly list the courses to load (don't want the big one)
     courses = ['toy', 'simple', 'simple_with_draft', 'test_unicode']
 
@@ -158,8 +158,8 @@ class TestMongoModuleStoreBase(unittest.TestCase):
         self.dummy_user = ModuleStoreEnum.UserID.test
 
 
-class TestMongoModuleStore(TestMongoModuleStoreBase):
-    '''Module store tests'''
+class TestMongoModuleStore(CourseStructureTestMixin, TestMongoModuleStoreBase):
+    """Module store tests"""
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):
@@ -177,7 +177,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         super(TestMongoModuleStore, cls).teardownClass()
 
     def test_init(self):
-        '''Make sure the db loads'''
+        """Make sure the db loads"""
         ids = list(self.connection[DB][COLLECTION].find({}, {'_id': True}))
         assert_greater(len(ids), 12)
 
@@ -190,7 +190,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         assert_equals(store.get_modulestore_type(''), ModuleStoreEnum.Type.mongo)
 
     def test_get_courses(self):
-        '''Make sure the course objects loaded properly'''
+        """Make sure the course objects loaded properly"""
         courses = self.draft_store.get_courses()
         assert_equals(len(courses), 6)
         course_ids = [course.id for course in courses]
@@ -289,10 +289,10 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         )
 
     def test_xlinter(self):
-        '''
+        """
         Run through the xlinter, we know the 'toy' course has violations, but the
         number will continue to grow over time, so just check > 0
-        '''
+        """
         assert_not_equals(perform_xlint(DATA_DIR, ['toy']), 0)
 
     def test_get_courses_has_no_templates(self):
@@ -705,11 +705,18 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         # Clean up the data so we don't break other tests which apparently expect a particular state
         self.draft_store.delete_course(course.id, self.dummy_user)
 
+    def test_get_course_structure(self):
+        """
+        Tests the implementation of ModuleStoreRead.get_course_structure.
+        """
+        course_key = CourseLocator(org='edX', course='simple', run='2012_Fall', deprecated=True)
+        self.assertValidCourseStructure(course_key, self.draft_store)
+
 
 class TestMongoModuleStoreWithNoAssetCollection(TestMongoModuleStore):
-    '''
+    """
     Tests a situation where no asset_collection is specified.
-    '''
+    """
 
     @classmethod
     def add_asset_collection(cls, doc_store_config):

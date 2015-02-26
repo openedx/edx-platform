@@ -938,3 +938,7 @@ class MixedModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase):
         """
         for store in self.modulestores:
             store.ensure_indexes()
+
+    def get_course_structure(self, course_id, version=None):
+        store = self._get_modulestore_for_courselike(course_id)
+        return store.get_course_structure(course_id, version)
