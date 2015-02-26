@@ -1,8 +1,18 @@
 {
     "name": "edx",
     "version": "0.1.0",
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/edx/edx-platform.git"
+    },
     "dependencies": {
       "coffee-script": "1.6.1",
       "uglify-js": "2.4.15"
+    },
+    "devDependencies": {
+      "gulp": "latest",
+      "gulp-notify": "latest",
+      "gulp-util": "latest",
+      "require-dir": "latest"
     }
 }
