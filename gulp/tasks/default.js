@@ -1,3 +1,7 @@
-var gulp = require('gulp');
+var gulp = require('gulp'),
+    runSequence = require('run-sequence');
 
-gulp.task('default', ['stylesStudio', 'watch']);
+gulp.task( 'default', function() {
+    runSequence( 'clean',
+                ['stylesStudio', 'watch']);
+});
