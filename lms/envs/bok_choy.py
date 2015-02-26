@@ -127,6 +127,10 @@ MOCK_SEARCH_BACKING_FILE = (
     TEST_ROOT / "index_file.dat"  # pylint: disable=no-value-for-parameter
 ).abspath()
 
+# Generate a random UUID so that different runs of acceptance tests don't break each other
+import uuid
+SECRET_KEY = uuid.uuid4().hex
+
 #####################################################################
 # Lastly, see if the developer has any local overrides.
 try:
