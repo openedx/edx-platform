@@ -98,6 +98,7 @@ def _write_styles(selector, output_root, classes):
     module_styles_lines = []
     module_styles_lines.append("@import '../../../sass/vendor/bourbon/bourbon';")
     module_styles_lines.append("@import '../../../sass/vendor/bourbon/bourbon-deprecated-upcoming';")
+short future)
     module_styles_lines.append("@import 'assets/anims';")
     for class_, fragment_names in css_imports.items():
         module_styles_lines.append("""{selector}.xmodule_{class_} {{""".format(
