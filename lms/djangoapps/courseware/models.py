@@ -133,7 +133,10 @@ class StudentModule(models.Model):
         return 'StudentModule<%r>' % ({
             'course_id': self.course_id,
             'module_type': self.module_type,
-            'student': self.student.username,  # pylint: disable=no-member
+            # We use the student_id instead of username to avoid a database hop.
+            # This can actually matter in cases where we're logging many of
+            # these (e.g. on a broken progress page).
+            'student_id': self.student_id,  # pylint: disable=no-member
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)

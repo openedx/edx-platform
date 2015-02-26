@@ -44,7 +44,7 @@ from openedx.core.djangoapps.credit.api import (
     is_user_eligible_for_credit,
     is_credit_course
 )
-from courseware.model_data import FieldDataCache
+from courseware.model_data import FieldDataCache, ScoresClient
 from .module_render import toc_for_course, get_module_for_descriptor, get_module, get_module_by_usage_id
 from .entrance_exams import (
     course_has_entrance_exam,
@@ -1054,10 +1054,15 @@ def _progress(request, course_key, student_id):
     # The pre-fetching of groups is done to make auth checks not require an
     # additional DB lookup (this kills the Progress page in particular).
     student = User.objects.prefetch_related("groups").get(id=student.id)
-
-    courseware_summary = grades.progress_summary(student, request, course)
+    field_data_cache = grades.field_data_cache_for_grading(course, student)
+    scores_client = ScoresClient.from_field_data_cache(field_data_cache)
+    courseware_summary = grades.progress_summary(
+        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+    )
+    grade_summary = grades.grade(
+        student, request, course, field_data_cache=field_data_cache, scores_client=scores_client
+    )
     studio_url = get_studio_url(course, 'settings/grading')
-    grade_summary = grades.grade(student, request, course)
 
     if courseware_summary is None:
         #This means the student didn't have access to the course (which the instructor requested)

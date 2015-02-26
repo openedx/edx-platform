@@ -109,6 +109,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         return resp
 
+    def look_at_question(self, problem_url_name):
+        """
+        Create state for a problem, but don't answer it
+        """
+        location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(location, "problem_get")
+        resp = self.client.get(modx_url)
+        return resp
+
     def reset_question_answer(self, problem_url_name):
         """
         Reset specified problem for current user.
@@ -457,6 +466,33 @@ class TestCourseGrader(TestSubmittingProblems):
         current_count = csmh.count()
         self.assertEqual(current_count, 3)
 
+    def test_grade_with_max_score_cache(self):
+        """
+        Tests that the max score cache is populated after a grading run
+        and that the results of grading runs before and after the cache
+        warms are the same.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.look_at_question('p2')
+        self.assertTrue(
+            StudentModule.objects.filter(
+                module_state_key=self.problem_location('p2')
+            ).exists()
+        )
+        location_to_cache = unicode(self.problem_location('p2'))
+        max_scores_cache = grades.MaxScoresCache.create_for_course(self.course)
+
+        # problem isn't in the cache
+        max_scores_cache.fetch_from_remote([location_to_cache])
+        self.assertIsNone(max_scores_cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+
+        # problem is in the cache
+        max_scores_cache.fetch_from_remote([location_to_cache])
+        self.assertIsNotNone(max_scores_cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+
     def test_none_grade(self):
         """
         Check grade is 0 to begin with.
@@ -473,6 +509,13 @@ class TestCourseGrader(TestSubmittingProblems):
         self.submit_question_answer('p1', {'2_1': 'Correct'})
         self.check_grade_percent(0.33)
         self.assertEqual(self.get_grade_summary()['grade'], 'B')
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_MAX_SCORE_CACHE": False})
+    def test_grade_no_max_score_cache(self):
+        """
+        Tests grading when the max score cache is disabled
+        """
+        self.test_b_grade_exact()
 
     def test_b_grade_above(self):
         """
