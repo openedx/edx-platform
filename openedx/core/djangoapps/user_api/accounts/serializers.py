@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from student.models import UserProfile
+from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 
 
 class AccountUserSerializer(serializers.HyperlinkedModelSerializer):
@@ -22,7 +23,20 @@ class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             "name", "gender", "goals", "year_of_birth", "level_of_education", "language", "country", "mailing_address"
         )
-        read_only_fields = ("name",)
+        # Currently no read-only field, but keep this so view code doesn't need to know.
+        read_only_fields = ()
+
+    def validate_name(self, attrs, source):
+        """ Enforce minimum length for name. """
+        if source in attrs:
+            new_name = attrs[source].strip()
+            if len(new_name) < NAME_MIN_LENGTH:
+                raise serializers.ValidationError(
+                    "The name field must be at least {} characters long.".format(NAME_MIN_LENGTH)
+                )
+            attrs[source] = new_name
+
+        return attrs
 
     def transform_gender(self, obj, value):
         """ Converts empty string to None, to indicate not set. Replaced by to_representation in version 3. """

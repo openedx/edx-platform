@@ -41,55 +41,9 @@ class ProfileApiTest(ModuleStoreTestCase):
             'city': None,
         })
 
-    def test_update_full_name(self):
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        profile_api.update_profile(self.USERNAME, full_name=u'ȻħȺɍłɇs')
-        profile = profile_api.profile_info(self.USERNAME)
-        self.assertEqual(profile['full_name'], u'ȻħȺɍłɇs')
-
-    @raises(profile_api.ProfileInvalidField)
-    @ddt.data('', 'a', 'a' * profile_api.FULL_NAME_MAX_LENGTH + 'a')
-    def test_update_full_name_invalid(self, invalid_name):
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-        profile_api.update_profile(self.USERNAME, full_name=invalid_name)
-
-    @raises(profile_api.ProfileUserNotFound)
-    def test_update_profile_no_user(self):
-        profile_api.update_profile(self.USERNAME, full_name='test')
-
     def test_retrieve_profile_no_user(self):
         profile = profile_api.profile_info('does not exist')
         self.assertIs(profile, None)
-
-    def test_record_name_change_history(self):
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
-
-        # Change the name once
-        # Since the original name was an empty string, expect that the list
-        # of old names is empty
-        profile_api.update_profile(self.USERNAME, full_name='new name')
-        meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
-        self.assertEqual(meta, {})
-
-        # Change the name again and expect the new name is stored in the history
-        profile_api.update_profile(self.USERNAME, full_name='another new name')
-        meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
-
-        self.assertEqual(len(meta['old_names']), 1)
-        name, rationale, timestamp = meta['old_names'][0]
-        self.assertEqual(name, 'new name')
-        self.assertEqual(rationale, u'')
-        self._assert_is_datetime(timestamp)
-
-        # Change the name a third time and expect both names are stored in the history
-        profile_api.update_profile(self.USERNAME, full_name='yet another new name')
-        meta = UserProfile.objects.get(user__username=self.USERNAME).get_meta()
-
-        self.assertEqual(len(meta['old_names']), 2)
-        name, rationale, timestamp = meta['old_names'][1]
-        self.assertEqual(name, 'another new name')
-        self.assertEqual(rationale, u'')
-        self._assert_is_datetime(timestamp)
 
     def test_update_and_retrieve_preference_info(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)

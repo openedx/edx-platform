@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 import ddt
 import json
@@ -9,7 +10,8 @@ from django.conf import settings
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
-from student.models import UserProfile
+from student.models import UserProfile, PendingEmailChange
+from student.views import confirm_email_change
 
 TEST_PASSWORD = "test"
 
@@ -44,6 +46,19 @@ class TestAccountAPI(APITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.send_get(self.different_client, expected_status=404)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_account_unknown_user(self, api_client, user):
+        """
+        Test that requesting a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, user)
+        response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
+        self.assertEqual(404, response.status_code)
 
     def test_get_account_default(self):
         """
@@ -116,6 +131,35 @@ class TestAccountAPI(APITestCase):
         for empty_field in ("level_of_education", "gender", "country"):
             self.assertIsNone(response.data[empty_field])
 
+    def test_patch_account_anonymous_user(self):
+        """
+        Test that an anonymous client (not logged in) cannot call patch.
+        """
+        self.send_patch(self.anonymous_client, {}, expected_status=401)
+
+    def test_patch_account_different_user(self):
+        """
+        Test that a client (logged in) cannot update the account information for a different client.
+        """
+        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.send_patch(self.different_client, {}, expected_status=404)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_patch_account_unknown_user(self, api_client, user):
+        """
+        Test that trying to update a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, user)
+        response = client.patch(
+            reverse("accounts_api", kwargs={'username': "does_not_exist"}),
+            data=json.dumps({}), content_type="application/merge-patch+json"
+        )
+        self.assertEqual(404, response.status_code)
+
     @ddt.data(
         (
             "client", "user", "gender", "f", "not a gender",
@@ -127,12 +171,15 @@ class TestAccountAPI(APITestCase):
         ),
         ("client", "user", "country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
         ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
+        ("client", "user", "name", "bob", "z"*256, "Ensure this value has at most 255 characters (it has 256)."),
+        ("client", "user", "name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
         ("client", "user", "language", "Creole"),
         ("client", "user", "goals", "Smell the roses"),
         ("client", "user", "mailing_address", "Sesame Street"),
         # All of the fields can be edited by is_staff, but iterating through all of them again seems like overkill.
         # Just test a representative field.
         ("staff_client", "staff_user", "goals", "Smell the roses"),
+        # Note that email is tested below, as it is not immediately updated.
     )
     @ddt.unpack
     def test_patch_account(
@@ -183,7 +230,7 @@ class TestAccountAPI(APITestCase):
                 "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
-        for field_name in ["username", "email", "date_joined", "name"]:
+        for field_name in ["username", "date_joined"]:
             response = self.send_patch(client, {field_name: "will_error", "gender": "f"}, expected_status=400)
             verify_error_response(field_name, response.data)
 
@@ -192,10 +239,10 @@ class TestAccountAPI(APITestCase):
         self.assertEqual("m", response.data["gender"])
 
         # Test error message with multiple read-only items
-        response = self.send_patch(client, {"username": "will_error", "email": "xx"}, expected_status=400)
+        response = self.send_patch(client, {"username": "will_error", "date_joined": "xx"}, expected_status=400)
         self.assertEqual(2, len(response.data["field_errors"]))
         verify_error_response("username", response.data)
-        verify_error_response("email", response.data)
+        verify_error_response("date_joined", response.data)
 
     def test_patch_bad_content_type(self):
         """
@@ -222,6 +269,84 @@ class TestAccountAPI(APITestCase):
             self.send_patch(self.client, {field_name: ""})
             response = self.send_get(self.client)
             self.assertIsNone(response.data[field_name])
+
+    def test_patch_name_metadata(self):
+        """
+        Test the metadata stored when changing the name field.
+        """
+        def get_name_change_info(expected_entries):
+            legacy_profile = UserProfile.objects.get(id=self.user.id)
+            name_change_info = legacy_profile.get_meta()["old_names"]
+            self.assertEqual(expected_entries, len(name_change_info))
+            return name_change_info
+
+        def verify_change_info(change_info, old_name, requester, new_name):
+            self.assertEqual(3, len(change_info))
+            self.assertEqual(old_name, change_info[0])
+            self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
+            self.assertIsNotNone(change_info[2])
+            # Verify the new name was also stored.
+            get_response = self.send_get(self.client)
+            self.assertEqual(new_name, get_response.data["name"])
+
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        legacy_profile = UserProfile.objects.get(id=self.user.id)
+        self.assertEqual({}, legacy_profile.get_meta())
+        old_name = legacy_profile.name
+
+        # First change the name as the user and verify meta information.
+        self.send_patch(self.client, {"name": "Mickey Mouse"})
+        name_change_info = get_name_change_info(1)
+        verify_change_info(name_change_info[0], old_name, self.user.username, "Mickey Mouse")
+
+        # Now change the name as a different (staff) user and verify meta information.
+        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
+        self.send_patch(self.staff_client, {"name": "Donald Duck"})
+        name_change_info = get_name_change_info(2)
+        verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)
+        verify_change_info(name_change_info[1], "Mickey Mouse", self.staff_user.username, "Donald Duck")
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_patch_email(self, api_client, user):
+        """
+        Test that the user (and anyone with an is_staff account) can request an email change through the accounts API.
+        Full testing of the helper method used (do_email_change_request) exists in the package with the code.
+        Here just do minimal smoke testing.
+        """
+        client = self.login_client(api_client, user)
+        old_email = self.user.email
+        new_email = "newemail@example.com"
+        self.send_patch(client, {"email": new_email, "goals": "change my email"})
+
+        # Since request is multi-step, the email won't change on GET immediately (though goals will update).
+        get_response = self.send_get(client)
+        self.assertEqual(old_email, get_response.data["email"])
+        self.assertEqual("change my email", get_response.data["goals"])
+
+        # Now call the method that will be invoked with the user clicks the activation key in the received email.
+        # First we must get the activation key that was sent.
+        pending_change = PendingEmailChange.objects.filter(user=self.user)
+        self.assertEqual(1, len(pending_change))
+        activation_key = pending_change[0].activation_key
+        confirm_change_url = reverse(
+            "student.views.confirm_email_change", kwargs={'key': activation_key}
+        )
+        response = self.client.post(confirm_change_url)
+        self.assertEqual(200, response.status_code)
+        get_response = self.send_get(client)
+        self.assertEqual(new_email, get_response.data["email"])
+
+        # Finally, try changing to an invalid email just to make sure error messages are appropriately returned.
+        error_response = self.send_patch(client, {"email": "not_an_email"}, expected_status=400)
+        self.assertEqual(
+            "Error thrown from do_email_change_request: 'Valid e-mail address required.'",
+            error_response.data["developer_message"]
+        )
+        self.assertEqual("Valid e-mail address required.", error_response.data["user_message"])
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """

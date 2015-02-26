@@ -50,10 +50,6 @@ class ProfileInternalError(Exception):
     pass
 
 
-FULL_NAME_MAX_LENGTH = 255
-FULL_NAME_MIN_LENGTH = 2
-
-
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
 def profile_info(username):
     """Retrieve a user's profile information.
@@ -88,36 +84,6 @@ def profile_info(username):
     }
 
     return profile_dict
-
-
-@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def update_profile(username, full_name=None):
-    """Update a user's profile.
-
-    Arguments:
-        username (unicode): The username associated with the account.
-
-    Keyword Arguments:
-        full_name (unicode): If provided, set the user's full name to this value.
-
-    Returns:
-        None
-
-    Raises:
-        ProfileRequestError: If there is no profile matching the provided username.
-
-    """
-    try:
-        profile = UserProfile.objects.get(user__username=username)
-    except UserProfile.DoesNotExist:
-        raise ProfileUserNotFound
-
-    if full_name is not None:
-        name_length = len(full_name)
-        if name_length > FULL_NAME_MAX_LENGTH or name_length < FULL_NAME_MIN_LENGTH:
-            raise ProfileInvalidField("full_name", full_name)
-        else:
-            profile.update_name(full_name)
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])

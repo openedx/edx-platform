@@ -40,11 +40,6 @@ class AccountUserAlreadyExists(AccountRequestError):
     pass
 
 
-class AccountUsernameAlreadyExists(AccountUserAlreadyExists):
-    """An account already exists with the requested username. """
-    pass
-
-
 class AccountUsernameInvalid(AccountRequestError):
     """The requested username is not in a valid format. """
     pass
@@ -68,6 +63,15 @@ class AccountUserNotFound(AccountRequestError):
 class AccountNotAuthorized(AccountRequestError):
     """The user is not authorized to perform the requested action. """
     pass
+
+
+class AccountUpdateError(AccountRequestError):
+    """
+    An update to the account failed. More detailed information is present in error_info (a dict
+    with at least a developer_message, though possibly also a nested field_errors dict).
+    """
+    def __init__(self, error_info):
+        self.error_info = error_info
 
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
@@ -210,6 +214,7 @@ def activate_account(activation_key):
     else:
         # This implicitly saves the registration
         registration.activate()
+
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 def request_password_change(email, orig_host, is_secure):
