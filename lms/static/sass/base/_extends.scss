@@ -120,3 +120,11 @@
   padding: ($baseline/5) ($baseline/2);
   color: shade($warning-color, 45%);
 }
+
+// extends - content - text overflow by ellipsis
+%cont-truncated {
+  @include box-sizing(border-box);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
