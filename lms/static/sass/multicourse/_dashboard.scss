@@ -384,64 +384,38 @@
         @include clearfix();
         @include padding(0, 10px, 0, 230px);
 
-         .course-item-info {
-           position: relative;
-           padding: 0;
-           width: 100%;
-           .course-title {
+        .course-item-info {
+          position: relative;
+          width: 100%;
+          padding: 0;
+
+          .course-title {
+            display: inline-block;
+            margin-top: -($baseline/2);
+
             a,
             span {
-              position: relative;
-              top: ($baseline*1.5);
               display: block;
               margin-bottom: ($baseline/3);
               font-family: $sans-serif;
               font-size: 34px;
               line-height: 42px;
               font-weight: 300;
-
-              &:hover,
-              &:focus {
-                text-decoration: none;
-              }
             }
+          }
+
+          .university,
+          .date-block {
+            @extend %t-copy-sub1;
+            margin: 0 0 6px 0;
           }
 
           .university {
-            position: absolute;
-            top: 0;
-            @include left(0);
-            color: $lighter-base-font-color;
-            font-family: $sans-serif;
-            font-size: 16px;
-            font-weight: 400;
-            margin: 0 0 6px;
-            text-transform: none;
-            letter-spacing: 0;
+            @extend %t-strong;
           }
 
           .date-block {
-            position: absolute;
-            top: 0;
-            @include right(0);
-            font-family: $sans-serif;
-            font-size: 13px;
-            font-style: italic;
             color: $lighter-base-font-color;
-            float: right;
-          }
-
-          h3 a, h3 span {
-            display: block;
-            margin-bottom: ($baseline/2);
-            font-family: $sans-serif;
-            font-size: 34px;
-            line-height: 42px;
-            font-weight: 300;
-
-            &:hover, &:focus {
-              text-decoration: none;
-            }
           }
         }
 
@@ -479,7 +453,6 @@
 
         .course-actions {
           @include clearfix();
-          padding-top: ($baseline);
         }
 
         .enter-course {
@@ -640,11 +613,8 @@
     // ====================
 
     // UI: message
-    .wrapper-message-primary {
-      @include clearfix();
-    }
-
     .message {
+      @include clearfix();
       border-radius: 3px;
       display: none;
       z-index: 10;
@@ -918,18 +888,13 @@
       }
 
       &.course-status-processing {
-        background-color: $gray-l5;
-        border: 0;
+
       }
 
       &.course-status-certnotavailable {
-        background-color: $gray-l5;
-        border: 0;
       }
 
       &.course-status-certrendering {
-        background-color: $gray-l5;
-        border: 0;
 
         .cta {
           margin-top: 2px;
@@ -943,10 +908,10 @@
         .message-copy {
           width: flex-grid(6, 12);
           position: relative;
-          @include float(left);
+          float: left;
         }
 
-        .actions-primary {
+        .actions {
           width: flex-grid(6, 12);
           position: relative;
           @include float(right);
@@ -984,24 +949,6 @@
             letter-spacing: 0;
           }
         }
-      }
-
-      .actions-secondary {
-        margin-top: ($baseline/2);
-        border-top: 1px solid $gray-l4;
-        padding-top: ($baseline/2);
-
-        .action-share {
-          @include float(right);
-          margin: 0;
-        }
-      }
-
-      .certificate-explanation {
-        @extend %t-copy-sub1;
-        margin-top: ($baseline/2);
-        border-top: 1px solid $gray-l4;
-        padding-top: ($baseline/2);
       }
 
       .verification-reminder {

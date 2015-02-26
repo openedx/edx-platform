@@ -117,6 +117,7 @@ from student.helpers import (
             <span>${course.display_number_with_default | h} ${course.display_name_with_default}</span>
           % endif
         </h3>
+        <p alt="university" class="university">${get_course_about_section(course, 'university')}</p>
         <p class="date-block">
         % if course.has_ended():
         ${_("Course Completed - {end_date}").format(end_date=course.end_datetime_text("DATE_TIME"))}
@@ -128,7 +129,6 @@ from student.helpers import (
         ${_("Course Starts - {start_date}").format(start_date=course.start_datetime_text("DATE_TIME"))}
         % endif
         </p>
-        <p alt="university" class="university">${get_course_about_section(course, 'university')}</p>
       </div>
 
       % if course.may_certify() and cert_status:
