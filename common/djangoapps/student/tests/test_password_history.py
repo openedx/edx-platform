@@ -89,7 +89,7 @@ class TestPasswordHistory(TestCase):
 
         self.assertTrue(PasswordHistory.is_allowable_password_reuse(staff, "test"))
 
-    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.PBKDF2PasswordHasher'))
+    @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.PBKDF2PasswordHasher',))
     @patch.dict("django.conf.settings.ADVANCED_SECURITY_CONFIG", {'MIN_DIFFERENT_STAFF_PASSWORDS_BEFORE_REUSE': 2})
     @patch.dict("django.conf.settings.ADVANCED_SECURITY_CONFIG", {'MIN_DIFFERENT_STUDENT_PASSWORDS_BEFORE_REUSE': 1})
     def test_pbkdf2_sha256_password_reuse(self):
