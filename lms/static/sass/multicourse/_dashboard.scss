@@ -1,37 +1,40 @@
 // lms - views - user/student dashboard
 // ====================
 
+// Table of Contents 
+// * +Dashboard - Sidebar
+// * +Dashboard - Course Listing
+// * +Dashboard - Banner
+
+
+// +Dashboard - Sidebar
+// ==================== 
 .dashboard {
   @include clearfix();
   padding: ($baseline*2) 0 0 0;
 
   .profile-sidebar {
-    background: transparent;
-    @include float(left);
-    @include margin-right(flex-gutter());
+    @include float(right);
+    @include margin-left(flex-gutter());
     width: flex-grid(3);
     background: transparent;
-    box-shadow: 0 0 1px $shadow-l1;
 
-    header.profile {
+    .profile {
       @include box-sizing(border-box);
       border: 1px solid $border-color-2;
+      border-bottom: none;
       border-radius: ($baseline/4) ($baseline/4) 0 0;
       width: flex-grid(12);
-      background: $dashboard-profile-color;
 
       .user-name {
+        @extend %t-title6;
+        @extend %t-ultrastrong;
+        @extend %cont-truncated;
         display: block;
-        overflow: hidden;
         margin: 0;
-        padding: ($baseline*0.75) ($baseline/2) 0;
+        padding: $baseline $baseline 0;
         color: $base-font-color;
         text-transform: none;
-        text-wrap: nowrap;
-        text-overflow: ellipsis;
-        text-align: center;
-        font-weight: 700;
-        line-height: 1.2em;
       }
     }
 
@@ -185,121 +188,47 @@
           }
         }
       }
-    }
 
-    .news-carousel {
-      @include clearfix();
-      margin: 30px 10px 0;
-      border: 1px solid $border-color-2;
-      background: $dashboard-profile-color;
-      box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
+      // status
+      .status {
 
-      * {
-        font-family: $sans-serif;
-      }
-
-      header {
-        @include clearfix();
-        height: 50px;
-      }
-
-      .page-dots {
-        float: right;
-        margin: 18px 15px 0 0;
-
-        li {
-          float: left;
-          margin-left: 6px;
-        }
-      }
-
-      .page-dot {
-        display: block;
-        width: 11px;
-        height: 11px;
-        border-radius: 11px;
-        background: $dot-color;
-
-        &:hover, &:focus {
-          background: $lighter-base-font-color;
+        .list--nav {
+          margin: ($baseline/2) 0 0 0;
+          padding: 0;
         }
 
-        &.current {
-          background: $link-color;
+        .nav__item {
+          @extend %t-weight4;
+          @include font-size(13);
+          margin-left: 26px;
         }
-      }
-
-      h4 {
-        float: left;
-        margin-left: ($baseline*0.75);
-        font-size: 15px;
-        line-height: 48px;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      .pages {
-        position: relative;
-      }
-
-      .page {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-
-        &:first-child {
-          display: block;
-        }
-      }
-
-      section {
-        padding: 0 10px;
-      }
-
-      .news-image {
-        height: 180px;
-        margin-bottom: ($baseline*0.75);
-
-        img {
-          width: 100%;
-          border: 1px solid $border-color-1;
-        }
-      }
-
-      h5 {
-        margin-bottom: 8px;
-        margin-left: ($baseline/4);
-
-        a {
-          font-size: 16px;
-          font-weight: 700;
-        }
-      }
-
-      .excerpt {
-        margin-left: ($baseline/4);
-        font-size: 13px;
-        padding-bottom: 40px;
       }
     }
   }
+}
 
-  // ====================
-
-  // course listings
+// +Dashboard - Course Listing
+// ==================== 
+.dashboard {
   .my-courses {
     @include float(left);
     margin: 0;
     width: flex-grid(9);
 
-    > header {
-      border-bottom: 1px solid $border-color-2;
-      margin-bottom: ($baseline*1.5);
+
+    .wrapper-header-courses {
+      border-bottom: 4px solid $border-color-l4;
+      margin-bottom: $baseline;
+
+      .header-courses {
+        @extend %t-title5;
+        @include padding-right($baseline/2);
+      }
     }
 
+    // CASE: empty dashboard
     .empty-dashboard-message {
-      padding: 60px 0px;
+      padding: ($baseline*2) 0;
       text-align: center;
 
       p {
@@ -339,9 +268,9 @@
       @extend %ui-no-list;
 
       .course-item {
-        margin-bottom: ($baseline*2.5);
+        margin-bottom: $baseline;
         border-bottom: 4px solid $border-color-l4;
-        padding-bottom: ($baseline*2.5);
+        padding-bottom: $baseline;
 
         &:last-child {
           margin-bottom: 0;
@@ -360,67 +289,210 @@
       @include clearfix();
       @extend %ui-depth2;
       position: relative;
+      padding: ($baseline/2);
 
-      .cover {
-        @include box-sizing(border-box);
-        @include transition(all 0.15s linear 0s);
-        overflow: hidden;
-        position: relative;
-        @include float(left);
-        height: 100%;
-        max-height: 100%;
-        width: 200px;
-        height: 120px;
-        margin: 0;
-        border-radius: ($baseline/10);
-        border: 1px solid $dashboard-course-cover-border;
-        border-bottom: 4px solid $dashboard-course-cover-border;
-        padding: ($baseline/10);
-
-        img {
-          width: 100%;
-          min-height: 100%;
-        }
-      }
-
-      .info {
+      .details {
         @include clearfix();
-        @include padding(0, 10px, 0, 230px);
 
-        > hgroup {
-          padding: 0;
-          width: 100%;
+        .cover {
+          @include box-sizing(border-box);
+          @include transition(all 0.15s linear 0s);
+          @include float(left);
+          @include margin-right(flex-gutter());
+          width: flex-grid(3);
+          min-width: 150px;
+          overflow: hidden;
+          display: block;
+          position: relative;
+          max-height: 100%;
+          height: 120px;
+          border-radius: ($baseline/10);
+          border: 1px solid $dashboard-course-cover-border;
+          border-bottom: 4px solid $dashboard-course-cover-border;
 
-          .university {
-            color: $lighter-base-font-color;
-            font-family: $sans-serif;
-            font-size: 16px;
-            font-weight: 400;
-            margin: 0 0 6px;
-            text-transform: none;
-            letter-spacing: 0;
+          &:before {
+            content: "";
+            display: block;
+            padding-top: 75%; // 4:3 aspect ratio
           }
 
-          .date-block {
-            position: absolute;
+          img {
+            display: block;
+            position:  absolute;
             top: 0;
-            @include right(0);
-            font-family: $sans-serif;
-            font-size: 13px;
-            font-style: italic;
-            color: $lighter-base-font-color;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            width: 100%;
           }
+        }
 
-          h3 a, h3 span {
+        .wrapper-course-details {
+          display: block;
+          @include float(left);
+          width: flex-grid(9);
+          padding: 0;
+          height: 120px;
+        }
+
+        .course-title {
+          border-bottom: 2px solid $gray-l5;
+
+          a, span {
+            @extend %t-title3;
+            @extend %t-light;
             display: block;
             margin-bottom: ($baseline/2);
-            font-family: $sans-serif;
-            font-size: 34px;
-            line-height: 42px;
-            font-weight: 300;
 
             &:hover, &:focus {
               text-decoration: none;
+            }
+          }
+        }
+
+        .course-info {
+          display: block;
+          @include float(left);
+          width: flex-grid(4);
+          padding: 0;
+          margin-top: ($baseline/2);
+
+          [class*="info-"] {
+            color: $gray-d1;
+            @extend %t-title6;
+            display: inline-block;
+          }
+
+          .info-date-block {
+            @extend %t-title7;
+            color: $gray-l1;
+            display: block;
+          }
+        }
+
+        .wrapper-course-actions {
+          display: block;
+          @include float(right);
+          width: flex-grid(8);
+          padding: 0;
+          margin-top: ($baseline/2);
+        }
+
+        .course-actions {
+          position: relative;
+          top: 50%;
+          transform: translateY(-50%);
+
+          // UI: course item actions
+
+          .action {
+            @include box-sizing(border-box);
+            @include margin-right($baseline/2);
+            display: inline-block;
+            float: right;
+            min-width: ($baseline*2);
+            color: $gray-l3;
+            border-radius: 3px;
+            padding: 12px;
+            border: 1px solid $white;
+            
+            &:hover, &:focus {
+              color: #333;
+              border: 1px solid $gray-l4;
+            }
+
+            // STATE: is-disabled
+            &.is-disabled {
+              color: #808080;
+              color: $gray-l4;
+            }
+
+            // TYPE: facebook share
+            &.action-facebook, {
+              color: #3b5998;
+            }
+
+            // TYPE: twitter share
+            &.action-twitter {
+              color: #55ACEE;
+            }
+          }
+
+          // UI: general actions dropdown layout
+          .wrapper-action-more {
+
+            .actions-dropdown {
+              @extend %ui-no-list;
+              @extend %ui-depth1;
+              display: none;
+              position: absolute;
+              top: ($baseline*2);
+              left: 17px;
+              pointer-events: none;
+              min-width: ($baseline*6.5);
+
+              &.is-expanded {
+                display: block;
+                pointer-events: auto;
+              }
+
+              .actions-dropdown-list {
+                @extend %ui-no-list;
+                display: table;
+                @include box-sizing(border-box);
+                box-shadow: 0 1px 1px $shadow-l1;
+                position: relative;
+                width: 100%;
+                border-radius: 3px;
+                margin: ($baseline/4) 0 0 0;
+                border: 1px solid $gray-l3;
+                padding: ($baseline/2) ($baseline*0.75);
+                background: $white;
+
+                // ui triangle/nub
+                &:after,
+                &:before {
+                  bottom: 100%;
+                  @include right(3px);
+                  border: solid transparent;
+                  content: " ";
+                  height: 0;
+                  width: 0;
+                  position: absolute;
+                  pointer-events: none;
+                }
+
+                &:after {
+                  border-color: $transparent;
+                  border-bottom-color: $white;
+                  border-width: 6px;
+                  @include margin-right(1px);
+                }
+
+                &:before {
+                  border-color: $transparent;
+                  border-bottom-color: $gray-l3;
+                  border-width: 7px;
+                }
+              }
+
+              .actions-item {
+                @extend %t-title7;
+                display: block;
+                margin: 0;
+
+                &.is-hidden {
+                  display: none;
+                }
+
+                .action {
+                  @include margin-right(0);
+
+                  &:hover, &:focus {
+                    border: 1px solid transparent;
+                   }
+                }
+              }
             }
           }
         }
@@ -461,18 +533,14 @@
           @include button(simple, $button-color);
           @include box-sizing(border-box);
           border-radius: 3px;
-          display: block;
-          @include float(left);
+          @include float(right);
           font: normal 15px/1.6rem $sans-serif;
           letter-spacing: 0;
-          padding: 6px 32px 7px;
           text-align: center;
-          margin-top: 16px;
 
           &.archived {
             @include button(simple, $button-archive-color);
             font: normal 15px/1.6rem $sans-serif;
-            padding: 6px 32px 7px;
 
             &:hover, &:focus {
               text-decoration: none;
@@ -485,17 +553,415 @@
         }
       }
 
-      .prerequisites {
-        @include clearfix;
+      // ====================
 
-        .tip {
+      // UI: message
+      .wrapper-message-primary {
+        @include clearfix();
+      }
+
+      .messages-list {
+        margin: 0;
+        padding: 0;
+      }
+
+      .message {
+        @extend %ui-depth1;
+        border-radius: 3px;
+        display: none;
+        margin: $baseline 0 ($baseline/2) 0;
+        padding: ($baseline*0.5) $baseline;
+        background: $gray-l5;
+        border: 1px solid $gray-l4;
+
+        // STATE: shown
+        &.is-shown {
+          display: block;
+        }
+
+        a {
           font-family: $sans-serif;
-          font-size: 1em;
-          color: $lighter-base-font-color;
-          margin-top: ($baseline/2);
+        }
+
+        strong {
+          font-weight: 700;
+
+          a {
+            font-weight: 700;
+          }
+        }
+
+        .actions {
+          @include clearfix();
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .message-title,
+        .message-copy .title {
+          @extend %t-title6;
+          @extend %t-weight4;
+          line-height: 1em;
+          margin-bottom: ($baseline/4);
+        }
+
+        .message-copy,
+        .message-copy .copy {
+          @extend %t-copy-sub1;
+          margin: 2px 0 0 0;
+        }
+
+        // CASE: expandable
+        &.is-expandable {
+
+          .wrapper-tip {
+
+            .message-title, .message-copy {
+              margin-bottom: 0;
+            }
+
+            .message-title .value, .message-copy {
+              @include transition(color $tmg-f2 ease-in-out 0s);
+            }
+
+            // STATE: hover
+            &:hover {
+              cursor: pointer;
+
+              .message-title .value, .message-copy, .ui-toggle-expansion {
+                color: $link-color;
+              }
+            }
+          }
+
+          .wrapper-extended {
+            @include transition(opacity $tmg-f2 ease-in-out 0);
+            display: none;
+            opacity: 0.0;
+          }
+
+          // STATE: is expanded
+          &.is-expanded {
+
+            .ui-toggle-expansion {
+              @include transform(rotate(0));
+              @include transform-origin(50% 50%);
+            }
+
+            .wrapper-extended {
+              display: block;
+              opacity: 1.0;
+            }
+          }
+        }
+
+        // TYPE: upsell
+        .message-upsell {
+
+          .wrapper-tip {
+            @include clearfix();
+
+            .message-title {
+              float: left;
+            }
+
+            .ui-toggle-expansion {
+              @include transition(all $tmg-f2 ease-in-out 0s);
+              @include transform-origin(50% 50%);
+              @include font-size(21);
+              display: inline-block;
+              vertical-align: middle;
+              margin-right: ($baseline/4);
+
+              @include rtl {
+                @include transform(rotate(90deg));
+              }
+
+              @include ltr {
+                @include transform(rotate(-90deg));
+              }
+            }
+
+            .message-copy {
+              float: right;
+            }
+          }
+
+          .wrapper-extended {
+            padding: ($baseline/2) 0;
+
+            .message-copy {
+              margin-bottom: $baseline;
+            }
+          }
+
+          .action-upgrade {
+            @extend %btn-primary-green;
+            @include clearfix();
+            position: relative;
+            left: ($baseline/2);
+            padding: 8px $baseline 8px ($baseline*2);
+
+            .deco-graphic {
+              position: absolute;
+              top: -($baseline/4);
+              left: -($baseline*0.75);
+              width: ($baseline*2);
+            }
+
+            span {
+              color: $white; // nasty but needed override for poor <span> styling
+            }
+
+            .copy, .copy-sub {
+              display: inline-block;
+              vertical-align: middle;
+            }
+
+            .copy {
+              @extend %t-action3;
+              @extend %t-weight4;
+              margin-right: $baseline;
+            }
+
+            .copy-sub {
+              @extend %t-action4;
+              opacity: 0.875;
+            }
+          }
+        }
+
+        // TYPE: status
+        .message-status {
+          background: tint($yellow,70%);
+          border-color: $gray-l3;
+
+          .message-copy {
+            @extend %t-copy-sub1;
+            margin: 0;
+
+            .grade-value {
+              font-size: 1.2rem;
+              font-weight: bold;
+            }
+          }
+
+          .actions {
+
+            .action {
+              float: left;
+              margin: 0 15px 0 0;
+
+              .btn, .cta {
+                display: inline-block;
+              }
+
+              .btn {
+                @include box-sizing(border-box);
+                border-radius: 3px;
+                float: left;
+                font: normal 0.8rem/1.2rem $sans-serif;
+                letter-spacing: 1px;
+                padding: 6px 12px;
+                text-align: center;
+
+                &.disabled {
+                  cursor: default !important;
+
+                  &:hover, &:focus {
+                    background: #eee;
+                    background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+                    background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+                    background-image: -ms-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+                    background-image: -o-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+                    background-image: linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
+                  }
+                }
+              }
+
+              .cta {
+                float: left;
+                font: normal 0.8rem/1.2rem $sans-serif;
+                letter-spacing: 1px;
+                padding: 6px 12px;
+                text-align: center;
+              }
+            }
+          }
+
+          .exam-registration-number {
+            font-family: $sans-serif;
+            font-size: 18px;
+
+            a {
+              font-family: $sans-serif;
+            }
+          }
+
+          &.exam-register {
+
+            .message-copy {
+              margin-top: ($baseline/4);
+              width: 55%;
+            }
+          }
+
+          &.exam-schedule {
+            .exam-button {
+              margin-top: ($baseline/4);
+            }
+          }
+
+          .exam-button {
+            @include button(simple, $pink);
+            margin-top: 0;
+            float: right;
+          }
+
+          .contact-button {
+            @include button(simple, $pink);
+          }
+
+          .button {
+            display: inline-block;
+            margin-top: ($baseline/2);
+            padding: 9px 18px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 0;
+
+            &:hover, &:focus {
+              text-decoration: none;
+            }
+          }
+
+          &.course-status-processing {
+            background-color: $gray-l5;
+            border: 0;
+          }
+
+          &.course-status-certnotavailable {
+            background-color: $gray-l5;
+            border: 0;
+          }
+
+          &.course-status-certrendering {
+            background-color: $gray-l5;
+            border: 0;
+
+            .cta {
+              margin-top: 2px;
+            }
+          }
+
+          &.course-status-certavailable {
+            background-color: $gray-l5;
+            border: 0;
+
+            .message-copy {
+              width: flex-grid(6, 12);
+              position: relative;
+              @include float(left);
+            }
+
+            .actions-primary {
+              width: flex-grid(6, 12);
+              position: relative;
+              @include float(right);
+
+              .action {
+                @include margin(0, 0, ($baseline/2), ($baseline*.75));
+                float: none;
+                text-align: center;
+
+                &:last-child {
+                  margin-bottom: 0;
+                }
+
+                .btn {
+                  float: none;
+                }
+              }
+
+              .action-certificate .btn {
+                @extend %btn-inherited-primary;
+                @include box-sizing(border-box);
+                float: none;
+                border-radius: 3px;
+                display: block;
+                @include padding(7px, ($baseline*.75), 7px, ($baseline*.75));
+                text-align: center;
+
+                a:link, a:visited {
+                  color: #fff;
+                }
+              }
+
+              .action-share .btn {
+                display: inline;
+                letter-spacing: 0;
+              }
+            }
+          }
+
+          .actions-secondary {
+            margin-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
+            padding-top: ($baseline/2);
+
+            .action-share {
+              @include float(right);
+              margin: 0;
+            }
+          }
+
+          .certificate-explanation {
+            @extend %t-copy-sub1;
+            margin-top: ($baseline/2);
+            border-top: 1px solid $gray-l4;
+            padding-top: ($baseline/2);
+          }
+
+          .verification-reminder {
+            width: flex-grid(8, 12);
+            position: relative;
+            float: left;
+          }
+
+          .verification-cta {
+            width: flex-grid(4, 12);
+            position: relative;
+            float: left;
+
+            .cta {
+              @include button(simple, $green-d1);
+              @include box-sizing(border-box);
+              @include float(right);
+              border-radius: 3px;
+              display: block;
+              font: normal 15px/1.6rem $sans-serif;
+              letter-spacing: 0;
+              padding: 6px 32px 7px;
+              text-align: center;
+            }
+          }
+        }
+
+        // TYPE: pre-requisites 
+        .prerequisites {
+          @include clearfix;
+
+          .tip {
+            font-family: $sans-serif;
+            font-size: 1em;
+            color: $lighter-base-font-color;
+            margin-top: ($baseline/2);
+          }
         }
       }
 
+      
       // "enrolled as" status
       .sts-enrollment {
         position: absolute;
@@ -611,437 +1077,9 @@
         }
       }
     }
-
-    // ====================
-
-    // UI: message
-    .wrapper-message-primary {
-      @include clearfix();
-    }
-
-    .message {
-      border-radius: 3px;
-      display: none;
-      z-index: 10;
-      margin: $baseline 0 ($baseline/2) 0;
-      padding: ($baseline*0.5) $baseline;
-      font-family: $sans-serif;
-      background: tint($yellow,70%);
-      border: 1px solid $gray-l3;
-
-      // STATE: shown
-      &.is-shown {
-        display: block;
-      }
-
-      a {
-        font-family: $sans-serif;
-      }
-
-      strong {
-        font-weight: 700;
-
-        a {
-          font-weight: 700;
-        }
-      }
-
-      .actions {
-        @include clearfix();
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      .message-title,
-      .message-copy .title {
-        @extend %t-title6;
-        @extend %t-weight4;
-        line-height: 1em;
-        margin-bottom: ($baseline/4);
-      }
-
-      .message-copy,
-      .message-copy .copy {
-        @extend %t-copy-sub1;
-        margin: 2px 0 0 0;
-      }
-
-      // CASE: expandable
-      &.is-expandable {
-
-        .wrapper-tip {
-
-          .message-title, .message-copy {
-            margin-bottom: 0;
-          }
-
-          .message-title .value, .message-copy {
-            @include transition(color $tmg-f2 ease-in-out 0s);
-          }
-
-          // STATE: hover
-          &:hover {
-            cursor: pointer;
-
-            .message-title .value, .message-copy, .ui-toggle-expansion {
-              color: $link-color;
-            }
-          }
-        }
-
-        .wrapper-extended {
-          @include transition(opacity $tmg-f2 ease-in-out 0);
-          display: none;
-          opacity: 0.0;
-        }
-
-        // STATE: is expanded
-        &.is-expanded {
-
-          .ui-toggle-expansion {
-            @include transform(rotate(0));
-            @include transform-origin(50% 50%);
-          }
-
-          .wrapper-extended {
-            display: block;
-            opacity: 1.0;
-          }
-        }
-      }
-    }
-
-    // TYPE: upsell
-    .message-upsell {
-
-      .wrapper-tip {
-        @include clearfix();
-
-        .message-title {
-          float: left;
-        }
-
-        .ui-toggle-expansion {
-          @include transition(all $tmg-f2 ease-in-out 0s);
-          @include transform-origin(50% 50%);
-          @include font-size(21);
-          display: inline-block;
-          vertical-align: middle;
-          margin-right: ($baseline/4);
-
-          @include rtl {
-            @include transform(rotate(90deg));
-          }
-
-          @include ltr {
-            @include transform(rotate(-90deg));
-          }
-        }
-
-        .message-copy {
-          float: right;
-        }
-      }
-
-      .wrapper-extended {
-        padding: ($baseline/2) 0;
-
-        .message-copy {
-          margin-bottom: $baseline;
-        }
-      }
-
-      .action-upgrade {
-        @extend %btn-primary-green;
-        @include clearfix();
-        position: relative;
-        left: ($baseline/2);
-        padding: 8px $baseline 8px ($baseline*2);
-
-        .deco-graphic {
-          position: absolute;
-          top: -($baseline/4);
-          left: -($baseline*0.75);
-          width: ($baseline*2);
-        }
-
-        span {
-          color: $white; // nasty but needed override for poor <span> styling
-        }
-
-        .copy, .copy-sub {
-          display: inline-block;
-          vertical-align: middle;
-        }
-
-        .copy {
-          @extend %t-action3;
-          @extend %t-weight4;
-          margin-right: $baseline;
-        }
-
-        .copy-sub {
-          @extend %t-action4;
-          opacity: 0.875;
-        }
-      }
-    }
-
-    // TYPE: status
-    .message-status {
-      background: tint($yellow,70%);
-      border-color: $gray-l3;
-
-      .message-copy {
-        @extend %t-copy-sub1;
-        margin: 0;
-
-        .grade-value {
-          font-size: 1.2rem;
-          font-weight: bold;
-        }
-      }
-
-      .actions {
-
-        .action {
-          float: left;
-          margin: 0 15px 0 0;
-
-          .btn, .cta {
-            display: inline-block;
-          }
-
-          .btn {
-            @include box-sizing(border-box);
-            border-radius: 3px;
-            float: left;
-            font: normal 0.8rem/1.2rem $sans-serif;
-            letter-spacing: 1px;
-            padding: 6px 12px;
-            text-align: center;
-
-            &.disabled {
-              cursor: default !important;
-
-              &:hover, &:focus {
-                background: #eee;
-                background-image: -webkit-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -moz-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -ms-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: -o-linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-                background-image: linear-gradient(top, #EEE 0%, #C2C2C2 50%, #ABABAB 50%, #B0B0B0 100%);
-              }
-            }
-          }
-
-          .cta {
-            float: left;
-            font: normal 0.8rem/1.2rem $sans-serif;
-            letter-spacing: 1px;
-            padding: 6px 12px;
-            text-align: center;
-          }
-        }
-      }
-
-      .exam-registration-number {
-        font-family: $sans-serif;
-        font-size: 18px;
-
-        a {
-          font-family: $sans-serif;
-        }
-      }
-
-      &.exam-register {
-
-        .message-copy {
-          margin-top: ($baseline/4);
-          width: 55%;
-        }
-      }
-
-      &.exam-schedule {
-        .exam-button {
-          margin-top: ($baseline/4);
-        }
-      }
-
-      .exam-button {
-        @include button(simple, $pink);
-        margin-top: 0;
-        float: right;
-      }
-
-      .contact-button {
-        @include button(simple, $pink);
-      }
-
-      .button {
-        display: inline-block;
-        margin-top: ($baseline/2);
-        padding: 9px 18px 10px;
-        font-size: 13px;
-        font-weight: bold;
-        letter-spacing: 0;
-
-        &:hover, &:focus {
-          text-decoration: none;
-        }
-      }
-
-      &.course-status-processing {
-        background-color: $gray-l5;
-        border: 0;
-      }
-
-      &.course-status-certnotavailable {
-        background-color: $gray-l5;
-        border: 0;
-      }
-
-      &.course-status-certrendering {
-        background-color: $gray-l5;
-        border: 0;
-
-        .cta {
-          margin-top: 2px;
-        }
-      }
-
-      &.course-status-certavailable {
-        background-color: $gray-l5;
-        border: 0;
-
-        .message-copy {
-          width: flex-grid(6, 12);
-          position: relative;
-          @include float(left);
-        }
-
-        .actions-primary {
-          width: flex-grid(6, 12);
-          position: relative;
-          @include float(right);
-
-          .action {
-            @include margin(0, 0, ($baseline/2), ($baseline*.75));
-            float: none;
-            text-align: center;
-
-            &:last-child {
-              margin-bottom: 0;
-            }
-
-            .btn {
-              float: none;
-            }
-          }
-
-          .action-certificate .btn {
-            @extend %btn-inherited-primary;
-            @include box-sizing(border-box);
-            float: none;
-            border-radius: 3px;
-            display: block;
-            @include padding(7px, ($baseline*.75), 7px, ($baseline*.75));
-            text-align: center;
-
-            a:link, a:visited {
-              color: #fff;
-            }
-          }
-
-          .action-share .btn {
-            display: inline;
-            letter-spacing: 0;
-          }
-        }
-      }
-
-      .actions-secondary {
-        margin-top: ($baseline/2);
-        border-top: 1px solid $gray-l4;
-        padding-top: ($baseline/2);
-
-        .action-share {
-          @include float(right);
-          margin: 0;
-        }
-      }
-
-      .certificate-explanation {
-        @extend %t-copy-sub1;
-        margin-top: ($baseline/2);
-        border-top: 1px solid $gray-l4;
-        padding-top: ($baseline/2);
-      }
-
-      .verification-reminder {
-        width: flex-grid(8, 12);
-        position: relative;
-        float: left;
-      }
-
-      .verification-cta {
-        width: flex-grid(4, 12);
-        position: relative;
-        float: left;
-
-        .cta {
-          @include button(simple, $green-d1);
-          @include box-sizing(border-box);
-          @include float(right);
-          border-radius: 3px;
-          display: block;
-          font: normal 15px/1.6rem $sans-serif;
-          letter-spacing: 0;
-          padding: 6px 32px 7px;
-          text-align: center;
-        }
-      }
-    }
-
-    a.unenroll {
-      @include float(right);
-      display: block;
-      font-style: italic;
-      color: $lighter-base-font-color;
-      text-decoration: underline;
-      font-size: .8em;
-      margin-top: 32px;
-
-      &:hover, &:focus {
-        color: #333;
-      }
-    }
-
-    a.email-settings {
-      @extend a.unenroll;
-      @include margin-right(10px);
-    }
   }
 
-  // account-related
-  .user-info {
 
-    // status
-    .status {
-
-      .list--nav {
-        margin: ($baseline/2) 0 0 0;
-        padding: 0;
-      }
-
-      .nav__item {
-        @extend %t-weight4;
-        @include font-size(13);
-        margin-left: 26px;
-      }
-    }
-  }
 
   // status - language
   .status-language {
@@ -1227,113 +1265,101 @@
     border:0;
     color:white;
     box-shadow:none;
+    
     &.archived {
-            @include button(simple, $button-archive-color);
-            font: normal 15px/1.6rem $sans-serif;
-            padding: 6px 32px 7px;
+      @include button(simple, $button-archive-color);
+      font: normal 15px/1.6rem $sans-serif;
+      padding: 6px 32px 7px;
 
-            &:hover, &:focus {
-              text-decoration: none;
-            }
-          }
+      &:hover, &:focus {
+        text-decoration: none;
+      }
+    }
   }
+
   a.disable-look{
     color: #808080;
   }
-  a.disable-look-unregister{
-    color: #808080;
-    float: right;
-    display: block;
-    font-style: italic;
-    color: $lighter-base-font-color;
-    text-decoration: underline;
-    font-size: .8em;
-    margin-top: 32px;
 
-  }
-  a.disable-look-settings{
-    @extend a.disable-look-unregister;
-      margin-right: ($baseline/2);
-    }
-
-  }
   a.fade-cover{
     @extend .cover;
     opacity: 0.5;
   }
 
-.dashboard-banner {
+  // +Dashboard - Banner
+  // ==================== 
+  .dashboard-banner {
 
-  &:empty {
-    display: none;
-  }
+    &:empty {
+      display: none;
+    }
 
-  .wrapper-msg {
-    padding-bottom: 0;
+    .wrapper-msg {
+      padding-bottom: 0;
 
-    .msg {
-      @include clearfix();
-      font-family: $sans-serif;
-      padding-bottom: $baseline;
-      border-bottom: thin solid $gray;
+      .msg {
+        @include clearfix();
+        font-family: $sans-serif;
+        padding-bottom: $baseline;
+        border-bottom: thin solid $gray;
 
-      &.title {
-        @extend %t-title5;
-        @extend %t-weight4;
-        font-family: $f-sans-serif;
+        &.title {
+          @extend %t-title5;
+          @extend %t-weight4;
+          font-family: $f-sans-serif;
 
-        // Overriding Platform h2 styles
-        text-transform: none;
-        letter-spacing: 0;
-      }
-
-      &.has-actions {
-
-        .donate-content {
-          width: flex-grid(8, 12);
+          // Overriding Platform h2 styles
+          text-transform: none;
+          letter-spacing: 0;
         }
 
-        .donate-actions {
-          width: flex-grid(4, 12);
-          vertical-align: bottom;
-          display: inline-block;
+        &.has-actions {
 
-          .monetary-symbol {
-            vertical-align: middle;
-            color: $white;
-            font-weight: 600;
+          .donate-content {
+            width: flex-grid(8, 12);
           }
 
-          .amount {
-            height: 40px;
-            width: 80px;
-            vertical-align: middle;
-            text-align: left;
-            border: 2px solid $white;
+          .donate-actions {
+            width: flex-grid(4, 12);
+            vertical-align: bottom;
+            display: inline-block;
 
-            &.validation-error {
-              border: 2px solid $error-color;
+            .monetary-symbol {
+              vertical-align: middle;
+              color: $white;
+              font-weight: 600;
             }
-          }
 
-          .action-donate {
-            @extend %btn-primary-blue;
-            vertical-align: middle;
-            padding-top: ($baseline/2);
-            padding-bottom: ($baseline/2);
-            text-shadow: none;
-            text-transform: none;
-            letter-spacing: 0;
-            color: $white;
-            font-weight: 600;
-          }
+            .amount {
+              height: 40px;
+              width: 80px;
+              vertical-align: middle;
+              text-align: left;
+              border: 2px solid $white;
 
-          .donation-error-msg {
-            padding: ($baseline/2) 0;
+              &.validation-error {
+                border: 2px solid $error-color;
+              }
+            }
+
+            .action-donate {
+              @extend %btn-primary-blue;
+              vertical-align: middle;
+              padding-top: ($baseline/2);
+              padding-bottom: ($baseline/2);
+              text-shadow: none;
+              text-transform: none;
+              letter-spacing: 0;
+              color: $white;
+              font-weight: 600;
+            }
+
+            .donation-error-msg {
+              padding: ($baseline/2) 0;
+            }
           }
         }
       }
     }
   }
 }
-

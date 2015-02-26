@@ -41,6 +41,7 @@
         }
 
         $('.message.is-expandable .wrapper-tip').bind('click', toggleExpandMessage);
+        $('.action-more').bind('click', toggleCourseActionsDropdown);
 
         // Track clicks of the upgrade button. The `trackLink` method is a helper that makes
         // a `track` call whenever a bound link is clicked. Usually the page would change before
@@ -93,6 +94,17 @@
                 category: 'upgrade',
                 label: course
             });
+        }
+
+        function toggleCourseActionsDropdown(event) {
+            var dropdown = $(event.target).closest('.action-more').find('.actions-dropdown-list')
+
+            event.preventDefault();
+
+            $(this).toggleClass('is-visible');
+
+            // add BI event here
+
         }
 
         $("#failed-verification-button-dismiss").click(function() {

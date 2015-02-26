@@ -46,10 +46,10 @@ class DashboardPage(PageObject):
         """
         def _get_course_name(el):
             # The first component in the link text is the course number
-            _, course_name = el.text.split(' ', 1)
+            course_name = el.text
             return course_name
 
-        return self.q(css='section.info > hgroup > h3 > a').map(_get_course_name).results
+        return self.q(css='h3.course-title > a').map(_get_course_name).results
 
     @property
     def full_name(self):
