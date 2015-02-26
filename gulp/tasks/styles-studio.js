@@ -1,9 +1,15 @@
-var gulp          = require('gulp');
-var config        = require('../config').studio_styles;
-var handleErrors  = require('../util/handleErrors');
+var gulp          = require( 'gulp' ),
+    config        = require( '../config' ).studio_styles,
+    handleErrors  = require( '../util/handleErrors' ),
+    sass          = require( 'gulp-ruby-sass' );
+
 
 gulp.task('styles-studio', function () {
-  return gulp.src(config.src)
-    .on('error', handleErrors)
-    .pipe(gulp.dest(config.dest))
+    return sass( config.src, {
+            lineNumbers: true,
+            verbose: true,
+            trace: true
+        })
+        .on( 'error', handleErrors )
+        .pipe( gulp.dest( config.dest ) );
 });
