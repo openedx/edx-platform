@@ -11,6 +11,7 @@ from mock import patch, Mock
 from oauth2_provider.tests.factories import AccessTokenFactory, ClientFactory
 from opaque_keys.edx.locator import CourseLocator
 from xmodule.error_module import ErrorDescriptor
+from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.xml import CourseLocationManager
@@ -77,7 +78,9 @@ class CourseViewTestsMixin(object):
         self.empty_course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
             end=datetime(2015, 1, 16),
-            org="MTD"
+            org="MTD",
+            # Use mongo so that we can get a test with a SlashSeparatedCourseKey
+            default_store=ModuleStoreEnum.Type.mongo
         )
 
     def build_absolute_url(self, path=None):

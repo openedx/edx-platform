@@ -1,7 +1,6 @@
 """ API implementation for course-oriented interactions. """
 
 import logging
-from operator import attrgetter
 
 from django.conf import settings
 from django.http import Http404
@@ -132,7 +131,7 @@ class CourseList(CourseViewMixin, ListAPIView):
         results = (course for course in results if self.user_can_access_course(self.request.user, course))
 
         # Sort the results in a predictable manner.
-        return sorted(results, key=attrgetter('id'))
+        return sorted(results, key=lambda course: unicode(course.id))
 
 
 class CourseDetail(CourseViewMixin, RetrieveAPIView):
