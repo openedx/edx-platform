@@ -5,7 +5,7 @@ var studioSrc  = './cms/static',
 
 module.exports = {
     stylesStudio: {
-        src: studioSrc + '/sass',
+        src: studioSrc + '/sass/**/*.scss',
         dest: studioDest + '/css'
     }
 };
