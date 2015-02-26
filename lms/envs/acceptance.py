@@ -183,3 +183,7 @@ YOUTUBE['TEXT_API']['url'] = "127.0.0.1:{0}/test_transcripts_youtube/".format(YO
 if FEATURES.get('ENABLE_COURSEWARE_SEARCH'):
     # Use MockSearchEngine as the search engine for test scenario
     SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+# Generate a random UUID so that different runs of acceptance tests don't break each other
+import uuid
+SECRET_KEY = uuid.uuid4().hex
