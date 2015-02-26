@@ -1,0 +1,34 @@
+<%! from django.utils.translation import ugettext as _ %>
+<!--<%namespace name='static' file='/static_content.html'/>-->
+
+<!--<%inherit file="../main.html" />-->
+
+<%block name="pagetitle">${_("Account Settings")}</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="content">
+<div class="wrapper-mast wrapper">
+    <header class="mast has-actions has-subtitle">
+<h1 class="page-header">
+    ${_("Account Settings")}
+    <!--<small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>-->
+
+</h1>
+        </header>
+        </div>
+</%block>
+
+
+<!--<div class="wrapper-mast wrapper">-->
+    <!--<header class="mast has-actions has-subtitle">-->
+        <!--<h1 class="page-header">Account Settings</h1>-->
+        <!--<small class="subtitle"></small>-->
+    <!--</header>-->
+<!--</div>-->
+
+<!--<div id="account-container"></div>-->

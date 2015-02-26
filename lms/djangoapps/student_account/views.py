@@ -295,3 +295,28 @@ def _external_auth_intercept(request, mode):
         return external_auth_login(request)
     elif mode == "register":
         return external_auth_register(request)
+
+
+@login_required
+@require_http_methods(['GET'])
+def account_settings_handler(request):
+    """Render the students account settings page.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the index page was sent successfully
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        GET /settings
+
+    """
+    return render_to_response(
+        'student_account/settings.html', {
+            'disable_courseware_js': True,
+        }
+    )
