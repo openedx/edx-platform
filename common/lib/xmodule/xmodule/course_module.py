@@ -403,21 +403,21 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Direct learners to edX Demo101"),
+                        "short_description": _("Direct learners to edX DemoX"),
                         "long_description": _(
-                            "A prompt is provided to the learner on the course info page on how to get started with the course "
-                            "(e.g. \"To get started, click on the \"Courseware\" tab at the top of the page.\")"
+                            "Provide a link to edX DemoX course (an introduction to the edX platform for new learners) in the "
+                            "first week's course content."
                         ),
                         "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
+                        "action_url": "https://www.edx.org/course/demox-edx-demox-1",
+                        "action_text": "Go to edX DemoX",
+                        "action_external": True,
                     },
                     {
                         "short_description": _("Prompt learners to get started on course"),
                         "long_description": _(
-                            "Establish your course's student enrollment and launch dates on the Schedule and Details "
-                            "page."
+                            "Provide a prompt to the learner on the course info page on how to get started with the course "
+                            "(e.g. \"To get started, click on the \"Courseware\" tab at the top of the page.\")"
                         ),
                         "is_checked": False,
                         "action_url": "CourseUpdates",
