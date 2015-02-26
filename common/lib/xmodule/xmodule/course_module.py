@@ -390,44 +390,46 @@ class CourseFields(object):
         scope=Scope.settings,
         default=[
             {
-                "short_description": _("Getting Started With Studio"),
+                "short_description": _("Course Introduction"),
                 "items": [
                     {
-                        "short_description": _("Add Course Team Members"),
+                        "short_description": _("Welcome Message"),
                         "long_description": _(
-                            "Grant your collaborators permission to edit your course so you can work together."
+                            "Provide a welcome message on course info page at the beginning of the course."
                         ),
                         "is_checked": False,
-                        "action_url": "ManageUsers",
-                        "action_text": _("Edit Course Team"),
+                        "action_url": "CourseUpdates",
+                        "action_text": _("View Course Updates"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Set Important Dates for Your Course"),
+                        "short_description": _("Direct learners to edX Demo101"),
+                        "long_description": _(
+                            "A prompt is provided to the learner on the course info page on how to get started with the course "
+                            "(e.g. \"To get started, click on the \"Courseware\" tab at the top of the page.\")"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Prompt learners to get started on course"),
                         "long_description": _(
                             "Establish your course's student enrollment and launch dates on the Schedule and Details "
                             "page."
                         ),
                         "is_checked": False,
-                        "action_url": "SettingsDetails",
-                        "action_text": _("Edit Course Details &amp; Schedule"),
+                        "action_url": "CourseUpdates",
+                        "action_text": _("View Course Updates"),
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Draft Your Course's Grading Policy"),
+                        "short_description": _("Tell learners how to get help"),
                         "long_description": _(
-                            "Set up your assignment types and grading policy even if you haven't created all your "
-                            "assignments."
-                        ),
-                        "is_checked": False,
-                        "action_url": "SettingsGrading",
-                        "action_text": _("Edit Grading Settings"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Explore the Other Studio Checklists"),
-                        "long_description": _(
-                            "Discover other available course authoring tools, and find help when you need it."
+                            "Explanation posted of how to get help with learner issues:"
+                            "(e.g. Course content issues should be posted in the Dicussions Forum, edX technical issues"
+                            "directed to Student Support Team via Help button)"
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -437,80 +439,132 @@ class CourseFields(object):
                 ],
             },
             {
-                "short_description": _("Draft a Rough Course Outline"),
+                "short_description": _("Course Syllabus"),
                 "items": [
                     {
-                        "short_description": _("Create Your First Section and Subsection"),
-                        "long_description": _("Use your course outline to build your first Section and Subsection."),
+                        "short_description": _("Include Syllabus in Course Handouts"),
+                        "long_description": _("Include a separate static page or PDF for the Course syllabus."),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Set Section Release Dates"),
+                        "short_description": _("Explain Pre-requisites"),
                         "long_description": _(
-                            "Specify the release dates for each Section in your course. Sections become visible to "
-                            "students on their release dates."
+                            "State the Pre-requisites for the course clearly on the course syllabus."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Designate a Subsection as Graded"),
+                        "short_description": _("Explain time commitments"),
                         "long_description": _(
-                            "Set a Subsection to be graded as a specific assignment type. Assignments within graded "
-                            "Subsections count toward a student's final grade."
+                            "State the time commitments for the course clearly on the course syllabus."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Reordering Course Content"),
-                        "long_description": _("Use drag and drop to reorder the content in your course."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Renaming Sections"),
-                        "long_description": _("Rename Sections by clicking the Section name from the Course Outline."),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Deleting Course Content"),
+                        "short_description": _("Explain course deadlines"),
                         "long_description": _(
-                            "Delete Sections, Subsections, or Units you don't need anymore. Be careful, as there is "
-                            "no Undo function."
+                            "State the course deadlines and due dates (including time zones)"
+                            "clearly on the course syllabus."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Add an Instructor-Only Section to Your Outline"),
+                        "short_description": _("Explain grading policy"),
                         "long_description": _(
-                            "Some course authors find using a section for unsorted, in-progress work useful. To do "
-                            "this, create a section and set the release date to the distant future."
+                            "State the course grading policy and certificate requirements clearly on the course syllabus."
                         ),
                         "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("Edit Course Outline"),
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain learning objectives"),
+                        "long_description": _(
+                            "State the learning objectives, goals, and course outcome(s) clearly on the course syllabus."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain academic policy"),
+                        "long_description": _(
+                            "State the academic policy for the course on the course syllabus"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain forum participation expectations"),
+                        "long_description": _(
+                            "State the expectation for learner forum participation for the course on the course syllabus"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Provide forum etiquette guidelines"),
+                        "long_description": _(
+                            "State the guidelines for forum use and ediquette for the course on the course syllabus"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain instructor/TA involvement"),
+                        "long_description": _(
+                            "Explain the role and level of involvement that instructors and course TAs for the course on the course syllabus"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Explain course material release schedule"),
+                        "long_description": _(
+                            "State the course material release schedule and frequency of updates for the course on the course syllabus"
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Communicate any changes to released content"),
+                        "long_description": _(
+                            "Agree to clearly communicate to learners when any changes have been made to released content"
+                            "to prevent learner confusion."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
                         "action_external": False,
                     },
                 ],
             },
             {
-                "short_description": _("Explore edX's Support Tools"),
+                "short_description": _("Course Structure and Design"),
                 "items": [
                     {
                         "short_description": _("Explore the Studio Help Forum"),
