@@ -406,8 +406,8 @@ class CourseFields(object):
                     {
                         "short_description": _("Direct learners to edX DemoX"),
                         "long_description": _(
-                            "Provide a link to edX DemoX course (an introduction to the edX platform for new learners) in the "
-                            "first week's course content."
+                            "Include a link to edX DemoX, the online course that introduces learners to the edX system, "
+                            "in the first week of the course."
                         ),
                         "is_checked": False,
                         "action_url": "https://www.edx.org/course/demox-edx-demox-1",
@@ -627,7 +627,8 @@ class CourseFields(object):
                     {
                         "short_description": _("Provide transcripts"),
                         "long_description": _(
-                            "Ensure that transcripts are uploaded for all video and audio content."
+                            "Use the Preview option to play course videos. Verify that transcript files are available for every video "
+                            "file to describe all video and audio content."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
