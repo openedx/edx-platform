@@ -349,6 +349,9 @@ FEATURES = {
     'ENABLE_COURSEWARE_SEARCH': False,
 }
 
+# Add Theme values here
+THEME_VALUES = {}
+
 # Ignore static asset files on import which match this pattern
 ASSET_IGNORE_REGEX = r"(^\._.*$)|(^\.DS_Store$)|(^.*~$)"
 
