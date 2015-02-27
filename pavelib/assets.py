@@ -128,6 +128,11 @@ def compile_coffeescript(*files):
     ))
 
 
+def gulp_compile_sass():
+    sh(cmd(
+        'gulp buildStyles'
+    ))
+
 def compile_sass(debug=False):
     """
     Compile Sass to CSS.
@@ -230,6 +235,7 @@ def update_assets(args):
     process_xmodule_assets()
     compile_coffeescript()
     compile_sass(args.debug)
+    gulp_compile_sass()
 
     if args.collect:
         collect_assets(args.system, args.settings)
