@@ -13,7 +13,6 @@ from student.roles import (
     OrgStaffRole, OrgInstructorRole, OrgLibraryUserRole,
 )
 from xblock.reference.user_service import XBlockUser
-from xmodule.library_content_module import LibraryVersionReference
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -64,7 +63,7 @@ class LibraryTestCase(ModuleStoreTestCase):
             parent_location=course.location,
             user_id=self.user.id,
             publish_item=False,
-            source_libraries=[LibraryVersionReference(library_key)],
+            source_library_id=unicode(library_key),
             **(other_settings or {})
         )
 
@@ -333,7 +332,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+            {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
@@ -376,7 +375,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [[str(library2key)]]},
+            {"source_library_id": str(library2key)},
         )
         self.assertEqual(resp.status_code, 200)
         lc_block = modulestore().get_item(lc_block.location)
@@ -450,7 +449,7 @@ class TestLibraries(LibraryTestCase):
         # Now, change the block settings to have an invalid library key:
         resp = self._update_item(
             lc_block.location,
-            {"source_libraries": [["library-v1:NOT+FOUND", None]]},
+            {"source_library_id": "library-v1:NOT+FOUND"},
         )
         self.assertEqual(resp.status_code, 200)
         with self.assertRaises(ValueError):
