@@ -207,7 +207,6 @@ class CourseModeModelTest(TestCase):
         self.assertEqual(len(all_modes[other_course_key]), 1)
         self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)
 
-
     @ddt.data(
         ("verified", "verify_need_to_verify"),
         ("verified", "verify_submitted"),
@@ -294,4 +293,3 @@ class CourseModeModelTest(TestCase):
                     "display_mode": 'professional'
                 }
             )
-
