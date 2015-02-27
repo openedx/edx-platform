@@ -56,57 +56,6 @@ class CoffeeScriptWatcher(PatternMatchingEventHandler):
         except Exception:  # pylint: disable=broad-except
             traceback.print_exc()
 
-
-class SassWatcher(PatternMatchingEventHandler):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    patterns = ['*.scss']
-    ignore_patterns = ['common/static/xmodule/*']
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        for dirname in SASS_LOAD_PATHS + SASS_UPDATE_DIRS + THEME_SASS_PATHS:
-            paths = []
-            if '*' in dirname:
-                paths.extend(glob.glob(dirname))
-            else:
-                paths.append(dirname)
-            for dirname in paths:
-                observer.schedule(self, dirname, recursive=True)
-
-    def on_modified(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            compile_sass()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
-class XModuleSassWatcher(SassWatcher):
-    """
-    Watches for sass file changes
-    """
-    ignore_directories = True
-    ignore_patterns = []
-
-    def register(self, observer):
-        """
-        register files with observer
-        """
-        observer.schedule(self, 'common/lib/xmodule/', recursive=True)
-
-    def on_modified(self, event):
-        print('\tCHANGED:', event.src_path)
-        try:
-            process_xmodule_assets()
-        except Exception:  # pylint: disable=broad-except
-            traceback.print_exc()
-
-
 def coffeescript_files():
     """
     return find command for paths containing coffee files
@@ -128,18 +77,10 @@ def compile_coffeescript(*files):
     ))
 
 
-def compile_sass(debug=False):
-    """
-    Compile Sass to CSS.
-    """
+def gulp_compile_sass():
     sh(cmd(
-        'sass', '' if debug else '--style compressed',
-        "--sourcemap" if debug else '',
-        "--cache-location {cache}".format(cache=SASS_CACHE_PATH),
-        "--load-path", " ".join(SASS_LOAD_PATHS + THEME_SASS_PATHS),
-        "--update", "-E", "utf-8", " ".join(SASS_UPDATE_DIRS + THEME_SASS_PATHS),
+        'gulp buildStyles'
     ))
-
 
 def compile_templated_sass(systems, settings):
     """
@@ -177,10 +118,8 @@ def watch_assets(options):
     observer = Observer()
 
     CoffeeScriptWatcher().register(observer)
-    SassWatcher().register(observer)
-    XModuleSassWatcher().register(observer)
 
-    print("Starting asset watcher...")
+    print("Starting coffeescript asset watcher...")
     observer.start()
     if not getattr(options, 'background', False):
         # when running as a separate process, the main thread needs to loop
@@ -229,7 +168,7 @@ def update_assets(args):
     compile_templated_sass(args.system, args.settings)
     process_xmodule_assets()
     compile_coffeescript()
-    compile_sass(args.debug)
+    gulp_compile_sass()
 
     if args.collect:
         collect_assets(args.system, args.settings)
