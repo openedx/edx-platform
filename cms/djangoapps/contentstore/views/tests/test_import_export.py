@@ -11,8 +11,9 @@ import tempfile
 from path import path
 from uuid import uuid4
 
-from django.test.utils import override_settings
 from django.conf import settings
+from django.test.utils import override_settings
+from django.utils import http
 from contentstore.utils import reverse_course_url
 
 from xmodule.modulestore.tests.factories import ItemFactory
@@ -294,7 +295,7 @@ class ExportTestCase(CourseTestCase):
         """
         fake_xblock = ItemFactory.create(parent_location=self.course.location, category='aawefawef')
         self.store.publish(fake_xblock.location, self.user.id)
-        self._verify_export_failure(u'/container/{}'.format(self.course.location))
+        self._verify_export_failure(u'/container/{}'.format(http.urlquote(unicode(self.course.location))))
 
     def test_export_failure_subsection_level(self):
         """
@@ -306,7 +307,7 @@ class ExportTestCase(CourseTestCase):
             category='aawefawef'
         )
 
-        self._verify_export_failure(u'/container/{}'.format(vertical.location))
+        self._verify_export_failure(u'/container/{}'.format(http.urlquote(vertical.location)))
 
     def _verify_export_failure(self, expected_text):
         """ Export failure helper method. """
