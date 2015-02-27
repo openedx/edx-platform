@@ -393,9 +393,10 @@ class CourseFields(object):
                 "short_description": _("Course Introduction"),
                 "items": [
                     {
-                        "short_description": _("Welcome Message"),
+                        "short_description": _("Provide a welcome message"),
                         "long_description": _(
-                            "Provide a welcome message on course info page at the beginning of the course."
+                            "Welcome learners with a message on the Course Info page, the first page "
+                            "shown when your course is accessed."
                         ),
                         "is_checked": False,
                         "action_url": "CourseUpdates",
@@ -414,10 +415,10 @@ class CourseFields(object):
                         "action_external": True,
                     },
                     {
-                        "short_description": _("Prompt learners to get started on course"),
+                        "short_description": _("Prompt learners to begin"),
                         "long_description": _(
-                            "Provide a prompt to the learner on the course info page on how to get started with the course "
-                            "(e.g. \"To get started, click on the \"Courseware\" tab at the top of the page.\")"
+                            "Guide learners to the Courseware tab by adding a prompt to the Course Info page. "
+                            "For example, \"To get started, click \"Courseware\" at the top of the page.\""
                         ),
                         "is_checked": False,
                         "action_url": "CourseUpdates",
@@ -427,9 +428,9 @@ class CourseFields(object):
                     {
                         "short_description": _("Tell learners how to get help"),
                         "long_description": _(
-                            "Explanation posted of how to get help with learner issues:"
-                            "(e.g. Course content issues should be posted in the Dicussions Forum, edX technical issues"
-                            "directed to Student Support Team via Help button)"
+                            "Provide your learners with information about ways to get help. For example, on the Course Info page "
+                            "include \"To get help with the course, click the Discussion tab and post a question. To get help "
+                            "with a technical problem, click FAQ at the bottom of the page.\""
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -442,17 +443,9 @@ class CourseFields(object):
                 "short_description": _("Course Syllabus"),
                 "items": [
                     {
-                        "short_description": _("Include Syllabus in Course Handouts"),
-                        "long_description": _("Include a separate static page or PDF for the Course syllabus."),
-                        "is_checked": False,
-                        "action_url": "",
-                        "action_text": "",
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Explain Pre-requisites"),
+                        "short_description": _("Identify course pre-requisites"),
                         "long_description": _(
-                            "State the Pre-requisites for the course clearly on the course syllabus."
+                            "State course prerequisites clearly in the syllabus."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -462,7 +455,7 @@ class CourseFields(object):
                     {
                         "short_description": _("Explain time commitments"),
                         "long_description": _(
-                            "State the time commitments for the course clearly on the course syllabus."
+                            "Include an estimate of the time commitment needed for the course."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -472,8 +465,8 @@ class CourseFields(object):
                     {
                         "short_description": _("Explain course deadlines"),
                         "long_description": _(
-                            "State the course deadlines and due dates (including time zones)"
-                            "clearly on the course syllabus."
+                            "Provide all course deadlines and due dates, and include an explanation of time "
+                            "zone differences."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -481,9 +474,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Explain grading policy"),
+                        "short_description": _("Explain the grading policy"),
                         "long_description": _(
-                            "State the course grading policy and certificate requirements clearly on the course syllabus."
+                            "Describe the course grading policy including the grade needed to receive a certificate."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -493,7 +486,7 @@ class CourseFields(object):
                     {
                         "short_description": _("Explain learning objectives"),
                         "long_description": _(
-                            "State the learning objectives, goals, and course outcome(s) clearly on the course syllabus."
+                            "State the learning objectives, the course goals, and the outcomes that learners can expect."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -503,7 +496,7 @@ class CourseFields(object):
                     {
                         "short_description": _("Explain academic policy"),
                         "long_description": _(
-                            "State the academic policy for the course on the course syllabus"
+                            "Describe the academic policy for the course."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -511,9 +504,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Explain forum participation expectations"),
+                        "short_description": _("Explain expectations for participation"),
                         "long_description": _(
-                            "State the expectation for learner forum participation for the course on the course syllabus"
+                            "Describe how learners participate in course discussions, and how participation affects the course experience."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -521,9 +514,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Provide forum etiquette guidelines"),
+                        "short_description": _("Provide discussion etiquette guidelines"),
                         "long_description": _(
-                            "State the guidelines for forum use and ediquette for the course on the course syllabus"
+                            "Provide guidelines for forum use and etiquette."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -533,7 +526,7 @@ class CourseFields(object):
                     {
                         "short_description": _("Explain instructor/TA involvement"),
                         "long_description": _(
-                            "Explain the role and level of involvement that instructors and course TAs for the course on the course syllabus"
+                            "Explain the roles of the instructors and teaching assistants, and estimate their level of involvement."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -541,9 +534,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Explain course material release schedule"),
+                        "short_description": _("Explain release schedule for course content"),
                         "long_description": _(
-                            "State the course material release schedule and frequency of updates for the course on the course syllabus"
+                            "Describe the schedule for releasing course content, and the expected frequency of course updates."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -551,14 +544,23 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Communicate any changes to released content"),
+                        "short_description": _("Explain communication methods for course changes"),
                         "long_description": _(
-                            "Agree to clearly communicate to learners when any changes have been made to released content"
-                            "to prevent learner confusion."
+                            "Identify how and when you will communicate changes that affect released course content to learners."
                         ),
                         "is_checked": False,
                         "action_url": "",
                         "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Include a detailed course syllabus"),
+                        "long_description": _(
+                            "Upload a PDF and then create a page for it or add it as a course handout."
+                        ),
+                        "is_checked": False,
+                        "action_url": "CourseUpdates",
+                        "action_text": "View Course Updates",
                         "action_external": False,
                     },
                 ],
@@ -567,10 +569,9 @@ class CourseFields(object):
                 "short_description": _("Course Structure and Design"),
                 "items": [
                     {
-                        "short_description": _("Interleave instructional content and exercises"),
+                        "short_description": _("Distribute exercises and instructional content"),
                         "long_description": _(
-                            "Ensure that you design your course so that instructional content (videos, text, etc) are"
-                            "interspersed with exercises."
+                            "Verify that the course design intersperses instructional content such as videos and text with exercises."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -578,9 +579,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Clearly articulated assignments"),
+                        "short_description": _("Review assignment questions"),
                         "long_description": _(
-                            "Ensure that your assignment questions and prompts are written clearly and articulately."
+                            "Verify that the questions and prompts in assignment problems are articulated clearly."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -588,9 +589,9 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Clearly communicated deadlines"),
+                        "short_description": _("Review assignment text for deadlines"),
                         "long_description": _(
-                            "Ensure that the deadline for every assignment is clearly communicated in the assignment itself."
+                            "Verify that the text for every assignment includes the date that it is due."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -605,7 +606,7 @@ class CourseFields(object):
                     {
                         "short_description": _("Include videos"),
                         "long_description": _(
-                            "Ensure that your course includes video content"
+                            "Verify that your course includes video components."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -613,10 +614,10 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Ensure video quality"),
+                        "short_description": _("Verify video quality"),
                         "long_description": _(
-                            "Ensure that all course videos are of consistent quality. Also ensure that audio levels"
-                            "of videos throughout the course are consistent and do not vary dramatically."
+                            "Use the Preview option to play course videos. Verify that video quality is consistent, "
+                            "and that audio levels are adequate and consistent."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -641,8 +642,9 @@ class CourseFields(object):
                     {
                         "short_description": _("Verify third-party material is freely available"),
                         "long_description": _(
-                            "Ensure all required third party content is freely available to students (e.g. open source, public"
-                            "domain, cleared/paid by institution, etc.) and integrated into courseware (not linked out)"
+                            "Verify that all content from third-party sources is integrated into the course material rather than linked "
+                            "to another site off-platform. In addition, verify that all content is freely available to leaners, for "
+                            "example, it is open source, in the public domain, or cleared or paid for by your organization."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -650,10 +652,10 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Verify paid content (if applicable)"),
+                        "short_description": _("Verify presentation of paid content (if applicable)"),
                         "long_description": _(
-                            "Verify that any paid material in the course is optional (not required to achieve learning goals)"
-                            "and clearly marked as paid content."
+                            "If your course offers material that requires payment by leaners, verify that the paid material is not required "
+                            "to achieve learning goals and clearly marked as paid content."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -661,11 +663,10 @@ class CourseFields(object):
                         "action_external": False,
                     },
                     {
-                        "short_description": _("Clearly indicate off-platform content"),
+                        "short_description": _("Clearly indicate off-platform content (if applicable)"),
                         "long_description": _(
-                            "If you've linked learners to third-party tools outside of the edX course, ensure that you've"
-                            "clearly communicated that this linked content is outside of the edX platform and any terms of"
-                            "service of the third-party service apply."
+                            "If your course includes a link to a third-party tool, verify that it is clear that the link will take learners "
+                            "to a site outside of your course and the edX platform, and that any terms of service required by that third party apply."
                         ),
                         "is_checked": False,
                         "action_url": "CourseOutline",
@@ -680,7 +681,17 @@ class CourseFields(object):
                     {
                         "short_description": _("Send welcome email"),
                         "long_description": _(
-                            "You agree to send a welcome email to learners on the course start date."
+                            "On the course start date, you agree to send a welcome email messages to learners."
+                        ),
+                        "is_checked": False,
+                        "action_url": "",
+                        "action_text": "",
+                        "action_external": False,
+                    },
+                    {
+                        "short_description": _("Encourage learners to introduce themselves"),
+                        "long_description": _(
+                            "On the Course Info page or in a course discussion post, ask learners to provide pertinent information about themselves."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -690,8 +701,8 @@ class CourseFields(object):
                     {
                         "short_description": _("Send emails throughout course run"),
                         "long_description": _(
-                            "You agree to send paced emails (recommended: once a week) to students throughout the course run" 
-                            "to communicate when new content is released, to update on course events, etc."
+                            "At intervals throughout the course (once a week is recommended), you agree to send email messages to learners to "
+                            "communicate the release of new content, provide updates on course events, and so on."
                         ),
                         "is_checked": False,
                         "action_url": "",
@@ -701,21 +712,11 @@ class CourseFields(object):
                     {
                         "short_description": _("Send closing email"),
                         "long_description": _(
-                            "You agree to send a closing email at the conclusion of the course to communicate final course details."
-                        ),
-                        "is_checked": False,
-                        "action_url": "CourseOutline",
-                        "action_text": _("View Course Outline"),
-                        "action_external": False,
-                    },
-                    {
-                        "short_description": _("Instruct learners to introduce themselves"),
-                        "long_description": _(
-                            "Encourage learners to use the discussion forums to introduce themselves."
+                            "Near the end date of the course, you agree to send a closing email message to learners with final course details."
                         ),
                         "is_checked": False,
                         "action_url": "",
-                        "action_text": "",
+                        "action_text": _(""),
                         "action_external": False,
                     },
                 ],
