@@ -1,5 +1,5 @@
 @mixin idashbutton ($color) {
-  @include button(simple, $color);
+  @include button-bourbon(simple, $color);
   @extend .button-reset;
   margin-bottom: 1em;
   padding: 8px 17px;
@@ -774,7 +774,7 @@
         display: inline;
         @include margin-left(-5px);
         span.browse{
-          @include button(simple, $blue);
+          @include button-bourbon(simple, $blue);
           @include margin-right($baseline);
           padding: 6px ($baseline/2);
           font-size: 12px;
@@ -882,7 +882,7 @@
       .member-list-widget {
 
         .header {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include border-top-radius(3);
           position: relative;
           padding: ($baseline/2);
@@ -902,7 +902,7 @@
         }
 
         .info {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           padding: ($baseline/2);
           border: 1px solid $light-gray;
           color: $lighter-base-font-color;
@@ -911,7 +911,7 @@
         }
 
         .member-list {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
 
           table {
             width: 100%;
@@ -936,7 +936,7 @@
         }
 
         .bottom-bar {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include border-bottom-radius(3);
           position: relative;
           padding: ($baseline/2);
@@ -1382,7 +1382,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
@@ -1569,7 +1569,7 @@ input[name="subject"] {
     border-radius: 2px;
     input[type="button"]#update_coupon_button, input[type="button"]#add_coupon_button,
     input[type="button"]#set_course_button {
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
       display: block;
       height: auto;
@@ -1578,7 +1578,7 @@ input[name="subject"] {
       white-space: normal;
     }
     input[name="generate-registration-codes-csv"]{
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
     }
     .modal-form-error {
@@ -1846,7 +1846,7 @@ input[name="subject"] {
     color: #3c3c3c;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
       @include float(right);
@@ -1859,7 +1859,7 @@ input[name="subject"] {
     color: #3C3C3C;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
     }
@@ -1882,7 +1882,7 @@ input[name="subject"] {
     color: #3C3C3C;
     line-height: 30px;
     .add{
-      @include button(simple, $blue);
+      @include button-bourbon(simple, $blue);
       @extend .button-reset;
       font-size: em(13);
     }

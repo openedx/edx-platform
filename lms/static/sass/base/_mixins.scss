@@ -57,7 +57,7 @@
 // extends - UI - used for page/view-level wrappers (for centering/grids)
 %ui-wrapper {
   @include clearfix();
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   width: 100%;
 }
 
@@ -159,7 +159,7 @@
 
 // extends - text - text overflow by ellipsis
 %text-truncated {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

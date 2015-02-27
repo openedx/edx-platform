@@ -47,7 +47,7 @@
           input {
 
             &[type="text"] {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
               margin: lh(0.5) 0;
               width: 100%;
             }
@@ -150,8 +150,8 @@
       margin-bottom: ($baseline*1.5);
       text-align: center;
       > a {
-        @include button(simple, $button-color);
-        @include box-sizing(border-box);
+        @include button-bourbon(simple, $button-color);
+        box-sizing: border-box;
         border-radius: 3px;
         font: normal 15px/1.6rem $sans-serif;
         letter-spacing: 0;
@@ -187,7 +187,7 @@
 
         h2 {
           @include border-right(1px dashed #ddd);
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           display: table-cell;
           letter-spacing: 0;
           margin: 0;

@@ -1,13 +1,13 @@
 .wrapper-course-material {
   @include clearfix();
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   border-bottom: none;
   margin: 0 auto 0;
   padding: 0;
   width: 100%;
 
   .course-material{
-    @extend %inner-wrapper; 
+    @extend %inner-wrapper;
   }
 
   ol.course-tabs {
@@ -89,7 +89,7 @@ header.global.slim {
       border: 1px solid transparent;
       border-color: darken($link-color, 10%);
       border-radius: 3px;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 0 0 rgba(255,255,255, 0.6);
       color: $white;
       display: inline-block;

@@ -34,7 +34,7 @@
       background: $body-bg;
       border: 1px solid $border-color-1;
       border-radius: 2px;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: 0 1px 10px 0 rgba(0,0,0, 0.15), inset 0 0 0 1px rgba(255,255,255, 0.9);
       margin-bottom: ($baseline*1.5);
       position: relative;
@@ -161,7 +161,7 @@
 
           .info-link {
             border-left: 1px solid rgba(150,150,150, 0.5);
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             color: $base-font-color;
             display: inline-block;
             font: bold 1.6em/1.2em $sans-serif;
@@ -203,7 +203,7 @@
         }
 
         .desc {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           height: 120px;
           overflow: hidden;
           padding: 10px 10px 12px 10px;
@@ -221,7 +221,7 @@
         }
 
         .bottom {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           padding: 0px 10px 10px 10px;
           width: 100%;
 

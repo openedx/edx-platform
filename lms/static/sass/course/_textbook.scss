@@ -20,7 +20,7 @@ div.book-wrapper {
   section.book-sidebar {
     @extend .sidebar;
     @extend .tran;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     padding: ($baseline/2) 0;
     border-radius: 3px 0 0 3px;
     border: 1px solid $gray-l3;
@@ -127,7 +127,7 @@ div.book-wrapper {
             background-color: rgba(#000, .7);
             background-position: center;
             background-repeat: no-repeat;
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             display: table;
             height: 100%;
             opacity: 0.0;
@@ -145,7 +145,7 @@ div.book-wrapper {
               display:none;
             }
           }
-          
+
           &.last {
             left: 0;
 

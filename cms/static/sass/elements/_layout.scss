@@ -208,7 +208,7 @@
 
 .content-primary,
 .content-supplementary {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
 }
 
 // 3/4 - 1/4 two col layout

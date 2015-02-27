@@ -10,7 +10,7 @@
     }
 
     .wrapper-content-header, .wrapper-content-features, .wrapper-content-cta {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       margin: 0;
       padding: 0 $baseline;
       position: relative;
@@ -139,13 +139,13 @@
         padding: 0 0 ($baseline*2) 0;
 
         .img {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           float: left;
           width: flex-grid(3, 12);
           margin-right: flex-gutter();
 
           a {
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             box-shadow: 0 1px ($baseline/10) $shadow-l1;
             position: relative;
             top: 0;
@@ -218,7 +218,7 @@
             margin: ($baseline*1.5) 0 0 0;
 
             .proofpoint {
-              @include box-sizing(border-box);
+              box-sizing: border-box;
               @include transition(all $tmg-f2 ease-in-out 0s);
               border-radius: ($baseline/4);
               position: relative;

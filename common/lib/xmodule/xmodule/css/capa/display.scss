@@ -88,7 +88,7 @@ div.problem {
     }
 
     fieldset {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       margin: 0px 0px $baseline;
       @include padding-left($baseline);
       @include border-left(1px solid #ddd);
@@ -97,7 +97,10 @@ div.problem {
     input[type="radio"],
     input[type="checkbox"] {
       @include float(left);
-      @include margin(4px, 8px, 0, 0);
+      margin-top: 4px;
+      @include margin-right(8px);
+      margin-bottom: 0;
+      @include margin-left(0);
     }
 
     text {
@@ -792,7 +795,7 @@ div.problem {
 
       a.full {
         @include position(absolute, 0 0 1px 0);
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         display: block;
         padding: ($baseline/5);
         background: $gray-l4;

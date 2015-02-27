@@ -8,7 +8,7 @@
   // ------------------------
   .modal-window  {
     @extend %ui-depth3;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     position: absolute;
     width: 50%;
     box-shadow: 0 0 7px $shadow-d1;

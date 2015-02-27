@@ -11,7 +11,7 @@
 .forum-new-post-form {
   .wmd-input {
     @include discussion-wmd-input;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     position: relative;
     z-index: 1;
     width: 100%;
@@ -41,7 +41,7 @@
 // CASE: inline styling
 // TO-DO: additional styling cleanup here necessary, for now this case was ported over from _discussion.scss
 .discussion-module {
-  
+
   .wmd-panel {
     width: 100%;
     min-width: 500px;

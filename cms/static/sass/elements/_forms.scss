@@ -33,7 +33,7 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 textarea.text {
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   @include linear-gradient($gray-l5, $white);
   @extend %t-copy-sub2;
   @extend %t-demi-strong;
@@ -59,7 +59,7 @@ textarea.text {
 }
 
 // +Fields - Not Editable
-// ==================== 
+// ====================
 .field.is-not-editable {
 
   & label.is-focused {
@@ -72,7 +72,7 @@ textarea.text {
 }
 
 // +Fields - With Error
-// ==================== 
+// ====================
 .field.error {
 
   input, textarea {
@@ -81,7 +81,7 @@ textarea.text {
 }
 
 // +Forms - Additional UI
-// ==================== 
+// ====================
 form {
 
   // CASE: cosmetic checkbox input
@@ -139,7 +139,7 @@ form {
   }
 
   .note {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .title {
 
@@ -173,7 +173,7 @@ form {
 }
 
 // +Form - Create New
-// ==================== 
+// ====================
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.
 .form-create {
@@ -390,8 +390,8 @@ form {
   }
 }
 
-// +Form - Inline Name Edit 
-// ==================== 
+// +Form - Inline Name Edit
+// ====================
 // form - inline xblock name edit on unit, container, outline
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
@@ -431,8 +431,8 @@ form {
   }
 }
 
-// +Form - Create New Wrapper 
-// ==================== 
+// +Form - Create New Wrapper
+// ====================
 .wrapper-create-element {
   height: 0;
   opacity: 0.0;
@@ -451,11 +451,11 @@ form {
   }
 }
 
-// +Form - Grandfathered 
-// ==================== 
+// +Form - Grandfathered
+// ====================
 input.search {
   padding: 6px 15px 8px 30px;
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   border: 1px solid $darkGrey;
   border-radius: 20px;
   background: url(../images/search-icon.png) no-repeat 8px 7px #edf1f5;
@@ -489,7 +489,7 @@ code {
   width: 100%;
   min-height: 80px;
   padding: 10px;
-  @include box-sizing(border-box);
+  box-sizing: border-box;
   border: 1px solid $mediumGrey;
   @include linear-gradient(top, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.3));
   background-color:  #edf1f5;

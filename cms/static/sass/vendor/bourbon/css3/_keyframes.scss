@@ -13,6 +13,7 @@
       @content;
     }
   }
+
   @if $original-prefix-for-mozilla {
     @include disable-prefix-for-all();
     $prefix-for-mozilla: true !global;

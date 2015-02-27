@@ -81,7 +81,7 @@ section.wiki {
   }
 
   .add-article-btn {
-    @include button(simple, #eee);
+    @include button-bourbon(simple, #eee);
     margin-left: 25px;
     padding: 7px 15px !important;
     font-size: 0.72em;
@@ -139,7 +139,7 @@ section.wiki {
     width: flex-grid(9);
     padding: 40px 0 40px 40px;
     color: $base-font-color;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   &.view .main-article {
@@ -228,7 +228,7 @@ section.wiki {
     float: left;
     width: flex-grid(3);
     padding: 40px 40px;
-    @include box-sizing(border-box);
+    box-sizing: border-box;
 
     .timestamp{
       margin-top: ($baseline*0.75);
@@ -408,7 +408,7 @@ section.wiki {
   }
 
   .btn {
-    @include button(simple, #eee);
+    @include button-bourbon(simple, #eee);
     font-size: 0.8em;
     margin-right: ($baseline/4);
     line-height: 1.2em;
@@ -421,17 +421,17 @@ section.wiki {
     }
 
     &.btn-primary {
-      @include button;
+      @include button-bourbon();
       font-size: 0.8em;
     }
 
     &.btn-danger {
-      @include button(simple, $pink);
+      @include button-bourbon(simple, $pink);
       font-size: 0.8em;
     }
 
     &.btn-info {
-      @include button(simple, $gray-l3);
+      @include button-bourbon(simple, $gray-l3);
       font-size: 0.8em;
     }
   }
@@ -1006,7 +1006,7 @@ section.wiki {
   }
 
   .modal-footer .btn {
-    @include button(simple, #eee);
+    @include button-bourbon(simple, #eee);
     font-size: 0.8em;
     margin-right: ($baseline/4);
     line-height: 1.2em;
@@ -1019,7 +1019,7 @@ section.wiki {
     }
 
     &.btn-primary {
-      @include button;
+      @include button-bourbon();
       font-size: 0.8em;
     }
 

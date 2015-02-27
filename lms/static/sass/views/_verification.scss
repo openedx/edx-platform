@@ -58,7 +58,7 @@
 
   // reset: box-sizing (making things so right its scary)
   * {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
   }
 
   // reset: typography
@@ -1129,7 +1129,7 @@
   }
 
   .content-supplementary {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     @include outer-container;
     @include span-columns(12);
 

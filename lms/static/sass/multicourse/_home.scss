@@ -2,7 +2,7 @@
   padding: 0;
 
   > .container {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     width: flex-grid(12);
   }
 
@@ -34,7 +34,7 @@
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       min-height: 120px;
       margin-left: grid-width(2) + $gw-gutter;
       width: flex-grid(6);
@@ -50,7 +50,7 @@
       }
 
       > hgroup {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         display: inline-block;
         left: 0px;
         opacity: 1.0;
@@ -83,7 +83,7 @@
       background: $course-header-bg;
       border: 1px solid $border-color-3;
       border-left: 0;
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       // box-shadow: 0 4px 25px 0 rgba(0,0,0, 0.5);
       height: 120px;
       float: left;
@@ -108,7 +108,7 @@
           @include background-image(linear-gradient(-90deg, rgba(0,0,0, 0.65), rgba(0,0,0, 0.75)));
           border-radius: 4px;
           box-shadow: 0 1px 12px 0 $shadow-d1;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           border: 2px solid rgba(255,255,255, 0.8);
           height: 60px;
           left: 50%;
@@ -156,7 +156,7 @@
   }
 
   .highlighted-courses {
-    @include box-sizing(border-box);
+    box-sizing: border-box;
     margin-bottom: ($baseline*2);
     position: relative;
     width: flex-grid(12);
@@ -327,17 +327,17 @@
     }
 
     &.university-partners2x6 {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       width: flex-grid(12, 12);
 
       .partners {
-        @include box-sizing(border-box);
+        box-sizing: border-box;
         @include clearfix();
         margin-left: 60px;
         padding: 12px 0;
 
         .partner {
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           width: flex-grid(2, 12);
           display: block;
           float: left;
@@ -409,7 +409,7 @@
     }
 
     .news {
-      @include box-sizing(border-box);
+      box-sizing: border-box;
       box-shadow: inset 0 0 3px 0 rgba(0,0,0, 0.15);
       padding: 20px;
       width: flex-grid(12);
@@ -423,7 +423,7 @@
         > article {
           border: 1px dotted transparent;
           border-color: $border-color-2;
-          @include box-sizing(border-box);
+          box-sizing: border-box;
           @include clearfix();
           float: left;
           margin-right: flex-gutter();
@@ -443,7 +443,7 @@
 
           .post-graphics {
             border: 1px solid $border-color-1;
-            @include box-sizing(border-box);
+            box-sizing: border-box;
             display: block;
             float: left;
             height: 84px;
