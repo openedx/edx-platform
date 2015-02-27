@@ -86,10 +86,6 @@ cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 
-lms/static/sass/_build.scss
-lms/static/sass/lms-course-rtl.scss
-lms/static/sass/lms-course.scss
-
 
 ### Logging artifacts
 log/
