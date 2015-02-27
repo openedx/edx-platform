@@ -446,37 +446,37 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/style-app.css',
+            'css/cms-style-app.css',
         ],
         'output_filename': 'css/cms-style-app.css',
     },
     'style-app-extend1': {
         'source_filenames': [
-            'sass/style-app-extend1.css',
+            'css/cms-style-app-extend1.css',
         ],
         'output_filename': 'css/cms-style-app-extend1.css',
     },
     'style-app-rtl': {
         'source_filenames': [
-            'sass/style-app-rtl.css',
+            'css/cms-style-app-rtl.css',
         ],
         'output_filename': 'css/cms-style-app-rtl.css',
     },
     'style-app-extend1-rtl': {
         'source_filenames': [
-            'sass/style-app-extend1-rtl.css',
+            'css/cms-style-app-extend1-rtl.css',
         ],
         'output_filename': 'css/cms-style-app-extend1-rtl.css',
     },
     'style-xmodule': {
         'source_filenames': [
-            'sass/style-xmodule.css',
+            'css/cms-style-xmodule.css',
         ],
         'output_filename': 'css/cms-style-xmodule.css',
     },
     'style-xmodule-rtl': {
         'source_filenames': [
-            'sass/style-xmodule-rtl.css',
+            'css/cms-style-xmodule-rtl.css',
         ],
         'output_filename': 'css/cms-style-xmodule-rtl.css',
     },
