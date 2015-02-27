@@ -446,15 +446,15 @@ PIPELINE_CSS = {
     },
     'style-main': {
         'source_filenames': [
-            'css/main.css',
+            'css/cms-main.css',
         ],
-        'output_filename': 'css/main.css',
+        'output_filename': 'css/cms-main.css',
     },
     'style-main-rtl': {
         'source_filenames': [
-            'css/main-rtl.css',
+            'css/cms-main-rtl.css',
         ],
-        'output_filename': 'css/main-rtl.css',
+        'output_filename': 'css/cms-main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
