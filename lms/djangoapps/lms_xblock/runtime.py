@@ -10,6 +10,7 @@ from django.conf import settings
 from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from openedx.core.djangoapps.user_api.api import course_tag as user_course_tag_api
 from xmodule.modulestore.django import modulestore
+from xmodule.services import SettingsService
 from xmodule.library_tools import LibraryToolsService
 from xmodule.x_module import ModuleSystem
 from xmodule.partitions.partitions_service import PartitionService
@@ -202,6 +203,7 @@ class LmsModuleSystem(LmsHandlerUrls, ModuleSystem):  # pylint: disable=abstract
         )
         services['library_tools'] = LibraryToolsService(modulestore())
         services['fs'] = xblock.reference.plugins.FSService()
+        services['settings'] = SettingsService()
         self.request_token = kwargs.pop('request_token', None)
         super(LmsModuleSystem, self).__init__(**kwargs)
 
