@@ -3,12 +3,14 @@ from __future__ import absolute_import
 
 import logging
 
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
 
 from . import ModuleStoreEnum
 from .exceptions import ItemNotFoundError
+
 
 # Use default index and document names for now
 INDEX_NAME = "courseware_index"
@@ -36,6 +38,7 @@ class CoursewareSearchIndexer(object):
         Add to courseware search index from given location and its children
         """
         error_list = []
+        indexed_count = 0
         # TODO - inline for now, need to move this out to a celery task
         searcher = SearchEngine.get_search_engine(INDEX_NAME)
         if not searcher:
@@ -115,6 +118,7 @@ class CoursewareSearchIndexer(object):
                 remove_index_item_location(location)
             else:
                 index_item_location(location, None)
+            indexed_count += 1
         except Exception as err:  # pylint: disable=broad-except
             # broad exception so that index operation does not prevent the rest of the application from working
             log.exception(
@@ -127,9 +131,72 @@ class CoursewareSearchIndexer(object):
         if raise_on_error and error_list:
             raise SearchIndexingError(_('Error(s) present during indexing'), error_list)
 
+        return indexed_count
+
+    @classmethod
+    def do_publish_index(cls, modulestore, location, delete=False, raise_on_error=False):
+        """
+        Add to courseware search index published section and children
+        """
+        indexed_count = cls.add_to_search_index(modulestore, location, delete, raise_on_error)
+        CoursewareSearchIndexer._track_index_request('edx.course.index.published', indexed_count, str(location))
+        return indexed_count
+
     @classmethod
     def do_course_reindex(cls, modulestore, course_key):
         """
         (Re)index all content within the given course
         """
-        return cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
+        indexed_count = cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
+        CoursewareSearchIndexer._track_index_request('edx.course.index.reindexed', indexed_count)
+        return indexed_count
+
+    @staticmethod
+    def _track_index_request(event_name, indexed_count, location=None):
+        """Track content index requests.
+
+        Arguments:
+            location (str): The ID of content to be indexed.
+            event_name (str):  Name of the event to be logged.
+        Returns:
+            None
+
+        """
+
+        from eventtracking import tracker as track
+        tracker = track.get_tracker()
+        tracking_context = tracker.resolve_context()  # pylint: disable=no-member
+        data = {
+            "indexed_count": indexed_count,
+            'category': 'courseware_index',
+        }
+
+        if location:
+            data['location_id'] = location
+
+        tracker.emit(
+            event_name,
+            data
+        )
+
+        try:
+            if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
+                #Google Analytics - log index content request
+                import analytics
+
+                analytics.track(
+                    event_name,
+                    data,
+                    context={
+                        'Google Analytics': {
+                            'clientId': tracking_context.get('client_id')
+                        }
+                    }
+                )
+        except Exception:  # pylint: disable=broad-except
+            # Capturing all exceptions thrown while tracking analytics events. We do not want
+            # an operation to fail because of an analytics event, so we will capture these
+            # errors in the logs.
+            log.exception(
+                u'Unable to emit {0} event for content indexing.'.format(event_name)
+            )

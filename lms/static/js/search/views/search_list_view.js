@@ -57,7 +57,7 @@ define([
                 var item = new SearchItemView({ model: result });
                 return item.render().el;
             });
-            this.$el.find('.search-results').append(items);
+            this.$el.find('.search-results').html(items);
         },
 
         totalCountMsg: function () {

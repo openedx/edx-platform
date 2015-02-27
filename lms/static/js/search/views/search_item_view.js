@@ -4,8 +4,9 @@ define([
     'jquery',
     'underscore',
     'backbone',
-    'gettext'
-], function ($, _, Backbone, gettext) {
+    'gettext',
+    'logger'
+], function ($, _, Backbone, gettext, Logger) {
    'use strict';
 
     return Backbone.View.extend({
@@ -17,6 +18,10 @@ define([
             'aria-label': 'search result'
         },
 
+        events: {
+            'click .search-results-item a': 'logSearchItem',
+        },
+
         initialize: function () {
             var template_name = (this.model.attributes.content_type === "Sequence") ? '#search_item_seq-tpl' : '#search_item-tpl';
             this.tpl = _.template($(template_name).html());
@@ -25,9 +30,34 @@ define([
         render: function () {
             this.$el.html(this.tpl(this.model.attributes));
             return this;
+        },
+
+        logSearchItem: function(event) {
+            event.preventDefault();
+            var target = this.model.id;
+            var link = $(event.target).attr('href');
+            var collection = this.model.collection;
+            var page = collection.page;
+            var pageSize = collection.pageSize;
+            var searchTerm = collection.searchTerm;
+            var index = collection.indexOf(this.model);
+            Logger.log("edx.course.search.result_selected",
+                {
+                    "search_term": searchTerm,
+                    "result_position": (page * pageSize + index),
+                    "result_link": target
+                });
+            window.analytics.track('"edx.course.search.result_selected"', {
+                category: 'courseware_search',
+                search_term: searchTerm,
+                result_position: (page * pageSize + index),
+                result_link: target
+            });
+            window.location.href = link;
         }
     });
 
 });
 
 })(define || RequireJS.define);
+

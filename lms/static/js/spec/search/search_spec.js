@@ -353,6 +353,7 @@ define([
             expect(this.listView.$el).toContainHtml('Search Results');
             expect(this.listView.$el).toContainHtml('this is a short excerpt');
 
+            searchResults[1] = searchResults[0]
             this.collection.set(searchResults);
             this.collection.totalCount = 2;
             this.listView.renderNext();
