@@ -446,13 +446,13 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/style-app.css',
+            'css/main.css',
         ],
         'output_filename': 'css/cms-style-app.css',
     },
     'style-app-rtl': {
         'source_filenames': [
-            'sass/style-app-rtl.css',
+            'css/main-rtl.css',
         ],
         'output_filename': 'css/cms-style-app-rtl.css',
     },
