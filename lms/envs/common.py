@@ -1173,13 +1173,13 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/lms-main.css'
         ],
-        'output_filename': 'css/lms-style-app.css',
+        'output_filename': 'css/lms-main.css',
     },
     'style-main-rtl': {
         'source_filenames': [
             'css/lms-main-rtl.css'
         ],
-        'output_filename': 'css/lms-style-app-rtl.css',
+        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1200,14 +1200,15 @@ PIPELINE_CSS = {
             'css/lms-course.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-style-course.css',
+        # NOTE: locally gulp will override this file without concatenating xmodule/modules.css.
+        'output_filename': 'css/lms-course.css',
     },
     'style-course-rtl': {
         'source_filenames': [
             'css/lms-course-rtl.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-style-course-rtl.css',
+        'output_filename': 'css/lms-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
