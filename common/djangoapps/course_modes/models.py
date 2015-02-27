@@ -317,8 +317,8 @@ class CourseMode(models.Model):
         if modes_dict is None:
             modes_dict = cls.modes_for_course_dict(course_id)
 
-        # Professional mode courses are always behind a paywall
-        if "professional" in modes_dict:
+        # Professional and no-id-professional mode courses are always behind a paywall
+        if "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODE[0] in modes_dict:
             return False
 
         # White-label uses course mode honor with a price
