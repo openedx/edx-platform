@@ -60,12 +60,12 @@ from student.helpers import (
     % endif
 
     % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
-      <span class="sts-enrollment" title="${_(course_verified_certs.get('enrollment_title'))}">
+      <span class="sts-enrollment" title="${course_verified_certs.get('enrollment_title')}">
         <span class="label">${_("Enrolled as: ")}</span>
         % if course_verified_certs.get('show_image'):
-            <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="${_(course_verified_certs.get('image_alt'))}" />
+            <img class="deco-graphic" src="${static.url('images/verified-ribbon.png')}" alt="${course_verified_certs.get('image_alt')}" />
         % endif
-        <div class="sts-enrollment-value">${_(course_verified_certs.get('enrollment_value'))}</div>
+        <div class="sts-enrollment-value">${course_verified_certs.get('enrollment_value')}</div>
       </span>
     % endif
 

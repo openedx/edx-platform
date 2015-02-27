@@ -7,6 +7,7 @@ from datetime import datetime
 from django.db import models
 from collections import namedtuple, defaultdict
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 from django.db.models import Q
 
 from xmodule_django.models import CourseKeyField
@@ -391,27 +392,27 @@ class CourseMode(models.Model):
 
         if mode == "verified":
             if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
-                enrollment_title = "Your verification is pending"
-                enrollment_value = "Verified: Pending Verification"
+                enrollment_title = __("Your verification is pending")
+                enrollment_value = __("Verified: Pending Verification")
                 show_image = True
-                image_alt = "ID verification pending"
+                image_alt = __("ID verification pending")
             elif verification_status == VERIFY_STATUS_APPROVED:
-                enrollment_title = "You're enrolled as a verified student"
-                enrollment_value = "Verified"
+                enrollment_title = __("You're enrolled as a verified student")
+                enrollment_value = __("Verified")
                 show_image = True
-                image_alt = "ID Verified Ribbon/Badge"
+                image_alt = __("ID Verified Ribbon/Badge")
             else:
-                enrollment_title = "You're enrolled as an honor code student"
-                enrollment_value = "Honor Code"
+                enrollment_title = __("You're enrolled as an honor code student")
+                enrollment_value = __("Honor Code")
         elif mode == "honor":
-            enrollment_title = "You're enrolled as an honor code student"
-            enrollment_value = "Honor Code"
+            enrollment_title = __("You're enrolled as an honor code student")
+            enrollment_value = __("Honor Code")
         elif mode == "audit":
-            enrollment_title = "You're auditing this course"
-            enrollment_value = "Auditing"
+            enrollment_title = __("You're auditing this course")
+            enrollment_value = __("Auditing")
         elif mode == "professional" or mode == "no-id-professional":
-            enrollment_title = "You're enrolled as a professional education student"
-            enrollment_value = "Professional Ed"
+            enrollment_title = __("You're enrolled as a professional education student")
+            enrollment_value = __("Professional Ed")
 
         return {
             'enrollment_title': enrollment_title,
