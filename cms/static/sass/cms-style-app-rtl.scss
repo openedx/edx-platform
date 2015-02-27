@@ -2,14 +2,17 @@
 // ====================
 
 // Table of Contents
+// * +Libs and Resets
 // * +Vendor and Rebase
 // * +Base - Utilities
 // * +Base - Assets
 // * +Base - Starter
 // * +Base - Elements
-// * +Base - Specific Views
-// * +Base - Contexts
-// * +Xmodule
+
+// +Libs and Resets - *do not edit*
+// ====================
+@import 'vendor/bourbon/bourbon'; // lib - bourbon
+@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
 
 // +Vendor and Rebase - *referenced/used vendor presentation and reset*
 // ====================
@@ -49,41 +52,3 @@
 @import 'elements/modal'; // interstitial UI, dialogs, modal windows
 @import 'elements/vendor'; // overrides to vendor-provided styling
 @import 'elements/modal-window';
-@import 'elements/pagination'; // pagination
-@import 'elements/xblocks'; //  studio rendering chrome for xblocks
-@import 'elements/uploaded-assets'; // layout for asset tables
-
-// +Base - Specific Views
-// ====================
-@import 'views/account';
-@import 'views/assets';
-@import 'views/updates';
-@import 'views/dashboard';
-@import 'views/export';
-@import 'views/index';
-@import 'views/course-create';
-@import 'views/import';
-@import 'views/outline';
-@import 'views/settings';
-@import 'views/static-pages';
-@import 'views/unit';
-@import 'views/container';
-@import 'views/users';
-@import 'views/checklists';
-@import 'views/textbooks';
-@import 'views/export-git';
-@import 'views/group-configuration';
-@import 'views/video-upload';
-
-// +Base - Contexts
-// ====================
-@import 'contexts/ie'; // ie-specific rules (mostly for known/older bugs)
-
-@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
-@import 'shame';     // used for any bad-form/orphaned scss
-
-// +Xmodule
-// ====================
-@import '../../../common/static/xmodule/modules/css/module-styles.scss';
-@import '../../../common/static/xmodule/descriptors/css/module-styles.scss';
-@import 'elements/xmodules'; // styling for Studio-specific contexts
