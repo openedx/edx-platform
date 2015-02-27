@@ -175,6 +175,25 @@ def _count_pep8_violations(report_file):
 
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
+def run_complexity():
+    """
+    Uses radon to examine cyclomatic complexity.
+    For additional details on radon, see http://radon.readthedocs.org/
+    """
+    system_string = 'cms/ lms/ common/ openedx/'
+    print "--> Calculating cyclomatic complexity of files..."
+    try:
+        sh(
+            "radon cc {system_string} --total-average".format(
+                system_string=system_string
+            )
+        )
+    except BuildFailure:
+        print "ERROR: Unable to calculate python-only code-complexity."
+
+
+@task
+@needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("compare-branch=", "b", "Branch to compare against, defaults to origin/master"),
     ("percentage=", "p", "fail if diff-quality is below this percentage"),
