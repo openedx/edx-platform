@@ -48,9 +48,6 @@
 @import 'course/modules/timer'; // timer
 @import 'course/modules/chat'; // chat utility
 
-// course - specific courses
-@import "course/courseware/courses/_cs188.scss";
-
 // course - wiki
 @import "course/wiki/basic-html";
 @import "course/wiki/sidebar";
