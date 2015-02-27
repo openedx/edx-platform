@@ -1169,13 +1169,13 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
             'css/lms-main.css'
         ],
         'output_filename': 'css/lms-style-app.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
             'css/lms-main-rtl.css'
         ],
