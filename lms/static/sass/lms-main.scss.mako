@@ -7,4 +7,4 @@
 @import 'vendor/bourbon/bourbon'; // lib - bourbon
 @import 'vendor/bi-app/bi-app-ltr'; // set the layout for left to right languages
 
-@import 'base';
+@import 'build';
