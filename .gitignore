@@ -86,7 +86,6 @@ cms/static/css/
 cms/static/sass/*.css
 cms/static/sass/*.css.map
 
-
 ### Logging artifacts
 log/
 logs
