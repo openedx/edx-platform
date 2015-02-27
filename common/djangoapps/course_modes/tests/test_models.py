@@ -206,3 +206,92 @@ class CourseModeModelTest(TestCase):
         # Check that we get a default mode for when no course mode is available
         self.assertEqual(len(all_modes[other_course_key]), 1)
         self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)
+
+
+    @ddt.data(
+        ("verified", "verify_need_to_verify"),
+        ("verified", "verify_submitted"),
+        ("verified", "verify_approved"),
+        ("verified", 'dummy'),
+        ("verified", None),
+        ('honor', None),
+        ('honor', 'dummy'),
+        ('audit', None),
+        ('professional', None),
+        ('no-id-professional', None),
+        ('no-id-professional', 'dummy')
+    )
+    @ddt.unpack
+    def test_get_certificate_display(self, mode, verification_status):
+        if mode == "verified":
+            if verification_status in ['verify_need_to_verify', 'verify_submitted']:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "Your verification is pending",
+                        "enrollment_value": "Verified: Pending Verification",
+                        "show_image": True,
+                        "image_alt": 'ID verification pending',
+                        "display_mode": 'verified'
+                    }
+                )
+
+            if verification_status in ['verify_approved']:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "You're enrolled as a verified student",
+                        "enrollment_value": "Verified",
+                        "show_image": True,
+                        "image_alt": 'ID Verified Ribbon/Badge',
+                        "display_mode": 'verified'
+                    }
+                )
+
+            if verification_status is None:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "You're enrolled as an honor code student",
+                        "enrollment_value": "Honor Code",
+                        "show_image": False,
+                        "image_alt": '',
+                        "display_mode": 'honor'
+                    }
+                )
+        if mode == "honor":
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're enrolled as an honor code student",
+                    "enrollment_value": "Honor Code",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'honor'
+                }
+            )
+
+        if mode == "audit":
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're auditing this course",
+                    "enrollment_value": "Auditing",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'audit'
+                }
+            )
+
+        if mode in ["professional", "no-id-professional"]:
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're enrolled as a professional education student",
+                    "enrollment_value": "Professional Ed",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'professional'
+                }
+            )
+
