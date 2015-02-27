@@ -13,7 +13,7 @@ from celery import Task, current_task
 from celery.states import SUCCESS, FAILURE
 from django.contrib.auth.models import User
 from django.core.files.storage import DefaultStorage
-from django.db import reset_queries
+from django.db import reset_queries, transaction
 import dogstats_wrapper as dog_stats_api
 from pytz import UTC
 
