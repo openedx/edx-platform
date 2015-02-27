@@ -57,7 +57,8 @@ var edx = edx || {};
         renderCourseCohortSettingsNotificationView: function() {
             var cohortStateMessageNotificationView = new CourseCohortSettingsNotificationView({
                 el: $('.cohort-state-message'),
-                cohortEnabled: this.getCohortsEnabled()});
+                cohortEnabled: this.getCohortsEnabled()
+            });
             cohortStateMessageNotificationView.render();
         },
 
@@ -123,6 +124,12 @@ var edx = edx || {};
             ).done(function() {
                 self.render();
                 self.renderCourseCohortSettingsNotificationView();
+            }).fail(function(result) {
+                self.showNotification({
+                    type: 'error',
+                    title: gettext("We've encountered an error. Refresh your browser and then try again.")},
+                    self.$('.cohorts-state-section')
+                );
             });
         },
 
@@ -199,9 +206,11 @@ var edx = edx || {};
 
         setCohortEditorVisibility: function(showEditor) {
             if (showEditor) {
+                this.$('.cohorts-state-section').removeClass(disabledClass).attr('aria-disabled', false);
                 this.$('.cohort-management-group').removeClass(hiddenClass);
                 this.$('.cohort-management-nav').removeClass(disabledClass).attr('aria-disabled', false);
             } else {
+                this.$('.cohorts-state-section').addClass(disabledClass).attr('aria-disabled', true);
                 this.$('.cohort-management-group').addClass(hiddenClass);
                 this.$('.cohort-management-nav').addClass(disabledClass).attr('aria-disabled', true);
             }

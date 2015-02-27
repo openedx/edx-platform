@@ -1,7 +1,7 @@
 (function() {
-  var CohortManagement;
+    var CohortManagement;
 
-  CohortManagement = (function() {
+    CohortManagement = (function() {
 
     function CohortManagement($section) {
       this.$section = $section;
@@ -12,18 +12,8 @@
 
     return CohortManagement;
 
-  })();
+    })();
 
-  _.defaults(window, {
-    InstructorDashboard: {}
-  });
-
-  _.defaults(window.InstructorDashboard, {
-    sections: {}
-  });
-
-  _.defaults(window.InstructorDashboard.sections, {
-    CohortManagement: CohortManagement
-  });
+    window.InstructorDashboard.sections.CohortManagement = CohortManagement;
 
 }).call(this);

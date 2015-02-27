@@ -3,7 +3,6 @@ Tests for course group views
 """
 # pylint: disable=attribute-defined-outside-init
 # pylint: disable=no-member
-from collections import namedtuple
 import json
 
 from collections import namedtuple
@@ -15,7 +14,6 @@ from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 from ..models import CourseUserGroup, CourseCohort
@@ -180,12 +178,25 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         config_course_cohorts(self.course, [], cohorted=True)
 
-        # Get the cohorts from the course. This will run the migrations.
-        # And due to migrations CourseCohortsSettings object will be created.
-        self.get_handler(self.course)
-
         response = self.put_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
         self.assertEqual("Bad Request", response.get("error"))
+
+    def test_update_settings_with_invalid_field_data_type(self):
+        """
+        Verify that course_cohort_settings_handler return HTTP 400 if field data type is incorrect.
+        """
+        config_course_cohorts(self.course, [], cohorted=True)
+
+        response = self.put_handler(
+            self.course,
+            data={'is_cohorted': ''},
+            expected_response_code=400,
+            handler=course_cohort_settings_handler
+        )
+        self.assertEqual(
+            "Incorrect field type for `{}`. Type must be `{}`".format('is_cohorted', bool.__name__),
+            response.get("error")
+        )
 
 
 class CohortHandlerTestCase(CohortViewsTestCase):

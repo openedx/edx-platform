@@ -456,9 +456,12 @@ def set_course_cohort_settings(course_key, **kwargs):
     Raises:
         ValueError if course_key is invalid.
     """
+    fields = {'is_cohorted': bool, 'always_cohort_inline_discussions': bool, 'cohorted_discussions': list}
     course_cohort_settings = get_course_cohort_settings(course_key)
-    for field in ('is_cohorted', 'always_cohort_inline_discussions', 'cohorted_discussions'):
+    for field, field_type in fields.items():
         if field in kwargs:
+            if not isinstance(kwargs[field], field_type):
+                raise ValueError("Incorrect field type for `{}`. Type must be `{}`".format(field, field_type.__name__))
             setattr(course_cohort_settings, field, kwargs[field])
     course_cohort_settings.save()
     return course_cohort_settings

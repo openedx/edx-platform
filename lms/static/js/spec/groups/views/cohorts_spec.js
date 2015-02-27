@@ -1,16 +1,18 @@
 define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
-        'js/groups/models/course_cohort_settings', 'js/groups/views/course_cohort_settings_notification'],
+        'js/groups/models/course_cohort_settings', 'js/utils/animation',
+        'js/groups/views/course_cohort_settings_notification'
+        ],
     function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
-              CourseCohortSettingsModel, CourseCohortSettingsNotificationView) {
+              CourseCohortSettingsModel, AnimationUtil, CourseCohortSettingsNotificationView) {
         'use strict';
 
         describe("Cohorts View", function () {
             var catLoversInitialCount = 123, dogLoversInitialCount = 456, unknownUserMessage,
-                createMockCohort, createMockCohorts, createMockContentGroups, createCohortSettings, createCohortsView,
-                cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage, verifyDetailedMessage,
-                verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup, clearContentGroup,
-                saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
+                createMockCohort, createMockCohorts, createMockContentGroups, createMockCohortSettingsJson,
+                createCohortsView, cohortsView, requests, respondToRefresh, verifyMessage, verifyNoMessage,
+                verifyDetailedMessage, verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup,
+                clearContentGroup, saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
                 MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
 
@@ -52,7 +54,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 ];
             };
 
-            createMockCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettingsJson = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
                 return {
                     id: 0,
                     is_cohorted: isCohorted || false,
@@ -61,9 +63,9 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 };
             };
 
-            createCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
                 return new CourseCohortSettingsModel(
-                    createMockCohortSettings(isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions)
+                    createMockCohortSettingsJson(isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions)
                 );
             };
 
@@ -73,7 +75,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
                 cohorts = new CohortCollection(cohortsJson, {parse: true});
                 contentGroups = options.contentGroups || createMockContentGroups();
-                cohortSettings = options.cohortSettings || createCohortSettings(true);
+                cohortSettings = options.cohortSettings || createMockCohortSettings(true);
                 cohortSettings.url = '/mock_service/cohorts/settings';
                 cohorts.url = '/mock_service/cohorts';
                 requests = AjaxHelpers.requests(test);
@@ -278,36 +280,36 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             });
 
             describe("Course Cohort Settings", function () {
-                it('enable/disable working correctly', function () {
-                    createCohortsView(this, {cohortSettings: createCohortSettings(false)});
+                it('can enable and disable cohorting', function () {
+                    createCohortsView(this, {cohortSettings: createMockCohortSettings(false)});
 
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
 
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettings(true, [], true)
+                        createMockCohortSettingsJson(true, [], true)
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettings(true)
+                        createMockCohortSettingsJson(true)
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeTruthy();
 
                     cohortsView.$('.cohorts-state').prop('checked', false).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettings(false, [], true)
+                        createMockCohortSettingsJson(false, [], true)
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettings(false)
+                        createMockCohortSettingsJson(false)
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                 });
 
 
-                it('Course Cohort Settings Notification View renders correctly', function () {
+                it('shows an appropriate cohort status message', function () {
                      var createCourseCohortSettingsNotificationView = function (is_cohorted) {
                         var notificationView = new CourseCohortSettingsNotificationView({
                             el: $('.cohort-state-message'),
@@ -323,6 +325,14 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     expect(notificationView.$('.action-toggle-message').text().trim()).toBe('Cohorts Disabled');
                 });
 
+                it('shows an appropriate error message for HTTP500', function () {
+                    createCohortsView(this, {cohortSettings: createMockCohortSettings(false)});
+                    expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
+                    cohortsView.$('.cohorts-state').prop('checked', true).change();
+                    AjaxHelpers.respondWithError(requests, 500);
+                    var expectedTitle = "We've encountered an error. Refresh your browser and then try again."
+                    expect(cohortsView.$('.message-title').text().trim()).toBe(expectedTitle);
+                });
             });
 
             describe("Cohort Group Header", function () {

@@ -20,11 +20,7 @@ var edx = edx || {};
         showCohortStateMessage: function () {
             var actionToggleMessage = this.$('.action-toggle-message');
 
-            // The following lines are necessary to re-trigger the CSS animation on span.action-toggle-message
-            actionToggleMessage.removeClass('is-fleeting');
-            actionToggleMessage.offset().width = actionToggleMessage.offset().width;
-            actionToggleMessage.addClass('is-fleeting');
-
+            AnimationUtil.triggerAnimation(actionToggleMessage);
             if (this.cohortEnabled) {
                 actionToggleMessage.text(gettext('Cohorts Enabled'));
             } else {

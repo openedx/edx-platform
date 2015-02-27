@@ -451,7 +451,7 @@ class CohortConfigurationTest(EventsTestMixin, UniqueCourseTest, CohortTestMixin
         And I can see the `Enable Cohorts` checkbox is checked.
         And cohort management controls are visible.
         When I uncheck the `Enable Cohorts` checkbox.
-        Then I cohort management controls are not visible.
+        Then cohort management controls are not visible.
         And When I reload the page.
         Then I can see the `Enable Cohorts` checkbox is unchecked.
         And cohort management controls are not visible.
