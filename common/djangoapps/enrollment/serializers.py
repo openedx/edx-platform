@@ -85,3 +85,4 @@ class ModeSerializer(serializers.Serializer):
     currency = serializers.CharField(max_length=8)
     expiration_datetime = serializers.DateTimeField()
     description = serializers.CharField()
+    sku = serializers.CharField()
