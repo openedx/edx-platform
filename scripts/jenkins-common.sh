@@ -34,3 +34,5 @@ fi
 
 # Activate the Python virtualenv
 source $HOME/edx-venv/bin/activate
+
+export PATH=$WORKSPACE/node_modules/.bin:$PATH
