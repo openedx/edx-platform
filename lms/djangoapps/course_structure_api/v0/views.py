@@ -191,7 +191,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
             return super(CourseStructure, self).retrieve(request, *args, **kwargs)
         except models.CourseStructure.DoesNotExist:
             # If we don't have data stored, generate it and return a 503.
-            models.update_course_structure.delay(self.course.id)
+            models.update_course_structure.delay(unicode(self.course.id))
             return Response(status=503, headers={'Retry-After': '120'})
 
     def get_object(self, queryset=None):
