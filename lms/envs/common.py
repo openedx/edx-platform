@@ -1189,8 +1189,7 @@ PIPELINE_CSS = {
     },
     'style-app-rtl': {
         'source_filenames': [
-            'sass/lms-app-rtl.css',
-            'sass/ie-rtl.css'
+            'sass/lms-app-rtl.css'
         ],
         'output_filename': 'css/lms-style-app-rtl.css',
     },
