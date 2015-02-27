@@ -444,41 +444,17 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/style-app.css',
+            'css/cms-main.css',
         ],
-        'output_filename': 'css/cms-style-app.css',
+        'output_filename': 'css/cms-main.css',
     },
-    'style-app-extend1': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/style-app-extend1.css',
+            'css/cms-main-rtl.css',
         ],
-        'output_filename': 'css/cms-style-app-extend1.css',
-    },
-    'style-app-rtl': {
-        'source_filenames': [
-            'sass/style-app-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-app-rtl.css',
-    },
-    'style-app-extend1-rtl': {
-        'source_filenames': [
-            'sass/style-app-extend1-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-app-extend1-rtl.css',
-    },
-    'style-xmodule': {
-        'source_filenames': [
-            'sass/style-xmodule.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule.css',
-    },
-    'style-xmodule-rtl': {
-        'source_filenames': [
-            'sass/style-xmodule-rtl.css',
-        ],
-        'output_filename': 'css/cms-style-xmodule-rtl.css',
+        'output_filename': 'css/cms-main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
