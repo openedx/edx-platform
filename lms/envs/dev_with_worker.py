@@ -29,11 +29,4 @@ DJKOMBU_POLLING_INTERVAL = 1.0
 
 # Disable transaction management because we are using a worker. Views
 # that request a task and wait for the result will deadlock otherwise.
-
-MIDDLEWARE_CLASSES = tuple(
-    c for c in MIDDLEWARE_CLASSES
-    if c != 'django.middleware.transaction.TransactionMiddleware')
-
-# Note: other alternatives for disabling transactions don't work in 1.4
-# https://code.djangoproject.com/ticket/2304
-# https://code.djangoproject.com/ticket/16039
+DATABASES['default']['ATOMIC_REQUESTS'] = False

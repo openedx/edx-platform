@@ -282,7 +282,7 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def update_name(self, new_name):
         """Update the user's name, storing the old name in the history.
 
@@ -1376,9 +1376,9 @@ def log_successful_login(sender, request, user, **kwargs):  # pylint: disable=un
 def log_successful_logout(sender, request, user, **kwargs):  # pylint: disable=unused-argument
     """Handler to log when logouts have occurred successfully."""
     if settings.FEATURES['SQUELCH_PII_IN_LOGS']:
-        AUDIT_LOG.info(u"Logout - user.id: {0}".format(request.user.id))
+        AUDIT_LOG.info(u"Logout - user.id: {0}".format(user.id))
     else:
-        AUDIT_LOG.info(u"Logout - {0}".format(request.user))
+        AUDIT_LOG.info(u"Logout - {0}".format(user))
 
 
 @receiver(user_logged_in)

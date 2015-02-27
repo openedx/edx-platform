@@ -3,14 +3,21 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from django.db.transaction import get_autocommit, set_autocommit
 from django_countries import countries
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         """Populate the available countries with all 2-character ISO country codes. """
-        for country_code, __ in list(countries):
-            orm.Country.objects.get_or_create(country=country_code)
+        old_autocommit = get_autocommit()
+
+        try:
+            set_autocommit(True)  # get_or_create uses transaction.atomic, which doesn't work when autocommit is False
+            for country_code, __ in list(countries):
+                orm.Country.objects.get_or_create(country=country_code)
+        finally:
+            set_autocommit(old_autocommit)
 
     def backwards(self, orm):
         """Clear all available countries. """

@@ -253,7 +253,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
-        self.assertEqual(data['total_cost'], item.unit_cost * qty)
+        self.assertEqual(Decimal(data['total_cost']), item.unit_cost * qty)
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'business')
 
@@ -295,7 +295,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
-        self.assertEqual(data['total_cost'], item.unit_cost * 1)
+        self.assertEqual(Decimal(data['total_cost']), item.unit_cost)
         cart = Order.get_cart_for_user(self.user)
         self.assertEqual(cart.order_type, 'personal')
 
@@ -353,7 +353,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         resp = self.client.post(reverse('shoppingcart.views.update_user_cart'), {'ItemId': item.id, 'qty': qty})
         self.assertEqual(resp.status_code, 200)
         data = json.loads(resp.content)
-        self.assertEqual(data['total_cost'], item.unit_cost * qty)
+        self.assertEqual(Decimal(data['total_cost']), item.unit_cost * qty)
 
         # use coupon code
         self.add_coupon(self.course_key, True, self.coupon_code)
@@ -842,7 +842,7 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         json_resp = json.loads(resp.content)
         self.assertEqual(json_resp.get('currency'), self.cart.currency)
         self.assertEqual(json_resp.get('purchase_datetime'), get_default_time_display(self.cart.purchase_time))
-        self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
+        self.assertEqual(Decimal(json_resp.get('total_cost')), self.cart.total_cost)
         self.assertEqual(json_resp.get('status'), "purchased")
         self.assertEqual(json_resp.get('billed_to'), {
             'first_name': self.cart.bill_to_first,
@@ -858,9 +858,9 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
         self.assertEqual(len(json_resp.get('items')), num_items)
         for item in json_resp.get('items'):
             self.assertEqual(item, {
-                'unit_cost': 40,
+                'unit_cost': u'40',
                 'quantity': 1,
-                'line_cost': 40,
+                'line_cost': u'40',
                 'line_desc': 'Honor Code Certificate for course Test Course'
             })
 
@@ -879,20 +879,20 @@ class ShoppingCartViewsTests(ModuleStoreTestCase):
 
         # Parse the response as JSON and check the contents
         json_resp = json.loads(resp.content)
-        self.assertEqual(json_resp.get('total_cost'), self.cart.total_cost)
+        self.assertEqual(Decimal(json_resp.get('total_cost')), self.cart.total_cost)
 
         items = json_resp.get('items')
         self.assertEqual(len(items), 2)
         self.assertEqual(items[0], {
-            'unit_cost': 40,
+            'unit_cost': u'40',
             'quantity': 1,
-            'line_cost': 40,
+            'line_cost': u'40',
             'line_desc': 'Registration for Course: Robot Super Course'
         })
         self.assertEqual(items[1], {
-            'unit_cost': 40,
+            'unit_cost': u'40',
             'quantity': 1,
-            'line_cost': 40,
+            'line_cost': u'40',
             'line_desc': 'Honor Code Certificate for course Test Course'
         })
 

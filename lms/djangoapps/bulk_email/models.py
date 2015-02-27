@@ -80,11 +80,9 @@ class CourseEmail(Email):
         Create an instance of CourseEmail.
 
         The CourseEmail.save_now method makes sure the CourseEmail entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, an autocommit buried within here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
+        When called from any view that is wrapped by ATOMIC_REQUESTS=True,
+        this autocommit here will cause any pending transaction to be
+        committed by a successful save here, breaking atomicity of the view.
         """
         # automatically generate the stripped version of the text from the HTML markup:
         if text_message is None:
@@ -116,12 +114,12 @@ class CourseEmail(Email):
         """
         Writes CourseEmail immediately, ensuring the transaction is committed.
 
-        Autocommit annotation makes sure the database entry is committed.
-        When called from any view that is wrapped by TransactionMiddleware,
-        and thus in a "commit-on-success" transaction, this autocommit here
-        will cause any pending transaction to be committed by a successful
-        save here.  Any future database operations will take place in a
-        separate transaction.
+        Autocommit annotation makes sure the database entry is committed, by
+        switching django from "auto mode" to "managed mode" for this method.
+
+        When called from any view that is wrapped by ATOMIC_REQUESTS=True,
+        this autocommit here will cause any pending transaction to be
+        committed by a successful save here, breaking atomicity of the view.
         """
         self.save()
 

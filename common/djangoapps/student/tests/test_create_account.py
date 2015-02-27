@@ -388,13 +388,17 @@ class TestCreateAccountValidation(TestCase):
             assert_honor_code_error("To enroll, you must follow the honor code.")
 
             # Empty, invalid
-            for honor_code in ["", "false", "not_boolean"]:
+            for honor_code in ["", "false"]:
                 params["honor_code"] = honor_code
                 assert_honor_code_error("To enroll, you must follow the honor code.")
 
             # True
-            params["honor_code"] = "tRUe"
-            self.assert_success(params)
+            for honor_code in ["not_boolean", "tRUe"]:
+                # Need to change username/email because user was created above
+                params["username"] = honor_code + "_username"
+                params["email"] = honor_code + "_test_email@example.com"
+                params["honor_code"] = honor_code
+                self.assert_success(params)
 
         with override_settings(REGISTRATION_EXTRA_FIELDS={"honor_code": "optional"}):
             # Missing
@@ -404,7 +408,13 @@ class TestCreateAccountValidation(TestCase):
             params["email"] = "another_test_email@example.com"
             self.assert_success(params)
 
-    def test_terms_of_service(self):
+    @ddt.data("tRUe", "not_boolean")
+    def test_terms_of_service_success(self, terms_of_service):
+        params = dict(self.minimal_params)
+        params["terms_of_service"] = terms_of_service
+        self.assert_success(params)
+
+    def test_terms_of_service_error(self):
         params = dict(self.minimal_params)
 
         def assert_terms_of_service_error(expected_error):
@@ -419,13 +429,9 @@ class TestCreateAccountValidation(TestCase):
         assert_terms_of_service_error("You must accept the terms of service.")
 
         # Empty, invalid
-        for terms_of_service in ["", "false", "not_boolean"]:
+        for terms_of_service in ["", "false"]:
             params["terms_of_service"] = terms_of_service
             assert_terms_of_service_error("You must accept the terms of service.")
-
-        # True
-        params["terms_of_service"] = "tRUe"
-        self.assert_success(params)
 
     @ddt.data(
         ("level_of_education", 1, "A level of education is required"),

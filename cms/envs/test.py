@@ -117,6 +117,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': TEST_ROOT / "db" / "cms.db",
+        'ATOMIC_REQUESTS': True,
     },
 }
 
@@ -178,7 +179,7 @@ simplefilter('ignore')
 CELERY_ALWAYS_EAGER = True
 CELERY_RESULT_BACKEND = 'cache'
 BROKER_TRANSPORT = 'memory'
-
+CELERY_CACHE_BACKEND = 'memory'
 
 ########################### Server Ports ###################################
 

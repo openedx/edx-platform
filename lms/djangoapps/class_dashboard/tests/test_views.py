@@ -5,9 +5,11 @@ import json
 
 from django.test.client import RequestFactory
 from mock import patch
+
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
+from student.tests.factories import AdminFactory
 from class_dashboard import views
 from student.tests.factories import AdminFactory
 

@@ -19,9 +19,7 @@ from django.utils.translation import ugettext as _
 import mongoengine
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
-from xmodule.modulestore.tests.django_utils import (
-    TEST_DATA_MOCK_MODULESTORE, TEST_DATA_XML_MODULESTORE
-)
+from xmodule.modulestore.tests.django_utils import TEST_DATA_XML_MODULESTORE
 from dashboard.models import CourseImportLog
 from dashboard.sysadmin import Users
 from dashboard.git_import import GitImportError
@@ -247,8 +245,9 @@ class TestSysadmin(SysadminBaseTestCase):
 
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
-        self.assertIn('test_user', response.content)
-        self.assertTrue(num_test_users + 2, len(response.content.splitlines()))
+        content = ''.join(response.streaming_content)
+        self.assertIn('test_user', content)
+        self.assertTrue(num_test_users + 2, len(content.splitlines()))
 
         # Clean up
         User.objects.filter(
@@ -383,12 +382,16 @@ class TestSysadmin(SysadminBaseTestCase):
 
         response = self.client.post(reverse('sysadmin_staffing'),
                                     {'action': 'get_staff_csv', })
+
+        self.assertEqual(200, response.status_code)
         self.assertIn('attachment', response['Content-Disposition'])
         self.assertEqual('text/csv', response['Content-Type'])
+
         columns = ['course_id', 'role', 'username',
                    'email', 'full_name', ]
+
         self.assertIn(','.join('"' + c + '"' for c in columns),
-                      response.content)
+                      ''.join(response.streaming_content))
 
         self._rm_edx4edx()
 

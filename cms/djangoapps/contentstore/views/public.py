@@ -29,7 +29,7 @@ def signup(request):
         # and registration is disabled.
         return redirect_with_get('login', request.GET, False)
 
-    return render_to_response('register.html', {'csrf': csrf_token})
+    return render_to_response('register.html', {'csrf': unicode(csrf_token)})
 
 
 @ssl_login_shortcut
@@ -56,7 +56,7 @@ def login_page(request):
     return render_to_response(
         'login.html',
         {
-            'csrf': csrf_token,
+            'csrf': unicode(csrf_token),
             'forgot_password_link': "//{base}/login#forgot-password-modal".format(base=settings.LMS_BASE),
             'platform_name': microsite.get_value('platform_name', settings.PLATFORM_NAME),
         }
