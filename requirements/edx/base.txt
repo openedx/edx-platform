@@ -118,14 +118,8 @@ ipaddr==2.1.11
 # Used to allow to configure CORS headers for cross-domain requests
 django-cors-headers==0.13
 
-# We've tried several times to update the debug toolbar to version 1.0.1,
-# and had problems each time, resulting in us rolling back to 0.9.4. Before
-# submitting another pull request to do this update, check the following:
-# * https://github.com/django-debug-toolbar/django-debug-toolbar/issues/535 should be resolved
-# * Studio and CMS should both run correctly, both directly and via devstack
-# * Check the Javascript console to be sure there are no Javascript errors
-#   related to the Django debug toolbar
-django_debug_toolbar==0.9.4
+# Debug toolbar
+django_debug_toolbar==1.2.2
 django-debug-toolbar-mongo
 
 # Used for testing
