@@ -4,6 +4,7 @@
 Group Configuration Tests.
 """
 import json
+from django.utils import http
 from mock import patch
 from contentstore.utils import reverse_course_url, reverse_usage_url
 from contentstore.views.component import SPLIT_TEST_COMPONENT_TYPE
@@ -636,7 +637,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
         expected = self._get_expected_content_group(
             usage_for_group=[
                 {
-                    'url': u"/container/{}".format(vertical.location),
+                    'url': u"/container/{}".format(http.urlquote(vertical.location)),
                     'label': u"Test Unit 0 / Test Problem 0JOSÉ ANDRÉS"
                 }
             ]
@@ -655,7 +656,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         expected = self._get_expected_content_group(usage_for_group=[
             {
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(http.urlquote(vertical.location)),
                 'label': 'Test Unit 0 / Test Problem 0'
             }
         ])
@@ -675,11 +676,11 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
 
         expected = self._get_expected_content_group(usage_for_group=[
             {
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(http.urlquote(vertical.location)),
                 'label': 'Test Unit 0 / Test Problem 0'
             },
             {
-                'url': '/container/{}'.format(vertical1.location),
+                'url': '/container/{}'.format(http.urlquote(vertical1.location)),
                 'label': 'Test Unit 1 / Test Problem 1'
             }
         ])
@@ -729,7 +730,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(http.urlquote(vertical.location)),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }],
@@ -771,7 +772,7 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(http.urlquote(vertical.location)),
                 'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
                 'validation': None,
             }],
@@ -802,11 +803,11 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [{
-                'url': '/container/{}'.format(vertical.location),
+                'url': '/container/{}'.format(http.urlquote(vertical.location)),
                 'label': 'Test Unit 0 / Test Content Experiment 0',
                 'validation': None,
             }, {
-                'url': '/container/{}'.format(vertical1.location),
+                'url': '/container/{}'.format(http.urlquote(vertical1.location)),
                 'label': 'Test Unit 1 / Test Content Experiment 1',
                 'validation': None,
             }],

@@ -259,7 +259,7 @@ class DownloadTestCase(AssetsTestCase):
         # Now, download it.
         resp = self.client.get(self.uploaded_url, HTTP_ACCEPT='text/html')
         self.assertEquals(resp.status_code, 200)
-        self.assertEquals(resp.content, self.asset_name)
+        self.assertEquals(''.join(resp), self.asset_name)
 
     def test_download_not_found_throw(self):
         url = self.uploaded_url.replace(self.asset_name, 'not_the_asset_name')

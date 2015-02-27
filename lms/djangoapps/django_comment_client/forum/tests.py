@@ -5,9 +5,10 @@ import ddt
 from django.core import cache
 from django.core.urlresolvers import reverse
 from django.http import Http404
+from edxmako.tests import mako_middleware_process_request
 from django.test.client import Client, RequestFactory
 from django.test.utils import override_settings
-from edxmako.tests import mako_middleware_process_request
+from django.utils import http
 
 from django_comment_client.forum import views
 from django_comment_client.tests.group_id import (
@@ -23,7 +24,6 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import (
     ModuleStoreTestCase,
-    TEST_DATA_MOCK_MODULESTORE,
     TEST_DATA_MONGO_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import check_mongo_calls, CourseFactory, ItemFactory
@@ -1012,7 +1012,8 @@ class InlineDiscussionTestCase(ModuleStoreTestCase):
         response = views.inline_discussion(request, self.course.id.to_deprecated_string(), "dummy_discussion_id")
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/i4x://TestX/101/discussion/Discussion1'
+        expected_courseware_url = '/courses/TestX/101/Test_Course/jump_to/{}'.format(
+            http.urlquote('i4x://TestX/101/discussion/Discussion1'))
         expected_courseware_title = 'Chapter / Discussion1'
         self.assertEqual(response_data['discussion_data'][0]['courseware_url'], expected_courseware_url)
         self.assertEqual(response_data["discussion_data"][0]["courseware_title"], expected_courseware_title)

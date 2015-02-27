@@ -38,12 +38,14 @@ class HelpersTestCase(CourseTestCase):
         # Verify unit URL
         vertical = ItemFactory.create(parent_location=sequential.location, category='vertical',
                                       display_name='Unit')
-        self.assertEqual(xblock_studio_url(vertical), u'/container/{}'.format(vertical.location))
+        self.assertEqual(xblock_studio_url(vertical),
+                         u'/container/{}'.format(http.urlquote(unicode(vertical.location))))
 
         # Verify child vertical URL
         child_vertical = ItemFactory.create(parent_location=vertical.location, category='vertical',
                                             display_name='Child Vertical')
-        self.assertEqual(xblock_studio_url(child_vertical), u'/container/{}'.format(child_vertical.location))
+        self.assertEqual(xblock_studio_url(child_vertical),
+                         u'/container/{}'.format(http.urlquote(unicode(child_vertical.location))))
 
         # Verify video URL
         video = ItemFactory.create(parent_location=child_vertical.location, category="video",
@@ -52,7 +54,7 @@ class HelpersTestCase(CourseTestCase):
 
         # Verify library URL
         library = LibraryFactory.create()
-        expected_url = u'/library/{}'.format(unicode(library.location.library_key))
+        expected_url = u'/library/{}'.format(http.urlquote(unicode(library.location.library_key)))
         self.assertEqual(xblock_studio_url(library), expected_url)
 
     def test_xblock_type_display_name(self):

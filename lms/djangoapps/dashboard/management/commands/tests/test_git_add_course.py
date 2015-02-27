@@ -53,10 +53,8 @@ class TestGitAddCourse(ModuleStoreTestCase):
         """
         Convenience function for testing command failures
         """
-        with self.assertRaises(SystemExit):
-            with self.assertRaisesRegexp(CommandError, regex):
-                call_command('git_add_course', *args,
-                             stderr=StringIO.StringIO())
+        with self.assertRaisesRegexp(CommandError, regex):
+            call_command('git_add_course', *args, stderr=StringIO.StringIO())
 
     def test_command_args(self):
         """
@@ -65,10 +63,11 @@ class TestGitAddCourse(ModuleStoreTestCase):
         self.assertCommandFailureRegexp(
             'This script requires at least one argument, the git URL')
         self.assertCommandFailureRegexp(
-            'Expected no more than three arguments; recieved 4',
+            'Expected no more than three arguments; received 4',
             'blah', 'blah', 'blah', 'blah')
+
         self.assertCommandFailureRegexp(
-            'Repo was not added, check log output for details',
+            "Path (.+) doesn't exist",
             'blah')
         # Test successful import from command
         if not os.path.isdir(self.GIT_REPO_DIR):

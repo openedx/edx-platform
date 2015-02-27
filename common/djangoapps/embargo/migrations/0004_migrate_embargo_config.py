@@ -3,26 +3,34 @@ import datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from django.db.transaction import get_autocommit, set_autocommit
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         """Move the current course embargo configuration to the new models. """
-        for old_course in orm.EmbargoedCourse.objects.all():
-            new_course, __ = orm.RestrictedCourse.objects.get_or_create(course_key=old_course.course_id)
 
-            # Set the message keys to 'embargo'
-            new_course.enroll_msg_key = 'embargo'
-            new_course.access_msg_key = 'embargo'
-            new_course.save()
+        old_autocommit = get_autocommit()
 
-            for country in self._embargoed_countries_list(orm):
-                country_model = orm.Country.objects.get(country=country)
-                orm.CountryAccessRule.objects.get_or_create(
-                    country=country_model,
-                    rule_type='blacklist',
-                    restricted_course=new_course
-                )
+        try:
+            set_autocommit(True)  # get_or_create uses transaction.atomic, which doesn't work when autocommit is False
+            for old_course in orm.EmbargoedCourse.objects.all():
+                new_course, __ = orm.RestrictedCourse.objects.get_or_create(course_key=old_course.course_id)
+
+                # Set the message keys to 'embargo'
+                new_course.enroll_msg_key = 'embargo'
+                new_course.access_msg_key = 'embargo'
+                new_course.save()
+
+                for country in self._embargoed_countries_list(orm):
+                    country_model = orm.Country.objects.get(country=country)
+                    orm.CountryAccessRule.objects.get_or_create(
+                        country=country_model,
+                        rule_type='blacklist',
+                        restricted_course=new_course
+                    )
+        finally:
+            set_autocommit(old_autocommit)
 
     def backwards(self, orm):
         """No backwards migration required since the forward migration is idempotent. """

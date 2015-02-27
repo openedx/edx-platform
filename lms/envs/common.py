@@ -702,6 +702,7 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 USE_TZ = True
 SESSION_COOKIE_SECURE = False
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
 # CMS base
 CMS_BASE = 'localhost:8001'
@@ -967,8 +968,8 @@ simplefilter('ignore')
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'staticfiles.finders.FileSystemFinder',
-    'staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'pipeline.finders.PipelineFinder',
 )
 
@@ -1017,7 +1018,6 @@ MIDDLEWARE_CLASSES = (
     # Detects user-requested locale from 'accept-language' header in http request
     'django.middleware.locale.LocaleMiddleware',
 
-    'django.middleware.transaction.TransactionMiddleware',
     # 'debug_toolbar.middleware.DebugToolbarMiddleware',
 
     'django_comment_client.utils.ViewNameMiddleware',
@@ -1247,7 +1247,7 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/vendor/ova/annotator.css',
             'css/vendor/ova/edx-annotator.css',
-            'css/vendor/ova/video-js.min.css',
+            'css/vendor/ova/video-js.css',
             'css/vendor/ova/rangeslider.css',
             'css/vendor/ova/share-annotator.css',
             'css/vendor/ova/richText-annotator.css',
@@ -1436,6 +1436,10 @@ CELERY_QUEUES = {
 # let logging work as configured:
 CELERYD_HIJACK_ROOT_LOGGER = False
 
+# For the Result Store, use the django cache named 'celery'
+CELERY_RESULT_BACKEND = 'djcelery.backends.cache:CacheBackend'
+CELERY_CACHE_BACKEND = 'default'
+
 ################################ Bulk Email ###################################
 
 # Suffix used to construct 'from' email address for bulk emails.
@@ -1505,6 +1509,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sessions',
     'django.contrib.sites',
+    'django.contrib.staticfiles',
     'djcelery',
     'south',
 
@@ -1517,7 +1522,6 @@ INSTALLED_APPS = (
     # For asset pipelining
     'edxmako',
     'pipeline',
-    'staticfiles',
     'static_replace',
 
     # Our courseware

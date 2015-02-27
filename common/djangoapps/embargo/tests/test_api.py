@@ -160,7 +160,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         # (restricted course, but pass all the checks)
         # This is the worst case, so it will hit all of the
         # caching code.
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(2):
             embargo_api.check_course_access(self.course.id, user=self.user, ip_address='0.0.0.0')
 
         with self.assertNumQueries(0):

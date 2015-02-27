@@ -1,6 +1,7 @@
 """
 Tests for the lms_result_processor
 """
+from django.utils import http
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
@@ -67,7 +68,8 @@ class LmsSearchResultProcessorTestCase(ModuleStoreTestCase):
         )
 
         self.assertEqual(
-            srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id), unicode(self.html.scope_ids.usage_id)))
+            srp.url, "/courses/{}/jump_to/{}".format(unicode(self.course.id),
+                                                     http.urlquote(unicode(self.html.scope_ids.usage_id))))
 
     def test_location_parameter(self):
         srp = LmsSearchResultProcessor(

@@ -5,7 +5,6 @@ import json
 import random
 import logging
 
-from contextlib import contextmanager
 from django.conf import settings
 from django.db import transaction
 from django.test.client import RequestFactory
@@ -124,10 +123,10 @@ def answer_distributions(course_key):
 @transaction.commit_manually
 def grade(student, request, course, keep_raw_scores=False):
     """
-    Wraps "_grade" with the manual_transaction context manager just in case
+    Wraps "_grade" with the atomic context manager just in case
     there are unanticipated errors.
     """
-    with manual_transaction():
+    with transaction.atomic():
         return _grade(student, request, course, keep_raw_scores)
 
 
@@ -188,7 +187,7 @@ def _grade(student, request, course, keep_raw_scores):
                 )
 
             if not should_grade_section:
-                with manual_transaction():
+                with transaction.atomic():
                     should_grade_section = StudentModule.objects.filter(
                         student=student,
                         module_state_key__in=[
@@ -205,7 +204,7 @@ def _grade(student, request, course, keep_raw_scores):
                     '''creates an XModule instance given a descriptor'''
                     # TODO: We need the request to pass into here. If we could forego that, our arguments
                     # would be simpler
-                    with manual_transaction():
+                    with transaction.atomic():
                         field_data_cache = FieldDataCache([descriptor], course.id, student)
                     return get_module_for_descriptor(student, request, descriptor, field_data_cache, course.id)
 
@@ -288,10 +287,10 @@ def grade_for_percentage(grade_cutoffs, percentage):
 @transaction.commit_manually
 def progress_summary(student, request, course):
     """
-    Wraps "_progress_summary" with the manual_transaction context manager just
+    Wraps "_progress_summary" with the atomic context manager just
     in case there are unanticipated errors.
     """
-    with manual_transaction():
+    with transaction.atomic():
         return _progress_summary(student, request, course)
 
 
@@ -319,7 +318,7 @@ def _progress_summary(student, request, course):
     will return None.
 
     """
-    with manual_transaction():
+    with transaction.atomic():
         field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
             course.id, student, course, depth=None
         )
@@ -343,7 +342,7 @@ def _progress_summary(student, request, course):
 
         for section_module in chapter_module.get_display_items():
             # Skip if the section is hidden
-            with manual_transaction():
+            with transaction.atomic():
                 if section_module.hide_from_toc:
                     continue
 
@@ -465,19 +464,6 @@ def get_score(course_id, user, problem_descriptor, module_creator, scores_cache=
         total = weight
 
     return (correct, total)
-
-
-@contextmanager
-def manual_transaction():
-    """A context manager for managing manual transactions"""
-    try:
-        yield
-    except Exception:
-        transaction.rollback()
-        log.exception('Due to an error, this transaction has been rolled back')
-        raise
-    else:
-        transaction.commit()
 
 
 def iterate_grades_for(course_id, students):

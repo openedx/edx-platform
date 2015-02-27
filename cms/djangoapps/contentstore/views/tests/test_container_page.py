@@ -57,8 +57,8 @@ class ContainerPageTestCase(StudioPageTestCase):
                 r'<a href="/course/{course}{subsection_parameters}" class="{classes}">\s*Lesson 1\s*</a>\s*'
                 r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>'
             ).format(
-                course=re.escape(unicode(self.course.id)),
-                unit=re.escape(unicode(self.vertical.location)),
+                course=re.escape(http.urlquote(unicode(self.course.id))),
+                unit=re.escape(http.urlquote(unicode(self.vertical.location))),
                 classes='navigation-item navigation-link navigation-parent',
                 section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                 subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
@@ -86,9 +86,9 @@ class ContainerPageTestCase(StudioPageTestCase):
                     r'<a href="/container/{unit}" class="{classes}">\s*Unit\s*</a>\s*'
                     r'<a href="/container/{split_test}" class="{classes}">\s*Split Test\s*</a>'
                 ).format(
-                    course=re.escape(unicode(self.course.id)),
-                    unit=re.escape(unicode(self.vertical.location)),
-                    split_test=re.escape(unicode(self.child_container.location)),
+                    course=re.escape(http.urlquote(unicode(self.course.id))),
+                    unit=re.escape(http.urlquote(unicode(self.vertical.location))),
+                    split_test=re.escape(http.urlquote(unicode(self.child_container.location))),
                     classes='navigation-item navigation-link navigation-parent',
                     section_parameters=re.escape(u'?show={}'.format(http.urlquote(self.chapter.location))),
                     subsection_parameters=re.escape(u'?show={}'.format(http.urlquote(self.sequential.location))),
