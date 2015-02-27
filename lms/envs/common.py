@@ -380,6 +380,16 @@ FEATURES = {
 
     # Enable notifications via edx-notifications
     'ENABLE_NOTIFICATIONS': False,
+
+    # Enable the Organizations,
+    'ORGANIZATIONS_APP': False,
+
+    # Whether edx-notifications should use Celery for bulk operations
+    'ENABLE_NOTIFICATIONS_CELERY': False,
+
+    # whether to turn on Social Engagment scoring
+    # driven through the comment service
+    'ENABLE_SOCIAL_ENGAGEMENT': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -1724,6 +1734,12 @@ INSTALLED_APPS = (
     'cors_csrf',
 
     'commerce',
+
+    # EDX API application
+    'api_manager',
+
+    # Social Engagement
+    'social_engagement',
 )
 
 ######################### CSRF #########################################
@@ -2287,11 +2303,33 @@ PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
 PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
 PROFILE_IMAGE_MIN_BYTES = 100
 
-#
-######## EDX-NOTIFICATIONS CONFIGURATION ########
-#
+# TODO (ECOM-16): Remove once the A/B test of auto-registration completes
+AUTO_REGISTRATION_AB_TEST_EXCLUDE_COURSES = set([
+    "HarvardX/SW12.2x/1T2014",
+    "HarvardX/SW12.3x/1T2014",
+    "HarvardX/SW12.4x/1T2014",
+    "HarvardX/SW12.5x/2T2014",
+    "HarvardX/SW12.6x/2T2014",
+    "HarvardX/HUM2.1x/3T2014",
+    "HarvardX/SW12x/2013_SOND",
+    "LinuxFoundationX/LFS101x/2T2014",
+    "HarvardX/CS50x/2014_T1",
+    "HarvardX/AmPoX.1/2014_T3",
+    "HarvardX/SW12.7x/3T2014",
+    "HarvardX/SW12.10x/1T2015",
+    "HarvardX/SW12.9x/3T2014",
+    "HarvardX/SW12.8x/3T2014",
+])
+
+################################### EDX-NOTIFICATIONS SUBSYSTEM ######################################
 INSTALLED_APPS += (
     'edx_notifications',
+    'edx_notifications.server.web',
+)
+
+TEMPLATE_LOADERS += (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
 )
 
 NOTIFICATION_STORE_PROVIDER = {
@@ -2300,21 +2338,48 @@ NOTIFICATION_STORE_PROVIDER = {
     }
 }
 
-if 'SOUTH_MIGRATION_MODULES' not in vars() and 'SOUTH_MIGRATION_MODULES' not in globals():
+if not 'SOUTH_MIGRATION_MODULES' in vars() and not 'SOUTH_MIGRATION_MODULES' in globals():
     SOUTH_MIGRATION_MODULES = {}
 
-# We have to point edx-notfications south migrations to a
-# subdirectory
 SOUTH_MIGRATION_MODULES.update({
     'edx_notifications': 'edx_notifications.stores.sql.migrations',
 })
 
+# to prevent run-away queries from happening
+NOTIFICATION_MAX_LIST_SIZE = 100
+
+#
+# Various mapping tables which is used by the MsgTypeToUrlLinkResolver
+# to map a notification type to a statically defined URL path
+#
+# NOTE: NOTIFICATION_CLICK_LINK_GROUP_URLS will usually get read in by the *.envs.json file
+#
+NOTIFICATION_CLICK_LINK_URL_MAPS = {
+    'open-edx.studio.announcements.*': '/courses/{course_id}/announcements',
+    'open-edx.lms.leaderboard.*': '/courses/{course_id}/cohort',
+    'open-edx.lms.discussions.*': '/courses/{course_id}/discussion/{commentable_id}/threads/{thread_id}',
+    'open-edx.xblock.group-project.*': '/courses/{course_id}/group_work?seqid={activity_location}',
+}
 
 # list all known channel providers
-# this can be overriden in aws.py via lms.auth.json
 NOTIFICATION_CHANNEL_PROVIDERS = {
-    # right now by default we map all notifications to the NullNotificationChannel
-    # which drops all notifications
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {
+            # list out all link resolvers
+            'link_resolvers': {
+                # right now the only defined resolver is 'type_to_url', which
+                # attempts to look up the msg type (key) via
+                # matching on the value
+                'msg_type_to_url': {
+                    'class': 'edx_notifications.channels.link_resolvers.MsgTypeToUrlLinkResolver',
+                    'config': {
+                        '_click_link': NOTIFICATION_CLICK_LINK_URL_MAPS,
+                    }
+                }
+            }
+        }
+    },
     'null': {
         'class': 'edx_notifications.channels.null.NullNotificationChannel',
         'options': {}
@@ -2323,5 +2388,5 @@ NOTIFICATION_CHANNEL_PROVIDERS = {
 
 # list all of the mappings of notification types to channel
 NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
-    '*': 'null',  # default global mapping
+    '*': 'durable',  # default global mapping
 }

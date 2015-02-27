@@ -17,7 +17,14 @@ from monkey_patch import django_utils_translation
 import analytics
 from edx_notifications import startup
 
+from course_groups.scope_resolver import CourseGroupScopeResolver
+from student.scope_resolver import CourseEnrollmentsScopeResolver, StudentEmailScopeResolver
+from projects.scope_resolver import GroupProjectParticipantsScopeResolver
+from edx_notifications.scopes import register_user_scope_resolver
+
 log = logging.getLogger(__name__)
+
+from edx_notifications import startup
 
 
 def run():
@@ -29,6 +36,9 @@ def run():
     autostartup()
 
     add_mimetypes()
+
+    if settings.FEATURES.get('ENABLE_NOTIFICATIONS', False):
+        startup_notification_subsystem()
 
     if settings.FEATURES.get('USE_CUSTOM_THEME', False):
         enable_theme()
@@ -153,15 +163,16 @@ def startup_notification_subsystem():
     Initialize the Notification subsystem
     """
     try:
-        # startup the Notification subsystem
-        # note, since we are initially just support ephemeral
-        # push notifications to mobile devices
-        # we don't need to register pre-defined
-        # msg_types which are oriented towards durable
-        # in-browser notifications
-        startup.initialize(register_system_types=False)
+        startup.initialize()
 
-    except Exception, ex:  # pylint: disable=broad-except
+        # register the two scope resolvers that the LMS will be providing
+        # to edx-notifications
+        register_user_scope_resolver('course_enrollments', CourseEnrollmentsScopeResolver())
+        register_user_scope_resolver('course_group', CourseGroupScopeResolver())
+        register_user_scope_resolver('group_project_participants', GroupProjectParticipantsScopeResolver())
+        register_user_scope_resolver('group_project_workgroup', GroupProjectParticipantsScopeResolver())
+        register_user_scope_resolver('student_email_resolver', StudentEmailScopeResolver())
+    except Exception, ex:
         # Note this will fail when we try to run migrations as manage.py will call startup.py
         # and startup.initialze() will try to manipulate some database tables.
         # We need to research how to identify when we are being started up as part of
@@ -169,6 +180,5 @@ def startup_notification_subsystem():
         log.error(
             'There was a problem initializing notifications subsystem. '
             'This could be because the database tables have not yet been created and '
-            './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". '
-            'Continuing...'.format(err_msg=str(ex))
+            './manage.py lms syncdb needs to run setup.py. Error was "{err_msg}". Continuing...'.format(err_msg=str(ex))
         )
