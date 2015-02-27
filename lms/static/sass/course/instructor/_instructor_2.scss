@@ -809,9 +809,10 @@
     }
   }
 
-  .cohort-management-assignment-type-settings {
+  .cohort-management-assignment-type-settings,
+  .cohorts-state-section {
      &.is-disabled {
-        opacity: 0.50;
+        opacity: 0.25;
       }
   }
 

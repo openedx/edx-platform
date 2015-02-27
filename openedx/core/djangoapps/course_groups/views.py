@@ -112,7 +112,13 @@ def course_cohort_settings_handler(request, course_key_string):
         if is_cohorted is None:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": "Bad Request"}, 400)
-        cohort_settings = cohorts.set_course_cohort_settings(course_key, is_cohorted=is_cohorted)
+
+        try:
+            cohort_settings = cohorts.set_course_cohort_settings(course_key, is_cohorted=is_cohorted)
+        except ValueError as err:
+            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
+            return JsonResponse({"error": unicode(err)}, 400)
+
         return JsonResponse(_get_course_cohort_settings_representation(cohort_settings))
 
 

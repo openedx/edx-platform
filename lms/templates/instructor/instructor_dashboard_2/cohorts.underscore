@@ -8,7 +8,7 @@
         <form action="" method="post" name="" id="cohort-management-nav-form" class="cohort-management-nav-form">
 
             <div class="cohort-management-nav-form-select field field-select">
-                <label for="cohort-select" class="label sr"><%- gettext("Select a cohort group to manage") %></label>
+                <label for="cohort-select" class="label sr"><%- gettext("Select a cohort to manage") %></label>
                 <select class="input cohort-select" name="cohort-select" id="cohort-select"></select>
             </div>
 
@@ -17,10 +17,10 @@
             </div>
         </form>
 
-        <a href="" class="action-primary action-create">
+        <button class="button action-primary action-create">
             <i class="icon fa fa-plus" aria-hidden="true"></i>
             <%- gettext('Add Cohort') %>
-        </a>
+        </button>
     </div>
 
     <!-- Add modal -->

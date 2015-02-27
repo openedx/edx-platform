@@ -716,6 +716,29 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertEqual(course_cohort_settings.cohorted_discussions, ['topic a id', 'topic b id'])
         self.assertFalse(course_cohort_settings.always_cohort_inline_discussions)
 
+    def test_update_course_cohort_settings_with_invalid_data_type(self):
+        """
+        Test that cohorts.set_course_cohort_settings raises exception if fields have incorrect data type.
+        """
+        course = modulestore().get_course(self.toy_course_key)
+        CourseCohortSettingsFactory(course_id=course.id)
+
+        exception_msg_tpl = "Incorrect field type for `{}`. Type must be `{}`"
+        fields = [
+            {'name': 'is_cohorted', 'type': bool},
+            {'name': 'always_cohort_inline_discussions', 'type': bool},
+            {'name': 'cohorted_discussions', 'type': list}
+        ]
+
+        for field in fields:
+            with self.assertRaises(ValueError) as value_error:
+                cohorts.set_course_cohort_settings(course.id, **{field['name']: ''})
+
+            self.assertEqual(
+                value_error.exception.message,
+                exception_msg_tpl.format(field['name'], field['type'].__name__)
+            )
+
 
 class TestCohortsAndPartitionGroups(ModuleStoreTestCase):
     """

@@ -93,12 +93,12 @@ class CourseCohortsSettings(models.Model):
 
     @property
     def cohorted_discussions(self):
-        """Jsonfiy the cohorted_discussions"""
+        """Jsonify the cohorted_discussions"""
         return json.loads(self._cohorted_discussions)
 
     @cohorted_discussions.setter
     def cohorted_discussions(self, value):
-        """UnJsonfiy the cohorted_discussions"""
+        """Un-Jsonify the cohorted_discussions"""
         self._cohorted_discussions = json.dumps(value)
 
 
