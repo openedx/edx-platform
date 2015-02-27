@@ -448,13 +448,13 @@ PIPELINE_CSS = {
         'source_filenames': [
             'css/main.css',
         ],
-        'output_filename': 'css/cms-style-app.css',
+        'output_filename': 'css/main.css',
     },
     'style-main-rtl': {
         'source_filenames': [
             'css/main-rtl.css',
         ],
-        'output_filename': 'css/cms-style-app-rtl.css',
+        'output_filename': 'css/main-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
