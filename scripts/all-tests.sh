@@ -80,6 +80,7 @@ case "$TEST_SUITE" in
         # Run quality task. Pass in the 'fail-under' percentage to diff-quality
         paver run_quality -p 100
 
+        paver run_complexity > code_complexity.log || echo "Unable to calculate code complexity. Ignoring error."
         # Need to create an empty test result so the post-build
         # action doesn't fail the build.
         mkdir -p reports
