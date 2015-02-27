@@ -28,6 +28,9 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 
 from openedx.core.djangoapps.user_api.api import profile as profile_api
+from openedx.core.djangoapps.user_api.accounts.views import AccountView
+from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
+from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -718,16 +721,13 @@ def submit_photos_for_verification(request):
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
-            profile_api.update_profile(
-                username,
-                full_name=request.POST.get('full_name')
-            )
-        except profile_api.ProfileUserNotFound:
+            AccountView.update_account(request.user, username, {"name": request.POST.get('full_name')})
+        except AccountUserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
-        except profile_api.ProfileInvalidField:
+        except AccountUpdateError:
             msg = _(
                 "Name must be at least {min_length} characters long."
-            ).format(min_length=profile_api.FULL_NAME_MIN_LENGTH)
+            ).format(min_length=NAME_MIN_LENGTH)
             return HttpResponseBadRequest(msg)
 
     # Create the attempt

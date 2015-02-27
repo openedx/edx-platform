@@ -282,33 +282,6 @@ class UserProfile(models.Model):
         self.set_meta(meta)
         self.save()
 
-    @transaction.commit_on_success
-    def update_name(self, new_name):
-        """Update the user's name, storing the old name in the history.
-
-        Implicitly saves the model.
-        If the new name is not the same as the old name, do nothing.
-
-        Arguments:
-            new_name (unicode): The new full name for the user.
-
-        Returns:
-            None
-
-        """
-        if self.name == new_name:
-            return
-
-        if self.name:
-            meta = self.get_meta()
-            if 'old_names' not in meta:
-                meta['old_names'] = []
-            meta['old_names'].append([self.name, u"", datetime.now(UTC).isoformat()])
-            self.set_meta(meta)
-
-        self.name = new_name
-        self.save()
-
 
 class UserSignupSource(models.Model):
     """
