@@ -112,7 +112,6 @@ AUTH_EMAIL_OPT_IN_KEY = 'email_opt_in'
 
 AUTH_ENTRY_DASHBOARD = 'dashboard'
 AUTH_ENTRY_LOGIN = 'login'
-AUTH_ENTRY_PROFILE = 'profile'
 AUTH_ENTRY_REGISTER = 'register'
 
 # This is left-over from an A/B test
@@ -143,16 +142,11 @@ AUTH_DISPATCH_URLS = {
     AUTH_ENTRY_LOGIN_2: '/account/login/',
     AUTH_ENTRY_REGISTER_2: '/account/register/',
 
-    # If linking/unlinking an account from the new student profile
-    # page, redirect to the profile page.  Only used if
-    # `FEATURES['ENABLE_NEW_DASHBOARD']` is true.
-    AUTH_ENTRY_PROFILE: '/profile/',
 }
 
 _AUTH_ENTRY_CHOICES = frozenset([
     AUTH_ENTRY_DASHBOARD,
     AUTH_ENTRY_LOGIN,
-    AUTH_ENTRY_PROFILE,
     AUTH_ENTRY_REGISTER,
 
     # This is left-over from an A/B test
@@ -452,8 +446,6 @@ def parse_query_params(strategy, response, *args, **kwargs):
         'is_login': auth_entry in [AUTH_ENTRY_LOGIN, AUTH_ENTRY_LOGIN_2],
         # Whether the auth pipeline entered from /register.
         'is_register': auth_entry in [AUTH_ENTRY_REGISTER, AUTH_ENTRY_REGISTER_2],
-        # Whether the auth pipeline entered from /profile.
-        'is_profile': auth_entry == AUTH_ENTRY_PROFILE,
         # Whether the auth pipeline entered from an API
         'is_api': auth_entry == AUTH_ENTRY_API,
     }
