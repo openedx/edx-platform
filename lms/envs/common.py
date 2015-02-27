@@ -1169,17 +1169,41 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-main': {
+    'style-app': {
         'source_filenames': [
-            'css/lms-main.css'
+            'css/lms-app.css'
         ],
-        'output_filename': 'css/lms-main.css',
+        'output_filename': 'css/lms-style-app.css',
     },
-    'style-main-rtl': {
+    'style-app-extend1': {
         'source_filenames': [
-            'css/lms-main-rtl.css'
+            'css/lms-app-extend1.css',
         ],
-        'output_filename': 'css/lms-main-rtl.css',
+        'output_filename': 'css/lms-style-app-extend1.css',
+    },
+    'style-app-extend2': {
+        'source_filenames': [
+            'css/lms-app-extend2.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2.css',
+    },
+    'style-app-rtl': {
+        'source_filenames': [
+            'css/lms-app-rtl.css'
+        ],
+        'output_filename': 'css/lms-style-app-rtl.css',
+    },
+    'style-app-extend1-rtl': {
+        'source_filenames': [
+            'css/lms-app-extend1-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend1-rtl.css',
+    },
+    'style-app-extend2-rtl': {
+        'source_filenames': [
+            'css/lms-app-extend2-rtl.css',
+        ],
+        'output_filename': 'css/lms-style-app-extend2-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1197,18 +1221,17 @@ PIPELINE_CSS = {
     },
     'style-course': {
         'source_filenames': [
-            'css/lms-course.css',
+            'css/course.css',
             'xmodule/modules.css',
         ],
-        # NOTE: locally gulp will override this file without concatenating xmodule/modules.css.
-        'output_filename': 'css/lms-course.css',
+        'output_filename': 'css/lms-style-course.css',
     },
     'style-course-rtl': {
         'source_filenames': [
-            'css/lms-course-rtl.css',
+            'css/course-rtl.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-course-rtl.css',
+        'output_filename': 'css/lms-style-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
