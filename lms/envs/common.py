@@ -1171,15 +1171,13 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
+            'css/lms-main.css'
         ],
         'output_filename': 'css/lms-style-app.css',
     },
     'style-app-rtl': {
         'source_filenames': [
-            'sass/application-rtl.css',
-            'sass/ie-rtl.css'
+            'css/lms-main-rtl.css'
         ],
         'output_filename': 'css/lms-style-app-rtl.css',
     },
@@ -1199,14 +1197,14 @@ PIPELINE_CSS = {
     },
     'style-course': {
         'source_filenames': [
-            'sass/course.css',
+            'css/lms-course.css',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course.css',
     },
     'style-course-rtl': {
         'source_filenames': [
-            'sass/course-rtl.css',
+            'css/lms-course-rtl.css',
             'xmodule/modules.css',
         ],
         'output_filename': 'css/lms-style-course-rtl.css',
