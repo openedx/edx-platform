@@ -728,9 +728,6 @@ class DraftModuleStore(MongoModuleStore):
             bulk_record.dirty = True
             self.collection.remove({'_id': {'$in': to_be_deleted}})
 
-        if self.signal_handler and not bulk_record.active:
-            self.signal_handler.send("course_published", course_key=course_key)
-
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         if self.signal_handler:
             self.signal_handler.send("course_published", course_key=location.course_key)
