@@ -4,7 +4,7 @@ import logging
 from celery.task import task
 from django.dispatch import receiver
 from model_utils.models import TimeStampedModel
-from opaque_keys.edx.locator import CourseLocator
+from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore, SignalHandler
 
 from util.models import CompressedTextField
@@ -60,7 +60,7 @@ def generate_course_structure(course_key):
 def listen_for_course_publish(sender, course_key, **kwargs):
     # Note: The countdown=0 kwarg is set to to ensure the method below does not attempt to access the course
     # before the signal emitter has finished all operations. This is also necessary to ensure all tests pass.
-    update_course_structure.delay(course_key, countdown=0)
+    update_course_structure.delay(unicode(course_key), countdown=0)
 
 
 @task()
@@ -68,9 +68,12 @@ def update_course_structure(course_key):
     """
     Regenerates and updates the course structure (in the database) for the specified course.
     """
-    if not isinstance(course_key, CourseLocator):
-        logger.error('update_course_structure requires a CourseLocator. Given %s.', type(course_key))
-        return
+    # Ideally we'd like to accept a CourseLocator; however, CourseLocator is not JSON-serializable (by default) so
+    # Celery's delayed tasks fail to start. For this reason, callers should pass the course key as a Unicode string.
+    if not isinstance(course_key, basestring):
+        raise ValueError('course_key must be a string. {} is not acceptable.'.format(type(course_key)))
+
+    course_key = CourseKey.from_string(course_key)
 
     try:
         structure = generate_course_structure(course_key)

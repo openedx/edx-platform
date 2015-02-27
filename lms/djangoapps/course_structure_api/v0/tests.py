@@ -299,7 +299,7 @@ class CourseStructureTests(CourseDetailMixin, CourseViewTestsMixin, ModuleStoreT
         super(CourseStructureTests, self).setUp()
 
         # Ensure course structure exists for the course
-        update_course_structure(self.course.id)
+        update_course_structure(unicode(self.course.id))
 
     def test_get(self):
         """
