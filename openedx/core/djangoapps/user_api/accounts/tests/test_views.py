@@ -167,7 +167,7 @@ class TestAccountAPI(APITestCase):
         ),
         ("client", "user", "country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
         ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
-        ("client", "user", "name", "bob", "z"*256, "Ensure this value has at most 255 characters (it has 256)."),
+        ("client", "user", "name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
         ("client", "user", "name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
         ("client", "user", "language", "Creole"),
         ("client", "user", "goals", "Smell the roses"),
