@@ -405,7 +405,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False):
+def prepare_content(content, course_key, is_staff=False, **kwargs):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -414,6 +414,12 @@ def prepare_content(content, course_key, is_staff=False):
 
     @TODO: not all response pre-processing steps are currently integrated into
     this function.
+
+    Arguments:
+        content (dict): A thread or comment.
+        course_key (CourseKey): The course key of the course.
+        is_staff (bool): Whether the user is a staff member.
+        course_is_cohorted (bool): Whether the course is cohorted.
     """
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
@@ -453,14 +459,19 @@ def prepare_content(content, course_key, is_staff=False):
         else:
             del endorsement["user_id"]
 
+    course_is_cohorted = kwargs.get('course_is_cohorted')
+    if course_is_cohorted is None:
+        course_is_cohorted = is_course_cohorted(course_key)
+
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
             children = [
-                prepare_content(child, course_key, is_staff) for child in content[child_content_key]
+                prepare_content(child, course_key, is_staff, course_is_cohorted=course_is_cohorted)
+                for child in content[child_content_key]
             ]
             content[child_content_key] = children
 
-    if is_course_cohorted(course_key):
+    if course_is_cohorted:
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
             content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name
