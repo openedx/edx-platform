@@ -48,6 +48,8 @@ from models.settings.course_grading import CourseGradingModel
 from cms.lib.xblock.runtime import handler_url, local_resource_url
 from opaque_keys.edx.keys import UsageKey, CourseKey
 
+from .preview import get_available_xblock_services
+
 __all__ = ['orphan_handler', 'xblock_handler', 'xblock_view_handler', 'xblock_outline_handler']
 
 log = logging.getLogger(__name__)
@@ -147,6 +149,9 @@ def xblock_handler(request, usage_key_string):
                 return HttpResponse(status=406)
 
         elif request.method == 'DELETE':
+            # let xblock (and children) know they are about to be deleted
+            _notify_xblocks_by_usage_key(request.user, usage_key, usage_key.course_key, 'on_before_studio_delete')
+
             _delete_item(usage_key, request.user)
             return JsonResponse()
         else:  # Since we have a usage_key, we are updating an existing xblock.
@@ -395,8 +400,50 @@ def _save_xblock(user, xblock, data=None, children=None, metadata=None, nullout=
     if publish == 'make_public':
         modulestore().publish(xblock.location, user.id)
 
+        # notify the xblocks that they have been published
+        _notify_xblocks(xblock, xblock.location.course_key, 'on_studio_published')
+
     # Note that children aren't being returned until we have a use case.
     return JsonResponse(result, encoder=EdxJSONEncoder)
+
+
+def _notify_xblocks(xblock, course_id, callback_name):
+    """
+    Notify xblock (and children) of a lifecycle activity, which basically looks to see if an xblock
+    has implemented the 'callback_name'
+    """
+
+    def _notify_xblock_subtree(parent_xblock, course_id, callback_name, xblock_services):
+        """
+        Recusively notifies all children, depth-first
+        """
+        for child in parent_xblock.get_children():
+            _notify_xblock_subtree(child, course_id, callback_name, xblock_services)
+
+        # then notify parent, if they have implemented the callback_name
+        # function
+        if hasattr(parent_xblock, callback_name):
+            log.info('Notifying xblock {loc} on {name}...'.format(loc=parent_xblock.location, name=callback_name))
+            func = getattr(parent_xblock, callback_name)
+            func(course_id, xblock_services)
+
+    xblock_services = get_available_xblock_services()
+    _notify_xblock_subtree(xblock, course_id, callback_name, xblock_services)
+
+
+def _notify_xblocks_by_usage_key(user, usage_key, course_id, callback_name):
+    """
+    Helper function when we only have the xblock location available
+    """
+
+    store = modulestore()
+    try:
+        xblock = store.get_item(usage_key, depth=None)
+        _notify_xblocks(xblock, course_id, callback_name)
+    except ItemNotFoundError:
+        log.error("_notify_xblocks_by_usage_key(): Can't find item at usage_key {}".format(usage_key))
+    except InvalidLocationError:
+        log.error("_notify_xblocks_by_usage_key(): Can't find item by location {}.".format(usage_key))
 
 
 @login_required

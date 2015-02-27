@@ -8,6 +8,7 @@ import json
 from django.test.client import Client
 from django.contrib.auth.models import User
 
+from lms import startup
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.inheritance import own_metadata
@@ -82,6 +83,9 @@ class CourseTestCase(ModuleStoreTestCase):
             number='999',
             display_name='Robot Super Course',
         )
+
+        # initialize the Notification subsystem
+        startup.startup_notification_subsystem()
 
     def create_non_staff_authed_user_client(self, authenticate=True):
         """
