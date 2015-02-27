@@ -367,6 +367,91 @@ class CourseMode(models.Model):
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
 
+    @classmethod
+    def get_certificate_display(cls, mode, verification_status):
+        """
+         on the basis of mode and verification status make certificate display html strings and css class.
+         Args:
+            mode (str): enrollment mode.
+            verification_status (str) : verification status of student
+
+        Returns:
+            dictionary:
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        show_image = False
+        enrollment_title, enrollment_value, image_alt = '', '', ''
+
+        if mode == "verified":
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+                enrollment_title = "Your verification is pending"
+                enrollment_value = "Verified: Pending Verification"
+                show_image = True
+                image_alt = "ID verification pending"
+            elif verification_status == VERIFY_STATUS_APPROVED:
+                enrollment_title = "You're enrolled as a verified student"
+                enrollment_value = "Verified"
+                show_image = True
+                image_alt = "ID Verified Ribbon/Badge"
+            else:
+                enrollment_title = "You're enrolled as an honor code student"
+                enrollment_value = "Honor Code"
+        elif mode == "honor":
+            enrollment_title = "You're enrolled as an honor code student"
+            enrollment_value = "Honor Code"
+        elif mode == "audit":
+            enrollment_title = "You're auditing this course"
+            enrollment_value = "Auditing"
+        elif mode == "professional" or mode == "no-id-professional":
+            enrollment_title = "You're enrolled as a professional education student"
+            enrollment_value = "Professional Ed"
+
+        return {
+            'enrollment_title': enrollment_title,
+            'enrollment_value': enrollment_value,
+            'show_image': show_image,
+            'image_alt': image_alt,
+            'mode_class': CourseMode._get_certificate_css_class(mode, verification_status)
+        }
+
+    @staticmethod
+    def _get_certificate_css_class(mode, verification_status):
+        """
+         get the css class on the basis of mode and status.
+         Args:
+            mode (str): enrollment mode.
+            verification_status (str) : verification status of student
+
+        Returns:
+            str: css class
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        if mode == "verified":
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+                mode_class = " verified"
+            else:
+                mode_class = " honor"
+        elif mode == "professional" or mode == "no-id-professional":
+            mode_class = "professional"
+        else:
+            mode_class = mode
+
+        return mode_class
+
     def to_tuple(self):
         """
         Takes a mode model and turns it into a model named tuple.
