@@ -419,19 +419,19 @@ class CourseMode(models.Model):
             'enrollment_value': enrollment_value,
             'show_image': show_image,
             'image_alt': image_alt,
-            'mode_class': CourseMode._get_certificate_css_class(mode, verification_status)
+            'display_mode': CourseMode._get_certificate_display_mode(mode, verification_status)
         }
 
     @staticmethod
-    def _get_certificate_css_class(mode, verification_status):
+    def _get_certificate_display_mode(enrollment_mode, verification_status):
         """
-         get the css class on the basis of mode and status.
+         return the of mode after checking enrollment mode and status.
          Args:
             mode (str): enrollment mode.
             verification_status (str) : verification status of student
 
         Returns:
-            str: css class
+            str: display mode for certs
         """
 
         # import inside the function to avoid the circular import
@@ -441,17 +441,17 @@ class CourseMode(models.Model):
             VERIFY_STATUS_APPROVED
         )
 
-        if mode == "verified":
+        if enrollment_mode == "verified":
             if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
-                mode_class = " verified"
+                mode = "verified"
             else:
-                mode_class = " honor"
-        elif mode == "professional" or mode == "no-id-professional":
-            mode_class = "professional"
+                mode = "honor"
+        elif enrollment_mode == "professional" or enrollment_mode == "no-id-professional":
+            mode = "professional"
         else:
-            mode_class = mode
+            mode = enrollment_mode
 
-        return mode_class
+        return mode
 
     def to_tuple(self):
         """

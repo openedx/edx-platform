@@ -32,10 +32,21 @@ from student.helpers import (
 <li class="course-item">
   % if settings.FEATURES.get('ENABLE_VERIFIED_CERTIFICATES'):
     <% course_verified_certs = CourseMode.get_certificate_display(enrollment.mode, verification_status.get('status')) %>
-    <% mode_class = " " + course_verified_certs.get('mode_class') %>
+    <%
+        display_mode = course_verified_certs.get('display_mode')
+        if display_mode == 'verified':
+             mode_class = ' ' + 'verified'
+        elif display_mode == 'honor':
+            mode_class = ' ' + 'verified'
+        elif display_mode == 'professional':
+            mode_class = ' ' + 'professional'
+        else:
+            mode_class = ''
+        endif
+    %>
   % else:
-    <% mode_class = "" %>
-  % endif
+    <% mode_class = '' %>
+   % endif
 
   <article class='course${mode_class}'>
 
