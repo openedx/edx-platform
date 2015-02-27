@@ -13,6 +13,7 @@ from student.models import UserProfile
 
 TEST_PASSWORD = "test"
 
+
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
 class TestAccountAPI(APITestCase):
@@ -29,7 +30,7 @@ class TestAccountAPI(APITestCase):
         self.staff_client = APIClient()
 
         self.user = UserFactory.create(password=TEST_PASSWORD)
-        
+
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
     def test_get_account_anonymous_user(self):

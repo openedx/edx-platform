@@ -8,6 +8,24 @@ import re
 from .utils.envs import Env
 
 
+DEFAULT_SYSTEMS = 'lms,cms,common,openedx'
+
+
+def _get_code_directories_for_system(system, subdirectories=['djangoapps', 'lib']):
+    """
+    Returns a string listing the code directories beneath the specified system root.
+    """
+    apps = [system]
+
+    for directory in [subdirectories]:
+        subdirectory_path = os.path.join(system, directory)
+        if os.path.isdir(subdirectory_path):
+            directories = os.listdir(subdirectory_path)
+            apps.extend([d for d in directories if os.path.isdir(os.path.join(subdirectory_path, d))])
+
+    return ' '.join(apps)
+
+
 @task
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
@@ -18,20 +36,14 @@ def find_fixme(options):
     Run pylint on system code, only looking for fixme items.
     """
     num_fixme = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', DEFAULT_SYSTEMS).split(',')
 
     for system in systems:
         # Directory to put the pylint report in.
         # This makes the folder if it doesn't already exist.
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
-        apps = [system]
-
-        for directory in ['djangoapps', 'lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
+        apps_list = _get_code_directories_for_system(system)
 
         pythonpath_prefix = (
             "PYTHONPATH={system}:{system}/lib"
@@ -72,7 +84,7 @@ def run_pylint(options):
     num_violations = 0
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', DEFAULT_SYSTEMS).split(',')
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -83,13 +95,7 @@ def run_pylint(options):
         if errors:
             flags.append("--errors-only")
 
-        apps = [system]
-
-        for directory in ['lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
+        apps_list = _get_code_directories_for_system(system, subdirectories=['lib'])
 
         pythonpath_prefix = (
             "PYTHONPATH={system}:{system}/djangoapps:{system}/"
@@ -149,7 +155,7 @@ def run_pep8(options):
     fail the task if too many violations are found.
     """
     num_violations = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    systems = getattr(options, 'system', DEFAULT_SYSTEMS).split(',')
     violations_limit = int(getattr(options, 'limit', -1))
 
     for system in systems:
@@ -238,7 +244,7 @@ def run_quality(options):
 
     pythonpath_prefix = (
         "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:"
-        "common:common/djangoapps:common/lib"
+        "common:common/djangoapps:common/lib:openedx:openedx/core:openedx/core/djangoapps"
     )
 
     try:

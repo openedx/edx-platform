@@ -225,7 +225,6 @@ class TestCohorts(ModuleStoreTestCase):
         # get_cohort should return a group for user
         self.assertEquals(cohorts.get_cohort(user, course.id).name, "AutoGroup")
 
-
     def test_auto_cohorting(self):
         """
         Make sure cohorts.get_cohort() does the right thing with auto_cohort_groups
