@@ -36,7 +36,7 @@
 @import 'course/base/mixins';
 @import 'course/base/base';
 @import 'course/base/extends';
-@import 'xmodule/modules/css/module-styles.scss';
+@import '../../../common/static/xmodule/modules/css/module-styles.scss';
 @import 'course/courseware/courseware';
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
@@ -79,7 +79,7 @@
 @import "course/instructor/instructor";
 @import "course/instructor/instructor_2";
 @import "course/instructor/email";
-@import "xmodule/descriptors/css/module-styles.scss";
+@import "../../../common/static/xmodule/descriptors/css/module-styles.scss";
 
 // course - discussion
 @import "course/discussion/form-wmd-toolbar";
