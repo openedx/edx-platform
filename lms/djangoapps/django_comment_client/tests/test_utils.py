@@ -14,7 +14,6 @@ from edxmako import add_lookup
 
 from openedx.core.djangoapps.course_groups.cohorts import set_course_cohort_settings
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
