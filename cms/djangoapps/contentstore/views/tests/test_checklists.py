@@ -41,12 +41,12 @@ class ChecklistTestCase(CourseTestCase):
     def test_get_checklists(self):
         """ Tests the get checklists method and URL expansion. """
         response = self.client.get(self.checklists_url)
-        self.assertContains(response, "Getting Started With Studio")
+        self.assertContains(response, "Course Introduction")
         # Verify expansion of action URL happened.
-        self.assertContains(response, 'course_team/mitX/333/Checklists_Course')
+        self.assertContains(response, 'course_info/mitX/333/Checklists_Course')
         # Verify persisted checklist does NOT have expanded URL.
         checklist_0 = self.get_persisted_checklists()[0]
-        self.assertEqual('ManageUsers', get_action_url(checklist_0, 0))
+        self.assertEqual('CourseUpdates', get_action_url(checklist_0, 0))
         payload = response.content
 
         # Now delete the checklists from the course and verify they get repopulated (for courses
@@ -62,7 +62,7 @@ class ChecklistTestCase(CourseTestCase):
     def test_get_checklists_html(self):
         """ Tests getting the HTML template for the checklists page). """
         response = self.client.get(self.checklists_url, HTTP_ACCEPT='text/html')
-        self.assertContains(response, "Getting Started With Studio")
+        self.assertContains(response, "Course Introduction")
         # The HTML generated will define the handler URL (for use by the Backbone model).
         self.assertContains(response, self.checklists_url)
 
@@ -72,7 +72,7 @@ class ChecklistTestCase(CourseTestCase):
         # Verify that persisted checklists do not have expanded action URLs.
         # compare_checklists will verify that returned_checklists DO have expanded action URLs.
         pers = self.get_persisted_checklists()
-        self.assertEqual('CourseOutline', get_first_item(pers[1]).get('action_url'))
+        self.assertEqual('CourseUpdates', get_first_item(pers[0]).get('action_url'))
         for pay, resp in zip(pers, returned_checklists):
             self.compare_checklists(pay, resp)
 
@@ -98,16 +98,16 @@ class ChecklistTestCase(CourseTestCase):
 
     def test_update_checklists_index(self):
         """ Check that an update of a particular checklist works. """
-        update_url = self.get_url(1)
+        update_url = self.get_url(2)
 
-        payload = self.course.checklists[1]
+        payload = self.course.checklists[2]
         self.assertFalse(get_first_item(payload).get('is_checked'))
         self.assertEqual('CourseOutline', get_first_item(payload).get('action_url'))
         get_first_item(payload)['is_checked'] = True
 
         returned_checklist = json.loads(self.client.ajax_post(update_url, payload).content)
         self.assertTrue(get_first_item(returned_checklist).get('is_checked'))
-        persisted_checklist = self.get_persisted_checklists()[1]
+        persisted_checklist = self.get_persisted_checklists()[2]
         # Verify that persisted checklist does not have expanded action URLs.
         # compare_checklists will verify that returned_checklist DOES have expanded action URLs.
         self.assertEqual('CourseOutline', get_first_item(persisted_checklist).get('action_url'))
@@ -136,9 +136,9 @@ class ChecklistTestCase(CourseTestCase):
             # Verify no side effect in the original list.
             self.assertEqual(get_action_url(checklist, index), stored)
 
-        test_expansion(self.course.checklists[0], 0, 'ManageUsers', '/course_team/mitX/333/Checklists_Course/')
-        test_expansion(self.course.checklists[1], 1, 'CourseOutline', '/course/mitX/333/Checklists_Course')
-        test_expansion(self.course.checklists[2], 0, 'http://help.edge.edx.org/', 'http://help.edge.edx.org/')
+        test_expansion(self.course.checklists[0], 0, 'CourseUpdates', '/course_info/mitX/333/Checklists_Course')
+        test_expansion(self.course.checklists[0], 1, 'https://www.edx.org/course/demox-edx-demox-1', 'https://www.edx.org/course/demox-edx-demox-1')
+        test_expansion(self.course.checklists[1], 0, '', '')
 
 
 def get_first_item(checklist):
