@@ -130,7 +130,9 @@ class TestGradeIteration(ModuleStoreTestCase):
 
 
 class TestMaxScoresCache(ModuleStoreTestCase):
-    """docstring for TestMaxScoresCache"""
+    """
+    Tests for the MaxScoresCache
+    """
     def setUp(self):
         super(TestMaxScoresCache, self).setUp()
         self.student = UserFactory.create()
@@ -147,7 +149,9 @@ class TestMaxScoresCache(ModuleStoreTestCase):
 
     @override_settings(KEY_PREFIX=str(uuid.uuid4()))  # hack to ensure unique cache per test
     def test_max_scores_cache(self):
-
+        """
+        Tests the behavior fo the MaxScoresCache
+        """
         max_scores_cache = MaxScoresCache(self.locations)
 
         self.assertEqual(max_scores_cache.locations, self.locations)

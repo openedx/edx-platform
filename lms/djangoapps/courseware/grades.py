@@ -32,7 +32,9 @@ from xblock.core import XBlock
 log = logging.getLogger("edx.courseware")
 
 GRADED_LOCATION_CATEGORIES = set(
-    cat for (cat, xblock_class) in XBlock.load_classes() if getattr(xblock_class, 'has_score', True)
+    cat for (cat, xblock_class) in XBlock.load_classes() if (
+        getattr(xblock_class, 'has_score', True) or getattr(xblock_class, 'has_children', True)
+    )
 )
 
 
@@ -46,7 +48,10 @@ def descriptor_filter(descriptor):
 
 
 class MaxScoresCache(object):
-    """docstring for MaxScoresCache"""
+    """
+    A cache for students' problems' max scores when students look at, but
+    do not answer, problems.
+    """
     def __init__(self, locations):
         self.locations = locations
         self._max_scores_cache = {}
@@ -550,6 +555,7 @@ def get_score(course_id, user, problem_descriptor, module_creator, max_scores_ca
             return (None, None)
 
         else:
+            # add location to the max score cache
             max_scores_cache.set(problem_descriptor.location, total)
 
     # Now we re-weight the problem, if specified
