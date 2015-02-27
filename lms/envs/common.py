@@ -1171,39 +1171,38 @@ PIPELINE_CSS = {
     },
     'style-app': {
         'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
+            'sass/lms-app.css'
         ],
         'output_filename': 'css/lms-style-app.css',
     },
     'style-app-extend1': {
         'source_filenames': [
-            'sass/application-extend1.css',
+            'sass/lms-app-extend1.css',
         ],
         'output_filename': 'css/lms-style-app-extend1.css',
     },
     'style-app-extend2': {
         'source_filenames': [
-            'sass/application-extend2.css',
+            'sass/lms-app-extend2.css',
         ],
         'output_filename': 'css/lms-style-app-extend2.css',
     },
     'style-app-rtl': {
         'source_filenames': [
-            'sass/application-rtl.css',
+            'sass/lms-app-rtl.css',
             'sass/ie-rtl.css'
         ],
         'output_filename': 'css/lms-style-app-rtl.css',
     },
     'style-app-extend1-rtl': {
         'source_filenames': [
-            'sass/application-extend1-rtl.css',
+            'sass/lms-app-extend1-rtl.css',
         ],
         'output_filename': 'css/lms-style-app-extend1-rtl.css',
     },
     'style-app-extend2-rtl': {
         'source_filenames': [
-            'sass/application-extend2-rtl.css',
+            'sass/lms-app-extend2-rtl.css',
         ],
         'output_filename': 'css/lms-style-app-extend2-rtl.css',
     },
