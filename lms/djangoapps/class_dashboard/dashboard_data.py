@@ -16,6 +16,8 @@ from instructor_analytics.csvs import create_csv_response
 from analyticsclient.client import Client
 from analyticsclient.exceptions import NotFoundError
 from opaque_keys.edx.locations import Location
+from student.models import CourseAccessRole
+from opaque_keys.edx import locator
 
 # Used to limit the length of list displayed to the screen.
 MAX_SCREEN_LIST_LENGTH = 250
@@ -23,6 +25,21 @@ PROB_TYPE_LIST = [
     'problem',
     'lti',
 ]
+
+# exclude these in Metrics
+NON_STUDENT_ROLES = ['instructor', 'staff']
+
+
+def get_non_student_list(course_key):
+    """
+    Find all user_ids with instructor or staff roles in student_courseaccessrole table
+    """
+    non_students = CourseAccessRole.objects.filter(
+        course_id=course_key,
+        role__in=NON_STUDENT_ROLES,
+    ).values('user_id').distinct()
+
+    return [non_student['user_id'] for non_student in non_students]
 
 
 def get_problem_grade_distribution(course_id, enrollment):
@@ -40,6 +57,7 @@ def get_problem_grade_distribution(course_id, enrollment):
       'total_student_count' where the key is problem 'module_id' and the value is number of students
         attempting the problem
     """
+    non_student_list = get_non_student_list(course_id)
 
     prob_grade_distrib = {}
     total_student_count = defaultdict(int)
@@ -50,7 +68,7 @@ def get_problem_grade_distribution(course_id, enrollment):
             course_id__exact=course_id,
             grade__isnull=False,
             module_type__in=PROB_TYPE_LIST,
-        ).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
+        ).exclude(student_id__in=non_student_list).values('module_state_key', 'grade', 'max_grade').annotate(count_grade=Count('grade'))
 
         # Loop through resultset building data for each problem
         for row in queryset:
@@ -123,12 +141,14 @@ def get_sequential_open_distrib(course_id, enrollment):
     """
     sequential_open_distrib = {}
 
+    non_student_list = get_non_student_list(course_id)
+
     if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB:
         # Aggregate query on studentmodule table for "opening a subsection" data
         queryset = models.StudentModule.objects.filter(
             course_id__exact=course_id,
             module_type__exact='sequential',
-        ).values('module_state_key').annotate(count_sequential=Count('module_state_key'))
+        ).exclude(student_id__in=non_student_list).values('module_state_key').annotate(count_sequential=Count('module_state_key'))
 
         for row in queryset:
             module_id = course_id.make_usage_key_from_deprecated_string(row['module_state_key'])
@@ -170,6 +190,9 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
       'max_grade' - the maximum grade possible for the course
       'grade_distrib' - array of tuples (`grade`,`count`) ordered by `grade`
     """
+
+    non_student_list = get_non_student_list(course_id)
+
     prob_grade_distrib = {}
 
     if enrollment <= settings.MAX_ENROLLEES_FOR_METRICS_USING_DB:
@@ -179,7 +202,7 @@ def get_problem_set_grade_distrib(course_id, problem_set, enrollment):
             grade__isnull=False,
             module_type__in=PROB_TYPE_LIST,
             module_state_key__in=problem_set,
-        ).values(
+        ).exclude(student_id__in=non_student_list).values(
             'module_state_key',
             'grade',
             'max_grade',
@@ -529,15 +552,20 @@ def get_students_opened_subsection(request, csv=False):
     student names, usernames for CSV download.
     """
     module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    course_id = request.GET.get('course_id')
     csv = request.GET.get('csv')
+
+    course_key = locator.CourseLocator.from_string(course_id)
+    non_student_list = get_non_student_list(course_key)
 
     # Query for "opened a subsection" students
     students = models.StudentModule.objects.select_related('student').filter(
         module_state_key__exact=module_state_key,
         module_type__exact='sequential',
-    ).values('student__username', 'student__profile__name').order_by('student__profile__name')
+    ).exclude(student_id__in=non_student_list).values('student__id', 'student__username', 'student__profile__name').order_by('student__profile__name')
 
     results = []
+
     if not csv:
         # Restrict screen list length
         # Adding 1 so can tell if list is larger than MAX_SCREEN_LIST_LENGTH
@@ -547,7 +575,6 @@ def get_students_opened_subsection(request, csv=False):
                 'name': student['student__profile__name'],
                 'username': student['student__username'],
             })
-
         max_exceeded = False
         if len(results) > MAX_SCREEN_LIST_LENGTH:
             # Remove the last item so list length is exactly MAX_SCREEN_LIST_LENGTH
@@ -563,7 +590,6 @@ def get_students_opened_subsection(request, csv=False):
 
         # Subsection name is everything after 3rd space in tooltip
         filename = sanitize_filename(' '.join(tooltip.split(' ')[3:]))
-
         header = [_("Name").encode('utf-8'), _("Username").encode('utf-8')]
         for student in students:
             results.append([student['student__profile__name'], student['student__username']])
@@ -581,16 +607,21 @@ def get_students_problem_grades(request, csv=False):
     student names, usernames, grades, percents for CSV download.
     """
     module_state_key = Location.from_deprecated_string(request.GET.get('module_id'))
+    course_id = request.GET.get('course_id')
     csv = request.GET.get('csv')
+
+    course_key = locator.CourseLocator.from_string(course_id)
+    non_student_list = get_non_student_list(course_key)
 
     # Query for "problem grades" students
     students = models.StudentModule.objects.select_related('student').filter(
         module_state_key=module_state_key,
         module_type__in=PROB_TYPE_LIST,
         grade__isnull=False,
-    ).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')
+    ).exclude(student_id__in=non_student_list).values('student__username', 'student__profile__name', 'grade', 'max_grade').order_by('student__profile__name')
 
     results = []
+
     if not csv:
         # Restrict screen list length
         # Adding 1 so can tell if list is larger than MAX_SCREEN_LIST_LENGTH
@@ -606,7 +637,6 @@ def get_students_problem_grades(request, csv=False):
             if student['max_grade'] > 0:
                 student_dict['percent'] = round(student['grade'] * 100 / student['max_grade'])
             results.append(student_dict)
-
         max_exceeded = False
         if len(results) > MAX_SCREEN_LIST_LENGTH:
             # Remove the last item so list length is exactly MAX_SCREEN_LIST_LENGTH
@@ -624,7 +654,6 @@ def get_students_problem_grades(request, csv=False):
 
         header = [_("Name").encode('utf-8'), _("Username").encode('utf-8'), _("Grade").encode('utf-8'), _("Percent").encode('utf-8')]
         for student in students:
-
             percent = 0
             if student['max_grade'] > 0:
                 percent = round(student['grade'] * 100 / student['max_grade'])
