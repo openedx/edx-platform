@@ -975,7 +975,7 @@ def xblock_view(request, course_id, usage_id, view_name):
     return JsonResponse({
         'html': fragment.content,
         'resources': hashed_resources.items(),
-        'csrf_token': str(csrf(request)['csrf_token']),
+        'csrf_token': unicode(csrf(request)['csrf_token']),
     })
 
 
