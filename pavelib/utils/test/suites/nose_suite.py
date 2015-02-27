@@ -141,7 +141,7 @@ class SystemTestSuite(NoseTestSuite):
 
         if self.root == 'lms':
             default_test_id += " {system}/tests.py".format(system=self.root)
-        
+
         if self.root == 'cms':
             default_test_id += " {system}/tests/*".format(system=self.root)
 

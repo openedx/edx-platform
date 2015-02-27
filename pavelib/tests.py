@@ -204,7 +204,6 @@ def coverage(options):
                 dir=directory
             ))
 
-
     call_task('diff_coverage', options=dict(options))
 
 

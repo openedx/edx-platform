@@ -54,8 +54,6 @@ if on_rtd:
 else:
     os.environ['DJANGO_SETTINGS_MODULE'] = 'lms'
 
-
-
 # -- General configuration -----------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
@@ -72,5 +70,3 @@ exclude_patterns = ['build', 'links.rst']
 
 project = u'edX Enrollment API Version 1'
 copyright = u'2015, edX'
-
-

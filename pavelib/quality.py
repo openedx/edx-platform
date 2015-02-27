@@ -1,11 +1,98 @@
 """
 Check code quality using pep8, pylint, and diff_quality.
 """
+from __future__ import print_function
 from paver.easy import sh, task, cmdopts, needs, BuildFailure
 import os
 import re
 
 from .utils.envs import Env
+
+DIRECTORIES_TOP_LEVEL_COMMON = {
+    'common',
+    'openedx',
+}
+
+DIRECTORIES_TOP_LEVEL_SYSTEMS = {
+    'cms',
+    'docs',
+    'lms',
+    'pavelib',
+    'scripts',
+}
+
+DIRECTORIES_TOP_LEVEL_ALL = set()
+DIRECTORIES_TOP_LEVEL_ALL.update(DIRECTORIES_TOP_LEVEL_COMMON)
+DIRECTORIES_TOP_LEVEL_ALL.update(DIRECTORIES_TOP_LEVEL_SYSTEMS)
+
+DIRECTORIES_INNER = {
+    'djangoapps',
+    'lib',
+}
+
+
+def _get_path_list(system):
+    """
+    Gather a list of subdirectories within the system
+
+    :param system: the system directory to search; e.g. 'lms', 'cms'
+    :returns: a list of system subdirectories to be linted
+    """
+    paths = [
+        system,
+    ]
+
+    for directory in DIRECTORIES_INNER:
+        try:
+            directories = os.listdir(os.path.join(system, directory))
+        except OSError:
+            pass
+        else:
+            paths.extend([
+                directory
+                for directory in directories
+                if os.path.isdir(os.path.join(system, directory, directory))
+            ])
+
+    path_list = ' '.join(paths)
+    return path_list
+
+
+def _get_python_path_prefix(directory_system):
+    """
+    Build a string to specify the PYTHONPATH environment variable
+
+    :param directory_system: the system directory to search; e.g. 'lms', 'cms'
+    :returns str: a PYTHONPATH environment string for the command line
+    """
+    paths = {
+        directory_system,
+    }
+    directories_all = set(DIRECTORIES_TOP_LEVEL_COMMON)
+    directories_all.add(directory_system)
+    for system in directories_all:
+        for subsystem in DIRECTORIES_INNER:
+            path = os.path.join(system, subsystem)
+            paths.add(path)
+    paths = ':'.join(paths)
+    environment_python_path = "PYTHONPATH={paths}".format(
+        paths=paths,
+    )
+    return environment_python_path
+
+
+def _parse(options):
+    """
+    Parse command line options, setting sane defaults
+
+    :param options: a Paver Options object
+    :returns dict: containing: errors, system, limit
+    """
+    return {
+        'errors': getattr(options, 'errors', False),
+        'systems': getattr(options, 'system', ','.join(DIRECTORIES_TOP_LEVEL_ALL)).split(','),
+        'limit': int(getattr(options, 'limit', -1)),
+    }
 
 
 @task
@@ -17,44 +104,28 @@ def find_fixme(options):
     """
     Run pylint on system code, only looking for fixme items.
     """
-    num_fixme = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    count = 0
+    options = _parse(options)
 
-    for system in systems:
-        # Directory to put the pylint report in.
-        # This makes the folder if it doesn't already exist.
+    for system in options['systems']:
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
-
-        apps = [system]
-
-        for directory in ['djangoapps', 'lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
-
-        pythonpath_prefix = (
-            "PYTHONPATH={system}:{system}/lib"
-            "common/djangoapps:common/lib".format(
-                system=system
-            )
-        )
-
+        path_list = _get_path_list(system)
+        environment_python_path = _get_python_path_prefix(system)
         sh(
-            "{pythonpath_prefix} pylint --disable R,C,W,E --enable=fixme "
-            "--msg-template={msg_template} {apps} "
+            "{environment_python_path} pylint --disable R,C,W,E --enable=fixme "
+            "--msg-template={msg_template} {path_list} "
             "| tee {report_dir}/pylint_fixme.report".format(
-                pythonpath_prefix=pythonpath_prefix,
+                environment_python_path=environment_python_path,
                 msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
-                apps=apps_list,
+                path_list=path_list,
                 report_dir=report_dir
             )
         )
+        count += _count_pylint_violations(
+            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir)
+        )
 
-        num_fixme += _count_pylint_violations(
-            "{report_dir}/pylint_fixme.report".format(report_dir=report_dir))
-
-    print("Number of pylint fixmes: " + str(num_fixme))
+    print("Number of pylint fixmes: " + str(count))
 
 
 @task
@@ -70,52 +141,34 @@ def run_pylint(options):
     fail the task if too many violations are found.
     """
     num_violations = 0
-    violations_limit = int(getattr(options, 'limit', -1))
-    errors = getattr(options, 'errors', False)
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
+    options = _parse(options)
 
-    for system in systems:
-        # Directory to put the pylint report in.
-        # This makes the folder if it doesn't already exist.
+    for system in options['systems']:
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
 
         flags = []
-        if errors:
+        if options['errors']:
             flags.append("--errors-only")
 
-        apps = [system]
-
-        for directory in ['lib']:
-            dirs = os.listdir(os.path.join(system, directory))
-            apps.extend([d for d in dirs if os.path.isdir(os.path.join(system, directory, d))])
-
-        apps_list = ' '.join(apps)
-
-        pythonpath_prefix = (
-            "PYTHONPATH={system}:{system}/djangoapps:{system}/"
-            "lib:common/djangoapps:common/lib".format(
-                system=system
-            )
-        )
-
+        path_list = _get_path_list(system)
+        environment_python_path = _get_python_path_prefix(system)
         sh(
-            "{pythonpath_prefix} pylint {flags} --msg-template={msg_template} {apps} | "
+            "{environment_python_path} pylint {flags} --msg-template={msg_template} {path_list} | "
             "tee {report_dir}/pylint.report".format(
-                pythonpath_prefix=pythonpath_prefix,
-                flags=" ".join(flags),
+                environment_python_path=environment_python_path,
+                flags=' '.join(flags),
                 msg_template='"{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"',
-                apps=apps_list,
+                path_list=path_list,
                 report_dir=report_dir
             )
         )
-
         num_violations += _count_pylint_violations(
             "{report_dir}/pylint.report".format(report_dir=report_dir))
 
     print("Number of pylint violations: " + str(num_violations))
-    if num_violations > violations_limit > -1:
+    if num_violations > options['limit'] > -1:
         raise Exception("Failed. Too many pylint violations. "
-                        "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+                        "The limit is {violations_limit}.".format(violations_limit=options['limit']))
 
 
 def _count_pylint_violations(report_file):
@@ -148,24 +201,19 @@ def run_pep8(options):
     Run pep8 on system code. When violations limit is passed in,
     fail the task if too many violations are found.
     """
-    num_violations = 0
-    systems = getattr(options, 'system', 'lms,cms,common').split(',')
-    violations_limit = int(getattr(options, 'limit', -1))
+    options = _parse(options)
+    count = 0
 
-    for system in systems:
-        # Directory to put the pep8 report in.
-        # This makes the folder if it doesn't already exist.
+    for system in options['systems']:
         report_dir = (Env.REPORT_DIR / system).makedirs_p()
-
         sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
-        num_violations = num_violations + _count_pep8_violations(
-            "{report_dir}/pep8.report".format(report_dir=report_dir))
+        count += _count_pep8_violations(
+            "{report_dir}/pep8.report".format(report_dir=report_dir)
+        )
 
-    print("Number of pep8 violations: " + str(num_violations))
-    # Fail the task if the violations limit has been reached
-    if num_violations > violations_limit > -1:
-        raise Exception("Failed. Too many pep8 violations. "
-                        "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+    print("Number of pep8 violations: {count}".format(count=count))
+    if count:
+        raise Exception("Failed. Too many pep8 violations.")
 
 
 def _count_pep8_violations(report_file):
@@ -236,17 +284,17 @@ def run_quality(options):
     pylint_files = get_violations_reports("pylint")
     pylint_reports = u' '.join(pylint_files)
 
-    pythonpath_prefix = (
+    environment_python_path = (
         "PYTHONPATH=$PYTHONPATH:lms:lms/djangoapps:lms/lib:cms:cms/djangoapps:cms/lib:"
         "common:common/djangoapps:common/lib"
     )
 
     try:
         sh(
-            "{pythonpath_prefix} diff-quality --violations=pylint "
+            "{environment_python_path} diff-quality --violations=pylint "
             "{pylint_reports} {percentage_string} {compare_branch_string} "
             "--html-report {dquality_dir}/diff_quality_pylint.html ".format(
-                pythonpath_prefix=pythonpath_prefix,
+                environment_python_path=environment_python_path,
                 pylint_reports=pylint_reports,
                 percentage_string=percentage_string,
                 compare_branch_string=compare_branch_string,
@@ -270,10 +318,7 @@ def is_percentage_failure(error_message):
     paver with a subprocess return code error. If the subprocess exits with anything other than 1, raise
     a paver exception.
     """
-    if "Subprocess return code: 1" not in error_message:
-        return False
-    else:
-        return True
+    return "Subprocess return code: 1" in error_message
 
 
 def get_violations_reports(violations_type):

@@ -98,7 +98,7 @@ def ensure_pr_fetch():
     """
     modified = False
     remotes = git.remote().splitlines()
-    if not "edx" in remotes:
+    if 'edx' not in remotes:
         git.remote("add", "edx", "https://github.com/edx/edx-platform.git")
         modified = True
     # it would be nice to use the git-python API to do this, but it doesn't seem
@@ -251,9 +251,9 @@ def ensure_github_creds(attempts=3):
     else:
         config = {}
     # update config
-    if not "credentials" in config:
+    if 'credentials' not in config:
         config["credentials"] = {}
-    if not "api.github.com" in config["credentials"]:
+    if 'api.github.com' not in config['credentials']:
         config["credentials"]["api.github.com"] = {}
     config["credentials"]["api.github.com"]["username"] = username
     config["credentials"]["api.github.com"]["token"] = token
