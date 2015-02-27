@@ -286,9 +286,15 @@ def get_component_templates(courselike, library=False):
             for advanced_problem_type in ADVANCED_PROBLEM_TYPES:
                 component = advanced_problem_type['component']
                 boilerplate_name = advanced_problem_type['boilerplate_name']
-                component_display_name = xblock_type_display_name(component)
-                templates_for_category.append(create_template_dict(component_display_name, component, boilerplate_name))
-                categories.add(component)
+                try:
+                    component_display_name = xblock_type_display_name(component)
+                except PluginMissingError:
+                    log.warning('Unable to load xblock type %s to read display_name', component, exc_info=True)
+                else:
+                    templates_for_category.append(
+                        create_template_dict(component_display_name, component, boilerplate_name)
+                    )
+                    categories.add(component)
 
         component_templates.append({
             "type": category,
