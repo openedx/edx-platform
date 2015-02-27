@@ -1,0 +1,139 @@
+/*
+ * This file is dynamically generated and ignored by Git.
+ * DO NOT MAKE CHANGES HERE. Instead, go edit its template:
+ * /edx/app/edxapp/edx-platform/lms/static/sass/_base.scss.mako
+ */
+
+// lms - css application architecture
+// ====================
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
+@import 'base/reset';
+@import 'base/font_face';
+@import 'base/variables';
+@import 'base/mixins';
+
+
+@import 'base/base';
+
+// base - assets
+@import 'base/extends';
+@import 'base/animations';
+
+// base - starter
+@import 'base/base';
+
+// base - elements
+@import 'elements/typography';
+@import 'elements/controls';
+@import 'elements/system-feedback';
+@import 'elements/navigation'; // all archetypes of navigation
+
+// shared - course
+@import 'shared/forms';
+@import 'shared/footer';
+@import 'shared/header';
+@import 'shared/course_object';
+@import 'shared/course_filter';
+@import 'shared/modal';
+@import 'shared/activation_messages';
+@import 'shared/unsubscribe';
+@import 'shared/tooltips';
+
+// shared - platform
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/account';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/media-kit';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+@import 'multicourse/edge';
+@import 'multicourse/survey-page';
+
+// base - specific views
+@import 'views/login-register';
+@import 'views/verification';
+@import 'views/decoupled-verification';
+@import 'views/shoppingcart';
+
+// applications
+@import "discussion/utilities/variables";
+@import "discussion/mixins";
+@import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import "discussion/elements/actions";
+@import "discussion/elements/editor";
+@import "discussion/elements/labels";
+@import "discussion/elements/navigation";
+@import "discussion/views/thread";
+@import "discussion/views/create-edit-post";
+@import "discussion/views/response";
+@import 'discussion/utilities/developer';
+@import 'discussion/utilities/shame';
+
+@import 'news';
+
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
+
+// course - base
+@import 'course/layout/courseware_header';
+@import 'course/layout/courseware_preview';
+@import 'course/layout/footer';
+@import 'course/base/mixins';
+@import 'course/base/base';
+@import 'course/base/extends';
+@import '../../../common/static/xmodule/modules/css/module-styles.scss';
+@import 'course/courseware/courseware';
+@import 'course/courseware/sidebar';
+@import 'course/courseware/amplifier';
+
+    @import 'course/courseware/courseware_search';
+
+// course - modules
+@import 'course/modules/student-notes'; // student notes
+@import 'course/modules/calculator'; // calculator utility
+@import 'course/modules/timer'; // timer
+@import 'course/modules/chat'; // chat utility
+
+
+// course - specific courses
+@import "course/courseware/courses/_cs188.scss";
+
+// course - wiki
+@import "course/wiki/basic-html";
+@import "course/wiki/sidebar";
+@import "course/wiki/create";
+@import "course/wiki/wiki";
+@import "course/wiki/table";
+
+// course - views
+@import "course/info";
+@import "course/syllabus"; // TODO arjun replace w/ custom tabs, see courseware/courses.py
+@import "course/textbook";
+@import "course/profile";
+@import "course/gradebook";
+@import "course/tabs";
+@import "course/staff_grading";
+@import "course/rubric";
+@import "course/open_ended_grading";
+@import "course/student-notes";
+
+// course - instructor-only views
+@import "course/instructor/instructor";
+@import "course/instructor/instructor_2";
+@import "course/instructor/email";
+@import "../../../common/static/xmodule/descriptors/css/module-styles.scss";
+
+// course - discussion
+@import "course/discussion/form-wmd-toolbar";
+
+// IE fixes
+@import "ie";
