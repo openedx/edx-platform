@@ -143,7 +143,7 @@ FEATURES = {
     'ENTRANCE_EXAMS': False,
 
     # Enable the courseware search functionality
-    'ENABLE_COURSEWARE_INDEX': False,
+    'ENABLE_COURSEWARE_INDEX': True,
 
     # Enable content libraries search functionality
     'ENABLE_LIBRARY_INDEX': False,
