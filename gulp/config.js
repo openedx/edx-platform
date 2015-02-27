@@ -4,8 +4,16 @@ var studioSrc  = './cms/static',
     lmsDest    = './lms/static';
 
 module.exports = {
-    stylesStudio: {
-        src: studioSrc + '/sass/**/*.scss',
-        dest: studioDest + '/css'
+    styles: {
+        lms: {
+            src: lmsSrc + '/sass/**/*.scss',
+            dest: lmsDest + '/css',
+            clean: lmsDest + '/css/*.css'
+        },
+
+        studio: {
+            src: studioSrc + '/sass/**/*.scss',
+            dest: studioDest + '/css'
+        }
     }
 };

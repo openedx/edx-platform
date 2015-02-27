@@ -4,6 +4,7 @@ var gulp = require('gulp'),
 
 gulp.task( 'clean', function(cb) {
     del([
-        config.stylesStudio.dest
+        config.styles.lms.clean,
+        config.styles.studio.dest
     ], cb);
 });

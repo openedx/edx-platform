@@ -1,6 +1,12 @@
-@import 'vendor/bourbon/bourbon';
-@import 'vendor/bi-app/bi-app-rtl'; // set the layout for right to left languages
+## Note: This Sass infrastructure is repeated in application-extend1 and application-extend2, but needed in order to address an IE9 rule limit within CSS - http://blogs.msdn.com/b/ieinternals/archive/2011/05/14/10164546.aspx
 
+// lms - css application architecture
+// ====================
+
+// BASE  *default edX offerings*
+// ====================
+
+// base - utilities
 @import 'base/reset';
 @import 'base/font_face';
 @import 'base/variables';
@@ -20,15 +26,70 @@
 % endif
 
 @import 'base/base';
+
+// base - assets
 @import 'base/extends';
 @import 'base/animations';
-@import 'shared/tooltips';
+
+// base - starter
+@import 'base/base';
 
 // base - elements
 @import 'elements/typography';
 @import 'elements/controls';
+@import 'elements/system-feedback';
 @import 'elements/navigation'; // all archetypes of navigation
 
+// shared - course
+@import 'shared/forms';
+@import 'shared/footer';
+@import 'shared/header';
+@import 'shared/course_object';
+@import 'shared/course_filter';
+@import 'shared/modal';
+@import 'shared/activation_messages';
+@import 'shared/unsubscribe';
+@import 'shared/tooltips';
+
+// shared - platform
+@import 'multicourse/home';
+@import 'multicourse/dashboard';
+@import 'multicourse/account';
+@import 'multicourse/courses';
+@import 'multicourse/course_about';
+@import 'multicourse/jobs';
+@import 'multicourse/media-kit';
+@import 'multicourse/about_pages';
+@import 'multicourse/press_release';
+@import 'multicourse/error-pages';
+@import 'multicourse/help';
+@import 'multicourse/edge';
+@import 'multicourse/survey-page';
+
+// base - specific views
+@import 'views/login-register';
+@import 'views/verification';
+@import 'views/decoupled-verification';
+@import 'views/shoppingcart';
+
+// applications
+@import "discussion/utilities/variables";
+@import "discussion/mixins";
+@import 'discussion/discussion'; // Process old file after definitions but before everything else
+@import "discussion/elements/actions";
+@import "discussion/elements/editor";
+@import "discussion/elements/labels";
+@import "discussion/elements/navigation";
+@import "discussion/views/thread";
+@import "discussion/views/create-edit-post";
+@import "discussion/views/response";
+@import 'discussion/utilities/developer';
+@import 'discussion/utilities/shame';
+
+@import 'news';
+
+@import 'developer'; // used for any developer-created scss that needs further polish/refactoring
+@import 'shame';     // used for any bad-form/orphaned scss
 
 // course - base
 @import 'course/layout/courseware_header';
@@ -42,11 +103,17 @@
 @import 'course/courseware/sidebar';
 @import 'course/courseware/amplifier';
 
+## Import styles for courseware search
+% if env["FEATURES"].get("ENABLE_COURSEWARE_SEARCH"):
+    @import 'course/courseware/courseware_search';
+% endif
+
 // course - modules
 @import 'course/modules/student-notes'; // student notes
 @import 'course/modules/calculator'; // calculator utility
 @import 'course/modules/timer'; // timer
 @import 'course/modules/chat'; // chat utility
+
 
 // course - specific courses
 @import "course/courseware/courses/_cs188.scss";
@@ -78,3 +145,6 @@
 
 // course - discussion
 @import "course/discussion/form-wmd-toolbar";
+
+// IE fixes
+@import "ie";

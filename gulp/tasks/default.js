@@ -3,5 +3,5 @@ var gulp = require('gulp'),
 
 gulp.task( 'default', function() {
     runSequence( 'clean',
-                ['stylesStudio', 'watch']);
+                ['stylesStudio', 'stylesLMS', 'watch'] );
 });
