@@ -45,11 +45,6 @@ class AccountUsernameAlreadyExists(AccountUserAlreadyExists):
     pass
 
 
-class AccountEmailAlreadyExists(AccountUserAlreadyExists):
-    """An account already exists with the requested email. """
-    pass
-
-
 class AccountUsernameInvalid(AccountRequestError):
     """The requested username is not in a valid format. """
     pass
@@ -215,122 +210,6 @@ def activate_account(activation_key):
     else:
         # This implicitly saves the registration
         registration.activate()
-
-
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
-def request_email_change(username, new_email, password):
-    """Request an email change.
-
-    Users must confirm the change before we update their information.
-
-    Args:
-        username (unicode): The username associated with the account.
-        new_email (unicode): The user's new email address.
-        password (unicode): The password the user entered to authorize the change.
-
-    Returns:
-        unicode: an activation key for the account.
-
-    Raises:
-        AccountUserNotFound
-        AccountEmailAlreadyExists
-        AccountEmailInvalid
-        AccountNotAuthorized
-
-    """
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        raise AccountUserNotFound
-
-    # Check the user's credentials
-    if not user.check_password(password):
-        raise AccountNotAuthorized
-
-    # Validate the email, raising an exception if it is not in the correct format
-    _validate_email(new_email)
-
-    # Verify that no active account has taken the email in between
-    # the request and the activation.
-    # We'll check again before confirming and persisting the change,
-    # but if the email is already taken by an active account, we should
-    # let the user know as soon as possible.
-    if User.objects.filter(email=new_email, is_active=True).exists():
-        raise AccountEmailAlreadyExists
-
-    try:
-        pending_change = PendingEmailChange.objects.get(user=user)
-    except PendingEmailChange.DoesNotExist:
-        pending_change = PendingEmailChange(user=user)
-
-    # Update the change (re-using the same record if it already exists)
-    # This will generate a new activation key and save the record.
-    return pending_change.request_change(new_email)
-
-
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
-@transaction.commit_on_success
-def confirm_email_change(activation_key):
-    """Confirm an email change.
-
-    Users can confirm the change by providing an activation key
-    they received via email.
-
-    Args:
-        activation_key (unicode): The activation key the user received
-            when he/she requested the email change.
-
-    Returns:
-        Tuple: (old_email, new_email)
-
-    Raises:
-        AccountNotAuthorized: The activation code is invalid.
-        AccountEmailAlreadyExists: Someone else has already taken the email address.
-        AccountInternalError
-
-    """
-
-    try:
-        # Activation key has a uniqueness constraint, so we're guaranteed to get
-        # at most one pending change.
-        pending_change = PendingEmailChange.objects.select_related('user').get(
-            activation_key=activation_key
-        )
-    except PendingEmailChange.DoesNotExist:
-        # If there are no changes, then the activation key is invalid
-        raise AccountNotAuthorized
-    else:
-        old_email = pending_change.user.email
-        new_email = pending_change.new_email
-
-        # Verify that no one else has taken the email in between
-        # the request and the activation.
-        # In our production database, email has a uniqueness constraint,
-        # so there is no danger of a race condition here.
-        if User.objects.filter(email=new_email).exists():
-            raise AccountEmailAlreadyExists
-
-        # Update the email history (in the user profile)
-        try:
-            profile = UserProfile.objects.get(user=pending_change.user)
-        except UserProfile.DoesNotExist:
-            raise AccountInternalError(
-                "No profile exists for the user '{username}'".format(
-                    username=pending_change.user.username
-                )
-            )
-        else:
-            profile.update_email(new_email)
-
-        # Delete the pending change, so that the activation code
-        # will be single-use
-        pending_change.delete()
-
-        # Return the old and new email
-        # This allows the caller of the function to notify users at both
-        # the new and old email, which is necessary for security reasons.
-        return (old_email, new_email)
-
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
 def request_password_change(email, orig_host, is_secure):

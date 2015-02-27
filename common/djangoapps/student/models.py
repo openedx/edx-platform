@@ -309,32 +309,6 @@ class UserProfile(models.Model):
         self.name = new_name
         self.save()
 
-    @transaction.commit_on_success
-    def update_email(self, new_email):
-        """Update the user's email and save the change in the history.
-
-        Implicitly saves the model.
-        If the new email is the same as the old email, do not update the history.
-
-        Arguments:
-            new_email (unicode): The new email for the user.
-
-        Returns:
-            None
-        """
-        if self.user.email == new_email:
-            return
-
-        meta = self.get_meta()
-        if 'old_emails' not in meta:
-            meta['old_emails'] = []
-        meta['old_emails'].append([self.user.email, datetime.now(UTC).isoformat()])
-        self.set_meta(meta)
-        self.save()
-
-        self.user.email = new_email
-        self.user.save()
-
 
 class UserSignupSource(models.Model):
     """
