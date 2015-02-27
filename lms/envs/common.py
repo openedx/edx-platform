@@ -1169,43 +1169,17 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/lms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
-            'sass/application.css',
-            'sass/ie.css'
+            'css/lms-main.css'
         ],
-        'output_filename': 'css/lms-style-app.css',
+        'output_filename': 'css/lms-main.css',
     },
-    'style-app-extend1': {
+    'style-main-rtl': {
         'source_filenames': [
-            'sass/application-extend1.css',
+            'css/lms-main-rtl.css'
         ],
-        'output_filename': 'css/lms-style-app-extend1.css',
-    },
-    'style-app-extend2': {
-        'source_filenames': [
-            'sass/application-extend2.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend2.css',
-    },
-    'style-app-rtl': {
-        'source_filenames': [
-            'sass/application-rtl.css',
-            'sass/ie-rtl.css'
-        ],
-        'output_filename': 'css/lms-style-app-rtl.css',
-    },
-    'style-app-extend1-rtl': {
-        'source_filenames': [
-            'sass/application-extend1-rtl.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend1-rtl.css',
-    },
-    'style-app-extend2-rtl': {
-        'source_filenames': [
-            'sass/application-extend2-rtl.css',
-        ],
-        'output_filename': 'css/lms-style-app-extend2-rtl.css',
+        'output_filename': 'css/lms-main-rtl.css',
     },
     'style-course-vendor': {
         'source_filenames': [
@@ -1223,17 +1197,18 @@ PIPELINE_CSS = {
     },
     'style-course': {
         'source_filenames': [
-            'sass/course.css',
+            'css/lms-course.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-style-course.css',
+        # NOTE: locally gulp will override this file without concatenating xmodule/modules.css.
+        'output_filename': 'css/lms-course.css',
     },
     'style-course-rtl': {
         'source_filenames': [
-            'sass/course-rtl.css',
+            'css/lms-course-rtl.css',
             'xmodule/modules.css',
         ],
-        'output_filename': 'css/lms-style-course-rtl.css',
+        'output_filename': 'css/lms-course-rtl.css',
     },
     'style-xmodule-annotations': {
         'source_filenames': [
