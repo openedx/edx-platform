@@ -44,6 +44,7 @@ If true, it:
 """
 
 from . import provider
+# from . import edvera_backend
 
 
 _FIELDS_STORED_IN_SESSION = ['auth_entry', 'next', 'enroll_course_id', 'email_opt_in']
