@@ -444,13 +444,13 @@ PIPELINE_CSS = {
         ],
         'output_filename': 'css/cms-style-vendor-tinymce-skin.css',
     },
-    'style-app': {
+    'style-main': {
         'source_filenames': [
             'css/main.css',
         ],
         'output_filename': 'css/cms-style-app.css',
     },
-    'style-app-rtl': {
+    'style-main-rtl': {
         'source_filenames': [
             'css/main-rtl.css',
         ],
