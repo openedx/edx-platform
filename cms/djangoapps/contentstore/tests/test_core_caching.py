@@ -4,6 +4,9 @@ from django.test import TestCase
 
 
 class Content(object):
+    """
+    Mock cached content
+    """
     def __init__(self, location, content):
         self.location = location
         self.content = content

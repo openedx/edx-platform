@@ -51,6 +51,9 @@ injected humour and the like).
 
 
 class Content(object):
+    """
+    A class with location and content_type members
+    """
     def __init__(self, location, content_type):
         self.location = location
         self.content_type = content_type
