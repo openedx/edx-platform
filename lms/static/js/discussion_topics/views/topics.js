@@ -16,15 +16,12 @@ var edx = edx || {};
             this.template = _.template($('#cohort-discussions-tpl').text());
         },
         render: function () {
-            var inlineTopicsHtml = this.renderInlineTopics(this.model),
-                coursewideTopicsHtml = this.renderCoursewideTopics(this.model.get('coursewide_categories'));
-
             this.$el.html(this.template({
-                coursewideTopics: coursewideTopicsHtml,
-                inlineTopicsHtml: inlineTopicsHtml,
+                coursewideTopics: this.renderCoursewideTopics(this.model.get('coursewide_categories')),
+                inlineTopicsHtml: this.renderInlineTopics(this.model),
                 always_cohort_inline_discussions:this.model.get('always_cohort_inline_discussions')
             }));
-            $('.inline-cohorts').qubit();
+            $('ul.inline-cohorts').qubit();
         },
         renderCoursewideTopics: function (topics) {
             var entry_template = _.template($('#cohort-discussions-subcategory-tpl').html());
@@ -92,7 +89,8 @@ var edx = edx || {};
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
             var self = this,
-                fieldData;
+                fieldData,
+                $inlineTopics = self.$('.inline-discussion-topics');
 
             self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
             fieldData = {
@@ -100,43 +98,39 @@ var edx = edx || {};
                 cohorted_discussion_ids: self.cohortedDiscussionTopics,
                 always_cohort_inline_discussions:self.$('.check-all-inline-discussions').prop('checked')
             };
-            self.saveForm(fieldData)
+            self.saveForm(fieldData, $inlineTopics)
                 .done(function () {
                     self.model.fetch().done(function () {
-                        self.showMessage(
-                            gettext('Changes Saved.'),
-                            self.$('.action-save')
-                        );
+                        self.showMessage(gettext('Changes Saved.'), $inlineTopics);
                     });
                 });
         },
         saveCoursewideDiscussionsForm: function (event) {
             var self = this,
-                fieldData;
+                fieldData,
+                $coursewideTopics = self.$('.coursewide-discussion-topics');
             event.preventDefault();
-
             self.getCohortedDiscussions('.check-discussion-subcategory-coursewide:checked');
             fieldData = {
                 coursewide_discussions: true,
                 cohorted_discussion_ids: self.cohortedDiscussionTopics
             };
-            self.saveForm(fieldData)
+
+            self.saveForm(fieldData, $coursewideTopics)
                 .done(function () {
                     self.model.fetch().done(function () {
-                        self.showMessage(
-                            gettext('Changes Saved.'),
-                            self.$('.action-save')
-                        );
+                        self.showMessage(gettext('Changes Saved.'), $coursewideTopics);
                     });
                 });
         },
-        saveForm: function (fieldData) {
+        saveForm: function (fieldData, $element) {
             var self = this,
                 discussionsModel = this.model,
                 saveOperation = $.Deferred(),
                 showErrorMessage;
-            showErrorMessage = function (message) {
-                self.showMessage(message, self.$('.action-save'), 'error');
+
+            showErrorMessage = function (message, $element) {
+                self.showMessage(message, $element, 'error');
             };
             this.removeNotification();
 
@@ -156,7 +150,7 @@ var edx = edx || {};
                     if (!errorMessage) {
                         errorMessage = gettext("We've encountered an error. Refresh your browser and then try again.");
                     }
-                    showErrorMessage(errorMessage);
+                    showErrorMessage(errorMessage, $element);
                     saveOperation.reject();
                 });
             return saveOperation.promise();
@@ -168,13 +162,13 @@ var edx = edx || {};
                 element
             );
         },
-        showNotification: function (options, afterElement) {
+        showNotification: function (options, $beforeElement) {
             var model = new NotificationModel(options);
             this.removeNotification();
             this.notification = new NotificationView({
                 model: model
             });
-            afterElement.after(this.notification.$el);
+            $beforeElement.before(this.notification.$el);
             this.notification.render();
         },
         removeNotification: function () {

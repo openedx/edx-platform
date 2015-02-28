@@ -8,7 +8,7 @@
                         <h3 class="subsection-title"><%- gettext('Coursewide Discussion Topics') %></h3>
                         <span><%- gettext('You can optionally designate coursewide discussions topics to be cohorted.') %></span>
                         <div class="field">
-                            <ul class="wrapper-tabs"><%= coursewideTopics %></ul>
+                            <ul class="discussions-wrapper"><%= coursewideTopics %></ul>
                         </div>
                     </div>
                 </div>
@@ -37,7 +37,7 @@
 
                         <hr class="divider divider-lv1" />
                         <div class="field">
-                            <ul class="inline-cohorts wrapper-tabs"><%= inlineTopicsHtml %></ul>
+                            <ul class="inline-cohorts discussions-wrapper"><%= inlineTopicsHtml %></ul>
                         </div>
 
                     </div>

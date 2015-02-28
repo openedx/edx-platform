@@ -1,7 +1,9 @@
 <li class="discussion-category-item">
-    <input type="checkbox" class="check-discussion-category"  <%- is_category_cohorted ? 'checked="checked"' : '' %>/>
-    <span class="category-title"><%- name %></span>
-    <span class="cohorted-text <%- is_category_cohorted ? '' : 'hidden'%>"><%- gettext('- Cohorted') %></span>
+    <div class="category-item">
+        <input type="checkbox" class="check-discussion-category"  <%- is_category_cohorted ? 'checked="checked"' : '' %>/>
+        <span class="category-title"><%- name %></span>
+        <span class="cohorted-text <%- is_category_cohorted ? '' : 'hidden'%>"><%- gettext('- Cohorted') %></span>
+    </div>
 
     <ul class="wrapper-tabs subcategories"><%= entries %></ul>
 </li>
