@@ -23,8 +23,7 @@ from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from certificates.api import certificate_downloadable_status, generate_user_certificates
-from certificates.models import CertificateGenerationConfiguration
+from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -1013,7 +1012,7 @@ def _progress(request, course_key, student_id):
         raise Http404
 
     # checking certificate generation configuration
-    show_generate_cert_btn = CertificateGenerationConfiguration.current().enabled
+    show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
     context = {
         'course': course,
@@ -1023,12 +1022,12 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'reverifications': fetch_reverify_banner_info(request, course_key),
-        'passed': is_course_passed(course, grade_summary) if show_generate_cert_btn else False,
+        'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn
     }
 
     if show_generate_cert_btn:
-        context.update(certificate_downloadable_status(student, course_key))
+        context.update(certs_api.certificate_downloadable_status(student, course_key))
 
     with grades.manual_transaction():
         response = render_to_response('courseware/progress.html', context)
@@ -1301,10 +1300,10 @@ def generate_user_cert(request, course_id):
     if not is_course_passed(course, None, student, request):
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
-    certificate_status = certificate_downloadable_status(student, course.id)
+    certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
     if not certificate_status["is_downloadable"] and not certificate_status["is_generating"]:
-        generate_user_certificates(student, course.id, course=course)
+        certs_api.generate_user_certificates(student, course.id)
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse(_("Creating certificate"))
 

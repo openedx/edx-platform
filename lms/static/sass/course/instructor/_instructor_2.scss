@@ -1773,6 +1773,17 @@ input[name="subject"] {
 }
 }
 
+.certificates-wrapper {
+  .generate-example-certificates-wrapper {
+    margin-bottom: 30px;
+  }
+
+  .example-certificate-status-wrapper {
+    width: 75%;
+  }
+
+}
+
 .profile-distribution-widget {
   margin-bottom: ($baseline * 2);
 

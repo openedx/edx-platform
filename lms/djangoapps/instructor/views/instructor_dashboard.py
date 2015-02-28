@@ -36,6 +36,8 @@ from student.models import CourseEnrollment
 from shoppingcart.models import Coupon, PaidCourseRegistration
 from course_modes.models import CourseMode, CourseModesArchive
 from student.roles import CourseFinanceAdminRole, CourseSalesAdminRole
+from certificates.models import CertificateGenerationConfiguration
+from certificates import api as certs_api
 
 from class_dashboard.dashboard_data import get_section_display_name, get_array_section_has_problem
 from .tools import get_units_with_due_date, title_or_url, bulk_email_is_enabled_for_course
@@ -107,6 +109,13 @@ def instructor_dashboard_2(request, course_id):
     # Gate access to Ecommerce tab
     if course_mode_has_price and (access['finance_admin'] or access['sales_admin']):
         sections.append(_section_e_commerce(course, access, paid_modes[0], is_white_label))
+
+    # Certificates panel
+    # This is used to generate example certificates
+    # and enable self-generated certificates for a course.
+    certs_enabled = CertificateGenerationConfiguration.current().enabled
+    if certs_enabled and access['admin']:
+        sections.append(_section_certificates(course))
 
     disable_buttons = not _is_small_course(course_key)
 
@@ -180,6 +189,53 @@ def _section_e_commerce(course, access, paid_mode, coupons_enabled):
         'total_amount': total_amount
     }
     return section_data
+
+
+def _section_certificates(course):
+    """Section information for the certificates panel.
+
+    The certificates panel allows global staff to generate
+    example certificates and enable self-generated certificates
+    for a course.
+
+    Arguments:
+        course (Course)
+
+    Returns:
+        dict
+
+    """
+    example_cert_status = certs_api.example_certificates_status(course.id)
+
+    # Allow the user to enable self-generated certificates for students
+    # *only* once a set of example certificates has been successfully generated.
+    # If certificates have been misconfigured for the course (for example, if
+    # the PDF template hasn't been uploaded yet), then we don't want
+    # to turn on self-generated certificates for students!
+    can_enable_for_course = (
+        example_cert_status is not None and
+        all(
+            cert_status['status'] == 'success'
+            for cert_status in example_cert_status
+        )
+    )
+    return {
+        'section_key': 'certificates',
+        'section_display_name': _('Certificates'),
+        'example_certificate_status': example_cert_status,
+        'can_enable_for_course': can_enable_for_course,
+        'enabled_for_course': certs_api.cert_generation_enabled(course.id),
+        'urls': {
+            'generate_example_certificates': reverse(
+                'generate_example_certificates',
+                kwargs={'course_id': course.id}
+            ),
+            'enable_certificate_generation': reverse(
+                'enable_certificate_generation',
+                kwargs={'course_id': course.id}
+            )
+        }
+    }
 
 
 @ensure_csrf_cookie

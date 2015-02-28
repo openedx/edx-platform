@@ -109,4 +109,13 @@ urlpatterns = patterns(
     # Cohort management
     url(r'add_users_to_cohorts$',
         'instructor.views.api.add_users_to_cohorts', name="add_users_to_cohorts"),
+
+    # Certificates
+    url(r'^generate_example_certificates$',
+        'instructor.views.api.generate_example_certificates',
+        name='generate_example_certificates'),
+
+    url(r'^enable_certificate_generation$',
+        'instructor.views.api.enable_certificate_generation',
+        name='enable_certificate_generation'),
 )
