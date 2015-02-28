@@ -725,18 +725,17 @@
       vertical-align: middle;
     }
 
-    .form-submit {
-      @include idashbutton($blue);
-      @include font-size(14);
-      @include line-height(14);
-      margin-right: ($baseline/2);
-      margin-bottom: 0;
-      text-shadow: none;
-    }
-
     .form-cancel {
       @extend %t-copy-sub1;
     }
+  }
+  .form-submit {
+    @include idashbutton($blue);
+    @include font-size(14);
+    @include line-height(14);
+    margin-right: ($baseline/2);
+    margin-bottom: 0;
+    text-shadow: none;
   }
 
   .cohort-management-nav {
@@ -1070,6 +1069,22 @@
       }
     }
   }
+  .cohort-discussions-nav {
+    .category-title,
+    .topic-name {
+      padding-left: ($baseline/2);
+    }
+    .category-item {
+      padding-bottom: ($baseline/2);
+    }
+    .cohorted-text {
+      color: $link-color;
+    }
+    .discussions-wrapper {
+      @extend %ui-no-list;
+    }
+  }
+
 
   .wrapper-tabs { // This applies to the tab-like interface that toggles between the student management and the group settings
     @extend %ui-no-list;
