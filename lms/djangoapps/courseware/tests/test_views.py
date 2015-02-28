@@ -15,6 +15,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from certificates import api as certs_api
 from certificates.models import CertificateStatuses, CertificateGenerationConfiguration
 from certificates.tests.factories import GeneratedCertificateFactory
 from edxmako.middleware import MakoMiddleware
@@ -677,10 +678,19 @@ class ProgressPageTests(ModuleStoreTestCase):
         resp = views.progress(self.request, course_id=self.course.id.to_deprecated_string())
         self.assertEqual(resp.status_code, 200)
 
-    def test_resp_with_generate_cert_config_enabled(self):
+    def test_generate_cert_config(self):
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertNotContains(resp, 'Create Your Certificate')
+
+        # Enable the feature, but do not enable it for this course
         CertificateGenerationConfiguration(enabled=True).save()
         resp = views.progress(self.request, course_id=unicode(self.course.id))
-        self.assertEqual(resp.status_code, 200)
+        self.assertNotContains(resp, 'Create Your Certificate')
+
+        # Enable certificate generation for this course
+        certs_api.set_cert_generation_enabled(self.course.id, True)
+        resp = views.progress(self.request, course_id=unicode(self.course.id))
+        self.assertContains(resp, 'Create Your Certificate')
 
 
 class VerifyCourseKeyDecoratorTests(TestCase):
