@@ -39,7 +39,7 @@ class Command(BaseCommand):
 
         for course_key in course_keys:
             try:
-                update_course_structure(course_key)
+                update_course_structure(unicode(course_key))
             except Exception as e:
                 logger.error('An error occurred while generating course structure for %s: %s', unicode(course_key), e)
 
