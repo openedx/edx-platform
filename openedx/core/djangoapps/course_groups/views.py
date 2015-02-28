@@ -385,24 +385,26 @@ def cohort_discussion_topics(request, course_key_string):
         return JsonError(status=404)
 
     discussions_category = get_discussion_category_map(course)
+    discussions_category['coursewide_categories'] = discussions_category['entries']
 
+    del discussions_category['entries']
     # get the children that are only related to inline discussions.
     discussions_category['children'] = [name for name in discussions_category['children']
-                                        if name not in discussions_category['entries']]
+                                        if name not in discussions_category['coursewide_categories']]
+    cohort_settings_obj = cohorts.get_course_cohort_settings(course_key)
+    discussions_category['always_cohort_inline_discussions'] = cohort_settings_obj.always_cohort_inline_discussions
     cohorted_discussions = []
     if request.method == 'POST':
-        cohort_settings_obj = cohorts.get_course_cohort_settings(course_key)
-        coursewide_discussions = discussions_category['entries']
+        coursewide_ids = [topic.get('id') for topic_name, topic in discussions_category['coursewide_categories'].iteritems()]
 
         if 'coursewide_discussions' in request.json.keys() and request.json.get('coursewide_discussions'):
-            coursewide_ids = [topic.get('id') for topic_name, topic in coursewide_discussions.iteritems()]
-
             cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if
                                     discussion_id not in coursewide_ids]
 
             cohorted_discussions.extend(request.json.get('cohorted_discussion_ids'))
         elif request.json.get('inline_discussions') in request.json.keys() and request.json.get('inline_discussions'):
-            cohorted_discussions = []
+            cohort_settings_obj.always_cohort_inline_discussions = request.json.get('always_cohort_inline_discussions')
+            cohorted_discussions = coursewide_ids.extend(request.json.get('cohorted_discussion_ids'))
 
         cohort_settings_obj.cohorted_discussions = cohorted_discussions
         cohort_settings_obj.save()
