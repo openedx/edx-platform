@@ -161,8 +161,8 @@ CACHES = {
 # Add external_auth to Installed apps for testing
 INSTALLED_APPS += ('external_auth', )
 
-# Add milestones to Installed apps for testing
-INSTALLED_APPS += ('milestones', )
+# Add milestones and edx_notifications to Installed apps for testing
+INSTALLED_APPS += ('milestones', 'edx_notifications',)
 
 # hide ratelimit warnings while running tests
 filterwarnings('ignore', message='No request passed to the backend, unable to rate-limit')

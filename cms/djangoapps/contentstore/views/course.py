@@ -78,6 +78,10 @@ from xmodule.course_module import CourseFields
 from xmodule.split_test_module import get_split_user_partitions
 from student.auth import has_course_author_access
 
+from student.tasks import publish_course_notifications_task
+from edx_notifications.data import NotificationMessage
+from edx_notifications.lib.publisher import get_notification_type
+
 from util.milestones_helpers import (
     set_prerequisite_courses,
     is_valid_course_key
@@ -815,6 +819,26 @@ def course_info_update_handler(request, course_key_string, provided_id=None):
     # can be either and sometimes django is rewriting one to the other:
     elif request.method in ('POST', 'PUT'):
         try:
+            if settings.FEATURES.get('NOTIFICATIONS_ENABLED', False) and request.method == 'POST':
+                # only send bulk notifications to users when there is
+                # new update/announcement in the course.
+
+                # get the notification type.
+                notification_type = get_notification_type(u'open-edx.studio.announcements.new_announcement')
+                course = modulestore().get_course(course_key, depth=0)
+                notification_msg = NotificationMessage(
+                    msg_type=notification_type,
+                    namespace=unicode(course_key),
+                    payload={
+                        '_schema_version': '1',
+                        'course_name': course.display_name,
+
+                    }
+                )
+
+                # Send the notification_msg to the Celery task
+                publish_course_notifications_task.delay(course_key, notification_msg)
+
             return JsonResponse(update_course_updates(usage_key, request.json, provided_id, request.user))
         except:
             return HttpResponseBadRequest(

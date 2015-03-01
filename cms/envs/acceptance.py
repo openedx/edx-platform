@@ -92,6 +92,9 @@ FEATURES['AUTOMATIC_AUTH_FOR_TESTING'] = True
 # DO NOT CHANGE THIS SETTING HERE.
 FEATURES['ENABLE_DISCUSSION_SERVICE'] = False
 
+# Enable edx_notifications app
+FEATURES['NOTIFICATIONS_ENABLED'] = True
+
 # HACK
 # Setting this flag to false causes imports to not load correctly in the lettuce python files
 # We do not yet understand why this occurs. Setting this to true is a stopgap measure

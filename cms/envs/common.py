@@ -139,6 +139,9 @@ FEATURES = {
     # Toggle course milestones app/feature
     'MILESTONES_APP': False,
 
+    # edx_notifications application feature flag
+    'NOTIFICATIONS_ENABLED': False,
+
     # Toggle course entrance exams feature
     'ENTRANCE_EXAMS': False,
 
@@ -801,6 +804,9 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # edx_notifications
+    'edx_notifications'
 )
 
 
@@ -909,4 +915,31 @@ ELASTIC_FIELD_MAPPINGS = {
     "start_date": {
         "type": "date"
     }
+}
+
+# for now we just support SQL backed stores
+NOTIFICATION_STORE_PROVIDER = {
+    "class": "edx_notifications.stores.sql.store_provider.SQLNotificationStoreProvider",
+    "options": {
+    }
+}
+
+# to prevent run-away queries from happening
+MAX_NOTIFICATION_LIST_SIZE = 100
+
+SOUTH_MIGRATION_MODULES = {
+    'edx_notifications': 'edx_notifications.stores.sql.migrations',
+}
+
+# list all known channel providers
+NOTIFICATION_CHANNEL_PROVIDERS = {
+    'durable': {
+        'class': 'edx_notifications.channels.durable.BaseDurableNotificationChannel',
+        'options': {}
+    }
+}
+
+# list all of the mappings of notification types to channel
+NOTIFICATION_CHANNEL_PROVIDER_TYPE_MAPS = {
+    '*': 'durable',  # default global mapping
 }

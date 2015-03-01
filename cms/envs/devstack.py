@@ -79,6 +79,9 @@ FEATURES['MILESTONES_APP'] = True
 ################################ ENTRANCE EXAMS ################################
 FEATURES['ENTRANCE_EXAMS'] = True
 
+########################### Notifications #################################
+FEATURES['NOTIFICATIONS_ENABLED'] = True
+
 ################################ SEARCH INDEX ################################
 FEATURES['ENABLE_COURSEWARE_INDEX'] = True
 SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"

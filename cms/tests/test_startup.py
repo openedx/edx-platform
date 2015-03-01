@@ -27,6 +27,13 @@ class StartupTestCase(TestCase):
             run()
             self.assertTrue(mock_enable_theme.called)
 
+    @patch.dict("django.conf.settings.FEATURES", {"NOTIFICATIONS_ENABLED": True})
+    def test_run_with_notifications_enabled(self):
+        self.assertEqual(settings.FEATURES["NOTIFICATIONS_ENABLED"], True)
+        with patch('cms.startup.startup_notification_subsystem') as mock_notification_subsystem:
+            run()
+            self.assertTrue(mock_notification_subsystem.called)
+
     @patch.dict("django.conf.settings.FEATURES", {"USE_CUSTOM_THEME": False})
     def test_run_without_theme(self):
         self.assertEqual(settings.FEATURES["USE_CUSTOM_THEME"], False)
