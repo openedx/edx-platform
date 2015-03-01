@@ -176,7 +176,7 @@ class TestCohorts(ModuleStoreTestCase):
         self.assertEqual(cohorts.get_cohort_id(user, course.id), cohort.id)
 
         self.assertRaises(
-            ValueError,
+            Http404,
             lambda: cohorts.get_cohort_id(user, SlashSeparatedCourseKey("course", "does_not", "exist"))
         )
 

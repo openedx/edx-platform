@@ -14,7 +14,9 @@ from django.utils.translation import ugettext as _
 
 from courseware import courses
 from eventtracking import tracker
+from request_cache.middleware import RequestCache
 from student.models import get_user_by_username_or_email
+
 from .models import CourseUserGroup, CourseCohort, CourseCohortsSettings, CourseUserGroupPartitionGroup
 
 
@@ -177,6 +179,10 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Given a Django user and a CourseKey, return the user's cohort in that
     cohort.
 
+    The cohort for the user is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
+
     Arguments:
         user: a Django User object.
         course_key: CourseKey
@@ -190,35 +196,37 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
     Raises:
        ValueError if the CourseKey doesn't exist.
     """
-    # pylint: disable=protected-access
-    # We cache the cohort on the user object so that we do not have to repeatedly
-    # query the database during a request. If the cached value exists, just return it.
-    if use_cached and hasattr(user, '_cohort'):
-        return user._cohort
+    request_cache = RequestCache.get_request_cache()
+    cache_key = u"cohorts.get_cohort.{}.{}".format(user.id, course_key)
+
+    if use_cached and cache_key in request_cache.data:
+        return request_cache.data[cache_key]
+
+    request_cache.data.pop(cache_key, None)
 
     # First check whether the course is cohorted (users shouldn't be in a cohort
     # in non-cohorted courses, but settings can change after course starts)
-    course = courses.get_course(course_key)
-    course_cohort_settings = get_course_cohort_settings(course.id)
-
+    course_cohort_settings = get_course_cohort_settings(course_key)
     if not course_cohort_settings.is_cohorted:
-        user._cohort = None
-        return user._cohort
+        return request_cache.data.setdefault(cache_key, None)
 
+    # If course is cohorted, check if the user already has a cohort.
     try:
-        user._cohort = CourseUserGroup.objects.get(
+        cohort = CourseUserGroup.objects.get(
             course_id=course_key,
             group_type=CourseUserGroup.COHORT,
             users__id=user.id,
         )
-        return user._cohort
+        return request_cache.data.setdefault(cache_key, cohort)
     except CourseUserGroup.DoesNotExist:
-        # Didn't find the group.  We'll go on to create one if needed.
+        # Didn't find the group. If we do not want to assign, return here.
         if not assign:
             # Do not cache the cohort here, because in the next call assign
             # may be True, and we will have to assign the user a cohort.
             return None
 
+    # Otherwise assign the user a cohort.
+    course = courses.get_course(course_key)
     cohorts = get_course_cohorts(course, assignment_type=CourseCohort.RANDOM)
     if cohorts:
         cohort = local_random().choice(cohorts)
@@ -231,8 +239,7 @@ def get_cohort(user, course_key, assign=True, use_cached=False):
 
     user.course_groups.add(cohort)
 
-    user._cohort = cohort
-    return user._cohort
+    return request_cache.data.setdefault(cache_key, cohort)
 
 
 def migrate_cohort_settings(course):
@@ -406,23 +413,26 @@ def get_group_info_for_cohort(cohort, use_cached=False):
 
     If the cohort has not been linked to any group/partition, both values in the
     tuple will be None.
+
+    The partition group info is cached for the duration of a request. Pass
+    use_cached=True to use the cached value instead of fetching from the
+    database.
     """
-    # pylint: disable=protected-access
-    # We cache the partition group on the cohort object so that we do not have to repeatedly
-    # query the database during a request.
-    if not use_cached and hasattr(cohort, '_partition_group'):
-        delattr(cohort, '_partition_group')
+    request_cache = RequestCache.get_request_cache()
+    cache_key = u"cohorts.get_group_info_for_cohort.{}".format(cohort.id)
 
-    if not hasattr(cohort, '_partition_group'):
-        try:
-            cohort._partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
-        except CourseUserGroupPartitionGroup.DoesNotExist:
-            cohort._partition_group = None
+    if use_cached and cache_key in request_cache.data:
+        return request_cache.data[cache_key]
 
-    if cohort._partition_group:
-        return cohort._partition_group.group_id, cohort._partition_group.partition_id
+    request_cache.data.pop(cache_key, None)
 
-    return None, None
+    try:
+        partition_group = CourseUserGroupPartitionGroup.objects.get(course_user_group=cohort)
+        return request_cache.data.setdefault(cache_key, (partition_group.group_id, partition_group.partition_id))
+    except CourseUserGroupPartitionGroup.DoesNotExist:
+        pass
+
+    return request_cache.data.setdefault(cache_key, (None, None))
 
 
 def set_assignment_type(user_group, assignment_type):
