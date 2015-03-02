@@ -405,7 +405,7 @@ def add_courseware_context(content_list, course, user, id_map=None):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False, **kwargs):
+def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -459,7 +459,6 @@ def prepare_content(content, course_key, is_staff=False, **kwargs):
         else:
             del endorsement["user_id"]
 
-    course_is_cohorted = kwargs.get('course_is_cohorted')
     if course_is_cohorted is None:
         course_is_cohorted = is_course_cohorted(course_key)
 
