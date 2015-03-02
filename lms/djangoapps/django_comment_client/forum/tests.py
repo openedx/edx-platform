@@ -301,7 +301,6 @@ class SingleThreadQueryCountTestCase(ModuleStoreTestCase):
     MODULESTORE = TEST_DATA_MONGO_MODULESTORE
 
     @ddt.data(
-        # old mongo: number of responses plus 14.  TODO: O(n)!
         (ModuleStoreEnum.Type.mongo, 1, 15, 30),
         (ModuleStoreEnum.Type.mongo, 50, 15, 30),
         # split mongo: 3 queries, regardless of thread response size.
