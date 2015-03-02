@@ -40,7 +40,11 @@ from instructor.tests.utils import FakeContentTask, FakeEmail, FakeEmailInfo
 from student.models import CourseEnrollment, CourseEnrollmentAllowed
 from courseware.models import StudentModule
 from instructor_email_widget.models import StudentsForQuery, TemporaryQuery
-from instructor.views.data_access import purge_temporary_queries, get_group_query_students
+from instructor.views.data_access import (
+    purge_temporary_queries,
+    get_group_query_students,
+    delete_group_temp_queries_and_students,
+)
 from instructor.views.data_access_constants import TEMPORARY_QUERY_LIFETIME
 
 # modules which are mocked in test cases.
@@ -248,12 +252,12 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response = self.client.get(use_delete_url)
         return response
 
-    def _delete_bulk_temp_query(self, query_ids):
+    def _delete_batch_temp_query(self, query_ids):
         """
         Deletes temporary queries en masse
         """
 
-        delete_url = reverse('delete_bulk_temp_query', kwargs={'course_id': self.course_key})
+        delete_url = reverse('delete_temp_query_batch', kwargs={'course_id': self.course_key})
         delete_args = {
             'existing': ','.join(query_ids),
         }
@@ -379,7 +383,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._make_query(self.NOT_COMPLETED)
         queries, students = self._get_query_students()
         self._check_against_students(students, [self.open_user, self.completed_user, self.not_opened_user])
-        self._delete_bulk_temp_query(queries)
+        self._delete_batch_temp_query(queries)
         self.assertEquals(len(self._get_temp_query_ids()), 0)
         self._make_query(self.OPEN, joining="AND")
         self._make_query(self.NOT_COMPLETED, joining="AND")
@@ -391,7 +395,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         self.assertEquals(to_match, csv_string)
         self._check_against_students(students2, [self.open_user])
-        self._delete_bulk_temp_query(queries2)
+        self._delete_batch_temp_query(queries2)
 
     def test_bulk_delete(self):
         """
@@ -401,7 +405,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self._make_query(self.OPEN)
         self._make_query(self.NOT_COMPLETED)
         temp_ids_before = self._get_temp_query_ids()
-        self._delete_bulk_temp_query(temp_ids_before)
+        self._delete_batch_temp_query(temp_ids_before)
         temp_ids_after = self._get_temp_query_ids()
         self.assertNotEquals(len(temp_ids_before), 0)
         self.assertEquals(len(temp_ids_after), 0)
@@ -445,6 +449,8 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         for student in students:
             check_students.add(student.profile.name)
         self.assertSetEqual(correct_students, check_students)
+        delete_group_temp_queries_and_students(query_group)
+
         students_left = StudentsForQuery.objects.all()
         queries_left = TemporaryQuery.objects.all()
         self.assertEquals(len(students_left), 0)
@@ -468,6 +474,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         correct_students = set([self.open_user, self.completed_user, self.not_opened_user])
         check_students = set(list(students))
         self.assertSetEqual(correct_students, check_students)
+        delete_group_temp_queries_and_students(query_group)
         self.assertEquals(len(TemporaryQuery.objects.all()), queries_left)
         self.assertEquals(len(StudentsForQuery.objects.all()), students_left)
 
@@ -496,7 +503,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         Ensures the code doesn't break if there aren't existing queries
         """
 
-        resp1 = self._delete_bulk_temp_query([])
+        resp1 = self._delete_batch_temp_query([])
         result1 = json.loads(resp1.content)['success']
         resp2 = self._save_query([])
         result2 = json.loads(resp2.content)['success']
