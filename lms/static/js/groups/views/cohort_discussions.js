@@ -44,14 +44,14 @@ var edx = edx || {};
             var category_template = _.template($('#cohort-discussions-category-tpl').html()),
                 entry_template = this.subCategoryTemplate,
                 is_category_cohorted = false,
-                children = category.children || category.get('children');
+                children = category.children || category.get('children'),
+                entries = category.entries || category.get('entries'),
+                subcategories = category.subcategories || category.get('subcategories');
 
             return _.map(children, function (name) {
-                var html = '', entry,
-                    entries = category.entries || category.get('entries'),
-                    subcategories = category.subcategories || category.get('subcategories');
+                var html = '', entry;
 
-                var filteredEntry = _.find(entries,function(entry){
+                var filteredEntry = _.find(entries,function(entry) {
                     if (entry.is_cohorted === false) {
                         // breaks the loop and returns the current entry.
                         return true;
@@ -106,7 +106,6 @@ var edx = edx || {};
             this.toggleSaveButton(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         changeDiscussionInlineCategory: function(event) {
-            event.preventDefault();
             var $selectedCategory = $(event.currentTarget);
 
             if (!$selectedCategory.prop('checked')) {
@@ -114,7 +113,6 @@ var edx = edx || {};
             }
         },
         changeDiscussionInlineSubCategory: function (event) {
-            event.preventDefault();
             var $selectedTopic = $(event.currentTarget);
             if (!$selectedTopic.prop('checked')) {
                 $('.check-all-inline-discussions').prop('checked', false);
@@ -142,6 +140,7 @@ var edx = edx || {};
             self.saveForm(fieldData, self.$('.inline-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
+                        self.render();
                         self.showMessage(gettext('Changes Saved.'), self.$('.inline-discussion-topics'));
                     });
                 });
@@ -160,6 +159,7 @@ var edx = edx || {};
             self.saveForm(fieldData, self.$('.coursewide-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
+                         self.render();
                         self.showMessage(gettext('Changes Saved.'), self.$('.coursewide-discussion-topics'));
                     });
                 });
@@ -178,7 +178,6 @@ var edx = edx || {};
             discussionsModel.save(
                 fieldData, {wait: true}
             ).done(function (result) {
-                    self.render();    // re-render to remove any now invalid error messages
                     saveOperation.resolve();
                 }).fail(function (result) {
                     var errorMessage = null;
