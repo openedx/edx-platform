@@ -43,7 +43,7 @@ var edx = edx || {};
         renderInlineTopics: function (category) {
             var category_template = _.template($('#cohort-discussions-category-tpl').html()),
                 entry_template = this.subCategoryTemplate,
-                is_category_cohorted = true,
+                is_category_cohorted = false,
                 children = category.children || category.get('children');
 
             return _.map(children, function (name) {
@@ -58,7 +58,7 @@ var edx = edx || {};
                     }
                 });
                 if (filteredEntry) {
-                    is_category_cohorted = false;
+                    is_category_cohorted = true;
                 }
                 if (entries && _.has(entries, name)) {
                     entry = entries[name];
