@@ -271,7 +271,7 @@ class PayAndVerifyView(View):
             return redirect(redirect_url)
 
         # Check that the course has an unexpired no-id-professional mode
-        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODE[0])
+        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
         # If there is no no-id-professional mode then check the verified track modes
         if not no_id_prof_mode:
             # Check that the course has an unexpired verified mode
@@ -522,7 +522,7 @@ class PayAndVerifyView(View):
             # The "make payment" step doubles as an intro step,
             # so if we're showing the payment step, hide the intro step.
             remove_steps |= set([self.INTRO_STEP])
-        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODE[0])
+        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
         if no_id_prof_mode:
             remove_steps |= set(self.VERIFICATION_STEPS)
         return [
@@ -654,7 +654,7 @@ def create_order(request):
         donation_for_course[unicode(course_id)] = amount
         request.session['donation_for_course'] = donation_for_course
 
-    no_id_prof_mode = CourseMode.mode_for_course(course_id, CourseMode.NO_ID_PROFESSIONAL_MODE[0])
+    no_id_prof_mode = CourseMode.mode_for_course(course_id, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
     # prefer NO-ID-PROFESSIONAL mode over professional mode then verified_mode
     current_mode = no_id_prof_mode if no_id_prof_mode else CourseMode.verified_mode_for_course(course_id)
 
@@ -663,7 +663,7 @@ def create_order(request):
         log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
-    if current_mode.slug in ['professional', CourseMode.NO_ID_PROFESSIONAL_MODE[0]]:
+    if current_mode.slug in ['professional', CourseMode.NO_ID_PROFESSIONAL_MODES[0]]:
         amount = current_mode.min_price
 
     if amount < current_mode.min_price:

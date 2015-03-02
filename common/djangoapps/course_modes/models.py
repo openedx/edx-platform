@@ -61,7 +61,7 @@ class CourseMode(models.Model):
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = ["verified", "professional"]
-    NO_ID_PROFESSIONAL_MODE = ["no-id-professional"]
+    NO_ID_PROFESSIONAL_MODES = ["no-id-professional"]
 
     class Meta:
         """ meta attributes of this model """
@@ -318,7 +318,7 @@ class CourseMode(models.Model):
             modes_dict = cls.modes_for_course_dict(course_id)
 
         # Professional and no-id-professional mode courses are always behind a paywall
-        if "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODE[0] in modes_dict:
+        if "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODES[0] in modes_dict:
             return False
 
         # White-label uses course mode honor with a price

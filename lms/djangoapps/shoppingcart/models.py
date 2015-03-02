@@ -1336,8 +1336,8 @@ class PaidCourseRegistration(OrderItem):
         # Check if the NO_ID_PROFESSIONAL mode is defined for the given course
         # then use this mode for registration instead of default 'honor' mode to
         # use the correct currency and amount for registration
-        if CourseMode.NO_ID_PROFESSIONAL_MODE[0] in course_modes:
-            mode_slug = CourseMode.NO_ID_PROFESSIONAL_MODE[0]
+        if CourseMode.NO_ID_PROFESSIONAL_MODES[0] in course_modes:
+            mode_slug = CourseMode.NO_ID_PROFESSIONAL_MODES[0]
         course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
