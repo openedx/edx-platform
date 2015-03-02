@@ -35,11 +35,11 @@ from student.helpers import (
     <%
         display_mode = course_verified_certs.get('display_mode')
         if display_mode == 'verified':
-             mode_class = ' ' + 'verified'
+             mode_class = 'verified'
         elif display_mode == 'honor':
-            mode_class = ' ' + 'verified'
+            mode_class = 'honor'
         elif display_mode == 'professional':
-            mode_class = ' ' + 'professional'
+            mode_class = 'professional'
         else:
             mode_class = ''
         endif
@@ -48,7 +48,7 @@ from student.helpers import (
     <% mode_class = '' %>
    % endif
 
-  <article class='course${mode_class}'>
+  <article class="course ${mode_class}">
 
     <%
       course_target = reverse('info', args=[course.id.to_deprecated_string()])
