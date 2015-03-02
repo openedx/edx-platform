@@ -84,8 +84,7 @@ class ChooseModeView(View):
 
         # Check if the no-id-professional mode is added in course. If so then redirect to payment/verification flow
         # skipping the verification step
-        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
-        if no_id_prof_mode:
+        if CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0]):
             return redirect(
                 reverse(
                     'verify_student_start_flow',

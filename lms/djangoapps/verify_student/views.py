@@ -522,8 +522,7 @@ class PayAndVerifyView(View):
             # The "make payment" step doubles as an intro step,
             # so if we're showing the payment step, hide the intro step.
             remove_steps |= set([self.INTRO_STEP])
-        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
-        if no_id_prof_mode:
+        if CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0]):
             remove_steps |= set(self.VERIFICATION_STEPS)
         return [
             {
@@ -663,7 +662,7 @@ def create_order(request):
         log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
-    if current_mode.slug in ['professional', CourseMode.NO_ID_PROFESSIONAL_MODES[0]]:
+    if CourseMode.has_professional_mode(no_id_prof_mode):
         amount = current_mode.min_price
 
     if amount < current_mode.min_price:
