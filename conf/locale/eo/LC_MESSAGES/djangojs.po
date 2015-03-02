@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-23 18:46+0000\n"
-"PO-Revision-Date: 2015-02-23 18:47:23.717807\n"
+"POT-Creation-Date: 2015-03-02 19:13+0000\n"
+"PO-Revision-Date: 2015-03-02 19:14:44.688527\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -2583,6 +2583,7 @@ msgstr ""
 "ιρѕυм ∂σłσя ѕ#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr "Pléäsé éntér ä stüdént émäïl äddréss ör üsérnämé. Ⱡ'σяєм ιρѕυм ∂#"
 
@@ -2668,6 +2669,65 @@ msgstr ""
 "Érrör géttïng täsk hïstörý för prößlém '<%= problem_id %>' änd stüdént '<%= "
 "student_id %>'. Mäké süré thät thé prößlém änd stüdént ïdéntïfïérs äré "
 "çömplété änd çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Entrance exam attempts is being reset for student '{student_id}'."
+msgstr ""
+"Éntränçé éxäm ättémpts ïs ßéïng rését för stüdént '{student_id}'. Ⱡ'σяєм "
+"ιρѕυм ∂σł#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid ""
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
+msgstr ""
+"Érrör réséttïng éntränçé éxäm ättémpts för stüdént '{student_id}'. Mäké süré"
+" stüdént ïdéntïfïér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Started entrance exam rescore task for student '{student_id}'. Click the "
+"'Show Background Task History for Student' button to see the status of the "
+"task."
+msgstr ""
+"Stärtéd éntränçé éxäm résçöré täsk för stüdént '{student_id}'. Çlïçk thé "
+"'Shöw Bäçkgröünd Täsk Hïstörý för Stüdént' ßüttön tö séé thé stätüs öf thé "
+"täsk. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'. "
+"Make sure that entrance exam has problems in it and student identifier is "
+"correct."
+msgstr ""
+"Érrör stärtïng ä täsk tö résçöré éntränçé éxäm för stüdént '{student_id}'. "
+"Mäké süré thät éntränçé éxäm häs prößléms ïn ït änd stüdént ïdéntïfïér ïs "
+"çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρι#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Entrance exam state is being deleted for student '{student_id}'."
+msgstr ""
+"Éntränçé éxäm stäté ïs ßéïng délétéd för stüdént '{student_id}'. Ⱡ'σяєм "
+"ιρѕυм ∂σł#"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting entrance exam state for student '{student_id}'. Make sure "
+"student identifier is correct."
+msgstr ""
+"Érrör délétïng éntränçé éxäm stäté för stüdént '{student_id}'. Mäké süré "
+"stüdént ïdéntïfïér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, #"
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting entrance exam task history for student '{student_id}'. Make "
+"sure student identifier is correct."
+msgstr ""
+"Érrör géttïng éntränçé éxäm täsk hïstörý för stüdént '{student_id}'. Mäké "
+"süré stüdént ïdéntïfïér ïs çörréçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σ#"
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -3229,6 +3289,31 @@ msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] "%s résült #"
 msgstr[1] "%s résülts Ⱡ#"
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Started entrance exam rescore task for student '{student_id}'."
+msgstr ""
+"Stärtéd éntränçé éxäm résçöré täsk för stüdént '{student_id}'. Ⱡ'σяєм ιρѕυм "
+"∂σ#"
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'."
+msgstr ""
+"Érrör stärtïng ä täsk tö résçöré éntränçé éxäm för stüdént '{student_id}'. "
+"Ⱡ'σяєм ιρѕυм ∂σłσя #"
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Error deleting entrance exam state for student '{student_id}'. "
+msgstr ""
+"Érrör délétïng éntränçé éxäm stäté för stüdént '{student_id}'.  Ⱡ'σяєм ιρѕυм"
+" ∂σ#"
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Error getting entrance exam task history for student '{student_id}'. "
+msgstr ""
+"Érrör géttïng éntränçé éxäm täsk hïstörý för stüdént '{student_id}'.  Ⱡ'σяєм"
+" ιρѕυм ∂σłσ#"
 
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
@@ -4167,8 +4252,8 @@ msgid "Course Index"
 msgstr "Çöürsé Ìndéx Ⱡ#"
 
 #: cms/static/js/views/pages/course_outline.js
-msgid "Course has been successfully reindexed."
-msgstr "Çöürsé häs ßéén süççéssfüllý réïndéxéd. Ⱡ'σяєм ιρѕ#"
+msgid "There were errors reindexing course."
+msgstr "Théré wéré érrörs réïndéxïng çöürsé. Ⱡ'σяєм ιρ#"
 
 #: cms/static/js/views/settings/advanced.js
 msgid ""

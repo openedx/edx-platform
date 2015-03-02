@@ -88,6 +88,7 @@
 # Ron Lucke <ronlucke@googlemail.com>, 2014
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2013
 # Shan <shanmathuran.sritharan@paluno.uni-due.de>, 2014
+# Sofia Gruber <sofia.karoline@me.com>, 2015
 # #-#-#-#-#  messages.po (edx-platform)  #-#-#-#-#
 # edX translation file
 # Copyright (C) 2013 edX
@@ -113,7 +114,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-23 18:31+0000\n"
+"POT-Creation-Date: 2015-03-02 19:02+0000\n"
 "PO-Revision-Date: 2015-02-19 20:46+0000\n"
 "Last-Translator: Johannes Heinlein <johannes@edx.org>\n"
 "Language-Team: German (Germany) (http://www.transifex.com/projects/p/edx-platform/language/de_DE/)\n"
@@ -609,12 +610,12 @@ msgid "Valid e-mail address required."
 msgstr "Gültige E-Mail-Adresse erforderlich."
 
 #: common/djangoapps/student/views.py
-msgid "An account with this e-mail already exists."
-msgstr "Es existiert bereits ein Konto mit dieser E-Mail-Adresse"
-
-#: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "Die alte E-Mail-Adresse ist identisch mit der neuen."
+
+#: common/djangoapps/student/views.py
+msgid "An account with this e-mail already exists."
+msgstr "Es existiert bereits ein Konto mit dieser E-Mail-Adresse"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
@@ -2519,11 +2520,10 @@ msgstr "Darstellungsformat des Fälligkeitsdatum"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
-"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
-"Gib das Format ein, in dem die Fälligkeitsdaten angezeigt werden. Möglich "
-"sind die MM-DD-YYYY, DD-MM-YYYY, YYYY-MM-DD oder YYYY-DD-MM Formate."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -2554,18 +2554,15 @@ msgstr "Verhalten für Zertifikatsanzeige"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
-"is the default behavior, where certificates will only appear after a course "
-"has ended. 'early_with_info' will display all certificate information before"
-" a course has ended. 'early_no_info' will hide all certificate information "
-"unless a student has earned a certificate."
+"Enter end, early_with_info, or early_no_info. After certificate generation, "
+"students who passed see a link to their certificates on the dashboard and "
+"students who did not pass see information about the grading configuration. "
+"The default is end, which displays this certificate information to all "
+"students after the course end date. To display this certificate information "
+"to all students as soon as certificates are generated, enter "
+"early_with_info. To display only the links to passing students as soon as "
+"certificates are generated, enter early_no_info."
 msgstr ""
-"Hat drei mögliche Zustände: 'end', 'early_with_info', 'early_no_info'. 'end'"
-" ist das Standardverhalten, bei dem Zertifikate nur angezeigt werden, wenn "
-"der Kurs zu Ende ist. 'early_with_info' zeigt alle Zertifikatsinformationen "
-"an, bevor der Kurs beendet ist. 'early_no_info' versteckt alle "
-"Zertifikatsinformationen, solange bis der Teilnehmer das Zertifikat "
-"tatsächlich erworben hat."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -2750,7 +2747,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content.Note, you must enable Entrance Exams for this course "
+" your course content. Note, you must enable Entrance Exams for this course "
 "setting to take effect."
 msgstr ""
 
@@ -2761,7 +2758,7 @@ msgstr ""
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content.Note, you must enable Entrance Exams for this "
+"view your course content. Note, you must enable Entrance Exams for this "
 "course setting to take effect."
 msgstr ""
 
@@ -4997,6 +4994,34 @@ msgid "An error occurred while deleting the score."
 msgstr "Ein Fehler ist während der Löschung der Benotung aufgetreten."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Course has no entrance exam section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and unique_student_identifier are mutually exclusive."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and delete_module are mutually exclusive."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Requires instructor access."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Course has no valid entrance exam section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "All Students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cannot rescore with all_students and unique_student_identifier."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
@@ -5323,6 +5348,10 @@ msgstr "Nutzer mit Fälligkeitsdatumserweiterungen für {0}"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Fälligkeitsdatumserweiterungen für {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Not all problems in entrance exam support re-scoring."
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -7279,6 +7308,14 @@ msgstr ""
 msgid "Terms of Service"
 msgstr ""
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Field '{field_name}' cannot be edited."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Value '{field_value}' is not valid for field '{field_name}'."
+msgstr ""
+
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
 msgstr ""
@@ -7372,6 +7409,11 @@ msgstr ""
 
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
+msgstr ""
+
+#: cms/djangoapps/contentstore/views/course.py
+#: cms/djangoapps/contentstore/views/tests/test_course_index.py
+msgid "Course has been successfully reindexed."
 msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
@@ -8248,6 +8290,10 @@ msgid "Jobs"
 msgstr ""
 
 #: lms/templates/footer.html
+msgid "Legal"
+msgstr ""
+
+#: lms/templates/footer.html
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
@@ -8658,31 +8704,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr ""
 
-#: lms/templates/name_changes.html
-msgid "Accepted"
-msgstr ""
-
-#: lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr ""
-
-#: lms/templates/name_changes.html
-msgid "Rejected"
-msgstr ""
-
-#: lms/templates/name_changes.html
-msgid "Pending name changes"
-msgstr ""
-
-#: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
-msgid "Confirm"
-msgstr ""
-
-#: lms/templates/name_changes.html
-msgid "Reject"
-msgstr ""
-
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr ""
@@ -8726,7 +8747,7 @@ msgid ""
 msgstr ""
 
 #: lms/templates/navigation.html
-msgid "Global Navigation"
+msgid "Global"
 msgstr ""
 
 #: lms/templates/navigation.html
@@ -9254,6 +9275,10 @@ msgstr ""
 #. Translators: Git is a version-control system; see http://git-scm.com/about
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
+msgstr ""
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
 msgstr ""
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
@@ -9887,6 +9912,10 @@ msgid "enroll"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course View"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "View this course as:"
 msgstr ""
 
@@ -9896,6 +9925,10 @@ msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
 msgid "set preview mode"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Course Material"
 msgstr ""
 
 #. Translators: 'needs attention' is an alternative string for the
@@ -13039,6 +13072,42 @@ msgid "Show Background Task History for Student"
 msgstr ""
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam Adjustment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student's {platform_name} email address or username:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Select an action for the student's entrance exam. This action will affect "
+"every problem in the student's exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Number of Student Attempts"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Problems"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"You can also delete all of the student's answers and scores for the entire "
+"entrance exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Delete Student's Answers and Scores"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Student's Exam Adjustment History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
 msgstr ""
 
@@ -13081,6 +13150,10 @@ msgstr ""
 msgid ""
 "Don't see your preferred language? {link_start}Volunteer to become a "
 "translator!{link_end}"
+msgstr ""
+
+#: lms/templates/modal/accessible_confirm.html
+msgid "Confirm"
 msgstr ""
 
 #. Translators: this text gives status on if the modal interface (a menu or
@@ -13802,39 +13875,6 @@ msgstr ""
 
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
-msgstr ""
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Email change failed."
-msgstr ""
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Something went wrong. Please contact {support} for help."
-msgstr ""
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"The email address you wanted to use is already used by another "
-"{platform_name} account."
-msgstr ""
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"You can try again from the {link_start}account settings{link_end} page."
-msgstr ""
-
-#: lms/templates/student_account/email_change_successful.html
-msgid "Email change successful!"
-msgstr ""
-
-#: lms/templates/student_account/email_change_successful.html
-msgid ""
-"You should see your new email address listed on the {link_start}account "
-"settings{link_end} page."
-msgstr ""
-
-#: lms/templates/student_account/index.html
-msgid "Student Account"
 msgstr ""
 
 #: lms/templates/student_account/login_and_register.html
@@ -15988,9 +16028,8 @@ msgstr ""
 
 #: cms/templates/index.html
 msgid ""
-"You will need to be added to the course in {studio_name} by the course "
-"creator. Please get in touch with the course creator or administrator for "
-"the specific course you are helping to author."
+"The course creator must give you access to the course. Contact the course "
+"creator or administrator for the course you are helping to author."
 msgstr ""
 
 #: cms/templates/index.html
@@ -16067,7 +16106,23 @@ msgid "(Read-only)"
 msgstr ""
 
 #: cms/templates/index.html
-msgid "You don't have any content libraries yet."
+msgid "Were you expecting to see a particular library here?"
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"The library creator must give you access to the library. Contact the library"
+" creator or administrator for the library you are helping to author."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Create Your First Library"
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"Libraries hold a pool of components that can be re-used across multiple "
+"courses. Create your first library with the click of a button!"
 msgstr ""
 
 #: cms/templates/index.html
@@ -16078,7 +16133,7 @@ msgstr ""
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
 "{studio_name} page you are viewing. You can also use the links at the bottom"
-" of the page to access our continously updated documentation and other "
+" of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
 

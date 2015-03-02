@@ -18,6 +18,7 @@
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # Erik Henrique <contato@erikhenrique.com.br>, 2015
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
+# Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # javiercencig <javier@jecnet.com.br>, 2014
 # Jefferson Floyd Conz <jefferson@conz.com.br>, 2014
 # Kayo Leone Dias Perim <kayo_2008_@hotmail.com>, 2014
@@ -60,6 +61,7 @@
 # Edgar Aparecido Pereira de Melo <edgarapmelo@gmail.com>, 2014
 # aivuk <e@vaz.io>, 2014
 # Francisco Cantarutti <francisco.cantarutti@sisqualis.com.br>, 2014
+# Gustavo Henrique de Almeida Gonçalves <gustavo@faprender.org>, 2015
 # Larissa Queiroz Pontes <lariqbiotec@gmail.com>, 2015
 # Leonardo Flores Zambaldi <fzleonardo@gmail.com>, 2014
 # Leonardo Lehnemann Agostinho Martins <lehneman@gmail.com>, 2014
@@ -114,7 +116,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-23 18:30+0000\n"
+"POT-Creation-Date: 2015-03-02 19:01+0000\n"
 "PO-Revision-Date: 2015-02-20 21:40+0000\n"
 "Last-Translator: Sarina Canelake <sarina@edx.org>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/edx-platform/language/pt_BR/)\n"
@@ -2550,6 +2552,7 @@ msgid "There was an error obtaining email content history for this course."
 msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
 msgid "Please enter a student email address or username."
 msgstr "Adicione o endereço de e-mail ou o nome de usuário de um aluno."
 
@@ -2633,6 +2636,49 @@ msgstr ""
 "Erro na obtenção do histórico de tarefas do problema  '<%= problem_id %>' e "
 "do aluno  '<%= student_id %>'. Certifique-se que o identificador do problema"
 " e do aluno estejam corretos."
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Entrance exam attempts is being reset for student '{student_id}'."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid ""
+"Error resetting entrance exam attempts for student '{student_id}'. Make sure"
+" student identifier is correct."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Started entrance exam rescore task for student '{student_id}'. Click the "
+"'Show Background Task History for Student' button to see the status of the "
+"task."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'. "
+"Make sure that entrance exam has problems in it and student identifier is "
+"correct."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Entrance exam state is being deleted for student '{student_id}'."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error deleting entrance exam state for student '{student_id}'. Make sure "
+"student identifier is correct."
+msgstr ""
+
+#: lms/static/coffee/src/instructor_dashboard/student_admin.js
+msgid ""
+"Error getting entrance exam task history for student '{student_id}'. Make "
+"sure student identifier is correct."
+msgstr ""
 
 #: lms/static/coffee/src/instructor_dashboard/student_admin.js
 msgid "Reset attempts for all students on problem '<%= problem_id %>'?"
@@ -3172,6 +3218,23 @@ msgid "%s result"
 msgid_plural "%s results"
 msgstr[0] ""
 msgstr[1] ""
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Started entrance exam rescore task for student '{student_id}'."
+msgstr ""
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid ""
+"Error starting a task to rescore entrance exam for student '{student_id}'."
+msgstr ""
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Error deleting entrance exam state for student '{student_id}'. "
+msgstr ""
+
+#: lms/static/js/spec/instructor_dashboard/student_admin_spec.js
+msgid "Error getting entrance exam task history for student '{student_id}'. "
+msgstr ""
 
 #: lms/static/js/student_account/account.js
 #: lms/static/js/student_profile/profile.js
@@ -4039,7 +4102,7 @@ msgid "Course Index"
 msgstr ""
 
 #: cms/static/js/views/pages/course_outline.js
-msgid "Course has been successfully reindexed."
+msgid "There were errors reindexing course."
 msgstr ""
 
 #: cms/static/js/views/settings/advanced.js
