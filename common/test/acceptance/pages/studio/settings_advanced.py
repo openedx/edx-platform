@@ -153,7 +153,6 @@ class AdvancedSettingsPage(CoursePage):
             'cert_name_long',
             'cert_name_short',
             'certificates_display_behavior',
-            'cohort_config',
             'course_image',
             'cosmetic_display_price',
             'advertised_start',
