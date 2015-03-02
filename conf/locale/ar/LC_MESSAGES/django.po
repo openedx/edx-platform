@@ -124,7 +124,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: edx-platform\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-23 18:31+0000\n"
+"POT-Creation-Date: 2015-03-02 19:02+0000\n"
 "PO-Revision-Date: 2015-02-05 11:21+0000\n"
 "Last-Translator: Nabeel El-Dughailib <nabeel@qordoba.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/edx-platform/language/ar/)\n"
@@ -691,12 +691,12 @@ msgid "Valid e-mail address required."
 msgstr "يجب إدخال عنوان بريد إلكتروني صحيح."
 
 #: common/djangoapps/student/views.py
-msgid "An account with this e-mail already exists."
-msgstr "يوجد مسبقًا حساب بهذا البريد الإلكتروني."
-
-#: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "البريد الإلكتروني القديم مطابق للبريد الإلكتروني الجديد."
+
+#: common/djangoapps/student/views.py
+msgid "An account with this e-mail already exists."
+msgstr "يوجد مسبقًا حساب بهذا البريد الإلكتروني."
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
@@ -2583,11 +2583,10 @@ msgstr "صيغة عرض تاريخ الاستحقاق"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
-"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
-"يُرجى إدخال الصيغة التي تُعرَض بها تواريخ الاستحقاق. ويجب أن تكون هذه "
-"التواريخ بصيغة MM-DD-YYYY، أو DD-MM-YYYY، أو YYYY-MM-DD، أو YYYY-DD-MM."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -2617,18 +2616,15 @@ msgstr "سلوك عرض الشهادات"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
-"is the default behavior, where certificates will only appear after a course "
-"has ended. 'early_with_info' will display all certificate information before"
-" a course has ended. 'early_no_info' will hide all certificate information "
-"unless a student has earned a certificate."
+"Enter end, early_with_info, or early_no_info. After certificate generation, "
+"students who passed see a link to their certificates on the dashboard and "
+"students who did not pass see information about the grading configuration. "
+"The default is end, which displays this certificate information to all "
+"students after the course end date. To display this certificate information "
+"to all students as soon as certificates are generated, enter "
+"early_with_info. To display only the links to passing students as soon as "
+"certificates are generated, enter early_no_info."
 msgstr ""
-"توجد ثلاث حالات محتملة: ’نهاية‘، أو ’باكرًا_مع_معلومات‘، أو "
-"’باكرًا_بلا_معلومات‘. وحالة ’نهاية‘ هي السلوك الافتراضي، حيث لن تظهر "
-"الشهادات إلّا بعد انتهاء المساق، أمّا حالة ’باكرًا_مع_معلومات‘، فإنّها "
-"ستُظهِر جميع معلومات الشهادات قبل انتهاء المساق، بينما ستخفي حالة "
-"’باكرًا_بلا_معلومات‘ جميع معلومات الشهادات إلّا في حال كان الطالب قد نال "
-"شهادة."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -2813,12 +2809,9 @@ msgstr "تفعيل خاصية امتحان الدخول"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content.Note, you must enable Entrance Exams for this course "
+" your course content. Note, you must enable Entrance Exams for this course "
 "setting to take effect."
 msgstr ""
-"يُرجى تحديد ما إذا يجب على الطلّاب استكمال امتحان دخول قبل أن يتمكّنوا من "
-"رؤية محتوى مساقك. كما يُرجى ملاحظة أنّه عليك تفعيل خاصية امتحانات الدخول "
-"ليسري مفعول هذا الإعداد."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam Minimum Score (%)"
@@ -2827,12 +2820,9 @@ msgstr "الدرجة الأدنى للنجاح في امتحان الدخول (%
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content.Note, you must enable Entrance Exams for this "
+"view your course content. Note, you must enable Entrance Exams for this "
 "course setting to take effect."
 msgstr ""
-"يُرجى تحديد النسبة المئوية الأدنى لدرجة النجاح في امتحان الدخول قبل أن "
-"يتمكّن الطلّاب من رؤية محتوى مساقك. كما يُرجى ملاحظة أنّه عليك تفعيل خاصية "
-"امتحانات الدخول ليسري مفعول هذا الإعداد."
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Entrance Exam ID"
@@ -5141,6 +5131,34 @@ msgid "An error occurred while deleting the score."
 msgstr "نأسف لحدوث خطأ أثناء حذف الدرجة."
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Course has no entrance exam section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and unique_student_identifier are mutually exclusive."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and delete_module are mutually exclusive."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Requires instructor access."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Course has no valid entrance exam section."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "All Students"
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cannot rescore with all_students and unique_student_identifier."
+msgstr ""
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
@@ -5482,6 +5500,10 @@ msgstr "المستخدمون الذين لديهم تمديدات تاريخ ا�
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "تمديدات تاريخ الاستحقاق لـ {0} {1} ({2})"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Not all problems in entrance exam support re-scoring."
+msgstr ""
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -6778,7 +6800,7 @@ msgid ""
 msgstr ""
 "\n"
 "وافق البنك المصدِّر على طلب التفويض ولكنّ CyberSource رفضته بناءً\n"
-"على إعدادات التفويض الذكية الموروثة الخاصة بك.\n"
+"على إعدادات التفويض الذكية القديمة الخاصة بك.\n"
 "الإجراء التصحيحي الممكن: إعادة المحاولة بوسيلة دفع أخرى. "
 
 #: lms/djangoapps/shoppingcart/tests/test_views.py
@@ -7713,6 +7735,14 @@ msgstr ""
 msgid "Terms of Service"
 msgstr "شروط الخدمة"
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Field '{field_name}' cannot be edited."
+msgstr ""
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Value '{field_value}' is not valid for field '{field_name}'."
+msgstr ""
+
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
 msgstr "الرمز التعريفي الخاص بتحديث المساق غير صحيح."
@@ -7821,6 +7851,11 @@ msgstr "فيديو"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "صفحة فارغة"
+
+#: cms/djangoapps/contentstore/views/course.py
+#: cms/djangoapps/contentstore/views/tests/test_course_index.py
+msgid "Course has been successfully reindexed."
+msgstr ""
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
@@ -8747,6 +8782,10 @@ msgid "Jobs"
 msgstr "الوظائف"
 
 #: lms/templates/footer.html
+msgid "Legal"
+msgstr ""
+
+#: lms/templates/footer.html
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
@@ -9205,31 +9244,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "البيانات الأوّلية:"
 
-#: lms/templates/name_changes.html
-msgid "Accepted"
-msgstr "مقبول"
-
-#: lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "خطأ"
-
-#: lms/templates/name_changes.html
-msgid "Rejected"
-msgstr "مرفوض"
-
-#: lms/templates/name_changes.html
-msgid "Pending name changes"
-msgstr "تغييرات في الاسم رهن المعالجة "
-
-#: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
-msgid "Confirm"
-msgstr "تأكيد"
-
-#: lms/templates/name_changes.html
-msgid "Reject"
-msgstr "رفض"
-
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "كيفية العمل"
@@ -9275,8 +9289,8 @@ msgstr ""
 "باستخدام {chrome_link} أو {ff_link}."
 
 #: lms/templates/navigation.html
-msgid "Global Navigation"
-msgstr "روابط تصفّح متطابقة في كافة صفحات الموقع"
+msgid "Global"
+msgstr ""
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -9835,6 +9849,10 @@ msgstr ""
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "أحدث نشاط تحميل git لمساق {course_id}"
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "خطأ"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Date"
@@ -10511,6 +10529,10 @@ msgid "enroll"
 msgstr ""
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course View"
+msgstr ""
+
+#: lms/templates/courseware/course_navigation.html
 msgid "View this course as:"
 msgstr "مشاهدة هذا المساق كـ:"
 
@@ -10521,6 +10543,10 @@ msgstr "التلميذ في {content_group}"
 #: lms/templates/courseware/course_navigation.html
 msgid "set preview mode"
 msgstr "ضبط وضعية المعاينة"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Course Material"
+msgstr ""
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -10646,7 +10672,7 @@ msgstr "نشرات المساق"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Legacy Instructor Dashboard"
-msgstr "لوحة المعلومات الموروثة للأستاذ"
+msgstr "لوحة معلومات الأستاذ القديمة"
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
@@ -10662,8 +10688,7 @@ msgid ""
 "You are using the legacy instructor dashboard, which we will retire in the "
 "near future."
 msgstr ""
-"إنّك تستخدم لوحة المعلومات الموروثة للأستاذ والتي سنوقفها في المستقبل "
-"القريب."
+"إنّك تستخدم لوحة معلومات الأستاذ القديمة والتي سنوقفها في المستقبل القريب."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Return to the Instructor Dashboard"
@@ -10947,7 +10972,7 @@ msgid ""
 "View course statistics in the Admin section of this legacy instructor "
 "dashboard."
 msgstr ""
-"استعراض إحصائيات المساق في قسم \"المشرف\" في لوحة معلومات الأستاذ الموروثة."
+"استعراض إحصائيات المساق في قسم \"المشرف\" في لوحة معلومات الأستاذ القديمة."
 
 #: lms/templates/courseware/legacy_instructor_dashboard.html
 msgid "Course errors"
@@ -13465,7 +13490,7 @@ msgstr "لوحة المعلومات الخاصة بموجّه المساق"
 
 #: lms/templates/instructor/instructor_dashboard_2/instructor_dashboard_2.html
 msgid "Revert to Legacy Dashboard"
-msgstr "العودة إلى لوحة المعلومات الموروثة "
+msgstr "العودة إلى لوحة معلومات الأستاذ القديمة"
 
 #: lms/templates/instructor/instructor_dashboard_2/membership.html
 msgid "Batch Enrollment"
@@ -13975,6 +14000,42 @@ msgid "Show Background Task History for Student"
 msgstr "أظهر تاريخ المهام للطالب "
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam Adjustment"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student's {platform_name} email address or username:"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Select an action for the student's entrance exam. This action will affect "
+"every problem in the student's exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Number of Student Attempts"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Problems"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"You can also delete all of the student's answers and scores for the entire "
+"entrance exam."
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Delete Student's Answers and Scores"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Student's Exam Adjustment History"
+msgstr ""
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
 msgstr "ثم اختر عملية"
 
@@ -14022,6 +14083,10 @@ msgid ""
 "translator!{link_end}"
 msgstr ""
 "لم تجد لغتك المفضّلة؟ {link_start}تطوّع لتقوم بدور المترجم! {link_end}"
+
+#: lms/templates/modal/accessible_confirm.html
+msgid "Confirm"
+msgstr "تأكيد"
 
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
@@ -14795,44 +14860,6 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr "تعمل مخدمات المنصة {platform_name} حالياً بمستوى تحميل يتجاوز طاقتها"
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Email change failed."
-msgstr "فشلت عملية تغيير عنوان البريد الإلكتروني."
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Something went wrong. Please contact {support} for help."
-msgstr ""
-"يبدو أنه قد حدث خطأ ما، يرجى الاتصال بـ {support} للحصول على المساعدة."
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"The email address you wanted to use is already used by another "
-"{platform_name} account."
-msgstr ""
-"البريد الإلكتروني الذي أردتَ استخدامه مستخدَم مسبقًا من قِبل حساب "
-"{platform_name} آخر."
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"You can try again from the {link_start}account settings{link_end} page."
-msgstr "يمكنك المحاولة مجددًا من صفحة {link_start}إعدادات الحساب{link_end}."
-
-#: lms/templates/student_account/email_change_successful.html
-msgid "Email change successful!"
-msgstr "تم تغيير عنوان البريد الالكتروني بنجاح!"
-
-#: lms/templates/student_account/email_change_successful.html
-msgid ""
-"You should see your new email address listed on the {link_start}account "
-"settings{link_end} page."
-msgstr ""
-"يجب أن تتمكن من مشاهدة عنوان بريدك الإلكتروني الجديد مدرجًا على صفحة "
-"{link_start}إعدادات الحساب{link_end}."
-
-#: lms/templates/student_account/index.html
-msgid "Student Account"
-msgstr "حساب الطالب"
 
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
@@ -17262,12 +17289,9 @@ msgstr "هل تنتمي إلى طاقم مساق قائم في {studio_name}؟"
 
 #: cms/templates/index.html
 msgid ""
-"You will need to be added to the course in {studio_name} by the course "
-"creator. Please get in touch with the course creator or administrator for "
-"the specific course you are helping to author."
+"The course creator must give you access to the course. Contact the course "
+"creator or administrator for the course you are helping to author."
 msgstr ""
-"ستحتاج إلى أن يضيفك \"منشئ المساق\" إلى المساق في {studio_name}. لذا يُرجى "
-"التواصل معه أو مع المشرف حول المساق المحدّد الذي تساعد على تأليفه. "
 
 #: cms/templates/index.html
 msgid "Create Your First Course"
@@ -17359,8 +17383,24 @@ msgid "(Read-only)"
 msgstr "(للقراءة فقط)"
 
 #: cms/templates/index.html
-msgid "You don't have any content libraries yet."
-msgstr "ليس لديك أي مكتبات محتوى بعد."
+msgid "Were you expecting to see a particular library here?"
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"The library creator must give you access to the library. Contact the library"
+" creator or administrator for the library you are helping to author."
+msgstr ""
+
+#: cms/templates/index.html
+msgid "Create Your First Library"
+msgstr ""
+
+#: cms/templates/index.html
+msgid ""
+"Libraries hold a pool of components that can be re-used across multiple "
+"courses. Create your first library with the click of a button!"
+msgstr ""
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -17370,13 +17410,9 @@ msgstr "هل أنت جديد في {studio_name}؟"
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
 "{studio_name} page you are viewing. You can also use the links at the bottom"
-" of the page to access our continously updated documentation and other "
+" of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
-"يُرجى الضغط على زر المساعدة في الزاوية العلوية اليمنى للحصول على مزيد من "
-"المساعدة في استخدام صفحة {studio_name} التي تراها الآن. كما يمكنك استخدام "
-"الروابط الموجودة في أسفل الصفحة لمراجعة وثائقنا المحدَّثة باستمرار ومصادر "
-"أخرى لـ {studio_name}. "
 
 #: cms/templates/index.html
 msgid "Getting Started with {studio_name}"

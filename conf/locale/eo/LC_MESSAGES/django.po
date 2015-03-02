@@ -37,8 +37,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.1a\n"
 "Report-Msgid-Bugs-To: openedx-translation@googlegroups.com\n"
-"POT-Creation-Date: 2015-02-23 18:47+0000\n"
-"PO-Revision-Date: 2015-02-23 18:47:23.375975\n"
+"POT-Creation-Date: 2015-03-02 19:14+0000\n"
+"PO-Revision-Date: 2015-03-02 19:14:44.314394\n"
 "Last-Translator: \n"
 "Language-Team: openedx-translation <openedx-translation@googlegroups.com>\n"
 "MIME-Version: 1.0\n"
@@ -585,12 +585,12 @@ msgid "Valid e-mail address required."
 msgstr "Välïd é-mäïl äddréss réqüïréd. Ⱡ'σяєм #"
 
 #: common/djangoapps/student/views.py
-msgid "An account with this e-mail already exists."
-msgstr "Àn äççöünt wïth thïs é-mäïl älréädý éxïsts. Ⱡ'σяєм ιρѕυм#"
-
-#: common/djangoapps/student/views.py
 msgid "Old email is the same as the new email."
 msgstr "Öld émäïl ïs thé sämé äs thé néw émäïl. Ⱡ'σяєм ιρѕ#"
+
+#: common/djangoapps/student/views.py
+msgid "An account with this e-mail already exists."
+msgstr "Àn äççöünt wïth thïs é-mäïl älréädý éxïsts. Ⱡ'σяєм ιρѕυм#"
 
 #: common/djangoapps/student/views.py
 msgid "Unable to send email activation link. Please try again later."
@@ -2553,12 +2553,14 @@ msgstr "Düé Däté Dïspläý Förmät Ⱡ'σяє#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Enter the format due dates are displayed in. Due dates must be in MM-DD-"
-"YYYY, DD-MM-YYYY, YYYY-MM-DD, or YYYY-DD-MM format."
+"Enter the format for due dates. The default is Mon DD, YYYY. Enter "
+"\"%m-%d-%Y\" for MM-DD-YYYY, \"%d-%m-%Y\" for DD-MM-YYYY, \"%Y-%m-%d\" for "
+"YYYY-MM-DD, or \"%Y-%d-%m\" for YYYY-DD-MM."
 msgstr ""
-"Éntér thé förmät düé dätés äré dïspläýéd ïn. Düé dätés müst ßé ïn MM-DD-"
-"ÝÝÝÝ, DD-MM-ÝÝÝÝ, ÝÝÝÝ-MM-DD, ör ÝÝÝÝ-DD-MM förmät. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
-"αмєт, ¢σηѕє¢тєт#"
+"Éntér thé förmät för düé dätés. Thé défäült ïs Mön DD, ÝÝÝÝ. Éntér "
+"\"%m-%d-%Ý\" för MM-DD-ÝÝÝÝ, \"%d-%m-%Ý\" för DD-MM-ÝÝÝÝ, \"%Ý-%m-%d\" för "
+"ÝÝÝÝ-MM-DD, ör \"%Ý-%d-%m\" för ÝÝÝÝ-DD-MM. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
+"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłι#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "External Login Domain"
@@ -2589,19 +2591,26 @@ msgstr "Çértïfïçätés Dïspläý Béhävïör Ⱡ'σяєм #"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
-"Has three possible states: 'end', 'early_with_info', 'early_no_info'. 'end' "
-"is the default behavior, where certificates will only appear after a course "
-"has ended. 'early_with_info' will display all certificate information before"
-" a course has ended. 'early_no_info' will hide all certificate information "
-"unless a student has earned a certificate."
+"Enter end, early_with_info, or early_no_info. After certificate generation, "
+"students who passed see a link to their certificates on the dashboard and "
+"students who did not pass see information about the grading configuration. "
+"The default is end, which displays this certificate information to all "
+"students after the course end date. To display this certificate information "
+"to all students as soon as certificates are generated, enter "
+"early_with_info. To display only the links to passing students as soon as "
+"certificates are generated, enter early_no_info."
 msgstr ""
-"Häs thréé pössïßlé stätés: 'énd', 'éärlý_wïth_ïnfö', 'éärlý_nö_ïnfö'. 'énd' "
-"ïs thé défäült ßéhävïör, whéré çértïfïçätés wïll önlý äppéär äftér ä çöürsé "
-"häs éndéd. 'éärlý_wïth_ïnfö' wïll dïspläý äll çértïfïçäté ïnförmätïön ßéföré"
-" ä çöürsé häs éndéd. 'éärlý_nö_ïnfö' wïll hïdé äll çértïfïçäté ïnförmätïön "
-"ünléss ä stüdént häs éärnéd ä çértïfïçäté. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт łαвσяє єт "
-"∂σłσяє#"
+"Éntér énd, éärlý_wïth_ïnfö, ör éärlý_nö_ïnfö. Àftér çértïfïçäté générätïön, "
+"stüdénts whö pässéd séé ä lïnk tö théïr çértïfïçätés ön thé däshßöärd änd "
+"stüdénts whö dïd nöt päss séé ïnförmätïön äßöüt thé grädïng çönfïgürätïön. "
+"Thé défäült ïs énd, whïçh dïspläýs thïs çértïfïçäté ïnförmätïön tö äll "
+"stüdénts äftér thé çöürsé énd däté. Tö dïspläý thïs çértïfïçäté ïnförmätïön "
+"tö äll stüdénts äs söön äs çértïfïçätés äré générätéd, éntér "
+"éärlý_wïth_ïnfö. Tö dïspläý önlý thé lïnks tö pässïng stüdénts äs söön äs "
+"çértïfïçätés äré générätéd, éntér éärlý_nö_ïnfö. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт "
+"αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕмσ∂ тємρσя ιη¢ι∂ι∂υηт υт "
+"łαвσяє єт ∂σłσяє мαgηα αłιqυα. υт єηιм α∂ мιηιм νєηιαм, qυιѕ ησѕтяυ∂ "
+"єχєя¢ιтαтιση υłłα#"
 
 #: common/lib/xmodule/xmodule/course_module.py
 msgid "Course About Page Image"
@@ -2802,11 +2811,11 @@ msgstr "Éntränçé Éxäm Énäßléd Ⱡ'σя#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify whether students must complete an entrance exam before they can view"
-" your course content.Note, you must enable Entrance Exams for this course "
+" your course content. Note, you must enable Entrance Exams for this course "
 "setting to take effect."
 msgstr ""
 "Spéçïfý whéthér stüdénts müst çömplété än éntränçé éxäm ßéföré théý çän vïéw"
-" ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs çöürsé "
+" ýöür çöürsé çöntént. Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs çöürsé "
 "séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιριѕι¢ιηg"
 " єł#"
 
@@ -2817,11 +2826,11 @@ msgstr "Éntränçé Éxäm Mïnïmüm Sçöré (%) Ⱡ'σяєм ι#"
 #: common/lib/xmodule/xmodule/course_module.py
 msgid ""
 "Specify a minimum percentage score for an entrance exam before students can "
-"view your course content.Note, you must enable Entrance Exams for this "
+"view your course content. Note, you must enable Entrance Exams for this "
 "course setting to take effect."
 msgstr ""
 "Spéçïfý ä mïnïmüm pérçéntägé sçöré för än éntränçé éxäm ßéföré stüdénts çän "
-"vïéw ýöür çöürsé çöntént.Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs "
+"vïéw ýöür çöürsé çöntént. Nöté, ýöü müst énäßlé Éntränçé Éxäms för thïs "
 "çöürsé séttïng tö täké éfféçt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłι#"
 
@@ -5223,6 +5232,39 @@ msgid "An error occurred while deleting the score."
 msgstr "Àn érrör öççürréd whïlé délétïng thé sçöré. Ⱡ'σяєм ιρѕυм#"
 
 #: lms/djangoapps/instructor/views/api.py
+msgid "Course has no entrance exam section."
+msgstr "Çöürsé häs nö éntränçé éxäm séçtïön. Ⱡ'σяєм ιρ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and unique_student_identifier are mutually exclusive."
+msgstr ""
+"äll_stüdénts änd ünïqüé_stüdént_ïdéntïfïér äré mütüällý éxçlüsïvé. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя #"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "all_students and delete_module are mutually exclusive."
+msgstr ""
+"äll_stüdénts änd délété_mödülé äré mütüällý éxçlüsïvé. Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Requires instructor access."
+msgstr "Réqüïrés ïnstrüçtör äççéss. Ⱡ'σяєм#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Course has no valid entrance exam section."
+msgstr "Çöürsé häs nö välïd éntränçé éxäm séçtïön. Ⱡ'σяєм ιρѕυ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "All Students"
+msgstr "Àll Stüdénts Ⱡ#"
+
+#: lms/djangoapps/instructor/views/api.py
+msgid "Cannot rescore with all_students and unique_student_identifier."
+msgstr ""
+"Çännöt résçöré wïth äll_stüdénts änd ünïqüé_stüdént_ïdéntïfïér. Ⱡ'σяєм ιρѕυм"
+" ∂σłσя#"
+
+#: lms/djangoapps/instructor/views/api.py
 msgid ""
 "Your grade report is being generated! You can view the status of the "
 "generation task in the 'Pending Instructor Tasks' section."
@@ -5574,6 +5616,11 @@ msgstr "Ûsérs wïth düé däté éxténsïöns för {0} Ⱡ'σяєм ιρѕ#"
 #: lms/djangoapps/instructor/views/tools.py
 msgid "Due date extensions for {0} {1} ({2})"
 msgstr "Düé däté éxténsïöns för {0} {1} ({2}) Ⱡ'σяєм ιρѕ#"
+
+#: lms/djangoapps/instructor_task/api_helper.py
+msgid "Not all problems in entrance exam support re-scoring."
+msgstr ""
+"Nöt äll prößléms ïn éntränçé éxäm süppört ré-sçörïng. Ⱡ'σяєм ιρѕυм ∂σ#"
 
 #. Translators: This is a past-tense verb that is inserted into task progress
 #. messages as {action}.
@@ -7887,6 +7934,15 @@ msgstr "Ýöü müst ägréé tö thé {platform_name} {terms_of_service}. Ⱡ'�
 msgid "Terms of Service"
 msgstr "Térms öf Sérvïçé Ⱡ'σ#"
 
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Field '{field_name}' cannot be edited."
+msgstr "Fïéld '{field_name}' çännöt ßé édïtéd. Ⱡ'σяєм #"
+
+#: openedx/core/djangoapps/user_api/accounts/views.py
+msgid "Value '{field_value}' is not valid for field '{field_name}'."
+msgstr ""
+"Välüé '{field_value}' ïs nöt välïd för fïéld '{field_name}'. Ⱡ'σяєм ιρѕυ#"
+
 #: cms/djangoapps/contentstore/course_info_model.py
 msgid "Invalid course update id."
 msgstr "Ìnvälïd çöürsé üpdäté ïd. Ⱡ'σяєм#"
@@ -7999,6 +8055,11 @@ msgstr "Vïdéö Ⱡ'σяєм ι#"
 #: cms/djangoapps/contentstore/views/component.py
 msgid "Blank"
 msgstr "Blänk Ⱡ'σяєм ι#"
+
+#: cms/djangoapps/contentstore/views/course.py
+#: cms/djangoapps/contentstore/views/tests/test_course_index.py
+msgid "Course has been successfully reindexed."
+msgstr "Çöürsé häs ßéén süççéssfüllý réïndéxéd. Ⱡ'σяєм ιρѕ#"
 
 #: cms/djangoapps/contentstore/views/course.py
 msgid "Unscheduled"
@@ -8939,6 +9000,10 @@ msgid "Jobs"
 msgstr "Jößs Ⱡ'σяєм#"
 
 #: lms/templates/footer.html
+msgid "Legal"
+msgstr "Légäl Ⱡ'σяєм ι#"
+
+#: lms/templates/footer.html
 msgid ""
 "{tos_link_start}Terms of Service{tos_link_end} and {honor_link_start}Honor "
 "Code{honor_link_end}"
@@ -9414,31 +9479,6 @@ msgstr ""
 msgid "Raw data:"
 msgstr "Räw dätä: #"
 
-#: lms/templates/name_changes.html
-msgid "Accepted"
-msgstr "Àççéptéd #"
-
-#: lms/templates/name_changes.html
-#: lms/templates/sysadmin_dashboard_gitlogs.html
-msgid "Error"
-msgstr "Érrör Ⱡ'σяєм ι#"
-
-#: lms/templates/name_changes.html
-msgid "Rejected"
-msgstr "Réjéçtéd #"
-
-#: lms/templates/name_changes.html
-msgid "Pending name changes"
-msgstr "Péndïng nämé çhängés Ⱡ'σя#"
-
-#: lms/templates/name_changes.html lms/templates/modal/accessible_confirm.html
-msgid "Confirm"
-msgstr "Çönfïrm #"
-
-#: lms/templates/name_changes.html
-msgid "Reject"
-msgstr "Réjéçt Ⱡ'σяєм ιρѕ#"
-
 #: lms/templates/navigation-edx.html lms/templates/navigation.html
 msgid "How it Works"
 msgstr "Höw ït Wörks Ⱡ#"
@@ -9484,8 +9524,8 @@ msgstr ""
 "réçömménd üsïng {chrome_link} ör {ff_link}. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт,#"
 
 #: lms/templates/navigation.html
-msgid "Global Navigation"
-msgstr "Glößäl Nävïgätïön Ⱡ'σ#"
+msgid "Global"
+msgstr "Glößäl Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/navigation.html
 msgid "Schools"
@@ -10055,6 +10095,10 @@ msgstr "néxt Ⱡ'σяєм#"
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Recent git load activity for {course_id}"
 msgstr "Réçént gït löäd äçtïvïtý för {course_id} Ⱡ'σяєм ι#"
+
+#: lms/templates/sysadmin_dashboard_gitlogs.html
+msgid "Error"
+msgstr "Érrör Ⱡ'σяєм ι#"
 
 #: lms/templates/sysadmin_dashboard_gitlogs.html
 msgid "Date"
@@ -10749,6 +10793,10 @@ msgid "enroll"
 msgstr "énröll Ⱡ'σяєм ιρѕ#"
 
 #: lms/templates/courseware/course_navigation.html
+msgid "Course View"
+msgstr "Çöürsé Vïéw Ⱡ#"
+
+#: lms/templates/courseware/course_navigation.html
 msgid "View this course as:"
 msgstr "Vïéw thïs çöürsé äs: Ⱡ'σя#"
 
@@ -10759,6 +10807,10 @@ msgstr "Stüdént ïn {content_group} Ⱡ'#"
 #: lms/templates/courseware/course_navigation.html
 msgid "set preview mode"
 msgstr "sét prévïéw mödé Ⱡ'σ#"
+
+#: lms/templates/courseware/course_navigation.html
+msgid "Course Material"
+msgstr "Çöürsé Mätérïäl Ⱡ'#"
 
 #. Translators: 'needs attention' is an alternative string for the
 #. notification image that indicates the tab "needs attention".
@@ -14389,6 +14441,46 @@ msgid "Show Background Task History for Student"
 msgstr "Shöw Bäçkgröünd Täsk Hïstörý för Stüdént Ⱡ'σяєм ιρѕυ#"
 
 #: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Entrance Exam Adjustment"
+msgstr "Éntränçé Éxäm Àdjüstmént Ⱡ'σяє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Student's {platform_name} email address or username:"
+msgstr "Stüdént's {platform_name} émäïl äddréss ör üsérnämé: Ⱡ'σяєм ιρѕυ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"Select an action for the student's entrance exam. This action will affect "
+"every problem in the student's exam."
+msgstr ""
+"Séléçt än äçtïön för thé stüdént's éntränçé éxäm. Thïs äçtïön wïll äfféçt "
+"évérý prößlém ïn thé stüdént's éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Reset Number of Student Attempts"
+msgstr "Rését Nümßér öf Stüdént Àttémpts Ⱡ'σяєм ι#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Rescore All Problems"
+msgstr "Résçöré Àll Prößléms Ⱡ'σя#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid ""
+"You can also delete all of the student's answers and scores for the entire "
+"entrance exam."
+msgstr ""
+"Ýöü çän älsö délété äll öf thé stüdént's änswérs änd sçörés för thé éntïré "
+"éntränçé éxäm. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Delete Student's Answers and Scores"
+msgstr "Délété Stüdént's Ànswérs änd Sçörés Ⱡ'σяєм ιρ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
+msgid "Show Student's Exam Adjustment History"
+msgstr "Shöw Stüdént's Éxäm Àdjüstmént Hïstörý Ⱡ'σяєм ιρѕ#"
+
+#: lms/templates/instructor/instructor_dashboard_2/student_admin.html
 msgid "Then select an action"
 msgstr "Thén séléçt än äçtïön Ⱡ'σя#"
 
@@ -14438,6 +14530,10 @@ msgid ""
 msgstr ""
 "Dön't séé ýöür préférréd längüägé? {link_start}Völüntéér tö ßéçömé ä "
 "tränslätör!{link_end} Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
+
+#: lms/templates/modal/accessible_confirm.html
+msgid "Confirm"
+msgstr "Çönfïrm #"
 
 #. Translators: this text gives status on if the modal interface (a menu or
 #. piece of UI that takes the full focus of the screen) is open or not
@@ -15273,46 +15369,6 @@ msgstr ""
 #: lms/templates/static_templates/server-overloaded.html
 msgid "Currently the {platform_name} servers are overloaded"
 msgstr "Çürréntlý thé {platform_name} sérvérs äré övérlöädéd Ⱡ'σяєм ιρѕυ#"
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Email change failed."
-msgstr "Émäïl çhängé fäïléd. Ⱡ'σя#"
-
-#: lms/templates/student_account/email_change_failed.html
-msgid "Something went wrong. Please contact {support} for help."
-msgstr ""
-"Söméthïng wént wröng. Pléäsé çöntäçt {support} för hélp. Ⱡ'σяєм ιρѕυм ∂#"
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"The email address you wanted to use is already used by another "
-"{platform_name} account."
-msgstr ""
-"Thé émäïl äddréss ýöü wäntéd tö üsé ïs älréädý üséd ßý änöthér "
-"{platform_name} äççöünt. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт#"
-
-#: lms/templates/student_account/email_change_failed.html
-msgid ""
-"You can try again from the {link_start}account settings{link_end} page."
-msgstr ""
-"Ýöü çän trý ägäïn fröm thé {link_start}äççöünt séttïngs{link_end} pägé. "
-"Ⱡ'σяєм ιρѕυм ∂σł#"
-
-#: lms/templates/student_account/email_change_successful.html
-msgid "Email change successful!"
-msgstr "Émäïl çhängé süççéssfül! Ⱡ'σяє#"
-
-#: lms/templates/student_account/email_change_successful.html
-msgid ""
-"You should see your new email address listed on the {link_start}account "
-"settings{link_end} page."
-msgstr ""
-"Ýöü shöüld séé ýöür néw émäïl äddréss lïstéd ön thé {link_start}äççöünt "
-"séttïngs{link_end} pägé. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт α#"
-
-#: lms/templates/student_account/index.html
-msgid "Student Account"
-msgstr "Stüdént Àççöünt Ⱡ'#"
 
 #: lms/templates/student_account/login_and_register.html
 msgid "Sign in or Register"
@@ -17897,14 +17953,12 @@ msgstr "Àré ýöü stäff ön än éxïstïng {studio_name} çöürsé? Ⱡ'σ
 
 #: cms/templates/index.html
 msgid ""
-"You will need to be added to the course in {studio_name} by the course "
-"creator. Please get in touch with the course creator or administrator for "
-"the specific course you are helping to author."
+"The course creator must give you access to the course. Contact the course "
+"creator or administrator for the course you are helping to author."
 msgstr ""
-"Ýöü wïll nééd tö ßé äddéd tö thé çöürsé ïn {studio_name} ßý thé çöürsé "
-"çréätör. Pléäsé gét ïn töüçh wïth thé çöürsé çréätör ör ädmïnïsträtör för "
-"thé spéçïfïç çöürsé ýöü äré hélpïng tö äüthör. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, "
-"¢σηѕє¢тєтυя α∂ιριѕι¢ιηg єłιт#"
+"Thé çöürsé çréätör müst gïvé ýöü äççéss tö thé çöürsé. Çöntäçt thé çöürsé "
+"çréätör ör ädmïnïsträtör för thé çöürsé ýöü äré hélpïng tö äüthör. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ι#"
 
 #: cms/templates/index.html
 msgid "Create Your First Course"
@@ -18000,8 +18054,30 @@ msgid "(Read-only)"
 msgstr "(Réäd-önlý) Ⱡ#"
 
 #: cms/templates/index.html
-msgid "You don't have any content libraries yet."
-msgstr "Ýöü dön't hävé äný çöntént lïßrärïés ýét. Ⱡ'σяєм ιρѕυ#"
+msgid "Were you expecting to see a particular library here?"
+msgstr "Wéré ýöü éxpéçtïng tö séé ä pärtïçülär lïßrärý héré? Ⱡ'σяєм ιρѕυм ∂σ#"
+
+#: cms/templates/index.html
+msgid ""
+"The library creator must give you access to the library. Contact the library"
+" creator or administrator for the library you are helping to author."
+msgstr ""
+"Thé lïßrärý çréätör müst gïvé ýöü äççéss tö thé lïßrärý. Çöntäçt thé lïßrärý"
+" çréätör ör ädmïnïsträtör för thé lïßrärý ýöü äré hélpïng tö äüthör. Ⱡ'σяєм "
+"ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α∂ιρ#"
+
+#: cms/templates/index.html
+msgid "Create Your First Library"
+msgstr "Çréäté Ýöür Fïrst Lïßrärý Ⱡ'σяєм#"
+
+#: cms/templates/index.html
+msgid ""
+"Libraries hold a pool of components that can be re-used across multiple "
+"courses. Create your first library with the click of a button!"
+msgstr ""
+"Lïßrärïés höld ä pööl öf çömpönénts thät çän ßé ré-üséd äçröss mültïplé "
+"çöürsés. Çréäté ýöür fïrst lïßrärý wïth thé çlïçk öf ä ßüttön! Ⱡ'σяєм ιρѕυм "
+"∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя α#"
 
 #: cms/templates/index.html
 msgid "New to {studio_name}?"
@@ -18011,12 +18087,12 @@ msgstr "Néw tö {studio_name}? Ⱡ#"
 msgid ""
 "Click Help in the upper-right corner to get more information about the "
 "{studio_name} page you are viewing. You can also use the links at the bottom"
-" of the page to access our continously updated documentation and other "
+" of the page to access our continually updated documentation and other "
 "{studio_name} resources."
 msgstr ""
 "Çlïçk Hélp ïn thé üppér-rïght çörnér tö gét möré ïnförmätïön äßöüt thé "
 "{studio_name} pägé ýöü äré vïéwïng. Ýöü çän älsö üsé thé lïnks ät thé ßöttöm"
-" öf thé pägé tö äççéss öür çöntïnöüslý üpdätéd döçüméntätïön änd öthér "
+" öf thé pägé tö äççéss öür çöntïnüällý üpdätéd döçüméntätïön änd öthér "
 "{studio_name} résöürçés. Ⱡ'σяєм ιρѕυм ∂σłσя ѕιт αмєт, ¢σηѕє¢тєтυя "
 "α∂ιριѕι¢ιηg єłιт, ѕє∂ ∂σ єιυѕм#"
 
