@@ -5,6 +5,8 @@ from django.conf.urls import patterns, include, url
 from ratelimitbackend import admin
 admin.autodiscover()
 
+# pylint: disable=bad-continuation
+
 # Pattern to match a course key or a library key
 COURSELIKE_KEY_PATTERN = r'(?P<course_key_string>({}|{}))'.format(
     r'[^/]+/[^/]+/[^/]+', r'[^/:]+:[^/+]+\+[^/+]+(\+[^/]+)?'
@@ -47,7 +49,7 @@ urlpatterns = patterns(
     url(r'^xmodule/', include('pipeline_js.urls')),
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
     url(r'^lang_pref/', include('lang_pref.urls')),
 )
 
@@ -87,7 +89,8 @@ urlpatterns += patterns(
         name='course_search_index_handler'
     ),
     url(r'^course/{}?$'.format(settings.COURSE_KEY_PATTERN), 'course_handler', name='course_handler'),
-    url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'course_notifications_handler'),
+    url(r'^course_notifications/{}/(?P<action_state_id>\d+)?$'.format(settings.COURSE_KEY_PATTERN),
+        'course_notifications_handler'),
     url(r'^course_rerun/{}$'.format(settings.COURSE_KEY_PATTERN), 'course_rerun_handler', name='course_rerun_handler'),
     url(r'^container/{}$'.format(settings.USAGE_KEY_PATTERN), 'container_handler'),
     url(r'^checklists/{}/(?P<checklist_index>\d+)?$'.format(settings.COURSE_KEY_PATTERN), 'checklists_handler'),
@@ -115,7 +118,7 @@ urlpatterns += patterns(
     url(r'^api/val/v0/', include('edxval.urls')),
 )
 
-js_info_dict = {
+JS_INFO_DICT = {
     'domain': 'djangojs',
     # We need to explicitly include external Django apps that are not in LOCALE_PATHS.
     'packages': ('openassessment',),
@@ -124,7 +127,7 @@ js_info_dict = {
 urlpatterns += patterns(
     '',
     # Serve catalog of localized strings to be rendered by Javascript
-    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', js_info_dict),
+    url(r'^i18n.js$', 'django.views.i18n.javascript_catalog', JS_INFO_DICT),
 )
 
 if settings.FEATURES.get('ENABLE_CONTENT_LIBRARIES'):

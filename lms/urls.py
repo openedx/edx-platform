@@ -60,9 +60,11 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^user_api/', include('openedx.core.djangoapps.user_api.urls')),
+    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
 
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.accounts.urls')),
+    # Note: these are older versions of the User API that will eventually be
+    # subsumed by api/user.
+    url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
     url(r'^notifier_api/', include('notifier_api.urls')),
 

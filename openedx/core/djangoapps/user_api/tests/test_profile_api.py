@@ -11,6 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import datetime
 
+from ..accounts.views import AccountView
 from ..api import account as account_api
 from ..api import profile as profile_api
 from ..models import UserProfile, UserOrgTag
@@ -27,23 +28,26 @@ class ProfileApiTest(ModuleStoreTestCase):
         # Create a new account, which should have an empty profile by default.
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
-        # Retrieve the profile, expecting default values
-        profile = profile_api.profile_info(username=self.USERNAME)
-        self.assertEqual(profile, {
+        # Retrieve the account settings
+        account_settings = AccountView.get_serialized_account(self.USERNAME)
+
+        # Expect a date joined field but remove it to simplify the following comparison
+        self.assertIsNotNone(account_settings['date_joined'])
+        del account_settings['date_joined']
+
+        # Expect all the values to be defaulted
+        self.assertEqual(account_settings, {
             'username': self.USERNAME,
             'email': self.EMAIL,
-            'full_name': u'',
+            'name': u'',
+            'gender': None,
+            'language': u'',
             'goals': None,
             'level_of_education': None,
             'mailing_address': None,
             'year_of_birth': None,
-            'country': '',
-            'city': None,
+            'country': None,
         })
-
-    def test_retrieve_profile_no_user(self):
-        profile = profile_api.profile_info('does not exist')
-        self.assertIs(profile, None)
 
     def test_update_and_retrieve_preference_info(self):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)

@@ -2047,3 +2047,26 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
+
+# The configuration for learner profiles
+PROFILE_CONFIGURATION = {
+    # Default visibility level for accounts without a specified value
+    # The value is one of: 'all_users', 'private'
+    "default_visibility": 'all_users',
+
+    # The list of all fields that can be shown on a learner's profile
+    "all_fields": [
+        'username',
+        'profile_image',
+        'country',
+        'time_zone',
+        'languages',
+        'bio',
+    ],
+
+    # The list of fields that are always public on a learner's profile
+    "public_fields": [
+        'username',
+        'profile_image',
+    ],
+}
