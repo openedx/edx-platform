@@ -253,7 +253,6 @@ class PayAndVerifyView(View):
         # The URL regex should guarantee that the key format is valid.
         course_key = CourseKey.from_string(course_id)
         course = modulestore().get_course(course_key)
-        self.course_key = course_key
 
         # Verify that the course exists and has a verified mode
         if course is None:
