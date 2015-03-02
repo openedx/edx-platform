@@ -247,6 +247,7 @@
 
         .task-description {
           @extend %t-copy-sub1;
+          @extend %t-regular;
           @include transition(color $tmg-f2 ease-in-out 0s);
           color: $gray-l2;
         }
@@ -290,6 +291,11 @@
         opacity: 1.0;
 
         .task-details {
+          color: $gray-d1;
+
+          .task-description {
+            color: $gray-d1;
+          }
 
           .task-support {
             opacity: 1.0;
@@ -310,8 +316,15 @@
         border-top-color: $gray-l5;
         border-bottom-color: $gray-l5;
 
-        .task-name {
-          color: $gray-l2;
+        .task-details {
+
+          .task-name {
+            color: $gray-l2;
+          }
+
+          .task-description {
+            color: $gray-l2;
+          }
         }
 
         .task-actions {
