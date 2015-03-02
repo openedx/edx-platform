@@ -3,6 +3,7 @@ var edx = edx || {};
 (function ($, _, Backbone, gettext, interpolate_text, NotificationModel, NotificationView) {
     'use strict';
 
+    var disabledClass = 'is-disabled';
     edx.discussions = edx.discussions || {};
 
     edx.discussions.DiscussionTopicsView = Backbone.View.extend({
@@ -89,8 +90,7 @@ var edx = edx || {};
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
             var self = this,
-                fieldData,
-                $inlineTopics = self.$('.inline-discussion-topics');
+                fieldData;
 
             self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
             fieldData = {
@@ -98,17 +98,17 @@ var edx = edx || {};
                 cohorted_discussion_ids: self.cohortedDiscussionTopics,
                 always_cohort_inline_discussions:self.$('.check-all-inline-discussions').prop('checked')
             };
-            self.saveForm(fieldData, $inlineTopics)
+            self.saveForm(fieldData, self.$('.inline-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
-                        self.showMessage(gettext('Changes Saved.'), $inlineTopics);
+                        self.showMessage(gettext('Changes Saved.'), self.$('.inline-discussion-topics'));
                     });
                 });
         },
         saveCoursewideDiscussionsForm: function (event) {
             var self = this,
-                fieldData,
-                $coursewideTopics = self.$('.coursewide-discussion-topics');
+                fieldData;
+
             event.preventDefault();
             self.getCohortedDiscussions('.check-discussion-subcategory-coursewide:checked');
             fieldData = {
@@ -116,10 +116,10 @@ var edx = edx || {};
                 cohorted_discussion_ids: self.cohortedDiscussionTopics
             };
 
-            self.saveForm(fieldData, $coursewideTopics)
+            self.saveForm(fieldData, self.$('.coursewide-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
-                        self.showMessage(gettext('Changes Saved.'), $coursewideTopics);
+                        self.showMessage(gettext('Changes Saved.'), self.$('.coursewide-discussion-topics'));
                     });
                 });
         },

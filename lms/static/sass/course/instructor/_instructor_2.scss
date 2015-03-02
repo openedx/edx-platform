@@ -923,8 +923,9 @@
     }
   }
 
-  // CSV-based file upload for auto cohort assigning
-  .toggle-cohort-management-secondary {
+  // CSV-based file upload for auto cohort assigning and
+  // cohort the discussion topics.
+  .toggle-cohort-management-secondary, .toggle-cohort-management-discussions {
     @extend %t-copy-sub1;
   }
 
@@ -1075,7 +1076,7 @@
       padding-left: ($baseline/2);
     }
     .category-item {
-      padding-bottom: ($baseline/2);
+      padding-top: ($baseline/2);
     }
     .cohorted-text {
       color: $link-color;
