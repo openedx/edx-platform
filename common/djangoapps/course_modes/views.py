@@ -88,7 +88,7 @@ class ChooseModeView(View):
         if no_id_prof_mode:
             return redirect(
                 reverse(
-                    'verify_student_payment_confirmation',
+                    'verify_student_start_flow',
                     kwargs={'course_id': unicode(course_key)}
                 )
             )
