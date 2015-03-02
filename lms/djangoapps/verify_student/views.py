@@ -269,14 +269,17 @@ class PayAndVerifyView(View):
         )
         if redirect_url:
             return redirect(redirect_url)
+        all_modes, course_mode, expired_course_mode = self._get_all_and_verified_modes_for_course(course_key)
 
         # Check that the course has an unexpired no-id-professional mode
-        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
+        no_id_prof_mode = CourseMode.mode_for_course(
+            course_key,
+            CourseMode.NO_ID_PROFESSIONAL_MODES[0],
+            modes=all_modes
+        )
         # If there is no no-id-professional mode then check the verified track modes
         if not no_id_prof_mode:
             # Check that the course has an unexpired verified mode
-            course_mode, expired_course_mode = self._get_verified_modes_for_course(course_key)
-
             if course_mode is not None:
                 log.info(
                     u"Entering verified workflow for user '%s', course '%s', with current step '%s'.",
@@ -464,7 +467,7 @@ class PayAndVerifyView(View):
         if url is not None:
             return redirect(url)
 
-    def _get_verified_modes_for_course(self, course_key):
+    def _get_all_and_verified_modes_for_course(self, course_key):
         """Retrieve unexpired and expired verified modes for a course.
 
         Arguments:
@@ -487,7 +490,7 @@ class PayAndVerifyView(View):
         if verified_mode is None:
             expired_verified_mode = CourseMode.verified_mode_for_course(course_key, modes=all_modes[course_key])
 
-        return (verified_mode, expired_verified_mode)
+        return (all_modes[course_key], verified_mode, expired_verified_mode)
 
     def _display_steps(self, always_show_payment, already_verified, already_paid, course_key):
         """Determine which steps to display to the user.
