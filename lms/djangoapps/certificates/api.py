@@ -18,19 +18,24 @@ from certificates.queue import XQueueCertInterface
 log = logging.getLogger("edx.certificate")
 
 
-def generate_user_certificates(student, course):
+def generate_user_certificates(student, course_key, course=None):
     """
     It will add the add-cert request into the xqueue.
 
     Args:
-        student (object):  user
-        course (object): course
+        student (User)
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        course (Course): Optionally provide the course object; if not provided
+            it will be loaded.
 
     Returns:
         returns status of generated certificate
+
     """
     xqueue = XQueueCertInterface()
-    ret = xqueue.add_cert(student, course.id, course=course)
+    ret = xqueue.add_cert(student, course_key, course=course)
     log.info(
         (
             u"Added a certificate generation task to the XQueue "
@@ -38,7 +43,7 @@ def generate_user_certificates(student, course):
             u"The new certificate status is '%s'."
         ),
         student.id,
-        unicode(course.id),
+        unicode(course_key),
         ret
     )
     return ret
