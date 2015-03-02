@@ -407,6 +407,11 @@ def _record_purchase(params, order):
     else:
         ccnum = "####"
 
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d purchased with params: %s", order.id, json.dumps(params)
+        )
+
     # Mark the order as purchased and store the billing information
     order.purchase(
         first=params.get('req_bill_to_forename', ''),
@@ -433,6 +438,11 @@ def _record_payment_info(params, order):
     Returns:
         None
     """
+    if settings.FEATURES.get("LOG_POSTPAY_CALLBACKS"):
+        log.info(
+            "Order %d processed (but not completed) with params: %s", order.id, json.dumps(params)
+        )
+
     order.processor_reply_dump = json.dumps(params)
     order.save()
 
