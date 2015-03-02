@@ -121,6 +121,6 @@ class VideoTranscripts(generics.RetrieveAPIView):
             raise Http404(u"Transcript not found for {}, lang: {}".format(block_id, lang))
 
         response = HttpResponse(content, content_type=mimetype)
-        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename="{}"'.format(filename.encode('utf-8'))
 
         return response
