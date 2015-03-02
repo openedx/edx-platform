@@ -4,9 +4,9 @@ var edx = edx || {};
     'use strict';
 
     var disabledClass = 'is-disabled';
-    edx.discussions = edx.discussions || {};
+    edx.groups = edx.groups || {};
 
-    edx.discussions.DiscussionTopicsView = Backbone.View.extend({
+    edx.groups.DiscussionTopicsView = Backbone.View.extend({
         events: {
             'change .check-discussion-category': 'changeDiscussionInlineCategory',
             'change .check-discussion-subcategory-inline': 'changeDiscussionInlineSubCategory',
@@ -18,6 +18,7 @@ var edx = edx || {};
 
         initialize: function () {
             this.template = _.template($('#cohort-discussions-tpl').text());
+            this.subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html());
         },
         render: function () {
             this.$el.html(this.template({
@@ -29,9 +30,9 @@ var edx = edx || {};
             this.toggleSaveButton(this.$('.action-save'), false);
         },
         renderCoursewideTopics: function (topics) {
-            var entry_template = _.template($('#cohort-discussions-subcategory-tpl').html());
+            var self = this;
             return _.map(topics, function (topic, topic_name) {
-                return entry_template({
+                return self.subCategoryTemplate({
                     name: topic_name,
                     id: topic.id,
                     is_cohorted: topic.is_cohorted,
@@ -41,7 +42,7 @@ var edx = edx || {};
         },
         renderInlineTopics: function (category) {
             var category_template = _.template($('#cohort-discussions-category-tpl').html()),
-                entry_template = _.template($('#cohort-discussions-subcategory-tpl').html()),
+                entry_template = this.subCategoryTemplate,
                 is_category_cohorted = true,
                 children = category.children || category.get('children');
 
@@ -49,7 +50,6 @@ var edx = edx || {};
                 var html = '', entry,
                     entries = category.entries || category.get('entries'),
                     subcategories = category.subcategories || category.get('subcategories');
-
 
                 var filteredEntry = _.find(entries,function(entry){
                     if (entry.is_cohorted === false) {
@@ -60,7 +60,6 @@ var edx = edx || {};
                 if (filteredEntry) {
                     is_category_cohorted = false;
                 }
-
                 if (entries && _.has(entries, name)) {
                     entry = entries[name];
                     html = entry_template({
