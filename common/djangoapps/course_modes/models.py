@@ -319,7 +319,7 @@ class CourseMode(models.Model):
             modes_dict = cls.modes_for_course_dict(course_id)
 
         # Professional and no-id-professional mode courses are always behind a paywall
-        if "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODES[0] in modes_dict:
+        if cls.has_professional_mode(modes_dict):
             return False
 
         # White-label uses course mode honor with a price
@@ -452,6 +452,19 @@ class CourseMode(models.Model):
             mode = enrollment_mode
 
         return mode
+
+    @classmethod
+    def has_professional_mode(cls, modes_dict):
+        """
+        check the course mode is profession or no-id-professional
+
+        Args:
+            modes_dict (dict): course modes.
+
+        Returns:
+            bool
+        """
+        return "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODES[0] in modes_dict
 
     def to_tuple(self):
         """
