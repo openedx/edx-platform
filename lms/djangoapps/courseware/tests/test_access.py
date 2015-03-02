@@ -88,12 +88,12 @@ class AccessTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
 
     def test__has_access_string(self):
         user = Mock(is_staff=True)
-        self.assertFalse(access._has_access_string(user, 'staff', 'not_global', self.course.course_key))
+        self.assertFalse(access._has_access_string(user, 'staff', 'not_global'))
 
         user._has_global_staff_access.return_value = True
-        self.assertTrue(access._has_access_string(user, 'staff', 'global', self.course.course_key))
+        self.assertTrue(access._has_access_string(user, 'staff', 'global'))
 
-        self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global', self.course.course_key)
+        self.assertRaises(ValueError, access._has_access_string, user, 'not_staff', 'global')
 
     def test__has_access_error_desc(self):
         descriptor = Mock()

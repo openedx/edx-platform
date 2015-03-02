@@ -92,6 +92,19 @@
                 qualityControl.el.click();
                 expect(player.setPlaybackQuality).toHaveBeenCalledWith('large');
             });
+
+            it('quality control is active if HD is available',
+                function () {
+                 player.getAvailableQualityLevels.andReturn(
+                     ['highres', 'hd1080', 'hd720']
+                 );
+
+                 qualityControl.quality = 'highres';
+
+                 videoPlayer.onPlay();
+                 expect(qualityControl.el).toHaveClass('active');
+            });
+
         });
 
         describe('constructor, HTML5 mode', function () {

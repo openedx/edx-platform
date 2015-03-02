@@ -449,7 +449,7 @@ class GroupConfigurationsTest(ContainerBase, SplitTestMixin):
 
         # Save the configuration
         self.assertEqual(config.get_text('.action-primary'), "Create")
-        self.assertTrue(config.delete_button_is_absent)
+        self.assertFalse(config.delete_button_is_present)
         config.save()
 
         self._assert_fields(

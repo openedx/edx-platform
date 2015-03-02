@@ -4,10 +4,9 @@ Common utility methods and decorators for Mobile APIs.
 
 
 import functools
-
 from rest_framework import permissions
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 
+from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 from courseware.courses import get_course_with_access
@@ -55,7 +54,10 @@ def mobile_view(is_user=False):
         Requires either OAuth2 or Session-based authentication.
         If is_user is True, also requires username in URL matches the request user.
         """
-        func_or_class.authentication_classes = (OAuth2Authentication, SessionAuthentication)
+        func_or_class.authentication_classes = (
+            OAuth2AuthenticationAllowInactiveUser,
+            SessionAuthenticationAllowInactiveUser
+        )
         func_or_class.permission_classes = (permissions.IsAuthenticated,)
         if is_user:
             func_or_class.permission_classes += (IsUser,)

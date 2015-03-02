@@ -45,7 +45,7 @@ from student.models import (
     CourseEnrollment, CourseEnrollmentAllowed, NonExistentCourseError
 )
 from student.tests.factories import UserFactory, CourseModeFactory
-from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole
+from student.roles import CourseBetaTesterRole, CourseSalesAdminRole, CourseFinanceAdminRole, CourseInstructorRole
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
@@ -2180,6 +2180,7 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
             self.course.id,
             'robot-some-problem-urlname'
         )
+
         self.problem_urlname = self.problem_location.to_deprecated_string()
 
         self.module_to_reset = StudentModule.objects.create(
@@ -2297,7 +2298,251 @@ class TestInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(act.called)
 
+    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    def test_course_has_entrance_exam_in_student_attempts_reset(self):
+        """ Test course has entrance exam id set while resetting attempts"""
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'all_students': True,
+            'delete_module': False,
+        })
+        self.assertEqual(response.status_code, 400)
 
+    @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+    def test_rescore_entrance_exam_with_invalid_exam(self):
+        """ Test course has entrance exam id set while re-scoring. """
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 400)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
+@patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
+class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollmentTestCase):
+    """
+    Test endpoints whereby instructors can rescore student grades,
+    reset student attempts and delete state for entrance exam.
+    """
+
+    def setUp(self):
+        super(TestEntranceExamInstructorAPIRegradeTask, self).setUp()
+        self.course = CourseFactory.create(
+            org='test_org',
+            course='test_course',
+            run='test_run',
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
+        self.course_with_invalid_ee = CourseFactory.create(entrance_exam_id='invalid_exam')
+
+        self.instructor = InstructorFactory(course_key=self.course.id)
+        # Add instructor to invalid ee course
+        CourseInstructorRole(self.course_with_invalid_ee.id).add_users(self.instructor)
+        self.client.login(username=self.instructor.username, password='test')
+
+        self.student = UserFactory()
+        CourseEnrollment.enroll(self.student, self.course.id)
+
+        self.entrance_exam = ItemFactory.create(
+            parent=self.course,
+            category='chapter',
+            display_name='Entrance exam'
+        )
+        subsection = ItemFactory.create(
+            parent=self.entrance_exam,
+            category='sequential',
+            display_name='Subsection 1'
+        )
+        vertical = ItemFactory.create(
+            parent=subsection,
+            category='vertical',
+            display_name='Vertical 1'
+        )
+        self.ee_problem_1 = ItemFactory.create(
+            parent=vertical,
+            category="problem",
+            display_name="Exam Problem - Problem 1"
+        )
+        self.ee_problem_2 = ItemFactory.create(
+            parent=vertical,
+            category="problem",
+            display_name="Exam Problem - Problem 2"
+        )
+
+        ee_module_to_reset1 = StudentModule.objects.create(
+            student=self.student,
+            course_id=self.course.id,
+            module_state_key=self.ee_problem_1.location,
+            state=json.dumps({'attempts': 10}),
+        )
+        ee_module_to_reset2 = StudentModule.objects.create(
+            student=self.student,
+            course_id=self.course.id,
+            module_state_key=self.ee_problem_2.location,
+            state=json.dumps({'attempts': 10}),
+        )
+        self.ee_modules = [ee_module_to_reset1.module_state_key, ee_module_to_reset2.module_state_key]
+
+    def test_reset_entrance_exam_student_attempts_deletall(self):
+        """ Make sure no one can delete all students state on entrance exam. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'all_students': True,
+            'delete_module': True,
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_reset_entrance_exam_student_attempts_single(self):
+        """ Test reset single student attempts for entrance exam. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 200)
+        # make sure problem attempts have been reset.
+        changed_modules = StudentModule.objects.filter(module_state_key__in=self.ee_modules)
+        for changed_module in changed_modules:
+            self.assertEqual(
+                json.loads(changed_module.state)['attempts'],
+                0
+            )
+
+    # mock out the function which should be called to execute the action.
+    @patch.object(instructor_task.api, 'submit_reset_problem_attempts_in_entrance_exam')
+    def test_reset_entrance_exam_all_student_attempts(self, act):
+        """ Test reset all student attempts for entrance exam. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'all_students': True,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    def test_reset_student_attempts_invalid_entrance_exam(self):
+        """ Test reset for invalid entrance exam. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_entrance_exam_sttudent_delete_state(self):
+        """ Test delete single student entrance exam state. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+            'delete_module': True,
+        })
+        self.assertEqual(response.status_code, 200)
+        # make sure the module has been deleted
+        changed_modules = StudentModule.objects.filter(module_state_key__in=self.ee_modules)
+        self.assertEqual(changed_modules.count(), 0)
+
+    def test_entrance_exam_delete_state_with_staff(self):
+        """ Test entrance exam delete state failure with staff access. """
+        self.client.logout()
+        staff_user = StaffFactory(course_key=self.course.id)
+        self.client.login(username=staff_user.username, password='test')
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+            'delete_module': True,
+        })
+        self.assertEqual(response.status_code, 403)
+
+    def test_entrance_exam_reset_student_attempts_nonsense(self):
+        """ Test failure with both unique_student_identifier and all_students. """
+        url = reverse('reset_student_attempts_for_entrance_exam',
+                      kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+            'all_students': True,
+        })
+        self.assertEqual(response.status_code, 400)
+
+    @patch.object(instructor_task.api, 'submit_rescore_entrance_exam_for_student')
+    def test_rescore_entrance_exam_single_student(self, act):
+        """ Test re-scoring of entrance exam for single student. """
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(act.called)
+
+    def test_rescore_entrance_exam_all_student(self):
+        """ Test rescoring for all students. """
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'all_students': True,
+        })
+        self.assertEqual(response.status_code, 200)
+
+    def test_rescore_entrance_exam_all_student_and_single(self):
+        """ Test re-scoring with both all students and single student parameters. """
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+            'all_students': True,
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_rescore_entrance_exam_with_invalid_exam(self):
+        """ Test re-scoring of entrance exam with invalid exam. """
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 400)
+
+    def test_list_entrance_exam_instructor_tasks_student(self):
+        """ Test list task history for entrance exam AND student. """
+        # create a re-score entrance exam task
+        url = reverse('rescore_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 200)
+
+        url = reverse('list_entrance_exam_instructor_tasks', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        tasks = json.loads(response.content)['tasks']
+        self.assertEqual(len(tasks), 1)
+
+    def test_list_entrance_exam_instructor_tasks_all_student(self):
+        """ Test list task history for entrance exam AND all student. """
+        url = reverse('list_entrance_exam_instructor_tasks', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.get(url, {})
+        self.assertEqual(response.status_code, 200)
+
+        # check response
+        tasks = json.loads(response.content)['tasks']
+        self.assertEqual(len(tasks), 0)
+
+    def test_list_entrance_exam_instructor_with_invalid_exam_key(self):
+        """ Test list task history for entrance exam failure if course has invalid exam. """
+        url = reverse('list_entrance_exam_instructor_tasks',
+                      kwargs={'course_id': unicode(self.course_with_invalid_ee.id)})
+        response = self.client.get(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 400)
+
+
+@override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
 @patch('bulk_email.models.html_to_text', Mock(return_value='Mocking CourseEmail.text_message'))
 @patch.dict(settings.FEATURES, {'ENABLE_INSTRUCTOR_EMAIL': True, 'REQUIRE_COURSE_EMAIL_AUTH': False})
 class TestInstructorSendEmail(ModuleStoreTestCase, LoginEnrollmentTestCase):
@@ -2432,8 +2677,9 @@ class TestInstructorAPITaskLists(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def setUp(self):
         super(TestInstructorAPITaskLists, self).setUp()
-
-        self.course = CourseFactory.create()
+        self.course = CourseFactory.create(
+            entrance_exam_id='i4x://{}/{}/chapter/Entrance_exam'.format('test_org', 'test_course')
+        )
         self.instructor = InstructorFactory(course_key=self.course.id)
         self.client.login(username=self.instructor.username, password='test')
 

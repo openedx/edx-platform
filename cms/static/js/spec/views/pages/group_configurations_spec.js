@@ -108,7 +108,7 @@ define([
             });
 
             it('should show a notification message if a content group is changed', function () {
-                this.view.contentGroupConfiguration.get('groups').add({name: 'Content Group'});
+                this.view.contentGroupConfiguration.get('groups').add({id: 0, name: 'Content Group'});
                 expect(this.view.onBeforeUnload())
                     .toBe('You have unsaved changes. Do you really want to leave this page?');
             });

@@ -46,6 +46,7 @@ class CorrectMap(object):
         hint='',
         hintmode=None,
         queuestate=None,
+        answervariable=None,    # pylint: disable=C0330
         **kwargs
     ):
 
@@ -57,6 +58,7 @@ class CorrectMap(object):
                 'hint': hint,
                 'hintmode': hintmode,
                 'queuestate': queuestate,
+                'answervariable': answervariable,
             }
 
     def __repr__(self):

@@ -59,13 +59,17 @@ define([
     };
 
     /**
-     * Modifies Annotator.highlightRange to add a "tabindex=0" attribute
-     * to the <span class="annotator-hl"> markup that encloses the note.
-     * These are then focusable via the TAB key.
+     * Modifies Annotator.highlightRange to add "tabindex=0" and role="link"
+     * attributes to the <span class="annotator-hl"> markup that encloses the
+     * note. These are then focusable via the TAB key and are accessible to
+     * screen readers.
      **/
     Annotator.prototype.highlightRange = _.compose(
         function (results) {
-            $('.annotator-hl', this.wrapper).attr('tabindex', 0);
+            $('.annotator-hl', this.wrapper).attr({
+                'tabindex': 0,
+                'role': 'link'
+            });
             return results;
         },
         Annotator.prototype.highlightRange
@@ -98,24 +102,37 @@ define([
     );
 
     /**
-     * Modifies Annotator.Viewer.html.item template to add an i18n for the
-     * buttons.
-     **/
-    Annotator.Viewer.prototype.html.item = [
-        '<li class="annotator-annotation annotator-item">',
-            '<span class="annotator-controls">',
-                '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
-                    _t('View as webpage'),
-                '</a>',
-                '<button title="', _t('Edit'), '" class="annotator-edit">',
-                    _t('Edit'),
-                '</button>',
-                '<button title="', _t('Delete'), '" class="annotator-delete">',
-                    _t('Delete'),
-                '</button>',
-            '</span>',
-        '</li>'
-    ].join('');
+     * Modifies Annotator.Viewer.html template to make viewer div focusable.
+     * Also adds a close button and necessary i18n attributes to all buttons.
+    **/
+        Annotator.Viewer.prototype.html = {
+        element: [
+            '<div class="annotator-outer annotator-viewer">',
+                '<ul class="annotator-widget annotator-listing" tabindex="-1"></ul>',
+            '</div>'
+        ].join(''),
+        item: [
+            '<li class="annotator-annotation annotator-item">',
+                '<span class="annotator-controls">',
+                    '<a href="#" title="', _t('View as webpage'), '" class="annotator-link">',
+                        _t('View as webpage'),
+                    '</a>',
+                    '<button class="annotator-edit">',
+                        _t('Edit'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                    '<button class="annotator-delete">',
+                        _t('Delete'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                    '<button class="annotator-close">',
+                        _t('Close'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                '</span>',
+            '</li>'
+        ].join('')
+    };
 
     /**
      * Overrides Annotator._setupViewer to add a "click" event on viewer and to
@@ -134,8 +151,8 @@ define([
                         $(field).html(Utils.nl2br(Annotator.Util.escape(annotation.text)));
                     } else {
                         $(field).html('<i>' + _t('No Comment') + '</i>');
-                        self.publish('annotationViewerTextField', [field, annotation]);
                     }
+                    return self.publish('annotationViewerTextField', [field, annotation]);
                 }
             })
             .element.appendTo(this.wrapper).bind({
@@ -146,6 +163,62 @@ define([
     };
 
     Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
+
+    /**
+     * Modifies Annotator.Editor.html template to add tabindex = -1 to
+     * form.annotator-widget and reverse order of Save and Cancel buttons.
+     **/
+    Annotator.Editor.prototype.html = [
+        '<div class="annotator-outer annotator-editor">',
+            '<form class="annotator-widget" tabindex="-1">',
+                '<ul class="annotator-listing"></ul>',
+                '<div class="annotator-controls">',
+                    '<button class="annotator-save">',
+                        _t('Save'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                    '<button class="annotator-cancel">',
+                        _t('Cancel'),
+                        '<span class="sr">', _t('Note'), '</span>',
+                    '</button>',
+                '</div>',
+            '</form>',
+        '</div>'
+    ].join('');
+
+    /**
+     * Modifies Annotator._setupEditor to add a label for textarea#annotator-field-0.
+     **/
+    Annotator.prototype._setupEditor = _.compose(
+        function () {
+            $('<label class="sr" for="annotator-field-0">Edit note</label>').insertBefore(
+                $('#annotator-field-0', this.wrapper)
+            );
+            return this;
+        },
+        Annotator.prototype._setupEditor
+    );
+
+    /**
+     * Modifies Annotator.Editor.show, in the case of a keydown event, to remove
+     * focus from Save button and put it on form.annotator-widget instead.
+     **/
+    Annotator.Editor.prototype.show = _.compose(
+        function (event) {
+            if (event.type === 'keydown') {
+                this.element.find('.annotator-save').removeClass(this.classes.focus);
+                this.element.find('form.annotator-widget').focus();
+            }
+        },
+        Annotator.Editor.prototype.show
+    );
+
+    /**
+     * Removes the textarea keydown event handler as it triggers 'processKeypress'
+     * which hides the viewer on ESC and saves on ENTER. We will define different
+     * behaviors for these in /plugins/accessibility.js
+     **/
+    delete Annotator.Editor.prototype.events["textarea keydown"];
 
     /**
      * Modifies Annotator.onHighlightMouseover to avoid showing the viewer if the
@@ -174,8 +247,6 @@ define([
         Annotator.prototype._setupWrapper
     );
 
-    Annotator.Editor.prototype.isShown = Annotator.Viewer.prototype.isShown;
-
     $.extend(true, Annotator.prototype, {
         isFrozen: false,
         uid: _.uniqueId(),
@@ -191,11 +262,15 @@ define([
         },
 
         onNoteClick: function (event) {
+            var target = $(event.target);
             event.stopPropagation();
             Annotator.Util.preventEventDefault(event);
-            if (!$(event.target).is('.annotator-delete')) {
+
+            if (!(target.is('.annotator-delete') || target.is('.annotator-close'))) {
                 Annotator.frozenSrc = this;
                 this.freezeAll();
+            } else if (target.is('.annotator-close')) {
+                this.viewer.hide();
             }
         },
 

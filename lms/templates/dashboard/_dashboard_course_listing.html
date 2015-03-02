@@ -136,7 +136,7 @@ from student.helpers import (
       % endif
 
       % if verification_status.get('status') in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED, VERIFY_STATUS_NEED_TO_REVERIFY] and not is_course_blocked:
-      <div class="message message-status is-shown">
+      <div class="message message-status wrapper-message-primary is-shown">
         % if verification_status['status'] == VERIFY_STATUS_NEED_TO_VERIFY:
           <div class="verification-reminder">
             % if verification_status['days_until_deadline'] is not None:

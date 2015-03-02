@@ -1,38 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-End-to-end tests for the LMS.
+Test for matlab problems
 """
 import time
 
-from ..helpers import UniqueCourseTest
-from ...pages.studio.auto_auth import AutoAuthPage
-from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.matlab_problem import MatlabProblemPage
-from ...fixtures.course import CourseFixture, XBlockFixtureDesc
+from ...fixtures.course import XBlockFixtureDesc
 from ...fixtures.xqueue import XQueueResponseFixture
+from .test_lms_problems import ProblemsTest
 from textwrap import dedent
 
 
-class MatlabProblemTest(UniqueCourseTest):
+class MatlabProblemTest(ProblemsTest):
     """
     Tests that verify matlab problem "Run Code".
     """
-    USERNAME = "STAFF_TESTER"
-    EMAIL = "johndoe@example.com"
-
-    def setUp(self):
-        super(MatlabProblemTest, self).setUp()
-
-        self.XQUEUE_GRADE_RESPONSE = None
-
-        self.courseware_page = CoursewarePage(self.browser, self.course_id)
-
-        # Install a course with sections/problems, tabs, updates, and handouts
-        course_fix = CourseFixture(
-            self.course_info['org'], self.course_info['number'],
-            self.course_info['run'], self.course_info['display_name']
-        )
-
+    def get_problem(self):
+        """
+        Create a matlab problem for the test.
+        """
         problem_data = dedent("""
             <problem markdown="null">
                   <text>
@@ -62,18 +48,7 @@ class MatlabProblemTest(UniqueCourseTest):
                   </text>
             </problem>
         """)
-
-        course_fix.add_children(
-            XBlockFixtureDesc('chapter', 'Test Section').add_children(
-                XBlockFixtureDesc('sequential', 'Test Subsection').add_children(
-                    XBlockFixtureDesc('problem', 'Test Matlab Problem', data=problem_data)
-                )
-            )
-        ).install()
-
-        # Auto-auth register for the course.
-        AutoAuthPage(self.browser, username=self.USERNAME, email=self.EMAIL,
-                     course_id=self.course_id, staff=False).visit()
+        return XBlockFixtureDesc('problem', 'Test Matlab Problem', data=problem_data)
 
     def _goto_matlab_problem_page(self):
         """
@@ -92,13 +67,13 @@ class MatlabProblemTest(UniqueCourseTest):
         # Enter a submission, which will trigger a pre-defined response from the XQueue stub.
         self.submission = "a=1" + self.unique_id[0:5]
 
-        self.XQUEUE_GRADE_RESPONSE = {'msg': self.submission}
+        self.xqueue_grade_response = {'msg': self.submission}
 
         matlab_problem_page = self._goto_matlab_problem_page()
 
         # Configure the XQueue stub's response for the text we will submit
-        if self.XQUEUE_GRADE_RESPONSE is not None:
-            XQueueResponseFixture(self.submission, self.XQUEUE_GRADE_RESPONSE).install()
+        if self.xqueue_grade_response is not None:
+            XQueueResponseFixture(self.submission, self.xqueue_grade_response).install()
 
         matlab_problem_page.set_response(self.submission)
         matlab_problem_page.click_run_code()
@@ -113,6 +88,6 @@ class MatlabProblemTest(UniqueCourseTest):
 
         self.assertEqual(u'', matlab_problem_page.get_grader_msg(".external-grader-message")[0])
         self.assertEqual(
-            self.XQUEUE_GRADE_RESPONSE.get("msg"),
+            self.xqueue_grade_response.get("msg"),
             matlab_problem_page.get_grader_msg(".ungraded-matlab-result")[0]
         )

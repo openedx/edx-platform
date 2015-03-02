@@ -156,7 +156,7 @@ class RestrictedCourse(models.Model):
         Cache all restricted courses and returns the list of course_keys that are restricted
         """
         restricted_courses = cache.get(cls.COURSE_LIST_CACHE_KEY)
-        if not restricted_courses:
+        if restricted_courses is None:
             restricted_courses = list(RestrictedCourse.objects.values_list('course_key', flat=True))
             cache.set(cls.COURSE_LIST_CACHE_KEY, restricted_courses)
         return restricted_courses
@@ -413,7 +413,7 @@ class CountryAccessRule(models.Model):
         """
         cache_key = cls.CACHE_KEY.format(course_key=course_id)
         allowed_countries = cache.get(cache_key)
-        if not allowed_countries:
+        if allowed_countries is None:
             allowed_countries = cls._get_country_access_list(course_id)
             cache.set(cache_key, allowed_countries)
 

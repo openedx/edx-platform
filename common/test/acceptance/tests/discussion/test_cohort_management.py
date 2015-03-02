@@ -51,9 +51,9 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).visit().get_user_id()
         self.add_user_to_cohort(self.course_fixture, self.student_name, self.manual_cohort_id)
 
-        # create a user with unicode characters in their username
-        self.unicode_student_id = AutoAuthPage(
-            self.browser, username="Ωπ", email="unicode_student_user@example.com",
+        # create a second student user
+        self.other_student_id = AutoAuthPage(
+            self.browser, username="other_student_user", email="other_student_user@example.com",
             course_id=self.course_id, staff=False
         ).visit().get_user_id()
 
@@ -389,12 +389,12 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
             }).count(),
             1
         )
-        # unicode_student_user (previously unassigned) is added to manual cohort
+        # other_student_user (previously unassigned) is added to manual cohort
         self.assertEqual(
             self.event_collection.find({
                 "name": "edx.cohort.user_added",
                 "time": {"$gt": start_time},
-                "event.user_id": {"$in": [int(self.unicode_student_id)]},
+                "event.user_id": {"$in": [int(self.other_student_id)]},
                 "event.cohort_name": self.manual_cohort_name,
             }).count(),
             1

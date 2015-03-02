@@ -23,9 +23,11 @@ function(ListItemEditorView, _) {
 
         getTemplateOptions: function() {
             return {
+                id: this.model.escape('id'),
                 name: this.model.escape('name'),
                 index: this.model.collection.indexOf(this.model),
                 isNew: this.model.isNew(),
+                usage: this.model.get('usage'),
                 uniqueId: _.uniqueId()
             };
         },

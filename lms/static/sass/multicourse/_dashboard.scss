@@ -612,8 +612,11 @@
     // ====================
 
     // UI: message
-    .message {
+    .wrapper-message-primary {
       @include clearfix();
+    }
+
+    .message {
       border-radius: 3px;
       display: none;
       z-index: 10;
@@ -887,13 +890,18 @@
       }
 
       &.course-status-processing {
-
+        background-color: $gray-l5;
+        border: 0;
       }
 
       &.course-status-certnotavailable {
+        background-color: $gray-l5;
+        border: 0;
       }
 
       &.course-status-certrendering {
+        background-color: $gray-l5;
+        border: 0;
 
         .cta {
           margin-top: 2px;
@@ -907,10 +915,10 @@
         .message-copy {
           width: flex-grid(6, 12);
           position: relative;
-          float: left;
+          @include float(left);
         }
 
-        .actions {
+        .actions-primary {
           width: flex-grid(6, 12);
           position: relative;
           @include float(right);
@@ -948,6 +956,24 @@
             letter-spacing: 0;
           }
         }
+      }
+
+      .actions-secondary {
+        margin-top: ($baseline/2);
+        border-top: 1px solid $gray-l4;
+        padding-top: ($baseline/2);
+
+        .action-share {
+          @include float(right);
+          margin: 0;
+        }
+      }
+
+      .certificate-explanation {
+        @extend %t-copy-sub1;
+        margin-top: ($baseline/2);
+        border-top: 1px solid $gray-l4;
+        padding-top: ($baseline/2);
       }
 
       .verification-reminder {

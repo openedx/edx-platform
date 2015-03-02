@@ -147,7 +147,7 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
         self.client.logout()
 
         # Try to enroll, this should fail.
-        self._create_enrollment(expected_status=status.HTTP_403_FORBIDDEN)
+        self._create_enrollment(expected_status=status.HTTP_401_UNAUTHORIZED)
 
     def test_user_not_activated(self):
         # Log out the default user, Bob.
@@ -254,6 +254,11 @@ class EnrollmentTest(ModuleStoreTestCase, APITestCase):
             self.assertEqual('honor', data['mode'])
             self.assertTrue(data['is_active'])
         return resp
+
+    def test_enrollment_already_enrolled(self):
+        response = self._create_enrollment()
+        repeat_response = self._create_enrollment()
+        self.assertEqual(json.loads(response.content), json.loads(repeat_response.content))
 
     def test_get_enrollment_with_invalid_key(self):
         resp = self.client.post(

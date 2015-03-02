@@ -706,7 +706,7 @@ class XMLModuleStore(ModuleStoreReadBase):
         """
         return CourseLocator(org, course, run, deprecated=True)
 
-    def get_courses(self, depth=0, **kwargs):
+    def get_courses(self, **kwargs):
         """
         Returns a list of course descriptors.  If there were errors on loading,
         some of these may be ErrorDescriptors instead.

@@ -96,7 +96,7 @@ def has_access(user, action, obj, course_key=None):
         return _has_access_location(user, action, obj, course_key)
 
     if isinstance(obj, basestring):
-        return _has_access_string(user, action, obj, course_key)
+        return _has_access_string(user, action, obj)
 
     # Passing an unknown object here is a coding error, so rather than
     # returning a default, complain.
@@ -487,7 +487,7 @@ def _has_access_course_key(user, action, course_key):
     return _dispatch(checkers, action, user, course_key)
 
 
-def _has_access_string(user, action, perm, course_key):
+def _has_access_string(user, action, perm):
     """
     Check if user has certain special access, specified as string.  Valid strings:
 

@@ -34,6 +34,12 @@ class @Problem
     @$('div.action input.reset').click @reset
     @$('div.action button.show').click @show
     @$('div.action input.save').click @save
+    # Accessibility helper for sighted keyboard users to show <clarification> tooltips on focus:
+    @$('.clarification').focus (ev) =>
+      icon = $(ev.target).children "i"
+      window.globalTooltipManager.openTooltip icon
+    @$('.clarification').blur (ev) =>
+      window.globalTooltipManager.hide()
 
     @bindResetCorrectness()
 

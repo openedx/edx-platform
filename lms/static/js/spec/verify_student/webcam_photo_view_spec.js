@@ -45,14 +45,14 @@ define([
                 };
             };
 
-            var createView = function( backends ) {
+            var createView = function( backendStub ) {
                 return new WebcamPhotoView({
                     el: $( '#current-step-container' ),
                     model: new VerificationModel({}),
                     modelAttribute: 'faceImage',
                     errorModel: new ( Backbone.Model.extend({}) )(),
                     submitButton: $( '#submit_button' ),
-                    backends: backends
+                    backend: backendStub
                 }).render();
             };
 
@@ -91,7 +91,7 @@ define([
             });
 
             it( 'takes a snapshot', function() {
-                var view = createView( [ StubBackend( "html5" ) ] );
+                var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
                 spyOn( view.backend, 'snapshot' ).andCallThrough();
@@ -122,7 +122,7 @@ define([
             });
 
             it( 'resets the camera', function() {
-                var view = createView( [ StubBackend( "html5" ) ]);
+                var view = createView( new StubBackend( "html5" ) );
 
                 // Spy on the backend
                 spyOn( view.backend, 'reset' ).andCallThrough();
@@ -145,30 +145,8 @@ define([
                 expect( view.model.get( 'faceImage' ) ).toEqual( "" );
             });
 
-            it( 'falls back to a second video capture backend', function() {
-                var backends = [ StubBackend( "html5", false ), StubBackend( "flash", true ) ],
-                    view = createView( backends );
-
-                // Expect that the second backend is chosen
-                expect( view.backend.name ).toEqual( backends[1].name );
-            });
-
-            it( 'displays an error if no video backend is supported', function() {
-                var backends = [ StubBackend( "html5", false ), StubBackend( "flash", false ) ],
-                    view = createView( backends );
-
-                // Expect an error
-                expect( view.errorModel.get( 'errorTitle' ) ).toEqual( 'Flash Not Detected' );
-                expect( view.errorModel.get( 'errorMsg' ) ).toContain( 'Get Flash' );
-                expect( view.errorModel.get( 'shown' ) ).toBe( true );
-
-                // Expect that submission is disabled
-                expectSubmitEnabled( false );
-            });
-
             it( 'displays an error if the snapshot fails', function() {
-                var backends = [ StubBackend( "html5", true, false ) ],
-                    view = createView( backends );
+                var view = createView( new StubBackend( "html5", true, false ) );
 
                 // Take a snapshot
                 takeSnapshot();
@@ -189,7 +167,7 @@ define([
             });
 
             it( 'displays an error triggered by the backend', function() {
-                var view = createView( [ StubBackend( "html5") ] );
+                var view = createView( new StubBackend( "html5") );
 
                 // Simulate an error triggered by the backend
                 // This could occur at any point, including

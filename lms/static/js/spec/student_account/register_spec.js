@@ -261,12 +261,8 @@ define([
             submitForm( true );
 
             // Verify that the client sent the course ID for analytics
-            var expectedData = {};
-            $.extend(expectedData, USER_DATA, {
-                analytics: JSON.stringify({
-                    enroll_course_id: COURSE_ID
-                })
-            });
+            var expectedData = {course_id: COURSE_ID};
+            $.extend(expectedData, USER_DATA);
 
             AjaxHelpers.expectRequest(
                 requests, 'POST',
