@@ -7,7 +7,7 @@ import re
 
 from .utils.envs import Env
 
-ALL_SYSTEMS = 'lms,cms,common,openedx,pavelib,scripts,docs'
+ALL_SYSTEMS = 'lms,cms,common'
 
 
 @task
