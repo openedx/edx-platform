@@ -373,9 +373,6 @@ def debug_cohort_mgmt(request, course_key_string):
 def cohort_discussion_topics(request, course_key_string):
     """
 
-    :param request:
-    :param course_key_string:
-    :return:
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     try:

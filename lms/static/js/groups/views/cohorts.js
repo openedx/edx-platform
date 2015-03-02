@@ -298,4 +298,4 @@ var edx = edx || {};
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
     edx.groups.CohortFormView, edx.groups.CourseCohortSettingsNotificationView, NotificationModel, NotificationView,
-    FileUploaderView, edx.discussions.DiscussionTopicsView);
+    FileUploaderView, edx.groups.DiscussionTopicsView);

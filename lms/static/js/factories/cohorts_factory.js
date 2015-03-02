@@ -1,14 +1,14 @@
 ;(function (define, undefined) {
     'use strict';
     define(['jquery', 'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/course_cohort_settings',
-            'js/discussion_topics/models/topics', 'js/discussion_topics/collections/topics'],
+            'js/groups/models/cohort_discussions'],
         function($) {
 
             return function(contentGroups, studioGroupConfigurationsUrl) {
 
                 var cohorts = new edx.groups.CohortCollection(),
                     courseCohortSettings = new edx.groups.CourseCohortSettingsModel(),
-                    discussionTopics = new edx.discussions.DiscussionTopicsModel();
+                    discussionTopics = new edx.groups.DiscussionTopicsModel();
 
                 var cohortManagementElement = $('.cohort-management');
 
