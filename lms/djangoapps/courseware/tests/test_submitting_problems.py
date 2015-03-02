@@ -5,10 +5,12 @@ Integration tests for submitting problem responses and getting grades.
 import json
 import os
 from textwrap import dedent
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from mock import patch
@@ -20,6 +22,7 @@ from capa.tests.response_xml_factory import (
 from courseware import grades
 from courseware.models import StudentModule
 from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.tests.factories import StudentModuleFactory
 from xmodule.modulestore.tests.django_utils import TEST_DATA_MOCK_MODULESTORE
 from lms.djangoapps.lms_xblock.runtime import quote_slashes
 from student.tests.factories import UserFactory
@@ -104,6 +107,15 @@ class TestSubmittingProblems(ModuleStoreTestCase, LoginEnrollmentTestCase):
         response_dict = {(answer_key_prefix + k): v for k, v in responses.items()}
         resp = self.client.post(modx_url, response_dict)
 
+        return resp
+
+    def look_at_question(self, problem_url_name):
+        """
+        Create state for a problem, but don't answer it
+        """
+        location = self.problem_location(problem_url_name)
+        modx_url = self.modx_url(location, "problem_get")
+        resp = self.client.get(modx_url)
         return resp
 
     def reset_question_answer(self, problem_url_name):
@@ -425,6 +437,36 @@ class TestCourseGrader(TestSubmittingProblems):
             "Please refresh your page."
         )
         self.assertEqual(json.loads(resp.content).get("success"), err_msg)
+
+    @override_settings(KEY_PREFIX=str(uuid.uuid4()))  # hack: we do this to ensure a unique cache per test
+    def test_grade_with_max_score_cache(self):
+        """
+        Tests that the max score cache is populated after a grading run
+        and that the results of grading runs before and after the cache
+        warms are the same.
+        """
+        self.basic_setup()
+        self.submit_question_answer('p1', {'2_1': 'Correct'})
+        self.look_at_question('p2')
+        self.assertTrue(
+            StudentModule.objects.filter(
+                module_state_key=self.problem_location('p2')
+            ).exists()
+        )
+        location_to_cache=unicode(self.problem_location('p2'))
+        # problem isn't in the cache
+        self.assertIsNone(cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+        # problem is in the cache
+        self.assertIsNotNone(cache.get(location_to_cache))
+        self.check_grade_percent(0.33)
+
+    @patch.dict("django.conf.settings.FEATURES", {"ENABLE_MAX_SCORE_CACHE": False})
+    def test_grade_no_max_score_cache(self):
+        """
+        Tests grading when the max score cache is disabled
+        """
+        self.test_b_grade_exact()
 
     def test_none_grade(self):
         """

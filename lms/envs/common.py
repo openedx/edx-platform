@@ -347,6 +347,9 @@ FEATURES = {
 
     # Courseware search feature
     'ENABLE_COURSEWARE_SEARCH': False,
+
+    # Enable the max score cache to speed up grading
+    'ENABLE_MAX_SCORE_CACHE': True,
 }
 
 # Ignore static asset files on import which match this pattern
