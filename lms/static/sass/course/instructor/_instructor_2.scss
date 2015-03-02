@@ -1070,19 +1070,39 @@
       }
     }
   }
+
+  // cohort discussions interface.
   .cohort-discussions-nav {
+
+    .cohort-coursewide-discussions-form {
+
+      .form-actions {
+        padding-top: ($baseline/2);
+      }
+    }
+
     .category-title,
-    .topic-name {
+    .topic-name,
+    .all-inline-discussions,
+    .always_cohort_inline_discussions {
       padding-left: ($baseline/2);
     }
+
+    .always_cohort_inline_discussions {
+      padding-top: ($baseline/2);
+    }
+
     .category-item {
       padding-top: ($baseline/2);
     }
+
     .cohorted-text {
       color: $link-color;
     }
+
     .discussions-wrapper {
       @extend %ui-no-list;
+      padding: 0 ($baseline/4);
     }
   }
 

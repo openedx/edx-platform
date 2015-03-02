@@ -8,6 +8,8 @@ var edx = edx || {};
 
     edx.discussions.DiscussionTopicsView = Backbone.View.extend({
         events: {
+            'change .check-discussion-category': 'changeDiscussionCategory',
+            'change .check-discussion-subcategory': 'changeDiscussionSubCategory',
             'click .cohort-coursewide-discussions-form .action-save': 'saveCoursewideDiscussionsForm',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'changeAllInlineDiscussions'
@@ -22,7 +24,7 @@ var edx = edx || {};
                 inlineTopicsHtml: this.renderInlineTopics(this.model),
                 always_cohort_inline_discussions:this.model.get('always_cohort_inline_discussions')
             }));
-            $('ul.inline-cohorts').qubit();
+            this.processInlineTopics();
         },
         renderCoursewideTopics: function (topics) {
             var entry_template = _.template($('#cohort-discussions-subcategory-tpl').html());
@@ -80,6 +82,36 @@ var edx = edx || {};
         //    $('.cohort-coursewide-discussions-form .action-save').off('click');
         //},
 
+        changeAllInlineDiscussions: function(event) {
+            event.preventDefault();
+            var $selectedCategory = $(event.currentTarget),
+                $childCategoires = $('.check-discussion-category'),
+                $childSubCategoires = $('.check-discussion-subcategory-inline');
+
+            if ($selectedCategory.prop('checked')) {
+                $childCategoires.prop('checked', 'checked');
+                $childSubCategoires.prop('checked', 'checked');
+            }
+            this.processInlineTopics();
+        },
+        processInlineTopics: function() {
+            $('ul.inline-cohorts').qubit();
+        },
+        changeDiscussionCategory: function(event) {
+            event.preventDefault();
+            var $selectedCategory = $(event.currentTarget);
+
+            if (!$selectedCategory.prop('checked')) {
+                $('.check-all-inline-discussions').prop('checked', false);
+            }
+        },
+        changeDiscussionSubCategory: function (event) {
+            event.preventDefault();
+            var $selectedTopic = $(event.currentTarget);
+            if (!$selectedTopic.prop('checked')) {
+                $('.check-all-inline-discussions').prop('checked', false);
+            }
+        },
         getCohortedDiscussions: function(selector) {
             var self=this;
             self.cohortedDiscussionTopics = [];
@@ -155,7 +187,6 @@ var edx = edx || {};
                 });
             return saveOperation.promise();
         },
-
         showMessage: function (message, element, type) {
             this.showNotification(
                 {type: type || 'confirmation', title: message},
