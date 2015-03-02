@@ -860,7 +860,7 @@ def course_about(request, course_id):
             'can_add_course_to_cart': can_add_course_to_cart,
             'cart_link': reverse('shoppingcart.views.show_cart'),
             'pre_requisite_courses': pre_requisite_courses,
-            'no_id_professional_mode': CourseMode.mode_for_course(course.id, CourseMode.NO_ID_PROFESSIONAL_MODE[0])
+            'no_id_professional_mode': CourseMode.mode_for_course(course.id, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
         })
 
 

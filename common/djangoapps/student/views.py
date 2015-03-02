@@ -925,7 +925,7 @@ def change_enrollment(request, check_access=True):
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )
-        elif CourseMode.NO_ID_PROFESSIONAL_MODE[0] in available_modes:
+        elif CourseMode.NO_ID_PROFESSIONAL_MODES[0] in available_modes:
             return HttpResponse(
                 reverse("verify_student_payment_confirmation", kwargs={'course_id': unicode(course_id)})
             )
