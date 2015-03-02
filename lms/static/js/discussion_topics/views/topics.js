@@ -8,8 +8,9 @@ var edx = edx || {};
 
     edx.discussions.DiscussionTopicsView = Backbone.View.extend({
         events: {
-            'change .check-discussion-category': 'changeDiscussionCategory',
-            'change .check-discussion-subcategory': 'changeDiscussionSubCategory',
+            'change .check-discussion-category': 'changeDiscussionInlineCategory',
+            'change .check-discussion-subcategory-inline': 'changeDiscussionInlineSubCategory',
+            'change .check-discussion-subcategory-coursewide': 'changeDiscussionCoursewideCategory',
             'click .cohort-coursewide-discussions-form .action-save': 'saveCoursewideDiscussionsForm',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'changeAllInlineDiscussions'
@@ -25,6 +26,7 @@ var edx = edx || {};
                 always_cohort_inline_discussions:this.model.get('always_cohort_inline_discussions')
             }));
             this.processInlineTopics();
+            this.toggleSaveButton(this.$('.action-save'), false);
         },
         renderCoursewideTopics: function (topics) {
             var entry_template = _.template($('#cohort-discussions-subcategory-tpl').html());
@@ -77,11 +79,20 @@ var edx = edx || {};
                 return html;
             }, this).join('');
         },
-        //toggleSaveButton: function(event) {
-        //    $('.cohort-coursewide-discussions-form .action-save').prop('disabled', '');
-        //    $('.cohort-coursewide-discussions-form .action-save').off('click');
-        //},
-
+        processInlineTopics: function() {
+            $('ul.inline-cohorts').qubit();
+        },
+        toggleSaveButton: function($element, enable) {
+            if (enable) {
+                $element.removeClass(disabledClass).attr('aria-disabled', enable);
+            } else {
+                $element.addClass(disabledClass).attr('aria-disabled', enable);
+            }
+        },
+        changeDiscussionCoursewideCategory: function(event) {
+            event.preventDefault();
+            this.toggleSaveButton(this.$('.cohort-coursewide-discussions-form .action-save'), true);
+        },
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
             var $selectedCategory = $(event.currentTarget),
@@ -93,11 +104,9 @@ var edx = edx || {};
                 $childSubCategoires.prop('checked', 'checked');
             }
             this.processInlineTopics();
+            this.toggleSaveButton(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
-        processInlineTopics: function() {
-            $('ul.inline-cohorts').qubit();
-        },
-        changeDiscussionCategory: function(event) {
+        changeDiscussionInlineCategory: function(event) {
             event.preventDefault();
             var $selectedCategory = $(event.currentTarget);
 
@@ -105,12 +114,13 @@ var edx = edx || {};
                 $('.check-all-inline-discussions').prop('checked', false);
             }
         },
-        changeDiscussionSubCategory: function (event) {
+        changeDiscussionInlineSubCategory: function (event) {
             event.preventDefault();
             var $selectedTopic = $(event.currentTarget);
             if (!$selectedTopic.prop('checked')) {
                 $('.check-all-inline-discussions').prop('checked', false);
             }
+            this.toggleSaveButton(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         getCohortedDiscussions: function(selector) {
             var self=this;
