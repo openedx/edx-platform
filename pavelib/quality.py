@@ -143,31 +143,32 @@ def _count_pylint_violations(report_file):
 @needs('pavelib.prereqs.install_python_prereqs')
 @cmdopts([
     ("system=", "s", "System to act on"),
-    ("limit=", "l", "limit for number of acceptable violations"),
 ])
 def run_pep8(options):
     """
-    Run pep8 on system code. When violations limit is passed in,
-    fail the task if too many violations are found.
+    Run pep8 on system code.
+    Fail the task if any violations are found.
     """
-    num_violations = 0
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
-    violations_limit = int(getattr(options, 'limit', -1))
+
+    report_dir = (Env.REPORT_DIR / 'pep8')
+    report_dir.rmtree(ignore_errors=True)
+    report_dir.makedirs_p()
 
     for system in systems:
-        # Directory to put the pep8 report in.
-        # This makes the folder if it doesn't already exist.
-        report_dir = (Env.REPORT_DIR / system).makedirs_p()
+        sh('pep8 {system} | tee {report_dir}/pep8.report -a'.format(system=system, report_dir=report_dir))
 
-        sh('pep8 {system} | tee {report_dir}/pep8.report'.format(system=system, report_dir=report_dir))
-        num_violations = num_violations + _count_pep8_violations(
-            "{report_dir}/pep8.report".format(report_dir=report_dir))
+    count = _count_pep8_violations(
+        "{report_dir}/pep8.report".format(report_dir=report_dir)
+    )
 
-    print("Number of pep8 violations: " + str(num_violations))
-    # Fail the task if the violations limit has been reached
-    if num_violations > violations_limit > -1:
-        raise Exception("Failed. Too many pep8 violations. "
-                        "The limit is {violations_limit}.".format(violations_limit=violations_limit))
+    print("Number of pep8 violations: {count}".format(count=count))
+    if count:
+        raise Exception(
+            "Too many pep8 violations. Number of violations found: {count}.".format(
+                count=count
+            )
+        )
 
 
 def _count_pep8_violations(report_file):
