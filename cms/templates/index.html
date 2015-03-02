@@ -472,7 +472,7 @@
     <aside class="content-supplementary" role="complementary">
       <div class="bit">
         <h3 class="title title-3">${_('New to {studio_name}?').format(studio_name=settings.STUDIO_NAME)}</h3>
-        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continously updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
+        <p>${_('Click Help in the upper-right corner to get more information about the {studio_name} page you are viewing. You can also use the links at the bottom of the page to access our continually updated documentation and other {studio_name} resources.').format(studio_name=settings.STUDIO_SHORT_NAME)}</p>
 
         <ol class="list-actions">
           <li class="action-item">
@@ -481,7 +481,7 @@
           </li>
           % if settings.TENDER_DOMAIN:
             <li class="action-item">
-              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="show-tender" title="${_("Use our feedback tool, Tender, to request help")}">
+              <a href="http://${settings.TENDER_DOMAIN}/discussion/new" class="action action-primary" title="${_("Use our feedback tool, Tender, to request help")}">
                 ${_("Request help with {studio_name}").format(studio_name=settings.STUDIO_NAME)}
               </a>
             </li>
