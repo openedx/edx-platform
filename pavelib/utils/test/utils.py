@@ -1,7 +1,6 @@
 """
 Helper functions for test tasks
 """
-from __future__ import print_function
 from paver.easy import sh, task, cmdopts
 from pavelib.utils.envs import Env
 import os
