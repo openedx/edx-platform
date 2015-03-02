@@ -927,7 +927,7 @@ def change_enrollment(request, check_access=True):
             )
         elif CourseMode.NO_ID_PROFESSIONAL_MODES[0] in available_modes:
             return HttpResponse(
-                reverse("verify_student_payment_confirmation", kwargs={'course_id': unicode(course_id)})
+                reverse("verify_student_start_flow", kwargs={'course_id': unicode(course_id)})
             )
 
         # Otherwise, there is only one mode available (the default)
