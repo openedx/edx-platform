@@ -47,6 +47,7 @@
             'youtube': '//www.youtube.com/player_api?noext',
             'tender': '//api.tenderapp.com/tender_widget',
             'coffee/src/ajax_prefix': 'xmodule_js/common_static/coffee/src/ajax_prefix',
+            'coffee/src/instructor_dashboard/student_admin': 'coffee/src/instructor_dashboard/student_admin',
             'xmodule_js/common_static/js/test/add_ajax_prefix': 'xmodule_js/common_static/js/test/add_ajax_prefix',
             'xblock/core': 'xmodule_js/common_static/js/xblock/core',
             'xblock/runtime.v1': 'xmodule_js/common_static/coffee/src/xblock/runtime.v1',
@@ -251,7 +252,10 @@
                 exports: 'AjaxPrefix',
                 deps: ['coffee/src/ajax_prefix']
             },
-
+            'coffee/src/instructor_dashboard/student_admin': {
+                exports: 'coffee/src/instructor_dashboard/student_admin',
+                deps: ['jquery', 'underscore', 'coffee/src/instructor_dashboard/util', 'string_utils']
+            },
             // LMS class loaded explicitly until they are converted to use RequireJS
             'js/student_account/account': {
                 exports: 'js/student_account/account',
@@ -423,6 +427,16 @@
             },
             'js/verify_student/views/webcam_photo_view': {
                 exports: 'edx.verify_student.WebcamPhotoView',
+                deps: [
+                    'jquery',
+                    'underscore',
+                    'backbone',
+                    'gettext',
+                    'js/verify_student/views/image_input_view'
+                ]
+            },
+            'js/verify_student/views/image_input_view': {
+                exports: 'edx.verify_student.ImageInputView',
                 deps: [ 'jquery', 'underscore', 'backbone', 'gettext' ]
             },
             'js/verify_student/views/step_view': {
@@ -529,6 +543,7 @@
         'lms/include/js/spec/groups/views/cohorts_spec.js',
         'lms/include/js/spec/shoppingcart/shoppingcart_spec.js',
         'lms/include/js/spec/instructor_dashboard/ecommerce_spec.js',
+        'lms/include/js/spec/instructor_dashboard/student_admin_spec.js',
         'lms/include/js/spec/student_account/account_spec.js',
         'lms/include/js/spec/student_account/access_spec.js',
         'lms/include/js/spec/student_account/login_spec.js',
@@ -540,6 +555,7 @@
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
+        'lms/include/js/spec/verify_student/image_input_spec.js',
         'lms/include/js/spec/verify_student/review_photos_step_view_spec.js',
         'lms/include/js/spec/verify_student/make_payment_step_view_spec.js',
         'lms/include/js/spec/edxnotes/utils/logger_spec.js',
@@ -558,8 +574,10 @@
         'lms/include/js/spec/edxnotes/views/toggle_notes_factory_spec.js',
         'lms/include/js/spec/edxnotes/models/tab_spec.js',
         'lms/include/js/spec/edxnotes/models/note_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/accessibility_spec.js',
         'lms/include/js/spec/edxnotes/plugins/events_spec.js',
         'lms/include/js/spec/edxnotes/plugins/scroller_spec.js',
+        'lms/include/js/spec/edxnotes/plugins/caret_navigation_spec.js',
         'lms/include/js/spec/edxnotes/collections/notes_spec.js',
         'lms/include/js/spec/search/search_spec.js'
     ]);

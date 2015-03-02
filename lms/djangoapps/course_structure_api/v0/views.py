@@ -12,12 +12,12 @@ from rest_framework.response import Response
 from xmodule.modulestore.django import modulestore
 from opaque_keys.edx.keys import CourseKey
 
+from course_structure_api.v0 import serializers
+from courseware import courses
 from courseware.access import has_access
 from openedx.core.djangoapps.content.course_structures import models
 from openedx.core.lib.api.permissions import IsAuthenticatedOrDebug
 from openedx.core.lib.api.serializers import PaginationSerializer
-from courseware import courses
-from course_structure_api.v0 import serializers
 from student.roles import CourseInstructorRole, CourseStaffRole
 
 
@@ -115,22 +115,24 @@ class CourseList(CourseViewMixin, ListAPIView):
     def get_queryset(self):
         course_ids = self.request.QUERY_PARAMS.get('course_id', None)
 
-        course_descriptors = []
+        results = []
         if course_ids:
             course_ids = course_ids.split(',')
             for course_id in course_ids:
                 course_key = CourseKey.from_string(course_id)
                 course_descriptor = courses.get_course(course_key)
-                course_descriptors.append(course_descriptor)
+                results.append(course_descriptor)
         else:
-            course_descriptors = modulestore().get_courses()
+            results = modulestore().get_courses()
 
-        results = [course for course in course_descriptors if self.user_can_access_course(self.request.user, course)]
+        # Ensure only course descriptors are returned.
+        results = (course for course in results if course.scope_ids.block_type == 'course')
+
+        # Ensure only courses accessible by the user are returned.
+        results = (course for course in results if self.user_can_access_course(self.request.user, course))
 
         # Sort the results in a predictable manner.
-        results.sort(key=attrgetter('id'))
-
-        return results
+        return sorted(results, key=attrgetter('id'))
 
 
 class CourseDetail(CourseViewMixin, RetrieveAPIView):

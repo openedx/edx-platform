@@ -213,6 +213,7 @@ class InputTypeBase(object):
         self.hint = feedback.get('hint', '')
         self.hintmode = feedback.get('hintmode', None)
         self.input_state = state.get('input_state', {})
+        self.answervariable = state.get("answervariable", None)
 
         # put hint above msg if it should be displayed
         if self.hintmode == 'always':
@@ -310,6 +311,8 @@ class InputTypeBase(object):
             (a, v) for (a, v) in self.loaded_attributes.iteritems() if a in self.to_render
         )
         context.update(self._extra_context())
+        if self.answervariable:
+            context.update({'answervariable': self.answervariable})
         return context
 
     def _extra_context(self):
@@ -1013,8 +1016,6 @@ class Schematic(InputTypeBase):
         ]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'setup_script': '{static_url}js/capa/schematicinput.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1407,8 +1408,6 @@ class EditAMoleculeInput(InputTypeBase):
                 Attribute('missing', None)]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'applet_loader': '{static_url}js/capa/editamolecule.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1443,8 +1442,6 @@ class DesignProtein2dInput(InputTypeBase):
                 ]
 
     def _extra_context(self):
-        """
-        """
         context = {
             'applet_loader': '{static_url}js/capa/design-protein-2d.js'.format(
                 static_url=self.capa_system.STATIC_URL),
@@ -1479,8 +1476,6 @@ class EditAGeneInput(InputTypeBase):
                 ]
 
     def _extra_context(self):
-        """
-            """
         context = {
             'applet_loader': '{static_url}js/capa/edit-a-gene.js'.format(
                 static_url=self.capa_system.STATIC_URL),

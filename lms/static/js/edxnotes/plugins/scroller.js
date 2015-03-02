@@ -51,6 +51,8 @@ define(['jquery', 'underscore', 'annotator_1.2.9'], function ($, _, Annotator) {
                         top: offset.top + 0.5 * highlight.height(),
                         left: offset.left + 0.5 * highlight.width()
                     });
+                    // Freeze the viewer
+                    this.annotator.freezeAll();
                     // Scroll to highlight
                     this.scrollIntoView(highlight);
                 }

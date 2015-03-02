@@ -20,9 +20,11 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.utils.timezone import UTC
-from django.views.decorators.http import require_GET
-from django.http import Http404, HttpResponse
+from django.views.decorators.http import require_GET, require_POST
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
+from certificates.api import certificate_downloadable_status, generate_user_certificates
+from certificates.models import CertificateGenerationConfiguration
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -60,6 +62,7 @@ from util.milestones_helpers import get_prerequisite_courses_display
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from instructor.enrollment import uses_shib
 
 from util.db import commit_on_success_with_read_committed
@@ -584,7 +587,7 @@ def jump_to_id(request, course_id, module_id):
 
 
 @ensure_csrf_cookie
-def jump_to(request, course_id, location):
+def jump_to(_request, course_id, location):
     """
     Show the page that contains a specific location.
 
@@ -1007,6 +1010,9 @@ def _progress(request, course_key, student_id):
         #This means the student didn't have access to the course (which the instructor requested)
         raise Http404
 
+    # checking certificate generation configuration
+    show_generate_cert_btn = CertificateGenerationConfiguration.current().enabled
+
     context = {
         'course': course,
         'courseware_summary': courseware_summary,
@@ -1014,8 +1020,13 @@ def _progress(request, course_key, student_id):
         'grade_summary': grade_summary,
         'staff_access': staff_access,
         'student': student,
-        'reverifications': fetch_reverify_banner_info(request, course_key)
+        'reverifications': fetch_reverify_banner_info(request, course_key),
+        'passed': is_course_passed(course, grade_summary) if show_generate_cert_btn else False,
+        'show_generate_cert_btn': show_generate_cert_btn
     }
+
+    if show_generate_cert_btn:
+        context.update(certificate_downloadable_status(student, course_key))
 
     with grades.manual_transaction():
         response = render_to_response('courseware/progress.html', context)
@@ -1231,3 +1242,72 @@ def course_survey(request, course_id):
         redirect_url=redirect_url,
         is_required=course.course_survey_required,
     )
+
+
+def is_course_passed(course, grade_summary=None, student=None, request=None):
+    """
+    check user's course passing status. return True if passed
+
+    Arguments:
+        course : course object
+        grade_summary (dict) : contains student grade details.
+        student : user object
+        request (HttpRequest)
+
+    Returns:
+        returns bool value
+    """
+    nonzero_cutoffs = [cutoff for cutoff in course.grade_cutoffs.values() if cutoff > 0]
+    success_cutoff = min(nonzero_cutoffs) if nonzero_cutoffs else None
+
+    if grade_summary is None:
+        grade_summary = grades.grade(student, request, course)
+
+    return success_cutoff and grade_summary['percent'] > success_cutoff
+
+
+@ensure_csrf_cookie
+@require_POST
+def generate_user_cert(request, course_id):
+    """
+    It will check all validation and on clearance will add the new-certificate request into the xqueue.
+
+     Args:
+        request (django request object):  the HTTP request object that triggered this view function
+        course_id (unicode):  id associated with the course
+
+    Returns:
+        returns json response
+    """
+
+    if not request.user.is_authenticated():
+        log.info(u"Anon user trying to generate certificate for %s", course_id)
+        return HttpResponseBadRequest(
+            _('You must be signed in to {platform_name} to create a certificate.').format(
+                platform_name=settings.PLATFORM_NAME
+            )
+        )
+
+    student = request.user
+
+    course_key = CourseKey.from_string(course_id)
+
+    course = modulestore().get_course(course_key, depth=2)
+    if not course:
+        return HttpResponseBadRequest(_("Course is not valid"))
+
+    if not is_course_passed(course, None, student, request):
+        return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
+
+    certificate_status = certificate_downloadable_status(student, course.id)
+
+    if not certificate_status["is_downloadable"] and not certificate_status["is_generating"]:
+        generate_user_certificates(student, course)
+        return HttpResponse(_("Creating certificate"))
+
+    # if certificate_status is not is_downloadable and is_generating or
+    # if any error appears during certificate generation return the message cert is generating.
+    # with badrequest
+    # at backend debug the issue and re-submit the task.
+
+    return HttpResponseBadRequest(_("Creating certificate"))

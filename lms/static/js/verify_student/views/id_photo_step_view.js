@@ -17,7 +17,7 @@ var edx = edx || {};
         },
 
         postRender: function() {
-            var webcam = new edx.verify_student.WebcamPhotoView({
+            var webcam = edx.verify_student.getSupportedWebcamView({
                 el: $( '#idcam' ),
                 model: this.model,
                 modelAttribute: 'identificationImage',

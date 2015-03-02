@@ -90,6 +90,31 @@ class UsernameCipher(object):
         return UsernameCipher._remove_padding(decrypted)
 
 
+def enable_notifications(user):
+    """
+    Enable notifications for a user.
+    Currently only used for daily forum digests.
+    """
+    UserPreference.objects.get_or_create(
+        user=user,
+        key=NOTIFICATION_PREF_KEY,
+        defaults={
+            "value": UsernameCipher.encrypt(user.username)
+        }
+    )
+
+
+def disable_notifications(user):
+    """
+    Disable notifications for a user.
+    Currently only used for daily forum digests.
+    """
+    UserPreference.objects.filter(
+        user=user,
+        key=NOTIFICATION_PREF_KEY
+    ).delete()
+
+
 @require_POST
 def ajax_enable(request):
     """
@@ -103,13 +128,7 @@ def ajax_enable(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    UserPreference.objects.get_or_create(
-        user=request.user,
-        key=NOTIFICATION_PREF_KEY,
-        defaults={
-            "value": UsernameCipher.encrypt(request.user.username)
-        }
-    )
+    enable_notifications(request.user)
 
     return HttpResponse(status=204)
 
@@ -125,10 +144,7 @@ def ajax_disable(request):
     if not request.user.is_authenticated():
         raise PermissionDenied
 
-    UserPreference.objects.filter(
-        user=request.user,
-        key=NOTIFICATION_PREF_KEY
-    ).delete()
+    disable_notifications(request.user)
 
     return HttpResponse(status=204)
 

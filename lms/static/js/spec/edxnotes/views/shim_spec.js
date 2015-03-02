@@ -137,6 +137,20 @@ define([
             );
         });
 
+        it('should hide viewer when close button is clicked', function() {
+            var close,
+                annotation = {
+                    id: '01',
+                    text: "Test text",
+                    highlights: [highlights[0].get(0)]
+                };
+
+            annotators[0].viewer.load([annotation]);
+            close = annotators[0].viewer.element.find('.annotator-close');
+            close.click();
+            expect($('#edx-notes-wrapper-123 .annotator-viewer')).toHaveClass('annotator-hide');
+        });
+
         describe('_setupViewer', function () {
             var mockViewer = null;
 

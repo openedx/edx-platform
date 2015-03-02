@@ -3,13 +3,14 @@ define([
     'js/collections/group_configuration', 'js/collections/group',
     'js/views/group_configuration_details', 'js/views/group_configurations_list', 'js/views/group_configuration_editor',
     'js/views/group_configuration_item', 'js/views/experiment_group_edit', 'js/views/content_group_list',
+    'js/views/content_group_details', 'js/views/content_group_editor', 'js/views/content_group_item',
     'js/views/feedback_notification', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
     'js/spec_helpers/view_helpers', 'jasmine-stealth'
 ], function(
     _, Course, GroupConfigurationModel, GroupModel, GroupConfigurationCollection, GroupCollection,
     GroupConfigurationDetailsView, GroupConfigurationsListView, GroupConfigurationEditorView,
-    GroupConfigurationItemView, ExperimentGroupEditView, GroupList, Notification, AjaxHelpers, TemplateHelpers,
-    ViewHelpers
+    GroupConfigurationItemView, ExperimentGroupEditView, GroupList, ContentGroupDetailsView,
+    ContentGroupEditorView, ContentGroupItemView, Notification, AjaxHelpers, TemplateHelpers, ViewHelpers
 ) {
     'use strict';
     var SELECTORS = {
@@ -39,6 +40,134 @@ define([
         warningIcon: '.wrapper-group-configuration-validation > i',
         note: '.wrapper-delete-button'
     };
+
+    var assertTheDetailsView = function (view, text) {
+        expect(view.$el).toContainText(text);
+        expect(view.$el).toContainText('ID: 0');
+        expect(view.$('.delete')).toExist();
+    };
+    var assertShowEmptyUsages = function (view, usageText) {
+        expect(view.$(SELECTORS.usageCount)).not.toExist();
+        expect(view.$(SELECTORS.usageText)).toContainText(usageText);
+        expect(view.$(SELECTORS.usageTextAnchor)).toExist();
+        expect(view.$(SELECTORS.usageUnit)).not.toExist();
+    };
+    var assertHideEmptyUsages = function (view) {
+        expect(view.$(SELECTORS.usageText)).not.toExist();
+        expect(view.$(SELECTORS.usageUnit)).not.toExist();
+        expect(view.$(SELECTORS.usageCount)).toContainText('Not in Use');
+    };
+    var assertShowNonEmptyUsages = function (view, usageText, toolTipText) {
+        var usageUnitAnchors = view.$(SELECTORS.usageUnitAnchor);
+
+        expect(view.$(SELECTORS.note)).toHaveAttr(
+            'data-tooltip', toolTipText
+        );
+        expect(view.$('.delete')).toHaveClass('is-disabled');
+        expect(view.$(SELECTORS.usageCount)).not.toExist();
+        expect(view.$(SELECTORS.usageText)).toContainText(usageText);
+        expect(view.$(SELECTORS.usageUnit).length).toBe(2);
+        expect(usageUnitAnchors.length).toBe(2);
+        expect(usageUnitAnchors.eq(0)).toContainText('label1');
+        expect(usageUnitAnchors.eq(0).attr('href')).toBe('url1');
+        expect(usageUnitAnchors.eq(1)).toContainText('label2');
+        expect(usageUnitAnchors.eq(1).attr('href')).toBe('url2');
+    };
+    var assertHideNonEmptyUsages = function (view) {
+        expect(view.$('.delete')).toHaveClass('is-disabled');
+        expect(view.$(SELECTORS.usageText)).not.toExist();
+        expect(view.$(SELECTORS.usageUnit)).not.toExist();
+        expect(view.$(SELECTORS.usageCount)).toContainText('Used in 2 units');
+    };
+    var setUsageInfo = function (model) {
+        model.set('usage', [
+            {'label': 'label1', 'url': 'url1'},
+            {'label': 'label2', 'url': 'url2'}
+        ]);
+    };
+    var assertHideValidationContent = function (view) {
+        expect(view.$(SELECTORS.usageUnitMessage)).not.toExist();
+        expect(view.$(SELECTORS.usageUnitWarningIcon)).not.toExist();
+        expect(view.$(SELECTORS.usageUnitErrorIcon)).not.toExist();
+    };
+    var assertControllerView = function (view, detailsView, editView) {
+        // Details view by default
+        expect(view.$(detailsView)).toExist();
+        view.$('.action-edit .edit').click();
+        expect(view.$(editView)).toExist();
+        expect(view.$(detailsView)).not.toExist();
+        view.$('.action-cancel').click();
+        expect(view.$(detailsView)).toExist();
+        expect(view.$(editView)).not.toExist();
+    };
+    var clickDeleteItem = function (that, promptSpy, promptText) {
+        that.view.$('.delete').click();
+        ViewHelpers.verifyPromptShowing(promptSpy, promptText);
+        ViewHelpers.confirmPrompt(promptSpy);
+        ViewHelpers.verifyPromptHidden(promptSpy);
+    };
+    var patchAndVerifyRequest = function (requests, url, notificationSpy) {
+        // Backbone.emulateHTTP is enabled in our system, so setting this
+        // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
+        // setting the X-HTTP-Method-Override header with the true method.
+        AjaxHelpers.expectJsonRequest(requests, 'POST', url);
+        expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+    };
+    var assertAndDeleteItemError = function (that, url, promptText) {
+        var requests = AjaxHelpers.requests(that),
+            promptSpy = ViewHelpers.createPromptSpy(),
+            notificationSpy = ViewHelpers.createNotificationSpy();
+
+        clickDeleteItem(that, promptSpy, promptText);
+
+        patchAndVerifyRequest(requests, url, notificationSpy);
+
+        AjaxHelpers.respondToDelete(requests);
+        ViewHelpers.verifyNotificationHidden(notificationSpy);
+        expect($(SELECTORS.itemView)).not.toExist();
+    };
+    var assertAndDeleteItemWithError = function (that, url, listItemView, promptText) {
+        var requests = AjaxHelpers.requests(that),
+            promptSpy = ViewHelpers.createPromptSpy(),
+            notificationSpy = ViewHelpers.createNotificationSpy();
+
+        clickDeleteItem(that, promptSpy, promptText);
+        patchAndVerifyRequest(requests, url, notificationSpy);
+
+        AjaxHelpers.respondWithError(requests);
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
+        expect($(listItemView)).toExist();
+    };
+    var submitAndVerifyFormSuccess = function (view, requests, notificationSpy) {
+        view.$('form').submit();
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+        requests[0].respond(200);
+        ViewHelpers.verifyNotificationHidden(notificationSpy);
+    };
+    var submitAndVerifyFormError = function (view, requests, notificationSpy) {
+        view.$('form').submit();
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+        AjaxHelpers.respondWithError(requests);
+        ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+    };
+    var assertCannotDeleteUsed = function (that, toolTipText, warningText){
+        setUsageInfo(that.model);
+        that.view.render();
+        expect(that.view.$(SELECTORS.note)).toHaveAttr(
+            'data-tooltip', toolTipText
+        );
+        expect(that.view.$(SELECTORS.warningMessage)).toContainText(warningText);
+        expect(that.view.$(SELECTORS.warningIcon)).toExist();
+        expect(that.view.$('.delete')).toHaveClass('is-disabled');
+    };
+    var assertUnusedOptions = function (that) {
+        that.model.set('usage', []);
+        that.view.render();
+        expect(that.view.$(SELECTORS.warningMessage)).not.toExist();
+        expect(that.view.$(SELECTORS.warningIcon)).not.toExist();
+    };
+
 
     beforeEach(function() {
         window.course = new Course({
@@ -107,9 +236,7 @@ define([
         });
 
         it('should render properly', function() {
-            expect(this.view.$el).toContainText('Configuration');
-            expect(this.view.$el).toContainText('ID: 0');
-            expect(this.view.$('.delete')).toExist();
+            assertTheDetailsView(this.view, 'Configuration');
         });
 
         it('should show groups appropriately', function() {
@@ -142,69 +269,40 @@ define([
         it('should show empty usage appropriately', function() {
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
-
-            expect(this.view.$(SELECTORS.usageCount)).not.toExist();
-            expect(this.view.$(SELECTORS.usageText))
-                .toContainText('This Group Configuration is not in use. ' +
-                               'Start by adding a content experiment to any ' +
-                               'Unit via the');
-            expect(this.view.$(SELECTORS.usageTextAnchor)).toExist();
-            expect(this.view.$(SELECTORS.usageUnit)).not.toExist();
+            assertShowEmptyUsages(
+                this.view,
+                'This Group Configuration is not in use. ' +
+                'Start by adding a content experiment to any Unit via the'
+            );
         });
 
         it('should hide empty usage appropriately', function() {
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
-
-            expect(this.view.$(SELECTORS.usageText)).not.toExist();
-            expect(this.view.$(SELECTORS.usageUnit)).not.toExist();
-            expect(this.view.$(SELECTORS.usageCount))
-                .toContainText('Not in Use');
+            assertHideEmptyUsages(this.view)
         });
 
         it('should show non-empty usage appropriately', function() {
-            var usageUnitAnchors;
-
-            this.model.set('usage', [
-                {'label': 'label1', 'url': 'url1'},
-                {'label': 'label2', 'url': 'url2'}
-            ]);
+            setUsageInfo(this.model);
             this.model.set('showGroups', false);
             this.view.$('.show-groups').click();
 
-            usageUnitAnchors = this.view.$(SELECTORS.usageUnitAnchor);
-
-            expect(this.view.$(SELECTORS.note)).toHaveAttr(
-                'data-tooltip', 'Cannot delete when in use by an experiment'
-            );
-            expect(this.view.$('.delete')).toHaveClass('is-disabled');
-            expect(this.view.$(SELECTORS.usageCount)).not.toExist();
-            expect(this.view.$(SELECTORS.usageText))
-                .toContainText('This Group Configuration is used in:');
-            expect(this.view.$(SELECTORS.usageUnit).length).toBe(2);
-            expect(usageUnitAnchors.length).toBe(2);
-            expect(usageUnitAnchors.eq(0)).toContainText('label1');
-            expect(usageUnitAnchors.eq(0).attr('href')).toBe('url1');
-            expect(usageUnitAnchors.eq(1)).toContainText('label2');
-            expect(usageUnitAnchors.eq(1).attr('href')).toBe('url2');
+            assertShowNonEmptyUsages(
+                this.view,
+                'This Group Configuration is used in:',
+                'Cannot delete when in use by an experiment'
+            )
         });
 
         it('should hide non-empty usage appropriately', function() {
-            this.model.set('usage', [
-                {'label': 'label1', 'url': 'url1'},
-                {'label': 'label2', 'url': 'url2'}
-            ]);
+            setUsageInfo(this.model);
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
 
             expect(this.view.$(SELECTORS.note)).toHaveAttr(
                 'data-tooltip', 'Cannot delete when in use by an experiment'
             );
-            expect(this.view.$('.delete')).toHaveClass('is-disabled');
-            expect(this.view.$(SELECTORS.usageText)).not.toExist();
-            expect(this.view.$(SELECTORS.usageUnit)).not.toExist();
-            expect(this.view.$(SELECTORS.usageCount))
-                .toContainText('Used in 2 units');
+            assertHideNonEmptyUsages(this.view);
         });
 
         it('should show validation warning icon and message appropriately', function() {
@@ -244,16 +342,11 @@ define([
         });
 
         it('should hide validation icons and messages appropriately', function() {
-            this.model.set('usage', [
-                {'label': 'label1', 'url': 'url1'},
-                {'label': 'label2', 'url': 'url2'}
-            ]);
+            setUsageInfo(this.model);
             this.model.set('showGroups', true);
             this.view.$('.hide-groups').click();
 
-            expect(this.view.$(SELECTORS.usageUnitMessage)).not.toExist();
-            expect(this.view.$(SELECTORS.usageUnitWarningIcon)).not.toExist();
-            expect(this.view.$(SELECTORS.usageUnitErrorIcon)).not.toExist();
+            assertHideValidationContent(this.view);
         });
     });
 
@@ -312,10 +405,7 @@ define([
                 inputDescription: 'New Description'
             });
 
-            this.view.$('form').submit();
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            requests[0].respond(200);
-            ViewHelpers.verifyNotificationHidden(notificationSpy);
+            submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
 
             expect(this.model).toBeCorrectValuesInModel({
                 name: 'New Configuration',
@@ -333,10 +423,7 @@ define([
                 notificationSpy = ViewHelpers.createNotificationSpy();
 
             setValuesToInputs(this.view, { inputName: 'New Configuration' });
-            this.view.$('form').submit();
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
-            AjaxHelpers.respondWithError(requests);
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Saving/);
+            submitAndVerifyFormError(this.view, requests, notificationSpy);
         });
 
         it('does not save on cancel', function() {
@@ -379,7 +466,7 @@ define([
             this.view.$('form').submit();
             // See error message
             expect(this.view.$(SELECTORS.errorMessage)).toContainText(
-                'Group Configuration name is required.'
+                'Group Configuration name is required'
             );
             // No request
             expect(requests.length).toBe(0);
@@ -461,30 +548,17 @@ define([
         });
 
         it('cannot be deleted if it is in use', function () {
-            this.model.set('usage', [ {'label': 'label1', 'url': 'url1'} ]);
-            this.view.render();
-            expect(this.view.$(SELECTORS.note)).toHaveAttr(
-                'data-tooltip', 'Cannot delete when in use by an experiment'
-            );
-            expect(this.view.$('.delete')).toHaveClass('is-disabled');
-        });
-
-        it('contains warning message if it is in use', function () {
-            this.model.set('usage', [ {'label': 'label1', 'url': 'url1'} ]);
-            this.view.render();
-            expect(this.view.$(SELECTORS.warningMessage)).toContainText(
+            assertCannotDeleteUsed(
+                this,
+                'Cannot delete when in use by an experiment',
                 'This configuration is currently used in content ' +
                 'experiments. If you make changes to the groups, you may ' +
                 'need to edit those experiments.'
             );
-            expect(this.view.$(SELECTORS.warningIcon)).toExist();
         });
 
         it('does not contain warning message if it is not in use', function () {
-            this.model.set('usage', []);
-            this.view.render();
-            expect(this.view.$(SELECTORS.warningMessage)).not.toExist();
-            expect(this.view.$(SELECTORS.warningIcon)).not.toExist();
+           assertUnusedOptions(this);
         });
     });
 
@@ -535,7 +609,6 @@ define([
     });
 
     describe('Experiment group configurations controller view', function() {
-        var clickDeleteItem;
 
         beforeEach(function() {
             TemplateHelpers.installTemplates([
@@ -550,56 +623,21 @@ define([
             appendSetFixtures(this.view.render().el);
         });
 
-        clickDeleteItem = function (view, promptSpy) {
-            view.$('.delete').click();
-            ViewHelpers.verifyPromptShowing(promptSpy, /Delete this group configuration/);
-            ViewHelpers.confirmPrompt(promptSpy);
-            ViewHelpers.verifyPromptHidden(promptSpy);
-        };
-
         it('should render properly', function() {
-            // Details view by default
-            expect(this.view.$(SELECTORS.detailsView)).toExist();
-            this.view.$('.action-edit .edit').click();
-            expect(this.view.$(SELECTORS.editView)).toExist();
-            expect(this.view.$(SELECTORS.detailsView)).not.toExist();
-            this.view.$('.action-cancel').click();
-            expect(this.view.$(SELECTORS.detailsView)).toExist();
-            expect(this.view.$(SELECTORS.editView)).not.toExist();
+            assertControllerView(this.view, SELECTORS.detailsView, SELECTORS.editView);
         });
 
         it('should destroy itself on confirmation of deleting', function () {
-            var requests = AjaxHelpers.requests(this),
-                promptSpy = ViewHelpers.createPromptSpy(),
-                notificationSpy = ViewHelpers.createNotificationSpy();
-
-            clickDeleteItem(this.view, promptSpy);
-            // Backbone.emulateHTTP is enabled in our system, so setting this
-            // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
-            // setting the X-HTTP-Method-Override header with the true method.
-            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
-            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            AjaxHelpers.respondToDelete(requests);
-            ViewHelpers.verifyNotificationHidden(notificationSpy);
-            expect($(SELECTORS.itemView)).not.toExist();
+            assertAndDeleteItemError(this, '/group_configurations/0', 'Delete this group configuration?');
         });
 
         it('does not hide deleting message if failure', function() {
-            var requests = AjaxHelpers.requests(this),
-                promptSpy = ViewHelpers.createPromptSpy(),
-                notificationSpy = ViewHelpers.createNotificationSpy();
-
-            clickDeleteItem(this.view, promptSpy);
-            // Backbone.emulateHTTP is enabled in our system, so setting this
-            // option  will fake PUT, PATCH and DELETE requests with a HTTP POST,
-            // setting the X-HTTP-Method-Override header with the true method.
-            AjaxHelpers.expectJsonRequest(requests, 'POST', '/group_configurations/0');
-            expect(_.last(requests).requestHeaders['X-HTTP-Method-Override']).toBe('DELETE');
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            AjaxHelpers.respondWithError(requests);
-            ViewHelpers.verifyNotificationShowing(notificationSpy, /Deleting/);
-            expect($(SELECTORS.itemView)).toExist();
+            assertAndDeleteItemWithError(
+                this,
+                '/group_configurations/0',
+                SELECTORS.itemView,
+                'Delete this group configuration?'
+            );
         });
     });
 
@@ -651,9 +689,9 @@ define([
             }
         };
 
-        createGroups = function (groupNames) {
-            var groups = new GroupCollection(_.map(groupNames, function (groupName) {
-                    return {name: groupName};
+        createGroups = function (groupNamesWithId) {
+            var groups = new GroupCollection(_.map(groupNamesWithId, function (groupName, id) {
+                    return {id: id, name: groupName};
                 })),
                 groupConfiguration = new GroupConfigurationModel({
                     id: 0,
@@ -661,11 +699,12 @@ define([
                     groups: groups
                 }, {canBeEmpty: true});
             groupConfiguration.urlRoot = '/mock_url';
+            groupConfiguration.outlineUrl = '/mock_url';
             return groups;
         };
 
-        renderView = function(groupNames) {
-            var view = new GroupList({collection: createGroups(groupNames || [])}).render();
+        renderView = function(groupNamesWithId) {
+            var view = new GroupList({collection: createGroups(groupNamesWithId || {})}).render();
             appendSetFixtures(view.el);
             return view;
         };
@@ -778,7 +817,7 @@ define([
             var requests = AjaxHelpers.requests(this),
                 oldGroupName = 'Old Group Name',
                 newGroupName = 'New Group Name',
-                view = renderView([oldGroupName]);
+                view = renderView({1: oldGroupName});
             editNewGroup(view, {newName: newGroupName, save: true});
             respondToSave(requests, view);
             verifyEditingGroup(view, false, 1);
@@ -836,6 +875,190 @@ define([
             var view = renderView();
             view.collection.add({name: 'Editing Group', editing: true});
             verifyEditingGroup(view, true);
+        });
+
+    });
+
+    describe('Content groups details view', function() {
+
+        beforeEach(function() {
+            TemplateHelpers.installTemplate('content-group-details', true);
+            this.model = new GroupModel({name: 'Content Group', id: 0});
+
+            var saveableModel = new GroupConfigurationModel({
+                name: 'Content Group Configuration',
+                id: 0,
+                scheme:'cohort',
+                groups: new GroupCollection([this.model]),
+            }, {canBeEmpty: true});
+
+            saveableModel.urlRoot = '/mock_url';
+
+            this.collection = new GroupConfigurationCollection([ saveableModel ]);
+            this.collection.outlineUrl = '/outline';
+
+            this.view = new ContentGroupDetailsView({
+                model: this.model
+            });
+            appendSetFixtures(this.view.render().el);
+        });
+
+        it('should render properly', function() {
+            assertTheDetailsView(this.view, 'Content Group');
+        });
+
+        it('should show empty usage appropriately', function() {
+            this.view.$('.show-groups').click();
+            assertShowEmptyUsages(this.view, 'This content group is not in use. ');
+        });
+
+        it('should hide empty usage appropriately', function() {
+            this.view.$('.hide-groups').click();
+            assertHideEmptyUsages(this.view)
+        });
+
+        it('should show non-empty usage appropriately', function() {
+            setUsageInfo(this.model);
+            this.view.$('.show-groups').click();
+
+            assertShowNonEmptyUsages(
+                this.view,
+                'This content group is used in:',
+                'Cannot delete when in use by a unit'
+            )
+        });
+
+        it('should hide non-empty usage appropriately', function() {
+            setUsageInfo(this.model);
+            this.view.$('.hide-groups').click();
+
+            expect(this.view.$('li.action-delete')).toHaveAttr(
+                'data-tooltip', 'Cannot delete when in use by a unit'
+            );
+            assertHideNonEmptyUsages(this.view);
+        });
+
+        it('should hide validation icons and messages appropriately', function() {
+            setUsageInfo(this.model);
+            this.view.$('.hide-groups').click();
+            assertHideValidationContent(this.view);
+        });
+    });
+
+    describe('Content groups editor view', function() {
+
+        beforeEach(function() {
+            ViewHelpers.installViewTemplates();
+            TemplateHelpers.installTemplates(['content-group-editor']);
+
+            this.model = new GroupModel({name: 'Content Group', id: 0});
+
+            this.saveableModel = new GroupConfigurationModel({
+                name: 'Content Group Configuration',
+                id: 0,
+                scheme:'cohort',
+                groups: new GroupCollection([this.model]),
+                editing:true
+            });
+
+            this.collection = new GroupConfigurationCollection([ this.saveableModel ]);
+            this.collection.outlineUrl = '/outline';
+            this.collection.url = '/group_configurations';
+
+            this.view = new ContentGroupEditorView({
+                model: this.model
+            });
+            appendSetFixtures(this.view.render().el);
+        });
+
+        it('should save properly', function() {
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy();
+
+            this.view.$('.action-add').click();
+            this.view.$(SELECTORS.inputName).val('New Content Group');
+
+            submitAndVerifyFormSuccess(this.view, requests, notificationSpy);
+
+            expect(this.model).toBeCorrectValuesInModel({
+                name: 'New Content Group'
+            });
+            expect(this.view.$el).not.toExist();
+        });
+
+        it('does not hide saving message if failure', function() {
+            var requests = AjaxHelpers.requests(this),
+                notificationSpy = ViewHelpers.createNotificationSpy();
+            this.view.$(SELECTORS.inputName).val('New Content Group')
+
+            submitAndVerifyFormError(this.view, requests, notificationSpy)
+        });
+
+        it('does not save on cancel', function() {
+            expect(this.view.$('.action-add'));
+            this.view.$('.action-add').click();
+            this.view.$(SELECTORS.inputName).val('New Content Group');
+
+            this.view.$('.action-cancel').click();
+            expect(this.model).toBeCorrectValuesInModel({
+                name: 'Content Group',
+            });
+            // Model is still exist in the collection
+            expect(this.collection.indexOf(this.saveableModel)).toBeGreaterThan(-1);
+            expect(this.collection.length).toBe(1);
+        });
+
+        it('cannot be deleted if it is in use', function () {
+            assertCannotDeleteUsed(
+                this,
+                'Cannot delete when in use by a unit',
+                'This content group is used in one or more units.'
+            );
+        });
+
+        it('does not contain warning message if it is not in use', function () {
+            assertUnusedOptions(this);
+        });
+    });
+
+    describe('Content group controller view', function() {
+        beforeEach(function() {
+            TemplateHelpers.installTemplates([
+                'content-group-editor', 'content-group-details'
+            ], true);
+
+            this.model = new GroupModel({name: 'Content Group', id: 0});
+
+            this.saveableModel = new GroupConfigurationModel({
+                name: 'Content Group Configuration',
+                id: 0,
+                scheme:'cohort',
+                groups: new GroupCollection([this.model])
+            });
+            this.saveableModel.urlRoot = '/group_configurations';
+            this.collection = new GroupConfigurationCollection([ this.saveableModel ]);
+            this.collection.url = '/group_configurations';
+            this.view = new ContentGroupItemView({
+                model: this.model
+            });
+            appendSetFixtures(this.view.render().el);
+        });
+
+        it('should render properly', function() {
+            assertControllerView(this.view, '.content-group-details', '.content-group-edit');
+        });
+
+        it('should destroy itself on confirmation of deleting', function () {
+            assertAndDeleteItemError(this, '/group_configurations/0/0', 'Delete this content group');
+        });
+
+        it('does not hide deleting message if failure', function() {
+            assertAndDeleteItemWithError(
+                this,
+                '/group_configurations/0/0',
+                '.content-groups-list-item',
+                'Delete this content group'
+            );
         });
     });
 });

@@ -1,12 +1,6 @@
 """
 Implement CourseTab
 """
-# pylint: disable=incomplete-protocol
-# Note: pylint complains that we do not implement __delitem__ and __len__, although we implement __setitem__
-# and __getitem__.  However, the former two do not apply to the CourseTab class so we do not implement them.
-# The reason we implement the latter two is to enable callers to continue to use the CourseTab object with
-# dict-type accessors.
-
 from abc import ABCMeta, abstractmethod
 from xblock.fields import List
 
@@ -15,7 +9,7 @@ from xblock.fields import List
 _ = lambda text: text
 
 
-class CourseTab(object):  # pylint: disable=incomplete-protocol
+class CourseTab(object):
     """
     The Course Tab class is a data abstraction for all tabs (i.e., course navigation links) within a course.
     It is an abstract class - to be inherited by various tab types.

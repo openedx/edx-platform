@@ -1930,7 +1930,7 @@ class Donation(OrderItem):
         ).format(platform_name=settings.PLATFORM_NAME)
 
     @classmethod
-    def _line_item_description(self, course_id=None):
+    def _line_item_description(cls, course_id=None):
         """Create a line-item description for the donation.
 
         Includes the course display name if provided.

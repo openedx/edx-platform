@@ -117,13 +117,12 @@ class PeerGradingService(GradingService):
         return result
 
 
-"""
-This is a mock peer grading service that can be used for unit tests
-without making actual service calls to the grading controller
-"""
-
-
 class MockPeerGradingService(object):
+    """
+    This is a mock peer grading service that can be used for unit tests
+    without making actual service calls to the grading controller
+    """
+
     def get_next_submission(self, problem_location, grader_id):
         return {
             'success': True,
