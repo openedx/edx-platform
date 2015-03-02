@@ -114,7 +114,7 @@ class AccountCreationForm(forms.Form):
         }
     )
     email = forms.EmailField(
-        max_length=75,  # Limit per RFCs is 254, but User's email field in django 1.4 only takes 75
+        max_length=255,
         error_messages={
             "required": _EMAIL_INVALID_MSG,
             "invalid": _EMAIL_INVALID_MSG,

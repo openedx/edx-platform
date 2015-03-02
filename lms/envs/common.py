@@ -1544,7 +1544,9 @@ INSTALLED_APPS = (
     # External auth (OpenID, shib)
     'external_auth',
     'django_openid_auth',
-    'longerusername',
+
+    # Allow longer usernames and passwords
+    'longerusernameandemail',
 
     # OAuth2 Provider
     'provider',
