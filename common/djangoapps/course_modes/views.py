@@ -82,6 +82,16 @@ class ChooseModeView(View):
                 )
             )
 
+        # Check if the no-id-professional mode is added in course. If so then redirect to payment/verification flow
+        # skipping the verification step
+        no_id_prof_mode = CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODE[0])
+        if no_id_prof_mode:
+            return redirect(
+                reverse(
+                    'verify_student_payment_confirmation',
+                    kwargs={'course_id': unicode(course_key)}
+                )
+            )
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
         # in the "honor" track by this point, so we send the user
