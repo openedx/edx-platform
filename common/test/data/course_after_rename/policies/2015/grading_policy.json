@@ -1,0 +1,34 @@
+{
+    "GRADER": [
+        {
+            "drop_count": 2, 
+            "min_count": 12, 
+            "short_label": "HW", 
+            "type": "Homework", 
+            "weight": 0.15
+        }, 
+        {
+            "drop_count": 2, 
+            "min_count": 12, 
+            "type": "Lab", 
+            "weight": 0.15
+        }, 
+        {
+            "drop_count": 0, 
+            "min_count": 1, 
+            "short_label": "Midterm", 
+            "type": "Midterm Exam", 
+            "weight": 0.3
+        }, 
+        {
+            "drop_count": 0, 
+            "min_count": 1, 
+            "short_label": "Final", 
+            "type": "Final Exam", 
+            "weight": 0.4
+        }
+    ], 
+    "GRADE_CUTOFFS": {
+        "Pass": 0.5
+    }
+}
