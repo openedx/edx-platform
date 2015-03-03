@@ -1,7 +1,7 @@
 var edx = edx || {};
 
 (function($, _, Backbone, gettext, interpolate_text, CohortModel, CohortEditorView, CohortFormView,
-          CourseCohortSettingsNotificationView, NotificationModel, NotificationView, FileUploaderView) {
+          CourseCohortSettingsNotificationView, NotificationModel, NotificationView, FileUploaderView, DiscussionTopicsView) {
     'use strict';
 
     var hiddenClass = 'is-hidden',
@@ -17,7 +17,8 @@ var edx = edx || {};
             'click .cohort-management-add-form .action-save': 'saveAddCohortForm',
             'click .cohort-management-add-form .action-cancel': 'cancelAddCohortForm',
             'click .link-cross-reference': 'showSection',
-            'click .toggle-cohort-management-secondary': 'showCsvUpload'
+            'click .toggle-cohort-management-secondary': 'showCsvUpload',
+            'click .toggle-cohort-management-discussions': 'showDiscussionTopics'
         },
 
         initialize: function(options) {
@@ -277,6 +278,19 @@ var edx = edx || {};
                 this.$('#file-upload-form-file').focus();
             }
         },
+        showDiscussionTopics: function(event) {
+            event.preventDefault();
+
+            $(event.currentTarget).addClass(hiddenClass);
+            var topicsElement = this.$('.discussion-topics').removeClass(hiddenClass);
+
+            if (!this.topicsView) {
+                this.topicsView = new DiscussionTopicsView({
+                    el: topicsElement,
+                    model: this.context.discussionTopicsModel
+                }).render();
+            }
+        },
 
         getSectionCss: function (section) {
             return ".instructor-nav .nav-item a[data-section='" + section + "']";
@@ -284,4 +298,4 @@ var edx = edx || {};
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortModel, edx.groups.CohortEditorView,
     edx.groups.CohortFormView, edx.groups.CourseCohortSettingsNotificationView, NotificationModel, NotificationView,
-    FileUploaderView);
+    FileUploaderView, edx.groups.DiscussionTopicsView);

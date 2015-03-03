@@ -56,6 +56,8 @@ from django.utils.translation import ugettext as _
 
 from microsite_configuration import microsite
 from opaque_keys.edx.locations import i4xEncoder
+from openedx.core.djangoapps.course_groups.cohorts import is_course_cohorted
+
 
 log = logging.getLogger(__name__)
 
@@ -451,6 +453,7 @@ def instructor_dashboard(request, course_id):
 
     context = {
         'course': course,
+        'course_is_cohorted': is_course_cohorted(course.id),
         'staff_access': True,
         'admin_access': request.user.is_staff,
         'instructor_access': instructor_access,

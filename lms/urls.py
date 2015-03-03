@@ -388,6 +388,9 @@ if settings.COURSEWARE_ENABLED:
         url(r'^courses/{}/cohorts/debug$'.format(settings.COURSE_KEY_PATTERN),
             'openedx.core.djangoapps.course_groups.views.debug_cohort_mgmt',
             name="debug_cohort_mgmt"),
+        url(r'^courses/{}/cohorts/topics$'.format(settings.COURSE_KEY_PATTERN),
+            'openedx.core.djangoapps.course_groups.views.cohort_discussion_topics',
+            name='cohort_discussion_topics'),
 
         # Open Ended Notifications
         url(r'^courses/{}/open_ended_notifications$'.format(settings.COURSE_ID_PATTERN),
