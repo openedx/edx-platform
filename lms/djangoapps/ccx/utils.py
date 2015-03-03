@@ -4,14 +4,14 @@ CCX Enrollment operations for use by Coach APIs.
 Does not include any access control, be sure to check access before calling.
 """
 import logging
-from courseware.courses import get_course_about_section
-from courseware.courses import get_course_by_id
+from courseware.courses import get_course_about_section  # pylint: disable=import-error
+from courseware.courses import get_course_by_id  # pylint: disable=import-error
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
-from edxmako.shortcuts import render_to_string
-from microsite_configuration import microsite
+from edxmako.shortcuts import render_to_string  # pylint: disable=import-error
+from microsite_configuration import microsite  # pylint: disable=import-error
 from xmodule.modulestore.django import modulestore
 from xmodule.error_module import ErrorDescriptor
 
@@ -44,7 +44,7 @@ class EmailEnrollmentState(object):
         self.in_ccx = in_ccx
 
     def __repr__(self):
-        return "{}(user={}, member={}, in_ccx={}".format(
+        return "{}(user={}, member={}, in_ccx={})".format(
             self.__class__.__name__,
             self.user,
             self.member,
@@ -52,6 +52,7 @@ class EmailEnrollmentState(object):
         )
 
     def to_dict(self):
+        """ return dict with membership and ccx info """
         return {
             'user': self.user,
             'member': self.member,
@@ -60,6 +61,9 @@ class EmailEnrollmentState(object):
 
 
 def enroll_email(ccx, student_email, auto_enroll=False, email_students=False, email_params=None):
+    """
+    Send email to newly enrolled student
+    """
     if email_params is None:
         email_params = get_email_params(ccx, True)
     previous_state = EmailEnrollmentState(ccx, student_email)
@@ -97,6 +101,9 @@ def enroll_email(ccx, student_email, auto_enroll=False, email_students=False, em
 
 
 def unenroll_email(ccx, student_email, email_students=False, email_params=None):
+    """
+    send email to unenrolled students
+    """
     if email_params is None:
         email_params = get_email_params(ccx, True)
     previous_state = EmailEnrollmentState(ccx, student_email)
@@ -112,8 +119,7 @@ def unenroll_email(ccx, student_email, email_students=False, email_params=None):
             send_mail_to_student(student_email, email_params)
     else:
         if CcxFutureMembership.objects.filter(
-            ccx=ccx, email=student_email
-        ).exists():
+                ccx=ccx, email=student_email).exists():
             CcxFutureMembership.objects.get(
                 ccx=ccx, email=student_email
             ).delete()
@@ -128,6 +134,9 @@ def unenroll_email(ccx, student_email, email_students=False, email_params=None):
 
 
 def get_email_params(ccx, auto_enroll, secure=True):
+    """
+    get parameters for enrollment emails
+    """
     protocol = 'https' if secure else 'http'
     course_id = ccx.course_id
 
@@ -172,6 +181,9 @@ def get_email_params(ccx, auto_enroll, secure=True):
 
 
 def send_mail_to_student(student, param_dict):
+    """
+    Check parameters, set text template and send email to student
+    """
     if 'course' in param_dict:
         param_dict['course_name'] = param_dict['course'].display_name
 
@@ -266,6 +278,7 @@ def get_all_ccx_for_user(user):
         })
     return memberships
 
+
 def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
     """
     Get the relevant set of (CustomCourseForEdX, CcxMembership, Course)
@@ -289,6 +302,6 @@ def get_ccx_membership_triplets(user, course_org_filter, org_filter_out_set):
 
                 yield (ccx, membership, course)
             else:
-                log.error("User {0} enrolled in {2} course {1}".format(
+                log.error("User {0} enrolled in {2} course {1}".format(  # pylint: disable=logging-format-interpolation
                     user.username, ccx.course_id, "broken" if course else "non-existent"
                 ))

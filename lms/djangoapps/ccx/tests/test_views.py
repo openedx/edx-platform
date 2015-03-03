@@ -1,3 +1,6 @@
+"""
+test views
+"""
 import datetime
 import json
 import re
@@ -5,14 +8,14 @@ import pytz
 from mock import patch
 
 from capa.tests.response_xml_factory import StringResponseXMLFactory
-from courseware.field_overrides import OverrideFieldData
-from courseware.tests.factories import StudentModuleFactory
-from courseware.tests.helpers import LoginEnrollmentTestCase
+from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
+from courseware.tests.factories import StudentModuleFactory  # pylint: disable=import-error
+from courseware.tests.helpers import LoginEnrollmentTestCase  # pylint: disable=import-error
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
-from edxmako.shortcuts import render_to_response
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import (
+from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
     CourseEnrollmentFactory,
     UserFactory,
@@ -23,7 +26,6 @@ from xmodule.modulestore.tests.factories import (
     CourseFactory,
     ItemFactory,
 )
-from ccx import ACTIVE_CCX_KEY
 from ..models import (
     CustomCourseForEdX,
     CcxMembership,
@@ -75,29 +77,41 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         chapters = [ItemFactory.create(start=start, parent=course)
                     for _ in xrange(2)]
         sequentials = flatten([
-            [ItemFactory.create(parent=chapter) for _ in xrange(2)]
-            for chapter in chapters]
-        )
+            [
+                ItemFactory.create(parent=chapter) for _ in xrange(2)
+            ] for chapter in chapters
+        ])
         verticals = flatten([
-            [ItemFactory.create(
-                due=due, parent=sequential, graded=True, format='Homework')
-                for _ in xrange(2)]
-            for sequential in sequentials]
-        )
-        blocks = flatten([
-            [ItemFactory.create(parent=vertical) for _ in xrange(2)]
-            for vertical in verticals]
-        )
+            [
+                ItemFactory.create(
+                    due=due, parent=sequential, graded=True, format='Homework'
+                ) for _ in xrange(2)
+            ] for sequential in sequentials
+        ])
+        blocks = flatten([  # pylint: disable=unused-variable
+            [
+                ItemFactory.create(parent=vertical) for _ in xrange(2)
+            ] for vertical in verticals
+        ])
 
     def make_coach(self):
+        """
+        create coach user
+        """
         role = CourseCcxCoachRole(self.course.id)
         role.add_users(self.coach)
 
     def make_ccx(self):
+        """
+        create ccx
+        """
         ccx = CcxFactory(course_id=self.course.id, coach=self.coach)
         return ccx
 
     def get_outbox(self):
+        """
+        get fake outbox
+        """
         from django.core import mail
         return mail.outbox
 
@@ -142,7 +156,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.post(url, {'name': 'New CCX'})
         self.assertEqual(response.status_code, 302)
-        url = response.get('location')
+        url = response.get('location')  # pylint: disable=no-member
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(re.search('id="ccx-schedule"', response.content))
@@ -159,7 +173,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
             'ccx_coach_dashboard',
             kwargs={'course_id': self.course.id.to_deprecated_string()})
         response = self.client.get(url)
-        schedule = json.loads(response.mako_context['schedule'])
+        schedule = json.loads(response.mako_context['schedule'])  # pylint: disable=no-member
         self.assertEqual(len(schedule), 2)
         self.assertEqual(schedule[0]['hidden'], True)
         self.assertEqual(schedule[0]['start'], None)
@@ -231,7 +245,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'enrollment-button': 'Enroll',
-            'student-ids': u','.join([student.email, ]),
+            'student-ids': u','.join([student.email, ]),  # pylint: disable=no-member
             'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
@@ -240,7 +254,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
-        self.assertTrue(student.email in outbox[0].recipients())
+        self.assertTrue(student.email in outbox[0].recipients())  # pylint: disable=no-member
         # a CcxMembership exists for this student
         self.assertTrue(
             CcxMembership.objects.filter(ccx=ccx, student=student).exists()
@@ -264,7 +278,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'enrollment-button': 'Unenroll',
-            'student-ids': u','.join([student.email, ]),
+            'student-ids': u','.join([student.email, ]),  # pylint: disable=no-member
             'email-students': 'Notify-students-by-email',
         }
         response = self.client.post(url, data=data, follow=True)
@@ -273,7 +287,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
         self.assertEqual(len(outbox), 1)
-        self.assertTrue(student.email in outbox[0].recipients())
+        self.assertTrue(student.email in outbox[0].recipients())  # pylint: disable=no-member
         # the membership for this student is gone
         self.assertFalse(
             CcxMembership.objects.filter(ccx=ccx, student=student).exists()
@@ -359,7 +373,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'student-action': 'add',
-            'student-id': u','.join([student.email, ]),
+            'student-id': u','.join([student.email, ]),  # pylint: disable=no-member
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -390,7 +404,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         data = {
             'student-action': 'revoke',
-            'student-id': u','.join([student.email, ]),
+            'student-id': u','.join([student.email, ]),  # pylint: disable=no-member
         }
         response = self.client.post(url, data=data, follow=True)
         self.assertEqual(response.status_code, 200)
@@ -463,14 +477,16 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # just inject the override field storage in this brute force manner.
         OverrideFieldData.provider_classes = None
         for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
-                coach, block._field_data)  # pylint: disable=protected-access
-            block._field_data_cache = {}
+            block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
+                coach, block._field_data)   # pylint: disable=protected-access
+            block._field_data_cache = {}  # pylint: disable=protected-access
             visible_children(block)
 
-        # and after everything is done, clean up by un-doing the change to the
-        # OverrideFieldData object that is done during the wrap method.
         def cleanup_provider_classes():
+            """
+            After everything is done, clean up by un-doing the change to the
+            OverrideFieldData object that is done during the wrap method.
+            """
             OverrideFieldData.provider_classes = None
         self.addCleanup(cleanup_provider_classes)
 
@@ -500,7 +516,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        student_info = response.mako_context['students'][0]
+        student_info = response.mako_context['students'][0]  # pylint: disable=no-member
         self.assertEqual(student_info['grade_summary']['percent'], 0.5)
         self.assertEqual(
             student_info['grade_summary']['grade_breakdown'][0]['percent'],
@@ -535,7 +551,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         self.client.login(username=self.student.username, password="test")
         session = self.client.session
-        session[ACTIVE_CCX_KEY] = self.ccx.id
+        session[ACTIVE_CCX_KEY] = self.ccx.id  # pylint: disable=no-member
         session.save()
         self.client.session.get(ACTIVE_CCX_KEY)
         url = reverse(
@@ -544,7 +560,7 @@ class TestCCXGrades(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        grades = response.mako_context['grade_summary']
+        grades = response.mako_context['grade_summary']  # pylint: disable=no-member
         self.assertEqual(grades['percent'], 0.5)
         self.assertEqual(grades['grade_breakdown'][0]['percent'], 0.5)
         self.assertEqual(len(grades['section_breakdown']), 4)
@@ -574,13 +590,16 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CcxMembershipFactory(ccx=self.ccx, student=self.user, active=active)
 
     def revoke_ccx_registration(self):
-        from ..models import CcxMembership
+        """
+        delete membership
+        """
         membership = CcxMembership.objects.filter(
             ccx=self.ccx, student=self.user
         )
         membership.delete()
 
-    def verify_active_ccx(self, request, id=None):
+    def verify_active_ccx(self, request, id=None):  # pylint: disable=redefined-builtin, invalid-name
+        """verify that we have the correct active ccx"""
         if id:
             id = str(id)
         self.assertEqual(id, request.session.get(ACTIVE_CCX_KEY, None))
@@ -610,7 +629,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         # if the ccx were active, we'd need to pass the ID of the ccx here.
         self.verify_active_ccx(self.client)
 
@@ -623,7 +642,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         self.verify_active_ccx(self.client, self.ccx.id)
 
     def test_enrolled_user_can_select_mooc(self):
@@ -639,7 +658,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         self.verify_active_ccx(self.client)
 
     def test_unenrolled_user_cannot_select_ccx(self):
@@ -650,7 +669,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         # if the ccx were active, we'd need to pass the ID of the ccx here.
         self.verify_active_ccx(self.client)
 
@@ -666,7 +685,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         # we tried to select the ccx but are not registered, so we are switched
         # back to the mooc view
         self.verify_active_ccx(self.client)
@@ -684,7 +703,7 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
         )
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(expected_url))
+        self.assertTrue(response.get('Location', '').endswith(expected_url))  # pylint: disable=no-member
         # the mooc should be active
         self.verify_active_ccx(self.client)
 
@@ -696,11 +715,11 @@ class TestSwitchActiveCCX(ModuleStoreTestCase, LoginEnrollmentTestCase):
             args=[self.course.id.to_deprecated_string(), self.ccx.id]
         )
         # delete the ccx
-        self.ccx.delete()
+        self.ccx.delete()  # pylint: disable=no-member
 
         response = self.client.get(switch_url)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.get('Location', '').endswith(self.target_url))
+        self.assertTrue(response.get('Location', '').endswith(self.target_url))  # pylint: disable=no-member
         # we tried to select the ccx it doesn't exist anymore, so we are
         # switched back to the mooc view
         self.verify_active_ccx(self.client)
@@ -734,6 +753,7 @@ def iter_blocks(course):
     Returns an iterator over all of the blocks in a course.
     """
     def visit(block):
+        """ get child blocks """
         yield block
         for child in block.get_children():
             for descendant in visit(child):  # wish they'd backport yield from
@@ -742,12 +762,15 @@ def iter_blocks(course):
 
 
 def visible_children(block):
+    """
+    Return only visible children
+    """
     block_get_children = block.get_children
 
-    def get_children():
-        def iter_children():
+    def get_children():  # pylint: disable=missing-docstring
+        def iter_children():  # pylint: disable=missing-docstring
             for child in block_get_children():
-                child._field_data_cache = {}
+                child._field_data_cache = {}  # pylint: disable=protected-access
                 if not child.visible_to_staff_only:
                     yield child
         return list(iter_children())

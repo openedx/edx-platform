@@ -1,14 +1,17 @@
-from ccx.models import (
+"""
+test utils
+"""
+from ccx.models import (  # pylint: disable=import-error
     CcxMembership,
     CcxFutureMembership,
 )
-from ccx.tests.factories import (
+from ccx.tests.factories import (  # pylint: disable=import-error
     CcxFactory,
     CcxMembershipFactory,
     CcxFutureMembershipFactory,
 )
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import (
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
     UserFactory,
     CourseEnrollmentFactory,
@@ -53,7 +56,7 @@ class TestEmailEnrollmentState(ModuleStoreTestCase):
     def create_one(self, email=None):
         """Create a single EmailEnrollmentState object and return it
         """
-        from ccx.utils import EmailEnrollmentState
+        from ccx.utils import EmailEnrollmentState  # pylint: disable=import-error
         if email is None:
             email = self.user.email
         return EmailEnrollmentState(self.ccx, email)
@@ -138,17 +141,20 @@ class TestGetEmailParams(ModuleStoreTestCase):
         self.url_keys = [k for k in self.all_keys if 'url' in k]
         self.course_keys = [k for k in self.url_keys if 'course' in k]
 
-    def call_FUT(self, auto_enroll=False, secure=False):
-        from ccx.utils import get_email_params
+    def call_fut(self, auto_enroll=False, secure=False):
+        """
+        call function under test
+        """
+        from ccx.utils import get_email_params  # pylint: disable=import-error
         return get_email_params(self.ccx, auto_enroll, secure)
 
     def test_params_have_expected_keys(self):
-        params = self.call_FUT()
+        params = self.call_fut()
         self.assertFalse(set(params.keys()) - set(self.all_keys))
 
     def test_ccx_id_in_params(self):
         expected_course_id = self.ccx.course_id.to_deprecated_string()
-        params = self.call_FUT()
+        params = self.call_fut()
         self.assertEqual(params['course'], self.ccx)
         for url_key in self.url_keys:
             self.assertTrue('http://' in params[url_key])
@@ -156,17 +162,17 @@ class TestGetEmailParams(ModuleStoreTestCase):
             self.assertTrue(expected_course_id in params[url_key])
 
     def test_security_respected(self):
-        secure = self.call_FUT(secure=True)
+        secure = self.call_fut(secure=True)
         for url_key in self.url_keys:
             self.assertTrue('https://' in secure[url_key])
-        insecure = self.call_FUT(secure=False)
+        insecure = self.call_fut(secure=False)
         for url_key in self.url_keys:
             self.assertTrue('http://' in insecure[url_key])
 
     def test_auto_enroll_passed_correctly(self):
-        not_auto = self.call_FUT(auto_enroll=False)
+        not_auto = self.call_fut(auto_enroll=False)
         self.assertFalse(not_auto['auto_enroll'])
-        auto = self.call_FUT(auto_enroll=True)
+        auto = self.call_fut(auto_enroll=True)
         self.assertTrue(auto['auto_enroll'])
 
 
@@ -234,14 +240,15 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.assertEqual(member, state.member)
         self.assertEqual(user, state.user)
 
-    def call_FUT(
-        self,
-        student_email=None,
-        auto_enroll=False,
-        email_students=False,
-        email_params=None
+    def call_fut(
+            self,
+            student_email=None,
+            auto_enroll=False,
+            email_students=False,
+            email_params=None
     ):
-        from ccx.utils import enroll_email
+        """Call function under test"""
+        from ccx.utils import enroll_email  # pylint: disable=import-error
         if student_email is None:
             student_email = self.user.email
         before, after = enroll_email(
@@ -255,7 +262,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
         test_email = "nobody@nowhere.com"
-        before, after = self.call_FUT(
+        before, after = self.call_fut(
             student_email=test_email, email_students=True
         )
 
@@ -274,7 +281,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.create_user()
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
-        before, after = self.call_FUT(email_students=True)
+        before, after = self.call_fut(email_students=True)
 
         # there should be a membership set for this email address now
         self.check_membership(email=self.user.email)
@@ -291,7 +298,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.register_user_in_ccx()
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
-        before, after = self.call_FUT(email_students=True)
+        before, after = self.call_fut(email_students=True)
 
         # there should be a membership set for this email address now
         self.check_membership(email=self.user.email)
@@ -308,7 +315,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
         test_email = "nobody@nowhere.com"
-        before, after = self.call_FUT(
+        before, after = self.call_fut(
             student_email=test_email, email_students=False
         )
 
@@ -324,7 +331,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.create_user()
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
-        before, after = self.call_FUT(email_students=False)
+        before, after = self.call_fut(email_students=False)
 
         # there should be a membership set for this email address now
         self.check_membership(email=self.user.email)
@@ -339,7 +346,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.register_user_in_ccx()
         # ensure no emails are in the outbox now
         self.assertEqual(self.outbox, [])
-        before, after = self.call_FUT(email_students=False)
+        before, after = self.call_fut(email_students=False)
 
         # there should be a membership set for this email address now
         self.check_membership(email=self.user.email)
@@ -363,6 +370,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         role.add_users(coach)
         self.ccx = CcxFactory(course_id=course.id, coach=coach)
         self.outbox = self.get_outbox()
+        self.email = "nobody@nowhere.com"
 
     def get_outbox(self):
         """Return the django mail outbox"""
@@ -385,7 +393,6 @@ class TestUnenrollEmail(ModuleStoreTestCase):
 
     def make_ccx_future_membership(self):
         """create future registration for email in self.ccx"""
-        self.email = "nobody@nowhere.com"
         CcxFutureMembershipFactory.create(
             ccx=self.ccx, email=self.email
         )
@@ -402,6 +409,9 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertEqual(user, state.user)
 
     def check_membership(self, future=False):
+        """
+        check membership
+        """
         if future:
             membership = CcxFutureMembership.objects.filter(
                 ccx=self.ccx, email=self.email
@@ -412,8 +422,9 @@ class TestUnenrollEmail(ModuleStoreTestCase):
             )
         return membership.exists()
 
-    def call_FUT(self, email_students=False):
-        from ccx.utils import unenroll_email
+    def call_fut(self, email_students=False):
+        """call function under test"""
+        from ccx.utils import unenroll_email  # pylint: disable=import-error
         email = getattr(self, 'user', None) and self.user.email or self.email
         return unenroll_email(self.ccx, email, email_students=email_students)
 
@@ -425,7 +436,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertTrue(self.check_membership(future=True))
         self.assertEqual(self.outbox, [])
         # unenroll the student
-        before, after = self.call_FUT(email_students=True)
+        before, after = self.call_fut(email_students=True)
 
         # assert that membership is now gone
         self.assertFalse(self.check_membership(future=True))
@@ -444,7 +455,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertTrue(self.check_membership())
         self.assertEqual(self.outbox, [])
         # unenroll the student
-        before, after = self.call_FUT(email_students=True)
+        before, after = self.call_fut(email_students=True)
 
         # assert that membership is now gone
         self.assertFalse(self.check_membership())
@@ -464,7 +475,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertTrue(self.check_membership(future=True))
         self.assertEqual(self.outbox, [])
         # unenroll the student
-        before, after = self.call_FUT()
+        before, after = self.call_fut()
 
         # assert that membership is now gone
         self.assertFalse(self.check_membership(future=True))
@@ -482,7 +493,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.assertTrue(self.check_membership())
         self.assertEqual(self.outbox, [])
         # unenroll the student
-        before, after = self.call_FUT()
+        before, after = self.call_fut()
 
         # assert that membership is now gone
         self.assertFalse(self.check_membership())
@@ -516,34 +527,36 @@ class TestUserCCXList(ModuleStoreTestCase):
         CcxMembershipFactory(ccx=self.ccx, student=self.user, active=active)
 
     def get_course_title(self):
-        from courseware.courses import get_course_about_section
+        """Get course title"""
+        from courseware.courses import get_course_about_section  # pylint: disable=import-error
         return get_course_about_section(self.course, 'title')
 
-    def call_FUT(self, user):
-        from ccx.utils import get_all_ccx_for_user
+    def call_fut(self, user):
+        """Call function under test"""
+        from ccx.utils import get_all_ccx_for_user  # pylint: disable=import-error
         return get_all_ccx_for_user(user)
 
     def test_anonymous_sees_no_ccx(self):
-        memberships = self.call_FUT(self.anonymous)
+        memberships = self.call_fut(self.anonymous)
         self.assertEqual(memberships, [])
 
     def test_unenrolled_sees_no_ccx(self):
-        memberships = self.call_FUT(self.user)
+        memberships = self.call_fut(self.user)
         self.assertEqual(memberships, [])
 
     def test_enrolled_inactive_sees_no_ccx(self):
         self.register_user_in_ccx()
-        memberships = self.call_FUT(self.user)
+        memberships = self.call_fut(self.user)
         self.assertEqual(memberships, [])
 
     def test_enrolled_sees_a_ccx(self):
         self.register_user_in_ccx(active=True)
-        memberships = self.call_FUT(self.user)
+        memberships = self.call_fut(self.user)
         self.assertEqual(len(memberships), 1)
 
     def test_data_structure(self):
         self.register_user_in_ccx(active=True)
-        memberships = self.call_FUT(self.user)
+        memberships = self.call_fut(self.user)
         this_membership = memberships[0]
         self.assertTrue(this_membership)
         # structure contains the expected keys

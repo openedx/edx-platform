@@ -26,6 +26,7 @@ class OverrideFieldDataTests(TestCase):
     """
 
     def setUp(self):
+        super(OverrideFieldDataTests, self).setUp()
         OverrideFieldData.provider_classes = None
 
     def tearDown(self):

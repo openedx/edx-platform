@@ -1821,12 +1821,12 @@ def activate_account(request, key):
             # enroll student in any pending CCXs he/she may have if auto_enroll flag is set
             if settings.FEATURES.get('CUSTOM_COURSES_EDX'):
                 from ccx.models import CcxMembership, CcxFutureMembership
-                pfms = CcxFutureMembership.objects.filter(
+                ccxfms = CcxFutureMembership.objects.filter(
                     email=student[0].email
                 )
-                for pfm in pfms:
-                    if pfm.auto_enroll:
-                        CcxMembership.auto_enroll(student[0], pfm)
+                for ccxfm in ccxfms:
+                    if ccxfm.auto_enroll:
+                        CcxMembership.auto_enroll(student[0], ccxfm)
 
         resp = render_to_response(
             "registration/activation_complete.html",

@@ -20,7 +20,6 @@ from abc import ABCMeta, abstractmethod
 from contextlib import contextmanager
 from django.conf import settings
 from xblock.field_data import FieldData
-from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.inheritance import InheritanceMixin
 
 

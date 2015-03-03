@@ -377,7 +377,7 @@ class DiscussionTab(EnrolledOrStaffTab):
 
     def can_display(self, course, settings, is_user_authenticated, is_user_staff, is_user_enrolled):
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
-            from ccx.overrides import get_current_ccx
+            from ccx.overrides import get_current_ccx  # pylint: disable=import-error
             if get_current_ccx():
                 return False
         super_can_display = super(DiscussionTab, self).can_display(
@@ -752,11 +752,16 @@ class CcxCoachTab(CourseTab):
         )
 
     def can_display(self, course, settings, *args, **kw):
+        """
+        Since we don't get the user here, we use a thread local defined in the ccx
+        overrides to get it, then use the course to get the coach role and find out if
+        the user is one.
+        """
         user_is_coach = False
         if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
             from opaque_keys.edx.locations import SlashSeparatedCourseKey
-            from student.roles import CourseCcxCoachRole
-            from ccx.overrides import get_current_request
+            from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+            from ccx.overrides import get_current_request  # pylint: disable=import-error
             course_id = course.id.to_deprecated_string()
             course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
             role = CourseCcxCoachRole(course_key)
@@ -766,7 +771,7 @@ class CcxCoachTab(CourseTab):
         super_can_display = super(CcxCoachTab, self).can_display(
             course, settings, *args, **kw
         )
-        return (user_is_coach and super_can_display)
+        return user_is_coach and super_can_display
 
 
 class CourseTabList(List):

@@ -1,6 +1,9 @@
-from student.models import CourseEnrollment
-from student.roles import CourseCcxCoachRole
-from student.tests.factories import (
+"""
+tests for the models
+"""
+from student.models import CourseEnrollment  # pylint: disable=import-error
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+from student.tests.factories import (  # pylint: disable=import-error
     AdminFactory,
     CourseEnrollmentFactory,
     UserFactory,
@@ -10,7 +13,6 @@ from xmodule.modulestore.tests.factories import CourseFactory
 
 from .factories import (
     CcxFactory,
-    CcxMembershipFactory,
     CcxFutureMembershipFactory,
 )
 from ..models import (
@@ -36,6 +38,9 @@ class TestCcxMembership(ModuleStoreTestCase):
         self.unenrolled_user = UserFactory.create()
 
     def create_future_enrollment(self, user, auto_enroll=True):
+        """
+        utility method to create future enrollment
+        """
         pfm = CcxFutureMembershipFactory.create(
             ccx=self.ccx,
             email=user.email,
@@ -44,24 +49,36 @@ class TestCcxMembership(ModuleStoreTestCase):
         return pfm
 
     def has_course_enrollment(self, user):
+        """
+        utility method to create future enrollment
+        """
         enrollment = CourseEnrollment.objects.filter(
             user=user, course_id=self.course.id
         )
         return enrollment.exists()
 
     def has_ccx_membership(self, user):
+        """
+        verify ccx membership
+        """
         membership = CcxMembership.objects.filter(
             student=user, ccx=self.ccx, active=True
         )
         return membership.exists()
 
     def has_ccx_future_membership(self, user):
+        """
+        verify future ccx membership
+        """
         future_membership = CcxFutureMembership.objects.filter(
             email=user.email, ccx=self.ccx
         )
         return future_membership.exists()
 
-    def call_MUT(self, student, future_membership):
+    def call_mut(self, student, future_membership):
+        """
+        Call the method undser test
+        """
         CcxMembership.auto_enroll(student, future_membership)
 
     def test_ccx_auto_enroll_unregistered_user(self):
@@ -75,7 +92,7 @@ class TestCcxMembership(ModuleStoreTestCase):
         self.assertTrue(self.has_ccx_future_membership(user))
         self.assertFalse(self.has_course_enrollment(user))
         # auto_enroll user
-        self.call_MUT(user, pfm)
+        self.call_mut(user, pfm)
 
         self.assertTrue(self.has_course_enrollment(user))
         self.assertTrue(self.has_ccx_membership(user))
@@ -89,7 +106,7 @@ class TestCcxMembership(ModuleStoreTestCase):
         self.assertTrue(self.has_ccx_future_membership(user))
         self.assertTrue(self.has_course_enrollment(user))
 
-        self.call_MUT(user, pfm)
+        self.call_mut(user, pfm)
 
         self.assertTrue(self.has_course_enrollment(user))
         self.assertTrue(self.has_ccx_membership(user))
@@ -103,7 +120,7 @@ class TestCcxMembership(ModuleStoreTestCase):
         self.assertTrue(self.has_ccx_future_membership(user))
         self.assertFalse(self.has_course_enrollment(user))
 
-        self.assertRaises(ValueError, self.call_MUT, user, pfm)
+        self.assertRaises(ValueError, self.call_mut, user, pfm)
 
         self.assertFalse(self.has_course_enrollment(user))
         self.assertFalse(self.has_ccx_membership(user))

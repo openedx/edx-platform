@@ -720,7 +720,7 @@ def modify_access(request, course_id):
     rolename = request.GET.get('rolename')
     action = request.GET.get('action')
 
-    if not rolename in ROLES:
+    if rolename not in ROLES:
         error = strip_tags("unknown rolename '{}'".format(rolename))
         log.error(error)
         return HttpResponseBadRequest(error)
@@ -783,7 +783,7 @@ def list_course_role_members(request, course_id):
 
     rolename = request.GET.get('rolename')
 
-    if not rolename in ROLES:
+    if rolename not in ROLES:
         return HttpResponseBadRequest()
 
     def extract_user_info(user):

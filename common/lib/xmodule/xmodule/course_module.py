@@ -1225,25 +1225,17 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         all_descriptors = []
         graded_sections = {}
 
-        def yield_descendents(module):
-            for child in module.get_children():
+        def yield_descriptor_descendents(module_descriptor):
+            for child in module_descriptor.get_children():
                 yield child
-                for module_descriptor in yield_descendents(child):
+                for module_descriptor in yield_descriptor_descendents(child):
                     yield module_descriptor
 
-<<<<<<< HEAD
         for chapter in self.get_children():
             for section in chapter.get_children():
                 if section.graded:
                     xmoduledescriptors = list(yield_descriptor_descendents(section))
                     xmoduledescriptors.append(section)
-=======
-        for c in module.get_children():
-            for s in c.get_children():
-                if s.graded:
-                    xmoduledescriptors = list(yield_descendents(s))
-                    xmoduledescriptors.append(s)
->>>>>>> Hide course blocks not in the CCX from view for coaches and students
 
                     # The xmoduledescriptors included here are only the ones that have scores.
                     section_description = {

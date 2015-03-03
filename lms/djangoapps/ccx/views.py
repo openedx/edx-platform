@@ -22,22 +22,23 @@ from django.core.validators import validate_email
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import cache_control
-from django_future.csrf import ensure_csrf_cookie
+from django_future.csrf import ensure_csrf_cookie  # pylint: disable=import-error
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from courseware.courses import get_course_by_id
-from courseware.field_overrides import disable_overrides
-from courseware.grades import iterate_grades_for
-from courseware.model_data import FieldDataCache
-from courseware.module_render import get_module_for_descriptor
-from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.keys import CourseKey
-from student.roles import CourseCcxCoachRole
+from courseware.courses import get_course_by_id  # pylint: disable=import-error
 
-from instructor.offline_gradecalc import student_grades
-from instructor.views.api import _split_input_list
-from instructor.views.tools import get_student_from_identifier
+from courseware.field_overrides import disable_overrides  # pylint: disable=import-error
+from courseware.grades import iterate_grades_for  # pylint: disable=import-error
+from courseware.model_data import FieldDataCache  # pylint: disable=import-error
+from courseware.module_render import get_module_for_descriptor  # pylint: disable=import-error
+from edxmako.shortcuts import render_to_response  # pylint: disable=import-error
+from opaque_keys.edx.keys import CourseKey
+from student.roles import CourseCcxCoachRole  # pylint: disable=import-error
+
+from instructor.offline_gradecalc import student_grades  # pylint: disable=import-error
+from instructor.views.api import _split_input_list  # pylint: disable=import-error
+from instructor.views.tools import get_student_from_identifier  # pylint: disable=import-error
 
 from .models import CustomCourseForEdX, CcxMembership
 from .overrides import (
@@ -50,7 +51,7 @@ from .utils import (
     enroll_email,
     unenroll_email,
 )
-from ccx import ACTIVE_CCX_KEY
+from ccx import ACTIVE_CCX_KEY  # pylint: disable=import-error
 
 
 log = logging.getLogger(__name__)
@@ -181,7 +182,7 @@ def save_ccx(request, course):
                 clear_override_for_ccx(ccx, block, 'due')
 
             if not unit['hidden'] and block.graded:
-               graded[block.format] = graded.get(block.format, 0) + 1
+                graded[block.format] = graded.get(block.format, 0) + 1
 
             children = unit.get('children', None)
             if children:
@@ -232,7 +233,9 @@ def set_grading_policy(request, course):
 
 
 def validate_date(year, month, day, hour, minute):
-    # avoid corrupting db if bad dates come in
+    """
+    avoid corrupting db if bad dates come in
+    """
     valid = True
     if year < 0:
         valid = False
@@ -320,6 +323,9 @@ def get_ccx_schedule(course, ccx):
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @coach_dashboard
 def ccx_schedule(request, course):
+    """
+    get json representation of ccx schedule
+    """
     ccx = get_ccx_for_coach(course, request.user)
     schedule = get_ccx_schedule(course, ccx)
     json_schedule = json.dumps(schedule, indent=4)
@@ -512,7 +518,7 @@ def switch_active_ccx(request, course_id, ccx_id=None):
             requested_ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
             assert unicode(requested_ccx.course_id) == course_id
             if not CcxMembership.objects.filter(
-                ccx=requested_ccx, student=request.user, active=True
+                    ccx=requested_ccx, student=request.user, active=True
             ).exists():
                 ccx_id = None
         except CustomCourseForEdX.DoesNotExist:

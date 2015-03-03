@@ -1,8 +1,11 @@
+"""
+Models for the custom course feature
+"""
 from django.contrib.auth.models import User
 from django.db import models
 
-from student.models import CourseEnrollment, AlreadyEnrolledError
-from xmodule_django.models import CourseKeyField, LocationKeyField
+from student.models import CourseEnrollment, AlreadyEnrolledError  # pylint: disable=import-error
+from xmodule_django.models import CourseKeyField, LocationKeyField  # pylint: disable=import-error
 
 
 class CustomCourseForEdX(models.Model):
@@ -45,6 +48,9 @@ class CcxMembership(models.Model):
 
     @classmethod
     def memberships_for_user(cls, user, active=True):
+        """
+        active memberships for a user
+        """
         return cls.objects.filter(student=user, active__exact=active)
 
 
@@ -65,7 +71,7 @@ class CcxFieldOverride(models.Model):
     location = LocationKeyField(max_length=255, db_index=True)
     field = models.CharField(max_length=255)
 
-    class Meta:
+    class Meta:  # pylint: disable=missing-docstring,old-style-class
         unique_together = (('ccx', 'location', 'field'),)
 
     value = models.TextField(default='null')

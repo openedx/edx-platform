@@ -1,10 +1,13 @@
+"""
+tests for overrides
+"""
 import datetime
 import mock
 import pytz
 
-from courseware.field_overrides import OverrideFieldData
+from courseware.field_overrides import OverrideFieldData  # pylint: disable=import-error
 from django.test.utils import override_settings
-from student.tests.factories import AdminFactory
+from student.tests.factories import AdminFactory  # pylint: disable=import-error
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
@@ -12,6 +15,7 @@ from ..models import CustomCourseForEdX
 from ..overrides import override_field_for_ccx
 
 from .test_views import flatten, iter_blocks
+
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
@@ -39,7 +43,7 @@ class TestFieldOverrides(ModuleStoreTestCase):
         verticals = flatten([
             [ItemFactory.create(due=due, parent=sequential) for _ in xrange(2)]
             for sequential in sequentials])
-        blocks = flatten([
+        blocks = flatten([  # pylint: disable=unused-variable
             [ItemFactory.create(parent=vertical) for _ in xrange(2)]
             for vertical in verticals])
 
@@ -59,12 +63,14 @@ class TestFieldOverrides(ModuleStoreTestCase):
         # just inject the override field storage in this brute force manner.
         OverrideFieldData.provider_classes = None
         for block in iter_blocks(course):
-            block._field_data = OverrideFieldData.wrap(  # pylint: disable=protected-access
-                AdminFactory.create(), block._field_data)  # pylint: disable=protected-access
+            block._field_data = OverrideFieldData.wrap(   # pylint: disable=protected-access
+                AdminFactory.create(), block._field_data)   # pylint: disable=protected-access
 
-        # and after everything is done, clean up by un-doing the change to the
-        # OverrideFieldData object that is done during the wrap method.
         def cleanup_provider_classes():
+            """
+            After everything is done, clean up by un-doing the change to the
+            OverrideFieldData object that is done during the wrap method.
+            """
             OverrideFieldData.provider_classes = None
         self.addCleanup(cleanup_provider_classes)
 

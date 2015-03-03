@@ -25,11 +25,11 @@ def get_override_for_user(user, block, name, default=None):
     overridden for the given user, returns `default`.
     """
     if not hasattr(block, '_student_overrides'):
-        block._student_overrides = {}
-    overrides = block._student_overrides.get(user.id)
+        block._student_overrides = {}  # pylint: disable=protected-access
+    overrides = block._student_overrides.get(user.id)  # pylint: disable=protected-access
     if overrides is None:
         overrides = _get_overrides_for_user(user, block)
-        block._student_overrides[user.id] = overrides
+        block._student_overrides[user.id] = overrides  # pylint: disable=protected-access
     return overrides.get(name, default)
 
 

@@ -20,7 +20,7 @@ from django.dispatch import receiver
 
 from model_utils.models import TimeStampedModel
 
-from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
+from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField  # pylint: disable=import-error
 
 
 class StudentModule(models.Model):
@@ -37,8 +37,7 @@ class StudentModule(models.Model):
                     ('course', 'course'),
                     ('chapter', 'Section'),
                     ('sequential', 'Subsection'),
-                    ('library_content', 'Library Content'),
-                    )
+                    ('library_content', 'Library Content'))
     ## These three are the key for the object
     module_type = models.CharField(max_length=32, choices=MODULE_TYPES, default='problem', db_index=True)
 
@@ -88,7 +87,7 @@ class StudentModule(models.Model):
         return 'StudentModule<%r>' % ({
             'course_id': self.course_id,
             'module_type': self.module_type,
-            'student': self.student.username,
+            'student': self.student.username,  # pylint: disable=no-member
             'module_state_key': self.module_state_key,
             'state': str(self.state)[:20],
         },)
@@ -244,7 +243,7 @@ class StudentFieldOverride(TimeStampedModel):
     location = LocationKeyField(max_length=255, db_index=True)
     student = models.ForeignKey(User, db_index=True)
 
-    class Meta:   # pylint: disable=missing-docstring
+    class Meta(object):   # pylint: disable=missing-docstring
         unique_together = (('course_id', 'field', 'location', 'student'),)
 
     field = models.CharField(max_length=255)
