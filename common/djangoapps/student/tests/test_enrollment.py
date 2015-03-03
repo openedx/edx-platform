@@ -103,7 +103,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
 
     @patch.dict(settings.FEATURES, {'ENABLE_MKTG_EMAIL_OPT_IN': True})
-    @patch('openedx.core.djangoapps.user_api.api.profile.update_email_opt_in')
+    @patch('openedx.core.djangoapps.user_api.preferences.api.update_email_opt_in')
     @ddt.data(
         ([], 'true'),
         ([], 'false'),

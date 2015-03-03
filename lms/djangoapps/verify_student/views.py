@@ -29,7 +29,7 @@ from django.core.mail import send_mail
 
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountValidationError
+from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -734,7 +734,7 @@ def submit_photos_for_verification(request):
     if request.POST.get('full_name'):
         try:
             update_account_settings(request.user, {"name": request.POST.get('full_name')})
-        except AccountUserNotFound:
+        except UserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountValidationError:
             msg = _(

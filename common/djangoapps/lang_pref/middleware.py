@@ -2,7 +2,7 @@
 Middleware for Language Preferences
 """
 
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 from lang_pref import LANGUAGE_KEY
 
 
@@ -20,6 +20,6 @@ class LanguagePreferenceMiddleware(object):
         no language set on the session (i.e. from dark language overrides), use the user's preference.
         """
         if request.user.is_authenticated() and 'django_language' not in request.session:
-            user_pref = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+            user_pref = get_user_preference(request.user, LANGUAGE_KEY)
             if user_pref:
                 request.session['django_language'] = user_pref

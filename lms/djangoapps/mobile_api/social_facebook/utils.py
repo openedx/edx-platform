@@ -5,10 +5,12 @@ import json
 import urllib2
 import facebook
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
 from rest_framework.response import Response
 from social.apps.django_app.default.models import UserSocialAuth
-from openedx.core.djangoapps.user_api.api.profile import preference_info
+from openedx.core.djangoapps.user_api.models import UserPreference
+from student.models import User
 
 
 # TODO
@@ -64,5 +66,11 @@ def share_with_facebook_friends(friend):
     """
     Return true if the user's share_with_facebook_friends preference is set to true.
     """
-    share_fb_friends_settings = preference_info(friend['edX_username'])
-    return share_fb_friends_settings.get('share_with_facebook_friends', None) == 'True'
+
+    # Calling UserPreference directly because the requesting user may be different (and not is_staff).
+    try:
+        existing_user = User.objects.get(username=friend['edX_username'])
+    except ObjectDoesNotExist:
+        return False
+
+    return UserPreference.get_value(existing_user, 'share_with_facebook_friends') == 'True'

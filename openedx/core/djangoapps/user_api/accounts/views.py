@@ -7,12 +7,10 @@ https://openedx.atlassian.net/wiki/display/TNL/User+API
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
+from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from rest_framework import permissions
 
-from openedx.core.djangoapps.user_api.api.account import (
-    AccountUserNotFound, AccountUpdateError, AccountNotAuthorized, AccountValidationError
-)
+from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
 
@@ -93,9 +91,9 @@ class AccountView(APIView):
             If the update could not be completed due to failure at the time of update, this method returns a 400 with
             specific errors in the returned JSON.
 
-            If the updated is successful, a 204 status is returned with no additional content.
+            If the update is successful, a 204 status is returned with no additional content.
     """
-    authentication_classes = (OAuth2Authentication, SessionAuthentication)
+    authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
@@ -105,7 +103,7 @@ class AccountView(APIView):
         """
         try:
             account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
-        except AccountUserNotFound:
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
@@ -120,7 +118,7 @@ class AccountView(APIView):
         """
         try:
             update_account_settings(request.user, request.DATA, username=username)
-        except (AccountUserNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:
             return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)

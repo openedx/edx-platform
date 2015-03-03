@@ -3,7 +3,7 @@ from django.test.client import RequestFactory
 from django.contrib.sessions.middleware import SessionMiddleware
 
 from lang_pref.middleware import LanguagePreferenceMiddleware
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from lang_pref import LANGUAGE_KEY
 from student.tests.factories import UserFactory
 
@@ -28,7 +28,7 @@ class TestUserPreferenceMiddleware(TestCase):
 
     def test_language_in_user_prefs(self):
         # language set in the user preferences and not the session
-        UserPreference.set_preference(self.user, LANGUAGE_KEY, 'eo')
+        set_user_preference(self.user, LANGUAGE_KEY, 'eo')
         self.middleware.process_request(self.request)
         self.assertEquals(self.request.session['django_language'], 'eo')
 
@@ -36,7 +36,7 @@ class TestUserPreferenceMiddleware(TestCase):
         # language set in both the user preferences and session,
         # session should get precedence
         self.request.session['django_language'] = 'en'
-        UserPreference.set_preference(self.user, LANGUAGE_KEY, 'eo')
+        set_user_preference(self.user, LANGUAGE_KEY, 'eo')
         self.middleware.process_request(self.request)
 
         self.assertEquals(self.request.session['django_language'], 'en')

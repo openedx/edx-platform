@@ -4,7 +4,7 @@ Test the user course tag API.
 from django.test import TestCase
 
 from student.tests.factories import UserFactory
-from openedx.core.djangoapps.user_api.api import course_tag as course_tag_api
+from openedx.core.djangoapps.user_api.course_tag import api as course_tag_api
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 

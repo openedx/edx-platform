@@ -45,9 +45,20 @@ def intercept_errors(api_error, ignore_errors=None):
             try:
                 return func(*args, **kwargs)
             except Exception as ex:
-                # Raise the original exception if it's in our list of "ignored" errors
+                # Raise and log the original exception if it's in our list of "ignored" errors
                 for ignored in ignore_errors or []:
                     if isinstance(ex, ignored):
+                        msg = (
+                            u"A handled error occurred when calling '{func_name}' "
+                            u"with arguments '{args}' and keyword arguments '{kwargs}': "
+                            u"{exception}"
+                        ).format(
+                            func_name=func.func_name,
+                            args=args,
+                            kwargs=kwargs,
+                            exception=repr(ex)
+                        )
+                        LOGGER.warning(msg)
                         raise
 
                 # Otherwise, log the error and raise the API-specific error
