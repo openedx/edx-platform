@@ -361,7 +361,7 @@ class XModuleMixin(XBlockMixin):
         return result
 
     def has_children_at_depth(self, depth):
-        """
+        r"""
         Returns true if self has children at the given depth. depth==0 returns
         false if self is a leaf, true otherwise.
 
@@ -384,7 +384,7 @@ class XModuleMixin(XBlockMixin):
             return any(child.has_children_at_depth(depth - 1) for child in self.get_children())
 
     def get_content_titles(self):
-        """
+        r"""
         Returns list of content titles for all of self's children.
 
                          SEQUENCE
