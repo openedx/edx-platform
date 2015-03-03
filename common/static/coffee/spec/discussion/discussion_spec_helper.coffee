@@ -586,6 +586,7 @@ browser and pasting the output.  When that file changes, this one should be rege
 </script>
 
 <script aria-hidden="true" type="text/template" id="post-user-display-template">
+  <span class="username-wrapper">
     <% if (username) { %>
     <a href="<%- user_url %>" class="username"><%- username %></a>
         <% if (is_community_ta) { %>
@@ -596,5 +597,6 @@ browser and pasting the output.  When that file changes, this one should be rege
     <% } else { %>
     anonymous
     <% } %>
+  </span>
 </script>
 """)
