@@ -40,6 +40,7 @@ class SettingsMilestonesTest(StudioCourseTest):
 
         self.assertTrue(self.settings_detail.pre_requisite_course_options)
 
+    @flaky  # TODO fix this, see SOL-449
     def test_prerequisite_course_save_successfully(self):
         """
          Scenario: Selecting course from Pre-Requisite course drop down save the selected course as pre-requisite
