@@ -32,6 +32,7 @@ class _CcxContext(threading.local):
     keeps track of the CCX currently set as the context.
     """
     ccx = None
+    request = None
 
 
 _CCX_CONTEXT = _CcxContext()
@@ -59,6 +60,10 @@ def get_current_ccx():
     if ccx:
         return ccx
 
+
+def get_current_request():
+    request = _CCX_CONTEXT.request
+    return request
 
 def get_override_for_ccx(ccx, block, name, default=None):
     """
@@ -151,9 +156,12 @@ class CcxMiddleware(object):
                 _CCX_CONTEXT.ccx = None
                 request.session.pop(ACTIVE_CCX_KEY)
 
+        _CCX_CONTEXT.request = request
+
     def process_response(self, request, response):
         """
         Clean up afterwards.
         """
         _CCX_CONTEXT.ccx = None
+        _CCX_CONTEXT.request = None
         return response

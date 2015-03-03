@@ -752,12 +752,21 @@ class CcxCoachTab(CourseTab):
         )
 
     def can_display(self, course, settings, *args, **kw):
-        # TODO Check that user actually has 'ccx_coach' role on course
-        #      this is difficult to do because the user isn't passed in.
-        #      We need either a hack or an architectural realignment.
-        return (
-            settings.FEATURES.get('CUSTOM_COURSES_EDX', False) and
-            super(CcxCoachTab, self).can_display(course, settings, *args, **kw))
+        user_is_coach = False
+        if settings.FEATURES.get('CUSTOM_COURSES_EDX', False):
+            from opaque_keys.edx.locations import SlashSeparatedCourseKey
+            from student.roles import CourseCcxCoachRole
+            from ccx.overrides import get_current_request
+            course_id = course.id.to_deprecated_string()
+            course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+            role = CourseCcxCoachRole(course_key)
+            request = get_current_request()
+            if request is not None:
+                user_is_coach = role.has_user(request.user)
+        super_can_display = super(CcxCoachTab, self).can_display(
+            course, settings, *args, **kw
+        )
+        return (user_is_coach and super_can_display)
 
 
 class CourseTabList(List):
