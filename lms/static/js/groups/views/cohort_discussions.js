@@ -122,9 +122,9 @@ var edx = edx || {};
             self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
             fieldData = {
                 content_specific_discussions: true,
-                cohorted_discussion_ids: self.cohortedDiscussionTopics,
-                always_cohort_inline_discussions:self.$('.check-all-inline-discussions').prop('checked')
+                cohorted_discussion_ids: self.cohortedDiscussionTopics
             };
+            this.model.set({always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')});
             self.saveForm(fieldData, self.$('.inline-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
@@ -183,19 +183,13 @@ var edx = edx || {};
                 });
             return saveOperation.promise();
         },
-        showMessage: function (message, element, type) {
-            this.showNotification(
-                {type: type || 'confirmation', title: message},
-                element
-            );
-        },
-        showNotification: function (options, $beforeElement) {
-            var model = new NotificationModel(options);
+        showMessage: function (message, $element, type) {
+            var model = new NotificationModel({type: type || 'confirmation', title: message});
             this.removeNotification();
             this.notification = new NotificationView({
                 model: model
             });
-            $beforeElement.before(this.notification.$el);
+            $element.before(this.notification.$el);
             this.notification.render();
         },
         removeNotification: function () {
