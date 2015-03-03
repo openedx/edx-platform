@@ -1404,10 +1404,19 @@ class TestFilteredChildren(ModuleStoreTestCase):
         return key in self.children_for_user[user]
 
     def assertBoundChildren(self, block, user):
+        """
+        Ensure the bound children are indeed children.
+        """
         self.assertChildren(block, self.children_for_user[user])
 
     def assertUnboundChildren(self, block):
+        """
+        Ensure unbound children are indeed children.
+        """
         self.assertChildren(block, self.all_children)
 
     def assertChildren(self, block, child_usage_ids):
+        """
+        Used to assert that sets of children are equivalent.
+        """
         self.assertEquals(set(child_usage_ids), set(child.scope_ids.usage_id for child in block.get_children()))
