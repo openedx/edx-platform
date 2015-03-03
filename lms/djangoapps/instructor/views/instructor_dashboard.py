@@ -328,6 +328,7 @@ def _section_data_download(course, access):
         'list_report_downloads_url': reverse('list_report_downloads', kwargs={'course_id': course_key.to_deprecated_string()}),
         'calculate_grades_csv_url': reverse('calculate_grades_csv', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_student_responses_url': reverse('get_student_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'get_student_forums_usage_url': reverse('get_student_forums_usage', kwargs={'course_id': unicode(course_key)}),
         'get_ora2_responses_url': reverse('get_ora2_responses', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_course_forums_usage_url': reverse('get_course_forums_usage', kwargs={'course_id': course_key.to_deprecated_string()}),
     }

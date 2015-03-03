@@ -17,13 +17,14 @@ from instructor_task.api import (
     submit_delete_problem_state_for_all_students,
     submit_bulk_course_email,
     submit_ora2_request_task,
+    submit_student_forums_usage_task,
     submit_course_forums_usage_task,
     submit_calculate_students_features_csv,
 )
 
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import InstructorTask, PROGRESS
-from instructor_task.tasks import get_ora2_responses, get_course_forums_usage
+from instructor_task.tasks import get_ora2_responses, get_course_forums_usage, get_student_forums_usage
 from instructor_task.tests.test_base import (
     InstructorTaskTestCase,
     InstructorTaskCourseTestCase,
@@ -227,3 +228,12 @@ class InstructorTaskCourseSubmitTest(TestReportMixin, InstructorTaskCourseTestCa
             submit_course_forums_usage_task(request, self.course.id)
 
             mock_submit_task.assert_called_once_with(request, 'course_forums', get_course_forums_usage, self.course.id, {}, '')
+
+    def test_submit_student_forums_usage_task(self):
+        request = self.create_task_request(self.instructor)
+
+        with patch('instructor_task.api.submit_task') as mock_submit_task:
+            mock_submit_task.return_value = MagicMock()
+            submit_student_forums_usage_task(request, self.course.id)
+
+            mock_submit_task.assert_called_once_with(request, 'student_forums', get_student_forums_usage, self.course.id, {}, '')
