@@ -333,17 +333,32 @@ class XQueueCertInterface(object):
                     new_status = status.generating
                     cert.status = new_status
                     cert.save()
-                    self._send_to_xqueue(contents, key)
 
-                    LOGGER.info(
-                        (
-                            u"The certificate status has been set to '%s'.  "
-                            u"Sent a certificate grading task to the XQueue "
-                            u"with the key '%s'. "
-                        ),
-                        key,
-                        new_status
-                    )
+                    try:
+                        self._send_to_xqueue(contents, key)
+                    except XQueueAddToQueueError as exc:
+                        new_status = ExampleCertificate.STATUS_ERROR
+                        cert.status = new_status
+                        cert.error_reason = unicode(exc)
+                        cert.save()
+                        LOGGER.critical(
+                            (
+                                u"Could not add certificate task to XQueue.  "
+                                u"The course was '%s' and the student was '%s'."
+                                u"The certificate task status has been marked as 'error' "
+                                u"and can be re-submitted with a management command."
+                            ), student.id, course_id
+                        )
+                    else:
+                        LOGGER.info(
+                            (
+                                u"The certificate status has been set to '%s'.  "
+                                u"Sent a certificate grading task to the XQueue "
+                                u"with the key '%s'. "
+                            ),
+                            key,
+                            new_status
+                        )
             else:
                 new_status = status.notpassing
                 cert.status = new_status
@@ -410,10 +425,18 @@ class XQueueCertInterface(object):
                 task_identifier=example_cert.uuid,
                 callback_url_path=callback_url_path
             )
+            LOGGER.info(u"Started generating example certificates for course '%s'.", example_cert.course_key)
         except XQueueAddToQueueError as exc:
             example_cert.update_status(
                 ExampleCertificate.STATUS_ERROR,
                 error_reason=unicode(exc)
+            )
+            LOGGER.critical(
+                (
+                    u"Could not add example certificate with uuid '%s' to XQueue.  "
+                    u"The exception was %s.  "
+                    u"The example certificate has been marked with status 'error'."
+                ), example_cert.uuid, unicode(exc)
             )
 
     def _send_to_xqueue(self, contents, key, task_identifier=None, callback_url_path='/update_certificate'):
