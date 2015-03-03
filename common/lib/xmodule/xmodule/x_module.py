@@ -625,6 +625,14 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
         self._loaded_children = None
         self.runtime.xmodule_instance = self
 
+    @property
+    def runtime(self):
+        return CombinedSystem(self._runtime, self.descriptor._runtime)
+
+    @runtime.setter
+    def runtime(self, value):
+        self._runtime = value
+
     def __unicode__(self):
         return u'<x_module(id={0})>'.format(self.id)
 
@@ -664,26 +672,6 @@ class XModule(XModuleMixin, HTMLSnippet, XBlock):  # pylint: disable=abstract-me
 
         response_data = self.handle_ajax(suffix, request_post)
         return Response(response_data, content_type='application/json')
-
-    def get_children(self):
-        """
-        Return module instances for all the children of this module.
-        """
-        if self._loaded_children is None:
-            child_descriptors = self.get_child_descriptors()
-
-            # This deliberately uses system.get_module, rather than runtime.get_block,
-            # because we're looking at XModule children, rather than XModuleDescriptor children.
-            # That means it can use the deprecated XModule apis, rather than future XBlock apis
-
-            # TODO: Once we're in a system where this returns a mix of XModuleDescriptors
-            # and XBlocks, we're likely to have to change this more
-            children = [self.system.get_module(descriptor) for descriptor in child_descriptors]
-            # get_module returns None if the current user doesn't have access
-            # to the location.
-            self._loaded_children = [c for c in children if c is not None]
-
-        return self._loaded_children
 
     def get_child_descriptors(self):
         """
