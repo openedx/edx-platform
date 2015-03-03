@@ -62,7 +62,6 @@ class FieldDataCache(object):
         asides: The list of aside types to load, or None to prefetch no asides.
         '''
         self.cache = {}
-        self.descriptors = descriptors
         self.select_for_update = select_for_update
 
         if asides is None:
@@ -74,24 +73,27 @@ class FieldDataCache(object):
         self.course_id = course_id
         self.user = user
 
-        if user.is_authenticated():
-            for scope, fields in self._fields_to_cache().items():
-                for field_object in self._retrieve_fields(scope, fields):
+        self.add_descriptors_to_cache(descriptors)
+
+    def add_descriptors_to_cache(self, descriptors):
+        """
+        Add all `descriptors` to this FieldDataCache.
+        """
+        if self.user.is_authenticated():
+            for scope, fields in self._fields_to_cache(descriptors).items():
+                for field_object in self._retrieve_fields(scope, fields, descriptors):
                     self.cache[self._cache_key_from_field_object(scope, field_object)] = field_object
 
-    @classmethod
-    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
-                                         descriptor_filter=lambda descriptor: True,
-                                         select_for_update=False, asides=None):
+    def add_descriptor_descendents(self, descriptor, depth=None, descriptor_filter=lambda descriptor: True):
         """
-        course_id: the course in the context of which we want StudentModules.
-        user: the django user for whom to load modules.
-        descriptor: An XModuleDescriptor
-        depth is the number of levels of descendent modules to load StudentModules for, in addition to
-            the supplied descriptor. If depth is None, load all descendent StudentModules
-        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
-            should be cached
-        select_for_update: Flag indicating whether the rows should be locked until end of transaction
+        Add all descendents of `descriptor` to this FieldDataCache.
+
+        Arguments:
+            descriptor: An XModuleDescriptor
+            depth is the number of levels of descendent modules to load StudentModules for, in addition to
+                the supplied descriptor. If depth is None, load all descendent StudentModules
+            descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
+                should be cached
         """
 
         def get_child_descriptors(descriptor, depth, descriptor_filter):
@@ -120,7 +122,25 @@ class FieldDataCache(object):
         with modulestore().bulk_operations(descriptor.location.course_key):
             descriptors = get_child_descriptors(descriptor, depth, descriptor_filter)
 
-        return FieldDataCache(descriptors, course_id, user, select_for_update, asides=asides)
+        self.add_descriptors_to_cache(descriptors)
+
+    @classmethod
+    def cache_for_descriptor_descendents(cls, course_id, user, descriptor, depth=None,
+                                         descriptor_filter=lambda descriptor: True,
+                                         select_for_update=False, asides=None):
+        """
+        course_id: the course in the context of which we want StudentModules.
+        user: the django user for whom to load modules.
+        descriptor: An XModuleDescriptor
+        depth is the number of levels of descendent modules to load StudentModules for, in addition to
+            the supplied descriptor. If depth is None, load all descendent StudentModules
+        descriptor_filter is a function that accepts a descriptor and return wether the StudentModule
+            should be cached
+        select_for_update: Flag indicating whether the rows should be locked until end of transaction
+        """
+        cache = FieldDataCache([], course_id, user, select_for_update, asides=asides)
+        cache.add_descriptor_descendents(descriptor, depth, descriptor_filter)
+        return cache
 
     def _query(self, model_class, **kwargs):
         """
@@ -147,14 +167,13 @@ class FieldDataCache(object):
         )
         return res
 
-    @property
-    def _all_usage_ids(self):
+    def _all_usage_ids(self, descriptors):
         """
         Return a set of all usage_ids for the descriptors that this FieldDataCache is caching
         against, and well as all asides for those descriptors.
         """
         usage_ids = set()
-        for descriptor in self.descriptors:
+        for descriptor in descriptors:
             usage_ids.add(descriptor.scope_ids.usage_id)
 
             for aside_type in self.asides:
@@ -162,13 +181,12 @@ class FieldDataCache(object):
 
         return usage_ids
 
-    @property
-    def _all_block_types(self):
+    def _all_block_types(self, descriptors):
         """
         Return a set of all block_types that are cached by this FieldDataCache.
         """
         block_types = set()
-        for descriptor in self.descriptors:
+        for descriptor in descriptors:
             block_types.add(BlockTypeKeyV1(descriptor.entry_point, descriptor.scope_ids.block_type))
 
         for aside_type in self.asides:
@@ -176,7 +194,7 @@ class FieldDataCache(object):
 
         return block_types
 
-    def _retrieve_fields(self, scope, fields):
+    def _retrieve_fields(self, scope, fields, descriptors):
         """
         Queries the database for all of the fields in the specified scope
         """
@@ -184,7 +202,7 @@ class FieldDataCache(object):
             return self._chunked_query(
                 StudentModule,
                 'module_state_key__in',
-                self._all_usage_ids,
+                self._all_usage_ids(descriptors),
                 course_id=self.course_id,
                 student=self.user.pk,
             )
@@ -192,14 +210,14 @@ class FieldDataCache(object):
             return self._chunked_query(
                 XModuleUserStateSummaryField,
                 'usage_id__in',
-                self._all_usage_ids,
+                self._all_usage_ids(descriptors),
                 field_name__in=set(field.name for field in fields),
             )
         elif scope == Scope.preferences:
             return self._chunked_query(
                 XModuleStudentPrefsField,
                 'module_type__in',
-                self._all_block_types,
+                self._all_block_types(descriptors),
                 student=self.user.pk,
                 field_name__in=set(field.name for field in fields),
             )
@@ -212,12 +230,12 @@ class FieldDataCache(object):
         else:
             return []
 
-    def _fields_to_cache(self):
+    def _fields_to_cache(self, descriptors):
         """
         Returns a map of scopes to fields in that scope that should be cached
         """
         scope_map = defaultdict(set)
-        for descriptor in self.descriptors:
+        for descriptor in descriptors:
             for field in descriptor.fields.values():
                 scope_map[field.scope].add(field)
         return scope_map

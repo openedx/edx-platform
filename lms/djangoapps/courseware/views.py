@@ -489,8 +489,8 @@ def _index_bulk_op(request, course_key, chapter, section, position):
 
             # Load all descendants of the section, because we're going to display its
             # html, which in general will need all of its children
-            section_field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                course_key, user, section_descriptor, depth=None, asides=XBlockAsidesConfig.possible_asides()
+            field_data_cache.add_descriptor_descendents(
+                section_descriptor, depth=None
             )
 
             # Verify that position a string is in fact an int
@@ -504,7 +504,7 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 request.user,
                 request,
                 section_descriptor,
-                section_field_data_cache,
+                field_data_cache,
                 course_key,
                 position
             )
