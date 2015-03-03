@@ -54,6 +54,22 @@ class UserAPITestCase(APITestCase):
         self.assertEqual(expected_status, response.status_code)
         return response
 
+    def send_put(self, client, data, content_type='text/plain', expected_status=204):
+        """
+        Helper method for sending a PUT to the server. Verifies the expected status and returns the response.
+        """
+        response = client.put(self.url, data=data, content_type=content_type)
+        self.assertEqual(expected_status, response.status_code)
+        return response
+
+    def send_delete(self, client, expected_status=204):
+        """
+        Helper method for sending a DELETE to the server. Verifies the expected status and returns the response.
+        """
+        response = client.delete(self.url)
+        self.assertEqual(expected_status, response.status_code)
+        return response
+
     def create_mock_profile(self, user):
         """
         Helper method that creates a mock profile for the specified user
