@@ -14,6 +14,7 @@ from pytz import UTC
 import analytics
 
 from eventtracking import tracker
+from ..accounts import NAME_MIN_LENGTH
 from ..accounts.views import AccountView
 from ..models import User, UserPreference, UserOrgTag
 from ..helpers import intercept_errors
@@ -34,6 +35,10 @@ class ProfileUserNotFound(ProfileRequestError):
 class ProfileInternalError(Exception):
     """ An error occurred in an API call. """
     pass
+
+
+FULL_NAME_MAX_LENGTH = 255
+FULL_NAME_MIN_LENGTH = NAME_MIN_LENGTH
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
