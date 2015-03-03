@@ -458,11 +458,11 @@ class TestTOC(ModuleStoreTestCase):
     # Split makes 6 queries to load the course to depth 2:
     #     - load the structure
     #     - load 5 definitions
-    # Split makes 2 queries to render the toc:
+    # Split makes 6 queries to render the toc:
     #     - it loads the active version at the start of the bulk operation
-    #     - it loads the course definition for inheritance, because it's outside
-    #     the bulk-operation marker that loaded the course descriptor
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
+    #     - it loads 5 definitions, because it instantiates the a CourseModule and 4 VideoModules
+    #       each of which access a Scope.content field in __init__
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
     @ddt.unpack
     def test_toc_toy_from_chapter(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
@@ -498,9 +498,9 @@ class TestTOC(ModuleStoreTestCase):
     #     - load 5 definitions
     # Split makes 2 queries to render the toc:
     #     - it loads the active version at the start of the bulk operation
-    #     - it loads the course definition for inheritance, because it's outside
-    #     the bulk-operation marker that loaded the course descriptor
-    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 2))
+    #     - it loads 5 definitions, because it instantiates the a CourseModule and 4 VideoModules
+    #       each of which access a Scope.content field in __init__
+    @ddt.data((ModuleStoreEnum.Type.mongo, 3, 0, 0), (ModuleStoreEnum.Type.split, 6, 0, 6))
     @ddt.unpack
     def test_toc_toy_from_section(self, default_ms, setup_finds, setup_sends, toc_finds):
         with self.store.default_store(default_ms):
