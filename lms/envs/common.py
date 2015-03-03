@@ -2056,7 +2056,7 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 PROFILE_CONFIGURATION = {
     # Default visibility level for accounts without a specified value
     # The value is one of: 'all_users', 'private'
-    "default_visibility": 'all_users',
+    "default_visibility": "private",
 
     # The list of all fields that can be shown on a learner's profile
     "all_fields": [
