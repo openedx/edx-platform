@@ -393,8 +393,7 @@
             display: inline-block;
             margin-top: -($baseline/2);
 
-            a,
-            span {
+            .course-display-name{
               display: block;
               margin-bottom: ($baseline/3);
               font-family: $sans-serif;
