@@ -6,7 +6,8 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
         var toggleExpandCollapse, showLoadingIndicator, hideLoadingIndicator, confirmThenRunOperation,
             runOperationShowingMessage, disableElementWhileRunning, getScrollOffset, setScrollOffset,
             setScrollTop, redirect, reload, hasChangedAttributes, deleteNotificationHandler,
-            validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations;
+            validateRequiredField, validateURLItemEncoding, validateTotalKeyLength, checkTotalKeyLengthViolations,
+            keywordValidator;
 
         // see https://openedx.atlassian.net/browse/TNL-889 for what is it and why it's 65
         var MAX_SUM_KEY_LENGTH = 65;
@@ -226,6 +227,33 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             }
         };
 
+        keywordValidator = (function () {
+            var regexp = /%%+[^%]+%%/g;
+            var keywords = ['%%USER_ID%%', '%%USER_FULLNAME%%', '%%COURSE_DISPLAY_NAME%%', '%%COURSE_END_DATE%%'];
+            var validate = function (string) {
+                var regex_match = string.match(regexp);
+                var found_keywords = regex_match == null ? [] : regex_match;
+                var invalid_keywords = [];
+                var num_found = found_keywords.length;
+                var curr_keyword;
+
+                $.each(found_keywords, function(i, keyword) {
+                    if ($.inArray(keyword, keywords) == -1) {
+                        invalid_keywords.push(keyword);
+                    }
+                });
+
+                return {
+                    'is_valid': invalid_keywords.length == 0,
+                    'invalid_keywords': invalid_keywords,
+                }
+
+            };
+            return {
+                'validate_string': validate,
+            };
+        }());
+
         return {
             'toggleExpandCollapse': toggleExpandCollapse,
             'showLoadingIndicator': showLoadingIndicator,
@@ -243,6 +271,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
             'validateRequiredField': validateRequiredField,
             'validateURLItemEncoding': validateURLItemEncoding,
             'validateTotalKeyLength': validateTotalKeyLength,
-            'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations
+            'checkTotalKeyLengthViolations': checkTotalKeyLengthViolations,
+            'keywordValidator': keywordValidator,
         };
     });
