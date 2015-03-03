@@ -672,6 +672,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('list_background_email_tasks', {}),
             ('list_report_downloads', {}),
             ('calculate_grades_csv', {}),
+            ('get_student_forums_usage', {}),
             ('get_ora2_responses', {}),
             ('get_course_forums_usage', {}),
             ('get_students_features', {}),
@@ -2532,6 +2533,23 @@ class TestInstructorAPILevelsDataDump(ModuleStoreTestCase, LoginEnrollmentTestCa
             mock_submit_course_forums_usage_task.side_effect = AlreadyRunningError()
             response = self.client.get(url, {})
         already_running_status = "A course forums usage report task is already in progress."
+        self.assertIn(already_running_status, response.content)
+
+    def test_get_student_forums_usage_success(self):
+        url = reverse('get_student_forums_usage', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_student_forums_usage_task'):
+            response = self.client.get(url, {})
+        success_status = "The student forums usage report is being generated."
+        self.assertIn(success_status, response.content)
+
+    def test_get_student_forums_usage_already_running(self):
+        url = reverse('get_student_forums_usage', kwargs={'course_id': unicode(self.course.id)})
+
+        with patch('instructor_task.api.submit_student_forums_usage_task') as mock_submit_student_forums_task:
+            mock_submit_student_forums_task.side_effect = AlreadyRunningError()
+            response = self.client.get(url, {})
+        already_running_status = "A student forums usage report task is already in progress."
         self.assertIn(already_running_status, response.content)
 
     def test_get_distribution_no_feature(self):
