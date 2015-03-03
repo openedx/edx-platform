@@ -19,7 +19,66 @@
       </div>
     <% } %>
 
-    <% if ( isActive && ( !hasVisibleReqs || upgrade ) ) { %>
+    <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
+      <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
+      <p>
+        <% if ( verificationDeadline ) { %>
+          <%- _.sprintf(
+            gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
+            { date: verificationDeadline }
+          ) %>
+        <% } else if ( !isActive ) { %>
+          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
+        <% } else { %>
+            <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
+        <% } %>
+      </p>
+      <% } %>
+    </div>
+
+    <div class="requirements-container">
+      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
+        <% if ( requirements['account-activation-required'] ) { %>
+          <li class="req req-0 req-activate">
+            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
+            <div class="placeholder-art">
+              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
+            </div>
+
+            <div class="copy">
+              <p>
+                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
+              </p>
+            </div>
+          </li>
+        <% } else {%>
+          <% if ( requirements['photo-id-required'] ) { %>
+          <li class="req req-1 req-id">
+            <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
+            <div class="placeholder-art fa-lg">
+              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
+              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+
+          <% if ( requirements['webcam-required'] ) { %>
+          <li class="req req-2 req-webcam">
+            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
+            <div class="placeholder-art">
+              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
+            </div>
+
+            <div class="copy"></div>
+          </li>
+          <% } %>
+        <% } %>
+      </ul>
+    </div>
+
+    <% if ( isActive && ( !hasVisibleReqs || upgrade || !contributionAmount) ) { %>
       <div class="wrapper-task hidden" aria-hidden="true">
         <ol class="review-tasks">
           <% if ( suggestedPrices.length > 0 ) { %>
@@ -96,66 +155,6 @@
       </div>
     </div>
     <% } %>
-
-    <div class="instruction <% if ( !upgrade ) { %>center-col<% } %>">
-      <% if ( _.some( requirements, function( isVisible ) { return isVisible; } ) ) { %>
-      <p>
-        <% if ( verificationDeadline ) { %>
-          <%- _.sprintf(
-            gettext( "You can pay now even if you don't have the following items available, but you will need to have these by %(date)s to qualify to earn a Verified Certificate." ),
-            { date: verificationDeadline }
-          ) %>
-        <% } else if ( !isActive ) { %>
-          <%- gettext( "You need to activate your account before you can enroll in courses. Check your inbox for an activation email. After you complete activation you can return and refresh this page." ) %>
-        <% } else { %>
-            <%- gettext( "You can pay now even if you don't have the following items available, but you will need to have these to qualify to earn a Verified Certificate." ) %>
-        <% } %>
-      </p>
-      <% } %>
-    </div>
-
-    <div class="requirements-container">
-      <ul class="list-reqs <% if ( requirements['account-activation-required'] ) { %>account-not-activated<% } %>">
-        <% if ( requirements['account-activation-required'] ) { %>
-          <li class="req req-0 req-activate">
-            <h4 class="title"><%- gettext( "Activate Your Account" ) %></h4>
-            <div class="placeholder-art">
-              <i class="icon fa fa-envelope-o" aria-hidden="true"></i>
-            </div>
-
-            <div class="copy">
-              <p>
-                <span class="copy-super"><%- gettext( "Check Your Email" ) %></span>
-              </p>
-            </div>
-          </li>
-        <% } else {%>
-          <% if ( requirements['photo-id-required'] ) { %>
-          <li class="req req-1 req-id">
-            <h4 class="title"><%- gettext( "Government-Issued Photo ID" ) %></h4>
-            <div class="placeholder-art fa-lg">
-              <i class="icon fa fa-list-alt fa-stack-2x" aria-hidden="true"></i>
-              <i class="icon fa fa-user id-photo fa-stack-1x" aria-hidden="true"></i>
-            </div>
-
-            <div class="copy"></div>
-          </li>
-          <% } %>
-
-          <% if ( requirements['webcam-required'] ) { %>
-          <li class="req req-2 req-webcam">
-            <h4 class="title"><%- gettext( "Webcam" ) %></h4>
-            <div class="placeholder-art">
-              <i class="icon fa fa-video-camera" aria-hidden="true"></i>
-            </div>
-
-            <div class="copy"></div>
-          </li>
-          <% } %>
-        <% } %>
-      </ul>
-    </div>
-
 
   <% if ( isActive ) { %>
   <nav class="nav-wizard is-ready <% if ( isActive && !upgrade ) { %>center<% } %>">
