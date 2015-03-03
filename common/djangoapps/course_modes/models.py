@@ -274,6 +274,19 @@ class CourseMode(models.Model):
         return 0
 
     @classmethod
+    def is_verified_mode(cls, course_mode_tuple):
+        """Check whether the given modes is_verified or not.
+
+        Args:
+            course_mode_tuple(Mode): Mode tuple
+
+        Returns:
+            bool: True iff the course modes is verified else False.
+
+        """
+        return course_mode_tuple.slug in cls.VERIFIED_MODES
+
+    @classmethod
     def has_payment_options(cls, course_id):
         """Determines if there is any mode that has payment options
 
