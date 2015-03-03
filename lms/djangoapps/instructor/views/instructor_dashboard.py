@@ -74,10 +74,10 @@ def instructor_dashboard_2(request, course_id):
     sections = [
         _section_course_info(course, access),
         _section_membership(course, access),
+        _section_cohort_management(course, access),
         _section_student_admin(course, access),
         _section_data_download(course, access),
         _section_analytics(course, access),
-        _section_cohort_management(course, access),
     ]
 
     #check if there is corresponding entry in the CourseMode Table related to the Instructor Dashboard course
@@ -338,7 +338,7 @@ def _section_cohort_management(course, access):
     course_key = course.id
     section_data = {
         'section_key': 'cohort_management',
-        'section_display_name': _('Cohort Management'),
+        'section_display_name': _('Cohorts'),
         'access': access,
         'course_cohort_settings_url': reverse(
             'course_cohort_settings',
