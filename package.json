@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "dependencies": {
       "coffee-script": "1.6.1",
+      "plato": "1.2.2",
       "uglify-js": "2.4.15"
     }
 }
