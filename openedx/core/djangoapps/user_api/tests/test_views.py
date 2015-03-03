@@ -28,7 +28,6 @@ from ..api import account as account_api, profile as profile_api
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
-from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
 
 
 TEST_API_KEY = "test_api_key"
@@ -842,7 +841,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"label": u"Full name",
                 u"instructions": u"The name that will appear on your certificates",
                 u"restrictions": {
-                    "max_length": NAME_MIN_LENGTH,
+                    "max_length": profile_api.FULL_NAME_MAX_LENGTH,
                 },
             }
         )
@@ -922,7 +921,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"label": u"Full name",
                     u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
-                        "max_length": NAME_MIN_LENGTH
+                        "max_length": profile_api.FULL_NAME_MAX_LENGTH,
                     }
                 }
             )
