@@ -21,13 +21,17 @@ var edx = edx || {};
             this.subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html());
         },
         render: function () {
+            var alwaysCohortInlineDiscussions = this.model.get('always_cohort_inline_discussions');
             this.$el.html(this.template({
                 coursewideTopics: this.renderCoursewideTopics(this.model.get('coursewide_categories'), this.model.get('course_wide_children')),
                 inlineTopicsHtml: this.renderInlineTopics(this.model),
-                always_cohort_inline_discussions:this.model.get('always_cohort_inline_discussions')
+                always_cohort_inline_discussions:alwaysCohortInlineDiscussions
             }));
             this.processInlineTopics();
-            this.toggleSaveButton(this.$('.action-save'), false);
+            this.toggleDisableClass(this.$('.action-save'), false);
+            if (alwaysCohortInlineDiscussions) {
+                this.toggleDisableClass(this.$('.inline-cohorts'), false)
+            }
         },
         renderCoursewideTopics: function (topics, children) {
             var self = this;
@@ -50,16 +54,6 @@ var edx = edx || {};
 
             return _.map(children, function (name) {
                 var html = '', entry;
-
-                var filteredEntry = _.find(entries,function(entry) {
-                    if (entry.is_cohorted === false) {
-                        // breaks the loop and returns the current entry.
-                        return true;
-                    }
-                });
-                if (filteredEntry) {
-                    is_category_cohorted = true;
-                }
                 if (entries && _.has(entries, name)) {
                     entry = entries[name];
                     html = entry_template({
@@ -81,7 +75,7 @@ var edx = edx || {};
         processInlineTopics: function() {
             $('ul.inline-cohorts').qubit();
         },
-        toggleSaveButton: function($element, enable) {
+        toggleDisableClass: function($element, enable) {
             if (enable) {
                 $element.removeClass(disabledClass).attr('aria-disabled', enable);
             } else {
@@ -90,20 +84,14 @@ var edx = edx || {};
         },
         changeDiscussionCoursewideCategory: function(event) {
             event.preventDefault();
-            this.toggleSaveButton(this.$('.cohort-coursewide-discussions-form .action-save'), true);
+            this.toggleDisableClass(this.$('.cohort-coursewide-discussions-form .action-save'), true);
         },
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
-            var $selectedCategory = $(event.currentTarget),
-                $childCategoires = $('.check-discussion-category'),
-                $childSubCategoires = $('.check-discussion-subcategory-inline');
 
-            if ($selectedCategory.prop('checked')) {
-                $childCategoires.prop('checked', 'checked');
-                $childSubCategoires.prop('checked', 'checked');
-            }
+            this.toggleDisableClass(this.$('.inline-cohorts'), !($(event.currentTarget).prop('checked')));
             this.processInlineTopics();
-            this.toggleSaveButton(this.$('.cohort-inline-discussions-form .action-save'), true);
+            this.toggleDisableClass(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         changeDiscussionInlineCategory: function(event) {
             var $selectedCategory = $(event.currentTarget);
@@ -117,7 +105,7 @@ var edx = edx || {};
             if (!$selectedTopic.prop('checked')) {
                 $('.check-all-inline-discussions').prop('checked', false);
             }
-            this.toggleSaveButton(this.$('.cohort-inline-discussions-form .action-save'), true);
+            this.toggleDisableClass(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         getCohortedDiscussions: function(selector) {
             var self=this;
