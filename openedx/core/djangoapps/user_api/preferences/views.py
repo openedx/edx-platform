@@ -4,9 +4,6 @@ NOTE: this API is WIP and has not yet been approved. Do not use this API without
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status

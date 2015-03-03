@@ -14,28 +14,29 @@ from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KE
 from openedx.core.djangoapps.user_api.models import UserPreference
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 
-TEST_PASSWORD = "test"
-
-
+@ddt.ddt
 class UserAPITestCase(APITestCase):
     """
     The base class for all tests of the User API
     """
+    test_password = "test"
+    __test__ = False
+    
     def setUp(self):
         super(UserAPITestCase, self).setUp()
 
         self.anonymous_client = APIClient()
-        self.different_user = UserFactory.create(password=TEST_PASSWORD)
+        self.different_user = UserFactory.create(password=self.test_password)
         self.different_client = APIClient()
-        self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
+        self.staff_user = UserFactory(is_staff=True, password=self.test_password)
         self.staff_client = APIClient()
-        self.user = UserFactory.create(password=TEST_PASSWORD)
+        self.user = UserFactory.create(password=self.test_password)
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
         client = getattr(self, api_client)
         user = getattr(self, user)
-        client.login(username=user.username, password=TEST_PASSWORD)
+        client.login(username=user.username, password=self.test_password)
         return client
 
     def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=204):
@@ -85,6 +86,25 @@ class UserAPITestCase(APITestCase):
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
         legacy_profile.save()
+
+    def test_get_anonymous_user(self):
+        """
+        Test that an anonymous client (not logged in) cannot call get.
+        """
+        self.send_get(self.anonymous_client, expected_status=401)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_unknown_user(self, api_client, username):
+        """
+        Test that requesting a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, username)
+        response = client.get(reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}))
+        self.assertEqual(404, response.status_code)
 
 
 @ddt.ddt
@@ -235,7 +255,7 @@ class TestAccountAPI(UserAPITestCase):
         Test that a client (logged in) can get her own account information (using default legacy profile information,
         as created by the test UserFactory).
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
         data = response.data
         self.assertEqual(11, len(data))
@@ -261,7 +281,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.gender = ""
         legacy_profile.save()
 
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country"):
             self.assertIsNone(response.data[empty_field])
@@ -368,7 +388,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         Test the behavior of patch when an incorrect content_type is specified.
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
         self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
@@ -377,7 +397,7 @@ class TestAccountAPI(UserAPITestCase):
         Tests the behavior of patch when attempting to set fields with a select list of options to the empty string.
         Also verifies the behaviour when setting to None.
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         for field_name in ["gender", "level_of_education", "country"]:
             self.send_patch(self.client, {field_name: ""})
             response = self.send_get(self.client)
@@ -409,7 +429,7 @@ class TestAccountAPI(UserAPITestCase):
             get_response = self.send_get(self.client)
             self.assertEqual(new_name, get_response.data["name"])
 
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         legacy_profile = UserProfile.objects.get(id=self.user.id)
         self.assertEqual({}, legacy_profile.get_meta())
         old_name = legacy_profile.name

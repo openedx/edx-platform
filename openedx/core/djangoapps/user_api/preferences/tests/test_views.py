@@ -249,4 +249,3 @@ class TestPreferencesDetailAPI(UserAPITestCase):
 
         # Verify that deleting a non-existent preference throws a 404
         self.send_delete(client, expected_status=404)
-

@@ -21,4 +21,14 @@ urlpatterns = patterns(
         PreferencesView.as_view(),
         name="preferences_api"
     ),
+    url(
+        r'^v0/preferences/' + USERNAME_PATTERN + '$',
+        PreferencesView.as_view(),
+        name="preferences_api"
+    ),
+    url(
+        r'^v0/preferences/' + USERNAME_PATTERN + '/(?P<preference_key>[a-zA-Z0-9_]+)$',
+        PreferencesDetailView.as_view(),
+        name="preferences_detail_api"
+    ),
 )
