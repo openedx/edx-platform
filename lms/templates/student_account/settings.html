@@ -8,19 +8,30 @@
 <%block name="js_extra">
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+
+     <script type="text/javascript" src="${static.url('js/student_account/views/AccountSettingsInfoView.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/models/AccountSettingsInfoModel.js')}"></script>
+
     <%static:js group='student_account'/>
 </%block>
 
-<%block name="content">
-<div class="wrapper-mast wrapper">
-    <header class="mast has-actions has-subtitle">
-<h1 class="page-header">
-    ${_("Account Settings")}
-    <!--<small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>-->
+<%block name="header_extras">
+    % for template_name in ["account_settings_info"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
 
-</h1>
+<%block name="content">
+    <div class="wrapper-mast wrapper">
+        <header class="mast has-actions has-subtitle">
+            <h1 class="page-header">
+                ${_("Account Settings")}
+                <!--<small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>-->
+            </h1>
         </header>
-        </div>
+    </div>
 </%block>
 
 
@@ -31,4 +42,16 @@
     <!--</header>-->
 <!--</div>-->
 
-<!--<div id="account-container"></div>-->
+<div class="account-settings-container"></div>
+
+<%block name="headextra">
+    <script>
+        $(document).ready(function() {
+            var accountSettingsElement = $('.account-settings-container');
+            var accountSettingsView = new edx.student.account.AccountSettingsInfoView({
+                el: accountSettingsElement
+            });
+            accountSettingsView.render();
+        });
+    </script>
+</%block>
