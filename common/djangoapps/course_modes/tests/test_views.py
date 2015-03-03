@@ -65,6 +65,25 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         else:
             self.assertEquals(response.status_code, 200)
 
+    def test_no_id_redirect(self):
+        # Create the course modes
+        CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODES[0], course_id=self.course.id, min_price=100)
+
+        # Enroll the user in the test course
+        CourseEnrollmentFactory(
+            is_active=False,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODES[0],
+            course_id=self.course.id,
+            user=self.user
+        )
+
+        # Configure whether we're upgrading or not
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        # Check whether we were correctly redirected
+        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
+        self.assertRedirects(response, start_flow_url)
+
     def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):

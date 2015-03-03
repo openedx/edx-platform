@@ -660,12 +660,7 @@ def create_order(request):
     # prefer NO-ID-PROFESSIONAL mode over professional mode then verified_mode
     current_mode = no_id_prof_mode if no_id_prof_mode else CourseMode.verified_mode_for_course(course_id)
 
-    # make sure this course has a verified mode if it is not no_id_professional mode
-    if not no_id_prof_mode and not current_mode:
-        log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
-        return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
-
-    if CourseMode.is_professional_mode(current_mode) or CourseMode.is_no_id_professional_mode(current_mode):
+    if CourseMode.is_professional_mode(current_mode):
         amount = current_mode.min_price
 
     if amount < current_mode.min_price:
