@@ -263,6 +263,7 @@ FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 
 ########################### External REST APIs #################################
 FEATURES['ENABLE_MOBILE_REST_API'] = True
+FEATURES['ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
 
 ###################### Payment ##############################3
@@ -460,3 +461,7 @@ FEATURES['ENTRANCE_EXAMS'] = True
 FEATURES['ENABLE_COURSEWARE_SEARCH'] = True
 # Use MockSearchEngine as the search engine for test scenario
 SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
+
+FACEBOOK_APP_SECRET = "Test"
+FACEBOOK_APP_ID = "Test"
+FACEBOOK_API_VERSION = "v2.2"
