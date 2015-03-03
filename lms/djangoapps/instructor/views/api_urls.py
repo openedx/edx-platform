@@ -125,4 +125,8 @@ urlpatterns = patterns('',  # nopep8
     # Collect ora2 data
     url(r'get_ora2_responses',
         'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
+
+    # Collect course forums data
+    url(r'get_course_forums_usage',
+        'instructor.views.api.get_course_forums_usage', name="get_course_forums_usage"),
 )

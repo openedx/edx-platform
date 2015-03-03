@@ -24,11 +24,11 @@ from courseware.grades import iterate_grades_for
 from courseware.models import StudentModule
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor_internal
-from instructor.utils import collect_ora2_data
 from instructor_analytics.basic import student_response_rows, enrolled_students_features
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
+from instructor.utils import collect_ora2_data, collect_course_forums_data
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = get_task_logger(__name__)
@@ -644,16 +644,29 @@ def push_student_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _
         rows
     )
 
-    return "succeeded" 
+    return "succeeded"
 
 
 def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
     """
     Collect ora2 responses and upload them to S3 as a CSV
     """
+    return _push_csv_responses_to_s3(collect_ora2_data, u'ORA2_responses', course_id, action_name)
+
+
+def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    Collect course forums usage data and upload them to S3 as a CSV
+    """
+    return _push_csv_responses_to_s3(collect_course_forums_data, u'course_forums', course_id, action_name)
+
+
+def _push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):
+    """
+    Collect responses and upload them to S3 as a CSV
+    """
 
     start_time = datetime.now(UTC)
-
     num_attempted = 1
     num_succeeded = 0
     num_failed = 0
@@ -679,7 +692,7 @@ def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _tas
     update_task_progress()
 
     try:
-        header, datarows = collect_ora2_data(course_id)
+        header, datarows = csv_fn(course_id)
         rows = [header] + [row for row in datarows]
     # Update progress to failed regardless of error type
     # pylint: disable=bare-except
@@ -695,11 +708,11 @@ def push_ora2_responses_to_s3(_xmodule_instance_args, _entry_id, course_id, _tas
     curr_step = "Uploading CSV"
     update_task_progress()
 
-    report_store = ReportStore.from_config()
-    report_store.store_rows(
+    upload_csv_to_report_store(
+        rows,
+        filename,
         course_id,
-        u'{}_ORA2_responses_{}.csv'.format(course_id_string, timestamp_str),
-        rows
+        start_time,
     )
 
     num_succeeded = 1
