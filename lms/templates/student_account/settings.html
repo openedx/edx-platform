@@ -42,16 +42,28 @@
     <!--</header>-->
 <!--</div>-->
 
-<div class="account-settings-container"></div>
+<div class="account-settings-container"
+     data-account-settings-url="${account_settings_url}"   >
+
+</div>
 
 <%block name="headextra">
     <script>
         $(document).ready(function() {
             var accountSettingsElement = $('.account-settings-container');
-            var accountSettingsView = new edx.student.account.AccountSettingsInfoView({
-                el: accountSettingsElement
+            var accountSettingsInfoModel = new edx.student.account.AccountSettingsInfoModel();
+            accountSettingsInfoModel.url = accountSettingsElement.data('account-settings-url');
+            var accountSettingsInfoView = new edx.student.account.AccountSettingsInfoView({
+                el: accountSettingsElement,
+                model: accountSettingsInfoModel,
+                context: {
+                    accountSettingsInfoModelUrl: accountSettingsInfoModel.url
+                }
             });
-            accountSettingsView.render();
+
+            accountSettingsInfoModel.fetch().done(function() {
+                accountSettingsInfoView.render();
+            });
         });
     </script>
 </%block>

@@ -10,10 +10,17 @@ var edx = edx || {};
         idAttribute: 'id',
         defaults: {
             username: '',
-            fullname: '',
+            name: '',
             email: '',
             password: '',
-            language: ''
+            language: '',
+            country: null,
+            date_joined: "",
+            gender: null,
+            goals: "",
+            level_of_education: null,
+            mailing_address: "",
+            year_of_birth: null
         }
     });
 }).call(this, Backbone);

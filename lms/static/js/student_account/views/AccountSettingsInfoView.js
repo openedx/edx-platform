@@ -16,7 +16,8 @@ var edx = edx || {};
 
         render: function() {
             this.$el.html(this.template({
-                username: 'Muhammad Ammar'
+                username: this.model.get('username'),
+                fullname: this.model.get('name')
             }));
             return this;
         }

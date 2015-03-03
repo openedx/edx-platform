@@ -299,7 +299,7 @@ def _external_auth_intercept(request, mode):
 
 @login_required
 @require_http_methods(['GET'])
-def account_settings_handler(request):
+def settings_render(request):
     """Render the students account settings page.
 
     Args:
@@ -315,8 +315,7 @@ def account_settings_handler(request):
         GET /settings
 
     """
-    return render_to_response(
-        'student_account/settings.html', {
-            'disable_courseware_js': True,
-        }
-    )
+    context = {
+        'account_settings_url': reverse("accounts_api", kwargs={'username': request.user.username}),
+    }
+    return render_to_response('student_account/settings.html', context)

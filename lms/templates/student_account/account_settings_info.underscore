@@ -1,26 +1,24 @@
 <div>
     <ol>
         <li>
-            <div class="field field-label">
-                <label class="form-label">
+            <div>
+                <label>
                     <%- gettext('Username') %>
                 </label>
-                <label class="form-label">
+                <label>
                     <%- gettext(username) %>
                 </label>
             </div>
             <hr class="divider divider-lv1">
-            <div class="field field-label">
-                <label class="form-label">
+            <div>
+                <label>
                     <%- gettext('Full Name') %>
                 </label>
-                <label class="form-label">
+                <label>
                     <%- gettext(fullname) %>
                 </label>
             </div>
             <hr class="divider divider-lv1">
         </li>
-        <!--<li></li>-->
-        <!--<li></li>-->
     </ol>
 </div>
