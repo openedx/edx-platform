@@ -479,6 +479,14 @@ class CourseMode(models.Model):
         """
         return CourseMode.NO_ID_PROFESSIONAL_MODES[0] in modes_dict
 
+    @classmethod
+    def is_professional_mode(cls, course_mode_tuple):
+        return course_mode_tuple.slug == 'professional'
+
+    @classmethod
+    def is_no_id_professional_mode(cls, course_mode_tuple):
+        return course_mode_tuple.slug == cls.NO_ID_PROFESSIONAL_MODES[0]
+
     def to_tuple(self):
         """
         Takes a mode model and turns it into a model named tuple.
@@ -501,12 +509,6 @@ class CourseMode(models.Model):
         return u"{} : {}, min={}, prices={}".format(
             self.course_id.to_deprecated_string(), self.mode_slug, self.min_price, self.suggested_prices
         )
-
-    def is_professional_mode(self):
-        return self.mode_slug == 'professional'
-
-    def is_no_id_professional_mode(self):
-        return self.mode_slug == self.NO_ID_PROFESSIONAL_MODES[0]
 
 
 class CourseModesArchive(models.Model):
