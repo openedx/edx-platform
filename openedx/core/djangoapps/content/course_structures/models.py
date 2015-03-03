@@ -63,7 +63,7 @@ def listen_for_course_publish(sender, course_key, **kwargs):
     update_course_structure.delay(unicode(course_key), countdown=0)
 
 
-@task()
+@task(name=u'openedx.core.djangoapps.content.course_structures.models.update_course_structure')
 def update_course_structure(course_key):
     """
     Regenerates and updates the course structure (in the database) for the specified course.
