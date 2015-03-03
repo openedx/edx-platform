@@ -8,6 +8,7 @@ from django.conf import settings
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.user_api import api as user_api
+from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -30,8 +31,27 @@ class EnrollmentUserThrottle(UserRateThrottle):
     rate = '50/second'
 
 
+class ApiKeyPermissionMixIn(object):
+    """
+    This mixin is used to provide a convenience function for doing individual permission checks
+    for the presence of API keys.
+    """
+    def has_api_key_permissions(self, request):
+        """
+        Checks to see if the request was made by a server with an API key.
+
+        Args:
+            request (Request): the request being made into the view
+
+        Return:
+            True if the request has been made with a valid API key
+            False otherwise
+        """
+        return ApiKeyHeaderPermission().has_permission(request, self)
+
+
 @can_disable_rate_limit
-class EnrollmentView(APIView):
+class EnrollmentView(APIView, ApiKeyPermissionMixIn):
     """
         **Use Cases**
 
@@ -73,7 +93,7 @@ class EnrollmentView(APIView):
     """
 
     authentication_classes = OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
-    permission_classes = permissions.IsAuthenticated,
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
     def get(self, request, course_id=None, user=None):
@@ -94,7 +114,7 @@ class EnrollmentView(APIView):
 
         """
         user = user if user else request.user.username
-        if request.user.username != user:
+        if request.user.username != user and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -182,7 +202,7 @@ class EnrollmentCourseDetailView(APIView):
 
 
 @can_disable_rate_limit
-class EnrollmentListView(APIView):
+class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     """
         **Use Cases**
 
@@ -245,7 +265,7 @@ class EnrollmentListView(APIView):
     """
 
     authentication_classes = OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
-    permission_classes = permissions.IsAuthenticated,
+    permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
     def get(self, request):
@@ -253,7 +273,7 @@ class EnrollmentListView(APIView):
             Gets a list of all course enrollments for the currently logged in user.
         """
         user = request.GET.get('user', request.user.username)
-        if request.user.username != user:
+        if request.user.username != user and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -276,7 +296,7 @@ class EnrollmentListView(APIView):
         user = request.DATA.get('user', request.user.username)
         if not user:
             user = request.user.username
-        if user != request.user.username:
+        if user != request.user.username and not self.has_api_key_permissions(request):
             # Return a 404 instead of a 403 (Unauthorized). If one user is looking up
             # other users, do not let them deduce the existence of an enrollment.
             return Response(status=status.HTTP_404_NOT_FOUND)
