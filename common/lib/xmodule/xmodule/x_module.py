@@ -1572,7 +1572,7 @@ class ModuleSystem(MetricsMixin, ConfigurableFragmentWrapper, Runtime):  # pylin
         self.__dict__[attr] = val
 
     def __str__(self):
-        return str(self.__dict__)
+        return "LmsModuleSystem{}".format(self.__dict__)
 
     @property
     def ajax_url(self):

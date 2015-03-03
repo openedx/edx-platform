@@ -151,12 +151,28 @@ class MongoKeyValueStore(InheritanceKeyValueStore):
         else:
             return False
 
+    def __repr__(self):
+        return "MongoKeyValueStore{!r}<{!r}, {!r}>".format(
+            (self._data, self._parent, self._children, self._metadata),
+            self._fields,
+            self.inherited_settings
+        )
+
 
 class CachingDescriptorSystem(MakoDescriptorSystem, EditInfoRuntimeMixin):
     """
     A system that has a cache of module json that it will use to load modules
     from, with a backup of calling to the underlying modulestore for more data
     """
+    def __repr__(self):
+        return "CachingDescriptorSystem{!r}".format((
+            self.modulestore,
+            unicode(self.course_id),
+            [unicode(key) for key in self.module_data.keys()],
+            self.default_class,
+            [unicode(key) for key in self.cached_metadata.keys()],
+        ))
+
     def __init__(self, modulestore, course_key, module_data, default_class, cached_metadata, **kwargs):
         """
         modulestore: the module store that can be used to retrieve additional modules
