@@ -72,9 +72,9 @@ class ChooseModeView(View):
 
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
-        # to the usual "choose your track" page.
+        # to the usual "choose your track" page same is true for no-id-professional mode.
         has_enrolled_professional = (enrollment_mode == "professional" and is_active)
-        if "professional" in modes and not has_enrolled_professional:
+        if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             return redirect(
                 reverse(
                     'verify_student_start_flow',
@@ -82,15 +82,6 @@ class ChooseModeView(View):
                 )
             )
 
-        # Check if the no-id-professional mode is added in course. If so then redirect to payment/verification flow
-        # skipping the verification step
-        if CourseMode.mode_for_course(course_key, CourseMode.NO_ID_PROFESSIONAL_MODES[0]):
-            return redirect(
-                reverse(
-                    'verify_student_start_flow',
-                    kwargs={'course_id': unicode(course_key)}
-                )
-            )
         # If there isn't a verified mode available, then there's nothing
         # to do on this page.  The user has almost certainly been auto-registered
         # in the "honor" track by this point, so we send the user
