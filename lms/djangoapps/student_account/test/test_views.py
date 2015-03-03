@@ -209,7 +209,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
     EMAIL = "bob@example.com"
     PASSWORD = "password"
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(StudentAccountLoginAndRegistrationTest, self).setUp('embargo')
 
@@ -398,7 +398,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         response = self.client.get(reverse("account_login"), {"course_id": unicode(course.id)})
         self._assert_third_party_auth_data(response, None, expected_providers)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_third_party_auth_enrollment_embargo(self):
         course = CourseFactory.create()
 

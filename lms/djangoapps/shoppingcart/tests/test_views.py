@@ -1585,7 +1585,7 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
     USERNAME = 'bob'
     PASSWORD = 'test'
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(RedeemCodeEmbargoTests, self).setUp('embargo')
         self.course = CourseFactory.create()
@@ -1594,7 +1594,7 @@ class RedeemCodeEmbargoTests(UrlResetMixin, ModuleStoreTestCase):
         self.assertTrue(result, msg="Could not log in")
 
     @ddt.data('get', 'post')
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_registration_code_redemption_embargo(self, method):
         # Create a valid registration code
         reg_code = CourseRegistrationCode.objects.create(

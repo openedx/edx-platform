@@ -312,7 +312,7 @@ class EnrollmentEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
     EMAIL = "bob@example.com"
     PASSWORD = "edx"
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         """ Create a course and user, then log in. """
         super(EnrollmentEmbargoTest, self).setUp('embargo')
@@ -320,7 +320,7 @@ class EnrollmentEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
         self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
         self.client.login(username=self.USERNAME, password=self.PASSWORD)
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_change_enrollment_restrict(self):
         url = reverse('courseenrollments')
         data = json.dumps({
@@ -344,7 +344,7 @@ class EnrollmentEmbargoTest(UrlResetMixin, ModuleStoreTestCase):
         # Verify that we were not enrolled
         self.assertEqual(self._get_enrollments(), [])
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_embargo_change_enrollment_allow(self):
         url = reverse('courseenrollments')
         data = json.dumps({

@@ -94,11 +94,9 @@ FEATURES = {
     # Hide any Personally Identifiable Information from application logs
     'SQUELCH_PII_IN_LOGS': False,
 
-    # Toggles the embargo functionality, which enable embargoing for particular courses
+    # Toggles the embargo functionality, which blocks users
+    # based on their location.
     'EMBARGO': False,
-
-    # Toggles the embargo site functionality, which enable embargoing for the whole site
-    'SITE_EMBARGOED': False,
 
     # Turn on/off Microsites feature
     'USE_MICROSITES': False,

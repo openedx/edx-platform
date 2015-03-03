@@ -72,8 +72,6 @@ urlpatterns = (
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
-    url(r'^embargo$', 'student.views.embargo', name="embargo"),
-
     # Feedback Form endpoint
     url(r'^submit_feedback$', 'util.views.submit_feedback'),
 
@@ -499,8 +497,8 @@ urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
 )
 
-# Country access (embargo)
-if settings.FEATURES.get('ENABLE_COUNTRY_ACCESS'):
+# Embargo
+if settings.FEATURES.get('EMBARGO'):
     urlpatterns += (
         url(r'^embargo/', include('embargo.urls')),
     )

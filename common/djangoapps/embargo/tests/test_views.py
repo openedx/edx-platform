@@ -32,7 +32,7 @@ class CourseAccessMessageViewTest(UrlResetMixin, TestCase):
 
     """
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(CourseAccessMessageViewTest, self).setUp('embargo')
 

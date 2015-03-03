@@ -11,15 +11,11 @@ from xmodule.modulestore.django import modulestore
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 
-from embargo.models import (
-    EmbargoedCourse, EmbargoedState, IPFilter,
-    RestrictedCourse
-)
-from embargo.fixtures.country_codes import COUNTRY_CODES
+from embargo.models import IPFilter, RestrictedCourse
 
 
-class CourseKeyValidationForm(forms.ModelForm):
-    """Base class for validating the "course_key" (or "course_id") field.
+class RestrictedCourseForm(forms.ModelForm):
+    """Validate course keys for the RestrictedCourse model.
 
     The default behavior in Django admin is to:
     * Save course keys for courses that do not exist.
@@ -29,16 +25,10 @@ class CourseKeyValidationForm(forms.ModelForm):
     error message instead.
 
     """
-
-    def clean_course_id(self):
-        """Clean the 'course_id' field in the form. """
-        return self._clean_course_key("course_id")
+    class Meta:  # pylint: disable=missing-docstring
+        model = RestrictedCourse
 
     def clean_course_key(self):
-        """Clean the 'course_key' field in the form. """
-        return self._clean_course_key("course_key")
-
-    def _clean_course_key(self, field_name):
         """Validate the course key.
 
         Checks that the key format is valid and that
@@ -51,7 +41,7 @@ class CourseKeyValidationForm(forms.ModelForm):
             CourseKey
 
         """
-        cleaned_id = self.cleaned_data[field_name]
+        cleaned_id = self.cleaned_data['course_key']
         error_msg = _('COURSE NOT FOUND.  Please check that the course ID is valid.')
 
         try:
@@ -63,51 +53,6 @@ class CourseKeyValidationForm(forms.ModelForm):
             raise forms.ValidationError(error_msg)
 
         return course_key
-
-
-class EmbargoedCourseForm(CourseKeyValidationForm):
-    """Validate course keys for the EmbargoedCourse model. """
-
-    class Meta:  # pylint: disable=missing-docstring
-        model = EmbargoedCourse
-
-
-class RestrictedCourseForm(CourseKeyValidationForm):
-    """Validate course keys for the RestirctedCourse model. """
-
-    class Meta:  # pylint: disable=missing-docstring
-        model = RestrictedCourse
-
-
-class EmbargoedStateForm(forms.ModelForm):  # pylint: disable=incomplete-protocol
-    """Form validating entry of states to embargo"""
-
-    class Meta:  # pylint: disable=missing-docstring
-        model = EmbargoedState
-
-    def _is_valid_code(self, code):
-        """Whether or not code is a valid country code"""
-        return code in COUNTRY_CODES
-
-    def clean_embargoed_countries(self):
-        """Validate the country list"""
-        embargoed_countries = self.cleaned_data["embargoed_countries"]
-        if not embargoed_countries:
-            return ''
-
-        error_countries = []
-
-        for country in embargoed_countries.split(','):
-            country = country.strip().upper()
-            if not self._is_valid_code(country):
-                error_countries.append(country)
-
-        if error_countries:
-            msg = 'COULD NOT PARSE COUNTRY CODE(S) FOR: {0}'.format(error_countries)
-            msg += ' Please check the list of country codes and verify your entries.'
-            raise forms.ValidationError(msg)
-
-        return embargoed_countries
 
 
 class IPFilterForm(forms.ModelForm):  # pylint: disable=incomplete-protocol

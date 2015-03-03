@@ -36,7 +36,7 @@ MODULESTORE_CONFIG = mixed_store_config(settings.COMMON_TEST_DATA_ROOT, {}, incl
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
-@mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+@mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
 class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
     """Test the embargo API calls to determine whether a user has access. """
 
@@ -137,7 +137,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
         result = embargo_api.check_course_access(self.course.id, user=self.user, ip_address='FE80::0202:B3FF:FE1E:8329')
         self.assertTrue(result)
 
-    @mock.patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @mock.patch.dict(settings.FEATURES, {'EMBARGO': True})
     def test_profile_country_db_null(self):
         # Django country fields treat NULL values inconsistently.
         # When saving a profile with country set to None, Django saves an empty string to the database.
@@ -183,7 +183,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
 class EmbargoMessageUrlApiTests(UrlResetMixin, ModuleStoreTestCase):
     """Test the embargo API calls for retrieving the blocking message URLs. """
 
-    @patch.dict(settings.FEATURES, {'ENABLE_COUNTRY_ACCESS': True})
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
     def setUp(self):
         super(EmbargoMessageUrlApiTests, self).setUp('embargo')
         self.course = CourseFactory.create()
