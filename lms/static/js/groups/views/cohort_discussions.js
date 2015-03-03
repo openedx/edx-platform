@@ -22,20 +22,20 @@ var edx = edx || {};
         },
         render: function () {
             this.$el.html(this.template({
-                coursewideTopics: this.renderCoursewideTopics(this.model.get('coursewide_categories')),
+                coursewideTopics: this.renderCoursewideTopics(this.model.get('coursewide_categories'), this.model.get('course_wide_children')),
                 inlineTopicsHtml: this.renderInlineTopics(this.model),
                 always_cohort_inline_discussions:this.model.get('always_cohort_inline_discussions')
             }));
             this.processInlineTopics();
             this.toggleSaveButton(this.$('.action-save'), false);
         },
-        renderCoursewideTopics: function (topics) {
+        renderCoursewideTopics: function (topics, children) {
             var self = this;
-            return _.map(topics, function (topic, topic_name) {
+            return _.map(children, function (name) {
                 return self.subCategoryTemplate({
-                    name: topic_name,
-                    id: topic.id,
-                    is_cohorted: topic.is_cohorted,
+                    name: name,
+                    id: topics[name].id,
+                    is_cohorted: topics[name].is_cohorted,
                     type: 'coursewide'
                 });
             }).join('');
@@ -133,7 +133,7 @@ var edx = edx || {};
 
             self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
             fieldData = {
-                inline_discussions: true,
+                content_specific_discussions: true,
                 cohorted_discussion_ids: self.cohortedDiscussionTopics,
                 always_cohort_inline_discussions:self.$('.check-all-inline-discussions').prop('checked')
             };
