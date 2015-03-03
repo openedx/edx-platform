@@ -20,6 +20,7 @@ class Env(object):
 
     # Reports Directory
     REPORT_DIR = REPO_ROOT / 'reports'
+    METRICS_DIR = REPORT_DIR / 'metrics'
 
     # Bok_choy dirs
     BOK_CHOY_DIR = REPO_ROOT / "common" / "test" / "acceptance"

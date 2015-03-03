@@ -75,6 +75,9 @@ def run_pylint(options):
     violations_limit = int(getattr(options, 'limit', -1))
     errors = getattr(options, 'errors', False)
     systems = getattr(options, 'system', ALL_SYSTEMS).split(',')
+    
+    # Make sure the metrics subdirectory exists
+    Env.METRICS_DIR.makedirs_p()
 
     for system in systems:
         # Directory to put the pylint report in.
@@ -114,7 +117,15 @@ def run_pylint(options):
         num_violations += _count_pylint_violations(
             "{report_dir}/pylint.report".format(report_dir=report_dir))
 
-    print("Number of pylint violations: " + str(num_violations))
+    # Print number of violations to log
+    violations_count_str = "Number of pylint violations: " + str(num_violations)
+    print(violations_count_str)
+
+    # Also write the number of violations to a file
+    with open(Env.METRICS_DIR / "pylint", "w") as f:
+        f.write(violations_count_str)
+
+    # Fail number of violations is greater than the limit
     if num_violations > violations_limit > -1:
         raise Exception("Failed. Too many pylint violations. "
                         "The limit is {violations_limit}.".format(violations_limit=violations_limit))
@@ -154,6 +165,9 @@ def run_pep8(options):
     report_dir = (Env.REPORT_DIR / 'pep8')
     report_dir.rmtree(ignore_errors=True)
     report_dir.makedirs_p()
+    
+    # Make sure the metrics subdirectory exists
+    Env.METRICS_DIR.makedirs_p()
 
     for system in systems:
         sh('pep8 {system} | tee {report_dir}/pep8.report -a'.format(system=system, report_dir=report_dir))
@@ -162,7 +176,15 @@ def run_pep8(options):
         "{report_dir}/pep8.report".format(report_dir=report_dir)
     )
 
-    print("Number of pep8 violations: {count}".format(count=count))
+    # Print number of violations to log
+    violations_count_str = "Number of pep8 violations: {count}".format(count=count)
+    print(violations_count_str)
+
+    # Also write the number of violations to a file
+    with open(Env.METRICS_DIR / "pep8", "w") as f:
+        f.write(violations_count_str)
+
+    # Fail if any violations are found
     if count:
         raise Exception(
             "Too many pep8 violations. Number of violations found: {count}.".format(
