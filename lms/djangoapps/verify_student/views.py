@@ -665,7 +665,7 @@ def create_order(request):
         log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
         return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
 
-    if CourseMode.has_professional_mode(no_id_prof_mode):
+    if current_mode.is_professional_mode() or current_mode.is_no_id_professional_mode():
         amount = current_mode.min_price
 
     if amount < current_mode.min_price:
