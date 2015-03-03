@@ -51,6 +51,21 @@ class DashboardPage(PageObject):
 
         return self.q(css='section.info > hgroup > h3 > a').map(_get_course_name).results
 
+    @property
+    def full_name(self):
+        """Return the displayed value for the user's full name"""
+        return self.q(css='li.info--username .data').text[0]
+
+    @property
+    def email(self):
+        """Return the displayed value for the user's email address"""
+        return self.q(css='li.info--email .data').text[0]
+
+    @property
+    def username(self):
+        """Return the displayed value for the user's username"""
+        return self.q(css='h1.user-name').text[0]
+
     def get_enrollment_mode(self, course_name):
         """Get the enrollment mode for a given course on the dashboard.
 
