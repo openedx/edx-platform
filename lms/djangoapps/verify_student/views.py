@@ -472,7 +472,7 @@ class PayAndVerifyView(View):
         if url is not None:
             return redirect(url)
 
-    def _get_expired_verified_and_all_paid_modes_for_course(self, course_key):
+    def _get_expired_verified_and_all_paid_modes_for_course(self, course_key):  # pylint: disable=invalid-name
         """Retrieve unexpired and expired verified modes for a course.
 
         Arguments:
@@ -669,8 +669,7 @@ def create_order(request):
     if paid_modes:
         if len(paid_modes) > 1:
             log.warn(
-                u"Multiple paid course modes found for course '%s' for create order flow request",
-                course_id
+                u"Multiple paid course modes found for {course_id} for create order request".format(course_id=course_id)
             )
         current_mode = paid_modes[0]
 
