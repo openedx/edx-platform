@@ -2024,6 +2024,9 @@ API_DATE_FORMAT = '%Y-%m-%d'
 # Enrollment API Cache Timeout
 ENROLLMENT_COURSE_DETAILS_CACHE_TIMEOUT = 60
 
+# The E-Commerce Purchase Endpoint
+PURCHASE_API_URL = "http://localhost:8002/purchase"
+
 # for Student Notes we would like to avoid too frequent token refreshes (default is 30 seconds)
 if FEATURES['ENABLE_EDXNOTES']:
     OAUTH_ID_TOKEN_EXPIRATION = 60 * 60
