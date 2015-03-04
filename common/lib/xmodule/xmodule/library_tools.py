@@ -104,15 +104,15 @@ class LibraryToolsService(object):
 
     def update_children(self, dest_block, user_id, user_perms=None):
         """
-        This method is to be used when any of the libraries that a LibraryContentModule
-        references have been updated. It will re-fetch all matching blocks from
+        This method is to be used when the library that a LibraryContentModule
+        references has been updated. It will re-fetch all matching blocks from
         the libraries, and copy them as children of dest_block. The children
         will be given new block_ids, but the definition ID used should be the
         exact same definition ID used in the library.
 
-        This method will update dest_block's 'source_libraries' field to store
-        the version number of the libraries used, so we easily determine if
-        dest_block is up to date or not.
+        This method will update dest_block's 'source_library_version' field to
+        store the version number of the libraries used, so we easily determine
+        if dest_block is up to date or not.
         """
         if user_perms and not user_perms.can_write(dest_block.location.course_key):
             raise PermissionDenied()
@@ -125,7 +125,7 @@ class LibraryToolsService(object):
         library_key = dest_block.source_library_key
         library = self._get_library(library_key)
         if library is None:
-            raise ValueError("Required library not found.")
+            raise ValueError("Requested library not found.")
         if user_perms and not user_perms.can_read(library_key):
             raise PermissionDenied()
         filter_children = (dest_block.capa_type != ANY_CAPA_TYPE_VALUE)

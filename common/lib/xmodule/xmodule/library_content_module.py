@@ -407,8 +407,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     (
                         ngettext(
-                            u'The specified libraries are configured to fetch {count} problem, ',
-                            u'The specified libraries are configured to fetch {count} problems, ',
+                            u'The specified library is configured to fetch {count} problem, ',
+                            u'The specified library is configured to fetch {count} problems, ',
                             self.max_count
                         ) +
                         ngettext(
