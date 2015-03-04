@@ -90,7 +90,7 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
-        if is_active and enrollment_mode in CourseMode.VERIFIED_MODES:
+        if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + CourseMode.NO_ID_PROFESSIONAL_MODES):
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
