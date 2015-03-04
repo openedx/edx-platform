@@ -668,14 +668,12 @@ def create_order(request):
     # for course exist then choose the first one
     if paid_modes:
         if len(paid_modes) > 1:
-            log.warn(
-                u"Multiple paid course modes found for {course_id} for create order request".format(course_id=course_id)
-            )
+            log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
         current_mode = paid_modes[0]
 
     # make sure this course has a verified mode
     if not current_mode:
-        log.warn(u"Create order requested for course {course_id} without a paid mode.".format(course_id=course_id))
+        log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
         return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
 
     if CourseMode.is_professional_mode(current_mode):
