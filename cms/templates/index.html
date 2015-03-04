@@ -17,7 +17,7 @@
     <h1 class="page-header">${_("{studio_name} Home").format(studio_name=settings.STUDIO_SHORT_NAME)}</h1>
 
     % if user.is_active:
-    <nav class="nav-actions">
+    <nav class="nav-actions" aria-label="${_('Page Actions')}">
       <h3 class="sr">${_("Page Actions")}</h3>
       <ul>
         <li class="nav-item">
