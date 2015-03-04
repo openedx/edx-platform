@@ -720,7 +720,7 @@ def submit_photos_for_verification(request):
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
-            AccountView.update_account(request.user, username, {"name": request.POST.get('full_name')})
+            AccountView.update_account(username, {"name": request.POST.get('full_name')})
         except AccountUserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountUpdateError:

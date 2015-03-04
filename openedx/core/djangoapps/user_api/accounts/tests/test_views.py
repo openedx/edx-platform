@@ -181,6 +181,13 @@ class TestAccountAPI(UserAPITestCase):
         self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
         self.send_patch(self.different_client, {}, expected_status=404)
 
+    def test_patch_account_is_staff(self):
+        """
+        Test that a client (logged in) with is_staff privileges cannot account settings for other users.
+        """
+        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
+        self.send_patch(self.staff_client, {}, expected_status=404)
+
     @ddt.data(
         ("client", "user"),
         ("staff_client", "staff_user"),
@@ -198,34 +205,25 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(404, response.status_code)
 
     @ddt.data(
-        (
-            "client", "user", "gender", "f", "not a gender",
-            "Select a valid choice. not a gender is not one of the available choices."
-        ),
-        (
-            "client", "user", "level_of_education", "none", "x",
-            "Select a valid choice. x is not one of the available choices."
-        ),
-        ("client", "user", "country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
-        ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
-        ("client", "user", "name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
-        ("client", "user", "name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
-        ("client", "user", "language", "Creole"),
-        ("client", "user", "goals", "Smell the roses"),
-        ("client", "user", "mailing_address", "Sesame Street"),
-        # All of the fields can be edited by is_staff, but iterating through all of them again seems like overkill.
-        # Just test a representative field.
-        ("staff_client", "staff_user", "goals", "Smell the roses"),
+        ("gender", "f", "not a gender", "Select a valid choice. not a gender is not one of the available choices."),
+        ("level_of_education", "none", "x", "Select a valid choice. x is not one of the available choices."),
+        ("country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
+        ("year_of_birth", 2009, "not_an_int", "Enter a whole number."),
+        ("name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
+        ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
+        ("language", "Creole"),
+        ("goals", "Smell the roses"),
+        ("mailing_address", "Sesame Street"),
         # Note that email is tested below, as it is not immediately updated.
     )
     @ddt.unpack
     def test_patch_account(
-            self, api_client, user, field, value, fails_validation_value=None, developer_validation_message=None
+            self, field, value, fails_validation_value=None, developer_validation_message=None
     ):
         """
         Test the behavior of patch, when using the correct content_type.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
         self.send_patch(client, {field: value})
 
         get_response = self.send_get(client)
@@ -248,16 +246,12 @@ class TestAccountAPI(UserAPITestCase):
             get_response = self.send_get(client)
             self.assertEqual("", get_response.data[field])
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
     @ddt.unpack
-    def test_patch_account_noneditable(self, api_client, user):
+    def test_patch_account_noneditable(self):
         """
         Tests the behavior of patch when a read-only field is attempted to be edited.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
 
         def verify_error_response(field_name, data):
             self.assertEqual(
@@ -317,10 +311,10 @@ class TestAccountAPI(UserAPITestCase):
             self.assertEqual(expected_entries, len(name_change_info))
             return name_change_info
 
-        def verify_change_info(change_info, old_name, requester, new_name):
+        def verify_change_info(change_info, old_name, new_name):
             self.assertEqual(3, len(change_info))
             self.assertEqual(old_name, change_info[0])
-            self.assertEqual("Name change requested through account API by {}".format(requester), change_info[1])
+            self.assertEqual("Name change requested through account API", change_info[1])
             self.assertIsNotNone(change_info[2])
             # Verify the new name was also stored.
             get_response = self.send_get(self.client)
@@ -334,27 +328,21 @@ class TestAccountAPI(UserAPITestCase):
         # First change the name as the user and verify meta information.
         self.send_patch(self.client, {"name": "Mickey Mouse"})
         name_change_info = get_name_change_info(1)
-        verify_change_info(name_change_info[0], old_name, self.user.username, "Mickey Mouse")
+        verify_change_info(name_change_info[0], old_name, "Mickey Mouse")
 
-        # Now change the name as a different (staff) user and verify meta information.
-        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
-        self.send_patch(self.staff_client, {"name": "Donald Duck"})
+        # Now change the name again and verify meta information.
+        self.send_patch(self.client, {"name": "Donald Duck"})
         name_change_info = get_name_change_info(2)
-        verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)
-        verify_change_info(name_change_info[1], "Mickey Mouse", self.staff_user.username, "Donald Duck")
+        verify_change_info(name_change_info[0], old_name, "Donald Duck",)
+        verify_change_info(name_change_info[1], "Mickey Mouse", "Donald Duck")
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_patch_email(self, api_client, user):
+    def test_patch_email(self):
         """
-        Test that the user (and anyone with an is_staff account) can request an email change through the accounts API.
+        Test that the user can request an email change through the accounts API.
         Full testing of the helper method used (do_email_change_request) exists in the package with the code.
         Here just do minimal smoke testing.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
         old_email = self.user.email
         new_email = "newemail@example.com"
         self.send_patch(client, {"email": new_email, "goals": "change my email"})

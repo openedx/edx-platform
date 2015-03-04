@@ -124,8 +124,12 @@ class AccountView(APIView):
         https://tools.ietf.org/html/rfc7396. The content_type must be "application/merge-patch+json" or
         else an error response with status code 415 will be returned.
         """
+        # Disallow users with is_staff access from calling patch on any account.
+        if request.user.username != username:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
         try:
-            AccountView.update_account(request.user, username, request.DATA)
+            AccountView.update_account(username, request.DATA)
         except AccountUserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountUpdateError as err:
@@ -134,16 +138,15 @@ class AccountView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @staticmethod
-    def update_account(requesting_user, username, update):
+    def update_account(username, update):
         """Update the account for the given username.
 
         Note:
             No authorization or permissions checks are done in this method. It is up to the caller
-            of this method to enforce the contract that this method is only called if
-            requesting_user.username == username or requesting_user.is_staff == True.
+            of this method to enforce the contract that this method is only called
+            by the user with the specified username.
 
         Arguments:
-            requesting_user (User): the user who initiated the request
             username (string): the username associated with the account to change
             update (dict): the updated account field values
 
@@ -200,15 +203,14 @@ class AccountView(APIView):
                 raise AccountUpdateError(validation_errors)
             serializer.save()
 
-        # If the name was changed, store information about the change operation. This is outside of the
-        # serializer so that we can store who requested the change.
+        # If the name was changed, store information about the change operation.
         if old_name:
             meta = existing_user_profile.get_meta()
             if 'old_names' not in meta:
                 meta['old_names'] = []
             meta['old_names'].append([
                 old_name,
-                "Name change requested through account API by {0}".format(requesting_user.username),
+                "Name change requested through account API",
                 datetime.datetime.now(UTC).isoformat()
             ])
             existing_user_profile.set_meta(meta)
