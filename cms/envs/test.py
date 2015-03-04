@@ -26,7 +26,17 @@ from uuid import uuid4
 
 # import settings from LMS for consistent behavior with CMS
 # pylint: disable=unused-import
-from lms.envs.test import (WIKI_ENABLED, PLATFORM_NAME, SITE_NAME, DEFAULT_FILE_STORAGE, MEDIA_ROOT, MEDIA_URL)
+from lms.envs.test import (
+    WIKI_ENABLED,
+    PLATFORM_NAME,
+    SITE_NAME,
+    DEFAULT_FILE_STORAGE,
+    MEDIA_ROOT,
+    MEDIA_URL,
+    # This is practically unused but needed by the oauth2_provider package, which
+    # some tests in common/ rely on.
+    OAUTH_OIDC_ISSUER,
+)
 
 # mongo connection settings
 MONGO_PORT_NUM = int(os.environ.get('EDXAPP_TEST_MONGO_PORT', '27017'))
