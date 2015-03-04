@@ -73,7 +73,7 @@ class ChooseModeView(View):
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
         # to the usual "choose your track" page same is true for no-id-professional mode.
-        has_enrolled_professional = (enrollment_mode == "professional" and is_active)
+        has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
         if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             return redirect(
                 reverse(
