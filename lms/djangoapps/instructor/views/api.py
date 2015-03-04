@@ -58,7 +58,7 @@ from shoppingcart.models import (
     CourseMode,
     CourseRegistrationCodeInvoiceItem,
 )
-from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user
+from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user, EntranceExamConfiguration
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
@@ -2322,3 +2322,27 @@ def spoc_gradebook(request, course_id):
         'staff_access': True,
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+@require_POST
+def mark_student_can_skip_entrance_exam(request, course_id):  # pylint: disable=invalid-name
+    """
+    Mark a student to skip entrance exam.
+    Takes `unique_student_identifier` as required POST parameter.
+    """
+    course_id = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    student_identifier = request.POST.get('unique_student_identifier')
+    student = get_student_from_identifier(student_identifier)
+
+    __, created = EntranceExamConfiguration.objects.get_or_create(user=student, course_id=course_id)
+    if created:
+        message = _('This student (%s) will skip the entrance exam.') % student_identifier
+    else:
+        message = _('This student (%s) is already allowed to skip the entrance exam.') % student_identifier
+    response_payload = {
+        'message': message,
+    }
+    return JsonResponse(response_payload)

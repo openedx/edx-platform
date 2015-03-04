@@ -204,6 +204,45 @@ class EntranceExamGradeTest(UniqueCourseTest):
         self.student_admin_section.wait_for_ajax()
         self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
 
+    def test_clicking_skip_entrance_exam_button_with_success(self):
+        """
+        Scenario: Clicking on the  Let Student Skip Entrance Exam button with
+        valid student email address or username should result in success prompt.
+            Given that I am on the Student Admin tab on the Instructor Dashboard
+            When I click the  Let Student Skip Entrance Exam Button under
+            Entrance Exam Grade Adjustment after entering a valid student
+            email address or username
+            Then I should be shown an alert with success message
+        """
+        self.student_admin_section.set_student_email(self.student_identifier)
+        self.student_admin_section.click_skip_entrance_exam_button()
+        #first we have window.confirm
+        alert = get_modal_alert(self.student_admin_section.browser)
+        alert.accept()
+
+        # then we have alert confirming action
+        alert = get_modal_alert(self.student_admin_section.browser)
+        alert.dismiss()
+
+    def test_clicking_skip_entrance_exam_button_with_error(self):
+        """
+        Scenario: Clicking on the Let Student Skip Entrance Exam button with
+        email address or username of a non existing student should result in error message.
+            Given that I am on the Student Admin tab on the Instructor Dashboard
+            When I click the Let Student Skip Entrance Exam Button under
+            Entrance Exam Grade Adjustment after entering non existing
+            student email address or username
+            Then I should be shown an error message
+        """
+        self.student_admin_section.set_student_email('non_existing@example.com')
+        self.student_admin_section.click_skip_entrance_exam_button()
+        #first we have window.confirm
+        alert = get_modal_alert(self.student_admin_section.browser)
+        alert.accept()
+
+        self.student_admin_section.wait_for_ajax()
+        self.assertGreater(len(self.student_admin_section.top_notification.text[0]), 0)
+
     def test_clicking_delete_student_attempts_button_with_success(self):
         """
         Scenario: Clicking on the Delete Student State for entrance exam button

@@ -23,6 +23,7 @@ from django.http import HttpRequest, HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import utc
+from django.utils.translation import ugettext as _
 
 from mock import Mock, patch
 from nose.tools import raises
@@ -2375,13 +2376,13 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
             student=self.student,
             course_id=self.course.id,
             module_state_key=self.ee_problem_1.location,
-            state=json.dumps({'attempts': 10}),
+            state=json.dumps({'attempts': 10, 'done': True}),
         )
         ee_module_to_reset2 = StudentModule.objects.create(
             student=self.student,
             course_id=self.course.id,
             module_state_key=self.ee_problem_2.location,
-            state=json.dumps({'attempts': 10}),
+            state=json.dumps({'attempts': 10, 'done': True}),
         )
         self.ee_modules = [ee_module_to_reset1.module_state_key, ee_module_to_reset2.module_state_key]
 
@@ -2521,6 +2522,7 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
         # check response
         tasks = json.loads(response.content)['tasks']
         self.assertEqual(len(tasks), 1)
+        self.assertEqual(tasks[0]['status'], _('Complete'))
 
     def test_list_entrance_exam_instructor_tasks_all_student(self):
         """ Test list task history for entrance exam AND all student. """
@@ -2540,6 +2542,27 @@ class TestEntranceExamInstructorAPIRegradeTask(ModuleStoreTestCase, LoginEnrollm
             'unique_student_identifier': self.student.email,
         })
         self.assertEqual(response.status_code, 400)
+
+    def test_skip_entrance_exam_student(self):
+        """ Test skip entrance exam api for student. """
+        # create a re-score entrance exam task
+        url = reverse('mark_student_can_skip_entrance_exam', kwargs={'course_id': unicode(self.course.id)})
+        response = self.client.post(url, {
+            'unique_student_identifier': self.student.email,
+        })
+        self.assertEqual(response.status_code, 200)
+        # check response
+        message = _('This student (%s) will skip the entrance exam.') % self.student.email
+        self.assertContains(response, message)
+
+        # post again with same student
+        response = self.client.post(url, {
+            'unique_student_identifier': self.student.email,
+        })
+
+        # This time response message should be different
+        message = _('This student (%s) is already allowed to skip the entrance exam.') % self.student.email
+        self.assertContains(response, message)
 
 
 @override_settings(MODULESTORE=TEST_DATA_MOCK_MODULESTORE)
