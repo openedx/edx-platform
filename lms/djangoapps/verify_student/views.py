@@ -662,9 +662,24 @@ def create_order(request):
         donation_for_course[unicode(course_id)] = amount
         request.session['donation_for_course'] = donation_for_course
 
-    no_id_prof_mode = CourseMode.mode_for_course(course_id, CourseMode.NO_ID_PROFESSIONAL_MODES[0])
-    # prefer NO-ID-PROFESSIONAL mode over professional mode then verified_mode
-    current_mode = no_id_prof_mode if no_id_prof_mode else CourseMode.verified_mode_for_course(course_id)
+    current_mode = None
+    paid_modes = CourseMode.paid_modes_for_course(course_id)
+    # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
+    # for course exist then choose the first one
+    if paid_modes:
+        if len(paid_modes) > 1:
+            log.warn(
+                u"Multiple paid course modes found for course '%s' for create order flow request",
+                course_id
+            )
+        current_mode = paid_modes[0]
+
+    if not current_mode:
+        log.warn(
+            u"No paid course mode found for course '%s' for create order flow request",
+            course_id
+        )
+        raise Http404
 
     if CourseMode.is_professional_mode(current_mode):
         amount = current_mode.min_price
