@@ -97,6 +97,20 @@ class VideoUploadTestMixin(object):
                 ]
             },
         ]
+        # Ensure every status string is tested
+        self.previous_uploads += [
+            {
+                "edx_video_id": "status_test_{}".format(status),
+                "client_video_id": "status_test.mp4",
+                "duration": 3.14,
+                "status": status,
+                "encoded_videos": [],
+            }
+            for status in (
+                StatusDisplayStrings._STATUS_MAP.keys() +  # pylint:disable=protected-access
+                ["non_existent_status"]
+            )
+        ]
         for profile in self.profiles:
             create_profile(profile)
         for video in self.previous_uploads:
