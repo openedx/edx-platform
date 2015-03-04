@@ -126,14 +126,14 @@ class TestLibraryContentModule(LibraryContentTest):
         Test that the validation method of LibraryContent blocks can validate
         the source_library setting.
         """
-        # When source_libraries is blank, the validation summary should say this block needs to be configured:
+        # When source_library_id is blank, the validation summary should say this block needs to be configured:
         self.lc_block.source_library_id = ""
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
         self.assertTrue(result.summary)
         self.assertEqual(StudioValidationMessage.NOT_CONFIGURED, result.summary.type)
 
-        # When source_libraries references a non-existent library, we should get an error:
+        # When source_library_id references a non-existent library, we should get an error:
         self.lc_block.source_library_id = "library-v1:BAD+WOLF"
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
@@ -141,7 +141,7 @@ class TestLibraryContentModule(LibraryContentTest):
         self.assertEqual(StudioValidationMessage.ERROR, result.summary.type)
         self.assertIn("invalid", result.summary.text)
 
-        # When source_libraries is set but the block needs to be updated, the summary should say so:
+        # When source_library_id is set but the block needs to be updated, the summary should say so:
         self.lc_block.source_library_id = unicode(self.library.location.library_key)
         result = self.lc_block.validate()
         self.assertFalse(result)  # Validation fails due to at least one warning/message
