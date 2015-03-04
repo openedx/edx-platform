@@ -348,7 +348,7 @@ CMS.URL.UPLOAD_ASSET = '${upload_asset_url}';
             advanced_config_url = utils.reverse_course_url('advanced_settings_handler', context_course.id)
           %>
         <h3 class="title-3">${_("Other Course Settings")}</h3>
-        <nav class="nav-related">
+        <nav class="nav-related" aria-label="${_('Other Course Settings')}">
           <ul>
             <li class="nav-item"><a href="${grading_config_url}">${_("Grading")}</a></li>
             <li class="nav-item"><a href="${course_team_url}">${_("Course Team")}</a></li>
