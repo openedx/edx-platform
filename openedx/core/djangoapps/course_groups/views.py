@@ -407,14 +407,14 @@ def cohort_discussion_topics(request, course_key_string):
 
     if request.method == 'POST':
         course_wide_ids = [topic.get('id') for name, topic in discussions_category['course_wide_categories'].items()]
-        if request.json.get('course_wide_discussion_ids'):
+        if request.json.get('course_wide_discussions'):
             cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if
                                     discussion_id not in course_wide_ids]
-            cohorted_discussions.extend(request.json.get('course_wide_discussion_ids'))
+            cohorted_discussions.extend(request.json.get('cohorted_discussion_ids'))
 
-        elif request.json.get('inline_discussion_ids'):
+        elif request.json.get('content_specific_discussions'):
             cohort_settings_obj.always_cohort_inline_discussions = request.json.get('always_cohort_inline_discussions')
-            course_wide_ids.extend(request.json.get('inline_discussion_ids'))
+            course_wide_ids.extend(request.json.get('cohorted_discussion_ids'))
             cohorted_discussions = course_wide_ids
 
         cohort_settings_obj.cohorted_discussions = cohorted_discussions
