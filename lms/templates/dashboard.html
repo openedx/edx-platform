@@ -7,6 +7,7 @@
 <%!
   from django.core.urlresolvers import reverse
 %>
+<%! from django_countries import countries %>
 
 <%
   cert_name_short = settings.CERT_NAME_SHORT
@@ -40,6 +41,7 @@
         changeEmail: "${reverse('change_email')}",
         changeEmailSettings: "${reverse('change_email_settings')}",
         changeName: "${reverse('change_name')}",
+        editUserInformation: "${reverse('edit_user_information')}",
         verifyToggleBannerFailedOff: "${reverse('verify_student_toggle_failed_banner_off')}",
       });
     });
@@ -164,6 +166,10 @@
           </form>
         </li>
         % endif
+
+        <li class="controls--account">
+            <span class="title"><a href="#edit_user_information" rel="leanModal">${_("Edit Profile")}</a></span>
+        </li>
 
         <%include file='dashboard/_dashboard_status_verification.html' />
 
@@ -373,6 +379,98 @@
           </div>
       </form>
     </div>
+  </div>
+</section>
+
+<section id="edit_user_information" class="modal edit-user-information-modal" aria-hidden="true">
+  <div class="inner-wrapper" role="dialog" aria-labelledby="edit-user-information-modal-title">
+    <button class="close-modal">
+      <i class="icon fa fa-remove"></i>
+      <span class="sr">
+        ## Translators: this is a control to allow users to exit out of this modal interface (a menu or piece of UI that takes the full focus of the screen)
+        ${_("Close")}
+      </span>
+    </button>
+
+    <header>
+      <h2>${_("Change My Profile Information")}</h2>
+    </header>
+
+      <form id="edit_user_information_form">
+        <div id="edit_user_information_error" class="modal-form-error">
+            <ul id="edit_user_information_errors"></ul>
+        </div>
+        <fieldset>
+          <div class="input-group">
+            <%def name="selected_value(value, expected)">${"selected='selected'" if value == expected else ""}</%def>
+            <%def name="required_field(field)">${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS[field] == 'required' else ''}</%def>
+            <%!
+                from django.conf import settings
+                def should_display(field):
+                    return settings.REGISTRATION_EXTRA_FIELDS['city'] != 'hidden'
+            %>
+            % if should_display('city'):
+            <label for="city">${_('City')}</label>
+            <input  type="text" name="city" value="${user.profile.city}" placeholder="${_('example: New York')}" aria-describedby="city-tip" ${required_field('city')} />
+            % endif
+            % if should_display('country'):
+            <div class="field-large">
+              <label for="country">${_("Country")}</label>
+              <select name="country" ${required_field('country')}>
+                <option value="" ${selected_value(user.profile.country, None)}>--</option>
+                %for code, country_name in sorted(countries.countries, key=lambda (__, name): unicode(name)):
+                <option value="${code}" ${selected_value(user.profile.country, code)}>${ unicode(country_name) }</option>
+                %endfor
+              </select>
+            </div>
+            % endif
+            % if should_display('level_of_education'):
+            <div class="field-large">
+              <label for="education-level">${_("Highest Level of Education Completed")}</label>
+              <select name="level_of_education" ${required_field('level_of_education')}>
+                <option value="" ${selected_value(user.profile.level_of_education, None)}>--</option>
+                %for code, ed_level in user.profile.LEVEL_OF_EDUCATION_CHOICES:
+                <option value="${code}" ${selected_value(user.profile.level_of_education, code)}>${_(ed_level)}</option>
+                %endfor
+              </select>
+            </div>
+            % endif
+            % if should_display('gender'):
+            <div class="field-large">
+              <label for="gender">${_("Gender")}</label>
+              <select name="gender" ${required_field('gender')}>
+                <option value="" ${selected_value(user.profile.gender, None)}>--</option>
+                %for code, gender in user.profile.GENDER_CHOICES:
+                <option value="${code}" ${selected_value(user.profile.gender, gender)}>${_(gender)}</option>
+                %endfor
+              </select>
+            </div>
+            % endif
+            % if should_display('year_of_birth'):
+            <div class="field-large">
+              <label for="yob">${_("Year of Birth")}</label>
+              <select id="yob" name="year_of_birth" ${required_field('year_of_birth')}>
+                <option value="" ${selected_value(user.profile.year_of_birth, None)}>--</option>
+                %for year in user.profile.VALID_YEARS:
+                <option value="${year}" ${selected_value(user.profile.year_of_birth, year)}>${year}</option>
+                %endfor
+              </select>
+            </div>
+            % endif
+            % if should_display('mailing_address'):
+            <label for="address-mailing">${_("Mailing Address")}</label>
+            <textarea id="address-mailing" name="mailing_address" value="${user.profile.mailing_address}" ${required_field('mailing_address')}></textarea>
+            % endif
+            % if should_display('goals'):
+            <label for="goals">${_("Please share with us your reasons for registering with {platform_name}").format(platform_name=platform_name)}</label>
+            <textarea id="goals" name="goals" value="${user.profile.goals}" ${required_field('goals')}></textarea>
+            % endif
+          </div>
+          <div class="submit">
+            <input type="submit" id="submit" value="${_("Change My Profile Information")}">
+          </div>
+        </fieldset>
+      </form>
   </div>
 </section>
 

@@ -216,6 +216,35 @@
             return false;
         });
 
+        $("#edit_user_information_form").submit(function(){
+            $.ajax({
+                type: "POST",
+                url: urls.editUserInformation,
+                data: $(this).serializeArray(),
+                success: function(data) {
+                    if(data.success) {
+                        location.reload();
+                    }
+                    else {
+                        $("#edit_user_information_errors").html("");
+                        for(var field in data.errors) {
+                            var errors = data.errors[field];
+                            for(var e = 0; e < errors.length; e += 1) {
+                                $("#edit_user_information_errors").append("<li>" + field + " - " + errors[e] + "</li>");
+                            }
+                        }
+                        $("#edit_user_information_error").css("display", "block");
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 403) {
+                        location.href = urls.signInUser;
+                    }
+                }
+            });
+            return false;
+        });
+
         accessibleModal(
             ".edit-name",
             "#apply_name_change .close-modal",
