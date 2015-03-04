@@ -132,7 +132,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # that the right template rendered
 
     @ddt.data('professional', 'no-id-professional')
-    def test_professional_enrollment(self,mode):
+    def test_professional_enrollment(self, mode):
         # The only course mode is professional ed
         CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=1)
 
