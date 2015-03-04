@@ -1,7 +1,6 @@
 """
 Views related to course groups functionality.
 """
-from copy import deepcopy
 
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
