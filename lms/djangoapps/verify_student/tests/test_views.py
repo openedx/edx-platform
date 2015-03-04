@@ -882,10 +882,8 @@ class TestCreateOrder(ModuleStoreTestCase):
         self.assertEqual(data['merchant_defined_data2'], "professional")
 
     def test_create_order_for_no_id_professional(self):
-        # Verify the student so we don't need to submit photos
-        self._verify_student()
 
-        # Create a prof ed course
+        # Create a no-id-professional ed course
         course = CourseFactory.create()
         CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10)
 
