@@ -70,8 +70,7 @@
 		 honor_link = u"<a href='{}'>".format(marketing_link('HONOR'))
 	      %>
 	      ${
-	        ## _("{tos_link_start}Terms of Service{tos_link_end} and 
-                  _("{honor_link_start}Honor Code{honor_link_end}").format(
+	        _("<!-- {tos_link_start}Terms of Service{tos_link_end} and -->{honor_link_start}Honor Code{honor_link_end}").format(
 	          tos_link_start=tos_link,
 	          tos_link_end="</a>",
 	          honor_link_start=honor_link,
