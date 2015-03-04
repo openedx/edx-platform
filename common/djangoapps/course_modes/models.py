@@ -395,6 +395,14 @@ class CourseMode(models.Model):
 
     @classmethod
     def is_professional_mode(cls, course_mode_tuple):
+        """
+        checking that tuple is professional mode.
+        Args:
+            course_mode_tuple (tuple) : course mode tuple
+
+        Returns:
+            bool
+        """
         if course_mode_tuple:
             return course_mode_tuple.slug == 'professional' or course_mode_tuple.slug == cls.NO_ID_PROFESSIONAL_MODES[0]
         return False
