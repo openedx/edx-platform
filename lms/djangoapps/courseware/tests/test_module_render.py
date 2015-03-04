@@ -5,6 +5,7 @@ Test for lms courseware app, module render unit
 import ddt
 import itertools
 import json
+from functools import partial
 
 from bson import ObjectId
 from django.http import Http404, HttpResponse
@@ -12,11 +13,9 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.test.client import RequestFactory
 from django.contrib.auth.models import AnonymousUser
-from functools import partial
 from mock import MagicMock, patch, Mock
 from opaque_keys.edx.keys import UsageKey, CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
-from courseware.module_render import hash_resource, get_module_for_descriptor
 from xblock.field_data import FieldData
 from xblock.runtime import Runtime
 from xblock.fields import ScopeIds
@@ -26,18 +25,18 @@ from capa.tests.response_xml_factory import OptionResponseXMLFactory
 from courseware import module_render as render
 from courseware.courses import get_course_with_access, course_image_url, get_course_info_section
 from courseware.model_data import FieldDataCache
+from courseware.module_render import hash_resource, get_module_for_descriptor
 from courseware.models import StudentModule
 from courseware.tests.factories import StudentModuleFactory, UserFactory, GlobalStaffFactory
 from courseware.tests.tests import LoginEnrollmentTestCase
+from courseware.tests.test_submitting_problems import TestSubmittingProblems
+from lms.djangoapps.lms_xblock.runtime import quote_slashes
+from student.models import anonymous_id_for_user
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE,
     TEST_DATA_XML_MODULESTORE,
 )
-from courseware.tests.test_submitting_problems import TestSubmittingProblems
-from lms.djangoapps.lms_xblock.runtime import quote_slashes
-from student.models import anonymous_id_for_user
 from xmodule.lti_module import LTIDescriptor
-
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
