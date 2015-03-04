@@ -55,6 +55,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         # We should NOT be auto-enrolled, because that would be giving
         # away an expensive course for free :)
         (['professional'], 'course_modes_choose', None),
+        (['no-id-professional'], 'course_modes_choose', None),
     )
     @ddt.unpack
     def test_enroll(self, course_modes, next_url, enrollment_mode):
