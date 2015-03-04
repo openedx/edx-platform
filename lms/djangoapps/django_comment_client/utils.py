@@ -134,7 +134,7 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course):
+def get_discussion_category_map(course, cohort_inline_discussion=False):
     course_id = course.id
 
     unexpanded_category_map = defaultdict(list)
@@ -189,8 +189,9 @@ def get_discussion_category_map(course):
                 "id": entry["id"],
                 "sort_key": entry["sort_key"],
                 "start_date": entry["start_date"],
-                "is_cohorted": (course_cohort_settings.is_cohorted and
-                                entry["id"] in course_cohort_settings.cohorted_discussions)
+                "is_cohorted":
+                    course_cohort_settings.is_cohorted and entry["id"] in course_cohort_settings.cohorted_discussions
+                    if cohort_inline_discussion else course_cohort_settings.is_cohorted
             }
 
     # TODO.  BUG! : course location is not unique across multiple course runs!

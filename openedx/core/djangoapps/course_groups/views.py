@@ -373,11 +373,12 @@ def debug_cohort_mgmt(request, course_key_string):
 def cohort_discussion_topics(request, course_key_string):
     """
     The restful handler for cohort discussion requests.
-    This will raise 404 if user is not staff or .
+    This will raise 404 if user is not staff.
     GET
         Returns the JSON representation of discussion topics w.r.t categories for the course.
     POST
-        Updates the cohort_discussion for the course. Returns the JSON representation of updated discussions.
+        Updates the cohort_discussions & always_cohort_inline_discussions for the course and
+        Returns the JSON representation of updated discussions.
     """
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     try:
@@ -386,15 +387,14 @@ def cohort_discussion_topics(request, course_key_string):
         # course didn't exist, or requesting user does not have access to it.
         return JsonError(status=404)
 
-    discussions_category = get_discussion_category_map(course)
-    discussions_category['coursewide_categories'] = discussions_category['entries']
+    discussions_category = get_discussion_category_map(course, cohort_inline_discussion=True)
+    discussions_category['course_wide_categories'] = discussions_category['entries']
     del discussions_category['entries']
 
     course_wide_children = []
     content_specific_children = []
-
     for child in discussions_category['children']:
-        if child in discussions_category['coursewide_categories']:
+        if child in discussions_category['course_wide_categories']:
             course_wide_children.append(child)
         else:
             content_specific_children.append(child)
@@ -407,17 +407,18 @@ def cohort_discussion_topics(request, course_key_string):
     cohort_settings_obj = cohorts.get_course_cohort_settings(course_key)
     discussions_category['always_cohort_inline_discussions'] = cohort_settings_obj.always_cohort_inline_discussions
     cohorted_discussions = []
+
     if request.method == 'POST':
-        coursewide_ids = [topic.get('id') for name, topic in discussions_category['coursewide_categories'].items()]
-        if request.json.get('coursewide_discussions'):
+        course_wide_ids = [topic.get('id') for name, topic in discussions_category['course_wide_categories'].items()]
+        if request.json.get('course_wide_discussions'):
             cohorted_discussions = [discussion_id for discussion_id in cohort_settings_obj.cohorted_discussions if
-                                    discussion_id not in coursewide_ids]
+                                    discussion_id not in course_wide_ids]
             cohorted_discussions.extend(request.json.get('cohorted_discussion_ids'))
 
         elif request.json.get('content_specific_discussions'):
             cohort_settings_obj.always_cohort_inline_discussions = request.json.get('always_cohort_inline_discussions')
-            coursewide_ids.extend(request.json.get('cohorted_discussion_ids'))
-            cohorted_discussions = coursewide_ids
+            course_wide_ids.extend(request.json.get('cohorted_discussion_ids'))
+            cohorted_discussions = course_wide_ids
 
         cohort_settings_obj.cohorted_discussions = cohorted_discussions
         cohort_settings_obj.save()

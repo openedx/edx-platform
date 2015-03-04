@@ -1074,7 +1074,7 @@
   // cohort discussions interface.
   .cohort-discussions-nav {
 
-    .cohort-coursewide-discussions-form {
+    .cohort-course-wide-discussions-form {
 
       .form-actions {
         padding-top: ($baseline/2);
@@ -1092,7 +1092,8 @@
       padding-top: ($baseline/2);
     }
 
-    .category-item {
+    .category-item,
+    .subcategory-item {
       padding-top: ($baseline/2);
     }
 
@@ -1100,9 +1101,13 @@
       color: $link-color;
     }
 
-    .discussions-wrapper {
-      @extend %ui-no-list;
-      padding: 0 ($baseline/2);
+    .discussions-wrapper
+    {
+      &.subcategories
+      {
+        @extend %ui-no-list;
+        padding: 0 ($baseline*1.5);
+      }
     }
   }
 

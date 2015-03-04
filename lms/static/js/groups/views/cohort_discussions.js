@@ -10,8 +10,8 @@ var edx = edx || {};
         events: {
             'change .check-discussion-category': 'changeDiscussionInlineCategory',
             'change .check-discussion-subcategory-inline': 'changeDiscussionInlineSubCategory',
-            'change .check-discussion-subcategory-coursewide': 'changeDiscussionCoursewideCategory',
-            'click .cohort-coursewide-discussions-form .action-save': 'saveCoursewideDiscussionsForm',
+            'change .check-discussion-subcategory-course-wide': 'changeDiscussionCourseWideCategory',
+            'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'changeAllInlineDiscussions'
         },
@@ -22,32 +22,38 @@ var edx = edx || {};
         },
         render: function () {
             var alwaysCohortInlineDiscussions = this.model.get('always_cohort_inline_discussions');
+
             this.$el.html(this.template({
-                coursewideTopics: this.renderCoursewideTopics(this.model.get('coursewide_categories'), this.model.get('course_wide_children')),
-                inlineTopicsHtml: this.renderInlineTopics(this.model),
-                always_cohort_inline_discussions:alwaysCohortInlineDiscussions
+                courseWideTopics: this.renderCourseWideTopics(
+                    this.model.get('course_wide_categories'),
+                    this.model.get('course_wide_children')
+                ),
+                inlineDiscussionTopics: this.renderInlineTopics(this.model),
+                alwaysCohortInlineDiscussions:alwaysCohortInlineDiscussions
             }));
-            this.processInlineTopics();
+
+            $('ul.inline-topics').qubit();
+
             this.toggleDisableClass(this.$('.action-save'), false);
             if (alwaysCohortInlineDiscussions) {
-                this.toggleDisableClass(this.$('.inline-cohorts'), false)
+                this.toggleDisableClass(this.$('.inline-topics'), false)
             }
         },
-        renderCoursewideTopics: function (topics, children) {
+        renderCourseWideTopics: function (topics, children) {
             var self = this;
             return _.map(children, function (name) {
                 return self.subCategoryTemplate({
                     name: name,
                     id: topics[name].id,
                     is_cohorted: topics[name].is_cohorted,
-                    type: 'coursewide'
+                    type: 'course-wide'
                 });
             }).join('');
         },
         renderInlineTopics: function (category) {
-            var category_template = _.template($('#cohort-discussions-category-tpl').html()),
-                entry_template = this.subCategoryTemplate,
-                is_category_cohorted = false,
+            var categoryTemplate = _.template($('#cohort-discussions-category-tpl').html()),
+                entryTemplate = this.subCategoryTemplate,
+                isCategoryCohorted = false,
                 children = category.children || category.get('children'),
                 entries = category.entries || category.get('entries'),
                 subcategories = category.subcategories || category.get('subcategories');
@@ -56,24 +62,21 @@ var edx = edx || {};
                 var html = '', entry;
                 if (entries && _.has(entries, name)) {
                     entry = entries[name];
-                    html = entry_template({
+                    html = entryTemplate({
                         name: name,
                         id: entry.id,
                         is_cohorted: entry.is_cohorted,
                         type: 'inline'
                     });
                 } else { // subcategory
-                    html = category_template({
+                    html = categoryTemplate({
                         name: name,
                         entries: this.renderInlineTopics(subcategories[name]),
-                        is_category_cohorted: is_category_cohorted
+                        isCategoryCohorted: isCategoryCohorted
                     });
                 }
                 return html;
             }, this).join('');
-        },
-        processInlineTopics: function() {
-            $('ul.inline-cohorts').qubit();
         },
         toggleDisableClass: function($element, enable) {
             if (enable) {
@@ -82,15 +85,14 @@ var edx = edx || {};
                 $element.addClass(disabledClass).attr('aria-disabled', enable);
             }
         },
-        changeDiscussionCoursewideCategory: function(event) {
+        changeDiscussionCourseWideCategory: function(event) {
             event.preventDefault();
-            this.toggleDisableClass(this.$('.cohort-coursewide-discussions-form .action-save'), true);
+            this.toggleDisableClass(this.$('.cohort-course-wide-discussions-form .action-save'), true);
         },
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
 
-            this.toggleDisableClass(this.$('.inline-cohorts'), !($(event.currentTarget).prop('checked')));
-            this.processInlineTopics();
+            this.toggleDisableClass(this.$('.inline-topics'), !($(event.currentTarget).prop('checked')));
             this.toggleDisableClass(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         changeDiscussionInlineCategory: function(event) {
@@ -133,22 +135,22 @@ var edx = edx || {};
                     });
                 });
         },
-        saveCoursewideDiscussionsForm: function (event) {
+        saveCourseWideDiscussionsForm: function (event) {
             var self = this,
                 fieldData;
 
             event.preventDefault();
-            self.getCohortedDiscussions('.check-discussion-subcategory-coursewide:checked');
+            self.getCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
             fieldData = {
-                coursewide_discussions: true,
+                course_wide_discussions: true,
                 cohorted_discussion_ids: self.cohortedDiscussionTopics
             };
 
-            self.saveForm(fieldData, self.$('.coursewide-discussion-topics'))
+            self.saveForm(fieldData, self.$('.course-wide-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
                          self.render();
-                        self.showMessage(gettext('Changes Saved.'), self.$('.coursewide-discussion-topics'));
+                        self.showMessage(gettext('Changes Saved.'), self.$('.course-wide-discussion-topics'));
                     });
                 });
         },
