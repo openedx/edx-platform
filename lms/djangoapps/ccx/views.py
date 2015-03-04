@@ -32,7 +32,7 @@ from courseware.grades import iterate_grades_for
 from courseware.model_data import FieldDataCache
 from courseware.module_render import get_module_for_descriptor
 from edxmako.shortcuts import render_to_response
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
+from opaque_keys.edx.keys import CourseKey
 from student.roles import CourseCcxCoachRole
 
 from instructor.offline_gradecalc import student_grades
@@ -69,7 +69,7 @@ def coach_dashboard(view):
         Wraps the view function, performing access check, loading the course,
         and modifying the view's call signature.
         """
-        course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+        course_key = CourseKey.from_string(course_id)
         role = CourseCcxCoachRole(course_key)
         if not role.has_user(request.user):
             return HttpResponseForbidden(
@@ -283,6 +283,8 @@ def get_ccx_schedule(course, ccx):
     def visit(node, depth=1):
         """
         Recursive generator function which yields CCX schedule nodes.
+        We convert dates to string to get them ready for use by the js date
+        widgets, which use text inputs.
         """
         for child in node.get_children():
             start = get_override_for_ccx(ccx, child, 'start', None)
@@ -358,7 +360,7 @@ def ccx_invite(request, course):
             if action == "Unenroll":
                 unenroll_email(ccx, email, email_students=email_students)
         except ValidationError:
-            pass  # maybe log this?
+            log.info('Invalid user name or email when trying to invite students: %s', email)
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
     return redirect(url)
 
@@ -389,7 +391,7 @@ def ccx_student_management(request, course):
         elif action == 'revoke':
             unenroll_email(ccx, email, email_students=False)
     except ValidationError:
-        pass  # XXX: log, report?
+        log.info('Invalid user name or email when trying to enroll student: %s', email)
 
     url = reverse('ccx_coach_dashboard', kwargs={'course_id': course.id})
     return redirect(url)
@@ -499,8 +501,7 @@ def ccx_grades_csv(request, course):
 def switch_active_ccx(request, course_id, ccx_id=None):
     """set the active CCX for the logged-in user
     """
-    user = request.user
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
     # will raise Http404 if course_id is bad
     course = get_course_by_id(course_key)
     course_url = reverse(
@@ -509,7 +510,7 @@ def switch_active_ccx(request, course_id, ccx_id=None):
     if ccx_id is not None:
         try:
             requested_ccx = CustomCourseForEdX.objects.get(pk=ccx_id)
-            assert requested_ccx.course_id.to_deprecated_string() == course_id
+            assert unicode(requested_ccx.course_id) == course_id
             if not CcxMembership.objects.filter(
                 ccx=requested_ccx, student=request.user, active=True
             ).exists():

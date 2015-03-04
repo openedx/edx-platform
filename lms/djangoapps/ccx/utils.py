@@ -65,8 +65,8 @@ def enroll_email(ccx, student_email, auto_enroll=False, email_students=False, em
     previous_state = EmailEnrollmentState(ccx, student_email)
 
     if previous_state.user:
+        user = User.objects.get(email=student_email)
         if not previous_state.in_ccx:
-            user = User.objects.get(email=student_email)
             membership = CcxMembership(
                 ccx=ccx, student=user, active=True
             )

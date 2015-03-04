@@ -7,6 +7,8 @@ import threading
 
 from contextlib import contextmanager
 
+from django.db import transaction, IntegrityError
+
 from courseware.field_overrides import FieldOverrideProvider
 from ccx import ACTIVE_CCX_KEY
 
@@ -97,20 +99,29 @@ def _get_overrides_for_ccx(ccx, block):
     return overrides
 
 
+@transaction.commit_on_success
 def override_field_for_ccx(ccx, block, name, value):
     """
     Overrides a field for the `ccx`.  `block` and `name` specify the block
     and the name of the field on that block to override.  `value` is the
     value to set for the given field.
     """
-    override, created = CcxFieldOverride.objects.get_or_create(
+    field = block.fields[name]
+    value = json.dumps(field.to_json(value))
+    try:
+        override = CcxFieldOverride.objects.create(
+        ccx=ccx,
+        location=block.location,
+        field=name,
+        value=value)
+    except IntegrityError:
+        transaction.commit()
+        override = CcxFieldOverride.objects.get(
         ccx=ccx,
         location=block.location,
         field=name)
-    field = block.fields[name]
-    override.value = json.dumps(field.to_json(value))
+        override.value = value
     override.save()
-
     if hasattr(block, '_ccx_overrides'):
         del block._ccx_overrides[ccx.id]
 

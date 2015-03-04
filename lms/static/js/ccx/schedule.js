@@ -54,55 +54,6 @@ var edx = edx || {};
 		self.schedule_collection.set(self.schedule);
 	        self.render();
 	    });
-        },
-
-        render: function() {
-	    self.schedule = this.schedule_collection.toJSON();
-            self.hidden = this.pruned(self.schedule, function(node) {
-              return node.hidden || node.category !== 'vertical'});
-            this.showing = this.pruned(self.schedule, function(node) {
-              return !node.hidden});
-            this.$el.html(schedule_template({chapters: this.showing}));
-            $('table.ccx-schedule .sequential,.vertical').hide();
-            $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
-	    //
-	    // Hidden hover fields for empty date fields
-	    $('table.ccx-schedule .date a').each(function() {
-	      if (! $(this).text()) {
-		$(this).text('Set date').addClass('empty');
-	      }
-	    });
-	    
-	    // Handle date edit clicks
-	    $('table.ccx-schedule .date a').attr('href', '#enter-date-modal')
-	      .leanModal({closeButton: '.close-modal'});
-	    $('table.ccx-schedule .due-date a').on('click', this.enterNewDate('due'));
-	    $('table.ccx-schedule .start-date a').on('click', this.enterNewDate('start'));
-	    // Click handler for remove all
-	    $('table.ccx-schedule a#remove-all').on('click', function(event) {
-	      event.preventDefault();
-	      self.schedule_apply(self.schedule, self.hide);
-	      self.dirty = true;
-	      self.schedule_collection.set(self.schedule);
-	      self.render();
-	    });
-
-	    // Show or hide form
-	    if (this.hidden.length) {
-	      // Populate chapters select, depopulate others
-	      this.chapter_select.html('')
-		.append('<option value="none">'+gettext("Select a chapter")+'...</option>')
-		.append(self.schedule_options(this.hidden));
-	      this.sequential_select.html('').prop('disabled', true);
-	      this.vertical_select.html('').prop('disabled', true);
-	      $('form#add-unit').show();
-	      $('#all-units-added').hide();
-	      $('#add-unit-button').prop('disabled', true);
-	    }
-	    else {
-	      $('form#add-unit').hide();
-	      $('#all-units-added').show();
-	    }
 
 	    // Add unit handlers
 	    this.chapter_select.on('change', function(event) {
@@ -174,6 +125,44 @@ var edx = edx || {};
 	      self.render();
 	    });
 
+	    // Handle save button
+	    $('#dirty-schedule #save-changes').on('click', function(event) {
+		event.preventDefault();
+		self.save();
+	    });
+
+        },
+
+        render: function() {
+	    self.schedule = this.schedule_collection.toJSON();
+            self.hidden = this.pruned(self.schedule, function(node) {
+              return node.hidden || node.category !== 'vertical'});
+            this.showing = this.pruned(self.schedule, function(node) {
+              return !node.hidden});
+            this.$el.html(schedule_template({chapters: this.showing}));
+            $('table.ccx-schedule .sequential,.vertical').hide();
+            $('table.ccx-schedule .toggle-collapse').on('click', this.toggle_collapse);
+	    //
+	    // Hidden hover fields for empty date fields
+	    $('table.ccx-schedule .date a').each(function() {
+	      if (! $(this).text()) {
+		$(this).text('Set date').addClass('empty');
+	      }
+	    });
+	    
+	    // Handle date edit clicks
+	    $('table.ccx-schedule .date a').attr('href', '#enter-date-modal')
+	      .leanModal({closeButton: '.close-modal'});
+	    $('table.ccx-schedule .due-date a').on('click', this.enterNewDate('due'));
+	    $('table.ccx-schedule .start-date a').on('click', this.enterNewDate('start'));
+	    // Click handler for remove all
+	    $('table.ccx-schedule a#remove-all').on('click', function(event) {
+	      event.preventDefault();
+	      self.schedule_apply(self.schedule, self.hide);
+	      self.dirty = true;
+	      self.schedule_collection.set(self.schedule);
+	      self.render();
+	    });
 	    // Remove unit handler
 	    $('table.ccx-schedule a.remove-unit').on('click', function(event) {
 	      var row = $(this).closest('tr'),
@@ -185,15 +174,27 @@ var edx = edx || {};
 	      self.render(); 
 	    });
 
+
+	    // Show or hide form
+	    if (this.hidden.length) {
+	      // Populate chapters select, depopulate others
+	      this.chapter_select.html('')
+		.append('<option value="none">'+gettext("Select a chapter")+'...</option>')
+		.append(self.schedule_options(this.hidden));
+	      this.sequential_select.html('').prop('disabled', true);
+	      this.vertical_select.html('').prop('disabled', true);
+	      $('form#add-unit').show();
+	      $('#all-units-added').hide();
+	      $('#add-unit-button').prop('disabled', true);
+	    }
+	    else {
+	      $('form#add-unit').hide();
+	      $('#all-units-added').show();
+	    }
+
 	    // Show or hide save button
 	    if (this.dirty) $('#dirty-schedule').show()
 	    else $('#dirty-schedule').hide();
-
-	    // Handle save button
-	    $('#dirty-schedule #save-changes').on('click', function(event) {
-		event.preventDefault();
-		self.save();
-	    });
 
 	    $('#ajax-error').hide();
 

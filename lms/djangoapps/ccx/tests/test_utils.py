@@ -253,7 +253,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         """enroll a non-user email and send an enrollment email to them
         """
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         test_email = "nobody@nowhere.com"
         before, after = self.call_FUT(
             student_email=test_email, email_students=True
@@ -273,7 +273,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         """
         self.create_user()
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         before, after = self.call_FUT(email_students=True)
 
         # there should be a membership set for this email address now
@@ -290,7 +290,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         """
         self.register_user_in_ccx()
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         before, after = self.call_FUT(email_students=True)
 
         # there should be a membership set for this email address now
@@ -306,7 +306,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         """register a non-user via email address but send no email
         """
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         test_email = "nobody@nowhere.com"
         before, after = self.call_FUT(
             student_email=test_email, email_students=False
@@ -317,13 +317,13 @@ class TestEnrollEmail(ModuleStoreTestCase):
         for state in [before, after]:
             self.check_enrollment_state(state, False, None, False)
         # ensure there are still no emails in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
 
     def test_enroll_non_member_no_email(self):
         """register a non-member but send no email"""
         self.create_user()
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         before, after = self.call_FUT(email_students=False)
 
         # there should be a membership set for this email address now
@@ -331,14 +331,14 @@ class TestEnrollEmail(ModuleStoreTestCase):
         self.check_enrollment_state(before, False, self.user, True)
         self.check_enrollment_state(after, True, self.user, True)
         # ensure there are still no emails in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
 
     def test_enroll_member_no_email(self):
         """enroll a member but send no email
         """
         self.register_user_in_ccx()
         # ensure no emails are in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         before, after = self.call_FUT(email_students=False)
 
         # there should be a membership set for this email address now
@@ -346,7 +346,7 @@ class TestEnrollEmail(ModuleStoreTestCase):
         for state in [before, after]:
             self.check_enrollment_state(state, True, self.user, True)
         # ensure there are still no emails in the outbox now
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
 
 
 # TODO: deal with changes in behavior for auto_enroll
@@ -363,11 +363,6 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         role.add_users(coach)
         self.ccx = CcxFactory(course_id=course.id, coach=coach)
         self.outbox = self.get_outbox()
-
-    def tearDown(self):
-        for attr in ['user', 'email']:
-            if hasattr(self, attr):
-                delattr(self, attr)
 
     def get_outbox(self):
         """Return the django mail outbox"""
@@ -428,7 +423,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.make_ccx_future_membership()
         # assert that a membership exists and that no emails have been sent
         self.assertTrue(self.check_membership(future=True))
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         # unenroll the student
         before, after = self.call_FUT(email_students=True)
 
@@ -447,7 +442,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.make_ccx_membership()
         # assert that a membership exists and that no emails have been sent
         self.assertTrue(self.check_membership())
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         # unenroll the student
         before, after = self.call_FUT(email_students=True)
 
@@ -467,7 +462,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.make_ccx_future_membership()
         # assert that a membership exists and that no emails have been sent
         self.assertTrue(self.check_membership(future=True))
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         # unenroll the student
         before, after = self.call_FUT()
 
@@ -477,7 +472,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         for state in [before, after]:
             self.check_enrollment_state(state, False, None, False)
         # no email was sent to the student
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
 
     def test_unenroll_member_no_email(self):
         """unenroll a current member but send no email
@@ -485,7 +480,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.make_ccx_membership()
         # assert that a membership exists and that no emails have been sent
         self.assertTrue(self.check_membership())
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
         # unenroll the student
         before, after = self.call_FUT()
 
@@ -495,7 +490,7 @@ class TestUnenrollEmail(ModuleStoreTestCase):
         self.check_enrollment_state(after, False, self.user, True)
         self.check_enrollment_state(before, True, self.user, True)
         # no email was sent to the student
-        self.assertEqual(len(self.outbox), 0)
+        self.assertEqual(self.outbox, [])
 
 
 class TestUserCCXList(ModuleStoreTestCase):
@@ -530,16 +525,16 @@ class TestUserCCXList(ModuleStoreTestCase):
 
     def test_anonymous_sees_no_ccx(self):
         memberships = self.call_FUT(self.anonymous)
-        self.assertEqual(len(memberships), 0)
+        self.assertEqual(memberships, [])
 
     def test_unenrolled_sees_no_ccx(self):
         memberships = self.call_FUT(self.user)
-        self.assertEqual(len(memberships), 0)
+        self.assertEqual(memberships, [])
 
     def test_enrolled_inactive_sees_no_ccx(self):
         self.register_user_in_ccx()
         memberships = self.call_FUT(self.user)
-        self.assertEqual(len(memberships), 0)
+        self.assertEqual(memberships, [])
 
     def test_enrolled_sees_a_ccx(self):
         self.register_user_in_ccx(active=True)

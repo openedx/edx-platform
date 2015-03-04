@@ -18,6 +18,8 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+from model_utils.models import TimeStampedModel
+
 from xmodule_django.models import CourseKeyField, LocationKeyField, BlockTypeKeyField
 
 
@@ -232,7 +234,7 @@ class OfflineComputedGradeLog(models.Model):
         return "[OCGLog] %s: %s" % (self.course_id.to_deprecated_string(), self.created)  # pylint: disable=no-member
 
 
-class StudentFieldOverride(models.Model):
+class StudentFieldOverride(TimeStampedModel):
     """
     Holds the value of a specific field overriden for a student.  This is used
     by the code in the `courseware.student_field_overrides` module to provide
@@ -243,7 +245,7 @@ class StudentFieldOverride(models.Model):
     student = models.ForeignKey(User, db_index=True)
 
     class Meta:   # pylint: disable=missing-docstring
-        unique_together = (('course_id', 'location', 'student'),)
+        unique_together = (('course_id', 'field', 'location', 'student'),)
 
     field = models.CharField(max_length=255)
     value = models.TextField(default='null')

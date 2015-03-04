@@ -1213,12 +1213,15 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
 
 
         """
+        # If this descriptor has been bound to a student, return the corresponding
+        # XModule. If not, just use the descriptor itself
         try:
             module = getattr(self, '_xmodule', None)
             if not module:
                 module = self
         except UndefinedContext:
             module = self
+
         all_descriptors = []
         graded_sections = {}
 

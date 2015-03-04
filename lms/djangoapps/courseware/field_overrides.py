@@ -199,20 +199,7 @@ def _lineage(block):
     Returns an iterator over all ancestors of the given block, starting with
     its immediate parent and ending at the root of the block tree.
     """
-    parent = _get_parent(block)
+    parent = block.get_parent()
     while parent:
         yield parent
-        parent = _get_parent(parent)
-
-
-def _get_parent(block):
-    """
-    Gets parent of a block, trying to cache result.
-    """
-    if not hasattr(block, '_parent'):
-        store = modulestore()
-        # Call to get_parent_location is fairly expensive.  Is there a more
-        # performant way to get at the ancestors of a block?
-        location = store.get_parent_location(block.location)
-        block._parent = store.get_item(location) if location else None
-    return block._parent
+        parent = parent.get_parent()

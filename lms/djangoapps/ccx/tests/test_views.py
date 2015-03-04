@@ -223,7 +223,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         outbox = self.get_outbox()
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
 
         url = reverse(
             'ccx_invite',
@@ -254,7 +254,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         enrollment = CourseEnrollmentFactory(course_id=self.course.id)
         student = enrollment.user
         outbox = self.get_outbox()
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
         # student is member of CCX:
         CcxMembershipFactory(ccx=ccx, student=student)
 
@@ -286,7 +286,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.make_coach()
         ccx = self.make_ccx()
         outbox = self.get_outbox()
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
 
         url = reverse(
             'ccx_invite',
@@ -318,7 +318,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         ccx = self.make_ccx()
         outbox = self.get_outbox()
         CcxFutureMembershipFactory(ccx=ccx, email=test_email)
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
 
         url = reverse(
             'ccx_invite',
@@ -351,7 +351,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         student = enrollment.user
         # no emails have been sent so far
         outbox = self.get_outbox()
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
 
         url = reverse(
             'ccx_manage_student',
@@ -366,7 +366,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
         # a CcxMembership exists for this student
         self.assertTrue(
             CcxMembership.objects.filter(ccx=ccx, student=student).exists()
@@ -382,7 +382,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         CcxMembershipFactory(ccx=ccx, student=student)
         # no emails have been sent so far
         outbox = self.get_outbox()
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
 
         url = reverse(
             'ccx_manage_student',
@@ -397,7 +397,7 @@ class TestCoachDashboard(ModuleStoreTestCase, LoginEnrollmentTestCase):
         # we were redirected to our current location
         self.assertEqual(len(response.redirect_chain), 1)
         self.assertTrue(302 in response.redirect_chain[0])
-        self.assertEqual(len(outbox), 0)
+        self.assertEqual(outbox, [])
         # a CcxMembership exists for this student
         self.assertFalse(
             CcxMembership.objects.filter(ccx=ccx, student=student).exists()

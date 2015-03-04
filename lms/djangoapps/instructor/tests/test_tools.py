@@ -242,6 +242,12 @@ class TestSetDueDateExtension(ModuleStoreTestCase):
         self.assertEqual(self.homework.due, extended)
         self.assertEqual(self.assignment.due, extended)
 
+    def test_set_due_date_extension_num_queries(self):
+        extended = datetime.datetime(2013, 12, 25, 0, 0, tzinfo=utc)
+        with self.assertNumQueries(4):
+            tools.set_due_date_extension(self.course, self.week1, self.user, extended)
+            self._clear_field_data_cache()
+
     def test_set_due_date_extension_invalid_date(self):
         extended = datetime.datetime(2009, 1, 1, 0, 0, tzinfo=utc)
         with self.assertRaises(tools.DashboardError):

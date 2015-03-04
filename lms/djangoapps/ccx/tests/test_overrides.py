@@ -11,6 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 from ..models import CustomCourseForEdX
 from ..overrides import override_field_for_ccx
 
+from .test_views import flatten, iter_blocks
 
 @override_settings(FIELD_OVERRIDE_PROVIDERS=(
     'ccx.overrides.CustomCoursesForEdxOverrideProvider',))
@@ -76,6 +77,28 @@ class TestFieldOverrides(ModuleStoreTestCase):
         override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
         self.assertEquals(chapter.start, ccx_start)
 
+    def test_override_num_queries(self):
+        """
+        Test that overriding and accessing a field produce same number of queries.
+        """
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        chapter = self.course.get_children()[0]
+        with self.assertNumQueries(4):
+            override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+            dummy = chapter.start
+
+    def test_overriden_field_access_produces_no_extra_queries(self):
+        """
+        Test no extra queries when accessing an overriden field more than once.
+        """
+        ccx_start = datetime.datetime(2014, 12, 25, 00, 00, tzinfo=pytz.UTC)
+        chapter = self.course.get_children()[0]
+        with self.assertNumQueries(4):
+            override_field_for_ccx(self.ccx, chapter, 'start', ccx_start)
+            dummy1 = chapter.start
+            dummy2 = chapter.start
+            dummy3 = chapter.start
+
     def test_override_is_inherited(self):
         """
         Test that sequentials inherit overridden start date from chapter.
@@ -98,22 +121,3 @@ class TestFieldOverrides(ModuleStoreTestCase):
         override_field_for_ccx(self.ccx, chapter, 'due', ccx_due)
         vertical = chapter.get_children()[0].get_children()[0]
         self.assertEqual(vertical.due, ccx_due)
-
-
-def flatten(seq):
-    """
-    For [[1, 2], [3, 4]] returns [1, 2, 3, 4].  Does not recurse.
-    """
-    return [x for sub in seq for x in sub]
-
-
-def iter_blocks(course):
-    """
-    Returns an iterator over all of the blocks in a course.
-    """
-    def visit(block):
-        yield block
-        for child in block.get_children():
-            for descendant in visit(child):  # wish they'd backport yield from
-                yield descendant
-    return visit(course)
