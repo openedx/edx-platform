@@ -673,7 +673,7 @@ def create_order(request):
 
     # make sure this course has a verified mode
     if not current_mode:
-        log.warn(u"Create order requested for course '%s' without a paid mode.",course_id)
+        log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
         return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
 
     if CourseMode.is_professional_mode(current_mode):
