@@ -24,6 +24,7 @@ define([
                 level_of_education: 'p',
                 gender: 'm',
                 year_of_birth: 2014,
+                education_completed: 'b',
                 mailing_address: '141 Portland',
                 goals: 'To boldly learn what no letter of the alphabet has learned before',
                 honor_code: true
@@ -55,7 +56,7 @@ define([
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
+                        placeholder: 'username@domain.com',
                         instructions: 'Enter your email.',
                         restrictions: {}
                     },
@@ -65,16 +66,18 @@ define([
                         defaultValue: '',
                         type: 'text',
                         required: true,
-                        instructions: 'Enter your username.',
+                        placeholder: 'Jane Doe',
+                        instructions: 'Needed for any certificates you may earn',
                         restrictions: {}
                     },
                     {
                         name: 'username',
-                        label: 'Username',
+                        label: 'Public username',
                         defaultValue: '',
                         type: 'text',
                         required: true,
-                        instructions: 'Enter your username.',
+                        placeholder: 'JaneDoe',
+                        instructions: 'The name that will identify you in your courses',
                         restrictions: {}
                     },
                     {
@@ -192,14 +195,14 @@ define([
             $('#register-name').val(USER_DATA.name);
             $('#register-username').val(USER_DATA.username);
             $('#register-password').val(USER_DATA.password);
-            $('#register-level_of_education').val(USER_DATA.level_of_education);
-            $('#register-gender').val(USER_DATA.gender);
-            $('#register-year_of_birth').val(USER_DATA.year_of_birth);
-            $('#register-mailing_address').val(USER_DATA.mailing_address);
-            $('#register-goals').val(USER_DATA.goals);
+            // $('#register-level_of_education').val(USER_DATA.level_of_education);
+            // $('#register-gender').val(USER_DATA.gender);
+            // $('#register-year_of_birth').val(USER_DATA.year_of_birth);
+            // $('#register-mailing_address').val(USER_DATA.mailing_address);
+            // $('#register-goals').val(USER_DATA.goals);
 
             // Check the honor code checkbox
-            $('#register-honor_code').prop('checked', USER_DATA.honor_code);
+            $('#register-honorcode-yes').prop('checked', USER_DATA.honor_code);
 
             // Create a fake click event
             var clickEvent = $.Event('click');

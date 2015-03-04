@@ -48,8 +48,8 @@ define([
                         defaultValue: '',
                         type: 'email',
                         required: true,
-                        placeholder: 'place@holder.org',
-                        instructions: 'Enter your email.',
+                        placeholder: 'username@domain.com',
+                        instructions: 'The email address you used to register with.',
                         restrictions: {}
                     },
                     {
@@ -58,6 +58,7 @@ define([
                         defaultValue: '',
                         type: 'password',
                         required: true,
+                        placeholder: '',
                         instructions: 'Enter your password.',
                         restrictions: {}
                     },
@@ -76,6 +77,7 @@ define([
 
         var createLoginView = function(test) {
             // Initialize the login model
+
             model = new LoginModel({}, {
                 url: FORM_DESCRIPTION.submit_url,
                 method: FORM_DESCRIPTION.method

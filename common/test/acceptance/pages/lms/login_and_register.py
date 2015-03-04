@@ -42,13 +42,12 @@ class RegisterPage(PageObject):
         Fill in registration info.
         `email`, `password`, `username`, and `full_name` are the user's credentials.
         """
-        self.q(css='input#email').fill(email)
-        self.q(css='input#password').fill(password)
-        self.q(css='input#username').fill(username)
-        self.q(css='input#name').fill(full_name)
-        self.q(css='input#tos-yes').first.click()
-        self.q(css='input#honorcode-yes').first.click()
-        self.q(css="#country option[value='US']").first.click()
+        self.q(css='input#register-email').fill(email)
+        self.q(css='input#register-name').fill(full_name)
+        self.q(css='input#register-username').fill(username)
+        self.q(css='input#register-password').fill(password)
+        self.q(css='input#register-honorcode-yes').first.click()
+        # self.q(css="#country option[value='US']").first.click()
 
     def submit(self):
         """
