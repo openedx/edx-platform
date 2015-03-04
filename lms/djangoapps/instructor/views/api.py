@@ -2309,7 +2309,7 @@ def spoc_gradebook(request, course_id):
             'id': student.id,
             'email': student.email,
             'grade_summary': student_grades(student, request, course),
-            'realname': student.profile.name,
+            'realname': student.profile.name if student.profile else 'no profile',
         }
         for student in enrolled_students
     ]

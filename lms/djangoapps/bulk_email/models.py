@@ -75,7 +75,7 @@ class CourseEmail(Email):
         return self.subject
 
     @classmethod
-    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name=None, from_addr=None):
+    def create(cls, course_id, sender, to_option, subject, html_message, text_message=None, template_name='def_email_template', from_addr=None):
         """
         Create an instance of CourseEmail.
 
@@ -172,8 +172,9 @@ class CourseEmailTemplate(models.Model):
         If one isn't stored, an exception is thrown.
         """
         try:
-            return CourseEmailTemplate.objects.get(name=name)
+            return CourseEmailTemplate.objects.get(name="def_email_template")
         except CourseEmailTemplate.DoesNotExist:
+            log.exception("SUPERLOG %s", name)
             log.exception("Attempting to fetch a non-existent course email template")
             raise
 
