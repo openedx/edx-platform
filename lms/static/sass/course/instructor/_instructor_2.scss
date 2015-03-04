@@ -1084,11 +1084,13 @@
     .category-title,
     .topic-name,
     .all-inline-discussions,
-    .always_cohort_inline_discussions {
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
       padding-left: ($baseline/2);
     }
 
-    .always_cohort_inline_discussions {
+    .always_cohort_inline_discussions,
+    .cohort_inline_discussions {
       padding-top: ($baseline/2);
     }
 
@@ -1101,11 +1103,11 @@
       color: $link-color;
     }
 
-    .discussions-wrapper
-    {
-      &.subcategories
-      {
-        @extend %ui-no-list;
+    .discussions-wrapper {
+      @extend %ui-no-list;
+      padding: 0 ($baseline/2);
+
+      .subcategories {
         padding: 0 ($baseline*1.5);
       }
     }

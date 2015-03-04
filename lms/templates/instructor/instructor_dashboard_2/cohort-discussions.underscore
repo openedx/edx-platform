@@ -29,11 +29,11 @@
                         <h3 class="subsection-title"><%- gettext('Content-Specific Discussion Topics') %></h3>
                         <p><%- gettext('Specify whether content-specific discussion topics are divided by cohort.') %></p>
                         <div class="always_cohort_inline_discussions">
-                            <input type="radio" name="content-specific" class="check-all-inline-discussions" <%- alwaysCohortInlineDiscussions ? 'checked="checked"' : '' %>/>
+                            <input type="radio" name="inline" class="check-all-inline-discussions" <%- alwaysCohortInlineDiscussions ? 'checked="checked"' : '' %>/>
                             <span class="all-inline-discussions"><%= interpolate('Always cohort content-specific discussion topics') %></span>
                         </div>
-                        <div class="always_cohort_inline_discussions">
-                            <input type="radio" name="content-specific" class="check-some-inline-discussions" <%- alwaysCohortInlineDiscussions ? '' : 'checked="checked"' %>/>
+                        <div class="cohort_inline_discussions">
+                            <input type="radio" name="inline" class="check-cohort-inline-discussions" <%- alwaysCohortInlineDiscussions ? '' : 'checked="checked"' %>/>
                             <span class="all-inline-discussions"><%= interpolate(' Cohort some content-specific discussion topics') %></span>
                         </div>
                         <hr class="divider divider-lv1" />

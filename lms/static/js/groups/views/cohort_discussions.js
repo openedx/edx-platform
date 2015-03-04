@@ -13,7 +13,8 @@ var edx = edx || {};
             'change .check-discussion-subcategory-course-wide': 'changeDiscussionCourseWideCategory',
             'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
-            'change .check-all-inline-discussions': 'changeAllInlineDiscussions'
+            'change .check-all-inline-discussions': 'changeAllInlineDiscussions',
+            'change .check-cohort-inline-discussions': 'changeCohortInlineDiscussions'
         },
 
         initialize: function () {
@@ -91,8 +92,14 @@ var edx = edx || {};
         },
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
-
-            this.toggleDisableClass(this.$('.inline-topics'), !($(event.currentTarget).prop('checked')));
+            this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
+        },
+        changeCohortInlineDiscussions: function(event) {
+            event.preventDefault();
+            this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
+        },
+        toggleInlineDiscussions: function(enable) {
+            this.toggleDisableClass(this.$('.inline-topics'), enable);
             this.toggleDisableClass(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         changeDiscussionInlineCategory: function(event) {
@@ -110,23 +117,25 @@ var edx = edx || {};
             this.toggleDisableClass(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
         getCohortedDiscussions: function(selector) {
-            var self=this;
-            self.cohortedDiscussionTopics = [];
+            var self=this,
+                cohortedDiscussionTopics = [];
             _.each(self.$(selector), function (topic) {
-                self.cohortedDiscussionTopics.push($(topic).data('id'))
+                cohortedDiscussionTopics.push($(topic).data('id'))
             });
+            return cohortedDiscussionTopics
         },
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
             var self = this,
-                fieldData;
+                fieldData,
+                inlineDiscussionIds;
 
-            self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
+            inlineDiscussionIds = self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
             fieldData = {
-                content_specific_discussions: true,
-                cohorted_discussion_ids: self.cohortedDiscussionTopics
+                inline_discussion_ids: inlineDiscussionIds
             };
             this.model.set({always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')});
+            this.model.unset("course_wide_discussion_ids");
             self.saveForm(fieldData, self.$('.inline-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
@@ -137,15 +146,15 @@ var edx = edx || {};
         },
         saveCourseWideDiscussionsForm: function (event) {
             var self = this,
-                fieldData;
+                fieldData,
+                coursewideDiscussionIds;
 
             event.preventDefault();
-            self.getCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
+            coursewideDiscussionIds = self.getCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
             fieldData = {
-                course_wide_discussions: true,
-                cohorted_discussion_ids: self.cohortedDiscussionTopics
+                course_wide_discussion_ids: coursewideDiscussionIds
             };
-
+            this.model.unset("inline_discussion_ids");
             self.saveForm(fieldData, self.$('.course-wide-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {

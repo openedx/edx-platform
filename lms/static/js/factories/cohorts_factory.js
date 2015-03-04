@@ -14,7 +14,7 @@
 
                 cohorts.url = cohortManagementElement.data('cohorts_url');
                 courseCohortSettings.url = cohortManagementElement.data('course_cohort_settings_url');
-                discussionTopics.url = cohortManagementElement.data('discussion_topics_url');
+                discussionTopics.url = cohortManagementElement.data('discussion-topics-url');
                 
                 var cohortsView = new edx.groups.CohortsView({
                     el: cohortManagementElement,
