@@ -674,12 +674,11 @@ def create_order(request):
             )
         current_mode = paid_modes[0]
 
+    # make sure this course has a verified mode
     if not current_mode:
-        log.warn(
-            u"No paid course mode found for course '%s' for create order flow request",
-            course_id
-        )
-        raise Http404
+        log.warn(u"Create order requested for course {course_id} without a paid mode.".format(course_id=course_id))
+        return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
+
 
     if CourseMode.is_professional_mode(current_mode):
         amount = current_mode.min_price
