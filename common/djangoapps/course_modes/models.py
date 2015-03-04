@@ -399,6 +399,10 @@ class CourseMode(models.Model):
             return course_mode_tuple.slug == 'professional' or course_mode_tuple.slug == cls.NO_ID_PROFESSIONAL_MODES[0]
         return False
 
+    @classmethod
+    def is_professional_slug(cls, slug):
+        return slug in ['professional', cls.NO_ID_PROFESSIONAL_MODES[0]]
+
     def to_tuple(self):
         """
         Takes a mode model and turns it into a model named tuple.
