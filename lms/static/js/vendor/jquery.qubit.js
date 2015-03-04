@@ -1,9 +1,13 @@
 /*
- * Checkboxes TreeView- jQuery plugin to manipulate checkboxes tree
- *
- * https://github.com/aexmachina/jquery-qubit
- *
- */
+** Checkboxes TreeView- jQuery
+** https://github.com/aexmachina/jquery-qubit
+**
+** Copyright (c) 2014 Simon Wade
+** The MIT License (MIT)
+** https://github.com/aexmachina/jquery-qubit/blob/master/LICENSE.txt
+**
+*/
+
 (function($) {
   $.fn.qubit = function(options) {
     return this.each(function() {
