@@ -495,6 +495,12 @@ class CourseMode(models.Model):
 
     @classmethod
     def is_professional_slug(cls, slug):
+        """
+        Args:
+            slug (str) : course mode string
+        Return:
+            bool
+        """
         return slug in ['professional', cls.NO_ID_PROFESSIONAL_MODES[0]]
 
     def to_tuple(self):
