@@ -27,8 +27,7 @@ from django_comment_client.utils import (
     JsonResponse,
     prepare_content,
     get_group_id_for_comments_service,
-    get_discussion_categories_ids,
-    get_discussion_category_map
+    get_discussion_categories_ids
 )
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 import lms.lib.comment_client as cc
