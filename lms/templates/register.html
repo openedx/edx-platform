@@ -256,7 +256,7 @@
               <label for="country">${_("Country")}</label>
               <select id="country" name="country" ${'required aria-required="true"' if settings.REGISTRATION_EXTRA_FIELDS['country'] == 'required' else ''}>
                 <option value="">--</option>
-                %for code, country_name in sorted(countries.countries, key=lambda (__, name): unicode(name)):
+                %for code, country_name in sorted(countries, key=lambda (__, name): unicode(name)):
                 <option value="${code}">${ unicode(country_name) }</option>
                 %endfor
               </select>

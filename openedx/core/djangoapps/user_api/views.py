@@ -562,7 +562,7 @@ class RegistrationView(APIView):
         country_label = _(u"Country")
 
         sorted_countries = sorted(
-            countries.countries, key=lambda(__, name): unicode(name)
+            countries, key=lambda(__, name): unicode(name)
         )
         options = [
             (country_code, unicode(country_name))
