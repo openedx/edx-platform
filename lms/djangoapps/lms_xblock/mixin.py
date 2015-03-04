@@ -28,13 +28,14 @@ class LmsBlockMixin(XBlockMixin):
     Mixin that defines fields common to all blocks used in the LMS
     """
     hide_from_toc = Boolean(
-        help="Whether to display this module in the table of contents",
+        help=_("Whether to display this module in the table of contents"),
         default=False,
         scope=Scope.settings
     )
     format = String(
-        help="What format this module is in (used for deciding which "
-             "grader to apply, and what to show in the TOC)",
+        # Translators: "TOC" stands for "Table of Contents"
+        help=_("What format this module is in (used for deciding which "
+               "grader to apply, and what to show in the TOC)"),
         scope=Scope.settings,
     )
     chrome = String(
