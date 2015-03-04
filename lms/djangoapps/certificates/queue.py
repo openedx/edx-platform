@@ -345,8 +345,8 @@ class XQueueCertInterface(object):
                         new_status
                     )
             else:
-                cert_status = status.notpassing
-                cert.status = cert_status
+                new_status = status.notpassing
+                cert.status = new_status
                 cert.save()
 
                 LOGGER.info(
@@ -357,7 +357,7 @@ class XQueueCertInterface(object):
                     ),
                     student.id,
                     unicode(course_id),
-                    cert_status
+                    new_status
                 )
 
         return new_status

@@ -1304,7 +1304,7 @@ def generate_user_cert(request, course_id):
     certificate_status = certificate_downloadable_status(student, course.id)
 
     if not certificate_status["is_downloadable"] and not certificate_status["is_generating"]:
-        generate_user_certificates(student, course)
+        generate_user_certificates(student, course.id, course=course)
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse(_("Creating certificate"))
 

@@ -127,7 +127,7 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
         # New requests save into xqueue and return the status
         with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
             mock_send_to_queue.return_value = (0, "Successfully queued")
-            result = certs_api.generate_user_certificates(self.student, self.course)
+            result = certs_api.generate_user_certificates(self.student, self.course.id)
             self.assertEqual(result, 'generating')
 
 
