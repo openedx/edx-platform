@@ -12,17 +12,38 @@ from .models import (
     XModuleStudentInfoField
 )
 import logging
+
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.block_types import BlockTypeKeyV1
 from opaque_keys.edx.asides import AsideUsageKeyV1
 
+from django.core.cache import get_cache, InvalidCacheBackendError
 from django.db import DatabaseError
+from django.conf import settings
 
 from xblock.runtime import KeyValueStore
 from xblock.exceptions import KeyValueMultiSaveError, InvalidScopeError
 from xblock.fields import Scope, UserScope
 from xmodule.modulestore.django import modulestore
 from xblock.core import XBlockAside
+
+try:
+    DJANGO_FIELD_CACHE = get_cache('xblock-fields')
+except InvalidCacheBackendError:
+    DJANGO_FIELD_CACHE = get_cache('default')
+
+if settings.FEATURES.get('DJANGO_CACHED_FIELDS', False):
+    DJANGO_CACHED_FIELDS = [
+        ('course', 'position'),
+        ('sequential', 'position'),
+        ('chapter', 'position'),
+        ('problemset', 'position'),
+        ('videosequence', 'position'),
+        ('video', 'speed'),
+        ('video', 'saved_video_position'),
+    ]
+else:
+    DJANGO_CACHED_FIELDS = []
 
 log = logging.getLogger(__name__)
 
@@ -338,6 +359,12 @@ class DjangoKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
 
+        if self._from_django_cache(key):
+            value = DJANGO_FIELD_CACHE.get(self._django_cache_key(key))
+            if value is None:
+                raise KeyError(key.field_name)
+            return value
+
         field_object = self._field_data_cache.find(key)
         if field_object is None:
             raise KeyError(key.field_name)
@@ -361,14 +388,27 @@ class DjangoKeyValueStore(KeyValueStore):
           xblock.KvsFieldData._key : value
 
         """
-        saved_fields = []
-        # field_objects maps a field_object to a list of associated fields
-        field_objects = dict()
         for field in kv_dict:
             # Check field for validity
             if field.scope not in self._allowed_scopes:
                 raise InvalidScopeError(field)
 
+        saved_fields = []
+
+        cache_fields = {
+            self._django_cache_key(key): value
+            for key, value in kv_dict.iteritems()
+            if self._from_django_cache(key)
+        }
+        DJANGO_FIELD_CACHE.set_many(cache_fields)
+        saved_fields.extend(key.field_name for key in kv_dict if self._from_django_cache(key))
+
+        database_fields = {key: value for key, value in kv_dict.iteritems() if not self._from_django_cache(key)}
+
+        # field_objects maps a field_object to a list of associated fields
+        field_objects = dict()
+
+        for field in database_fields:
             # If the field is valid and isn't already in the dictionary, add it.
             field_object = self._field_data_cache.find_or_create(field)
             if field_object not in field_objects.keys():
@@ -401,6 +441,10 @@ class DjangoKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
 
+        if self._from_django_cache(key):
+            DJANGO_FIELD_CACHE.delete(self._django_cache_key(key))
+            return
+
         field_object = self._field_data_cache.find(key)
         if field_object is None:
             raise KeyError(key.field_name)
@@ -417,6 +461,9 @@ class DjangoKeyValueStore(KeyValueStore):
         if key.scope not in self._allowed_scopes:
             raise InvalidScopeError(key)
 
+        if self._from_django_cache(key):
+            return DJANGO_FIELD_CACHE.get(self._django_cache_key(key)) is not None
+
         field_object = self._field_data_cache.find(key)
         if field_object is None:
             return False
@@ -425,3 +472,21 @@ class DjangoKeyValueStore(KeyValueStore):
             return key.field_name in json.loads(field_object.state)
         else:
             return True
+
+    def _from_django_cache(self, key):
+        """
+        Return whether to load this key from the django cache.
+
+        Arguments:
+            key (KeyValueStore.key): the key being queried.
+        """
+        return (key.block_scope_id, key.field_name) in DJANGO_CACHED_FIELDS
+
+    def _django_cache_key(self, key):
+        """
+        Return the cache key for the django cache to use when storing this `key`.
+
+        Arguments:
+            key (KeyValueStore.key): the key being stored.
+        """
+        return unicode(key)
