@@ -797,6 +797,24 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         url = reverse('verify_student_upgrade_and_verify', kwargs={'course_id': unicode(course_id)})
         self.assertRedirects(response, url)
 
+    def test_course_upgrade_page_with_unicode_and_special_values_in_display_name(self):
+        """Check the course information on the page. """
+        mode_display_name = u"Introduction à l'astrophysique"
+        course = CourseFactory.create(display_name=mode_display_name)
+        for course_mode in ["honor", "verified"]:
+            min_price = (self.MIN_PRICE if course_mode != "honor" else 0)
+            CourseModeFactory(
+                course_id=course.id,
+                mode_slug=course_mode,
+                mode_display_name=mode_display_name,
+                min_price=min_price
+            )
+
+        self._enroll(course.id, "honor")
+        response_dict = self._get_page_data(self._get_page('verify_student_start_flow', course.id))
+
+        self.assertEqual(response_dict['course_name'], mode_display_name)
+
 
 class TestCreateOrder(ModuleStoreTestCase):
     """
