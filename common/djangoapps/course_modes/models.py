@@ -423,7 +423,7 @@ class CourseMode(models.Model):
         elif mode == "audit":
             enrollment_title = __("You're auditing this course")
             enrollment_value = __("Auditing")
-        elif mode == "professional" or mode == "no-id-professional":
+        elif mode in["professional", "no-id-professional"]:
             enrollment_title = __("You're enrolled as a professional education student")
             enrollment_value = __("Professional Ed")
 

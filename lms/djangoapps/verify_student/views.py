@@ -269,19 +269,8 @@ class PayAndVerifyView(View):
         )
         if redirect_url:
             return redirect(redirect_url)
-        course_mode = None
-        expired_course_mode, unexpired_paid_course_mode = self._get_expired_verified_and_all_paid_modes_for_course(
-            course_key)
 
-        if unexpired_paid_course_mode:
-            course_mode = unexpired_paid_course_mode[0]
-            if len(unexpired_paid_course_mode) > 1:
-                # There is more than one paid mode defined,
-                # so choose the first one.
-                log.warn(
-                    u"More than one paid modes are defined for course '%s' choosing the first one %s",
-                    course_id, unexpired_paid_course_mode[0]
-                )
+        expired_course_mode, course_mode = self._get_expired_verified_and_paid_mode(course_key)
 
         # Check that the course has an unexpired paid mode
         if course_mode is not None:
@@ -472,7 +461,7 @@ class PayAndVerifyView(View):
         if url is not None:
             return redirect(url)
 
-    def _get_expired_verified_and_all_paid_modes_for_course(self, course_key):  # pylint: disable=invalid-name
+    def _get_expired_verified_and_paid_mode(self, course_key):  # pylint: disable=invalid-name
         """Retrieve unexpired and expired verified modes for a course.
 
         Arguments:
@@ -490,6 +479,14 @@ class PayAndVerifyView(View):
 
         # Unexpired paid modes
         unexpired_paid_modes = [mode for mode in unexpired_modes[course_key] if mode.min_price]
+        if len(unexpired_paid_modes) > 1:
+                # There is more than one paid mode defined,
+                # so choose the first one.
+                log.warn(
+                    u"More than one paid modes are defined for course '%s' choosing the first one %s",
+                    course_key, unexpired_paid_modes[0]
+                )
+        unexpired_paid_modes = unexpired_paid_modes[0] if unexpired_paid_modes else None
 
         # Find an unexpired verified mode
         verified_mode = CourseMode.verified_mode_for_course(course_key, modes=unexpired_modes[course_key])
@@ -671,7 +668,7 @@ def create_order(request):
             log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
         current_mode = paid_modes[0]
 
-    # make sure this course has a verified mode
+    # Make sure this course has a paid mode
     if not current_mode:
         log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
         return HttpResponseBadRequest(_("This course doesn't support paid certificates"))

@@ -1153,8 +1153,7 @@ class CourseEnrollment(models.Model):
         """
         Returns True, if course is paid
         """
-        paid_course = CourseMode.objects.filter(Q(course_id=self.course_id) & Q(mode_slug='honor') &
-                                                (Q(expiration_datetime__isnull=True) | Q(expiration_datetime__gte=datetime.now(pytz.UTC)))).exclude(min_price=0)
+        paid_course = CourseMode.is_white_label(self.course_id)
         if paid_course or CourseMode.is_professional_slug(self.mode):
             return True
 
