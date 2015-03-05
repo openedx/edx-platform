@@ -58,7 +58,7 @@ from verify_student.views import PayAndVerifyView
       data-full-name='${user_full_name}'
       data-platform-name='${platform_name}'
       data-course-key='${course_key}'
-      data-course-name='${course.display_name}'
+      data-course-name='${course.display_name|h}'
       data-course-start-date='${course.start_datetime_text()}'
       data-courseware-url='${courseware_url}'
       data-course-mode-name='${course_mode.name}'
