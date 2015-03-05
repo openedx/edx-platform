@@ -114,6 +114,9 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         (['professional'], 'true'),
         (['professional'], 'false'),
         (['professional'], None),
+        (['no-id-professional'], 'true'),
+        (['no-id-professional'], 'false'),
+        (['no-id-professional'], None),
     )
     @ddt.unpack
     def test_enroll_with_email_opt_in(self, course_modes, email_opt_in, mock_update_email_opt_in):
