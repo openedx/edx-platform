@@ -122,6 +122,10 @@ class GradebookTests(ModuleStoreTestCase):
             metadata={'rerandomize': 'always', 'graded': True, 'format': "Final Exam"}
         )
 
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_receiver_on_score_changed(self):
         self._create_course()
         module = self.get_module_for_user(self.user, self.course, self.problem)
@@ -150,7 +154,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 5)
 
-    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_open_course(self):
         self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
 
@@ -168,7 +175,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 2)
 
-    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_not_yet_started_course(self):
         self._create_course(start=datetime(3000,1,1, tzinfo=UTC()), end=datetime(3000, 1, 1, tzinfo=UTC()))
 
@@ -186,7 +196,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 2)
 
-    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_student(self):
         self._create_course(start=datetime(2010,1,1, tzinfo=UTC()), end=datetime(2011, 1, 1, tzinfo=UTC()))
 
@@ -204,7 +217,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
-    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_admin(self):
         """
         Users marked as Admin should be able to submit grade events to a closed course
@@ -226,7 +242,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
-    @patch.dict(settings.FEATURES, {'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False})
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_closed_course_staff(self):
         """
         Users marked as course staff should be able to submit grade events to a closed course
@@ -248,6 +267,10 @@ class GradebookTests(ModuleStoreTestCase):
         history = StudentGradebookHistory.objects.all()
         self.assertEqual(len(history), 0)
 
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_receiver_on_course_deleted(self):
         self._create_course(start=datetime(2010, 1, 1, tzinfo=UTC()), end=datetime(2020, 1, 1, tzinfo=UTC()))
         module = self.get_module_for_user(self.user, self.course, self.problem)

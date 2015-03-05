@@ -1736,7 +1736,7 @@ class CoursesApiTests(ModuleStoreTestCase):
             number='4033',
             name='leaders_by_completions',
             start=datetime(2014, 9, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            end=datetime(2020, 1, 16)
         )
 
         chapter = ItemFactory.create(
