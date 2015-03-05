@@ -60,10 +60,8 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
-
     # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user.
+    # subsumed by api/user listed below.
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
     url(r'^notifier_api/', include('notifier_api.urls')),
@@ -87,6 +85,11 @@ urlpatterns = (
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
 )
+
+if settings.FEATURES["ENABLE_USER_REST_API"]:
+    urlpatterns += (
+        url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+    )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
