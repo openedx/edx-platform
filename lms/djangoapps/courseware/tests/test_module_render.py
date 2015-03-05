@@ -934,10 +934,11 @@ class TestAnonymousStudentId(ModuleStoreTestCase, LoginEnrollmentTestCase):
             name='descriptor',
             _field_data_cache={},
             _dirty_fields={},
+            fields={},
         )
         descriptor.runtime = CombinedSystem(descriptor._runtime, None)  # pylint: disable=protected-access
         # Use the xblock_class's bind_for_student method
-        descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor, self.user.id)
+        descriptor.bind_for_student = partial(xblock_class.bind_for_student, descriptor)
 
         if hasattr(xblock_class, 'module_class'):
             descriptor.module_class = xblock_class.module_class
