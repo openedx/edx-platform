@@ -97,8 +97,11 @@ def _get_cohort_representation(cohort, course):
 
 
 def get_cohorted_discussion_ids(course, cohorted_discussions):
+    """
+    Returns the cohorted course-wide and content-specific discussion ids separately.
+    """
     discussions_category = get_discussion_category_map(course)
-    course_wide_ids = [category.get('id') for name, category in discussions_category['entries'].items()]
+    course_wide_ids = [category.get('id') for _, category in discussions_category['entries'].items()]
 
     cohorted_course_wide_ids = []
     cohorted_inline_ids = []
@@ -430,11 +433,11 @@ def cohort_discussion_topics(request, course_key_string):
 
     course_wide_children = []
     inline_children = []
-    for child in discussions_category['children']:
-        if child in discussions_category['course_wide_categories']:
-            course_wide_children.append(child)
+    for name in discussions_category['children']:
+        if name in discussions_category['course_wide_categories']:
+            course_wide_children.append(name)
         else:
-            inline_children.append(child)
+            inline_children.append(name)
 
     discussions_category['course_wide_children'] = course_wide_children
     discussions_category['children'] = inline_children
