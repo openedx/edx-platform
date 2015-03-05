@@ -4,6 +4,7 @@ This file contains implementation override of SearchResultProcessor which will a
     * Confirms user access to object
 """
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from search.result_processor import SearchResultProcessor
@@ -11,6 +12,8 @@ from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.search import path_to_location
 
 from courseware.access import has_access
+
+UNNAMED_MODULE_NAME = _("(Unnamed)")
 
 
 class LmsSearchResultProcessor(SearchResultProcessor):
@@ -66,25 +69,25 @@ class LmsSearchResultProcessor(SearchResultProcessor):
         # TODO: update whern changes to "cohorted-courseware" branch are merged in
         (course_key, chapter, section, position) = path_to_location(self.get_module_store(), self.get_usage_key())
 
-        def get_display_name(category, item_id):
-            """ helper to get display name from object """
-            item = self.get_item(course_key.make_usage_key(category, item_id))
-            return getattr(item, "display_name", None)
+        def get_display_name(item_key):
+            """ gets display name from object's key """
+            item = self.get_item(item_key)
+            display_name = getattr(item, "display_name", None)
+            return display_name if display_name else UNNAMED_MODULE_NAME
 
         def get_position_name(section, position):
             """ helper to fetch name corresponding to the position therein """
             pos = int(position)
             section_item = self.get_item(course_key.make_usage_key("sequential", section))
             if section_item.has_children and len(section_item.children) >= pos:
-                item = self.get_item(section_item.children[pos - 1])
-                return getattr(item, "display_name", None)
+                return get_display_name(section_item.children[pos - 1])
             return None
 
         location_description = []
         if chapter:
-            location_description.append(get_display_name("chapter", chapter))
+            location_description.append(get_display_name(course_key.make_usage_key("chapter", chapter)))
         if section:
-            location_description.append(get_display_name("sequential", section))
+            location_description.append(get_display_name(course_key.make_usage_key("sequential", section)))
         if position:
             location_description.append(get_position_name(section, position))
 
