@@ -170,6 +170,10 @@ class RegisterFromCombinedPageTest(UniqueCourseTest):
         course_names = self.dashboard_page.wait_for_page().available_courses
         self.assertIn(self.course_info["display_name"], course_names)
 
+        self.assertEqual("Test User", self.dashboard_page.full_name)
+        self.assertEqual(email, self.dashboard_page.email)
+        self.assertEqual(username, self.dashboard_page.username)
+
     def test_register_failure(self):
         # Navigate to the registration page
         self.register_page.visit()
