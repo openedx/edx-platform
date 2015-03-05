@@ -127,6 +127,7 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
                         'choices': choices,
                         'status': Status('correct'),
                         'label': 'test',
+                        'question_label': 'test',
                         'input_type': 'checkbox',
                         'name_array_suffix': '1',
                         'value': '3'}
@@ -339,11 +340,6 @@ class ChoiceGroupTemplateTest(TemplateTestCase):
             # Expect that we do NOT see the message yet
             self.assert_no_xpath(xml, "//div[@class='capa_alert']", self.context)
 
-    def test_label(self):
-        xml = self.render_to_xml(self.context)
-        xpath = "//fieldset[@aria-label='%s']" % self.context['label']
-        self.assert_has_xpath(xml, xpath, self.context)
-
 
 class TextlineTemplateTest(TemplateTestCase):
     """
@@ -356,6 +352,7 @@ class TextlineTemplateTest(TemplateTestCase):
         self.context = {'id': '1',
                         'status': Status('correct'),
                         'label': 'test',
+                        'question_label': 'test',
                         'value': '3',
                         'preprocessor': None,
                         'trailing_text': None}
@@ -484,6 +481,7 @@ class FormulaEquationInputTemplateTest(TemplateTestCase):
             'value': 'PREFILLED_VALUE',
             'status': Status('unsubmitted'),
             'label': 'test',
+            'question_label': 'test',
             'previewer': 'file.js',
             'reported_status': 'REPORTED_STATUS',
         }
@@ -681,6 +679,7 @@ class OptionInputTemplateTest(TemplateTestCase):
             'options': [],
             'status': Status('unsubmitted'),
             'label': 'test',
+            'question_label': 'test',
             'value': 0
         }
         super(OptionInputTemplateTest, self).setUp()
@@ -727,7 +726,7 @@ class OptionInputTemplateTest(TemplateTestCase):
 
     def test_label(self):
         xml = self.render_to_xml(self.context)
-        xpath = "//select[@aria-label='%s']" % self.context['label']
+        xpath = "//select[@id='input_%s']" % str(self.context['id'])
         self.assert_has_xpath(xml, xpath, self.context)
 
 
