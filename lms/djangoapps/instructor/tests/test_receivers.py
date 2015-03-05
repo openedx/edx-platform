@@ -26,7 +26,7 @@ class InstructorReceiversTests(TestCase):
         # Create a course to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            end=datetime(2020, 1, 16)
         )
         test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
