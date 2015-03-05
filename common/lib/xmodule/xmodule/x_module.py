@@ -543,13 +543,13 @@ class XModuleMixin(XBlockMixin):
 
         # Skip rebinding if we're already bound for this user.
         if user_id == self.scope_ids.user_id:
-            continue
+            return
 
         # If we are switching users mid-request, save the data from the old user.
         self.save()
 
         # Update scope_ids to point to the new user.
-        self.scope_ids = self.scope_ids.replace(user_id=user_id)
+        self.scope_ids = self.scope_ids._replace(user_id=user_id)
 
         # Clear out any cached instantiated children.
         self._child_instances = None
