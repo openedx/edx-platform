@@ -797,7 +797,7 @@ def try_change_enrollment(request):
             log.exception(u"Exception automatically enrolling after login: %s", exc)
 
 
-def _update_email_opt_in(request, username, org):
+def _update_email_opt_in(request, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
 
     # TODO: remove circular dependency on openedx from common
@@ -806,7 +806,7 @@ def _update_email_opt_in(request, username, org):
     email_opt_in = request.POST.get('email_opt_in')
     if email_opt_in is not None:
         email_opt_in_boolean = email_opt_in == 'true'
-        profile_api.update_email_opt_in(username, org, email_opt_in_boolean)
+        profile_api.update_email_opt_in(request.user, org, email_opt_in_boolean)
 
 
 @require_POST
@@ -878,7 +878,7 @@ def change_enrollment(request, check_access=True):
 
         # Record the user's email opt-in preference
         if settings.FEATURES.get('ENABLE_MKTG_EMAIL_OPT_IN'):
-            _update_email_opt_in(request, user.username, course_id.org)
+            _update_email_opt_in(request, course_id.org)
 
         available_modes = CourseMode.modes_for_course_dict(course_id)
 

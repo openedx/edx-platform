@@ -8,6 +8,7 @@ import re
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core import mail
+from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from unittest import skipUnless
@@ -1247,7 +1248,8 @@ class RegistrationViewTest(ApiTestCase):
         )
 
         # Verify that the user's full name is set
-        account_settings = AccountView.get_serialized_account(self.USERNAME)
+        user = User.objects.get(username=self.USERNAME)
+        account_settings = AccountView.get_serialized_account(user)
         self.assertEqual(account_settings["name"], self.NAME)
 
         # Verify that we've been logged in
@@ -1280,7 +1282,8 @@ class RegistrationViewTest(ApiTestCase):
         self.assertHttpOK(response)
 
         # Verify the user's account
-        account_settings = AccountView.get_serialized_account(self.USERNAME)
+        user = User.objects.get(username=self.USERNAME)
+        account_settings = AccountView.get_serialized_account(user)
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
         self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))

@@ -714,13 +714,11 @@ def submit_photos_for_verification(request):
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return HttpResponseBadRequest(_("You already have a valid or pending verification."))
 
-    username = request.user.username
-
     # If the user wants to change his/her full name,
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
-            AccountView.update_account(username, {"name": request.POST.get('full_name')})
+            AccountView.update_account(request.user, {"name": request.POST.get('full_name')})
         except AccountUserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
         except AccountUpdateError:
@@ -743,7 +741,7 @@ def submit_photos_for_verification(request):
     attempt.mark_ready()
     attempt.submit()
 
-    account_settings = AccountView.get_serialized_account(username)
+    account_settings = AccountView.get_serialized_account(request.user)
 
     # Send a confirmation email to the user
     context = {

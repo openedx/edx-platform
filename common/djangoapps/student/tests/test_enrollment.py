@@ -130,7 +130,7 @@ class EnrollmentTest(UrlResetMixin, ModuleStoreTestCase):
         # Verify that the profile API has been called as expected
         if email_opt_in is not None:
             opt_in = email_opt_in == 'true'
-            mock_update_email_opt_in.assert_called_once_with(self.USERNAME, self.course.org, opt_in)
+            mock_update_email_opt_in.assert_called_once_with(self.user, self.course.org, opt_in)
         else:
             self.assertFalse(mock_update_email_opt_in.called)
 
