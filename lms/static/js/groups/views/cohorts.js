@@ -287,7 +287,8 @@ var edx = edx || {};
             if (!this.topicsView) {
                 this.topicsView = new DiscussionTopicsView({
                     el: topicsElement,
-                    model: this.context.discussionTopicsModel
+                    model: this.context.discussionTopicsModel,
+                    cohortSettings: this.cohortSettings
                 }).render();
             }
         },

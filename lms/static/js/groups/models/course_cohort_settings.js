@@ -9,7 +9,8 @@ var edx = edx || {};
         idAttribute: 'id',
         defaults: {
             is_cohorted: false,
-            cohorted_discussions: [],
+            cohorted_inline_discussions: [],
+            cohorted_course_wide_discussions:[],
             always_cohort_inline_discussions: true
         }
     });
