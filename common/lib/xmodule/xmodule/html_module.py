@@ -20,6 +20,7 @@ from xmodule.x_module import XModule, DEPRECATION_VSCOMPAT_EVENT
 from xmodule.xml_module import XmlDescriptor, name_to_pathname
 from xblock.core import XBlock
 from xblock.fields import Scope, String, Boolean, List
+from xmodule.mixin import LicenseMixin
 
 log = logging.getLogger("edx.courseware")
 
@@ -56,6 +57,9 @@ class HtmlFields(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(HtmlFields, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlFields.data)
         return non_editable_fields
@@ -93,7 +97,7 @@ class HtmlModule(HtmlModuleMixin):
     pass
 
 
-class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
+class HtmlDescriptor(HtmlFields, LicenseMixin, XmlDescriptor, EditingDescriptor):  # pylint: disable=abstract-method
     """
     Module for putting raw html in a course
     """
@@ -269,6 +273,9 @@ class HtmlDescriptor(HtmlFields, XmlDescriptor, EditingDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `use_latex_compiler` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(HtmlDescriptor, self).non_editable_metadata_fields
         non_editable_fields.append(HtmlDescriptor.use_latex_compiler)
         return non_editable_fields
@@ -307,6 +314,9 @@ class AboutFields(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(AboutFields, self).non_editable_metadata_fields
         non_editable_fields.append(AboutFields.data)
         return non_editable_fields
@@ -350,6 +360,9 @@ class StaticTabFields(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(StaticTabFields, self).non_editable_metadata_fields
         non_editable_fields.append(StaticTabFields.data)
         return non_editable_fields
@@ -390,6 +403,9 @@ class CourseInfoFields(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(CourseInfoFields, self).non_editable_metadata_fields
         non_editable_fields.append(CourseInfoFields.data)
         return non_editable_fields

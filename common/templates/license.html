@@ -1,0 +1,55 @@
+<%page args="license, button=False, button_size='88x31'"/>
+## keep this synchronized with the contents of cms/templates/js/license-selector.underscore
+<%!
+from django.utils.translation import ugettext as _
+
+def parse_license(lic):
+    """
+    Returns a two-tuple: license type, and options.
+    """
+    if not lic:
+        return None, {}
+    if ":" not in lic:
+        # no options, so the entire thing is the license type
+        return lic, {}
+
+    ltype, option_str = lic.split(":", 1)
+    options = {}
+    for part in option_str.split():
+        if "=" in part:
+            key, value = part.split("=", 1)
+            options[key] = value
+        else:
+            options[part] = True
+    return ltype, options
+%>
+<% license_type, license_options = parse_license(license) %>
+% if license_type == "all-rights-reserved":
+    © <span class="license-text">${_("All Rights Reserved")}</span>
+% elif license_type == "creative-commons":
+    <%
+    possible = ["by", "nc", "nd", "sa"]
+    enabled = [opt for opt in possible
+               if license_options.get(opt) or license_options.get(opt.upper())]
+    version = license_options.get("ver", "4.0")
+    if len(enabled) == 0:
+        enabled = ["zero"]
+        version = license_options.get("ver", "1.0")
+    %>
+    <a rel="license" href="//creativecommons.org/licenses/${'-'.join(enabled)}/${version}/">
+    % if button:
+        <img src="https://licensebuttons.net/l/${'-'.join(enabled)}/${version}/${button_size}.png"
+             alt="${license}"
+             />
+        </a>
+    % else:
+        <i class="icon-cc"></i>
+        % for option in enabled:
+            <i class="icon-cc-${option}"></i>
+        % endfor
+        <span class="license-text">${_("Some Rights Reserved")}</span>
+    % endif
+    </a>
+% else:
+    ${license}
+% endif

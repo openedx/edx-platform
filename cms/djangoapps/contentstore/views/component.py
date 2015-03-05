@@ -63,7 +63,7 @@ CONTAINER_TEMPATES = [
     "editor-mode-button", "upload-dialog", "image-modal",
     "add-xblock-component", "add-xblock-component-button", "add-xblock-component-menu",
     "add-xblock-component-menu-problem", "xblock-string-field-editor", "publish-xblock", "publish-history",
-    "unit-outline", "container-message"
+    "unit-outline", "container-message", "license-selector",
 ]
 
 

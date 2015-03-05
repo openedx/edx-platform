@@ -41,6 +41,7 @@ from .video_xfields import VideoFields
 from .video_handlers import VideoStudentViewHandlers, VideoStudioViewHandlers
 
 from xmodule.video_module import manage_video_subtitles_save
+from xmodule.mixin import LicenseMixin
 
 # The following import/except block for edxval is temporary measure until
 # edxval is a proper XBlock Runtime Service.
@@ -282,10 +283,12 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'transcript_languages': json.dumps(sorted_languages),
             'transcript_translation_url': self.runtime.handler_url(self, 'transcript', 'translation').rstrip('/?'),
             'transcript_available_translations_url': self.runtime.handler_url(self, 'transcript', 'available_translations').rstrip('/?'),
+            'license': getattr(self, "license", None),
         })
 
 
-class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers, TabsEditingDescriptor, EmptyDataRawDescriptor):
+class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandlers,
+                      TabsEditingDescriptor, LicenseMixin, EmptyDataRawDescriptor):
     """
     Descriptor for `VideoModule`.
     """
@@ -483,6 +486,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
             except edxval_api.ValVideoNotFoundError:
                 pass
 
+        # handle license specifically
+        self.add_license_to_xml(xml)
+
         return xml
 
     def get_context(self):
@@ -641,6 +647,9 @@ class VideoDescriptor(VideoFields, VideoTranscriptsMixin, VideoStudioViewHandler
                 field_data['edx_video_id'],
                 course_id=getattr(id_generator, 'target_course_id', None)
             )
+
+        # load license if it exists
+        field_data = LicenseMixin.parse_license_from_xml(field_data, xml)
 
         return field_data
 

@@ -1,6 +1,8 @@
+# coding: utf-8
 """
 Course Schedule and Details Settings page.
 """
+from __future__ import unicode_literals
 from bok_choy.promise import EmptyPromise
 
 from .course_page import CoursePage
@@ -69,6 +71,17 @@ class SettingsPage(CoursePage):
                 '#entrance-exam-minimum-score-pct',
                 'Entrance exam minimum score percent is invisible'
             )
+
+    def set_course_license(self, license_type):
+        css_selector = (
+            "section.license ul.license-types "
+            "li[data-license={license_type}] button"
+        ).format(license_type=license_type)
+        self.wait_for_element_presence(
+            css_selector,
+            '{license_type} button is present'.format(license_type=license_type)
+        )
+        self.q(css=css_selector).click()
 
     def save_changes(self, wait_for_confirmation=True):
         """

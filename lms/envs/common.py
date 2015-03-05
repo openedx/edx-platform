@@ -40,6 +40,7 @@ from django.utils.translation import ugettext_lazy as _
 from .discussionsettings import *
 import dealer.git
 from xmodule.modulestore.modulestore_settings import update_module_store_settings
+from xmodule.mixin import LicenseMixin
 from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 
 ################################### FEATURES ###################################
@@ -673,6 +674,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
+# These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (LmsBlockMixin, InheritanceMixin, XModuleMixin)
@@ -1274,6 +1276,8 @@ PIPELINE_CSS = {
     'style-main': {
         'source_filenames': [
             'sass/lms-main.css',
+            'css/edx-cc.css',
+            'css/edx-cc-ie7.css',
         ],
         'output_filename': 'css/lms-main.css',
     },

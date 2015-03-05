@@ -50,6 +50,7 @@ from lms.djangoapps.lms_xblock.mixin import LmsBlockMixin
 from cms.lib.xblock.authoring_mixin import AuthoringMixin
 import dealer.git
 from xmodule.modulestore.edit_info import EditInfoMixin
+from xmodule.mixin import LicenseMixin
 
 ############################ FEATURE CONFIGURATION #############################
 STUDIO_NAME = "Studio"
@@ -312,6 +313,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore import prefer_xmodules
 from xmodule.x_module import XModuleMixin
 
+# These are the Mixins that should be added to every XBlock.
 # This should be moved into an XBlock Runtime/Application object
 # once the responsibility of XBlock creation is moved out of modulestore - cpennington
 XBLOCK_MIXINS = (
@@ -465,6 +467,7 @@ PIPELINE_CSS = {
     'style-main': {
         'source_filenames': [
             'sass/studio-main.css',
+            'css/edx-cc.css',
         ],
         'output_filename': 'css/studio-main.css',
     },

@@ -88,6 +88,13 @@ class CoursewarePage(CoursePage):
 
         return True
 
+    @property
+    def course_license(self):
+        element = self.q(css="#content .container-footer .course-license")
+        if element.is_present():
+            return element.text[0]
+        return None
+
     def get_active_subsection_url(self):
         """
         return the url of the active subsection in the left nav

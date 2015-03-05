@@ -43,6 +43,9 @@ class DiscussionFields(object):
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        `data` should not be editable in the Studio settings editor.
+        """
         non_editable_fields = super(DiscussionFields, self).non_editable_metadata_fields
         non_editable_fields.append(DiscussionFields.data)
         return non_editable_fields

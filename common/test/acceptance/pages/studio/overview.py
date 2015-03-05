@@ -12,6 +12,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from .course_page import CoursePage
 from .container import ContainerPage
+from .settings import SettingsPage
 from .utils import set_input_value_and_save, set_input_value, click_css, confirm_prompt
 
 
@@ -578,6 +579,21 @@ class CourseOutlinePage(CoursePage, CourseOutlineContainer):
         Return a list of xblocks loaded on the outline page.
         """
         return self.children(CourseOutlineChild)
+
+    @property
+    def license(self):
+        return self.q(css=".license-value").first.text[0]
+
+    def edit_course_start_date(self):
+        self.q(css=".status-release .action-edit a.action-button").click()
+        sp = SettingsPage(
+            self.browser,
+            self.course_info['course_org'],
+            self.course_info['course_num'],
+            self.course_info['course_run'],
+        )
+        sp.wait_for_page()
+        return sp
 
 
 class CourseOutlineModal(object):

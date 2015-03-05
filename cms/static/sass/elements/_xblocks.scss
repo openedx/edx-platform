@@ -103,6 +103,28 @@
     }
   }
 
+  .xblock-license,
+  .xmodule_display.xmodule_HtmlModule .xblock-license {
+    text-align: $bi-app-right;
+    border-top: 1px solid $gray-l3;
+    margin: 0 15px;
+    padding: 5px;
+    font-size: 80%;
+    color: $gray-l3;
+
+    a {
+      color: $gray-l3;
+
+      &:hover {
+        color: $ui-link-color;
+      }
+    }
+    span {
+      color: inherit;
+    }
+
+  }
+
   .container-paging-header {
     .meta-wrap {
       margin: $baseline ($baseline/2);

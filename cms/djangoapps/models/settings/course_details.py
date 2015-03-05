@@ -42,6 +42,7 @@ class CourseDetails(object):
         self.overview = ""  # html to render as the overview
         self.intro_video = None  # a video pointer
         self.effort = None  # int hours/week
+        self.license = None
         self.course_image_name = ""
         self.course_image_asset_path = ""  # URL of the course image
         self.pre_requisite_courses = []  # pre-requisite courses
@@ -79,6 +80,7 @@ class CourseDetails(object):
         course_details.pre_requisite_courses = descriptor.pre_requisite_courses
         course_details.course_image_name = descriptor.course_image
         course_details.course_image_asset_path = course_image_url(descriptor)
+        course_details.license = getattr(descriptor, "license", None)
 
         for attribute in ABOUT_ATTRIBUTES:
             value = cls._fetch_about_attribute(course_key, attribute)
@@ -171,6 +173,10 @@ class CourseDetails(object):
         if 'pre_requisite_courses' in jsondict \
                 and sorted(jsondict['pre_requisite_courses']) != sorted(descriptor.pre_requisite_courses):
             descriptor.pre_requisite_courses = jsondict['pre_requisite_courses']
+            dirty = True
+
+        if 'license' in jsondict:
+            descriptor.license = jsondict['license']
             dirty = True
 
         if dirty:

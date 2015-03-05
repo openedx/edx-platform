@@ -5,4 +5,9 @@
   </script>
 % endif
   ${content}
+% if license:
+  <div class="xblock-license">
+    <%include file="license.html" args="license=license" />
+  </div>
+% endif
 </div>

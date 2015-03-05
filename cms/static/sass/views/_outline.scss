@@ -176,6 +176,7 @@
   // course status
   // --------------------
   .course-status {
+    float: $bi-app-left;
     margin-bottom: $baseline;
 
     .status-release {
@@ -214,6 +215,32 @@
         opacity: 1.0;
       }
     }
+  }
+
+  // course content license
+  // --------------------
+  .course-license {
+    @extend .content-primary;
+    @include text-align(right);
+    display: block;
+    float: $bi-app-right;
+    width: auto;
+
+    .license-label,
+    .license-value,
+    .license-actions {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 0;
+    }
+
+    img {
+      display: inline;
+    }
+  }
+
+  .wrapper-dnd {
+    clear: both;
   }
 
   // outline

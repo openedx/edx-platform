@@ -682,6 +682,8 @@ class XModuleMixin(XModuleFields, XBlockMixin):
             editor_type = "Dict"
         elif isinstance(field, RelativeTime):
             editor_type = "RelativeTime"
+        elif isinstance(field, String) and field.name == "license":
+            editor_type = "License"
         metadata_field_editor_info['type'] = editor_type
         metadata_field_editor_info['options'] = [] if values is None else values
 

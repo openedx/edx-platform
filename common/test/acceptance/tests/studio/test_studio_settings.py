@@ -1,14 +1,19 @@
+# coding: utf-8
 """
 Acceptance tests for Studio's Setting pages
 """
+from __future__ import unicode_literals
+from nose.plugins.attrib import attr
 
 from base_studio_test import StudioCourseTest
 from bok_choy.promise import EmptyPromise
 from ...fixtures.course import XBlockFixtureDesc
 from ..helpers import create_user_partition_json
 from ...pages.studio.overview import CourseOutlinePage
+from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
+from ...pages.lms.courseware import CoursewarePage
 from unittest import skip
 from textwrap import dedent
 from xmodule.partitions.partitions import Group
@@ -397,3 +402,49 @@ class AdvancedSettingsValidationTest(StudioCourseTest):
         expected_fields = self.advanced_settings.expected_settings_names
         displayed_fields = self.advanced_settings.displayed_settings_names
         self.assertEquals(set(displayed_fields), set(expected_fields))
+
+
+@attr('shard_1')
+class ContentLicenseTest(StudioCourseTest):
+    def setUp(self):
+        super(ContentLicenseTest, self).setUp()
+        self.outline_page = CourseOutlinePage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.settings_page = SettingsPage(
+            self.browser,
+            self.course_info['org'],
+            self.course_info['number'],
+            self.course_info['run']
+        )
+        self.lms_courseware = CoursewarePage(
+            self.browser,
+            self.course_id,
+        )
+        self.outline_page.visit()
+
+    def test_empty_license(self):
+        self.assertEqual(self.outline_page.license, "None")
+        self.lms_courseware.visit()
+        self.assertIsNone(self.lms_courseware.course_license)
+
+    def test_arr_license(self):
+        self.outline_page.edit_course_start_date()
+        self.settings_page.set_course_license("all-rights-reserved")
+        self.settings_page.save_changes()
+        self.outline_page.visit()
+        self.assertEqual(self.outline_page.license, "© All Rights Reserved")
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "© All Rights Reserved")
+
+    def test_cc_license(self):
+        self.outline_page.edit_course_start_date()
+        self.settings_page.set_course_license("creative-commons")
+        self.settings_page.save_changes()
+        self.outline_page.visit()
+        self.assertEqual(self.outline_page.license, "Some Rights Reserved")
+        self.lms_courseware.visit()
+        self.assertEqual(self.lms_courseware.course_license, "Some Rights Reserved")
