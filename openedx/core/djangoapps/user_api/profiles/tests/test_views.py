@@ -7,6 +7,7 @@ import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from mock import patch
 
 from openedx.core.djangoapps.user_api.accounts.tests.test_views import UserAPITestCase
 from openedx.core.djangoapps.user_api.models import UserPreference
@@ -59,6 +60,10 @@ class TestProfileAPI(UserAPITestCase):
         ("staff_client", "staff_user"),
     )
     @ddt.unpack
+    # Note: using getattr so that the patching works even if there is no configuration.
+    # This is needed when testing CMS as the patching is still executed even though the
+    # suite is skipped.
+    @patch.dict(getattr(settings, "PROFILE_CONFIGURATION", {}), {"default_visibility": "all_users"})
     def test_get_default_profile(self, api_client, username):
         """
         Test that any logged in user can get the main test user's public profile information.
@@ -67,6 +72,26 @@ class TestProfileAPI(UserAPITestCase):
         self.create_mock_profile(self.user)
         response = self.send_get(client)
         self._verify_full_profile_response(response)
+
+    @ddt.data(
+        ("client", "user"),
+        ("different_client", "different_user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    # Note: using getattr so that the patching works even if there is no configuration.
+    # This is needed when testing CMS as the patching is still executed even though the
+    # suite is skipped.
+    @patch.dict(getattr(settings, "PROFILE_CONFIGURATION", {}), {"default_visibility": "private"})
+    def test_get_default_private_profile(self, api_client, username):
+        """
+        Test that any logged in user gets only the public fields for a profile
+        if the default visibility is 'private'.
+        """
+        client = self.login_client(api_client, username)
+        self.create_mock_profile(self.user)
+        response = self.send_get(client)
+        self._verify_private_profile_response(response)
 
     @ddt.data(
         ("client", "user"),
