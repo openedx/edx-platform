@@ -9,14 +9,14 @@
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
 
-     <script type="text/javascript" src="${static.url('js/student_account/views/AccountSettingsInfoView.js')}"></script>
-     <script type="text/javascript" src="${static.url('js/student_account/models/AccountSettingsInfoModel.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/AccountSettingsView.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/models/AccountSettingsModel.js')}"></script>
 
     <%static:js group='student_account'/>
 </%block>
 
 <%block name="header_extras">
-    % for template_name in ["account_settings_info"]:
+    % for template_name in ["account_settings", "field_dropdown", "field_link", "field_readonly", "field_string"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="student_account/${template_name}.underscore" />
         </script>
@@ -28,41 +28,71 @@
         <header class="mast has-actions has-subtitle">
             <h1 class="page-header">
                 ${_("Account Settings")}
-                <!--<small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>-->
             </h1>
+            <small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>
         </header>
     </div>
+
+    <div class="account-settings-container"
+         data-accounts-api-url="${accounts_api_url}"
+    ></div>
 </%block>
-
-
-<!--<div class="wrapper-mast wrapper">-->
-    <!--<header class="mast has-actions has-subtitle">-->
-        <!--<h1 class="page-header">Account Settings</h1>-->
-        <!--<small class="subtitle"></small>-->
-    <!--</header>-->
-<!--</div>-->
-
-<div class="account-settings-container"
-     data-account-settings-url="${account_settings_url}"   >
-
-</div>
 
 <%block name="headextra">
     <script>
         $(document).ready(function() {
             var accountSettingsElement = $('.account-settings-container');
-            var accountSettingsInfoModel = new edx.student.account.AccountSettingsInfoModel();
-            accountSettingsInfoModel.url = accountSettingsElement.data('account-settings-url');
-            var accountSettingsInfoView = new edx.student.account.AccountSettingsInfoView({
+            var accountSettingsModel = new edx.student.account.AccountSettingsModel();
+            accountSettingsModel.url = accountSettingsElement.data('accounts-api-url');
+            var accountSettingsView = new edx.student.account.AccountSettingsView({
                 el: accountSettingsElement,
-                model: accountSettingsInfoModel,
+                model: accountSettingsModel,
                 context: {
-                    accountSettingsInfoModelUrl: accountSettingsInfoModel.url
-                }
+                    accountSettingsModelUrl: accountSettingsModel.url
+                },
+                sections : [
+                    {
+                        title: "Basic Account Information",
+                        fields: [
+                            {
+                                view: new edx.student.account.ReadonlyFieldView({
+                                    title: "Username",
+                                    description: ""
+                                }).render()
+                            },
+                            {
+                                view: new edx.student.account.ReadonlyFieldView({
+                                    title: "Full Name",
+                                    description: "This is used on your edX certificates, and all changes are reviewed."
+                                }).render()                            },
+                            {
+                                view: new edx.student.account.ReadonlyFieldView({
+                                    title: "Email",
+                                    description: "You account email is used as a login mechanism and for course communications."
+                                }).render()                            },
+                            {
+                                view: new edx.student.account.ReadonlyFieldView({
+                                    title: "Password",
+                                    description: "To reset your password you'll need to click the reset password link sent to you via email."
+                                }).render()                            },
+                            {
+                                view: new edx.student.account.ReadonlyFieldView({
+                                    title: "Language",
+                                    description: "This setting controls your default edX language."
+                                }).render()                            },
+                        ]
+                    },
+                    {
+                        title: "Demographics and Additional Details",
+                    },
+                    {
+                        title: "Connected Accounts",
+                    }
+                ]
             });
 
-            accountSettingsInfoModel.fetch().done(function() {
-                accountSettingsInfoView.render();
+            accountSettingsModel.fetch().done(function() {
+                accountSettingsView.render();
             });
         });
     </script>

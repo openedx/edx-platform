@@ -1,0 +1,7 @@
+<div>
+    <span><%- gettext(title) %></span>
+    <span>Value</span>
+    <span><%- gettext(description) %></span>
+</div>
+<hr class="divider divider-lv1">
+<div>

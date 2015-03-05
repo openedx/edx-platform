@@ -6,7 +6,7 @@ var edx = edx || {};
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
 
-    edx.student.account.AccountSettingsInfoModel = Backbone.Model.extend({
+    edx.student.account.AccountSettingsModel = Backbone.Model.extend({
         idAttribute: 'id',
         defaults: {
             username: '',

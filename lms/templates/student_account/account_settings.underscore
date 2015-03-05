@@ -1,0 +1,8 @@
+<div>
+    <% _.each(sections, function(section) { %>
+        <h2><%- gettext(section.title) %></h2>
+        <hr class="divider divider-lv1">
+        <div class="account-settings-section-body">
+        <div>
+    <% }); %>
+</div>

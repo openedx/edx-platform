@@ -299,14 +299,14 @@ def _external_auth_intercept(request, mode):
 
 @login_required
 @require_http_methods(['GET'])
-def settings_render(request):
+def account_settings(request):
     """Render the students account settings page.
 
     Args:
         request (HttpRequest)
 
     Returns:
-        HttpResponse: 200 if the index page was sent successfully
+        HttpResponse: 200 if the page was sent successfully
         HttpResponse: 302 if not logged in (redirect to login page)
         HttpResponse: 405 if using an unsupported HTTP method
 
@@ -316,6 +316,6 @@ def settings_render(request):
 
     """
     context = {
-        'account_settings_url': reverse("accounts_api", kwargs={'username': request.user.username}),
+        'accounts_api_url': reverse("accounts_api", kwargs={'username': request.user.username}),
     }
     return render_to_response('student_account/settings.html', context)
