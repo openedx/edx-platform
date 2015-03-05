@@ -17,8 +17,11 @@ from webob import Response
 from webob.multidict import MultiDict
 
 from xblock.core import XBlock, XBlockAside
-from xblock.fields import Scope, Integer, Float, List, XBlockMixin, String, Dict, ScopeIds, Reference, \
-    ReferenceList, ReferenceValueDict
+from xblock.fields import (
+    Scope, Integer, Float, List, XBlockMixin,
+    String, Dict, ScopeIds, Reference, ReferenceList,
+    ReferenceValueDict, UserScope
+)
 from xblock.fragment import Fragment
 from xblock.runtime import Runtime, IdReader, IdGenerator
 from xmodule.fields import RelativeTime
@@ -536,9 +539,15 @@ class XModuleMixin(XBlockMixin):
             field_data (:class:`FieldData`): The :class:`FieldData` to use for all subsequent data access
         """
         # pylint: disable=attribute-defined-outside-init
+        self.save()
+
         self._child_instances = None
-        self._field_data_cache.clear()
-        self._dirty_fields.clear()
+        for field in self.fields.values():
+            if field.scope in (Scope.parent, Scope.children):
+                continue
+
+            if field.scope.user == UserScope.ONE:
+                field._del_cached_value(self)
 
         self.xmodule_runtime = xmodule_runtime
         self._field_data = field_data
