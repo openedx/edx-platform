@@ -38,7 +38,8 @@ class EnrollmentTest(TestCase):
         (['honor', 'verified', 'audit'], 'honor'),
 
         # Check for professional ed happy path.
-        (['professional'], 'professional')
+        (['professional'], 'professional'),
+        (['no-id-professional'], 'no-id-professional')
     )
     @ddt.unpack
     def test_enroll(self, course_modes, mode):
@@ -72,7 +73,8 @@ class EnrollmentTest(TestCase):
         (['honor', 'verified', 'audit'], 'honor'),
 
         # Check for professional ed happy path.
-        (['professional'], 'professional')
+        (['professional'], 'professional'),
+        (['no-id-professional'], 'no-id-professional')
     )
     @ddt.unpack
     def test_unenroll(self, course_modes, mode):

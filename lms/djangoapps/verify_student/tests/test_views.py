@@ -99,6 +99,21 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         ])
         self._assert_upgrade_session_flag(False)
 
+    @ddt.data("no-id-professional")
+    def test_start_flow_with_no_id_professional(self, course_mode):
+        course = self._create_course(course_mode)
+        # by default enrollment is honor
+        self._enroll(course.id, "honor")
+        response = self._get_page('verify_student_start_flow', course.id)
+        self._assert_displayed_mode(response, course_mode)
+        self._assert_steps_displayed(
+            response,
+            PayAndVerifyView.PAYMENT_STEPS,
+            PayAndVerifyView.MAKE_PAYMENT_STEP
+        )
+        self._assert_messaging(response, PayAndVerifyView.FIRST_TIME_VERIFY_MSG)
+        self._assert_requirements_displayed(response, [])
+
     @ddt.data("expired", "denied")
     def test_start_flow_expired_or_denied_verification(self, verification_status):
         course = self._create_course("verified")
@@ -122,7 +137,8 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
         ("verified", "submitted"),
         ("verified", "approved"),
         ("verified", "error"),
-        ("professional", "submitted")
+        ("professional", "submitted"),
+        ("no-id-professional", None),
     )
     @ddt.unpack
     def test_start_flow_already_verified(self, course_mode, verification_status):
@@ -517,6 +533,14 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
                 expected_status_code=404
             )
 
+    @ddt.data([], ["no-id-professional", "professional"], ["honor", "audit"])
+    def test_no_id_professional_entry_point(self, modes_available):
+        course = self._create_course(*modes_available)
+        if "no-id-professional" in modes_available or "professional" in modes_available:
+            self._get_page("verify_student_start_flow", course.id, expected_status_code=200)
+        else:
+            self._get_page("verify_student_start_flow", course.id, expected_status_code=404)
+
     @ddt.data(
         "verify_student_start_flow",
         "verify_student_verify_now",
@@ -648,7 +672,7 @@ class TestPayAndVerifyView(UrlResetMixin, ModuleStoreTestCase):
             modulestore().update_item(course, ModuleStoreEnum.UserID.test)
 
         for course_mode in course_modes:
-            min_price = (self.MIN_PRICE if course_mode != "honor" else 0)
+            min_price = (0 if course_mode in ["honor", "audit"] else self.MIN_PRICE)
             CourseModeFactory(
                 course_id=course.id,
                 mode_slug=course_mode,
@@ -809,8 +833,8 @@ class TestCreateOrder(ModuleStoreTestCase):
 
         self.user = UserFactory.create(username="test", password="test")
         self.course = CourseFactory.create()
-        for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+        for mode, min_price in (('audit', 0), ('honor', 0), ('verified', 100)):
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
         self.client.login(username="test", password="test")
 
     def test_create_order_already_verified(self):
@@ -821,6 +845,7 @@ class TestCreateOrder(ModuleStoreTestCase):
         url = reverse('verify_student_create_order')
         params = {
             'course_id': unicode(self.course.id),
+            'contribution': 100
         }
         response = self.client.post(url, params)
         self.assertEqual(response.status_code, 200)
@@ -840,7 +865,7 @@ class TestCreateOrder(ModuleStoreTestCase):
 
         # Create a prof ed course
         course = CourseFactory.create()
-        CourseModeFactory(mode_slug="professional", course_id=course.id)
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10)
 
         # Create an order for a prof ed course
         url = reverse('verify_student_create_order')
@@ -854,6 +879,45 @@ class TestCreateOrder(ModuleStoreTestCase):
         data = json.loads(response.content)
         self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
         self.assertEqual(data['merchant_defined_data2'], "professional")
+
+    def test_create_order_for_no_id_professional(self):
+
+        # Create a no-id-professional ed course
+        course = CourseFactory.create()
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10)
+
+        # Create an order for a prof ed course
+        url = reverse('verify_student_create_order')
+        params = {
+            'course_id': unicode(course.id)
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the course ID and transaction type are included in "merchant-defined data"
+        data = json.loads(response.content)
+        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
+        self.assertEqual(data['merchant_defined_data2'], "no-id-professional")
+
+    def test_create_order_for_multiple_paid_modes(self):
+
+        # Create a no-id-professional ed course
+        course = CourseFactory.create()
+        CourseModeFactory(mode_slug="no-id-professional", course_id=course.id, min_price=10)
+        CourseModeFactory(mode_slug="professional", course_id=course.id, min_price=10)
+
+        # Create an order for a prof ed course
+        url = reverse('verify_student_create_order')
+        params = {
+            'course_id': unicode(course.id)
+        }
+        response = self.client.post(url, params)
+        self.assertEqual(response.status_code, 200)
+
+        # Verify that the course ID and transaction type are included in "merchant-defined data"
+        data = json.loads(response.content)
+        self.assertEqual(data['merchant_defined_data1'], unicode(course.id))
+        self.assertEqual(data['merchant_defined_data2'], "no-id-professional")
 
     def test_create_order_set_donation_amount(self):
         # Verify the student so we don't need to submit photos
@@ -947,7 +1011,7 @@ class TestCreateOrderView(ModuleStoreTestCase):
             photo_id_image=self.IMAGE_DATA,
             expect_status_code=400
         )
-        self.assertIn('This course doesn\'t support verified certificates', response.content)
+        self.assertIn('This course doesn\'t support paid certificates', response.content)
 
     @patch.dict(settings.FEATURES, {'AUTOMATIC_VERIFY_STUDENT_IDENTITY_FOR_TESTING': True})
     def test_create_order_fail_with_get(self):

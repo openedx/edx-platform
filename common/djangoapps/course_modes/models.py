@@ -62,7 +62,7 @@ class CourseMode(models.Model):
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = ["verified", "professional"]
-    NO_ID_PROFESSIONAL_MODE = ["no-id-professional"]
+    NO_ID_PROFESSIONAL_MODES = ["no-id-professional"]
 
     class Meta:
         """ meta attributes of this model """
@@ -275,6 +275,19 @@ class CourseMode(models.Model):
         return 0
 
     @classmethod
+    def is_verified_mode(cls, course_mode_tuple):
+        """Check whether the given modes is_verified or not.
+
+        Args:
+            course_mode_tuple(Mode): Mode tuple
+
+        Returns:
+            bool: True iff the course modes is verified else False.
+
+        """
+        return course_mode_tuple.slug in cls.VERIFIED_MODES
+
+    @classmethod
     def has_payment_options(cls, course_id):
         """Determines if there is any mode that has payment options
 
@@ -318,8 +331,8 @@ class CourseMode(models.Model):
         if modes_dict is None:
             modes_dict = cls.modes_for_course_dict(course_id)
 
-        # Professional mode courses are always behind a paywall
-        if "professional" in modes_dict:
+        # Professional and no-id-professional mode courses are always behind a paywall
+        if cls.has_professional_mode(modes_dict):
             return False
 
         # White-label uses course mode honor with a price
@@ -452,6 +465,43 @@ class CourseMode(models.Model):
             mode = enrollment_mode
 
         return mode
+
+    @classmethod
+    def has_professional_mode(cls, modes_dict):
+        """
+        check the course mode is profession or no-id-professional
+
+        Args:
+            modes_dict (dict): course modes.
+
+        Returns:
+            bool
+        """
+        return "professional" in modes_dict or CourseMode.NO_ID_PROFESSIONAL_MODES[0] in modes_dict
+
+    @classmethod
+    def is_professional_mode(cls, course_mode_tuple):
+        """
+        checking that tuple is professional mode.
+        Args:
+            course_mode_tuple (tuple) : course mode tuple
+
+        Returns:
+            bool
+        """
+        if course_mode_tuple:
+            return course_mode_tuple.slug == 'professional' or course_mode_tuple.slug == cls.NO_ID_PROFESSIONAL_MODES[0]
+        return False
+
+    @classmethod
+    def is_professional_slug(cls, slug):
+        """
+        Args:
+            slug (str) : course mode string
+        Return:
+            bool
+        """
+        return slug in ['professional', cls.NO_ID_PROFESSIONAL_MODES[0]]
 
     def to_tuple(self):
         """
