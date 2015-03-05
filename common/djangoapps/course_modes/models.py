@@ -7,6 +7,7 @@ from datetime import datetime
 from django.db import models
 from collections import namedtuple, defaultdict
 from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as __
 from django.db.models import Q
 
 from xmodule_django.models import CourseKeyField
@@ -379,6 +380,91 @@ class CourseMode(models.Model):
         """
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
+
+    @classmethod
+    def get_certificate_display(cls, mode, verification_status):
+        """
+         on the basis of mode and verification status make certificate display html strings and css class.
+         Args:
+            mode (str): enrollment mode.
+            verification_status (str) : verification status of student
+
+        Returns:
+            dictionary:
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        show_image = False
+        enrollment_title, enrollment_value, image_alt = '', '', ''
+
+        if mode == "verified":
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED]:
+                enrollment_title = __("Your verification is pending")
+                enrollment_value = __("Verified: Pending Verification")
+                show_image = True
+                image_alt = __("ID verification pending")
+            elif verification_status == VERIFY_STATUS_APPROVED:
+                enrollment_title = __("You're enrolled as a verified student")
+                enrollment_value = __("Verified")
+                show_image = True
+                image_alt = __("ID Verified Ribbon/Badge")
+            else:
+                enrollment_title = __("You're enrolled as an honor code student")
+                enrollment_value = __("Honor Code")
+        elif mode == "honor":
+            enrollment_title = __("You're enrolled as an honor code student")
+            enrollment_value = __("Honor Code")
+        elif mode == "audit":
+            enrollment_title = __("You're auditing this course")
+            enrollment_value = __("Auditing")
+        elif mode == "professional" or mode == "no-id-professional":
+            enrollment_title = __("You're enrolled as a professional education student")
+            enrollment_value = __("Professional Ed")
+
+        return {
+            'enrollment_title': enrollment_title,
+            'enrollment_value': enrollment_value,
+            'show_image': show_image,
+            'image_alt': image_alt,
+            'display_mode': CourseMode._get_certificate_display_mode(mode, verification_status)
+        }
+
+    @staticmethod
+    def _get_certificate_display_mode(enrollment_mode, verification_status):
+        """
+         return the of mode after checking enrollment mode and status.
+         Args:
+            mode (str): enrollment mode.
+            verification_status (str) : verification status of student
+
+        Returns:
+            str: display mode for certs
+        """
+
+        # import inside the function to avoid the circular import
+        from student.helpers import (
+            VERIFY_STATUS_NEED_TO_VERIFY,
+            VERIFY_STATUS_SUBMITTED,
+            VERIFY_STATUS_APPROVED
+        )
+
+        if enrollment_mode == "verified":
+            if verification_status in [VERIFY_STATUS_NEED_TO_VERIFY, VERIFY_STATUS_SUBMITTED, VERIFY_STATUS_APPROVED]:
+                mode = "verified"
+            else:
+                mode = "honor"
+        elif enrollment_mode == "professional" or enrollment_mode == "no-id-professional":
+            mode = "professional"
+        else:
+            mode = enrollment_mode
+
+        return mode
 
     @classmethod
     def has_professional_mode(cls, modes_dict):
