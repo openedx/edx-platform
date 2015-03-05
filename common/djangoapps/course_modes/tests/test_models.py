@@ -150,6 +150,12 @@ class CourseModeModelTest(TestCase):
         honor.save()
         self.assertTrue(CourseMode.has_payment_options(self.course_key))
 
+    def test_course_has_payment_options_with_no_id_professional(self):
+        # Has payment options.
+        professional, _ = self.create_mode('no-id-professional', 'no-id-professional', min_price=5)
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+
     @ddt.data(
         ([], True),
         ([("honor", 0), ("audit", 0), ("verified", 100)], True),
