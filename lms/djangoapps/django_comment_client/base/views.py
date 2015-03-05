@@ -74,7 +74,7 @@ def track_forum_event(request, event_name, course, obj, data, id_map=None):
     user = request.user
     data['id'] = obj.id
     if id_map is None:
-        id_map = get_discussion_id_map(course, user)
+        id_map = get_discussion_id_map(course)
 
     commentable_id = data['commentable_id']
     if commentable_id in id_map:
@@ -173,9 +173,9 @@ def create_thread(request, course_id, commentable_id):
 
     # Calls to id map are expensive, but we need this more than once.
     # Prefetch it.
-    id_map = get_discussion_id_map(course, request.user)
+    id_map = get_discussion_id_map(course)
 
-    add_courseware_context([data], course, request.user, id_map=id_map)
+    add_courseware_context([data], course, id_map=id_map)
 
     track_forum_event(request, 'edx.forum.thread.created',
                       course, thread, event_data, id_map=id_map)
@@ -208,7 +208,7 @@ def update_thread(request, course_id, thread_id):
         thread.thread_type = request.POST["thread_type"]
     if "commentable_id" in request.POST:
         course = get_course_with_access(request.user, 'load', course_key)
-        commentable_ids = get_discussion_categories_ids(course, request.user)
+        commentable_ids = get_discussion_categories_ids(course)
         if request.POST.get("commentable_id") in commentable_ids:
             thread.commentable_id = request.POST["commentable_id"]
         else:
