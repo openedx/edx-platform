@@ -2,12 +2,16 @@
 """Tests for the XQueue certificates interface. """
 from contextlib import contextmanager
 import json
-from mock import patch
+from mock import patch, Mock
 
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from opaque_keys.edx.locator import CourseLocator
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from student.tests.factories import UserFactory, CourseEnrollmentFactory
+from xmodule.modulestore.tests.factories import CourseFactory
+
 
 # It is really unfortunate that we are using the XQueue client
 # code from the capa library.  In the future, we should move this
@@ -21,7 +25,36 @@ from certificates.models import ExampleCertificateSet, ExampleCertificate
 
 
 @override_settings(CERT_QUEUE='certificates')
-class XQueueCertInterfaceTest(TestCase):
+class XQueueCertInterfaceAddCertificateTest(ModuleStoreTestCase):
+    """Test the "add to queue" operation of the XQueue interface. """
+
+    def setUp(self):
+        super(XQueueCertInterfaceAddCertificateTest, self).setUp()
+        self.user = UserFactory.create()
+        self.course = CourseFactory.create()
+        self.enrollment = CourseEnrollmentFactory(
+            user=self.user,
+            course_id=self.course.id,
+            is_active=True,
+            mode="honor",
+        )
+        self.xqueue = XQueueCertInterface()
+
+    def test_add_cert_callback_url(self):
+        with patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75})):
+            with patch.object(XQueueInterface, 'send_to_queue') as mock_send:
+                mock_send.return_value = (0, None)
+                self.xqueue.add_cert(self.user, self.course.id)
+
+        # Verify that the task was sent to the queue with the correct callback URL
+        self.assertTrue(mock_send.called)
+        __, kwargs = mock_send.call_args_list[0]
+        actual_header = json.loads(kwargs['header'])
+        self.assertIn('https://edx.org/update_certificate?key=', actual_header['lms_callback_url'])
+
+
+@override_settings(CERT_QUEUE='certificates')
+class XQueueCertInterfaceExampleCertificateTest(TestCase):
     """Tests for the XQueue interface for certificate generation. """
 
     COURSE_KEY = CourseLocator(org='test', course='test', run='test')
@@ -31,7 +64,7 @@ class XQueueCertInterfaceTest(TestCase):
     ERROR_MSG = 'Kaboom!'
 
     def setUp(self):
-        super(XQueueCertInterfaceTest, self).setUp()
+        super(XQueueCertInterfaceExampleCertificateTest, self).setUp()
         self.xqueue = XQueueCertInterface()
 
     def test_add_example_cert(self):

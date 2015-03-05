@@ -416,7 +416,7 @@ class XQueueCertInterface(object):
                 error_reason=unicode(exc)
             )
 
-    def _send_to_xqueue(self, contents, key, task_identifier=None, callback_url_path='update_certificate'):
+    def _send_to_xqueue(self, contents, key, task_identifier=None, callback_url_path='/update_certificate'):
         """Create a new task on the XQueue.
 
         Arguments:
