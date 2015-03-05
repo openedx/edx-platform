@@ -1149,7 +1149,7 @@ class TestSubmitPhotosForVerification(TestCase):
             AssertionError
 
         """
-        account_settings = AccountView.get_serialized_account(self.user.username)
+        account_settings = AccountView.get_serialized_account(self.user)
         self.assertEqual(account_settings['name'], full_name)
 
 

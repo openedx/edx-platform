@@ -90,14 +90,14 @@ def update_preferences(username, **kwargs):
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def update_email_opt_in(username, org, optin):
+def update_email_opt_in(user, org, optin):
     """Updates a user's preference for receiving org-wide emails.
 
     Sets a User Org Tag defining the choice to opt in or opt out of organization-wide
     emails.
 
     Arguments:
-        username (str): The user to set a preference for.
+        user (User): The user to set a preference for.
         org (str): The org is used to determine the organization this setting is related to.
         optin (Boolean): True if the user is choosing to receive emails for this organization. If the user is not
             the correct age to receive emails, email-optin is set to False regardless.
@@ -105,11 +105,8 @@ def update_email_opt_in(username, org, optin):
     Returns:
         None
 
-    Raises:
-        AccountUserNotFound: Raised when the username specified is not associated with a user.
-
     """
-    account_settings = AccountView.get_serialized_account(username)
+    account_settings = AccountView.get_serialized_account(user)
     year_of_birth = account_settings['year_of_birth']
     of_age = (
         year_of_birth is None or  # If year of birth is not set, we assume user is of age.
@@ -118,7 +115,6 @@ def update_email_opt_in(username, org, optin):
     )
 
     try:
-        user = User.objects.get(username=username)
         preference, _ = UserOrgTag.objects.get_or_create(
             user=user, org=org, key='email-optin'
         )
