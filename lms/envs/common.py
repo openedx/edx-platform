@@ -1419,7 +1419,7 @@ INSTALLED_APPS = (
 
     # Country list
     'django_countries',
-    
+
     # EDX API application
     'api_manager',
 )
@@ -1756,7 +1756,10 @@ OPTIONAL_APPS = (
     'openassessment.assessment',
     'openassessment.fileupload',
     'openassessment.workflow',
-    'openassessment.xblock'
+    'openassessment.xblock',
+
+    # mckinsey apps
+    'gradebook',
 )
 
 for app_name in OPTIONAL_APPS:
