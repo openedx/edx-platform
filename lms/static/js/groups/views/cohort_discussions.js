@@ -172,7 +172,7 @@ var edx = edx || {};
 
             cohortSettingsModel.save(
                 cohortSettingsModel.changedAttributes(), {patch: true, wait: true}
-            ).done(function (result) {
+            ).done(function () {
                     saveOperation.resolve();
                 }).fail(function (result) {
                     var errorMessage = null;
