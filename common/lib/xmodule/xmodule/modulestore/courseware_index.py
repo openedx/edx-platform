@@ -181,7 +181,7 @@ class CoursewareSearchIndexer(object):
 
         try:
             if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-                #Google Analytics - log index content request
+                # Google Analytics - log index content request
                 import analytics
 
                 analytics.track(
@@ -198,5 +198,6 @@ class CoursewareSearchIndexer(object):
             # an operation to fail because of an analytics event, so we will capture these
             # errors in the logs.
             log.exception(
-                u'Unable to emit {0} event for content indexing.'.format(event_name)
+                u'Unable to emit %s event for content indexing.',
+                event_name,
             )

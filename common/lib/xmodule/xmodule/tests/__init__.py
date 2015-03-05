@@ -51,6 +51,7 @@ open_ended_grading_interface = {
     'grading_controller': 'grading_controller',
 }
 
+
 class TestModuleSystem(ModuleSystem):  # pylint: disable=abstract-method
     """
     ModuleSystem for testing
