@@ -596,14 +596,16 @@ ${secondaryAction("delete", "remove", _("Delete"))}
 </script>
 
 <script aria-hidden="true" type="text/template" id="post-user-display-template">
-    ${"<% if (username) { %>"}
-    <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
-        ${"<% if (is_community_ta) { %>"}
-        <span class="user-label-community-ta">${_("Community TA")}</span>
-        ${"<% } else if (is_staff) { %>"}
-        <span class="user-label-staff">${_("Staff")}</span>
+    <span class="username-wrapper">
+        ${"<% if (username) { %>"}
+        <a href="${'<%- user_url %>'}" class="username">${'<%- username %>'}</a>
+            ${"<% if (is_community_ta) { %>"}
+            <span class="user-label-community-ta">${_("Community TA")}</span>
+            ${"<% } else if (is_staff) { %>"}
+            <span class="user-label-staff">${_("Staff")}</span>
+            ${"<% } %>"}
+        ${"<% } else { %>"}
+            ${_('anonymous') | h}
         ${"<% } %>"}
-    ${"<% } else { %>"}
-    ${_('anonymous') | h}
-    ${"<% } %>"}
+    </span>
 </script>
