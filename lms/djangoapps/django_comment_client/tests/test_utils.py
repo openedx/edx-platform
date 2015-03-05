@@ -10,7 +10,6 @@ import mock
 
 from django_comment_client.tests.factories import RoleFactory
 from django_comment_client.tests.unicode import UnicodeTestMixin
-from django_comment_client.tests.utils import ContentGroupTestCase
 import django_comment_client.utils as utils
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
@@ -89,7 +88,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
     comment client service integration
     """
     def setUp(self):
-        super(CoursewareContextTestCase, self).setUp(create_user=True)
+        super(CoursewareContextTestCase, self).setUp()
 
         self.course = CourseFactory.create(org="TestX", number="101", display_name="Test Course")
         self.discussion1 = ItemFactory.create(
@@ -108,12 +107,12 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         )
 
     def test_empty(self):
-        utils.add_courseware_context([], self.course, self.user)
+        utils.add_courseware_context([], self.course)
 
     def test_missing_commentable_id(self):
         orig = {"commentable_id": "non-inline"}
         modified = dict(orig)
-        utils.add_courseware_context([modified], self.course, self.user)
+        utils.add_courseware_context([modified], self.course)
         self.assertEqual(modified, orig)
 
     def test_basic(self):
@@ -121,7 +120,7 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
             {"commentable_id": self.discussion1.discussion_id},
             {"commentable_id": self.discussion2.discussion_id}
         ]
-        utils.add_courseware_context(threads, self.course, self.user)
+        utils.add_courseware_context(threads, self.course)
 
         def assertThreadCorrect(thread, discussion, expected_title):  # pylint: disable=invalid-name
             """Asserts that the given thread has the expected set of properties"""
@@ -145,29 +144,13 @@ class CoursewareContextTestCase(ModuleStoreTestCase):
         assertThreadCorrect(threads[1], self.discussion2, "Subsection / Discussion 2")
 
 
-class CategoryMapTestMixin(object):
-    """
-    Provides functionality for classes that test
-    `get_discussion_category_map`.
-    """
-    def assert_category_map_equals(self, expected, requesting_user=None):
-        """
-        Call `get_discussion_category_map`, and verify that it returns
-        what is expected.
-        """
-        self.assertEqual(
-            utils.get_discussion_category_map(self.course, requesting_user or self.user),
-            expected
-        )
-
-
-class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
+class CategoryMapTestCase(ModuleStoreTestCase):
     """
     Base testcase class for discussion categories for the
     comment client service integration
     """
     def setUp(self):
-        super(CategoryMapTestCase, self).setUp(create_user=True)
+        super(CategoryMapTestCase, self).setUp()
 
         self.course = CourseFactory.create(
             org="TestX", number="101", display_name="Test Course",
@@ -193,8 +176,20 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             **kwargs
         )
 
+    def assertCategoryMapEquals(self, expected):
+        """
+        Compare a manually-constructed category map to the actual result from `utils.get_discussion_category_map`
+        """
+        self.assertEqual(
+            utils.get_discussion_category_map(self.course),
+            expected
+        )
+
     def test_empty(self):
-        self.assert_category_map_equals({"entries": {}, "subcategories": {}, "children": []})
+        self.assertEqual(
+            utils.get_discussion_category_map(self.course),
+            {"entries": {}, "subcategories": {}, "children": []}
+        )
 
     def test_configured_topics(self):
         self.course.discussion_topics = {
@@ -203,8 +198,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
 
-        def check_cohorted_topics(expected_ids):
-            self.assert_category_map_equals(
+        def check_cohorted_topics(expected_ids):  # pylint: disable=missing-docstring
+            self.assertCategoryMapEquals(
                 {
                     "entries": {
                         "Topic A": {"id": "Topic_A", "sort_key": "Topic A", "is_cohorted": "Topic_A" in expected_ids},
@@ -236,7 +231,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
     def test_single_inline(self):
         self.create_discussion("Chapter", "Discussion")
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {},
                 "subcategories": {
@@ -266,7 +261,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
 
         def check_cohorted(is_cohorted):
 
-            self.assert_category_map_equals(
+            self.assertCategoryMapEquals(
                 {
                     "entries": {},
                     "subcategories": {
@@ -390,7 +385,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion", start=later)
         self.create_discussion("Chapter 3 / Section 1", "Discussion", start=later)
 
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {},
                 "subcategories": {
@@ -428,7 +423,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter", "Discussion 4", sort_key="C")
         self.create_discussion("Chapter", "Discussion 5", sort_key="B")
 
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {},
                 "subcategories": {
@@ -480,7 +475,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic B": {"id": "Topic_B", "sort_key": "C"},
             "Topic C": {"id": "Topic_C", "sort_key": "A"}
         }
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {
                     "Topic A": {"id": "Topic_A", "sort_key": "B", "is_cohorted": False},
@@ -501,7 +496,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter", "Discussion C")
         self.create_discussion("Chapter", "Discussion B")
 
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {},
                 "subcategories": {
@@ -554,7 +549,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter B", "Discussion 1")
         self.create_discussion("Chapter A", "Discussion 2")
 
-        self.assert_category_map_equals(
+        self.assertCategoryMapEquals(
             {
                 "entries": {},
                 "subcategories": {
@@ -607,7 +602,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         )
 
     def test_ids_empty(self):
-        self.assertEqual(utils.get_discussion_categories_ids(self.course, self.user), [])
+        self.assertEqual(utils.get_discussion_categories_ids(self.course), [])
 
     def test_ids_configured_topics(self):
         self.course.discussion_topics = {
@@ -616,7 +611,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["Topic_A", "Topic_B", "Topic_C"]
         )
 
@@ -628,7 +623,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 2", "Discussion")
         self.create_discussion("Chapter 3 / Section 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["discussion1", "discussion2", "discussion3", "discussion4", "discussion5", "discussion6"]
         )
 
@@ -642,174 +637,8 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
         self.create_discussion("Chapter 2", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.assertItemsEqual(
-            utils.get_discussion_categories_ids(self.course, self.user),
+            utils.get_discussion_categories_ids(self.course),
             ["Topic_A", "Topic_B", "Topic_C", "discussion1", "discussion2", "discussion3"]
-        )
-
-
-class ContentGroupCategoryMapTestCase(CategoryMapTestMixin, ContentGroupTestCase):
-    """
-    Tests `get_discussion_category_map` on discussion modules which are
-    only visible to some content groups.
-    """
-    def test_staff_user(self):
-        """
-        Verify that the staff user can access the alpha, beta, and
-        global discussion topics.
-        """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            'Visible to Alpha',
-                            'Visible to Beta',
-                            'Visible to Everyone'
-                        ],
-                        'entries': {
-                            'Visible to Alpha': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'alpha_group_discussion'
-                            },
-                            'Visible to Beta': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'beta_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'global_group_discussion'
-                            }
-                        }
-                    }
-                },
-                'children': ['General', 'Week 1'],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_cohorted': False,
-                        'id': 'i4x-org-number-course-run'
-                    }
-                }
-            },
-            requesting_user=self.staff_user
-        )
-
-    def test_alpha_user(self):
-        """
-        Verify that the alpha user can access the alpha and global
-        discussion topics.
-        """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            'Visible to Alpha',
-                            'Visible to Everyone'
-                        ],
-                        'entries': {
-                            'Visible to Alpha': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'alpha_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'global_group_discussion'
-                            }
-                        }
-                    }
-                },
-                'children': ['General', 'Week 1'],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_cohorted': False,
-                        'id': 'i4x-org-number-course-run'
-                    }
-                }
-            },
-            requesting_user=self.alpha_user
-        )
-
-    def test_beta_user(self):
-        """
-        Verify that the beta user can access the beta and global
-        discussion topics.
-        """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            'Visible to Beta',
-                            'Visible to Everyone'
-                        ],
-                        'entries': {
-                            'Visible to Beta': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'beta_group_discussion'
-                            },
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'global_group_discussion'
-                            }
-                        }
-                    }
-                },
-                'children': ['General', 'Week 1'],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_cohorted': False,
-                        'id': 'i4x-org-number-course-run'
-                    }
-                }
-            },
-            requesting_user=self.beta_user
-        )
-
-    def test_non_cohorted_user(self):
-        """
-        Verify that the non-cohorted user can access the global
-        discussion topic.
-        """
-        self.assert_category_map_equals(
-            {
-                'subcategories': {
-                    'Week 1': {
-                        'subcategories': {},
-                        'children': [
-                            'Visible to Everyone'
-                        ],
-                        'entries': {
-                            'Visible to Everyone': {
-                                'sort_key': None,
-                                'is_cohorted': True,
-                                'id': 'global_group_discussion'
-                            }
-                        }
-                    }
-                },
-                'children': ['General', 'Week 1'],
-                'entries': {
-                    'General': {
-                        'sort_key': 'General',
-                        'is_cohorted': False,
-                        'id': 'i4x-org-number-course-run'
-                    }
-                }
-            },
-            requesting_user=self.non_cohorted_user
         )
 
 

@@ -17,7 +17,7 @@ from xmodule.modulestore.django import modulestore
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from edxmako import lookup_template
-from courseware.access import has_access
+
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, \
     is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -59,11 +59,9 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-# pylint: disable=invalid-name
-def get_accessible_discussion_modules(course, user):
+def _get_discussion_modules(course):
     """
-    Get all discussion modules within a course which are accessible to
-    the user.
+    Return a list of all valid discussion modules in this course.
     """
     all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
@@ -74,23 +72,20 @@ def get_accessible_discussion_modules(course, user):
                 return False
         return True
 
-    return [
-        module for module in all_modules
-        if has_required_keys(module) and has_access(user, 'load', module, course.id)
-    ]
+    return filter(has_required_keys, all_modules)
 
 
-def get_discussion_id_map(course, user):
+def get_discussion_id_map(course):
     """
-    Get metadata about discussion modules visible to the user in a course.
+    Transform the list of this course's discussion modules into a dictionary of metadata keyed by discussion_id.
     """
-    def get_entry(module):
+    def get_entry(module):  # pylint: disable=missing-docstring
         discussion_id = module.discussion_id
         title = module.discussion_target
         last_category = module.discussion_category.split("/")[-1].strip()
         return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
 
-    return dict(map(get_entry, get_accessible_discussion_modules(course, user)))
+    return dict(map(get_entry, _get_discussion_modules(course)))
 
 
 def _filter_unstarted_categories(category_map):
@@ -143,14 +138,14 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course, user):
+def get_discussion_category_map(course):
     """
-    Get a mapping of categories and subcategories that are visible to
-    the user within a course.
+    Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
+    to render the discussion category map in the discussion tab sidebar.
     """
     unexpanded_category_map = defaultdict(list)
 
-    modules = get_accessible_discussion_modules(course, user)
+    modules = _get_discussion_modules(course)
 
     is_course_cohorted = course.is_cohorted
     cohorted_discussion_ids = course.cohorted_discussions
@@ -223,12 +218,12 @@ def get_discussion_category_map(course, user):
     return _filter_unstarted_categories(category_map)
 
 
-def get_discussion_categories_ids(course, user):
+def get_discussion_categories_ids(course):
     """
     Returns a list of available ids of categories for the course.
     """
     ids = []
-    queue = [get_discussion_category_map(course, user)]
+    queue = [get_discussion_category_map(course)]
     while queue:
         category_map = queue.pop()
         for child in category_map["children"]:
@@ -387,12 +382,12 @@ def extend_content(content):
     return merge_dict(content, content_info)
 
 
-def add_courseware_context(content_list, course, user, id_map=None):
+def add_courseware_context(content_list, course, id_map=None):
     """
     Decorates `content_list` with courseware metadata.
     """
     if id_map is None:
-        id_map = get_discussion_id_map(course, user)
+        id_map = get_discussion_id_map(course)
 
     for content in content_list:
         commentable_id = content['commentable_id']
