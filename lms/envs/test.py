@@ -265,6 +265,7 @@ FEATURES['ENABLE_OAUTH2_PROVIDER'] = True
 FEATURES['ENABLE_MOBILE_REST_API'] = True
 FEATURES['ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES'] = True
 FEATURES['ENABLE_VIDEO_ABSTRACTION_LAYER_API'] = True
+FEATURES['ENABLE_USER_REST_API'] = True
 
 ###################### Payment ##############################3
 # Enable fake payment processing page
