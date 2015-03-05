@@ -111,12 +111,18 @@ def wrap_xblock(runtime_class, block, view, frag, context, usage_id_serializer, 
     if block.name:
         data['name'] = block.name
 
+    if settings.FEATURES.get("LICENSING", False):
+        license = getattr(block, "license", None)
+    else:
+        license = None
+
     template_context = {
         'content': block.display_name if display_name_only else frag.content,
         'classes': css_classes,
         'display_name': block.display_name_with_default,
         'data_attributes': u' '.join(u'data-{}="{}"'.format(markupsafe.escape(key), markupsafe.escape(value))
                                      for key, value in data.iteritems()),
+        'license': license,
     }
 
     if hasattr(frag, 'json_init_args') and frag.json_init_args is not None:

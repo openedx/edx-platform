@@ -133,6 +133,25 @@ a:focus {
   min-width: 760px;
   width: flex-grid(12);
 }
+.container-footer {
+  max-width: grid-width(12);
+  min-width: 760px;
+  width: flex-grid(12);
+  margin: 0 auto;
+  text-align: $bi-app-right;
+  color: $gray-l2;
+
+  span {
+    color: inherit;
+  }
+
+  a:link, a:visited {
+    color: $gray-l2;
+  }
+  a:active, a:hover {
+    color: $blue;
+  }
+}
 
 span.edx {
   text-transform: none;

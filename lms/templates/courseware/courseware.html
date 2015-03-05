@@ -172,6 +172,7 @@ ${fragment.foot_html()}
           % endif
         </nav>
       </div>
+
     </div>
 % endif
     <section class="course-content" id="course-content">
@@ -202,6 +203,13 @@ ${fragment.foot_html()}
       </section>
     % endif
   </div>
+</div>
+<div class="container-footer">
+  % if settings.FEATURES.get("LICENSING", False) and getattr(course, "license", None):
+    <div class="course-license">
+      <%include file="../license.html" args="license=course.license" />
+    </div>
+  % endif
 </div>
 
 <nav class="nav-utilities ${"has-utility-calculator" if course.show_calculator else ""}" aria-label="${_('Course Utilities')}">

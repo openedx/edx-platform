@@ -15,6 +15,7 @@ from lazy import lazy
 from xmodule.seq_module import SequenceDescriptor, SequenceModule
 from xmodule.graders import grader_from_conf
 from xmodule.tabs import CourseTabList
+from xmodule.mixin import LicenseMixin
 import json
 
 from xblock.fields import Scope, List, String, Dict, Boolean, Integer, Float
@@ -833,7 +834,10 @@ class CourseFields(object):
     )
 
 
-class CourseDescriptor(CourseFields, SequenceDescriptor):
+class CourseDescriptor(CourseFields, SequenceDescriptor, LicenseMixin):
+    """
+    The descriptor for the course XModule
+    """
     module_class = SequenceModule
 
     def __init__(self, *args, **kwargs):

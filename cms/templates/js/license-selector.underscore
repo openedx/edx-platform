@@ -1,0 +1,108 @@
+<div class="license-wrapper">
+  <label class="label setting-label" for="list-license-types">
+    <%= gettext("License Type") %>
+  </label>
+  <ul class="license-types" id="list-license-types">
+    <% var learn_more_tpl = gettext("{link_start}Learn more{link_end} about {license_name}"); %>
+    <% var link_start_tpl = '<a href="{url}" target="_blank">'; %>
+    <% _.each(licenseInfo, function(license, licenseType) { %>
+      <li data-license="<%- licenseType %>">
+        <button name="license-<%- licenseType %>" class="action license-button
+                <% if(model.type === licenseType) { print("is-selected"); } %>"
+              name="license-<%- licenseType %>"
+            <% if (license.tooltip) { %>data-tooltip="<%- license.tooltip %>"<% } %>>
+          <%- license.name %>
+        </button>
+        <p class="tip">
+          <% if(license.url) { %>
+            <a href="<%- license.url %>" target="_blank">
+              <%= gettext("Learn more about {license_name}")
+                    .replace("{license_name}", license.name)
+              %>
+            </a>
+          <% } else { %>
+            &nbsp;
+          <% } %>
+        </p>
+      </li>
+    <% }) %>
+  </ul>
+
+<% var license = licenseInfo[model.type]; %>
+<% if(license && !_.isEmpty(license.options)) { %>
+  <div class="wrapper-license-options">
+    <label class="label setting-label" for="list-license-options">
+      <%- gettext("Options for {license_name}").replace("{license_name}", license.name) %>
+    </label>
+    <p class='tip tip-inline'>
+      <%- gettext("The following options are available for the {license_name} license.")
+            .replace("{license_name}", license.name) %>
+    </p>
+    <ul class="license-options" id="list-license-options">
+      <% _.each(license.option_order, function(optionKey) { %>
+        <% var optionInfo = license.options[optionKey]; %>
+        <% if (optionInfo.type == "boolean") { %>
+          <% var optionSelected = model.options[optionKey]; %>
+          <% var optionDisabled = optionInfo.disabled ||
+              (optionInfo.conflictsWith && _.any(optionInfo.conflictsWith, function(key) {return model.options[key];}));
+          %>
+          <li data-option="<%- optionKey %>"
+              class="action-item license-button
+                     <% if (optionSelected) { print("is-selected"); } %>
+                     <% if (optionDisabled) { print("is-disabled"); } else { print("is-clickable"); } %>"
+          >
+            <i class="fa fa-fw
+               <% if(optionSelected) { print("fa-check-square-o"); } else { print("fa-square-o"); } %>
+               <% if(optionDisabled) { print("is-disabled"); } %>
+               "></i>
+            <h4 class="option-name"><%- optionInfo.name %></h4>
+            <div class="explanation"><%- optionInfo.help %></div>
+          </li>
+        <% } // could implement other types here %>
+      <% }) %>
+    </ul>
+  </div>
+<% } %>
+
+<% if (showPreview) { %>
+  <div class="license-preview-wrapper">
+    <label class="label setting-label" for="license-preview">
+      <%= gettext("License Display") %>
+    </label>
+    <p class="tip">
+      <%= gettext("The following message will be displayed at the bottom of the courseware pages within your course.") %>
+    </p>
+    <div id="license-preview">
+    <% // keep this synchronized with the contents of common/templates/license.html %>
+    <% if (model.type === "all-rights-reserved") { %>
+      © <span class="license-text"><%= gettext("All Rights Reserved") %></span>
+    <% } else if (model.type === "creative-commons") {
+       var possible = ["by", "nc", "nd", "sa"];
+       var enabled = _.filter(possible, function(option) {
+         return model.options[option] === true || model.options[option.toUpperCase()] === true;
+       });
+       var version = model.options.ver || "4.0";
+       if (_.isEmpty(enabled)) {
+          enabled = ["zero"];
+          version = model.options.ver || "1.0";
+       }
+    %>
+      <a rel="license" href="//creativecommons.org/licenses/<%- enabled.join("-") %>/<%- version %>/">
+      <% if (previewButton) { %>
+        <img src="https://licensebuttons.net/l/<%- enabled.join("-") %>/<%- version %>/<%- typeof buttonSize == "string" ? buttonSize : "88x31" %>.png"
+             alt="<%- typeof licenseString == "string" ? licenseString : "" %>"
+             />
+      <% } else { %>
+        <i class="icon-cc"></i>
+        <% _.each(enabled, function(option) { %>
+            <i class="icon-cc-<%- option %>"></i>
+        <% }); %>
+        <span class="license-text"><%= gettext("Some Rights Reserved") %></span>
+      <% } %>
+    <% } else { %>
+      <%= typeof licenseString == "string" ? licenseString : "" %>
+    <% } %>
+    </a>
+  </div>
+<% } %>
+</div>

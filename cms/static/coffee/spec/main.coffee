@@ -227,6 +227,7 @@ define([
     "js/spec/models/explicit_url_spec",
     "js/spec/models/xblock_info_spec",
     "js/spec/models/xblock_validation_spec",
+    "js/spec/models/license_spec",
 
     "js/spec/utils/drag_and_drop_spec",
     "js/spec/utils/handle_iframe_binding_spec",
@@ -247,6 +248,7 @@ define([
     "js/spec/views/xblock_editor_spec",
     "js/spec/views/xblock_string_field_editor_spec",
     "js/spec/views/xblock_validation_spec",
+    "js/spec/views/license_spec",
 
     "js/spec/views/utils/view_utils_spec",
 

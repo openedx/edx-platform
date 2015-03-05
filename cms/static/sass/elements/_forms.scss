@@ -59,7 +59,7 @@ textarea.text {
 }
 
 // +Fields - Not Editable
-// ==================== 
+// ====================
 .field.is-not-editable {
 
   & label.is-focused {
@@ -72,7 +72,7 @@ textarea.text {
 }
 
 // +Fields - With Error
-// ==================== 
+// ====================
 .field.error {
 
   input, textarea {
@@ -81,7 +81,7 @@ textarea.text {
 }
 
 // +Forms - Additional UI
-// ==================== 
+// ====================
 form {
 
   // CASE: cosmetic checkbox input
@@ -172,8 +172,109 @@ form {
   }
 }
 
+// +Forms - License selector UI
+// ====================
+.license-img {
+  padding: 4px;
+}
+
+ul.license-types {
+  text-align: middle;
+  vertical-align: middle;
+  display: inline-block;
+
+  li {
+    display: inline-block;
+  }
+
+  .action.license-button {
+    @include grey-button;
+    @extend %t-action2;
+
+    display: inline-block;
+
+    text-align: center;
+
+    width: 220px;
+    height: 40px;
+
+    cursor: pointer;
+
+    &.is-selected {
+      @include blue-button;
+    }
+  }
+
+  .tip {
+    @extend %t-copy-sub2;
+  }
+}
+.wrapper-license-options {
+  margin-bottom: 10px;
+
+  .tip {
+    @extend %t-copy-sub2;
+  }
+  #list-license-options {
+    padding-bottom: 10px;
+
+    li {
+      line-height: 1.5;
+      border-bottom: 1px solid #EEE;
+      padding: ($baseline / 2) 0 ($baseline * 0.4);
+      &.is-clickable {
+        cursor: pointer;
+      }
+      &.last {
+        border-bottom: none;
+      }
+
+      .fa {
+        vertical-align: top;
+      }
+      .fa-square-o {
+        display: inline-block;
+        margin: ($baseline * 0.15) 15px 0px;
+      }
+      .fa-square-o.is-disabled {
+        color: $gray;
+      }
+      .fa-check-square-o {
+        color: $blue;
+        display: none;
+        margin: ($baseline * 0.15) 14px 0px 16px;
+      }
+      .fa-check-square-o.is-disabled {
+        color: $gray;
+      }
+      &.is-selected {
+        .fa-check-square-o {
+          display: inline-block;
+        }
+        .fa-square-o {
+          display: none;
+        }
+      }
+      .option-name {
+        @extend %t-action3;
+        @extend %t-strong;
+        display: inline-block;
+        width: 15%;
+        vertical-align: top;
+      }
+      .explanation {
+        @extend %t-action4;
+        display: inline-block;
+        width: 75%;
+        vertical-align: top;
+        color: $gray;
+      }
+    }
+  }
+}
+
 // +Form - Create New
-// ==================== 
+// ====================
 // form styling for creating a new content item (course, user, textbook)
 // TODO: refactor this into a placeholder to extend.
 .form-create {
@@ -390,8 +491,8 @@ form {
   }
 }
 
-// +Form - Inline Name Edit 
-// ==================== 
+// +Form - Inline Name Edit
+// ====================
 // form - inline xblock name edit on unit, container, outline
 // TODO: abstract this out into a Sass placeholder
 .incontext-editor.is-editable {
@@ -431,8 +532,8 @@ form {
   }
 }
 
-// +Form - Create New Wrapper 
-// ==================== 
+// +Form - Create New Wrapper
+// ====================
 .wrapper-create-element {
   height: 0;
   opacity: 0.0;
@@ -451,8 +552,8 @@ form {
   }
 }
 
-// +Form - Grandfathered 
-// ==================== 
+// +Form - Grandfathered
+// ====================
 input.search {
   padding: 6px 15px 8px 30px;
   @include box-sizing(border-box);
