@@ -48,10 +48,10 @@ class StatusDisplayStrings(object):
     # Translators: This is the status for a video that the servers have successfully processed
     _COMPLETE = ugettext_noop("Complete")
     # Translators: This is the status for a video that the servers have failed to process
-    _FAILED = ugettext_noop("Failed"),
+    _FAILED = ugettext_noop("Failed")
     # Translators: This is the status for a video for which an invalid
     # processing token was provided in the course settings
-    _INVALID_TOKEN = ugettext_noop("Invalid Token"),
+    _INVALID_TOKEN = ugettext_noop("Invalid Token")
     # Translators: This is the status for a video that is in an unknown state
     _UNKNOWN = ugettext_noop("Unknown")
 
