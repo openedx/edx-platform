@@ -128,7 +128,7 @@ In development, we don't use collectstatic, instead accessing the files in place
 
 ## Testing
 
-See `testing.md`.
+See `testing.rst`.
 
 ## TODO:
 
