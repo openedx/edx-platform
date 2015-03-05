@@ -1,7 +1,7 @@
-from .aws import *
+import os
+
 
 GOOGLE_TAG_MANAGER_ID = os.environ.get("GOOGLE_TAG_MANAGER_ID", None)
+#use server-vars.yml instead of `env`
 
-INSTALLED_APPS += ('appsembler',)
-
-TEMPLATE_CONTEXT_PROCESSORS += ('appsembler.context_processors.intercom',)
+#include intercom stuff too
