@@ -1,6 +1,5 @@
 from collections import defaultdict
 from datetime import datetime
-import json
 import logging
 import string
 
@@ -9,18 +8,13 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import connection
 from django.http import HttpResponse
-from django.utils.timezone import UTC
 import pystache_custom as pystache
-from opaque_keys.edx.locations import i4xEncoder
-from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.django import modulestore
 
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, has_permission
 from django_comment_client.settings import MAX_COMMENT_DEPTH
 from edxmako import lookup_template
 
-from courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import (
     get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
 )

@@ -3,6 +3,8 @@ import datetime
 import json
 import mock
 from nose.plugins.attrib import attr
+import ddt
+from datetime import datetime
 from pytz import UTC
 from django.utils.timezone import UTC as django_utc
 
@@ -983,3 +985,18 @@ class DiscussionTabTestCase(ModuleStoreTestCase):
 
         with self.settings(FEATURES={'CUSTOM_COURSES_EDX': True}):
             self.assertFalse(self.discussion_tab_present(self.enrolled_user))
+
+
+@ddt.ddt
+class FormatFilenameTests(TestCase):
+    @ddt.unpack
+    @ddt.data(
+        ("normal.txt", "normal.txt"),
+        ("normal_with_alnum.csv", "normal_with_alnum.csv"),
+        ("normal_with_multiple_extensions.dot.csv", "normal_with_multiple_extensions.dot.csv"),
+        ("contains/slashes.html", "containsslashes.html"),
+        ("contains_symbols!@#$%^&*+=\|,.html", "contains_symbols.html"),
+        ("contains spaces.org", "contains_spaces.org"),
+    )
+    def test_format_filename(self, raw_filename, expected_output):
+        self.assertEqual(utils.format_filename(raw_filename), expected_output)
