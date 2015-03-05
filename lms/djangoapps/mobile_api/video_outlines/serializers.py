@@ -5,6 +5,9 @@ from rest_framework.reverse import reverse
 
 from xmodule.modulestore.mongo.base import BLOCK_TYPES_WITH_CHILDREN
 from courseware.access import has_access
+from courseware.model_data import FieldDataCache
+from courseware.module_render import get_module_for_descriptor
+from util.module_utils import get_dynamic_descriptor_children
 
 from edxval.api import (
     get_video_info_for_course_and_profile, ValInternalError
@@ -39,6 +42,17 @@ class BlockOutline(object):
                 usage_key.block_type in BLOCK_TYPES_WITH_CHILDREN
             )
 
+        def create_module(descriptor):
+            """
+            Factory method for creating and binding a module for the given descriptor.
+            """
+            field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
+                self.course_id, self.request.user, descriptor
+            )
+            return get_module_for_descriptor(
+                self.request.user, self.request, descriptor, field_data_cache, self.course_id
+            )
+
         child_to_parent = {}
         stack = [self.start_block]
         while stack:
@@ -49,7 +63,7 @@ class BlockOutline(object):
                 # the hierarchy.  The reason being is that these blocks may not have human-readable names
                 # to display on the mobile clients.
                 # Eventually, we'll need to figure out how we want these blocks to be displayed on the
-                # mobile clients.  As, they are still accessible in the browser, just not navigatable
+                # mobile clients.  As they are still accessible in the browser, just not navigatable
                 # from the table-of-contents.
                 continue
 
@@ -70,7 +84,11 @@ class BlockOutline(object):
                 }
 
             if curr_block.has_children:
-                children = curr_block.get_children(usage_key_filter=parent_or_requested_block_type)
+                children = get_dynamic_descriptor_children(
+                    curr_block,
+                    create_module,
+                    usage_key_filter=parent_or_requested_block_type
+                )
                 for block in reversed(children):
                     stack.append(block)
                     child_to_parent[block] = curr_block

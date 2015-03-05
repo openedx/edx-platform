@@ -3,6 +3,8 @@
 Tests for video outline API
 """
 # pylint: disable=no-member
+import ddt
+import itertools
 from uuid import uuid4
 from collections import namedtuple
 
@@ -10,6 +12,10 @@ from edxval import api
 from xmodule.modulestore.tests.factories import ItemFactory
 from xmodule.video_module import transcripts_utils
 from xmodule.modulestore.django import modulestore
+from xmodule.partitions.partitions import Group, UserPartition
+
+from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
+from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin
 
@@ -49,20 +55,8 @@ class TestVideoAPITestCase(MobileAPITestCase):
             metadata={'graded': True, 'format': 'Homework'},
             display_name=None,
         )
-        self.split_unit = ItemFactory.create(
-            parent=self.sub_section,
-            category="vertical",
-            display_name=u"split test vertical\u03a9",
-        )
-
-        self.split_test = ItemFactory.create(
-            parent=self.split_unit,
-            category="split_test",
-            display_name=u"split test unit"
-        )
 
         self.edx_video_id = 'testing-123'
-
         self.video_url = 'http://val.edx.org/val/video.mp4'
         self.html5_video_url = 'http://video.edx.org/html5/video.mp4'
 
@@ -101,6 +95,11 @@ class TestVideoAPITestCase(MobileAPITestCase):
                 }
             ]})
 
+
+class TestVideoAPIMixin(object):
+    """
+    Mixin class that provides helpers for testing video related mobile APIs
+    """
     def _create_video_with_subs(self, custom_subid=None):
         """
         Creates and returns a video with stored subtitles.
@@ -128,31 +127,76 @@ class TestVideoAPITestCase(MobileAPITestCase):
             sub=subid
         )
 
-
-class TestNonStandardCourseStructure(MobileAPITestCase):
-    """
-    Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
-    """
-    REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
-
-    def _verify_paths(self, course_outline, path_list):
+    def _verify_paths(self, course_outline, path_list, outline_index=0):
         """
         Takes a path_list and compares it against the course_outline
 
         Attributes:
-            path_list (list): A list of the expected strings
             course_outline (list): A list of dictionaries that includes a 'path'
                 and 'named_path' field which we will be comparing path_list to
+            path_list (list): A list of the expected strings
+            outline_index (int): Index into the course_outline list for which the
+                path is being tested.
         """
-        path = course_outline[0]['path']
+        path = course_outline[outline_index]['path']
         self.assertEqual(len(path), len(path_list))
         for i in range(0, len(path_list)):
             self.assertEqual(path_list[i], path[i]['name'])
         #named_path will be deprecated eventually
-        named_path = course_outline[0]['named_path']
+        named_path = course_outline[outline_index]['named_path']
         self.assertEqual(len(named_path), len(path_list))
         for i in range(0, len(path_list)):
             self.assertEqual(path_list[i], named_path[i])
+
+    def _setup_course_partitions(self, scheme_id='random', is_cohorted=False):
+        """Helper method to configure the user partitions in the course."""
+        self.partition_id = 0  # pylint: disable=attribute-defined-outside-init
+        self.course.user_partitions = [
+            UserPartition(
+                self.partition_id, 'first_partition', 'First Partition',
+                [Group(0, 'alpha'), Group(1, 'beta')],
+                scheme=None, scheme_id=scheme_id
+            ),
+        ]
+        self.course.cohort_config = {'cohorted': is_cohorted}
+        self.store.update_item(self.course, self.user.id)
+
+    def _setup_group_access(self, xblock, partition_id, group_ids):
+        """Helper method to configure the partition and group mapping for the given xblock."""
+        xblock.group_access = {partition_id: group_ids}
+        self.store.update_item(xblock, self.user.id)
+
+    def _setup_split_module(self, sub_block_category):
+        """Helper method to configure a split_test unit with children of type sub_block_category."""
+        self._setup_course_partitions()
+        self.split_test = ItemFactory.create(  # pylint: disable=attribute-defined-outside-init
+            parent=self.unit,
+            category="split_test",
+            display_name=u"split test unit",
+            user_partition_id=0,
+        )
+        sub_block_a = ItemFactory.create(
+            parent=self.split_test,
+            category=sub_block_category,
+            display_name=u"split test block a",
+        )
+        sub_block_b = ItemFactory.create(
+            parent=self.split_test,
+            category=sub_block_category,
+            display_name=u"split test block b",
+        )
+        self.split_test.group_id_to_child = {
+            str(index): url for index, url in enumerate([sub_block_a.location, sub_block_b.location])
+        }
+        self.store.update_item(self.split_test, self.user.id)
+        return sub_block_a, sub_block_b
+
+
+class TestNonStandardCourseStructure(MobileAPITestCase, TestVideoAPIMixin):
+    """
+    Tests /api/mobile/v0.5/video_outlines/courses/{course_id} with no course set
+    """
+    REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
 
     def setUp(self):
         super(TestNonStandardCourseStructure, self).setUp()
@@ -357,7 +401,10 @@ class TestNonStandardCourseStructure(MobileAPITestCase):
         )
 
 
-class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+@ddt.ddt
+class TestVideoSummaryList(
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+):
     """
     Tests for /api/mobile/v0.5/video_outlines/courses/{course_id}..
     """
@@ -443,25 +490,130 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
         self.assertTrue(unit_url)
         self.assertEqual(section_url, unit_url)
 
-    def test_with_split_test(self):
+    @ddt.data(
+        *itertools.product([True, False], ["video", "problem"])
+    )
+    @ddt.unpack
+    def test_with_split_block(self, is_user_staff, sub_block_category):
+        """Test with split_module->sub_block_category and for both staff and non-staff users."""
         self.login_and_enroll()
+        self.user.is_staff = is_user_staff
+        self.user.save()
+        self._setup_split_module(sub_block_category)
+
+        video_outline = self.api_response().data
+        num_video_blocks = 1 if sub_block_category == "video" else 0
+        self.assertEqual(len(video_outline), num_video_blocks)
+        for block_index in range(num_video_blocks):
+            self._verify_paths(
+                video_outline,
+                [
+                    self.section.display_name,
+                    self.sub_section.display_name,
+                    self.unit.display_name,
+                    self.split_test.display_name
+                ],
+                block_index
+            )
+            self.assertIn(u"split test block", video_outline[block_index]["summary"]["name"])
+
+    def test_with_split_vertical(self):
+        """Test with split_module->vertical->video structure."""
+        self.login_and_enroll()
+        split_vertical_a, split_vertical_b = self._setup_split_module("vertical")
 
         ItemFactory.create(
-            parent=self.split_test,
+            parent=split_vertical_a,
             category="video",
-            display_name=u"split test video a",
+            display_name=u"video in vertical a",
         )
         ItemFactory.create(
-            parent=self.split_test,
+            parent=split_vertical_b,
             category="video",
-            display_name=u"split test video b",
+            display_name=u"video in vertical b",
         )
-        course_outline = self.api_response().data
-        self.assertEqual(len(course_outline), 2)
-        self.assertEqual(len(course_outline[0]["path"]), 4)
-        self.assertEqual(len(course_outline[1]["path"]), 4)
-        self.assertEqual(course_outline[0]["summary"]["name"], u"split test video a")
-        self.assertEqual(course_outline[1]["summary"]["name"], u"split test video b")
+
+        video_outline = self.api_response().data
+
+        # user should see only one of the videos (a or b).
+        self.assertEqual(len(video_outline), 1)
+        self.assertIn(u"video in vertical", video_outline[0]["summary"]["name"])
+        a_or_b = video_outline[0]["summary"]["name"][-1:]
+        self._verify_paths(
+            video_outline,
+            [
+                self.section.display_name,
+                self.sub_section.display_name,
+                self.unit.display_name,
+                self.split_test.display_name,
+                u"split test block " + a_or_b
+            ],
+        )
+
+    def _create_cohorted_video(self, group_id):
+        """Creates a cohorted video block, giving access to only the given group_id."""
+        video_block = ItemFactory.create(
+            parent=self.unit,
+            category="video",
+            display_name=u"video for group " + unicode(group_id),
+        )
+        self._setup_group_access(video_block, self.partition_id, [group_id])
+
+    def _create_cohorted_vertical_with_video(self, group_id):
+        """Creates a cohorted vertical with a child video block, giving access to only the given group_id."""
+        vertical_block = ItemFactory.create(
+            parent=self.sub_section,
+            category="vertical",
+            display_name=u"vertical for group " + unicode(group_id),
+        )
+        self._setup_group_access(vertical_block, self.partition_id, [group_id])
+        ItemFactory.create(
+            parent=vertical_block,
+            category="video",
+            display_name=u"video for group " + unicode(group_id),
+        )
+
+    @ddt.data("_create_cohorted_video", "_create_cohorted_vertical_with_video")
+    def test_with_cohorted_content(self, content_creator_method_name):
+        self.login_and_enroll()
+        self._setup_course_partitions(scheme_id='cohort', is_cohorted=True)
+
+        cohorts = []
+        for group_id in [0, 1]:
+            getattr(self, content_creator_method_name)(group_id)
+
+            cohorts.append(CohortFactory(course_id=self.course.id, name=u"Cohort " + unicode(group_id)))
+            link = CourseUserGroupPartitionGroup(
+                course_user_group=cohorts[group_id],
+                partition_id=self.partition_id,
+                group_id=group_id,
+            )
+            link.save()
+
+        for cohort_index in range(len(cohorts)):
+            # add user to this cohort
+            cohorts[cohort_index].users.add(self.user)
+
+            # should only see video for this cohort
+            video_outline = self.api_response().data
+            self.assertEqual(len(video_outline), 1)
+            self.assertEquals(
+                u"video for group " + unicode(cohort_index),
+                video_outline[0]["summary"]["name"]
+            )
+
+            # remove user from this cohort
+            cohorts[cohort_index].users.remove(self.user)
+
+        # un-cohorted user should see no videos
+        video_outline = self.api_response().data
+        self.assertEqual(len(video_outline), 0)
+
+        # staff user sees all videos
+        self.user.is_staff = True
+        self.user.save()
+        video_outline = self.api_response().data
+        self.assertEqual(len(video_outline), 2)
 
     def test_with_hidden_blocks(self):
         self.login_and_enroll()
@@ -558,7 +710,9 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
             )
 
 
-class TestTranscriptsDetail(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin):
+class TestTranscriptsDetail(
+    TestVideoAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseAccessTestMixin, TestVideoAPIMixin  # pylint: disable=bad-continuation
+):
     """
     Tests for /api/mobile/v0.5/video_outlines/transcripts/{course_id}..
     """
