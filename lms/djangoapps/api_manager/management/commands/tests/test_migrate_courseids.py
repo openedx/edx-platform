@@ -27,7 +27,7 @@ class MigrateCourseIdsTests(TestCase):
 
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            end=datetime(2020, 1, 16)
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -47,7 +47,7 @@ class MigrateCourseIdsTests(TestCase):
         self.course2 = CourseFactory.create(
             org='TEST',
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            end=datetime(2020, 1, 16)
         )
         self.chapter2 = ItemFactory.create(
             category="chapter",

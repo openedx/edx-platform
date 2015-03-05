@@ -1631,7 +1631,7 @@ class UsersApiTests(TestCase):
         course2 = CourseFactory.create(
             display_name="TEST COURSE2",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
             org='TURLG',
             run='TURLG1'
         )
@@ -1639,7 +1639,7 @@ class UsersApiTests(TestCase):
         course3 = CourseFactory.create(
             display_name="TEST COURSE3",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
             org='TURLG2',
             run='TURLG2'
         )
@@ -1720,7 +1720,7 @@ class UsersApiTests(TestCase):
         course2 = CourseFactory.create(
             display_name="TEST COURSE2",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
             org='TURLP2',
             run='TURLP2'
         )
@@ -1731,7 +1731,7 @@ class UsersApiTests(TestCase):
         course3 = CourseFactory.create(
             display_name="TEST COURSE3",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
             org='TURLP3',
             run='TURLP3'
         )
@@ -1742,7 +1742,7 @@ class UsersApiTests(TestCase):
         course4 = CourseFactory.create(
             display_name="COURSE4 NO MODERATOR",
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16, 14, 30),
+            end=datetime(2020, 1, 16, 14, 30),
             org='TURLP4',
             run='TURLP4'
         )
