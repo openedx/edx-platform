@@ -1,9 +1,5 @@
 This is the main edX platform which consists of LMS and Studio.
 
-See `code.edx.org`_ for other parts of the edX code base.
-
-.. _code.edx.org: http://code.edx.org/
-
 
 Installation
 ------------
@@ -33,15 +29,35 @@ unless otherwise noted. Please see the `LICENSE`_ file for details.
 .. _LICENSE: https://github.com/edx/edx-platform/blob/master/LICENSE
 
 
+The Open edX Portal
+---------------------
+
+See the `Open edX Portal`_ to learn more about Open edX. You can find
+information about the edX roadmap, as well as about hosting, extending, and
+contributing to Open edX. In addition, the Open edX Portal provides product
+announcements, the Open edX blog, and other rich community resources. 
+
+To comment on blog posts or the edX roadmap, you must create an account and log
+in. If you do not have an account, follow these steps.
+
+#. Visit `open.edx.org/user/register`_.
+#. Fill in your personal details.
+#. Select **Create New Account**. You are then logged in to the `Open edX
+   Portal`_.
+
+.. _Open edX Portal: https://open.edx.org
+.. _open.edx.org/user/register: https://open.edx.org/user/register
+
 Documentation
 -------------
 
-Documentation for developers, researchers, and course staff is located
-in the ``docs`` subdirectory. Documentation is built using `Sphinx`_:
-you can `view the built documentation on ReadTheDocs`_.
+Documentation is managed in the `edx-documentation`_ repository. Documentation
+is built using `Sphinx`_: you can `view the built documentation on
+ReadTheDocs`_.
 
 .. _Sphinx: http://sphinx-doc.org/
 .. _view the built documentation on ReadTheDocs: http://docs.edx.org/
+.. _edx-documentation: https://github.com/edx/edx-documentation
 
 
 Getting Help
@@ -99,5 +115,5 @@ Reporting Security Issues
 Please do not report security issues in public. Please email
 security@edx.org
 
-.. _individual contributor’s agreement: http://code.edx.org/individual-contributor-agreement.pdf
-.. _CONTRIBUTING: https://github.com/edx/edx-platform/blob/master/CONTRIBUTING.rst
+.. _individual contributor’s agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
+.. _CONTRIBUTING: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf
