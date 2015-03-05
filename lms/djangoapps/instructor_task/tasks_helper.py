@@ -28,7 +28,7 @@ from instructor_analytics.basic import student_response_rows, enrolled_students_
 from instructor_analytics.csvs import format_dictlist
 from instructor_task.models import ReportStore, InstructorTask, PROGRESS
 from student.models import CourseEnrollment
-from instructor.utils import collect_ora2_data, collect_course_forums_data
+from instructor.utils import collect_ora2_data, collect_course_forums_data, collect_student_forums_data
 
 # define different loggers for use within tasks and on client side
 TASK_LOG = get_task_logger(__name__)
@@ -659,6 +659,13 @@ def push_course_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, 
     Collect course forums usage data and upload them to S3 as a CSV
     """
     return _push_csv_responses_to_s3(collect_course_forums_data, u'course_forums', course_id, action_name)
+
+
+def push_student_forums_data_to_s3(_xmodule_instance_args, _entry_id, course_id, _task_input, action_name):
+    """
+    Generate student forums report and upload it to s3 as a CSV
+    """
+    return _push_csv_responses_to_s3(collect_student_forums_data, u'student_forums', course_id, action_name)
 
 
 def _push_csv_responses_to_s3(csv_fn, filename, course_id, action_name):

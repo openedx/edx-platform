@@ -34,7 +34,8 @@ from instructor_task.tasks_helper import (
     push_ora2_responses_to_s3,
     push_course_forums_data_to_s3,
     upload_grades_csv,
-    upload_students_csv
+    upload_students_csv,
+    push_student_forums_data_to_s3,
 )
 from bulk_email.tasks import perform_delegate_email_batches
 
@@ -187,4 +188,14 @@ def get_course_forums_usage(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_course_forums_data_to_s3, xmodule_instance_args)
+    return run_main_task(entry_id, task_fn, action_name)
+
+
+@task(base=BaseInstructorTask, routing_key=settings.STUDENT_FORUMS_DOWNLOAD_ROUTING_KEY)
+def get_student_forums_usage(entry_id, xmodule_instance_args):
+    """
+    Generate a CSV of student forums usage and push it to S3.
+    """
+    action_name = ugettext_noop('generated')
+    task_fn = partial(push_student_forums_data_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
