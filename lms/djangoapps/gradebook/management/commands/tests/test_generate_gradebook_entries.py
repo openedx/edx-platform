@@ -3,7 +3,7 @@ Run these tests @ Devstack:
     rake fasttest_lms[common/djangoapps/api_manager/management/commands/tests/test_migrate_orgdata.py]
 """
 from datetime import datetime
-from mock import MagicMock
+from mock import MagicMock, patch
 import uuid
 
 from django.conf import settings
@@ -31,7 +31,8 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
         # Create a couple courses to work with
         self.course = CourseFactory.create(
             start=datetime(2014, 6, 16, 14, 30),
-            end=datetime(2015, 1, 16)
+            end=datetime(2020, 1, 16),
+            org='GRADEBOOK'
         )
         self.test_data = '<html>{}</html>'.format(str(uuid.uuid4()))
 
@@ -131,6 +132,10 @@ class GenerateGradebookEntriesTests(ModuleStoreTestCase):
             course.id
         )._xmodule
 
+    @patch.dict(settings.FEATURES, {
+                'ALLOW_STUDENT_STATE_UPDATES_ON_CLOSED_COURSE': False,
+                'SIGNAL_ON_SCORE_CHANGED': True
+    })
     def test_generate_gradebook_entries(self):
         """
         Test the gradebook entry generator

@@ -1950,7 +1950,7 @@ INSTALLED_APPS = (
     'teams',
 
     'xblock_django',
-    
+
     # EDX API application
     'api_manager',
 )
@@ -2413,6 +2413,10 @@ OPTIONAL_APPS = (
 
     # milestones
     'milestones',
+
+    # mckinsey apps
+    'gradebook',
+
 )
 
 for app_name in OPTIONAL_APPS:
