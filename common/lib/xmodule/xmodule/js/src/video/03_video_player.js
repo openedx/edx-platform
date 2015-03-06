@@ -815,18 +815,18 @@ function (HTML5Video, Resizer) {
 
     function updatePlayTime(time, skip_seek) {
         var videoPlayer = this.videoPlayer,
-            duration = this.videoPlayer.duration(),
+            endTime = this.videoPlayer.duration(),
             youTubeId;
 
         if (this.config.endTime !== null) {
-            duration = Math.min(this.config.endTime, duration);
+            endTime = Math.min(this.config.endTime, endTime);
         }
 
         this.trigger(
             'videoProgressSlider.updatePlayTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
@@ -834,7 +834,7 @@ function (HTML5Video, Resizer) {
             'videoControl.updateVcrVidTime',
             {
                 time: time,
-                duration: duration
+                duration: endTime
             }
         );
 
