@@ -18,9 +18,10 @@ from certificates import api as certs_api
 from certificates.models import (
     CertificateStatuses,
     CertificateGenerationConfiguration,
-    ExampleCertificate
+    ExampleCertificate,
+    GeneratedCertificate
 )
-from certificates.queue import XQueueCertInterface
+from certificates.queue import XQueueCertInterface, XQueueAddToQueueError
 from certificates.tests.factories import GeneratedCertificateFactory
 
 
@@ -103,8 +104,11 @@ class CertificateDownloadableStatusTests(ModuleStoreTestCase):
         )
 
 
+@override_settings(CERT_QUEUE='certificates')
 class GenerateUserCertificatesTest(ModuleStoreTestCase):
-    """Tests for the `generate_user_certificates` helper function. """
+    """Tests for generating certificates for students. """
+
+    ERROR_REASON = "Kaboom!"
 
     def setUp(self):
         super(GenerateUserCertificatesTest, self).setUp()
@@ -120,15 +124,44 @@ class GenerateUserCertificatesTest(ModuleStoreTestCase):
         self.enrollment = CourseEnrollment.enroll(self.student, self.course.id, mode='honor')
         self.request_factory = RequestFactory()
 
-    @override_settings(CERT_QUEUE='certificates')
-    @patch('courseware.grades.grade', Mock(return_value={'grade': 'Pass', 'percent': 0.75}))
     def test_new_cert_requests_into_xqueue_returns_generating(self):
-        # Mock `grade.grade` and return a summary with passing score.
-        # New requests save into xqueue and return the status
-        with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_send_to_queue:
-            mock_send_to_queue.return_value = (0, "Successfully queued")
-            result = certs_api.generate_user_certificates(self.student, self.course.id)
-            self.assertEqual(result, 'generating')
+        with self._mock_passing_grade():
+            with self._mock_queue():
+                certs_api.generate_user_certificates(self.student, self.course.id)
+
+        # Verify that the certificate has status 'generating'
+        cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
+        self.assertEqual(cert.status, 'generating')
+
+    def test_xqueue_submit_task_error(self):
+        with self._mock_passing_grade():
+            with self._mock_queue(is_successful=False):
+                certs_api.generate_user_certificates(self.student, self.course.id)
+
+        # Verify that the certificate has been marked with status error
+        cert = GeneratedCertificate.objects.get(user=self.student, course_id=self.course.id)
+        self.assertEqual(cert.status, 'error')
+        self.assertIn(self.ERROR_REASON, cert.error_reason)
+
+    @contextmanager
+    def _mock_passing_grade(self):
+        """Mock the grading function to always return a passing grade. """
+        symbol = 'courseware.grades.grade'
+        with patch(symbol) as mock_grade:
+            mock_grade.return_value = {'grade': 'Pass', 'percent': 0.75}
+            yield
+
+    @contextmanager
+    def _mock_queue(self, is_successful=True):
+        """Mock the "send to XQueue" method to return either success or an error. """
+        symbol = 'capa.xqueue_interface.XQueueInterface.send_to_queue'
+        with patch(symbol) as mock_send_to_queue:
+            if is_successful:
+                mock_send_to_queue.return_value = (0, "Successfully queued")
+            else:
+                mock_send_to_queue.side_effect = XQueueAddToQueueError(1, self.ERROR_REASON)
+
+            yield mock_send_to_queue
 
 
 @ddt.ddt
