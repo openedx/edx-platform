@@ -101,7 +101,7 @@ var edx = edx || {};
             event.preventDefault();
 
             var self = this;
-            self.getCohortedDiscussions('.check-discussion-subcategory-inline:checked');
+            self.setCohortedDiscussions('.check-discussion-subcategory-inline:checked');
 
             this.cohortSettings.set({
                 cohorted_inline_discussions: self.cohortedDiscussions,

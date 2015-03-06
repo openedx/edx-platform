@@ -7,6 +7,13 @@ var edx = edx || {};
 
     edx.groups.CohortDiscussionsView = Backbone.View.extend({
 
+        /**
+        Add/Remove the disabled attribute on given element.
+
+        Args:
+            $element (JQuery element): The element to disable.
+            enable (Bool): The flag to add/remove 'disabled' attribute.
+        **/
         setDisabled: function($element, enable) {
             if (enable) {
                 $element.prop('disabled', false);
@@ -15,7 +22,13 @@ var edx = edx || {};
             }
         },
 
-        getCohortedDiscussions: function(selector) {
+        /**
+        Sets the cohorted discussions list.
+
+        Args:
+            selector (HTML element): The topic element to get the ids.
+        **/
+        setCohortedDiscussions: function(selector) {
             var self=this;
 
             this.cohortedDiscussions = [];
@@ -24,6 +37,13 @@ var edx = edx || {};
             });
         },
 
+        /**
+        Sends the cohortSettings model's changed attributes to the server via patch method.
+         Also, it shows the error message(s) if any.
+
+        Args:
+            $element (JQuery element): Messages would be shown before this element.
+        **/
         saveForm: function ($element) {
             var self = this,
                 cohortSettingsModel = this.cohortSettings,
@@ -56,6 +76,14 @@ var edx = edx || {};
             return saveOperation.promise();
         },
 
+        /**
+        Shows the notification messages before given element using the NotificationModel.
+
+        Args:
+            message (string): Text message to show.
+            $element (JQuery element): Message would be shown before this element.
+            type (string): Type of message to show e.g. confirmation or error.
+        **/
         showMessage: function (message, $element, type) {
             var model = new NotificationModel({type: type || 'confirmation', title: message});
             this.removeNotification();
@@ -66,6 +94,9 @@ var edx = edx || {};
             this.notification.render();
         },
 
+        /**
+        Removes the notification messages.
+        **/
         removeNotification: function () {
             if (this.notification) {
                 this.notification.remove();

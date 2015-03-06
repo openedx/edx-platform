@@ -51,7 +51,7 @@ var edx = edx || {};
             event.preventDefault();
 
             var self = this;
-            self.getCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
+            self.setCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
 
             this.cohortSettings.set({cohorted_course_wide_discussions:self.cohortedDiscussions});
             self.saveForm(self.$('.course-wide-discussion-topics'))
