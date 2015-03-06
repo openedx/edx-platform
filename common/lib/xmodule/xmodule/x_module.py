@@ -1003,6 +1003,8 @@ class XModuleDescriptor(XModuleMixin, HTMLSnippet, ResourceTemplates, XBlock):
         # 3. A generic string editor for anything else (editing JSON representation of the value).
         editor_type = "Generic"
         values = field.values
+        if "values_provider" in field.runtime_options:
+            values = field.runtime_options['values_provider'](self)
         if isinstance(values, (tuple, list)) and len(values) > 0:
             editor_type = "Select"
             values = [jsonify_value(field, json_choice) for json_choice in values]
