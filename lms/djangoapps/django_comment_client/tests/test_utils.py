@@ -649,6 +649,7 @@ class RenderMustacheTests(TestCase):
 
 @ddt.ddt
 class FormatFilenameTests(TestCase):
+    """ Tests format filename utility function """
     @ddt.unpack
     @ddt.data(
         ("normal.txt", "normal.txt"),
@@ -659,4 +660,5 @@ class FormatFilenameTests(TestCase):
         ("contains spaces.org", "contains_spaces.org"),
     )
     def test_format_filename(self, raw_filename, expected_output):
+        """ Tests that format_filename produces expected output for certain inputs """
         self.assertEqual(utils.format_filename(raw_filename), expected_output)
