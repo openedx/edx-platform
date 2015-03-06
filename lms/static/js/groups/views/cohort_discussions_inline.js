@@ -29,10 +29,10 @@ var edx = edx || {};
 
             $('ul.inline-topics').qubit();
 
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
             if (alwaysCohortInlineDiscussions) {
-                this.setDisabled(this.$('.check-discussion-category'), false);
-                this.setDisabled(this.$('.check-discussion-subcategory-inline'), false);
+                this.setDisabled(this.$('.check-discussion-category'), true);
+                this.setDisabled(this.$('.check-discussion-subcategory-inline'), true);
             }
         },
 
@@ -67,18 +67,18 @@ var edx = edx || {};
 
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
-            this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
+            this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
         },
 
         changeCohortInlineDiscussions: function(event) {
             event.preventDefault();
-            this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
+            this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
         },
 
-        toggleInlineDiscussions: function(enable) {
-            this.setDisabled(this.$('.check-discussion-category'), enable);
-            this.setDisabled(this.$('.check-discussion-subcategory-inline'), enable);
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
+        toggleInlineDiscussions: function(disable) {
+            this.setDisabled(this.$('.check-discussion-category'), disable);
+            this.setDisabled(this.$('.check-discussion-subcategory-inline'), disable);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
         },
 
         /**
@@ -97,7 +97,7 @@ var edx = edx || {};
             if (!$selectedTopic.prop('checked')) {
                 $('.check-all-inline-discussions').prop('checked', false);
             }
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
         },
 
 
@@ -108,7 +108,7 @@ var edx = edx || {};
             event.preventDefault();
 
             var self = this;
-            var cohortedInlineDiscussions = self.setCohortedDiscussions(
+            var cohortedInlineDiscussions = self.getCohortedDiscussions(
                 '.check-discussion-subcategory-inline:checked'
             );
 

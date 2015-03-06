@@ -11,19 +11,19 @@ var edx = edx || {};
         Add/Remove the disabled attribute on given element.
 
         Args:
-            $element (JQuery element): The element to disable.
-            enable (Bool): The flag to add/remove 'disabled' attribute.
+            $element (JQuery element): The element to disable/enable.
+            disable (Bool): The flag to add/remove 'disabled' attribute.
         **/
-        setDisabled: function($element, enable) {
-            if (enable) {
-                $element.prop('disabled', false);
-            } else {
+        setDisabled: function($element, disable) {
+            if (disable) {
                 $element.prop('disabled', 'disabled');
+            } else {
+                $element.prop('disabled', false);
             }
         },
 
         /**
-        Sets the cohorted discussions list.
+        Returns the cohorted discussions list.
 
         Args:
             selector (HTML element): The topic element to get the ids.
@@ -31,7 +31,7 @@ var edx = edx || {};
         Returns:
             Cohorted discussions list.
         **/
-        setCohortedDiscussions: function(selector) {
+        getCohortedDiscussions: function(selector) {
             var self=this,
                 cohortedDiscussions = [];
 
@@ -43,7 +43,7 @@ var edx = edx || {};
         },
 
         /**
-        Sends the cohortSettings model's changed attributes to the server via patch method.
+        Save the cohortSettings' changed attributes to the server via PATCH method.
          Also, it shows the error message(s) if any.
 
         Args:
