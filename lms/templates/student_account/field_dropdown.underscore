@@ -1,1 +1,14 @@
-<div>Dropdown</div>
+<label class="account-settings-field-title">
+    <%- gettext(title) %>
+</label>
+<div class="account-settings-field-value">
+    <select name="select">
+      <option value="value1">Value 1</option>
+      <option value="value2" selected>Value 2</option>
+      <option value="value3">Value 3</option>
+    </select>
+</div>
+<div class="account-settings-field-message">
+    <%- gettext(message) %>
+</div>
+<hr class="divider divider-lv1">

@@ -1,7 +1,10 @@
-<div>
-    <span><%- gettext(title) %></span>
-    <span>Value</span>
-    <span><%- gettext(description) %></span>
+<label class="account-settings-field-title">
+    <%- gettext(title) %>
+</label>
+<div class="account-settings-field-value">
+    <%- gettext(value) %>
+</div>
+<div class="account-settings-field-message">
+    <%- gettext(message) %>
 </div>
 <hr class="divider divider-lv1">
-<div>

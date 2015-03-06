@@ -1,8 +1,12 @@
-<div>
+<div class="account-settings-sections">
     <% _.each(sections, function(section) { %>
-        <h2><%- gettext(section.title) %></h2>
-        <hr class="divider divider-lv1">
-        <div class="account-settings-section-body">
-        <div>
+        <div class="account-settings-section">
+            <div class="account-settings-section-header">
+                <h2><%- gettext(section.title) %></h2>
+                <hr class="divider divider-lv1">
+            </div>
+            <div class="account-settings-section-body">
+            </div>
+        </div>
     <% }); %>
 </div>

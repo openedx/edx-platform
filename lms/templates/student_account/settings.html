@@ -16,7 +16,7 @@
 </%block>
 
 <%block name="header_extras">
-    % for template_name in ["account_settings", "field_dropdown", "field_link", "field_readonly", "field_string"]:
+    % for template_name in ["account_settings", "field_dropdown", "field_link", "field_readonly", "field_text"]:
         <script type="text/template" id="${template_name}-tpl">
             <%static:include path="student_account/${template_name}.underscore" />
         </script>
@@ -56,30 +56,44 @@
                         fields: [
                             {
                                 view: new edx.student.account.ReadonlyFieldView({
+                                    model: accountSettingsModel,
                                     title: "Username",
-                                    description: ""
-                                }).render()
+                                    value_attribute: "username",
+                                    message: ""
+                                })
                             },
                             {
-                                view: new edx.student.account.ReadonlyFieldView({
+                                view: new edx.student.account.TextFieldView({
+                                    model: accountSettingsModel,
                                     title: "Full Name",
-                                    description: "This is used on your edX certificates, and all changes are reviewed."
-                                }).render()                            },
+                                    value_attribute: "name",
+                                    message: "This is used on your edX certificates, and all changes are reviewed."
+                                })
+                            },
                             {
-                                view: new edx.student.account.ReadonlyFieldView({
+                                view: new edx.student.account.TextFieldView({
+                                    model: accountSettingsModel,
                                     title: "Email",
-                                    description: "You account email is used as a login mechanism and for course communications."
-                                }).render()                            },
+                                    value_attribute: "email",
+                                    message: "You account email is used as a login mechanism and for course communications."
+                                })
+                            },
                             {
-                                view: new edx.student.account.ReadonlyFieldView({
+                                view: new edx.student.account.LinkFieldView({
+                                    model: accountSettingsModel,
                                     title: "Password",
-                                    description: "To reset your password you'll need to click the reset password link sent to you via email."
-                                }).render()                            },
+                                    link_title: "Reset Password",
+                                    link_href: "#",
+                                    message: "To reset your password you'll need to click the reset password link sent to you via email."
+                                })
+                            },
                             {
-                                view: new edx.student.account.ReadonlyFieldView({
+                                view: new edx.student.account.DropdownFieldView({
+                                    model: accountSettingsModel,
                                     title: "Language",
-                                    description: "This setting controls your default edX language."
-                                }).render()                            },
+                                    message: "This setting controls your default edX language."
+                                })
+                            },
                         ]
                     },
                     {
