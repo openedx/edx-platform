@@ -139,8 +139,8 @@ class User(models.Model):
         return get_user_social_stats(self.id, self.course_id, end_date=end_date)
 
     @classmethod
-    def all_social_stats(cls, course_id, end_date=None):
-        return get_user_social_stats('*', course_id, end_date=end_date)
+    def all_social_stats(cls, course_id, end_date=None, thread_type=None):
+        return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type)
 
     def _retrieve(self, *args, **kwargs):
         url = self.url(action='get', params=self.attributes)
