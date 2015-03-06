@@ -18,7 +18,7 @@ from courseware.tests.factories import StudentPrefsFactory, StudentInfoFactory
 from xblock.fields import Scope, BlockScope, ScopeIds
 from xblock.exceptions import KeyValueMultiSaveError
 from xblock.core import XBlock
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.db import DatabaseError
 
 
@@ -53,6 +53,9 @@ class StudentModuleFactory(cmfStudentModuleFactory):
 
 
 class TestInvalidScopes(TestCase):
+    """
+    Invalid scope testing for KeyValueStore
+    """
     def setUp(self):
         super(TestInvalidScopes, self).setUp()
         self.user = UserFactory.create(username='user')
@@ -180,6 +183,9 @@ class TestStudentModuleStorage(OtherUserFailureTestMixin, TestCase):
 
 
 class TestMissingStudentModule(TestCase):
+    """
+    Test StudentModule for a particular course.
+    """
     def setUp(self):
         super(TestMissingStudentModule, self).setUp()
 
@@ -315,6 +321,28 @@ class StorageTestBase(object):
         exception = exception_context.exception
         self.assertEquals(len(exception.saved_field_names), 1)
         self.assertEquals(exception.saved_field_names[0], 'existing_field')
+
+
+@patch('django.conf.settings.DB_UTILS_ENABLE_TRANSACTIONS', True)
+class StorageTransactionEnabledTest(StorageTestBase, TransactionTestCase):
+    """
+    We use decorators from db_utils for managing transactions. During testing
+    these decorators are disabled because TestCase does not work with code
+    that uses transactions.
+    Here we inherit from TransactionTestCase and check that the db_utils
+    decorators used in the DjangoKeyValueStore work fine.
+    """
+    factory = StudentInfoFactory
+    scope = Scope.user_info
+    key_factory = user_info_key
+    storage_class = XModuleStudentInfoField
+
+    def test_set_many_with_read_committed(self):
+        """
+        Test that setting many regular fields at the same time works
+        """
+        kv_dict = self.construct_kv_dict()
+        self.kvs.set_many(kv_dict)
 
 
 class TestUserStateSummaryStorage(StorageTestBase, TestCase):
