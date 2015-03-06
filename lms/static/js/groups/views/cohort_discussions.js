@@ -7,13 +7,14 @@ var edx = edx || {};
 
     edx.groups.CohortDiscussionsView = Backbone.View.extend({
 
-        toggleDisabledAttribute: function($element, enable) {
+        setDisabled: function($element, enable) {
             if (enable) {
                 $element.prop('disabled', false);
             } else {
                 $element.prop('disabled', 'disabled');
             }
         },
+
         getCohortedDiscussions: function(selector) {
             var self=this;
 
@@ -22,6 +23,7 @@ var edx = edx || {};
                 self.cohortedDiscussions.push($(topic).data('id'))
             });
         },
+
         saveForm: function ($element) {
             var self = this,
                 cohortSettingsModel = this.cohortSettings,
@@ -53,6 +55,7 @@ var edx = edx || {};
                 });
             return saveOperation.promise();
         },
+
         showMessage: function (message, $element, type) {
             var model = new NotificationModel({type: type || 'confirmation', title: message});
             this.removeNotification();
@@ -62,11 +65,13 @@ var edx = edx || {};
             $element.before(this.notification.$el);
             this.notification.render();
         },
+
         removeNotification: function () {
             if (this.notification) {
                 this.notification.remove();
             }
         }
+
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, NotificationModel, NotificationView
 );

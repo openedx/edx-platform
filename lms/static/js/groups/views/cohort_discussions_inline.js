@@ -18,6 +18,7 @@ var edx = edx || {};
             this.template = _.template($('#cohort-discussions-inline-tpl').text());
             this.cohortSettings = options.cohortSettings;
         },
+
         render: function () {
             var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions');
 
@@ -28,12 +29,13 @@ var edx = edx || {};
 
             $('ul.inline-topics').qubit();
 
-            this.toggleDisabledAttribute(this.$('.cohort-inline-discussions-form .action-save'), false);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
             if (alwaysCohortInlineDiscussions) {
-                this.toggleDisabledAttribute(this.$('.check-discussion-category'), false);
-                this.toggleDisabledAttribute(this.$('.check-discussion-subcategory-inline'), false);
+                this.setDisabled(this.$('.check-discussion-category'), false);
+                this.setDisabled(this.$('.check-discussion-subcategory-inline'), false);
             }
         },
+
         getInlineDiscussions: function (categoryMap) {
             var categoryTemplate = _.template($('#cohort-discussions-category-tpl').html()),
                 entryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
@@ -62,19 +64,23 @@ var edx = edx || {};
                 return html;
             }, this).join('');
         },
+
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
             this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
         },
+
         changeCohortInlineDiscussions: function(event) {
             event.preventDefault();
             this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
         },
+
         toggleInlineDiscussions: function(enable) {
-            this.toggleDisabledAttribute(this.$('.check-discussion-category'), enable);
-            this.toggleDisabledAttribute(this.$('.check-discussion-subcategory-inline'), enable);
-            this.toggleDisabledAttribute(this.$('.cohort-inline-discussions-form .action-save'), true);
+            this.setDisabled(this.$('.check-discussion-category'), enable);
+            this.setDisabled(this.$('.check-discussion-subcategory-inline'), enable);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
+
         changeInlineDiscussionsCategory: function(event) {
             var $selectedCategory = $(event.currentTarget);
 
@@ -82,13 +88,15 @@ var edx = edx || {};
                 $('.check-all-inline-discussions').prop('checked', false);
             }
         },
+
         changeInlineDiscussionsSubCategory: function (event) {
             var $selectedTopic = $(event.currentTarget);
             if (!$selectedTopic.prop('checked')) {
                 $('.check-all-inline-discussions').prop('checked', false);
             }
-            this.toggleDisabledAttribute(this.$('.cohort-inline-discussions-form .action-save'), true);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
+
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
 
@@ -108,5 +116,6 @@ var edx = edx || {};
                     });
                 });
         }
+
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortDiscussionsView);

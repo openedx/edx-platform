@@ -15,14 +15,16 @@ var edx = edx || {};
             this.template = _.template($('#cohort-discussions-course-wide-tpl').text());
             this.cohortSettings = options.cohortSettings;
         },
+
         render: function () {
             this.$('.cohort-course-wide-discussions-nav').html(this.template({
                 courseWideTopics: this.getCourseWideDiscussions(
                     this.model.get('course_wide_discussions')
                 )
             }));
-            this.toggleDisabledAttribute(this.$('.cohort-course-wide-discussions-form .action-save'), false);
+            this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), false);
         },
+
         getCourseWideDiscussions: function (courseWideDiscussions) {
             var self = this,
                 subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
@@ -39,10 +41,12 @@ var edx = edx || {};
                 });
             }).join('');
         },
+
         changeCourseWideDiscussionCategory: function(event) {
             event.preventDefault();
-            this.toggleDisabledAttribute(this.$('.cohort-course-wide-discussions-form .action-save'), true);
+            this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), true);
         },
+
         saveCourseWideDiscussionsForm: function (event) {
             event.preventDefault();
 
@@ -58,5 +62,6 @@ var edx = edx || {};
                     });
                 });
         }
+
     });
 }).call(this, $, _, Backbone, gettext, interpolate_text, edx.groups.CohortDiscussionsView);

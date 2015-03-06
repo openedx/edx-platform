@@ -417,7 +417,7 @@ def cohort_discussion_topics(request, course_key_string):
 
     Returns the JSON representation of discussion topics w.r.t categories for the course.
     """
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
+    course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
 
     discussion_topics = {}
