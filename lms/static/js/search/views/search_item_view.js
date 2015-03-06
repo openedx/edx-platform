@@ -32,6 +32,14 @@ define([
             return this;
         },
 
+        /**
+         * Redirect to a URL.  Mainly useful for mocking out in tests.
+         * @param  {string} url The URL to redirect to.
+         */
+        redirect: function(url) {
+            window.location.href = url;
+        },
+
         logSearchItem: function(event) {
             event.preventDefault();
             var target = this.model.id;
@@ -47,13 +55,7 @@ define([
                     "result_position": (page * pageSize + index),
                     "result_link": target
                 });
-            window.analytics.track('"edx.course.search.result_selected"', {
-                category: 'courseware_search',
-                search_term: searchTerm,
-                result_position: (page * pageSize + index),
-                result_link: target
-            });
-            window.location.href = link;
+            this.redirect(link);
         }
     });
 

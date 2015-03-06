@@ -117,6 +117,18 @@ define([
             expect(this.item.$el).toContainHtml(breadcrumbs);
         });
 
+        it('log request on follow item link', function () {
+            this.model.collection = new SearchCollection([this.model], { course_id: 'edx101' });
+            this.item.render();
+            // Mock the redirect call
+            spyOn(this.item, 'redirect').andCallFake( function() {} );
+            spyOn(this.item, 'logSearchItem').andCallThrough();
+            var link = this.item.$el.find('a');
+            expect(link.length).toBe(1);
+            link.trigger('click');
+            expect(this.item.redirect).toHaveBeenCalled();
+        });
+
     });
 
 

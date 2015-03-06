@@ -178,26 +178,3 @@ class CoursewareSearchIndexer(object):
             event_name,
             data
         )
-
-        try:
-            if settings.FEATURES.get('SEGMENT_IO_LMS') and hasattr(settings, 'SEGMENT_IO_LMS_KEY'):
-                # Google Analytics - log index content request
-                import analytics
-
-                analytics.track(
-                    event_name,
-                    data,
-                    context={
-                        'Google Analytics': {
-                            'clientId': tracking_context.get('client_id')
-                        }
-                    }
-                )
-        except Exception:  # pylint: disable=broad-except
-            # Capturing all exceptions thrown while tracking analytics events. We do not want
-            # an operation to fail because of an analytics event, so we will capture these
-            # errors in the logs.
-            log.exception(
-                u'Unable to emit %s event for content indexing.',
-                event_name,
-            )
