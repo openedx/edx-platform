@@ -9,7 +9,7 @@ var edx = edx || {};
         events: {
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'changeAllInlineDiscussions',
-            'change .check-cohort-inline-discussions': 'changeCohortInlineDiscussions'
+            'change .check-cohort-inline-discussions': 'changeSomeInlineDiscussions'
         },
 
         initialize: function (options) {
@@ -74,9 +74,9 @@ var edx = edx || {};
         },
 
         /**
-         Enable/Disable the discussion category checkboxes.
-         Enable/Disable the discussion sub-category checkboxes.
-         Enable/Disable the save button for inline discussion topics.
+         Disables the discussion category checkboxes.
+         Disables the discussion sub-category checkboxes.
+         Enables the save button for inline discussion topics.
 
          Args:
             disable (Bool): The flag to enable/disable the elements.
@@ -87,14 +87,14 @@ var edx = edx || {};
         },
 
         /**
-         Enable/Disable the discussion category checkboxes.
-         Enable/Disable the discussion sub-category checkboxes.
-         Enable/Disable the save button for inline discussion topics.
+         Enables the discussion category checkboxes.
+         Enables the discussion sub-category checkboxes.
+         Enables the save button for inline discussion topics.
 
          Args:
             disable (Bool): The flag to enable/disable the elements.
         **/
-        changeCohortInlineDiscussions: function(event) {
+        changeSomeInlineDiscussions: function(event) {
             event.preventDefault();
             this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
         },
