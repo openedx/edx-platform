@@ -1332,12 +1332,6 @@ class PaidCourseRegistration(OrderItem):
         # First a bunch of sanity checks:
         # actually fetch the course to make sure it exists, use this to
         # throw errors if it doesn't.
-        course_modes = CourseMode.modes_for_course_dict(course_id)
-        # Check if the NO_ID_PROFESSIONAL mode is defined for the given course
-        # then use this mode for registration instead of default 'honor' mode to
-        # use the correct currency and amount for registration
-        if CourseMode.NO_ID_PROFESSIONAL_MODE[0] in course_modes:
-            mode_slug = CourseMode.NO_ID_PROFESSIONAL_MODE[0]
         course = modulestore().get_course(course_id)
         if not course:
             log.error("User {} tried to add non-existent course {} to cart id {}"
