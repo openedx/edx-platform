@@ -81,6 +81,9 @@ var edx = edx || {};
             this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
 
+        /**
+        Enables the save button for inline discussions.
+        **/
         changeInlineDiscussionsCategory: function(event) {
             var $selectedCategory = $(event.currentTarget);
 
@@ -97,14 +100,20 @@ var edx = edx || {};
             this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
         },
 
+
+        /**
+        Sends the cohorted_inline_discussions to the server and renders the view.
+        **/
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
 
             var self = this;
-            self.setCohortedDiscussions('.check-discussion-subcategory-inline:checked');
+            var cohortedInlineDiscussions = self.setCohortedDiscussions(
+                '.check-discussion-subcategory-inline:checked'
+            );
 
             this.cohortSettings.set({
-                cohorted_inline_discussions: self.cohortedDiscussions,
+                cohorted_inline_discussions: cohortedInlineDiscussions,
                 always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')
             });
 

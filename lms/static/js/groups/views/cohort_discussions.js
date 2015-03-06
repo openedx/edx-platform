@@ -27,14 +27,19 @@ var edx = edx || {};
 
         Args:
             selector (HTML element): The topic element to get the ids.
+
+        Returns:
+            Cohorted discussions list.
         **/
         setCohortedDiscussions: function(selector) {
-            var self=this;
+            var self=this,
+                cohortedDiscussions = [];
 
-            this.cohortedDiscussions = [];
             _.each(self.$(selector), function (topic) {
-                self.cohortedDiscussions.push($(topic).data('id'))
+                cohortedDiscussions.push($(topic).data('id'))
             });
+
+            return cohortedDiscussions;
         },
 
         /**

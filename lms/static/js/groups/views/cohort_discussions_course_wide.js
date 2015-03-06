@@ -25,9 +25,18 @@ var edx = edx || {};
             this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), false);
         },
 
+        /**
+        Returns the html list for course-wide discussion topics.
+
+        Args:
+            courseWideDiscussions (object): course-wide discussions object from server
+                with two attributes 'children' & 'entries'.
+
+        Returns:
+            HTML list for course-wide discussion topics.
+        **/
         getCourseWideDiscussions: function (courseWideDiscussions) {
-            var self = this,
-                subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
+            var subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
                 entries = courseWideDiscussions.entries,
                 children = courseWideDiscussions.children;
 
@@ -42,18 +51,26 @@ var edx = edx || {};
             }).join('');
         },
 
+        /**
+        Enables the save button for course-wide discussions.
+        **/
         changeCourseWideDiscussionCategory: function(event) {
             event.preventDefault();
             this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), true);
         },
 
+        /**
+        Sends the cohorted_course_wide_discussions to the server and renders the view.
+        **/
         saveCourseWideDiscussionsForm: function (event) {
             event.preventDefault();
 
             var self = this;
-            self.setCohortedDiscussions('.check-discussion-subcategory-course-wide:checked');
+            var courseWideCohortedDiscussions = self.setCohortedDiscussions(
+                '.check-discussion-subcategory-course-wide:checked'
+            );
 
-            this.cohortSettings.set({cohorted_course_wide_discussions:self.cohortedDiscussions});
+            this.cohortSettings.set({cohorted_course_wide_discussions:courseWideCohortedDiscussions});
             self.saveForm(self.$('.course-wide-discussion-topics'))
                 .done(function () {
                     self.model.fetch().done(function () {
