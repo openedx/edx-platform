@@ -440,8 +440,23 @@ class TestAccountAPI(UserAPITestCase):
 
         # Finally, try changing to an invalid email just to make sure error messages are appropriately returned.
         error_response = self.send_patch(client, {"email": "not_an_email"}, expected_status=400)
+        field_errors = error_response.data["field_errors"]
         self.assertEqual(
-            "Error thrown from do_email_change_request: 'Valid e-mail address required.'",
+            "Error thrown from validate_new_email: 'Valid e-mail address required.'",
+            field_errors["email"]["developer_message"]
+        )
+        self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
+
+    @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
+    def test_patch_serializer_save_fails(self, serializer_save):
+        """
+        Test that AccountUpdateErrors are passed through to the response.
+        """
+        serializer_save.side_effect = [Exception("bummer"), None]
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        error_response = self.send_patch(self.client, {"goals": "save an account field"}, expected_status=400)
+        self.assertEqual(
+            "Error thrown when saving account updates: 'bummer'",
             error_response.data["developer_message"]
         )
-        self.assertEqual("Valid e-mail address required.", error_response.data["user_message"])
+        self.assertIsNone(error_response.data["user_message"])

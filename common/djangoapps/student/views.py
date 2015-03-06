@@ -1909,7 +1909,8 @@ def reactivation_email_for_user(user):
     return JsonResponse({"success": True})
 
 
-# TODO: delete this method and redirect unit tests to do_email_change_request after accounts page work is done.
+# TODO: delete this method and redirect unit tests to validate_new_email and do_email_change_request
+# after accounts page work is done.
 @ensure_csrf_cookie
 def change_email_request(request):
     """ AJAX call from the profile page. User wants a new e-mail.
@@ -1928,6 +1929,7 @@ def change_email_request(request):
 
     new_email = request.POST['new_email']
     try:
+        validate_new_email(request.user, new_email)
         do_email_change_request(request.user, new_email)
     except ValueError as err:
         return JsonResponse({
@@ -1937,11 +1939,10 @@ def change_email_request(request):
     return JsonResponse({"success": True})
 
 
-def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
+def validate_new_email(user, new_email):
     """
-    Given a new email for a user, does some basic verification of the new address and sends an activation message
-    to the new address. If any issues are encountered with verification or sending the message, a ValueError will
-    be thrown.
+    Given a new email for a user, does some basic verification of the new address If any issues are encountered
+    with verification a ValueError will be thrown.
     """
     try:
         validate_email(new_email)
@@ -1954,6 +1955,13 @@ def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
     if User.objects.filter(email=new_email).count() != 0:
         raise ValueError(_('An account with this e-mail already exists.'))
 
+
+def do_email_change_request(user, new_email, activation_key=uuid.uuid4().hex):
+    """
+    Given a new email for a user, does some basic verification of the new address and sends an activation message
+    to the new address. If any issues are encountered with verification or sending the message, a ValueError will
+    be thrown.
+    """
     pec_list = PendingEmailChange.objects.filter(user=user)
     if len(pec_list) == 0:
         pec = PendingEmailChange()
