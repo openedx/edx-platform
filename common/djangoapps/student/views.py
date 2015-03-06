@@ -909,9 +909,9 @@ def change_enrollment(request, check_access=True):
 
         # If we have more than one course mode or professional ed is enabled,
         # then send the user to the choose your track page.
-        # (In the case of professional ed, this will redirect to a page that
+        # (In the case of no-id-professional/professional ed, this will redirect to a page that
         # funnels users directly into the verification / payment flow)
-        if CourseMode.has_verified_mode(available_modes):
+        if CourseMode.has_verified_mode(available_modes) or CourseMode.has_professional_mode(available_modes):
             return HttpResponse(
                 reverse("course_modes_choose", kwargs={'course_id': unicode(course_id)})
             )

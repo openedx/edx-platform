@@ -150,11 +150,18 @@ class CourseModeModelTest(TestCase):
         honor.save()
         self.assertTrue(CourseMode.has_payment_options(self.course_key))
 
+    def test_course_has_payment_options_with_no_id_professional(self):
+        # Has payment options.
+        professional, _ = self.create_mode('no-id-professional', 'no-id-professional', min_price=5)
+        self.assertTrue(CourseMode.has_payment_options(self.course_key))
+
+
     @ddt.data(
         ([], True),
         ([("honor", 0), ("audit", 0), ("verified", 100)], True),
         ([("honor", 100)], False),
         ([("professional", 100)], False),
+        ([("no-id-professional", 100)], False),
     )
     @ddt.unpack
     def test_can_auto_enroll(self, modes_and_prices, can_auto_enroll):
@@ -206,3 +213,116 @@ class CourseModeModelTest(TestCase):
         # Check that we get a default mode for when no course mode is available
         self.assertEqual(len(all_modes[other_course_key]), 1)
         self.assertEqual(all_modes[other_course_key][0], CourseMode.DEFAULT_MODE)
+
+    @ddt.data('', 'no-id-professional', 'professional', 'verified')
+    def test_course_has_professional_mode(self, mode):
+        # check the professional mode.
+
+        self.create_mode(mode, 'course mode', 10)
+        modes_dict = CourseMode.modes_for_course_dict(self.course_key)
+
+        if mode in ['professional', 'no-id-professional']:
+            self.assertTrue(CourseMode.has_professional_mode(modes_dict))
+        else:
+            self.assertFalse(CourseMode.has_professional_mode(modes_dict))
+
+    @ddt.data('no-id-professional', 'professional', 'verified')
+    def test_course_is_professional_mode(self, mode):
+        # check that tuple has professional mode
+
+        course_mode, __ = self.create_mode(mode, 'course mode', 10)
+        if mode in ['professional', 'no-id-professional']:
+            self.assertTrue(CourseMode.is_professional_mode(course_mode.to_tuple()))
+        else:
+            self.assertFalse(CourseMode.is_professional_mode(course_mode.to_tuple()))
+
+    def test_course_is_professional_mode_with_invalid_tuple(self):
+        # check that tuple has professional mode with None
+        self.assertFalse(CourseMode.is_professional_mode(None))
+
+    @ddt.data(
+        ("verified", "verify_need_to_verify"),
+        ("verified", "verify_submitted"),
+        ("verified", "verify_approved"),
+        ("verified", 'dummy'),
+        ("verified", None),
+        ('honor', None),
+        ('honor', 'dummy'),
+        ('audit', None),
+        ('professional', None),
+        ('no-id-professional', None),
+        ('no-id-professional', 'dummy')
+    )
+    @ddt.unpack
+    def test_get_certificate_display(self, mode, verification_status):
+        if mode == "verified":
+            if verification_status in ['verify_need_to_verify', 'verify_submitted']:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "Your verification is pending",
+                        "enrollment_value": "Verified: Pending Verification",
+                        "show_image": True,
+                        "image_alt": 'ID verification pending',
+                        "display_mode": 'verified'
+                    }
+                )
+
+            if verification_status in ['verify_approved']:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "You're enrolled as a verified student",
+                        "enrollment_value": "Verified",
+                        "show_image": True,
+                        "image_alt": 'ID Verified Ribbon/Badge',
+                        "display_mode": 'verified'
+                    }
+                )
+
+            if verification_status is None:
+                self.assertEqual(
+                    CourseMode.get_certificate_display(mode, verification_status),
+                    {
+                        "enrollment_title": "You're enrolled as an honor code student",
+                        "enrollment_value": "Honor Code",
+                        "show_image": False,
+                        "image_alt": '',
+                        "display_mode": 'honor'
+                    }
+                )
+        if mode == "honor":
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're enrolled as an honor code student",
+                    "enrollment_value": "Honor Code",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'honor'
+                }
+            )
+
+        if mode == "audit":
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're auditing this course",
+                    "enrollment_value": "Auditing",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'audit'
+                }
+            )
+
+        if mode in ["professional", "no-id-professional"]:
+            self.assertEqual(
+                CourseMode.get_certificate_display(mode, verification_status),
+                {
+                    "enrollment_title": "You're enrolled as a professional education student",
+                    "enrollment_value": "Professional Ed",
+                    "show_image": False,
+                    "image_alt": '',
+                    "display_mode": 'professional'
+                }
+            )

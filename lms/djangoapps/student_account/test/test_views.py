@@ -298,7 +298,7 @@ class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase)
         ]
         self._assert_third_party_auth_data(response, current_provider, expected_providers)
 
-    @ddt.data([], ["honor"], ["honor", "verified", "audit"], ["professional"])
+    @ddt.data([], ["honor"], ["honor", "verified", "audit"], ["professional"], ["no-id-professional"])
     def test_third_party_auth_course_id_verified(self, modes):
         # Create a course with the specified course modes
         course = CourseFactory.create()
