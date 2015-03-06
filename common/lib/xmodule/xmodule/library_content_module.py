@@ -9,7 +9,6 @@ from capa.responsetypes import registry
 from gettext import ngettext
 
 from .mako_module import MakoModuleDescriptor
-from opaque_keys import InvalidKeyError
 from opaque_keys.edx.locator import LibraryLocator
 import random
 from webob import Response
@@ -28,11 +27,6 @@ _ = lambda text: text
 
 
 ANY_CAPA_TYPE_VALUE = 'any'
-
-
-def enum(**enums):
-    """ enum helper in lieu of enum34 """
-    return type('Enum', (), enums)
 
 
 def _get_human_name(problem_class):
@@ -54,85 +48,6 @@ def _get_capa_types():
     ], key=lambda item: item.get('display_name'))
 
 
-class LibraryVersionReference(namedtuple("LibraryVersionReference", "library_id version")):
-    """
-    A reference to a specific library, with an optional version.
-    The version is used to find out when the LibraryContentXBlock was last
-    updated with the latest content from the library.
-
-    library_id is a LibraryLocator
-    version is an ObjectId or None
-    """
-    def __new__(cls, library_id, version=None):
-        # pylint: disable=super-on-old-class
-        if not isinstance(library_id, LibraryLocator):
-            library_id = LibraryLocator.from_string(library_id)
-        if library_id.version_guid:
-            assert (version is None) or (version == library_id.version_guid)
-            if not version:
-                version = library_id.version_guid
-            library_id = library_id.for_version(None)
-        if version and not isinstance(version, ObjectId):
-            try:
-                version = ObjectId(version)
-            except InvalidId:
-                raise ValueError(version)
-        return super(LibraryVersionReference, cls).__new__(cls, library_id, version)
-
-    @staticmethod
-    def from_json(value):
-        """
-        Implement from_json to convert from JSON
-        """
-        return LibraryVersionReference(*value)
-
-    def to_json(self):
-        """
-        Implement to_json to convert value to JSON
-        """
-        # TODO: Is there anyway for an xblock to *store* an ObjectId as
-        # part of the List() field value?
-        return [unicode(self.library_id), unicode(self.version) if self.version else None]  # pylint: disable=no-member
-
-
-class LibraryList(List):
-    """
-    Special List class for listing references to content libraries.
-    Is simply a list of LibraryVersionReference tuples.
-    """
-    def from_json(self, values):
-        """
-        Implement from_json to convert from JSON.
-
-        values might be a list of lists, or a list of strings
-        Normally the runtime gives us:
-            [[u'library-v1:ProblemX+PR0B', '5436ffec56c02c13806a4c1b'], ...]
-        But the studio editor gives us:
-            [u'library-v1:ProblemX+PR0B,5436ffec56c02c13806a4c1b', ...]
-        """
-        def parse(val):
-            """ Convert this list entry from its JSON representation """
-            if isinstance(val, basestring):
-                val = val.strip(' []')
-                parts = val.rsplit(',', 1)
-                val = [parts[0], parts[1] if len(parts) > 1 else None]
-            try:
-                return LibraryVersionReference.from_json(val)
-            except InvalidKeyError:
-                try:
-                    friendly_val = val[0]  # Just get the library key part, not the version
-                except IndexError:
-                    friendly_val = unicode(val)
-                raise ValueError(_('"{value}" is not a valid library ID.').format(value=friendly_val))
-        return [parse(v) for v in values]
-
-    def to_json(self, values):
-        """
-        Implement to_json to convert value to JSON
-        """
-        return [lvr.to_json() for lvr in values]
-
-
 class LibraryContentFields(object):
     """
     Fields for the LibraryContentModule.
@@ -141,7 +56,7 @@ class LibraryContentFields(object):
     descriptor.
     """
     # Please note the display_name of each field below is used in
-    # common/test/acceptance/pages/studio/overview.py:StudioLibraryContentXBlockEditModal
+    # common/test/acceptance/pages/studio/library.py:StudioLibraryContentXBlockEditModal
     # to locate input elements - keep synchronized
     display_name = String(
         display_name=_("Display Name"),
@@ -149,10 +64,15 @@ class LibraryContentFields(object):
         default="Randomized Content Block",
         scope=Scope.settings,
     )
-    source_libraries = LibraryList(
-        display_name=_("Libraries"),
-        help=_("Enter a library ID for each library from which you want to draw content."),
-        default=[],
+    source_library_id = String(
+        display_name=_("Library"),
+        help=_("Select the library from which you want to draw content."),
+        scope=Scope.settings,
+        values_provider=lambda instance: instance.source_library_values(),
+    )
+    source_library_version = String(
+        # This is a hidden field that stores the version of source_library when we last pulled content from it
+        display_name=_("Library Version"),
         scope=Scope.settings,
     )
     mode = String(
@@ -193,6 +113,13 @@ class LibraryContentFields(object):
         scope=Scope.user_state,
     )
     has_children = True
+
+    @property
+    def source_library_key(self):
+        """
+        Convenience method to get the library ID as a LibraryLocator and not just a string
+        """
+        return LibraryLocator.from_string(self.source_library_id)
 
 
 #pylint: disable=abstract-method
@@ -361,7 +288,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         # The only supported mode is currently 'random'.
         # Add the mode field to non_editable_metadata_fields so that it doesn't
         # render in the edit form.
-        non_editable_fields.append(LibraryContentFields.mode)
+        non_editable_fields.extend([LibraryContentFields.mode, LibraryContentFields.source_library_version])
         return non_editable_fields
 
     @XBlock.handler
@@ -374,7 +301,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         will be given new block_ids, but the definition ID used should be the
         exact same definition ID used in the library.
 
-        This method will update this block's 'source_libraries' field to store
+        This method will update this block's 'source_library_id' field to store
         the version number of the libraries used, so we easily determine if
         this block is up to date or not.
         """
@@ -395,7 +322,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         """
         latest_version = lib_tools.get_library_version(library_key)
         if latest_version is not None:
-            if version is None or version != latest_version:
+            if version is None or version != unicode(latest_version):
                 validation.set_summary(
                     StudioValidationMessage(
                         StudioValidationMessage.WARNING,
@@ -446,7 +373,7 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                 )
             )
             return validation
-        if not self.source_libraries:
+        if not self.source_library_id:
             validation.set_summary(
                 StudioValidationMessage(
                     StudioValidationMessage.NOT_CONFIGURED,
@@ -457,12 +384,10 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
             )
             return validation
         lib_tools = self.runtime.service(self, 'library_tools')
-        for library_key, version in self.source_libraries:
-            if not self._validate_library_version(validation, lib_tools, version, library_key):
-                break
+        self._validate_library_version(validation, lib_tools, self.source_library_version, self.source_library_key)
 
         # Note: we assume refresh_children() has been called
-        # since the last time fields like source_libraries or capa_types were changed.
+        # since the last time fields like source_library_id or capa_types were changed.
         matching_children_count = len(self.children)  # pylint: disable=no-member
         if matching_children_count == 0:
             self._set_validation_error_if_empty(
@@ -482,8 +407,8 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
                     StudioValidationMessage.WARNING,
                     (
                         ngettext(
-                            u'The specified libraries are configured to fetch {count} problem, ',
-                            u'The specified libraries are configured to fetch {count} problems, ',
+                            u'The specified library is configured to fetch {count} problem, ',
+                            u'The specified library is configured to fetch {count} problems, ',
                             self.max_count
                         ) +
                         ngettext(
@@ -499,12 +424,31 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
         return validation
 
+    def source_library_values(self):
+        """
+        Return a list of possible values for self.source_library_id
+        """
+        lib_tools = self.runtime.service(self, 'library_tools')
+        user_perms = self.runtime.service(self, 'studio_user_permissions')
+        all_libraries = lib_tools.list_available_libraries()
+        if user_perms:
+            all_libraries = [
+                (key, name) for key, name in all_libraries
+                if user_perms.can_read(key) or self.source_library_id == unicode(key)
+            ]
+        all_libraries.sort(key=lambda entry: entry[1])  # Sort by name
+        if self.source_library_id and self.source_library_key not in [entry[0] for entry in all_libraries]:
+            all_libraries.append((self.source_library_id, _(u"Invalid Library")))
+        all_libraries = [(u"", _("No Library Selected"))] + all_libraries
+        values = [{"display_name": name, "value": unicode(key)} for key, name in all_libraries]
+        return values
+
     def editor_saved(self, user, old_metadata, old_content):
         """
-        If source_libraries or capa_type has been edited, refresh_children automatically.
+        If source_library_id or capa_type has been edited, refresh_children automatically.
         """
-        old_source_libraries = LibraryList().from_json(old_metadata.get('source_libraries', []))
-        if (set(old_source_libraries) != set(self.source_libraries) or
+        old_source_library_id = old_metadata.get('source_library_id', [])
+        if (old_source_library_id != self.source_library_id or
                 old_metadata.get('capa_type', ANY_CAPA_TYPE_VALUE) != self.capa_type):
             try:
                 self.refresh_children()
