@@ -1352,13 +1352,6 @@ class PaidCourseRegistration(OrderItem):
                         .format(order.user.email, course_id, order.id))
             raise AlreadyEnrolledInCourseException
 
-        course_modes = CourseMode.modes_for_course_dict(course_id)
-        # Check if the NO_ID_PROFESSIONAL mode is defined for the given course
-        # then use this mode for registration instead of default 'honor' mode to
-        # use the correct currency and amount for registration
-        if CourseMode.NO_ID_PROFESSIONAL_MODES[0] in course_modes:
-            mode_slug = CourseMode.NO_ID_PROFESSIONAL_MODES[0]
-
         ### Validations done, now proceed
         ### handle default arguments for mode_slug, cost, currency
         course_mode = CourseMode.mode_for_course(course_id, mode_slug)
