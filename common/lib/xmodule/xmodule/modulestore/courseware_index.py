@@ -3,10 +3,10 @@ from __future__ import absolute_import
 
 import logging
 
-from django.conf import settings
 from django.utils.translation import ugettext as _
 from opaque_keys.edx.locator import CourseLocator
 from search.search_engine_base import SearchEngine
+from eventtracking import tracker
 
 from . import ModuleStoreEnum
 from .exceptions import ItemNotFoundError
@@ -139,7 +139,7 @@ class CoursewareSearchIndexer(object):
         Add to courseware search index published section and children
         """
         indexed_count = cls.add_to_search_index(modulestore, location, delete, raise_on_error)
-        CoursewareSearchIndexer._track_index_request('edx.course.index.published', indexed_count, str(location))
+        cls._track_index_request('edx.course.index.published', indexed_count, str(location))
         return indexed_count
 
     @classmethod
@@ -148,7 +148,7 @@ class CoursewareSearchIndexer(object):
         (Re)index all content within the given course
         """
         indexed_count = cls.add_to_search_index(modulestore, course_key, delete=False, raise_on_error=True)
-        CoursewareSearchIndexer._track_index_request('edx.course.index.reindexed', indexed_count)
+        cls._track_index_request('edx.course.index.reindexed', indexed_count)
         return indexed_count
 
     @staticmethod
@@ -162,10 +162,6 @@ class CoursewareSearchIndexer(object):
             None
 
         """
-
-        from eventtracking import tracker as track
-        tracker = track.get_tracker()
-        tracking_context = tracker.resolve_context()  # pylint: disable=no-member
         data = {
             "indexed_count": indexed_count,
             'category': 'courseware_index',

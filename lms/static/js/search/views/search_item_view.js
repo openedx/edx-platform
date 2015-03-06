@@ -42,6 +42,7 @@ define([
 
         logSearchItem: function(event) {
             event.preventDefault();
+            var self = this;
             var target = this.model.id;
             var link = $(event.target).attr('href');
             var collection = this.model.collection;
@@ -54,8 +55,9 @@ define([
                     "search_term": searchTerm,
                     "result_position": (page * pageSize + index),
                     "result_link": target
+                }).always(function() {
+                    self.redirect(link);
                 });
-            this.redirect(link);
         }
     });
 

@@ -2,6 +2,7 @@ define([
     'jquery',
     'sinon',
     'backbone',
+    'logger',
     'js/common_helpers/template_helpers',
     'js/search/views/search_form',
     'js/search/views/search_item_view',
@@ -14,6 +15,7 @@ define([
     $,
     Sinon,
     Backbone,
+    Logger,
     TemplateHelpers,
     SearchForm,
     SearchItemView,
@@ -123,6 +125,7 @@ define([
             // Mock the redirect call
             spyOn(this.item, 'redirect').andCallFake( function() {} );
             spyOn(this.item, 'logSearchItem').andCallThrough();
+            spyOn(Logger, 'log').andReturn($.Deferred().resolve());
             var link = this.item.$el.find('a');
             expect(link.length).toBe(1);
             link.trigger('click');
