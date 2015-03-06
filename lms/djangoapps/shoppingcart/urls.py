@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from django.conf import settings
+from shoppingcart.views import PurchaseView
 
 urlpatterns = patterns(
     'shoppingcart.views',
@@ -19,6 +20,7 @@ urlpatterns = patterns(
     url(r'^reset_code_redemption/$', 'reset_code_redemption'),
     url(r'^billing_details/$', 'billing_details', name='billing_details'),
     url(r'^verify_cart/$', 'verify_cart'),
+    url(r'^purchase', PurchaseView.as_view(), name='purchase'),
 )
 
 if settings.FEATURES.get('ENABLE_PAYMENT_FAKE'):

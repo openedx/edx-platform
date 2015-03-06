@@ -12,7 +12,15 @@ from django.http import (
     HttpResponseBadRequest, HttpResponseForbidden, Http404
 )
 from django.utils.translation import ugettext as _
+import requests
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from course_modes.models import CourseMode
+from enrollment.errors import CourseEnrollmentError
+from enrollment.views import EnrollmentUserThrottle, EnrollmentListView
+from enrollment import api as enrollment_api
+from util.authentication import OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from django.views.decorators.http import require_POST, require_http_methods
 from django.core.urlresolvers import reverse
@@ -22,6 +30,7 @@ from util.date_utils import get_default_time_display
 from django.contrib.auth.decorators import login_required
 from microsite_configuration import microsite
 from edxmako.shortcuts import render_to_response
+from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys.edx.locator import CourseLocator
 from opaque_keys import InvalidKeyError
@@ -1022,3 +1031,118 @@ def csv_report(request):
 
     else:
         return HttpResponseBadRequest("HTTP Method Not Supported")
+
+
+class PurchaseView(APIView):
+    """Purchase Seats and Certificates for a Course. """
+
+    authentication_classes = OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
+    throttle_classes = EnrollmentUserThrottle,
+
+    def post(self, request):
+        """Purchase Endpoint for calling the E-Commerce Service.
+
+        Call the E-Commerce Purchase application to complete and order and fulfill the associated enrollment.
+        This endpoint will short-circuit the E-Commerce Service if no SKU is found for the requested Course and
+        Certificate Type.
+
+        Use Cases
+            1. Purchase a Seat and associated Certificate for a Course.
+            2. Enroll the currently logged in user in a course. Currently you can use this command only to enroll
+                the user in "honor" mode. If honor mode is not supported for the course, the request fails and returns
+                the available modes.
+
+        Example Requests
+            POST /purchase{"course_details":{"course_id": "edX/DemoX/Demo_Course"}}
+
+        Post Parameters
+            * course details: A collection that contains:
+                * course_id: The unique identifier for the course.
+
+        """
+        user = request.user.username
+        if 'course_details' not in request.DATA or 'course_id' not in request.DATA['course_details']:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={"message": u"Course ID must be specified to purchase a seat."}
+            )
+        course_id = request.DATA['course_details']['course_id']
+
+        try:
+            course_id = CourseKey.from_string(course_id)
+        except InvalidKeyError:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data={
+                    "message": u"No course '{course_id}' found for purchase".format(course_id=course_id)
+                }
+            )
+
+        # Check whether any country access rules block the user from enrollment.
+        redirect_url = embargo_api.redirect_if_blocked(
+            course_id, user=request.user,
+            ip_address=get_ip(request),
+            url=request.path
+        )
+        if redirect_url:
+            return Response(
+                status=status.HTTP_403_FORBIDDEN,
+                data={
+                    "message": (
+                        u"Users from this location cannot access the course '{course_id}'."
+                    ).format(course_id=course_id),
+                    "user_message_url": redirect_url
+                }
+            )
+
+        # Get the course enrollment details from the enrollment API, then determine if the
+        # honor mode has a SKU associated with it. This will indicate that there is an
+        # associated product in the catalog, and we can use the e-commerce service to
+        # purchase the seat.
+        course_details = enrollment_api.get_course_enrollment_details(unicode(course_id))
+        sku = None
+        for mode in course_details['course_modes']:
+            if mode['slug'] == 'honor' and mode['sku']:
+                sku = mode['sku']
+                break
+
+        if sku is not None:
+            return self._call_ecommerce_purchase_endpoint(user, sku)
+        else:
+            try:
+                return Response(enrollment_api.add_enrollment(user, unicode(course_id)))
+            except CourseEnrollmentError as error:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={
+                        "message": u"Error enrolling for course '{course_id}'.".format(course_id=course_id),
+                        "course_details": error.data
+                    })
+
+    def _call_ecommerce_purchase_endpoint(self, username, sku):
+        """ Make a request to the E-Commerce Service purchase endpoint
+
+        Makes an HTTP request to the E-Commerce Service's purchase endpoint for a User and SKU.
+
+        Args:
+            username (string): Make a purchase on behalf of the specified user.
+            sku (string): The SKU for the product being purchased.
+
+        Returns:
+            response (Response): Return the response from the E-Commerce Service endpoint.
+
+        """
+        log.info("Attempting to purchase product with SKU [%s]", sku)
+        purchase_api_url = getattr(settings, 'PURCHASE_API_URL', None)
+        api_key = getattr(settings, 'EDX_API_KEY', None)
+        if not purchase_api_url or not api_key:
+            error_msg = "PURCHASE_API_URL and EDX_API_KEY must be set to purchase a course seat."
+            log.error(error_msg)
+            return Response(
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                data={"message": error_msg}
+            )
+        data = {'user': username, 'sku': sku,}
+        headers = {'Content-Type': 'application/json', 'X-Edx-Api-Key': api_key,}
+        response = requests.post(purchase_api_url, data=json.dumps(data), headers=headers, timeout=5)
+        return Response(status=response.status_code)

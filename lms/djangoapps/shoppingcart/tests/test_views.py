@@ -1,6 +1,8 @@
 """
 Tests for Shopping Cart views
 """
+import unittest
+import mock
 import pytz
 from urlparse import urlparse
 from decimal import Decimal
@@ -26,6 +28,10 @@ import ddt
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
+from requests import Response
+from rest_framework import status
+from rest_framework.test import APITestCase
+from enrollment.errors import CourseEnrollmentError
 from student.roles import CourseSalesAdminRole
 from util.date_utils import get_default_time_display
 from util.testing import UrlResetMixin
@@ -42,6 +48,7 @@ from student.models import CourseEnrollment
 from course_modes.models import CourseMode
 from edxmako.shortcuts import render_to_response
 from embargo.test_utils import restrict_course
+from enrollment import api as enrollment_api
 from shoppingcart.processors import render_purchase_form_html
 from shoppingcart.admin import SoftDeleteCouponAdmin
 from shoppingcart.views import initialize_report
@@ -1931,3 +1938,153 @@ class UtilFnsTest(TestCase):
         self.assertEqual(2013, date.year)
         self.assertEqual(10, date.month)
         self.assertEqual(1, date.day)
+
+
+@unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
+@override_settings(EDX_API_KEY='foo')
+class PurchaseViewTest(UrlResetMixin, ModuleStoreTestCase, APITestCase):
+    """ Tests the Purchase endpoint"""
+
+    USERNAME = "Bob"
+    EMAIL = "bob@example.com"
+    PASSWORD = "edx"
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def setUp(self):
+        """Create users and courses."""
+        super(PurchaseViewTest, self).setUp()
+        self.user = UserFactory.create(username=self.USERNAME, email=self.EMAIL, password=self.PASSWORD)
+        self.course = CourseFactory.create()
+        self.course_mode = CourseMode(course_id=self.course.id,
+                                      mode_slug="honor",
+                                      mode_display_name="honor cert",
+                                      min_price=0)
+        self.course_mode.save()
+        self.client.login(username=self.USERNAME, password=self.PASSWORD)
+
+    def test_bypass_purchase_endpoint(self):
+        """Test that the purchase endpoint is not used when there is no SKU for the Course."""
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertEqual(unicode(self.course.id), data['course_details']['course_id'])
+        self.assertEqual('honor', data['mode'])
+        self.assertTrue(data['is_active'])
+
+    def test_honor_only(self):
+        """Test that we do not try and purchase a seat if there is no honor certificate mode. """
+        self.course_mode.mode_slug = 'verified'
+        self.course_mode.sku = 'DEMOX-SEAT-VERIFIED'
+        self.course_mode.save()
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        data = json.loads(response.content)
+        self.assertIn('Error enrolling', data['message'])
+        self.assertIsNotNone(data['course_details'])
+
+    @patch.dict(settings.FEATURES, {'EMBARGO': True})
+    def test_embargo(self):
+        """Verify that the purchase will not be initiated if the user cannot access the course. """
+        # Set a SKU on the course mode.
+        self.course_mode.sku = "DEMOX-SEAT-HONOR"
+        self.course_mode.save()
+
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        # Attempt to enroll from a country embargoed for this course
+        with restrict_course(self.course.id) as redirect_url:
+            response = self.client.post(url, data, content_type='application/json')
+
+            # Expect an error response
+            self.assertEqual(response.status_code, 403)
+
+            # Expect that the redirect URL is included in the response
+            resp_data = json.loads(response.content)
+            self.assertEqual(resp_data['user_message_url'], redirect_url)
+
+    def test_data_structure(self):
+        """Test that incorrect POST data returns the correct error."""
+        data = json.dumps({
+            'crazy_horse': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('Course ID', response.content)
+
+    @mock.patch('enrollment.api.add_enrollment')
+    def test_enrollment_api_error(self, mock_enrollment_api):
+        """Test that an Enrollment API Error returns the appropriate error code."""
+        mock_enrollment_api.side_effect = CourseEnrollmentError('Bad stuff')
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @override_settings(PURCHASE_API_URL=None)
+    def test_bad_ecommerce_config(self):
+        """Test that incorrect endpoint configuration will not attempt a request."""
+        # Set a SKU on the course mode.
+        self.course_mode.sku = "DEMOX-SEAT-HONOR"
+        self.course_mode.save()
+
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn('PURCHASE_API_URL', response.content)
+
+    @mock.patch('requests.post')
+    def test_purchase_endpoint(self, mock_post):
+        """Test that a course with an Honor mode and SKU does hit the E-Commerce endpoint."""
+
+        # Mock out the response from the purchase endpoint.
+        fake_error_response = Response()
+        fake_error_response.status_code = status.HTTP_200_OK
+        mock_post.return_value = fake_error_response
+
+        # Set a SKU on the course mode.
+        self.course_mode.sku = "DEMOX-SEAT-HONOR"
+        self.course_mode.save()
+
+        data = json.dumps({
+            'course_details': {
+                'course_id': unicode(self.course.id)
+            },
+            'user': self.USERNAME
+        })
+        url = reverse('purchase')
+        response = self.client.post(url, data, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
