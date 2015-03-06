@@ -68,6 +68,25 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         else:
             self.assertEquals(response.status_code, 200)
 
+    def test_no_id_redirect(self):
+        # Create the course modes
+        CourseModeFactory(mode_slug=CourseMode.NO_ID_PROFESSIONAL_MODE, course_id=self.course.id, min_price=100)
+
+        # Enroll the user in the test course
+        CourseEnrollmentFactory(
+            is_active=False,
+            mode=CourseMode.NO_ID_PROFESSIONAL_MODE,
+            course_id=self.course.id,
+            user=self.user
+        )
+
+        # Configure whether we're upgrading or not
+        url = reverse('course_modes_choose', args=[unicode(self.course.id)])
+        response = self.client.get(url)
+        # Check whether we were correctly redirected
+        start_flow_url = reverse('verify_student_start_flow', args=[unicode(self.course.id)])
+        self.assertRedirects(response, start_flow_url)
+
     def test_no_enrollment(self):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
@@ -115,9 +134,10 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         # TODO: Fix it so that response.templates works w/ mako templates, and then assert
         # that the right template rendered
 
-    def test_professional_enrollment(self):
+    @ddt.data('professional', 'no-id-professional')
+    def test_professional_enrollment(self, mode):
         # The only course mode is professional ed
-        CourseModeFactory(mode_slug='professional', course_id=self.course.id)
+        CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=1)
 
         # Go to the "choose your track" page
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])
@@ -132,7 +152,7 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
         CourseEnrollmentFactory(
             user=self.user,
             is_active=True,
-            mode="professional",
+            mode=mode,
             course_id=unicode(self.course.id),
         )
 
@@ -156,7 +176,8 @@ class CourseModeViewTest(UrlResetMixin, ModuleStoreTestCase):
     def test_choose_mode_redirect(self, course_mode, expected_redirect):
         # Create the course modes
         for mode in ('audit', 'honor', 'verified'):
-            CourseModeFactory(mode_slug=mode, course_id=self.course.id)
+            min_price = 0 if course_mode in ["honor", "audit"] else 1
+            CourseModeFactory(mode_slug=mode, course_id=self.course.id, min_price=min_price)
 
         # Choose the mode (POST request)
         choose_track_url = reverse('course_modes_choose', args=[unicode(self.course.id)])

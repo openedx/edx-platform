@@ -272,15 +272,16 @@ class PayAndVerifyView(View):
         if redirect_url:
             return redirect(redirect_url)
 
-        # Check that the course has an unexpired verified mode
-        course_mode, expired_course_mode = self._get_verified_modes_for_course(course_key)
+        expired_verified_course_mode, unexpired_paid_course_mode = self._get_expired_verified_and_paid_mode(course_key)
 
-        if course_mode is not None:
-            log.info(
-                u"Entering verified workflow for user '%s', course '%s', with current step '%s'.",
-                request.user.id, course_id, current_step
-            )
-        elif expired_course_mode is not None:
+        # Check that the course has an unexpired paid mode
+        if unexpired_paid_course_mode is not None:
+            if CourseMode.is_verified_mode(unexpired_paid_course_mode):
+                log.info(
+                    u"Entering verified workflow for user '%s', course '%s', with current step '%s'.",
+                    request.user.id, course_id, current_step
+                )
+        elif expired_verified_course_mode is not None:
             # Check if there is an *expired* verified course mode;
             # if so, we should show a message explaining that the verification
             # deadline has passed.
@@ -288,16 +289,16 @@ class PayAndVerifyView(View):
             context = {
                 'course': course,
                 'deadline': (
-                    get_default_time_display(expired_course_mode.expiration_datetime)
-                    if expired_course_mode.expiration_datetime else ""
+                    get_default_time_display(expired_verified_course_mode.expiration_datetime)
+                    if expired_verified_course_mode.expiration_datetime else ""
                 )
             }
             return render_to_response("verify_student/missed_verification_deadline.html", context)
         else:
-            # Otherwise, there has never been a verified mode,
+            # Otherwise, there has never been a verified/paid mode,
             # so return a page not found response.
             log.warn(
-                u"No verified course mode found for course '%s' for verification flow request",
+                u"No paid/verified course mode found for course '%s' for verification/payment flow request",
                 course_id
             )
             raise Http404
@@ -307,7 +308,9 @@ class PayAndVerifyView(View):
         # with a paid course mode (such as "verified").
         # For this reason, every paid user is enrolled, but not
         # every enrolled user is paid.
-        already_verified = self._check_already_verified(request.user)
+        # If the course mode is not verified(i.e only paid) then already_verified is always True
+        already_verified = self._check_already_verified(request.user) \
+            if CourseMode.is_verified_mode(unexpired_paid_course_mode) else True
         already_paid, is_enrolled = self._check_enrollment(request.user, course_key)
 
         # Redirect the user to a more appropriate page if the
@@ -326,7 +329,8 @@ class PayAndVerifyView(View):
         display_steps = self._display_steps(
             always_show_payment,
             already_verified,
-            already_paid
+            already_paid,
+            unexpired_paid_course_mode
         )
         requirements = self._requirements(display_steps, request.user.is_active)
 
@@ -371,7 +375,7 @@ class PayAndVerifyView(View):
             'contribution_amount': contribution_amount,
             'course': course,
             'course_key': unicode(course_key),
-            'course_mode': course_mode,
+            'course_mode': unexpired_paid_course_mode,
             'courseware_url': courseware_url,
             'current_step': current_step,
             'disable_courseware_js': True,
@@ -383,8 +387,8 @@ class PayAndVerifyView(View):
             'requirements': requirements,
             'user_full_name': full_name,
             'verification_deadline': (
-                get_default_time_display(course_mode.expiration_datetime)
-                if course_mode.expiration_datetime else ""
+                get_default_time_display(unexpired_paid_course_mode.expiration_datetime)
+                if unexpired_paid_course_mode.expiration_datetime else ""
             ),
         }
         return render_to_response("verify_student/pay_and_verify.html", context)
@@ -459,21 +463,32 @@ class PayAndVerifyView(View):
         if url is not None:
             return redirect(url)
 
-    def _get_verified_modes_for_course(self, course_key):
-        """Retrieve unexpired and expired verified modes for a course.
+    def _get_expired_verified_and_paid_mode(self, course_key):  # pylint: disable=invalid-name
+        """Retrieve expired verified mode and unexpired paid mode(with min_price>0) for a course.
 
         Arguments:
             course_key (CourseKey): The location of the course.
 
         Returns:
-            Tuple of `(verified_mode, expired_verified_mode)`.  If provided,
-                `verified_mode` is an *unexpired* verified mode for the course.
-                If provided, `expired_verified_mode` is an *expired* verified
+            Tuple of `(expired_verified_mode, unexpired_paid_mode)`.  If provided,
+                `expired_verified_mode` is an *expired* verified mode for the course.
+                If provided, `unexpired_paid_mode` is an *unexpired* paid(with min_price>0)
                 mode for the course.  Either of these may be None.
 
         """
         # Retrieve all the modes at once to reduce the number of database queries
         all_modes, unexpired_modes = CourseMode.all_and_unexpired_modes_for_courses([course_key])
+
+        # Unexpired paid modes
+        unexpired_paid_modes = [mode for mode in unexpired_modes[course_key] if mode.min_price]
+        if len(unexpired_paid_modes) > 1:
+            # There is more than one paid mode defined,
+            # so choose the first one.
+            log.warn(
+                u"More than one paid modes are defined for course '%s' choosing the first one %s",
+                course_key, unexpired_paid_modes[0]
+            )
+        unexpired_paid_mode = unexpired_paid_modes[0] if unexpired_paid_modes else None
 
         # Find an unexpired verified mode
         verified_mode = CourseMode.verified_mode_for_course(course_key, modes=unexpired_modes[course_key])
@@ -482,9 +497,9 @@ class PayAndVerifyView(View):
         if verified_mode is None:
             expired_verified_mode = CourseMode.verified_mode_for_course(course_key, modes=all_modes[course_key])
 
-        return (verified_mode, expired_verified_mode)
+        return (expired_verified_mode, unexpired_paid_mode)
 
-    def _display_steps(self, always_show_payment, already_verified, already_paid):
+    def _display_steps(self, always_show_payment, already_verified, already_paid, course_mode):
         """Determine which steps to display to the user.
 
         Includes all steps by default, but removes steps
@@ -508,7 +523,7 @@ class PayAndVerifyView(View):
         display_steps = self.ALL_STEPS
         remove_steps = set()
 
-        if already_verified:
+        if already_verified or not CourseMode.is_verified_mode(course_mode):
             remove_steps |= set(self.VERIFICATION_STEPS)
 
         if already_paid and not always_show_payment:
@@ -517,7 +532,6 @@ class PayAndVerifyView(View):
             # The "make payment" step doubles as an intro step,
             # so if we're showing the payment step, hide the intro step.
             remove_steps |= set([self.INTRO_STEP])
-
         return [
             {
                 'name': step,
@@ -642,15 +656,21 @@ def create_order(request):
     except decimal.InvalidOperation:
         return HttpResponseBadRequest(_("Selected price is not valid number."))
 
-    # prefer professional mode over verified_mode
-    current_mode = CourseMode.verified_mode_for_course(course_id)
+    current_mode = None
+    paid_modes = CourseMode.paid_modes_for_course(course_id)
+    # Check if there are more than 1 paid(mode with min_price>0 e.g verified/professional/no-id-professional) modes
+    # for course exist then choose the first one
+    if paid_modes:
+        if len(paid_modes) > 1:
+            log.warn(u"Multiple paid course modes found for course '%s' for create order request", course_id)
+        current_mode = paid_modes[0]
 
-    # make sure this course has a verified mode
+    # Make sure this course has a paid mode
     if not current_mode:
-        log.warn(u"Verification requested for course {course_id} without a verified mode.".format(course_id=course_id))
-        return HttpResponseBadRequest(_("This course doesn't support verified certificates"))
+        log.warn(u"Create order requested for course '%s' without a paid mode.", course_id)
+        return HttpResponseBadRequest(_("This course doesn't support paid certificates"))
 
-    if current_mode.slug == 'professional':
+    if CourseMode.is_professional_mode(current_mode):
         amount = current_mode.min_price
 
     if amount < current_mode.min_price:

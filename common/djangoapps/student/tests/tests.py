@@ -219,7 +219,10 @@ class DashboardTest(ModuleStoreTestCase):
             attempt.approve()
 
         response = self.client.get(reverse('dashboard'))
-        self.assertContains(response, "class=\"course {0}\"".format(mode))
+        if mode in ['professional', 'no-id-professional']:
+            self.assertContains(response, 'class="course professional"')
+        else:
+            self.assertContains(response, 'class="course {0}"'.format(mode))
         self.assertContains(response, value)
 
     @patch.dict("django.conf.settings.FEATURES", {'ENABLE_VERIFIED_CERTIFICATES': True})
@@ -231,6 +234,8 @@ class DashboardTest(ModuleStoreTestCase):
         self._check_verification_status_on('verified', 'You\'re enrolled as a verified student')
         self._check_verification_status_on('honor', 'You\'re enrolled as an honor code student')
         self._check_verification_status_on('audit', 'You\'re auditing this course')
+        self._check_verification_status_on('professional', 'You\'re enrolled as a professional education student')
+        self._check_verification_status_on('no-id-professional', 'You\'re enrolled as a professional education student')
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def _check_verification_status_off(self, mode, value):

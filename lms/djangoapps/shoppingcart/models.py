@@ -1746,20 +1746,26 @@ class CertificateItem(OrderItem):
         self.course_enrollment.activate()
 
     def additional_instruction_text(self):
+        verification_reminder = ""
+        is_enrollment_mode_verified = self.course_enrollment.is_verified_enrollment()  # pylint: disable=E1101
+
+        if is_enrollment_mode_verified:
+            domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
+            path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
+            verification_url = "http://{domain}{path}".format(domain=domain, path=path)
+
+            verification_reminder = _(
+                "If you haven't verified your identity yet, please start the verification process ({verification_url})."
+            ).format(verification_url=verification_url)
+
         refund_reminder = _(
-            "You have up to two weeks into the course to unenroll from the Verified Certificate option "
-            "and receive a full refund. To receive your refund, contact {billing_email}. "
+            "You have up to two weeks into the course to unenroll and receive a full refund."
+            "To receive your refund, contact {billing_email}. "
             "Please include your order number in your email. "
             "Please do NOT include your credit card information."
-        ).format(billing_email=settings.PAYMENT_SUPPORT_EMAIL)
-
-        domain = microsite.get_value('SITE_NAME', settings.SITE_NAME)
-        path = reverse('verify_student_verify_later', kwargs={'course_id': unicode(self.course_id)})
-        verification_url = "http://{domain}{path}".format(domain=domain, path=path)
-
-        verification_reminder = _(
-            "If you haven't verified your identity yet, please start the verification process ({verification_url})."
-        ).format(verification_url=verification_url)
+        ).format(
+            billing_email=settings.PAYMENT_SUPPORT_EMAIL
+        )
 
         # Need this to be unicode in case the reminder strings
         # have been translated and contain non-ASCII unicode
