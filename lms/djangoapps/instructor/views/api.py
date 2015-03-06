@@ -23,16 +23,15 @@ from django.core.validators import validate_email
 from django.utils.translation import ugettext as _
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.utils.html import strip_tags
+from django.shortcuts import redirect
 import string  # pylint: disable=deprecated-module
 import random
 import unicodecsv
 import urllib
 import decimal
 from student import auth
-from student.roles import CourseSalesAdminRole
+from student.roles import GlobalStaff, CourseSalesAdminRole
 from util.file import store_uploaded_file, course_and_time_based_filename_generator, FileValidationException, UniversalNewlineIterator
-import datetime
-import pytz
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -58,7 +57,10 @@ from shoppingcart.models import (
     CourseMode,
     CourseRegistrationCodeInvoiceItem,
 )
-from student.models import CourseEnrollment, unique_id_for_user, anonymous_id_for_user, EntranceExamConfiguration
+from student.models import (
+    CourseEnrollment, unique_id_for_user, anonymous_id_for_user,
+    UserProfile, Registration, EntranceExamConfiguration
+)
 import instructor_task.api
 from instructor_task.api_helper import AlreadyRunningError
 from instructor_task.models import ReportStore
@@ -82,6 +84,8 @@ from instructor.views import INVOICE_KEY
 
 from submissions import api as sub_api  # installed from the edx-submissions repository
 
+from certificates import api as certs_api
+
 from bulk_email.models import CourseEmail
 
 from .tools import (
@@ -100,7 +104,6 @@ from .tools import (
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from opaque_keys import InvalidKeyError
-from student.models import UserProfile, Registration
 
 log = logging.getLogger(__name__)
 
@@ -232,6 +235,20 @@ def require_level(level):
                 return HttpResponseForbidden()
         return wrapped
     return decorator
+
+
+def require_global_staff(func):
+    """View decorator that requires that the user have global staff permissions. """
+    def wrapped(request, *args, **kwargs):  # pylint: disable=missing-docstring
+        if GlobalStaff().has_user(request.user):
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden(
+                u"Must be {platform_name} staff to perform this action.".format(
+                    platform_name=settings.PLATFORM_NAME
+                )
+            )
+    return wrapped
 
 
 def require_sales_admin(func):
@@ -2282,6 +2299,60 @@ def _split_input_list(str_list):
     new_list = [s for s in new_list if s != '']
 
     return new_list
+
+
+def _instructor_dash_url(course_key, section=None):
+    """Return the URL for a section in the instructor dashboard.
+
+    Arguments:
+        course_key (CourseKey)
+
+    Keyword Arguments:
+        section (str): The name of the section to load.
+
+    Returns:
+        unicode: The URL of a section in the instructor dashboard.
+
+    """
+    url = reverse('instructor_dashboard', kwargs={'course_id': unicode(course_key)})
+    if section is not None:
+        url += u'#view-{section}'.format(section=section)
+    return url
+
+
+@require_global_staff
+@require_POST
+def generate_example_certificates(request, course_id=None):  # pylint: disable=unused-argument
+    """Start generating a set of example certificates.
+
+    Example certificates are used to verify that certificates have
+    been configured correctly for the course.
+
+    Redirects back to the intructor dashboard once certificate
+    generation has begun.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    certs_api.generate_example_certificates(course_key)
+    return redirect(_instructor_dash_url(course_key, section='certificates'))
+
+
+@require_global_staff
+@require_POST
+def enable_certificate_generation(request, course_id=None):
+    """Enable/disable self-generated certificates for a course.
+
+    Once self-generated certificates have been enabled, students
+    who have passed the course will be able to generate certificates.
+
+    Redirects back to the intructor dashboard once the
+    setting has been updated.
+
+    """
+    course_key = CourseKey.from_string(course_id)
+    is_enabled = (request.POST.get('certificates-enabled', 'false') == 'true')
+    certs_api.set_cert_generation_enabled(course_key, is_enabled)
+    return redirect(_instructor_dash_url(course_key, section='certificates'))
 
 
 #---- Gradebook (shown to small courses only) ----
