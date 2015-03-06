@@ -362,7 +362,7 @@ class CategoryMapTestCase(ModuleStoreTestCase):
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")
         self.create_discussion("Chapter 2 / Section 1 / Subsection 1", "Discussion")  # duplicate
 
-        category_map = utils.get_discussion_category_map(self.course, self.user)
+        category_map = utils.get_discussion_category_map(self.course)
 
         chapter1 = category_map["subcategories"]["Chapter 1"]
         chapter1_discussions = set(["Discussion A", "Discussion B", "Discussion A (1)", "Discussion A (2)"])
