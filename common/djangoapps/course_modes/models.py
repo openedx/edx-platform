@@ -66,7 +66,7 @@ class CourseMode(models.Model):
         help_text="This is the SKU(stock keeping unit) of this mode in external services."
     )
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None)
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None, None)
     DEFAULT_MODE_SLUG = 'honor'
 
     # Modes that allow a student to pursue a verified certificate
