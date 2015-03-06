@@ -179,3 +179,4 @@ class BlockTypeKeyField(OpaqueKeyField):
 add_introspection_rules([], [r"^xmodule_django\.models\.CourseKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.LocationKeyField"])
 add_introspection_rules([], [r"^xmodule_django\.models\.UsageKeyField"])
+add_introspection_rules([], [r"^xmodule_django\.models\.BlockTypeKeyField"])
