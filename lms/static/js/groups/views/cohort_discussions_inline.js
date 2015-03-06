@@ -7,8 +7,6 @@ var edx = edx || {};
 
     edx.groups.InlineDiscussionsView = CohortDiscussionsView.extend({
         events: {
-            'change .check-discussion-category': 'changeInlineDiscussionsCategory',
-            'change .check-discussion-subcategory-inline': 'changeInlineDiscussionsSubCategory',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'changeAllInlineDiscussions',
             'change .check-cohort-inline-discussions': 'changeCohortInlineDiscussions'
@@ -36,13 +34,23 @@ var edx = edx || {};
             }
         },
 
-        getInlineDiscussions: function (categoryMap) {
+        /**
+         Returns the html list for inline discussion topics.
+
+         Args:
+            inlineDiscussions (object): inline discussions object from server
+                with attributes 'entries', 'children' & 'subcategories'.
+
+         Returns:
+            HTML list for inline discussion topics.
+        **/
+        getInlineDiscussions: function (inlineDiscussions) {
             var categoryTemplate = _.template($('#cohort-discussions-category-tpl').html()),
                 entryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
                 isCategoryCohorted = false,
-                children = categoryMap.children,
-                entries = categoryMap.entries,
-                subcategories = categoryMap.subcategories;
+                children = inlineDiscussions.children,
+                entries = inlineDiscussions.entries,
+                subcategories = inlineDiscussions.subcategories;
 
             return _.map(children, function (name) {
                 var html = '', entry;
@@ -65,16 +73,40 @@ var edx = edx || {};
             }, this).join('');
         },
 
+        /**
+         Enable/Disable the discussion category checkboxes.
+         Enable/Disable the discussion sub-category checkboxes.
+         Enable/Disable the save button for inline discussion topics.
+
+         Args:
+            disable (Bool): The flag to enable/disable the elements.
+        **/
         changeAllInlineDiscussions: function(event) {
             event.preventDefault();
             this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
         },
 
+        /**
+         Enable/Disable the discussion category checkboxes.
+         Enable/Disable the discussion sub-category checkboxes.
+         Enable/Disable the save button for inline discussion topics.
+
+         Args:
+            disable (Bool): The flag to enable/disable the elements.
+        **/
         changeCohortInlineDiscussions: function(event) {
             event.preventDefault();
             this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
         },
 
+        /**
+         Enable/Disable the discussion category checkboxes.
+         Enable/Disable the discussion sub-category checkboxes.
+         Enable/Disable the save button for inline discussion topics.
+
+         Args:
+            disable (Bool): The flag to enable/disable the elements.
+        **/
         toggleInlineDiscussions: function(disable) {
             this.setDisabled(this.$('.check-discussion-category'), disable);
             this.setDisabled(this.$('.check-discussion-subcategory-inline'), disable);
@@ -82,27 +114,7 @@ var edx = edx || {};
         },
 
         /**
-        Enables the save button for inline discussions.
-        **/
-        changeInlineDiscussionsCategory: function(event) {
-            var $selectedCategory = $(event.currentTarget);
-
-            if (!$selectedCategory.prop('checked')) {
-                $('.check-all-inline-discussions').prop('checked', false);
-            }
-        },
-
-        changeInlineDiscussionsSubCategory: function (event) {
-            var $selectedTopic = $(event.currentTarget);
-            if (!$selectedTopic.prop('checked')) {
-                $('.check-all-inline-discussions').prop('checked', false);
-            }
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
-        },
-
-
-        /**
-        Sends the cohorted_inline_discussions to the server and renders the view.
+         Sends the cohorted_inline_discussions to the server and renders the view.
         **/
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();

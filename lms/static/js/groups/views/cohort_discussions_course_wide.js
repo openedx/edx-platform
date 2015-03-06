@@ -26,13 +26,13 @@ var edx = edx || {};
         },
 
         /**
-        Returns the html list for course-wide discussion topics.
+         Returns the html list for course-wide discussion topics.
 
-        Args:
+         Args:
             courseWideDiscussions (object): course-wide discussions object from server
                 with two attributes 'children' & 'entries'.
 
-        Returns:
+         Returns:
             HTML list for course-wide discussion topics.
         **/
         getCourseWideDiscussions: function (courseWideDiscussions) {
@@ -52,7 +52,7 @@ var edx = edx || {};
         },
 
         /**
-        Enables the save button for course-wide discussions.
+         Enables the save button for course-wide discussions.
         **/
         changeCourseWideDiscussionCategory: function(event) {
             event.preventDefault();
@@ -60,7 +60,7 @@ var edx = edx || {};
         },
 
         /**
-        Sends the cohorted_course_wide_discussions to the server and renders the view.
+         Sends the cohorted_course_wide_discussions to the server and renders the view.
         **/
         saveCourseWideDiscussionsForm: function (event) {
             event.preventDefault();

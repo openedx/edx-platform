@@ -8,9 +8,9 @@ var edx = edx || {};
     edx.groups.CohortDiscussionsView = Backbone.View.extend({
 
         /**
-        Add/Remove the disabled attribute on given element.
+         Add/Remove the disabled attribute on given element.
 
-        Args:
+         Args:
             $element (JQuery element): The element to disable/enable.
             disable (Bool): The flag to add/remove 'disabled' attribute.
         **/
@@ -23,12 +23,12 @@ var edx = edx || {};
         },
 
         /**
-        Returns the cohorted discussions list.
+         Returns the cohorted discussions list.
 
-        Args:
+         Args:
             selector (HTML element): The topic element to get the ids.
 
-        Returns:
+         Returns:
             Cohorted discussions list.
         **/
         getCohortedDiscussions: function(selector) {
@@ -43,10 +43,10 @@ var edx = edx || {};
         },
 
         /**
-        Save the cohortSettings' changed attributes to the server via PATCH method.
-         Also, it shows the error message(s) if any.
+         Save the cohortSettings' changed attributes to the server via PATCH method.
+         It shows the error message(s) if any.
 
-        Args:
+         Args:
             $element (JQuery element): Messages would be shown before this element.
         **/
         saveForm: function ($element) {
@@ -82,9 +82,9 @@ var edx = edx || {};
         },
 
         /**
-        Shows the notification messages before given element using the NotificationModel.
+         Shows the notification messages before given element using the NotificationModel.
 
-        Args:
+         Args:
             message (string): Text message to show.
             $element (JQuery element): Message would be shown before this element.
             type (string): Type of message to show e.g. confirmation or error.
@@ -100,7 +100,7 @@ var edx = edx || {};
         },
 
         /**
-        Removes the notification messages.
+         Removes the notification messages.
         **/
         removeNotification: function () {
             if (this.notification) {
