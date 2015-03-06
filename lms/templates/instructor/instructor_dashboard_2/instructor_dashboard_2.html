@@ -67,6 +67,8 @@
   <script type="text/javascript" src="${static.url('js/groups/views/course_cohort_settings_notification.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/models/cohort_discussions.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohort_discussions.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/groups/views/cohort_discussions_course_wide.js')}"></script>
+  <script type="text/javascript" src="${static.url('js/groups/views/cohort_discussions_inline.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohort_form.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohort_editor.js')}"></script>
   <script type="text/javascript" src="${static.url('js/groups/views/cohorts.js')}"></script>
@@ -75,7 +77,7 @@
 
 ## Include Underscore templates
 <%block name="header_extras">
-% for template_name in ["cohorts", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions", "cohort-discussions-category","cohort-discussions-subcategory"]:
+% for template_name in ["cohorts", "cohort-editor", "cohort-group-header", "cohort-selector", "cohort-form", "notification", "cohort-state", "cohort-discussions-inline", "cohort-discussions-course-wide", "cohort-discussions-category","cohort-discussions-subcategory"]:
 <script type="text/template" id="${template_name}-tpl">
   <%static:include path="instructor/instructor_dashboard_2/${template_name}.underscore" />
 </script>

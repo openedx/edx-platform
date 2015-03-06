@@ -66,16 +66,15 @@ def _get_course_cohort_settings_representation(course, course_cohort_settings):
     """
     Returns a JSON representation of a course cohort settings.
     """
-    cohorted_course_wide_ids, cohorted_inline_ids = get_cohorted_discussion_ids(
-        course,
-        course_cohort_settings.cohorted_discussions
+    cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
+        course, course_cohort_settings
     )
 
     return {
         'id': course_cohort_settings.id,
         'is_cohorted': course_cohort_settings.is_cohorted,
-        'cohorted_inline_discussions': cohorted_inline_ids,
-        'cohorted_course_wide_discussions': cohorted_course_wide_ids,
+        'cohorted_inline_discussions': cohorted_inline_discussions,
+        'cohorted_course_wide_discussions': cohorted_course_wide_discussions,
         'always_cohort_inline_discussions': course_cohort_settings.always_cohort_inline_discussions,
     }
 
@@ -96,23 +95,23 @@ def _get_cohort_representation(cohort, course):
     }
 
 
-def get_cohorted_discussion_ids(course, cohorted_discussions):
+def get_cohorted_discussions(course, course_settings):
     """
-    Returns the cohorted course-wide and content-specific discussion ids separately.
+    Returns the course-wide and inline cohorted discussion ids separately.
     """
-    discussions_category = get_discussion_category_map(course)
-    course_wide_ids = [category.get('id') for _, category in discussions_category['entries'].items()]
+    discussion_category_map = get_discussion_category_map(course)
+    course_wide_discussions = [category.get('id') for __, category in discussion_category_map['entries'].items()]
 
-    cohorted_course_wide_ids = []
-    cohorted_inline_ids = []
+    cohorted_course_wide_discussions = []
+    cohorted_inline_discussions = []
 
-    for cohorted_discussion_id in cohorted_discussions:
-        if cohorted_discussion_id in course_wide_ids:
-            cohorted_course_wide_ids.append(cohorted_discussion_id)
+    for cohorted_discussion_id in course_settings.cohorted_discussions:
+        if cohorted_discussion_id in course_wide_discussions:
+            cohorted_course_wide_discussions.append(cohorted_discussion_id)
         else:
-            cohorted_inline_ids.append(cohorted_discussion_id)
+            cohorted_inline_discussions.append(cohorted_discussion_id)
 
-    return cohorted_course_wide_ids, cohorted_inline_ids
+    return cohorted_course_wide_discussions, cohorted_inline_discussions
 
 
 @require_http_methods(("GET", "PUT", "POST", "PATCH"))
@@ -133,39 +132,33 @@ def course_cohort_settings_handler(request, course_key_string):
     cohort_settings = cohorts.get_course_cohort_settings(course_key)
 
     if request.method == 'PATCH':
-        cohorted_course_wide_ids, cohorted_inline_ids = get_cohorted_discussion_ids(
-            course,
-            cohort_settings.cohorted_discussions
+        cohorted_course_wide_discussions, cohorted_inline_discussions = get_cohorted_discussions(
+            course, cohort_settings
         )
 
-        if request.json.get('cohorted_course_wide_discussions'):
-            cohorted_inline_ids.extend(request.json.get('cohorted_course_wide_discussions'))
-            cohorted_discussions = cohorted_inline_ids
-        elif request.json.get('cohorted_inline_discussions'):
-            cohorted_course_wide_ids.extend(request.json.get('cohorted_inline_discussions'))
-            cohorted_discussions = cohorted_course_wide_ids
-        else:
-            cohorted_discussions = cohort_settings.cohorted_discussions
+        settings_to_change = {}
+
+        if 'is_cohorted' in request.json:
+            settings_to_change['is_cohorted'] = request.json.get('is_cohorted')
+
+        if 'cohorted_course_wide_discussions' in request.json or 'cohorted_inline_discussions' in request.json:
+            cohorted_course_wide_discussions = request.json.get(
+                'cohorted_course_wide_discussions', cohorted_course_wide_discussions
+            )
+            cohorted_inline_discussions = request.json.get(
+                'cohorted_inline_discussions', cohorted_inline_discussions
+            )
+            settings_to_change['cohorted_discussions'] = cohorted_course_wide_discussions + cohorted_inline_discussions
+
+        if 'always_cohort_inline_discussions' in request.json:
+            settings_to_change['always_cohort_inline_discussions'] = request.json.get(
+                'always_cohort_inline_discussions'
+            )
 
         try:
             cohort_settings = cohorts.set_course_cohort_settings(
-                course_key,
-                cohorted_discussions=cohorted_discussions,
-                always_cohort_inline_discussions=request.json.get(
-                    'always_cohort_inline_discussions', cohort_settings.always_cohort_inline_discussions
-                )
+                course_key, **settings_to_change
             )
-        except ValueError as err:
-            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": unicode(err)}, 400)
-    elif request.method in ["PUT", "POST"]:
-        is_cohorted = request.json.get('is_cohorted')
-        if is_cohorted is None:
-            # Note: error message not translated because it is not exposed to the user (UI prevents this state).
-            return JsonResponse({"error": "Bad Request"}, 400)
-
-        try:
-            cohort_settings = cohorts.set_course_cohort_settings(course_key, is_cohorted=is_cohorted)
         except ValueError as err:
             # Note: error message not translated because it is not exposed to the user (UI prevents this state).
             return JsonResponse({"error": unicode(err)}, 400)
@@ -424,22 +417,30 @@ def cohort_discussion_topics(request, course_key_string):
 
     Returns the JSON representation of discussion topics w.r.t categories for the course.
     """
-
     course_key = SlashSeparatedCourseKey.from_deprecated_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)
 
-    discussions_category = get_discussion_category_map(course, cohort_inline_discussion=True)
-    discussions_category['course_wide_categories'] = discussions_category.pop('entries')
+    discussion_topics = {}
+    discussion_category_map = get_discussion_category_map(course, cohort_inline_discussion=True)
+
+    # We extract the data for the course wide discussions from the category map.
+    course_wide_entries = discussion_category_map.pop('entries')
 
     course_wide_children = []
     inline_children = []
-    for name in discussions_category['children']:
-        if name in discussions_category['course_wide_categories']:
+
+    for name in discussion_category_map['children']:
+        if name in course_wide_entries:
             course_wide_children.append(name)
         else:
             inline_children.append(name)
 
-    discussions_category['course_wide_children'] = course_wide_children
-    discussions_category['children'] = inline_children
+    discussion_topics['course_wide_discussions'] = {
+        'entries': course_wide_entries,
+        'children': course_wide_children
+    }
 
-    return JsonResponse(discussions_category)
+    discussion_category_map['children'] = inline_children
+    discussion_topics['inline_discussions'] = discussion_category_map
+
+    return JsonResponse(discussion_topics)
