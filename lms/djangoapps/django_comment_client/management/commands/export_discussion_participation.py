@@ -1,4 +1,3 @@
-""" Management command to export discussion participation statistics per course to csv """
 import csv
 import dateutil
 from datetime import datetime
