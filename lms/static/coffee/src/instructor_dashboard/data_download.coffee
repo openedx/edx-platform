@@ -190,6 +190,7 @@ class ReportDownloads
       forceFitColumns: true
 
     columns = [
+      (
         id: 'link'
         field: 'link'
         name: gettext('File Name')
@@ -198,13 +199,32 @@ class ReportDownloads
         minWidth: 150
         cssClass: "file-download-link"
         formatter: (row, cell, value, columnDef, dataContext) ->
-          '<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a> <span class="delete-report"><i class="icon-remove-sign"></i> Delete Report</span>'
+          data_link ='<a class="course-forums-data" href="' + dataContext['url'] + '">' + dataContext['name'] + '</a>'
+          if dataContext['name'].indexOf("course_forums") > -1
+            graph_button = _.template('<a class="graph-forums"><i class="icon-bar-chart"></i> <%= label %></a>',
+                {label: 'Graph This'})
+          else
+            graph_button = ""
+          delete_button = _.template('<a class="delete-report"><i class="icon-remove-sign"></i> <%= label %></a>',
+              {label: 'Delete Report'})
+          return data_link +  delete_button+ graph_button
+      ),
     ]
+
 
     $table_placeholder = $ '<div/>', class: 'slickgrid'
     @$report_downloads_table.append $table_placeholder
     grid = new Slick.Grid($table_placeholder, report_downloads_data, columns, options)
     grid.autosizeColumns()
+
+    $graph_btns = @$section.find(".graph-forums")
+    $graph_btns.click (e) =>
+      parent = jQuery(e.target.parentElement.parentElement)
+      table_row = parent.find(".course-forums-data")
+      @$clicked_name = table_row.text()
+      @$graph_element = @$section.find ".report-downloads-graph"
+      @$graphEndpoint = @$graph_element.data 'endpoint'
+      @graph_forums()
 
     $delete_btns = @$section.find('.delete-report')
     $delete_btns.click (e) =>
@@ -251,6 +271,36 @@ class ReportDownloads
         success_cb()
       error: (std_ajax_err) =>
         failure_cb()
+ 
+  get_forum_csv: (cb)->
+    $.ajax
+      dataType: 'json'
+      url: @$graphEndpoint
+      data: "clicked_on": @$clicked_name
+      success: (data) -> cb? null, data
+      error: std_ajax_err ->
+        cb? gettext('Error getting forum csv')
+
+  # graph forums data
+  graph_forums: ->
+      @get_forum_csv (error, forums) =>
+        if error
+          # instead of graph, show the message that the file is missing and to re-generate
+          return @show_errors error
+        data = forums['data']
+        file_name = forums['filename']
+        graph_classname = "report-downloads-graph"
+        if data == 'failure'
+          error_str = "No Data To Graph. The file might have expired; please refresh and try again"
+          $(".report-downloads-graph-title").html(error_str)
+          $("."+graph_classname).html("");
+          return 'No data to Graph'
+        # d3_graph_data_download is defined in templates/class_dashboard/d3_graph_data_download.js
+        # because it uses d3
+        $(".report-downloads-graph-title").html(file_name)
+        d3_graph_data_download(data, "report-downloads-graph")
+  show_errors: (msg) -> @$error_section?.text msg
+
 
 
 # export for use

@@ -1,6 +1,12 @@
 <%! from django.utils.translation import ugettext as _ %>
 <%page args="section_data"/>
 
+<script>
+  ${d3_graph_data_download.body()}
+</script>
+
+<%namespace name="d3_graph_data_download" file="/class_dashboard/d3_graph_data_download.js"/>
+
 
 <div class="data-download-container action-type-container">
   <h2>${_("Data Download")}</h2>
@@ -66,9 +72,15 @@
 
     ## Translators: a table of URL links to report files appears after this sentence.
     <p>${_("<b>Note</b>: To keep student data secure, you cannot save or email these links for direct access. Copies of links expire within 5 minutes.")}</p><br>
+
     <div class="report-downloads-table" id="report-downloads-table" data-endpoint="${ section_data['list_report_downloads_url'] }" ></div>
-    <div class="report-downloads-delete" data-endpoint="${ section_data['delete_report_download_url'] }" ></div>
+    <div class="report-downloads-action-block">
+        <div class="report-downloads-graph-title"></div>
+        <div class="report-downloads-graph" id="report-downloads-graph" data-endpoint="${ section_data['graph_course_forums_usage_url'] }"></div>
+        <div class="report-downloads-delete" data-endpoint="${ section_data['delete_report_download_url'] }" ></div>   
+   </div>
   </div>
+
 %endif
 
 %if settings.FEATURES.get('ENABLE_INSTRUCTOR_BACKGROUND_TASKS'):

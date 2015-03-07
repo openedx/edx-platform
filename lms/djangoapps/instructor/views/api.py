@@ -27,6 +27,7 @@ from django.utils.html import strip_tags
 import string  # pylint: disable=W0402
 import random
 import urllib
+import urllib2
 from util.json_request import JsonResponse
 from instructor.views.instructor_task_helpers import extract_email_features, extract_task_features
 
@@ -82,6 +83,7 @@ from .tools import (
     strip_if_string,
     bulk_email_is_enabled_for_course,
     add_block_ids,
+    generate_course_forums_d3,
 )
 from opaque_keys.edx.keys import CourseKey
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
@@ -2153,6 +2155,30 @@ def get_course_forums_usage(request, course_id):
         return JsonResponse({
             "status": already_running_status
         })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def graph_course_forums_usage(request, course_id):
+    """
+    Generate a d3 graphable csv-string by checking the report store for the clicked_on file
+    """
+    clicked_text = request.GET.get('clicked_on')
+    course_key = CourseKey.from_string(course_id)
+    report_store = ReportStore.from_config()
+    graph = None
+    if clicked_text:
+        for name, url in report_store.links_for(course_key):
+            if clicked_text in name and 'course_forums' in name:
+                url_handle = urllib2.urlopen(url)
+                graph = generate_course_forums_d3(url_handle)
+                break
+    if graph:
+        return JsonResponse({'data': graph,
+                             'filename': clicked_text})
+    else:
+        return JsonResponse({'data': 'failure'})
 
 
 @ensure_csrf_cookie

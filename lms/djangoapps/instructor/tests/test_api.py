@@ -676,6 +676,7 @@ class TestInstructorAPIDenyLevels(ModuleStoreTestCase, LoginEnrollmentTestCase):
             ('get_ora2_responses', {}),
             ('get_course_forums_usage', {}),
             ('get_students_features', {}),
+            ('graph_course_forums_usage', {}),
         ]
         # Endpoints that only Instructors can access
         self.instructor_level_endpoints = [
