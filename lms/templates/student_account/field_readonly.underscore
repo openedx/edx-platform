@@ -4,7 +4,7 @@
 <div class="account-settings-field-value">
     <%- gettext(value) %>
 </div>
-<div class="account-settings-field-message">
+<small class="account-settings-field-message">
     <%- gettext(message) %>
-</div>
-<hr class="divider divider-lv1">
+</small>
+<hr class="divider">

@@ -1,10 +1,10 @@
 <label class="account-settings-field-title">
     <%- gettext(title) %>
 </label>
-<div class="account-settings-field-value">
+<small class="account-settings-field-value">
     <a href="<%- gettext(link_href) %>"><%- gettext(link_title) %></a>
-</div>
-<div class="account-settings-field-message">
+</small>
+<small class="account-settings-field-message">
     <%- gettext(message) %>
-</div>
-<hr class="divider divider-lv1">
+</small>
+<hr class="divider">

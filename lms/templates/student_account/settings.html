@@ -1,7 +1,7 @@
 <%! from django.utils.translation import ugettext as _ %>
-<!--<%namespace name='static' file='/static_content.html'/>-->
 
-<!--<%inherit file="../main.html" />-->
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
 
 <%block name="pagetitle">${_("Account Settings")}</%block>
 
@@ -23,22 +23,13 @@
     % endfor
 </%block>
 
-<%block name="content">
-    <div class="wrapper-mast wrapper">
-        <header class="mast has-actions has-subtitle">
-            <h1 class="page-header">
-                ${_("Account Settings")}
-            </h1>
-            <small class="subtitle">${_("A collection of all your account settings, including basic personalization controls, demographic information, and linked social accounts.")}</small>
-        </header>
-    </div>
-
-    <div class="account-settings-container"
-         data-accounts-api-url="${accounts_api_url}"
-    ></div>
-</%block>
+<div class="account-settings-container"
+     data-accounts-api-url="${accounts_api_url}">
+</div>
 
 <%block name="headextra">
+    <%static:css group='style-course'/>
+
     <script>
         $(document).ready(function() {
             var accountSettingsElement = $('.account-settings-container');
