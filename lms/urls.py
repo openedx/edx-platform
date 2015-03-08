@@ -498,6 +498,7 @@ if settings.FEATURES.get('RESTRICT_ENROLL_BY_REG_METHOD'):
 # Shopping cart
 urlpatterns += (
     url(r'^shoppingcart/', include('shoppingcart.urls')),
+    url(r'^commerce/', include('commerce.urls', namespace='commerce')),
 )
 
 # Embargo
