@@ -47,13 +47,14 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
+            _.bindAll(this, 'render');
             this.listenTo(this.model, "change", this.render);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
-                value: this.model[this.options.attribute],
+                value: this.model.get(this.options.value_attribute),
                 message: this.options.message,
             }));
             return this;
@@ -69,13 +70,14 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            this.listenTo(this.model, "change", this.render);
+            _.bindAll(this, 'render');
+            this.listenTo(this.model, "change:" + this.options.value_attribute, this.render);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
-                value: this.model[this.options.attribute],
+                value: this.model.get(this.options.value_attribute),
                 message: this.options.message,
             }));
             return this;
@@ -91,6 +93,7 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
+            _.bindAll(this, 'render');
             this.listenTo(this.model, "change", this.render);
         },
 
@@ -114,6 +117,7 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
+            _.bindAll(this, 'render');
             this.listenTo(this.model, "change", this.render);
         },
 
@@ -121,7 +125,9 @@ var edx = edx || {};
             this.$el.html(this.template({
                 title: this.options.title,
                 message: this.options.message,
+                select_options: this.options.options,
             }));
+            this.$('.account-settings-field-value select').val(this.model.get(this.options.value_attribute));
             return this;
         }
     });
