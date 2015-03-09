@@ -40,10 +40,10 @@ class RubricParsingError(Exception):
 class CombinedOpenEndedRubric(object):
     TEMPLATE_DIR = "combinedopenended/openended"
 
-    def __init__(self, system, view_only=False):
+    def __init__(self, render_template, view_only=False):
         self.has_score = False
         self.view_only = view_only
-        self.system = system
+        self.render_template = render_template
 
     def render_rubric(self, rubric_xml, score_list=None):
         '''
@@ -70,7 +70,7 @@ class CombinedOpenEndedRubric(object):
             rubric_template = '{0}/open_ended_rubric.html'.format(self.TEMPLATE_DIR)
             if self.view_only:
                 rubric_template = '{0}/open_ended_view_only_rubric.html'.format(self.TEMPLATE_DIR)
-            html = self.system.render_template(
+            html = self.render_template(
                 rubric_template,
                 {
                     'categories': rubric_categories,
@@ -254,7 +254,7 @@ class CombinedOpenEndedRubric(object):
             else:
                 correct.append(.5)
 
-        html = self.system.render_template(
+        html = self.render_template(
             '{0}/open_ended_combined_rubric.html'.format(self.TEMPLATE_DIR),
             {
                 'categories': rubric_categories,

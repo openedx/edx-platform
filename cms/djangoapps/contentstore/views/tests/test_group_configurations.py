@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 """
 Group Configuration Tests.
 """
@@ -35,7 +36,7 @@ class HelperMethods(object):
     """
     Mixin that provides useful methods for Group Configuration tests.
     """
-    def _create_content_experiment(self, cid=-1, name_suffix=''):
+    def _create_content_experiment(self, cid=-1, name_suffix='', special_characters=''):
         """
         Create content experiment.
 
@@ -53,7 +54,7 @@ class HelperMethods(object):
             category='split_test',
             parent_location=vertical.location,
             user_partition_id=cid,
-            display_name='Test Content Experiment {}'.format(name_suffix),
+            display_name=u"Test Content Experiment {}{}".format(name_suffix, special_characters),
             group_id_to_child={"0": c0_url, "1": c1_url, "2": c2_url}
         )
         ItemFactory.create(
@@ -487,6 +488,36 @@ class GroupConfigurationsUsageInfoTestCase(CourseTestCase, HelperMethods):
                 {'id': 2, 'name': 'Group C', 'version': 1},
             ],
             'usage': [],
+        }]
+
+        self.assertEqual(actual, expected)
+
+    def test_can_get_usage_info_when_special_characters_are_used(self):
+        """
+        Test if group configurations json updated successfully when special
+         characters are being used in content experiment
+        """
+        self._add_user_partitions(count=1)
+        vertical, __ = self._create_content_experiment(cid=0, name_suffix='0', special_characters=u"JOSÉ ANDRÉS")
+
+        actual = GroupConfiguration.get_split_test_partitions_with_usage(self.course, self.store)
+
+        expected = [{
+            'id': 0,
+            'name': 'Name 0',
+            'scheme': 'random',
+            'description': 'Description 0',
+            'version': UserPartition.VERSION,
+            'groups': [
+                {'id': 0, 'name': 'Group A', 'version': 1},
+                {'id': 1, 'name': 'Group B', 'version': 1},
+                {'id': 2, 'name': 'Group C', 'version': 1},
+            ],
+            'usage': [{
+                'url': '/container/{}'.format(vertical.location),
+                'label': u"Test Unit 0 / Test Content Experiment 0JOSÉ ANDRÉS",
+                'validation': None,
+            }],
         }]
 
         self.assertEqual(actual, expected)

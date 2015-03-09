@@ -54,7 +54,7 @@ class EmbargoMiddlewareTests(ModuleStoreTestCase):
         CourseEnrollment.enroll(self.user, self.regular_course.id)
         CourseEnrollment.enroll(self.user, self.embargo_course.id)
         # Text from lms/templates/static_templates/embargo.html
-        self.embargo_text = "Unfortunately, at this time edX must comply with export controls, and we cannot allow you to access this particular course."
+        self.embargo_text = "Unfortunately, at this time edX must comply with export controls, and we cannot allow you to access this course."
 
         self.patcher = mock.patch.object(pygeoip.GeoIP, 'country_code_by_addr', self.mock_country_code_by_addr)
         self.patcher.start()

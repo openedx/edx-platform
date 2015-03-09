@@ -14,8 +14,8 @@ class PeerGradingService(GradingService):
 
     METRIC_NAME = 'edxapp.open_ended_grading.peer_grading_service'
 
-    def __init__(self, config, system):
-        config['system'] = system
+    def __init__(self, config, render_template):
+        config['render_template'] = render_template
         super(PeerGradingService, self).__init__(config)
         self.url = config['url'] + config['peer_grading']
         self.login_url = self.url + '/login/'
@@ -27,7 +27,6 @@ class PeerGradingService(GradingService):
         self.get_problem_list_url = self.url + '/get_problem_list/'
         self.get_notifications_url = self.url + '/get_notifications/'
         self.get_data_for_location_url = self.url + '/get_data_for_location/'
-        self.system = system
 
     def get_data_for_location(self, problem_location, student_id):
         if isinstance(problem_location, UsageKey):

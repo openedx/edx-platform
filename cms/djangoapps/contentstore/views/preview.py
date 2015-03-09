@@ -185,7 +185,8 @@ def _preview_module_system(request, descriptor, field_data):
         wrappers=wrappers,
         error_descriptor_class=ErrorDescriptor,
         get_user_role=lambda: get_user_role(request.user, course_id),
-        descriptor_runtime=descriptor.runtime,
+        # Get the raw DescriptorSystem, not the CombinedSystem
+        descriptor_runtime=descriptor._runtime,  # pylint: disable=protected-access
         services={
             "i18n": ModuleI18nService(),
             "field-data": field_data,
