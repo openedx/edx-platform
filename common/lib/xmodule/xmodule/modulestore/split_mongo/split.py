@@ -2474,7 +2474,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Split specific lookup
         """
-        return self._lookup_course(course_key).structure.get('assets', {})
+        try:
+            course_assets = self._lookup_course(course_key).structure.get('assets', {})
+        except (InsufficientSpecificationError, VersionConflictError) as err:
+            log.warning(u'Error finding assets for org "%s" course "%s" on asset '
+                        u'request. Either version of course_key is None or invalid.',
+                        course_key.org, course_key.course)
+            return {}
+
+        return course_assets
 
     def _update_course_assets(self, user_id, asset_key, update_function):
         """
