@@ -140,6 +140,7 @@ class User(models.Model):
 
     @classmethod
     def all_social_stats(cls, course_id, end_date=None, thread_type=None):
+        """ Get social stats for all users participating in a course """
         return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type)
 
     def _retrieve(self, *args, **kwargs):
