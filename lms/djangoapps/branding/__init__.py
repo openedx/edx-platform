@@ -1,6 +1,7 @@
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseDescriptor
 from django.conf import settings
+from branding_stanford.models import TileConfiguration
 
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from microsite_configuration import microsite
@@ -10,6 +11,11 @@ def get_visible_courses():
     """
     Return the set of CourseDescriptors that should be visible in this branded instance
     """
+
+    # In the event we don't want any course tiles displayed
+    if not getattr(settings, 'DISPLAY_COURSE_TILES', False):
+        return []
+
     _courses = modulestore().get_courses()
 
     courses = [c for c in _courses
@@ -27,6 +33,14 @@ def get_visible_courses():
 
     filtered_by_org = microsite.get_value('course_org_filter')
 
+    filtered_by_db = TileConfiguration.objects.filter(
+        enabled=True,
+    ).values('course_id').order_by('-change_date')
+
+    if filtered_by_db:
+        filtered_by_db_ids = [course['course_id'] for course in filtered_by_db]
+        filtered_by_db_keys = frozenset([SlashSeparatedCourseKey.from_string(c) for c in filtered_by_db_ids])
+        return [course for course in courses if course.id in filtered_by_db_keys]
     if filtered_by_org:
         return [course for course in courses if course.location.org == filtered_by_org]
     if filtered_visible_ids:

@@ -1988,3 +1988,7 @@ FORUM_MONGO_PARAMS = {
     'user': '',
     'database': 'forum',
 }
+
+################### branding - for database driven tiles ##################
+INSTALLED_APPS += ('branding_stanford',)
+DISPLAY_COURSE_TILES = True
