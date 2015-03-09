@@ -13,10 +13,13 @@ from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
-from ..serializers import UserSerializer
-from openedx.core.djangoapps.user_api.api.account import AccountNotAuthorized
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from openedx.core.lib.api.parsers import MergePatchParser
+from ..api.account import AccountUserNotFound, AccountNotAuthorized, AccountValidationError, AccountUpdateError
+from .api import (
+    PreferenceNotFound, get_user_preference, get_user_preferences, set_user_preference,
+    update_user_preferences, delete_user_preference
+)
 
 
 class PreferencesView(APIView):
@@ -50,26 +53,30 @@ class PreferencesView(APIView):
         GET /api/user/v0/preferences/{username}/
         """
         try:
-            existing_user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
+            user_preferences = get_user_preferences(request.user, username=username)
+        except AccountUserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        user_serializer = UserSerializer(existing_user)
-        return Response(user_serializer.data["preferences"])
+        return Response(user_preferences)
 
     def patch(self, request, username):
         """
         PATCH /api/user/v0/preferences/{username}/
         """
-        for preference_key in request.DATA.keys():
-            preference_value = request.data[preference_key]
-            if preference_value:
-                user_preference, __ = existing_user.preferences.get_or_create(user=existing_user, key=preference_key)
-                user_preference.value = request.DATA
-                user_preference.save()
-            else
-
-
+        try:
+            update_user_preferences(request.user, request.DATA, username=username)
+        except (AccountUserNotFound, AccountNotAuthorized):
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except AccountValidationError as err:
+            return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
+        except AccountUpdateError as err:
+            return Response(
+                {
+                    "developer_message": err.developer_message,
+                    "user_message": err.user_message
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -105,57 +112,27 @@ class PreferencesDetailView(APIView):
         GET /api/user/v0/preferences/{username}/{preference_key}
         """
         try:
-            existing_user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
+            value = get_user_preference(request.user, preference_key, username=username)
+        except (AccountUserNotFound, PreferenceNotFound):
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        try:
-            preference_value = existing_user.preferences.get(key=preference_key).value
-        except ObjectDoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        return Response(preference_value)
+        return Response(value)
 
     def put(self, request, username, preference_key):
         """
         PUT /api/user/v0/preferences/{username}/{preference_key}
         """
         try:
-            existing_user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
+            set_user_preference(request.user, preference_key, request.DATA, username=username)
+        except (AccountUserNotFound, PreferenceNotFound):
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if not isinstance(request.DATA, basestring):
-            return Response({}, status.HTTP_400_BAD_REQUEST)
-
-        user_preference, __ = existing_user.preferences.get_or_create(user=existing_user, key=preference_key)
-        user_preference.value = request.DATA
-        user_preference.save()
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     def delete(self, request, username, preference_key):
         """
         DELETE /api/user/v0/preferences/{username}/{preference_key}
         """
-        if request.user.username != username:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
-
         try:
-            self._delete_preference(request.user, preference_key)
-        except ObjectDoesNotExist:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
+            delete_user_preference(request.user, preference_key, username=username)
+        except (AccountUserNotFound, PreferenceNotFound):
+            return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @staticmethod
-    def _delete_preference(requesting_user, preference_key, username=None):
-        """
-        """
-        if username is None:
-            username = requesting_user.username
-
-        if requesting_user.username != username:
-            raise AccountNotAuthorized()
-
-        user_preference = requesting_user.preferences.get(key=preference_key)
-        user_preference.delete()
