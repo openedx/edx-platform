@@ -102,7 +102,8 @@ var edx = edx || {};
          Enable/Disable the save button for inline discussion topics.
 
          Args:
-            disable (Bool): The flag to enable/disable the elements.
+            enable_checkboxes (Bool): The flag to enable/disable the checkboxes.
+            enable_save_button (Bool): The flag to enable/disable the save button.
         **/
         setElementsEnabled: function(enable_checkboxes, enable_save_button) {
             this.setDisabled(this.$('.check-discussion-category'), enable_checkboxes);

@@ -22,7 +22,7 @@ from courseware.courses import get_course_with_access
 from edxmako.shortcuts import render_to_response
 
 from . import cohorts
-from lms.djangoapps.django_comment_client.utils import get_discussion_category_map
+from lms.djangoapps.django_comment_client.utils import get_discussion_category_map, get_discussion_categories_ids
 from .models import CourseUserGroup, CourseUserGroupPartitionGroup
 
 log = logging.getLogger(__name__)
@@ -99,22 +99,22 @@ def get_cohorted_discussions(course, course_settings):
     """
     Returns the course-wide and inline cohorted discussion ids separately.
     """
-    discussion_category_map = get_discussion_category_map(course)
-    course_wide_discussions = [category.get('id') for __, category in discussion_category_map['entries'].items()]
-
     cohorted_course_wide_discussions = []
     cohorted_inline_discussions = []
+
+    course_wide_discussions = [topic['id'] for __, topic in course.discussion_topics.items()]
+    all_discussions = get_discussion_categories_ids(course)
 
     for cohorted_discussion_id in course_settings.cohorted_discussions:
         if cohorted_discussion_id in course_wide_discussions:
             cohorted_course_wide_discussions.append(cohorted_discussion_id)
-        else:
+        elif cohorted_discussion_id in all_discussions:
             cohorted_inline_discussions.append(cohorted_discussion_id)
 
     return cohorted_course_wide_discussions, cohorted_inline_discussions
 
 
-@require_http_methods(("GET", "PUT", "POST", "PATCH"))
+@require_http_methods(("GET", "PATCH"))
 @ensure_csrf_cookie
 @expect_json
 @login_required
@@ -154,6 +154,9 @@ def course_cohort_settings_handler(request, course_key_string):
             settings_to_change['always_cohort_inline_discussions'] = request.json.get(
                 'always_cohort_inline_discussions'
             )
+
+        if not settings_to_change:
+            return JsonResponse({"error": unicode("Bad Request")}, 400)
 
         try:
             cohort_settings = cohorts.set_course_cohort_settings(
