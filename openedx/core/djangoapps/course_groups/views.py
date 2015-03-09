@@ -416,6 +416,42 @@ def cohort_discussion_topics(request, course_key_string):
     This will raise 404 if user is not staff.
 
     Returns the JSON representation of discussion topics w.r.t categories for the course.
+
+    Example:
+        >>> example = {
+        >>>               "course_wide_categories": {
+        >>>                   "General": {
+        >>>                       "sort_key": "General",
+        >>>                       "is_cohorted": True,
+        >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>                   }
+        >>>               },
+        >>>               "course_wide_children": ["General"],
+        >>>               "inline_discussions" : {
+        >>>                   "subcategories": {
+        >>>                       "Getting Started": {
+        >>>                           "subcategories": {},
+        >>>                               "children": [
+        >>>                                   "Working with Videos",
+        >>>                                   "Videos on edX"
+        >>>                               ],
+        >>>                           "entries": {
+        >>>                               "Working with Videos": {
+        >>>                                   "sort_key": None,
+        >>>                                   "is_cohorted": False,
+        >>>                                   "id": "d9f970a42067413cbb633f81cfb12604"
+        >>>                               },
+        >>>                               "Videos on edX": {
+        >>>                                   "sort_key": None,
+        >>>                                   "is_cohorted": False,
+        >>>                                   "id": "98d8feb5971041a085512ae22b398613"
+        >>>                               }
+        >>>                           }
+        >>>                       },
+        >>>                   },
+        >>>                   "children": ["Getting Started"]
+        >>>               }
+        >>>          }
     """
     course_key = CourseKey.from_string(course_key_string)
     course = get_course_with_access(request.user, 'staff', course_key)

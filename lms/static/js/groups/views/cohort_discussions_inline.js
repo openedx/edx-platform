@@ -8,8 +8,8 @@ var edx = edx || {};
     edx.groups.InlineDiscussionsView = CohortDiscussionsView.extend({
         events: {
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
-            'change .check-all-inline-discussions': 'changeAllInlineDiscussions',
-            'change .check-cohort-inline-discussions': 'changeSomeInlineDiscussions'
+            'change .check-all-inline-discussions': 'setAllInlineDiscussions',
+            'change .check-cohort-inline-discussions': 'setSomeInlineDiscussions'
         },
 
         initialize: function (options) {
@@ -21,17 +21,17 @@ var edx = edx || {};
             var alwaysCohortInlineDiscussions = this.cohortSettings.get('always_cohort_inline_discussions');
 
             this.$('.cohort-inline-discussions-nav').html(this.template({
-                inlineDiscussionTopics: this.getInlineDiscussions(this.model.get('inline_discussions')),
+                inlineDiscussionTopics: this.getInlineDiscussionsHtml(this.model.get('inline_discussions')),
                 alwaysCohortInlineDiscussions:alwaysCohortInlineDiscussions
             }));
 
+            // Provides the semantics for a nested list of tri-state checkboxes.
+            // When attached to a jQuery element it listens for change events to
+            // input[type=checkbox] elements, and updates the checked and indeterminate
+            // based on the checked values of any checkboxes in child elements of the DOM.
             $('ul.inline-topics').qubit();
 
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), true);
-            if (alwaysCohortInlineDiscussions) {
-                this.setDisabled(this.$('.check-discussion-category'), true);
-                this.setDisabled(this.$('.check-discussion-subcategory-inline'), true);
-            }
+            this.setElementsEnabled(alwaysCohortInlineDiscussions, true);
         },
 
         /**
@@ -44,7 +44,7 @@ var edx = edx || {};
          Returns:
             HTML list for inline discussion topics.
         **/
-        getInlineDiscussions: function (inlineDiscussions) {
+        getInlineDiscussionsHtml: function (inlineDiscussions) {
             var categoryTemplate = _.template($('#cohort-discussions-category-tpl').html()),
                 entryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
                 isCategoryCohorted = false,
@@ -65,7 +65,7 @@ var edx = edx || {};
                 } else { // subcategory
                     html = categoryTemplate({
                         name: name,
-                        entries: this.getInlineDiscussions(subcategories[name]),
+                        entries: this.getInlineDiscussionsHtml(subcategories[name]),
                         isCategoryCohorted: isCategoryCohorted
                     });
                 }
@@ -77,13 +77,10 @@ var edx = edx || {};
          Disables the discussion category checkboxes.
          Disables the discussion sub-category checkboxes.
          Enables the save button for inline discussion topics.
-
-         Args:
-            disable (Bool): The flag to enable/disable the elements.
         **/
-        changeAllInlineDiscussions: function(event) {
+        setAllInlineDiscussions: function(event) {
             event.preventDefault();
-            this.toggleInlineDiscussions(($(event.currentTarget).prop('checked')));
+            this.setElementsEnabled(($(event.currentTarget).prop('checked')), false);
         },
 
         /**
@@ -94,9 +91,9 @@ var edx = edx || {};
          Args:
             disable (Bool): The flag to enable/disable the elements.
         **/
-        changeSomeInlineDiscussions: function(event) {
+        setSomeInlineDiscussions: function(event) {
             event.preventDefault();
-            this.toggleInlineDiscussions(!($(event.currentTarget).prop('checked')));
+            this.setElementsEnabled(!($(event.currentTarget).prop('checked')), false);
         },
 
         /**
@@ -107,10 +104,10 @@ var edx = edx || {};
          Args:
             disable (Bool): The flag to enable/disable the elements.
         **/
-        toggleInlineDiscussions: function(disable) {
-            this.setDisabled(this.$('.check-discussion-category'), disable);
-            this.setDisabled(this.$('.check-discussion-subcategory-inline'), disable);
-            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
+        setElementsEnabled: function(enable_checkboxes, enable_save_button) {
+            this.setDisabled(this.$('.check-discussion-category'), enable_checkboxes);
+            this.setDisabled(this.$('.check-discussion-subcategory-inline'), enable_checkboxes);
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), enable_save_button);
         },
 
         /**

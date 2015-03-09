@@ -26,7 +26,7 @@ var edx = edx || {};
          Returns the cohorted discussions list.
 
          Args:
-            selector (HTML element): The topic element to get the ids.
+            selector (string): To select the discussion elements whose ids to return.
 
          Returns:
             Cohorted discussions list.

@@ -7,7 +7,7 @@ var edx = edx || {};
 
     edx.groups.CourseWideDiscussionsView = CohortDiscussionsView.extend({
         events: {
-            'change .check-discussion-subcategory-course-wide': 'changeCourseWideDiscussionCategory',
+            'change .check-discussion-subcategory-course-wide': 'discussionCategoryStateChanged',
             'click .cohort-course-wide-discussions-form .action-save': 'saveCourseWideDiscussionsForm'
         },
 
@@ -18,7 +18,7 @@ var edx = edx || {};
 
         render: function () {
             this.$('.cohort-course-wide-discussions-nav').html(this.template({
-                courseWideTopics: this.getCourseWideDiscussions(
+                courseWideTopics: this.getCourseWideDiscussionsHtml(
                     this.model.get('course_wide_discussions')
                 )
             }));
@@ -35,7 +35,7 @@ var edx = edx || {};
          Returns:
             HTML list for course-wide discussion topics.
         **/
-        getCourseWideDiscussions: function (courseWideDiscussions) {
+        getCourseWideDiscussionsHtml: function (courseWideDiscussions) {
             var subCategoryTemplate = _.template($('#cohort-discussions-subcategory-tpl').html()),
                 entries = courseWideDiscussions.entries,
                 children = courseWideDiscussions.children;
@@ -54,7 +54,7 @@ var edx = edx || {};
         /**
          Enables the save button for course-wide discussions.
         **/
-        changeCourseWideDiscussionCategory: function(event) {
+        discussionCategoryStateChanged: function(event) {
             event.preventDefault();
             this.setDisabled(this.$('.cohort-course-wide-discussions-form .action-save'), false);
         },
