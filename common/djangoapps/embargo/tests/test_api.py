@@ -188,6 +188,7 @@ class EmbargoCheckAccessApiTests(ModuleStoreTestCase):
             mock_ip.return_value = country_code
             yield
 
+
 @ddt.ddt
 @override_settings(MODULESTORE=MODULESTORE_CONFIG)
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
