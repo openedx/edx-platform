@@ -8,7 +8,7 @@ from rest_framework.tests import test_authentication
 from provider import scope, constants
 from unittest import skipUnless
 
-from ..authentication import OAuth2AuthenticationAllowInactiveUser
+from ..openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
 class OAuth2AuthAllowInactiveUserDebug(OAuth2AuthenticationAllowInactiveUser):
