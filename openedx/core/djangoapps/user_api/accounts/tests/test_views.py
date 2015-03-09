@@ -169,7 +169,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         Test that DELETE, POST, and PUT are not supported.
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.login_client(self.client, self.user)
         self.assertEqual(405, self.client.put(self.url).status_code)
         self.assertEqual(405, self.client.post(self.url).status_code)
         self.assertEqual(405, self.client.delete(self.url).status_code)
@@ -196,7 +196,7 @@ class TestAccountAPI(UserAPITestCase):
         Test that a client (logged in) can only get the shareable fields for a different user.
         This is the case when default_visibility is set to "all_users".
         """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.login_client(self.different_client, self.different_user)
         self.create_mock_profile(self.user)
         response = self.send_get(self.different_client)
         self._verify_full_shareable_account_response(response)
@@ -210,7 +210,7 @@ class TestAccountAPI(UserAPITestCase):
         Test that a client (logged in) can only get the shareable fields for a different user.
         This is the case when default_visibility is set to "private".
         """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.login_client(self.different_client, self.different_user)
         self.create_mock_profile(self.user)
         response = self.send_get(self.different_client)
         self._verify_private_account_response(response)
@@ -489,7 +489,7 @@ class TestAccountAPI(UserAPITestCase):
         Test that AccountUpdateErrors are passed through to the response.
         """
         serializer_save.side_effect = [Exception("bummer"), None]
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.login_client(self.client, self.user)
         error_response = self.send_patch(self.client, {"goals": "save an account field"}, expected_status=400)
         self.assertEqual(
             "Error thrown when saving account updates: 'bummer'",
