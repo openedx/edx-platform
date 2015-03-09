@@ -1,6 +1,7 @@
-
-import string
+""" Utility functions for django_comment_client """
 import pytz
+
+import string  # http://www.logilab.org/ticket/2481 pylint: disable=deprecated-module
 from collections import defaultdict
 import logging
 from datetime import datetime
@@ -15,6 +16,7 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 
 from edxmako import lookup_template
 import pystache_custom as pystache
+
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
@@ -440,7 +442,7 @@ def safe_content(content, course_id, is_staff=False):
     return content
 
 
-def format_filename(s):
+def format_filename(filename):
     """Take a string and return a valid filename constructed from the string.
     Uses a whitelist approach: any characters not present in valid_chars are
     removed. Also spaces are replaced with underscores.
@@ -453,6 +455,6 @@ def format_filename(s):
     https://gist.github.com/seanh/93666
     """
     valid_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
-    filename = ''.join(c for c in s if c in valid_chars)
+    filename = ''.join(c for c in filename if c in valid_chars)
     filename = filename.replace(' ', '_')
     return filename
