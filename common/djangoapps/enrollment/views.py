@@ -17,7 +17,10 @@ from opaque_keys.edx.keys import CourseKey
 from embargo import api as embargo_api
 from cors_csrf.authentication import SessionAuthenticationCrossDomainCsrf
 from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
-from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
+from openedx.core.lib.api.authentication import (
+    SessionAuthenticationAllowInactiveUser,
+    OAuth2AuthenticationAllowInactiveUser,
+)
 from util.disable_rate_limit import can_disable_rate_limit
 from enrollment import api
 from enrollment.errors import (
