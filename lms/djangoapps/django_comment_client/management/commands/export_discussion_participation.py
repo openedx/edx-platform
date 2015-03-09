@@ -17,7 +17,7 @@ from lms.lib.comment_client.user import User
 import django_comment_client.utils as utils
 
 
-class _Fields:
+class DiscussionExportFields(object):
     """ Container class for field names """
     USER_ID = u"id"
     USERNAME = u"username"
@@ -30,18 +30,6 @@ class _Fields:
     UPVOTES = u"num_upvotes"
     FOLOWERS = u"num_thread_followers"
     COMMENTS_GENERATED = u"num_comments_generated"
-
-
-def _make_social_stats(threads=0, comments=0, replies=0, upvotes=0, followers=0, comments_generated=0):
-    """ Builds social stats with values specified """
-    return {
-        _Fields.THREADS: threads,
-        _Fields.COMMENTS: comments,
-        _Fields.REPLIES: replies,
-        _Fields.UPVOTES: upvotes,
-        _Fields.FOLOWERS: followers,
-        _Fields.COMMENTS_GENERATED: comments_generated,
-    }
 
 
 class Command(BaseCommand):
@@ -99,48 +87,6 @@ class Command(BaseCommand):
         ),
     )
 
-    row_order = [
-        _Fields.USERNAME, _Fields.EMAIL, _Fields.FIRST_NAME, _Fields.LAST_NAME, _Fields.USER_ID,
-        _Fields.THREADS, _Fields.COMMENTS, _Fields.REPLIES,
-        _Fields.UPVOTES, _Fields.FOLOWERS, _Fields.COMMENTS_GENERATED
-    ]
-
-    def _get_users(self, course_key):
-        """ Returns users enrolled to a course as dictionary user_id => user """
-        users = CourseEnrollment.users_enrolled_in(course_key)
-        return {user.id: user for user in users}
-
-    def _get_social_stats(self, course_key, end_date=None, thread_type=None):
-        """ Gets social stats for course with specified filter parameters """
-        date = dateutil.parser.parse(end_date) if end_date else None
-        return {
-            int(user_id): data for user_id, data
-            in User.all_social_stats(str(course_key), end_date=date, thread_type=thread_type).iteritems()
-        }
-
-    def _merge_user_data_and_social_stats(self, userdata, social_stats):
-        """ Merges user data (email, username, etc.) and discussion stats """
-        result = []
-        for user_id, user in userdata.iteritems():
-            user_record = {
-                _Fields.USER_ID: user.id,
-                _Fields.USERNAME: user.username,
-                _Fields.EMAIL: user.email,
-                _Fields.FIRST_NAME: user.first_name,
-                _Fields.LAST_NAME: user.last_name,
-            }
-            stats = social_stats.get(user_id, _make_social_stats())
-            result.append(utils.merge_dict(user_record, stats))
-        return result
-
-    def _output(self, data, output_stream):
-        """ Exports data in csv format to specified output stream """
-        csv_writer = csv.DictWriter(output_stream, self.row_order)
-        csv_writer.writeheader()
-        for row in sorted(data, key=lambda item: item['username']):
-            to_write = {key: value for key, value in row.items() if key in self.row_order}
-            csv_writer.writerow(to_write)
-
     def _get_filter_string_representation(self, options):
         """ Builds human-readable filter parameters representation """
         filter_strs = []
@@ -178,20 +124,92 @@ class Command(BaseCommand):
         if not course:
             raise CommandError("Invalid course id: {}".format(course_key))
 
-        users = self._get_users(course_key)
-        social_stats = self._get_social_stats(
+        raw_end_date = options.get(self.END_DATE_PARAMETER, None)
+        end_date = dateutil.parser.parse(raw_end_date) if raw_end_date else None
+        data = Extractor().extract(
             course_key,
-            end_date=options.get(self.END_DATE_PARAMETER, None),
-            thread_type=options.get(self.THREAD_TYPE_PARAMETER, None)
+            end_date=end_date,
+            thread_type=(options.get(self.THREAD_TYPE_PARAMETER, None))
         )
-        merged_data = self._merge_user_data_and_social_stats(users, social_stats)
 
         filter_str = self._get_filter_string_representation(options)
 
-        self.stdout.write("Writing social stats ({filters}) to {file}\n".format(
-            filters=filter_str, file=output_file_location
-        ))
+        self.stdout.write("Writing social stats ({}) to {}\n".format(filter_str, output_file_location))
         with open(output_file_location, 'wb') as output_stream:
-            self._output(merged_data, output_stream)
+            Exporter(output_stream).export(data)
 
         self.stdout.write("Success!\n")
+
+
+class Extractor(object):
+    """ Extracts discussion participation data from db and cs_comments_service """
+
+    @classmethod
+    def _make_social_stats(cls, threads=0, comments=0, replies=0, upvotes=0, followers=0, comments_generated=0):
+        """ Builds social stats with values specified """
+        return {
+            DiscussionExportFields.THREADS: threads,
+            DiscussionExportFields.COMMENTS: comments,
+            DiscussionExportFields.REPLIES: replies,
+            DiscussionExportFields.UPVOTES: upvotes,
+            DiscussionExportFields.FOLOWERS: followers,
+            DiscussionExportFields.COMMENTS_GENERATED: comments_generated,
+        }
+
+    def _get_users(self, course_key):
+        """ Returns users enrolled to a course as dictionary user_id => user """
+        users = CourseEnrollment.users_enrolled_in(course_key)
+        return {user.id: user for user in users}
+
+    def _get_social_stats(self, course_key, end_date=None, thread_type=None):
+        """ Gets social stats for course with specified filter parameters """
+        return {
+            int(user_id): data for user_id, data
+            in User.all_social_stats(str(course_key), end_date=end_date, thread_type=thread_type).iteritems()
+        }
+
+    def _merge_user_data_and_social_stats(self, userdata, social_stats):
+        """ Merges user data (email, username, etc.) and discussion stats """
+        result = []
+        for user_id, user in userdata.iteritems():
+            user_record = {
+                DiscussionExportFields.USER_ID: user.id,
+                DiscussionExportFields.USERNAME: user.username,
+                DiscussionExportFields.EMAIL: user.email,
+                DiscussionExportFields.FIRST_NAME: user.first_name,
+                DiscussionExportFields.LAST_NAME: user.last_name,
+            }
+            stats = social_stats.get(user_id, self._make_social_stats())
+            result.append(utils.merge_dict(user_record, stats))
+        return result
+
+    def extract(self, course_key, end_date=None, thread_type=None):
+        """ Extracts and merges data according to course key and filter parameters """
+        users = self._get_users(course_key)
+        social_stats = self._get_social_stats(
+            course_key,
+            end_date=end_date,
+            thread_type=thread_type
+        )
+        return self._merge_user_data_and_social_stats(users, social_stats)
+
+
+class Exporter(object):
+    """ Exports data to csv """
+    def __init__(self, output_stream):
+        self.stream = output_stream
+
+    row_order = [
+        DiscussionExportFields.USERNAME, DiscussionExportFields.EMAIL, DiscussionExportFields.FIRST_NAME,
+        DiscussionExportFields.LAST_NAME, DiscussionExportFields.USER_ID,
+        DiscussionExportFields.THREADS, DiscussionExportFields.COMMENTS, DiscussionExportFields.REPLIES,
+        DiscussionExportFields.UPVOTES, DiscussionExportFields.FOLOWERS, DiscussionExportFields.COMMENTS_GENERATED
+    ]
+
+    def export(self, data):
+        """ Exports data in csv format to specified output stream """
+        csv_writer = csv.DictWriter(self.stream, self.row_order)
+        csv_writer.writeheader()
+        for row in sorted(data, key=lambda item: item['username']):
+            to_write = {key: value for key, value in row.items() if key in self.row_order}
+            csv_writer.writerow(to_write)
