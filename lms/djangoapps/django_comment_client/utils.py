@@ -1,3 +1,4 @@
+""" Utility functions for django_comment_client """
 from collections import defaultdict
 from datetime import datetime
 import logging
@@ -25,6 +26,7 @@ from openedx.core.djangoapps.course_groups.cohorts import (
 )
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from request_cache.middleware import request_cached
+
 
 from xmodule.modulestore.django import modulestore
 from django.utils.timezone import UTC
