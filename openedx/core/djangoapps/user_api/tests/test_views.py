@@ -1693,6 +1693,7 @@ class TestGoogleRegistrationView(
     """Tests the User API registration endpoint with Google authentication."""
     pass
 
+
 @ddt.ddt
 class UpdateEmailOptInTestCase(ApiTestCase, ModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """
