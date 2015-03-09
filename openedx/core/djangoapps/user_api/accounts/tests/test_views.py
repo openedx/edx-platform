@@ -97,9 +97,9 @@ class UserAPITestCase(APITestCase):
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
-@patch('openedx.core.djangoapps.user_api.accounts.helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch('openedx.core.djangoapps.user_api.accounts.image_helpers._PROFILE_IMAGE_SIZES', [50, 10])
 @patch.dict(
-    'openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+    'openedx.core.djangoapps.user_api.accounts.image_helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
 )
 class TestAccountAPI(UserAPITestCase):
     """
@@ -200,7 +200,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(403 if user == "staff_user" else 404, response.status_code)
 
     # Note: using getattr so that the patching works even if there is no configuration.
     # This is needed when testing CMS as the patching is still executed even though the
@@ -279,7 +279,6 @@ class TestAccountAPI(UserAPITestCase):
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
-            # TODO: what should the format of this be?
             self.assertEqual("m", data["gender"])
             self.assertEqual("Learn a lot", data["goals"])
             self.assertEqual(self.user.email, data["email"])
@@ -323,7 +322,7 @@ class TestAccountAPI(UserAPITestCase):
         is_staff access).
         """
         client = self.login_client(api_client, user)
-        self.send_patch(client, {}, expected_status=404)
+        self.send_patch(client, {}, expected_status=403 if user == "staff_user" else 404)
 
     @ddt.data(
         ("client", "user"),
