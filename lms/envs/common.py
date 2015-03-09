@@ -2192,7 +2192,13 @@ ECOMMERCE_API_TIMEOUT = 5
 
 # PROFILE IMAGE CONFIG
 # TODO: add these settings to aws.py as well
-PROFILE_IMAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
+# WARNING: Certain django storage backends do not support atomic
+# file overwrites (including the default, specified below) - instead
+# there are separate calls to delete and then write a new file in the
+# storage backend.  This introduces the risk of a race condition
+# occurring when a user uploads a new profile image to replace an
+# earlier one (the file will temporarily be deleted).
+PROFILE_IMAGE_BACKEND = 'storages.backends.overwrite.OverwriteStorage'
 # PROFILE_IMAGE_DOMAIN points to the domain from which we serve image
 # files from.  When this is '/', it refers to the same domain as the
 # app server.  If serving from a different domain, specify that here
@@ -2205,3 +2211,5 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'default_profile_image'  # TODO: determine fina
 # platform unaware of current image URLs, resulting in reverting all
 # users' profile images to the default placeholder image.
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
+PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
+PROFILE_IMAGE_MIN_BYTES = 100
