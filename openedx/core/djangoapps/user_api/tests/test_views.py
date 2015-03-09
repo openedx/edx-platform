@@ -24,7 +24,7 @@ from django_comment_common import models
 from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from third_party_auth.tests.testutil import simulate_running_pipeline
 
-from ..accounts.views import AccountView
+from ..accounts.api import get_account_settings
 from ..api import account as account_api, profile as profile_api
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
@@ -1249,7 +1249,7 @@ class RegistrationViewTest(ApiTestCase):
 
         # Verify that the user's full name is set
         user = User.objects.get(username=self.USERNAME)
-        account_settings = AccountView.get_serialized_account(user)
+        account_settings = get_account_settings(user)
         self.assertEqual(account_settings["name"], self.NAME)
 
         # Verify that we've been logged in
@@ -1283,7 +1283,7 @@ class RegistrationViewTest(ApiTestCase):
 
         # Verify the user's account
         user = User.objects.get(username=self.USERNAME)
-        account_settings = AccountView.get_serialized_account(user)
+        account_settings = get_account_settings(user)
         self.assertEqual(account_settings["level_of_education"], self.EDUCATION)
         self.assertEqual(account_settings["mailing_address"], self.ADDRESS)
         self.assertEqual(account_settings["year_of_birth"], int(self.YEAR_OF_BIRTH))

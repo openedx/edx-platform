@@ -15,7 +15,7 @@ import analytics
 
 from eventtracking import tracker
 from ..accounts import NAME_MIN_LENGTH
-from ..accounts.views import AccountView
+from ..accounts.api import get_account_settings
 from ..models import User, UserPreference, UserOrgTag
 from ..helpers import intercept_errors
 
@@ -106,7 +106,7 @@ def update_email_opt_in(user, org, optin):
         None
 
     """
-    account_settings = AccountView.get_serialized_account(user)
+    account_settings = get_account_settings(user)
     year_of_birth = account_settings['year_of_birth']
     of_age = (
         year_of_birth is None or  # If year of birth is not set, we assume user is of age.

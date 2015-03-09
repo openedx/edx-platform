@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import datetime
 
-from ..accounts.views import AccountView
+from ..accounts.api import get_account_settings
 from ..api import account as account_api
 from ..api import profile as profile_api
 from ..models import UserProfile, UserOrgTag
@@ -30,7 +30,7 @@ class ProfileApiTest(ModuleStoreTestCase):
 
         # Retrieve the account settings
         user = User.objects.get(username=self.USERNAME)
-        account_settings = AccountView.get_serialized_account(user)
+        account_settings = get_account_settings(user)
 
         # Expect a date joined field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])

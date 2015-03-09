@@ -27,9 +27,9 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 
-from openedx.core.djangoapps.user_api.accounts.views import AccountView
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
+from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountValidationError
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -718,10 +718,10 @@ def submit_photos_for_verification(request):
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
-            AccountView.update_account(request.user, {"name": request.POST.get('full_name')})
+            update_account_settings(request.user, {"name": request.POST.get('full_name')})
         except AccountUserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
-        except AccountUpdateError:
+        except AccountValidationError:
             msg = _(
                 "Name must be at least {min_length} characters long."
             ).format(min_length=NAME_MIN_LENGTH)
@@ -741,7 +741,7 @@ def submit_photos_for_verification(request):
     attempt.mark_ready()
     attempt.submit()
 
-    account_settings = AccountView.get_serialized_account(request.user)
+    account_settings = get_account_settings(request.user)
 
     # Send a confirmation email to the user
     context = {
