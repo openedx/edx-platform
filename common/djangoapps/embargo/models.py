@@ -401,6 +401,8 @@ class CountryAccessRule(models.Model):
 
     CACHE_KEY = u"embargo.allowed_countries.{course_key}"
 
+    ALL_COUNTRIES = set(code[0] for code in list(countries))
+
     @classmethod
     def check_country_access(cls, course_id, country):
         """
@@ -415,6 +417,14 @@ class CountryAccessRule(models.Model):
             True if country found in allowed country
             otherwise check given country exists in list
         """
+        # If the country code is not in the list of all countries,
+        # we don't want to automatically exclude the user.
+        # This can happen, for example, when GeoIP falls back
+        # to using a continent code because it cannot determine
+        # the specific country.
+        if country not in cls.ALL_COUNTRIES:
+            return True
+
         cache_key = cls.CACHE_KEY.format(course_key=course_id)
         allowed_countries = cache.get(cache_key)
         if allowed_countries is None:
@@ -454,7 +464,7 @@ class CountryAccessRule(models.Model):
 
         # If there are no whitelist countries, default to all countries
         if not whitelist_countries:
-            whitelist_countries = set(code[0] for code in list(countries))
+            whitelist_countries = cls.ALL_COUNTRIES
 
         # Consolidate the rules into a single list of countries
         # that have access to the course.
