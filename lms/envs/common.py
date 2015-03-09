@@ -207,7 +207,7 @@ FEATURES = {
     'ENABLE_INSTRUCTOR_LEGACY_DASHBOARD': True,
 
     # Is this an edX-owned domain? (used for edX specific messaging and images)
-    'IS_EDX_DOMAIN': False,
+    'IS_EDX_DOMAIN': True,
 
     # Toggle to enable certificates of courses on dashboard
     'ENABLE_VERIFIED_CERTIFICATES': False,
@@ -312,7 +312,7 @@ FEATURES = {
     'ENABLE_MOBILE_SOCIAL_FACEBOOK_FEATURES': False,
 
     # Enable the combined login/registration form
-    'ENABLE_COMBINED_LOGIN_REGISTRATION': False,
+    'ENABLE_COMBINED_LOGIN_REGISTRATION': True,
 
     # Enable organizational email opt-in
     'ENABLE_MKTG_EMAIL_OPT_IN': False,

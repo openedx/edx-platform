@@ -441,10 +441,12 @@ $sm-btn-linkedin: #0077b5;
         background: tint($yellow,20%);
 
         .message-title {
-            @extend %heading-4;
-            font-family: $sans-serif;
+            @extend %t-title6;
+            @extend %t-weight4;
             margin: 0 0 ($baseline/4) 0;
+            font-family: $sans-serif;
             font-weight: 600;
+            text-transform: uppercase;
         }
 
         .message-copy,
