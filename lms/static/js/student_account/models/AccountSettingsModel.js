@@ -13,7 +13,7 @@ var edx = edx || {};
             name: '',
             email: '',
             password: '',
-            language: '',
+            language: null,
             country: null,
             date_joined: "",
             gender: null,
@@ -23,4 +23,5 @@ var edx = edx || {};
             year_of_birth: null
         }
     });
+
 }).call(this, Backbone);

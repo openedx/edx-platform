@@ -331,5 +331,6 @@ def account_settings(request):
     context = {
         'accounts_api_url': reverse("accounts_api", kwargs={'username': request.user.username}),
         'language_options': language_options,
+        'language_default': settings.LANGUAGE_CODE,
     }
     return render_to_response('student_account/settings.html', context)
