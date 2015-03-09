@@ -88,6 +88,7 @@
                                     model: accountSettingsModel,
                                     title: "Language",
                                     value_attribute: "language",
+                                    default_value: "${ language_default }",
                                     message: "This setting controls your default edX language.",
                                     options: [
                                         % for language_option in language_options:
@@ -107,8 +108,9 @@
                 ]
             });
 
-            accountSettingsModel.fetch().done(function() {
-                accountSettingsView.render();
+            accountSettingsView.render();
+            accountSettingsModel.fetch().done(function(data, textStatus, jqXHR) {
+                accountSettingsView.setup_fields();
             });
         });
     </script>
