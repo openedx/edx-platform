@@ -5,6 +5,7 @@ Unit tests for profile APIs.
 
 import unittest
 import ddt
+import json
 
 from django.core.urlresolvers import reverse
 from django.conf import settings
@@ -19,12 +20,17 @@ class TestPreferencesAPI(UserAPITestCase):
     """
     Unit tests /api/user/v0/accounts/{username}/
     """
-    __test__ = True
-
     def setUp(self):
         super(TestPreferencesAPI, self).setUp()
         self.url_endpoint_name = "preferences_api"
         self.url = reverse(self.url_endpoint_name, kwargs={'username': self.user.username})
+
+    def test_anonymous_access(self):
+        """
+        Test that an anonymous client (not logged in) cannot call GET or PATCH.
+        """
+        self.send_get(self.anonymous_client, expected_status=401)
+        self.send_patch(self.anonymous_client, {}, expected_status=401)
 
     def test_get_different_user(self):
         """
@@ -32,6 +38,19 @@ class TestPreferencesAPI(UserAPITestCase):
         """
         self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.send_get(self.different_client, expected_status=404)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_unknown_user(self, api_client, username):
+        """
+        Test that requesting a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, username)
+        response = client.get(reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}))
+        self.assertEqual(404, response.status_code)
 
     def test_get_preferences_default(self):
         """
@@ -60,6 +79,30 @@ class TestPreferencesAPI(UserAPITestCase):
         client = self.login_client(api_client, user)
         response = self.send_get(client)
         self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value"}, response.data)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_patch_unknown_user(self, api_client, user):
+        """
+        Test that trying to update preferences for a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, user)
+        response = client.patch(
+            reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}),
+            data=json.dumps({"string_pref": "value"}), content_type="application/merge-patch+json"
+        )
+        self.assertEqual(404, response.status_code)
+
+    def test_patch_bad_content_type(self):
+        """
+        Test the behavior of patch when an incorrect content_type is specified.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
+        self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
     @ddt.data(
         ("client", "user"),
@@ -118,8 +161,6 @@ class TestPreferencesDetailAPI(UserAPITestCase):
     """
     Unit tests /api/user/v0/accounts/{username}/{preference_key}
     """
-    __test__ = True
-
     def setUp(self):
         super(TestPreferencesDetailAPI, self).setUp()
         self.test_pref_key = "test_key"
@@ -158,8 +199,7 @@ class TestPreferencesDetailAPI(UserAPITestCase):
     @ddt.unpack
     def test_get_unknown_user(self, api_client, username):
         """
-        Test that requesting a user who does not exist returns a 404. Most override the base class
-        implementation because it is necessary to specify "preference_key".
+        Test that requesting a user who does not exist returns a 404.
         """
         client = self.login_client(api_client, username)
         response = client.get(
