@@ -29,7 +29,7 @@ var edx = edx || {};
         },
 
         setup_fields: function() {
-            this.$('.ui-loading').addClass('is-hidden');
+            this.$('.ui-loading-anim').addClass('is-hidden');
 
             var view = this;
             _.each(this.$('.account-settings-section-body'), function(section_el, index) {
