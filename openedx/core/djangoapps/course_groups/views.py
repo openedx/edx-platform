@@ -422,22 +422,24 @@ def cohort_discussion_topics(request, course_key_string):
 
     Example:
         >>> example = {
-        >>>               "course_wide_categories": {
-        >>>                   "General": {
-        >>>                       "sort_key": "General",
-        >>>                       "is_cohorted": True,
-        >>>                       "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>               "course_wide_discussions": {
+        >>>                   "entries": {
+        >>>                       "General": {
+        >>>                           "sort_key": "General",
+        >>>                           "is_cohorted": True,
+        >>>                           "id": "i4x-edx-eiorguegnru-course-foobarbaz"
+        >>>                       }
         >>>                   }
+        >>>                   "children": ["General"]
         >>>               },
-        >>>               "course_wide_children": ["General"],
         >>>               "inline_discussions" : {
         >>>                   "subcategories": {
         >>>                       "Getting Started": {
         >>>                           "subcategories": {},
-        >>>                               "children": [
-        >>>                                   "Working with Videos",
-        >>>                                   "Videos on edX"
-        >>>                               ],
+        >>>                           "children": [
+        >>>                               "Working with Videos",
+        >>>                               "Videos on edX"
+        >>>                           ],
         >>>                           "entries": {
         >>>                               "Working with Videos": {
         >>>                                   "sort_key": None,
@@ -451,8 +453,8 @@ def cohort_discussion_topics(request, course_key_string):
         >>>                               }
         >>>                           }
         >>>                       },
+        >>>                       "children": ["Getting Started"]
         >>>                   },
-        >>>                   "children": ["Getting Started"]
         >>>               }
         >>>          }
     """
