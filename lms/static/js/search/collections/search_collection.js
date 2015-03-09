@@ -16,6 +16,7 @@ define([
         page: 0,
         url: '/search/',
         fetchXhr: null,
+        cohortId: null,
 
         initialize: function (models, options) {
             // call super constructor
@@ -31,12 +32,16 @@ define([
             this.totalCount = 0;
             this.accessDeniedCount = 0;
             this.page = 0;
-            this.fetchXhr = this.fetch({
-                data: {
+            var data = {
                     search_string: searchTerm,
                     page_size: this.pageSize,
                     page_index: 0
-                },
+                };
+            if(this.cohortId !== null){
+                data.cohort_id = this.cohortId;
+            }
+            this.fetchXhr = this.fetch({
+                data: data,
                 type: 'POST',
                 success: function (self, xhr) {
                     self.trigger('search');

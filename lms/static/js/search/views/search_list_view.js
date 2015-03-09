@@ -21,12 +21,16 @@ define([
         initialize: function () {
             this.courseName = this.$el.attr('data-course-name');
             this.$courseContent = $('#course-content');
+            this.$searchPermissions = $('#action-preview-select option:selected');
             this.listTemplate = _.template($('#search_list-tpl').html());
             this.loadingTemplate = _.template($('#search_loading-tpl').html());
             this.errorTemplate = _.template($('#search_error-tpl').html());
             this.collection.on('search', this.render, this);
             this.collection.on('next', this.renderNext, this);
             this.collection.on('error', this.showErrorMessage, this);
+            if(this.$searchPermissions.val() === 'group.id') {
+                this.collection.cohortId = this.$searchPermissions.data('group-id');
+            }
         },
 
         render: function () {
