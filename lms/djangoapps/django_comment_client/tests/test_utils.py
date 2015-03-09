@@ -2,6 +2,7 @@
 
 import json
 import mock
+import ddt
 from datetime import datetime
 from pytz import UTC
 from django.core.urlresolvers import reverse
@@ -644,3 +645,20 @@ class RenderMustacheTests(TestCase):
         """
         add_lookup('main', '', package=__name__)
         self.assertEqual(utils.render_mustache('test.mustache', {}), 'Testing 1 2 3.\n')
+
+
+@ddt.ddt
+class FormatFilenameTests(TestCase):
+    """ Tests format filename utility function """
+    @ddt.unpack
+    @ddt.data(
+        ("normal.txt", "normal.txt"),
+        ("normal_with_alnum.csv", "normal_with_alnum.csv"),
+        ("normal_with_multiple_extensions.dot.csv", "normal_with_multiple_extensions.dot.csv"),
+        ("contains/slashes.html", "containsslashes.html"),
+        ("contains_symbols!@#$%^&*+=\|,.html", "contains_symbols.html"),
+        ("contains spaces.org", "contains_spaces.org"),
+    )
+    def test_format_filename(self, raw_filename, expected_output):
+        """ Tests that format_filename produces expected output for certain inputs """
+        self.assertEqual(utils.format_filename(raw_filename), expected_output)
