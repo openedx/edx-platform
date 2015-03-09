@@ -241,15 +241,14 @@ def submit_get_student_responses(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-def submit_ora2_request_task(request, course_key):
+def submit_ora2_request_task(request, course_key, include_email):
     """
     AlreadyRunningError is raised if an ora2 report is already being generated.
     """
     task_type = 'ora2_responses'
     task_class = get_ora2_responses
-    task_input = {}
+    task_input = {'include_email': include_email}
     task_key = ''
-
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
