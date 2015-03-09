@@ -2205,3 +2205,5 @@ PROFILE_IMAGE_DEFAULT_FILENAME = 'default_profile_image'  # TODO: determine fina
 # platform unaware of current image URLs, resulting in reverting all
 # users' profile images to the default placeholder image.
 PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
+PROFILE_IMAGE_MAX_BYTES = 1024 * 1024
+PROFILE_IMAGE_MIN_BYTES = 100
