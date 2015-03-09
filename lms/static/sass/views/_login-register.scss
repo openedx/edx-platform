@@ -441,7 +441,7 @@ $sm-btn-linkedin: #0077b5;
         background: tint($yellow,20%);
 
         .message-title {
-            @extend %t-title4;
+            @extend %heading-4;
             font-family: $sans-serif;
             margin: 0 0 ($baseline/4) 0;
             font-weight: 600;
