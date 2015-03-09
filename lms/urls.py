@@ -91,6 +91,7 @@ urlpatterns = (
 if settings.FEATURES["ENABLE_USER_REST_API"]:
     urlpatterns += (
         url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+        url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
     )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
@@ -617,6 +618,9 @@ urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(
+        settings.PROFILE_IMAGE_DOMAIN + settings.PROFILE_IMAGE_URL_PATH, document_root=settings.MEDIA_ROOT
+    )
 
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
     urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
