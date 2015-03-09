@@ -2,14 +2,13 @@ import logging
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
-
 from opaque_keys.edx.keys import CourseKey
 from xmodule.modulestore.django import modulestore
 
-from openedx.core.djangoapps.content.course_structures.models import update_course_structure
+from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
 
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -31,16 +30,17 @@ class Command(BaseCommand):
             course_keys = [CourseKey.from_string(arg) for arg in args]
 
         if not course_keys:
-            logger.fatal('No courses specified.')
+            log.fatal('No courses specified.')
             return
 
-        logger.info('Generating course structures for %d courses.', len(course_keys))
+        log.info('Generating course structures for %d courses.', len(course_keys))
         logging.debug('Generating course structure(s) for the following courses: %s', course_keys)
 
         for course_key in course_keys:
             try:
                 update_course_structure(unicode(course_key))
-            except Exception as e:
-                logger.error('An error occurred while generating course structure for %s: %s', unicode(course_key), e)
+            except Exception as ex:
+                log.exception('An error occurred while generating course structure for %s: %s',
+                              unicode(course_key), ex.message)
 
-        logger.info('Finished generating course structures.')
+        log.info('Finished generating course structures.')
