@@ -139,6 +139,7 @@ class User(models.Model):
 
     @classmethod
     def all_social_stats(cls, course_id, end_date=None, thread_type=None):
+        """ Get social stats for all users participating in a course """
         return get_user_social_stats('*', course_id, end_date=end_date, thread_type=thread_type)
 
     def _retrieve(self, *args, **kwargs):
@@ -175,6 +176,7 @@ class User(models.Model):
 
 
 def get_user_social_stats(user_id, course_id, end_date=None, thread_type=None):
+    """ Queries cs_comments_service for social_stats """
     if not course_id:
         raise CommentClientRequestError("Must provide course_id when retrieving social stats for the user")
 

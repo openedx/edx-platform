@@ -1257,7 +1257,7 @@ class FormatFilenameTests(TestCase):
         ("normal_with_alnum.csv", "normal_with_alnum.csv"),
         ("normal_with_multiple_extensions.dot.csv", "normal_with_multiple_extensions.dot.csv"),
         ("contains/slashes.html", "containsslashes.html"),
-        ("contains_symbols!@#$%^&*+=\|,.html", "contains_symbols.html"),
+        (r"contains_symbols!@#$%^&*+=\|,.html", "contains_symbols.html"),
         ("contains spaces.org", "contains_spaces.org"),
     )
     def test_format_filename(self, raw_filename, expected_output):
