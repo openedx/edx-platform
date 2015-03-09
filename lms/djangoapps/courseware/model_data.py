@@ -68,6 +68,63 @@ def _chunked_query(model_class, select_for_update, chunk_field, items, chunk_siz
     return res
 
 
+class UserStateCache(object):
+    """
+    Cache for Scope.user_state xblock field data.
+    """
+    def __init__(self, user, course_id, usage_keys, select_for_update=False):
+        self._data = _chunked_query(
+            StudentModule,
+            select_for_update,
+            'module_state_key__in',
+            usage_keys,
+            course_id=course_id,
+            student=user.pk,
+        )
+
+
+class UserStateSummaryCache(object):
+    """
+    Cache for Scope.user_state_summary xblock field data.
+    """
+    def __init__(self, usage_keys, fields, select_for_update=False):
+        self._data = _chunked_query(
+            XModuleUserStateSummaryField,
+            select_for_update,
+            'usage_id__in',
+            usage_keys,
+            field_name__in=set(field.name for field in fields),
+        )
+
+
+class PreferencesCache(object):
+    """
+    Cache for Scope.preferences xblock field data.
+    """
+    def __init__(self, user, block_types, fields, select_for_update=False):
+        self._data = _chunked_query(
+            XModuleStudentPrefsField,
+            select_for_update,
+            'module_type__in',
+            block_types,
+            student=user.pk,
+            field_name__in=set(field.name for field in fields),
+        )
+
+
+class UserInfoCache(object):
+    """
+    Cache for Scope.user_info xblock field data
+    """
+    def __init__(self, user, fields, select_for_update=False):
+        self._data = _query(
+            XModuleStudentInfoField,
+            select_for_update,
+            student=user.pk,
+            field_name__in=set(field.name for field in fields),
+        )
+
+
 class FieldDataCache(object):
     """
     A cache of django model objects needed to supply the data
@@ -201,38 +258,35 @@ class FieldDataCache(object):
         Queries the database for all of the fields in the specified scope
         """
         if scope == Scope.user_state:
-            return _chunked_query(
-                StudentModule,
-                self.select_for_update,
-                'module_state_key__in',
+            self.user_state_cache = UserStateCache(
+                self.user,
+                self.course_id,
                 self._all_usage_ids(descriptors),
-                course_id=self.course_id,
-                student=self.user.pk,
+                self.select_for_update,
             )
+            return self.user_state_cache._data
         elif scope == Scope.user_state_summary:
-            return _chunked_query(
-                XModuleUserStateSummaryField,
-                self.select_for_update,
-                'usage_id__in',
+            self.user_state_summary_cache = UserStateSummaryCache(
                 self._all_usage_ids(descriptors),
-                field_name__in=set(field.name for field in fields),
+                fields,
+                self.select_for_update,
             )
+            return self.user_state_summary_cache._data
         elif scope == Scope.preferences:
-            return _chunked_query(
-                XModuleStudentPrefsField,
-                self.select_for_update,
-                'module_type__in',
+            self.preferences_cache = PreferencesCache(
+                self.user,
                 self._all_block_types(descriptors),
-                student=self.user.pk,
-                field_name__in=set(field.name for field in fields),
-            )
-        elif scope == Scope.user_info:
-            return _query(
-                XModuleStudentInfoField,
+                fields,
                 self.select_for_update,
-                student=self.user.pk,
-                field_name__in=set(field.name for field in fields),
             )
+            return self.preferences_cache._data
+        elif scope == Scope.user_info:
+            self.user_info_cache = UserInfoCache(
+                self.user,
+                fields,
+                self.select_for_update,
+            )
+            return self.user_info_cache._data
         else:
             return []
 
