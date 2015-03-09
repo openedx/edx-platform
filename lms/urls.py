@@ -61,6 +61,9 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
+    # TODO jimabramson: put this in the right place
+    url(r'^api/profile_images/', include('openedx.core.djangoapps.profile_images.urls')),
+
     # Note: these are older versions of the User API that will eventually be
     # subsumed by api/user listed below.
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
@@ -608,6 +611,9 @@ urlpatterns = patterns(*urlpatterns)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(
+        settings.PROFILE_IMAGE_DOMAIN + settings.PROFILE_IMAGE_URL_PATH, document_root=settings.MEDIA_ROOT
+    )
 
     # in debug mode, allow any template to be rendered (most useful for UX reference templates)
     urlpatterns += url(r'^template/(?P<template>.+)$', 'debug.views.show_reference_template'),
