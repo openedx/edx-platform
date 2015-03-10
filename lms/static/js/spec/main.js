@@ -311,11 +311,11 @@
             },
             'js/groups/views/cohort_discussions_course_wide': {
                 exports: 'edx.groups.CourseWideDiscussionsView',
-                deps: ['backbone']
+                deps: ['backbone', 'js/groups/views/cohort_discussions']
             },
             'js/groups/views/cohort_discussions_inline': {
                 exports: 'edx.groups.InlineDiscussionsView',
-                deps: ['backbone']
+                deps: ['backbone', 'js/groups/views/cohort_discussions']
             },
             'js/groups/views/course_cohort_settings_notification': {
                 exports: 'edx.groups.CourseCohortSettingsNotificationView',
