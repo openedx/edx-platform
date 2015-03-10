@@ -17,7 +17,9 @@ from django_comment_client.permissions import check_permissions_by_view, cached_
 from edxmako import lookup_template
 import pystache_custom as pystache
 
-from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+from openedx.core.djangoapps.course_groups.cohorts import (
+    get_course_cohort_settings, get_cohort_by_id, get_cohort_id, is_commentable_cohorted, is_course_cohorted
+)
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
 from opaque_keys.edx.locations import i4xEncoder
 from opaque_keys.edx.keys import CourseKey
@@ -139,8 +141,7 @@ def get_discussion_category_map(course):
 
     modules = _get_discussion_modules(course)
 
-    is_course_cohorted = course.is_cohorted
-    cohorted_discussion_ids = course.cohorted_discussions
+    course_cohort_settings = get_course_cohort_settings(course.id)
 
     for module in modules:
         id = module.discussion_id
@@ -184,19 +185,24 @@ def get_discussion_category_map(course):
                 node[level]["start_date"] = category_start_date
 
         for entry in entries:
-            node[level]["entries"][entry["title"]] = {"id": entry["id"],
-                                                      "sort_key": entry["sort_key"],
-                                                      "start_date": entry["start_date"],
-                                                      "is_cohorted": is_course_cohorted}
+            node[level]["entries"][entry["title"]] = {
+                "id": entry["id"],
+                "sort_key": entry["sort_key"],
+                "start_date": entry["start_date"],
+                "is_cohorted": course_cohort_settings.is_cohorted
+            }
 
     # TODO.  BUG! : course location is not unique across multiple course runs!
     # (I think Kevin already noticed this)  Need to send course_id with requests, store it
     # in the backend.
     for topic, entry in course.discussion_topics.items():
-        category_map['entries'][topic] = {"id": entry["id"],
-                                          "sort_key": entry.get("sort_key", topic),
-                                          "start_date": datetime.now(UTC()),
-                                          "is_cohorted": is_course_cohorted and entry["id"] in cohorted_discussion_ids}
+        category_map['entries'][topic] = {
+            "id": entry["id"],
+            "sort_key": entry.get("sort_key", topic),
+            "start_date": datetime.now(UTC()),
+            "is_cohorted": (course_cohort_settings.is_cohorted and
+                            entry["id"] in course_cohort_settings.cohorted_discussions)
+        }
 
     _sort_map_entries(category_map, course.discussion_sort_alpha)
 
@@ -384,7 +390,7 @@ def add_courseware_context(content_list, course):
             content.update({"courseware_url": url, "courseware_title": title})
 
 
-def prepare_content(content, course_key, is_staff=False):
+def prepare_content(content, course_key, is_staff=False, course_is_cohorted=None):
     """
     This function is used to pre-process thread and comment models in various
     ways before adding them to the HTTP response.  This includes fixing empty
@@ -393,6 +399,12 @@ def prepare_content(content, course_key, is_staff=False):
 
     @TODO: not all response pre-processing steps are currently integrated into
     this function.
+
+    Arguments:
+        content (dict): A thread or comment.
+        course_key (CourseKey): The course key of the course.
+        is_staff (bool): Whether the user is a staff member.
+        course_is_cohorted (bool): Whether the course is cohorted.
     """
     fields = [
         'id', 'title', 'body', 'course_id', 'anonymous', 'anonymous_to_peers',
@@ -432,14 +444,18 @@ def prepare_content(content, course_key, is_staff=False):
         else:
             del endorsement["user_id"]
 
+    if course_is_cohorted is None:
+        course_is_cohorted = is_course_cohorted(course_key)
+
     for child_content_key in ["children", "endorsed_responses", "non_endorsed_responses"]:
         if child_content_key in content:
             children = [
-                prepare_content(child, course_key, is_staff) for child in content[child_content_key]
+                prepare_content(child, course_key, is_staff, course_is_cohorted=course_is_cohorted)
+                for child in content[child_content_key]
             ]
             content[child_content_key] = children
 
-    if is_course_cohorted(course_key):
+    if course_is_cohorted:
         # Augment the specified thread info to include the group name if a group id is present.
         if content.get('group_id') is not None:
             content['group_name'] = get_cohort_by_id(course_key, content.get('group_id')).name

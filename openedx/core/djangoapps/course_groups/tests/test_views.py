@@ -25,7 +25,9 @@ from ..cohorts import (
     get_cohort, get_cohort_by_name, get_cohort_by_id,
     DEFAULT_COHORT_NAME, get_group_info_for_cohort
 )
-from .helpers import config_course_cohorts, CohortFactory, CourseCohortFactory, topic_name_to_id
+from .helpers import (
+    config_course_cohorts, config_course_cohorts_legacy, CohortFactory, CourseCohortFactory, topic_name_to_id
+)
 
 
 class CohortViewsTestCase(ModuleStoreTestCase):
@@ -136,7 +138,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         Verify that course_cohort_settings_handler is working for HTTP GET.
         """
         cohorted_discussions = ['Topic A', 'Topic B']
-        config_course_cohorts(self.course, [], cohorted=True, cohorted_discussions=cohorted_discussions)
+        config_course_cohorts(self.course, is_cohorted=True, cohorted_discussions=cohorted_discussions)
 
         response = self.get_handler(self.course, handler=course_cohort_settings_handler)
         response['cohorted_discussions'].sort()
@@ -155,7 +157,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         Verify that course_cohort_settings_handler is working for HTTP POST.
         """
-        config_course_cohorts(self.course, [], cohorted=True)
+        config_course_cohorts(self.course, is_cohorted=True)
 
         response = self.get_handler(self.course, handler=course_cohort_settings_handler)
 
@@ -176,7 +178,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         Verify that course_cohort_settings_handler return HTTP 400 if required data field is missing from post data.
         """
-        config_course_cohorts(self.course, [], cohorted=True)
+        config_course_cohorts(self.course, is_cohorted=True)
 
         response = self.put_handler(self.course, expected_response_code=400, handler=course_cohort_settings_handler)
         self.assertEqual("Bad Request", response.get("error"))
@@ -185,7 +187,7 @@ class CourseCohortSettingsHandlerTestCase(CohortViewsTestCase):
         """
         Verify that course_cohort_settings_handler return HTTP 400 if field data type is incorrect.
         """
-        config_course_cohorts(self.course, [], cohorted=True)
+        config_course_cohorts(self.course, is_cohorted=True)
 
         response = self.put_handler(
             self.course,
@@ -268,23 +270,21 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         """
         Verify that auto cohorts are included in the response.
         """
-        config_course_cohorts(self.course, [], cohorted=True,
-                              auto_cohort_groups=["AutoGroup1", "AutoGroup2"])
+        config_course_cohorts(self.course, is_cohorted=True, auto_cohorts=["AutoGroup1", "AutoGroup2"])
 
-        # Will create cohort1, cohort2, and cohort3. Auto cohorts remain uncreated.
+        # Will create manual cohorts cohort1, cohort2, and cohort3.
         self._create_cohorts()
-        # Get the cohorts from the course, which will cause auto cohorts to be created.
         actual_cohorts = self.get_handler(self.course)
         # Get references to the created auto cohorts.
         auto_cohort_1 = get_cohort_by_name(self.course.id, "AutoGroup1")
         auto_cohort_2 = get_cohort_by_name(self.course.id, "AutoGroup2")
         expected_cohorts = [
+            CohortHandlerTestCase.create_expected_cohort(auto_cohort_1, 0, CourseCohort.RANDOM),
+            CohortHandlerTestCase.create_expected_cohort(auto_cohort_2, 0, CourseCohort.RANDOM),
             CohortHandlerTestCase.create_expected_cohort(self.cohort1, 3, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort2, 2, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort3, 2, CourseCohort.MANUAL),
             CohortHandlerTestCase.create_expected_cohort(self.cohort4, 2, CourseCohort.RANDOM),
-            CohortHandlerTestCase.create_expected_cohort(auto_cohort_1, 0, CourseCohort.RANDOM),
-            CohortHandlerTestCase.create_expected_cohort(auto_cohort_2, 0, CourseCohort.RANDOM),
         ]
         self.verify_lists_expected_cohorts(expected_cohorts, actual_cohorts)
 
@@ -295,8 +295,8 @@ class CohortHandlerTestCase(CohortViewsTestCase):
         # verify the default cohort is not created when the course is not cohorted
         self.verify_lists_expected_cohorts([])
 
-        # create a cohorted course without any auto_cohort_groups
-        config_course_cohorts(self.course, [], cohorted=True)
+        # create a cohorted course without any auto_cohorts
+        config_course_cohorts(self.course, is_cohorted=True)
 
         # verify the default cohort is not yet created until a user is assigned
         self.verify_lists_expected_cohorts([])
@@ -320,7 +320,7 @@ class CohortHandlerTestCase(CohortViewsTestCase):
 
         # set auto_cohort_groups
         # these cohort config will have not effect on lms side as we are already done with migrations
-        config_course_cohorts(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
+        config_course_cohorts_legacy(self.course, [], cohorted=True, auto_cohort_groups=["AutoGroup"])
 
         # We should expect the DoesNotExist exception because above cohort config have
         # no effect on lms side so as a result there will be no AutoGroup cohort present

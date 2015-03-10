@@ -544,6 +544,9 @@ class ImportTestCase(BaseCourseTestCase):
     def test_cohort_config(self):
         """
         Check that cohort config parsing works right.
+
+        Note: The cohort config on the CourseModule is no longer used.
+        See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         modulestore = XMLModuleStore(DATA_DIR, course_dirs=['toy'])
 

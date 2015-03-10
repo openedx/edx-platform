@@ -1028,6 +1028,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def is_cohorted(self):
         """
         Return whether the course is cohorted.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
@@ -1039,6 +1041,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
     def auto_cohort(self):
         """
         Return whether the course is auto-cohorted.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         if not self.is_cohorted:
             return False
@@ -1052,6 +1056,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return the list of groups to put students into.  Returns [] if not
         specified. Returns specified list even if is_cohorted and/or auto_cohort are
         false.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         if self.cohort_config is None:
             return []
@@ -1072,6 +1078,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         Return the set of discussions that is explicitly cohorted.  It may be
         the empty set.  Note that all inline discussions are automatically
         cohorted based on the course's is_cohorted setting.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
@@ -1085,6 +1093,8 @@ class CourseDescriptor(CourseFields, SequenceDescriptor):
         This allow to change the default behavior of inline discussions cohorting. By
         setting this to False, all inline discussions are non-cohorted unless their
         ids are specified in cohorted_discussions.
+
+        Note: No longer used. See openedx.core.djangoapps.course_groups.models.CourseCohortSettings.
         """
         config = self.cohort_config
         if config is None:
