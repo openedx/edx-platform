@@ -22,6 +22,7 @@ from django.db.models import Q
 import pytz
 from urllib import urlencode
 
+from django.core.cache import cache
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.conf import settings
 from django.utils import timezone
@@ -177,6 +178,50 @@ class UserStanding(models.Model):
     )
     changed_by = models.ForeignKey(User, blank=True)
     standing_last_changed_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Override save() behavior to modify cache.
+        """
+        super(UserStanding, self).save(*args, **kwargs)
+        is_disabled = (self.account_status == UserStanding.ACCOUNT_DISABLED)
+        cache_key = UserStanding._cache_key(self.user_id)
+        cache.set(cache_key, is_disabled)
+
+    @classmethod
+    def is_user_disabled(cls, user):
+        """
+        Return True/False on whether the given User object is disabled (banned).
+        """
+        # Can't ban a user we don't know (yet)
+        if user.is_anonymous():
+            return False
+
+        # Check our cached value
+        cache_key = cls._cache_key(user.id)
+        is_disabled = cache.get(cache_key)
+
+        # If we had something in our cache, return that value (it's a bool)
+        if is_disabled is not None:
+            return is_disabled
+
+        # Otherwise, do the database lookup...
+        try:
+            user_standing = cls.objects.get(user=user.id)  # unique
+            is_disabled = (user_standing.account_status == cls.ACCOUNT_DISABLED)
+        except cls.DoesNotExist:
+            is_disabled = False
+
+        # Set our cached value before we return
+        cache.set(cache_key, is_disabled)
+
+        return is_disabled
+
+    @staticmethod
+    def _cache_key(user_id):
+        return "UserStanding.is_user_disabled.{}".format(user_id)
+
+
 
 
 class UserProfile(models.Model):

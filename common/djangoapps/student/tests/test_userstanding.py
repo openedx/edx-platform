@@ -7,6 +7,7 @@ import unittest
 from student.tests.factories import UserFactory, UserStandingFactory
 from student.models import UserStanding
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 
@@ -58,9 +59,18 @@ class UserStandingTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_disable_account(self):
-        self.assertEqual(
-            UserStanding.objects.filter(user=self.good_user).count(), 0
-        )
+        # Assert that there exists no UserStanding entry for this user
+        self.assertEqual(UserStanding.objects.filter(user=self.good_user).count(), 0)
+        # The first time we ask is_user_disabled(), it has to hit the database:
+        with self.assertNumQueries(1):
+            self.assertFalse(UserStanding.is_user_disabled(self.good_user))
+        # The second time, it should pull from the cache
+        with self.assertNumQueries(0):
+            self.assertFalse(UserStanding.is_user_disabled(self.good_user))
+        # Neither of the above checks actually created any models though.
+        self.assertEqual(UserStanding.objects.filter(user=self.good_user).count(), 0)
+
+        # Now disable the account...
         response = self.admin_client.post(reverse('disable_account_ajax'), {
             'username': self.good_user.username,
             'account_action': 'disable',
@@ -69,6 +79,10 @@ class UserStandingTest(TestCase):
             UserStanding.objects.get(user=self.good_user).account_status,
             UserStanding.ACCOUNT_DISABLED
         )
+        # Because the save() action updates the cache, we should be able to get
+        # this without hitting the database.
+        with self.assertNumQueries(0):
+            self.assertTrue(UserStanding.is_user_disabled(self.good_user))
 
     def test_disabled_account_403s(self):
         response = self.bad_user_client.get(self.some_url)
@@ -76,6 +90,17 @@ class UserStandingTest(TestCase):
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_reenable_account(self):
+        # Clear the cache value that got set when we set up the bad_user, to
+        # simulate someone who's been away for a while...
+        cache.delete(UserStanding._cache_key(self.bad_user.id))
+
+        # The first time we ask is_user_disabled(), it has to hit the database:
+        with self.assertNumQueries(1):
+            self.assertTrue(UserStanding.is_user_disabled(self.bad_user))
+        # The second time, it should pull from the cache
+        with self.assertNumQueries(0):
+            self.assertTrue(UserStanding.is_user_disabled(self.bad_user))
+
         response = self.admin_client.post(reverse('disable_account_ajax'), {
             'username': self.bad_user.username,
             'account_action': 'reenable'
@@ -84,6 +109,11 @@ class UserStandingTest(TestCase):
             UserStanding.objects.get(user=self.bad_user).account_status,
             UserStanding.ACCOUNT_ENABLED
         )
+
+        # Because the save() action updates the cache, we should be able to get
+        # this without hitting the database.
+        with self.assertNumQueries(0):
+            self.assertFalse(UserStanding.is_user_disabled(self.bad_user))
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_non_staff_cant_access_disable_view(self):
