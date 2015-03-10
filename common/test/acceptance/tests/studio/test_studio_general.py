@@ -14,7 +14,7 @@ from ...pages.studio.import_export import ExportCoursePage, ImportCoursePage
 from ...pages.studio.howitworks import HowitworksPage
 from ...pages.studio.index import DashboardPage
 from ...pages.studio.login import LoginPage
-from ...pages.studio.manage_users import CourseTeamPage
+from ...pages.studio.users import CourseTeamPage
 from ...pages.studio.overview import CourseOutlinePage
 from ...pages.studio.settings import SettingsPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage

@@ -42,6 +42,10 @@ class StudioCourseTest(UniqueCourseTest):
         Log in as the user that created the course. The user will be given instructor access
         to the course and enrolled in it. By default the user will not have staff access unless
         is_staff is passed as True.
+
+        Args:
+            user(dict): dictionary containing user data: {'username': ..., 'email': ..., 'password': ...}
+            is_staff(bool): register this user as staff
         """
         self.auth_page = AutoAuthPage(
             self.browser,

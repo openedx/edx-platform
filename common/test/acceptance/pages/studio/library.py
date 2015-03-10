@@ -7,8 +7,8 @@ from bok_choy.promise import EmptyPromise
 from selenium.webdriver.support.select import Select
 from .component_editor import ComponentEditorView
 from .container import XBlockWrapper
+from ...pages.studio.users import UsersPageMixin
 from ...pages.studio.pagination import PaginatedMixin
-from ...tests.helpers import disable_animations
 from .utils import confirm_prompt, wait_for_notification
 from . import BASE_URL
 
@@ -35,7 +35,7 @@ class LibraryPage(PageObject):
         return self.q(css='body.view-library').present
 
 
-class LibraryEditPage(LibraryPage, PaginatedMixin):
+class LibraryEditPage(LibraryPage, PaginatedMixin, UsersPageMixin):
     """
     Library edit page in Studio
     """
@@ -56,11 +56,7 @@ class LibraryEditPage(LibraryPage, PaginatedMixin):
         for improved test reliability.
         """
         self.wait_for_ajax()
-        self.wait_for_element_invisibility(
-            '.ui-loading',
-            'Wait for the page to complete its initial loading of XBlocks via AJAX'
-        )
-        disable_animations(self)
+        super(LibraryEditPage, self).wait_until_ready()
 
     @property
     def xblocks(self):
@@ -146,6 +142,7 @@ class StudioLibraryContentEditor(ComponentEditorView):
 
     @property
     def library_name(self):
+        """ Gets name of library """
         return self.get_selected_option_text(self.LIBRARY_LABEL)
 
     @library_name.setter
