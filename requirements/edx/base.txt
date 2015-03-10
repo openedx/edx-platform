@@ -152,3 +152,6 @@ testtools==0.9.34
 analytics-python==0.4.4
 
 git+https://github.com/mfogel/django-settings-context-processor.git
+
+# Needed for mailchimp(mailing djangoapp)
+mailsnake==1.6.2
