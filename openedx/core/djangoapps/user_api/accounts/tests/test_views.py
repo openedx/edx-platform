@@ -10,28 +10,29 @@ from rest_framework.test import APITestCase, APIClient
 from student.tests.factories import UserFactory
 from student.models import UserProfile, PendingEmailChange
 
-TEST_PASSWORD = "test"
-
-
+@ddt.ddt
 class UserAPITestCase(APITestCase):
     """
     The base class for all tests of the User API
     """
+    test_password = "test"
+    __test__ = False
+    
     def setUp(self):
         super(UserAPITestCase, self).setUp()
 
         self.anonymous_client = APIClient()
-        self.different_user = UserFactory.create(password=TEST_PASSWORD)
+        self.different_user = UserFactory.create(password=self.test_password)
         self.different_client = APIClient()
-        self.staff_user = UserFactory(is_staff=True, password=TEST_PASSWORD)
+        self.staff_user = UserFactory(is_staff=True, password=self.test_password)
         self.staff_client = APIClient()
-        self.user = UserFactory.create(password=TEST_PASSWORD)
+        self.user = UserFactory.create(password=self.test_password)
 
     def login_client(self, api_client, user):
         """Helper method for getting the client and user and logging in. Returns client. """
         client = getattr(self, api_client)
         user = getattr(self, user)
-        client.login(username=user.username, password=TEST_PASSWORD)
+        client.login(username=user.username, password=self.test_password)
         return client
 
     def send_patch(self, client, json_data, content_type="application/merge-patch+json", expected_status=204):
@@ -53,6 +54,22 @@ class UserAPITestCase(APITestCase):
         self.assertEqual(expected_status, response.status_code)
         return response
 
+    def send_put(self, client, data, content_type='text/plain', expected_status=204):
+        """
+        Helper method for sending a PUT to the server. Verifies the expected status and returns the response.
+        """
+        response = client.put(self.url, data=data, content_type=content_type)
+        self.assertEqual(expected_status, response.status_code)
+        return response
+
+    def send_delete(self, client, expected_status=204):
+        """
+        Helper method for sending a DELETE to the server. Verifies the expected status and returns the response.
+        """
+        response = client.delete(self.url)
+        self.assertEqual(expected_status, response.status_code)
+        return response
+
     def create_mock_profile(self, user):
         """
         Helper method that creates a mock profile for the specified user
@@ -66,6 +83,25 @@ class UserAPITestCase(APITestCase):
         legacy_profile.mailing_address = "Park Ave"
         legacy_profile.save()
 
+    def test_get_anonymous_user(self):
+        """
+        Test that an anonymous client (not logged in) cannot call get.
+        """
+        self.send_get(self.anonymous_client, expected_status=401)
+
+    @ddt.data(
+        ("client", "user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_get_unknown_user(self, api_client, username):
+        """
+        Test that requesting a user who does not exist returns a 404.
+        """
+        client = self.login_client(api_client, username)
+        response = client.get(reverse(self.url_endpoint_name, kwargs={'username': "does_not_exist"}))
+        self.assertEqual(404, response.status_code)
+
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
@@ -73,44 +109,26 @@ class TestAccountAPI(UserAPITestCase):
     """
     Unit tests for the Account API.
     """
+    __test__ = True
 
     def setUp(self):
         super(TestAccountAPI, self).setUp()
-
-        self.url = reverse("accounts_api", kwargs={'username': self.user.username})
-
-    def test_get_account_anonymous_user(self):
-        """
-        Test that an anonymous client (not logged in) cannot call get.
-        """
-        self.send_get(self.anonymous_client, expected_status=401)
+        self.url_endpoint_name = "accounts_api"
+        self.url = reverse(self.url_endpoint_name, kwargs={'username': self.user.username})
 
     def test_get_account_different_user(self):
         """
         Test that a client (logged in) cannot get the account information for a different client.
         """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.send_get(self.different_client, expected_status=404)
-
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_get_account_unknown_user(self, api_client, user):
-        """
-        Test that requesting a user who does not exist returns a 404.
-        """
-        client = self.login_client(api_client, user)
-        response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
 
     def test_get_account_default(self):
         """
         Test that a client (logged in) can get her own account information (using default legacy profile information,
         as created by the test UserFactory).
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
         data = response.data
         self.assertEqual(11, len(data))
@@ -163,7 +181,7 @@ class TestAccountAPI(UserAPITestCase):
         legacy_profile.gender = ""
         legacy_profile.save()
 
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
         for empty_field in ("level_of_education", "gender", "country"):
             self.assertIsNone(response.data[empty_field])
@@ -178,7 +196,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         Test that a client (logged in) cannot update the account information for a different client.
         """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.different_client.login(username=self.different_user.username, password=self.test_password)
         self.send_patch(self.different_client, {}, expected_status=404)
 
     @ddt.data(
@@ -285,7 +303,7 @@ class TestAccountAPI(UserAPITestCase):
         """
         Test the behavior of patch when an incorrect content_type is specified.
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
         self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
@@ -294,7 +312,7 @@ class TestAccountAPI(UserAPITestCase):
         Tests the behavior of patch when attempting to set fields with a select list of options to the empty string.
         Also verifies the behaviour when setting to None.
         """
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         for field_name in ["gender", "level_of_education", "country"]:
             self.send_patch(self.client, {field_name: ""})
             response = self.send_get(self.client)
@@ -326,7 +344,7 @@ class TestAccountAPI(UserAPITestCase):
             get_response = self.send_get(self.client)
             self.assertEqual(new_name, get_response.data["name"])
 
-        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.client.login(username=self.user.username, password=self.test_password)
         legacy_profile = UserProfile.objects.get(id=self.user.id)
         self.assertEqual({}, legacy_profile.get_meta())
         old_name = legacy_profile.name
@@ -337,7 +355,7 @@ class TestAccountAPI(UserAPITestCase):
         verify_change_info(name_change_info[0], old_name, self.user.username, "Mickey Mouse")
 
         # Now change the name as a different (staff) user and verify meta information.
-        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
+        self.staff_client.login(username=self.staff_user.username, password=self.test_password)
         self.send_patch(self.staff_client, {"name": "Donald Duck"})
         name_change_info = get_name_change_info(2)
         verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)

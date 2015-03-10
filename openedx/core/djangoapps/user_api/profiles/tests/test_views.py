@@ -21,16 +21,12 @@ class TestProfileAPI(UserAPITestCase):
     """
     Unit tests for the profile API.
     """
+    __test__ = True
 
     def setUp(self):
         super(TestProfileAPI, self).setUp()
-        self.url = reverse("profiles_api", kwargs={'username': self.user.username})
-
-    def test_get_profile_anonymous_user(self):
-        """
-        Test that an anonymous client (not logged in) cannot call get.
-        """
-        self.send_get(self.anonymous_client, expected_status=401)
+        self.url_endpoint_name = "profiles_api"
+        self.url = reverse(self.url_endpoint_name, kwargs={'username': self.user.username})
 
     def _verify_full_profile_response(self, response):
         """
@@ -122,16 +118,3 @@ class TestProfileAPI(UserAPITestCase):
             self._verify_full_profile_response(response)
         else:
             self._verify_private_profile_response(response)
-
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_get_profile_unknown_user(self, api_client, username):
-        """
-        Test that requesting a user who does not exist returns a 404.
-        """
-        client = self.login_client(api_client, username)
-        response = client.get(reverse("profiles_api", kwargs={'username': "does_not_exist"}))
-        self.assertEqual(404, response.status_code)
