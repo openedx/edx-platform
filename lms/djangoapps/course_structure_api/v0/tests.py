@@ -18,7 +18,8 @@ from xmodule.modulestore.xml import CourseLocationManager
 from xmodule.tests import get_test_system
 
 from courseware.tests.factories import GlobalStaffFactory, StaffFactory
-from openedx.core.djangoapps.content.course_structures.models import CourseStructure, update_course_structure
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.content.course_structures.tasks import update_course_structure
 
 
 TEST_SERVER_HOST = 'http://testserver'
