@@ -4,24 +4,17 @@ NOTE: this API is WIP and has not yet been approved. Do not use this API without
 For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
-import datetime
-from pytz import UTC
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
-from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer, AccountUserSerializer
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
+from openedx.core.djangoapps.user_api.api.account import (
+    AccountUserNotFound, AccountUpdateError, AccountNotAuthorized, AccountValidationError
+)
 from openedx.core.lib.api.parsers import MergePatchParser
-from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
-from student.models import UserProfile
-from student.views import do_email_change_request
+from .api import get_account_settings, update_account_settings
 
 
 class AccountView(APIView):
@@ -32,54 +25,78 @@ class AccountView(APIView):
 
         **Example Requests**:
 
-            GET /api/user/v0/accounts/{username}/
+            GET /api/user/v0/accounts/{username}/[?view=shared]
 
             PATCH /api/user/v0/accounts/{username}/ with content_type "application/merge-patch+json"
 
         **Response Values for GET**
 
-            * username: username associated with the account (not editable)
+            If the user making the request has username "username", or has "is_staff" access, the following
+            fields will be returned:
 
-            * name: full name of the user (must be at least two characters)
+                * username: username associated with the account (not editable)
 
-            * email: email for the user (the new email address must be confirmed via a confirmation email, so GET will
-                not reflect the change until the address has been confirmed)
+                * name: full name of the user (must be at least two characters)
 
-            * date_joined: date this account was created (not editable), in the string format provided by
-                datetime (for example, "2014-08-26T17:52:11Z")
+                * email: email for the user (the new email address must be confirmed via a confirmation email, so GET will
+                    not reflect the change until the address has been confirmed)
 
-            * gender: null (not set), "m", "f", or "o"
+                * date_joined: date this account was created (not editable), in the string format provided by
+                    datetime (for example, "2014-08-26T17:52:11Z")
 
-            * year_of_birth: null or integer year
+                * gender: null (not set), "m", "f", or "o"
 
-            * level_of_education: null (not set), or one of the following choices:
+                * year_of_birth: null or integer year
 
-                * "p" signifying "Doctorate"
-                * "m" signifying "Master's or professional degree"
-                * "b" signifying "Bachelor's degree"
-                * "a" signifying "Associate's degree"
-                * "hs" signifying "Secondary/high school"
-                * "jhs" signifying "Junior secondary/junior high/middle school"
-                * "el" signifying "Elementary/primary school"
-                * "none" signifying "None"
-                * "o" signifying "Other"
+                * level_of_education: null (not set), or one of the following choices:
 
-             * language: null or name of preferred language
+                    * "p" signifying "Doctorate"
+                    * "m" signifying "Master's or professional degree"
+                    * "b" signifying "Bachelor's degree"
+                    * "a" signifying "Associate's degree"
+                    * "hs" signifying "Secondary/high school"
+                    * "jhs" signifying "Junior secondary/junior high/middle school"
+                    * "el" signifying "Elementary/primary school"
+                    * "none" signifying "None"
+                    * "o" signifying "Other"
 
-             * country: null (not set), or a Country corresponding to one of the ISO 3166-1 countries
+                * language: null or name of preferred language
 
-             * mailing_address: null or textual representation of mailing address
+                * country: null (not set), or a Country corresponding to one of the ISO 3166-1 countries
 
-             * goals: null or textual representation of goals
+                * mailing_address: null or textual representation of mailing address
+
+                * goals: null or textual representation of goals
+
+            If a user without "is_staff" access has requested account information for a different user,
+            only a subset of these fields will be returned. The actual fields returned depend on the configuration
+            setting ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of the user with username
+            "username".
+
+            Note that a user can view which account fields they have shared with other users by requesting their
+            own username and providing the url parameter "view=shared".
+
+            This method will return a 404 if no user exists with username "username".
 
         **Response for PATCH**
 
-             Returns a 204 status if successful, with no additional content.
-             If "application/merge-patch+json" is not the specified content_type, returns a 415 status.
+            Users can only modify their own account information. If the requesting user does not have username
+            "username", this method will return with a status of 404.
 
+            This method will also return a 404 if no user exists with username "username".
+
+            If "application/merge-patch+json" is not the specified content_type, this method returns a 415 status.
+
+            If the update could not be completed due to validation errors, this method returns a 400 with all
+            field-specific error messages in the "field_errors" field of the returned JSON.
+
+            If the update could not be completed due to failure at the time of update, this method returns a 400 with
+            specific errors in the returned JSON.
+
+            If the updated is successful, a 204 status is returned with no additional content.
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
-    permission_classes = (permissions.IsAuthenticated, IsUserInUrlOrStaff)
+    permission_classes = (permissions.IsAuthenticated,)
     parser_classes = (MergePatchParser,)
 
     def get(self, request, username):
@@ -87,34 +104,11 @@ class AccountView(APIView):
         GET /api/user/v0/accounts/{username}/
         """
         try:
-            account_settings = AccountView.get_serialized_account(username)
+            account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
         except AccountUserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
-
-    @staticmethod
-    def get_serialized_account(username):
-        """Returns the user's account information serialized as JSON.
-
-        Note:
-          This method does not perform authentication so it is up to the caller
-          to ensure that only the user themselves or staff can access the account.
-
-        Args:
-          username (str): The username for the desired account.
-
-        Returns:
-           A dict containing each of the account's fields.
-
-        Raises:
-           AccountUserNotFound: raised if there is no account for the specified username.
-        """
-        existing_user, existing_user_profile = AccountView._get_user_and_profile(username)
-        user_serializer = AccountUserSerializer(existing_user)
-        legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile)
-
-        return dict(user_serializer.data, **legacy_profile_serializer.data)
 
     def patch(self, request, username):
         """
@@ -125,128 +119,18 @@ class AccountView(APIView):
         else an error response with status code 415 will be returned.
         """
         try:
-            AccountView.update_account(request.user, username, request.DATA)
-        except AccountUserNotFound:
+            update_account_settings(request.user, request.DATA, username=username)
+        except (AccountUserNotFound, AccountNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
+        except AccountValidationError as err:
+            return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
         except AccountUpdateError as err:
-            return Response(err.error_info, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {
+                    "developer_message": err.developer_message,
+                    "user_message": err.user_message
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @staticmethod
-    def update_account(requesting_user, username, update):
-        """Update the account for the given username.
-
-        Note:
-            No authorization or permissions checks are done in this method. It is up to the caller
-            of this method to enforce the contract that this method is only called if
-            requesting_user.username == username or requesting_user.is_staff == True.
-
-        Arguments:
-            requesting_user (User): the user who initiated the request
-            username (string): the username associated with the account to change
-            update (dict): the updated account field values
-
-        Raises:
-            AccountUserNotFound: no user exists with the specified username
-            AccountUpdateError: the update could not be completed, usually due to validation errors
-                (for example, read-only fields were specified or field values are not legal)
-        """
-        existing_user, existing_user_profile = AccountView._get_user_and_profile(username)
-
-        # If user has requested to change email, we must call the multi-step process to handle this.
-        # It is not handled by the serializer (which considers email to be read-only).
-        new_email = None
-        if "email" in update:
-            new_email = update["email"]
-            del update["email"]
-
-        # If user has requested to change name, store old name because we must update associated metadata
-        # after the save process is complete.
-        old_name = None
-        if "name" in update:
-            old_name = existing_user_profile.name
-
-        # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
-        read_only_fields = set(update.keys()).intersection(
-            AccountUserSerializer.Meta.read_only_fields + AccountLegacyProfileSerializer.Meta.read_only_fields
-        )
-        if read_only_fields:
-            field_errors = {}
-            for read_only_field in read_only_fields:
-                field_errors[read_only_field] = {
-                    "developer_message": "This field is not editable via this API",
-                    "user_message": _("Field '{field_name}' cannot be edited.".format(field_name=read_only_field))
-                }
-            raise AccountUpdateError({"field_errors": field_errors})
-
-        # If the user asked to change email, send the request now.
-        if new_email:
-            try:
-                do_email_change_request(existing_user, new_email)
-            except ValueError as err:
-                response_data = {
-                    "developer_message": "Error thrown from do_email_change_request: '{}'".format(err.message),
-                    "user_message": err.message
-                }
-                raise AccountUpdateError(response_data)
-
-        user_serializer = AccountUserSerializer(existing_user, data=update)
-        legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile, data=update)
-
-        for serializer in user_serializer, legacy_profile_serializer:
-            validation_errors = AccountView._get_validation_errors(update, serializer)
-            if validation_errors:
-                raise AccountUpdateError(validation_errors)
-            serializer.save()
-
-        # If the name was changed, store information about the change operation. This is outside of the
-        # serializer so that we can store who requested the change.
-        if old_name:
-            meta = existing_user_profile.get_meta()
-            if 'old_names' not in meta:
-                meta['old_names'] = []
-            meta['old_names'].append([
-                old_name,
-                "Name change requested through account API by {0}".format(requesting_user.username),
-                datetime.datetime.now(UTC).isoformat()
-            ])
-            existing_user_profile.set_meta(meta)
-            existing_user_profile.save()
-
-    @staticmethod
-    def _get_user_and_profile(username):
-        """
-        Helper method to return the legacy user and profile objects based on username.
-        """
-        try:
-            existing_user = User.objects.get(username=username)
-            existing_user_profile = UserProfile.objects.get(user=existing_user)
-        except ObjectDoesNotExist:
-            raise AccountUserNotFound()
-
-        return existing_user, existing_user_profile
-
-    @staticmethod
-    def _get_validation_errors(update, serializer):
-        """
-        Helper method that returns any validation errors that are present.
-        """
-        validation_errors = {}
-        if not serializer.is_valid():
-            field_errors = {}
-            errors = serializer.errors
-            for key, value in errors.iteritems():
-                if isinstance(value, list) and len(value) > 0:
-                    developer_message = value[0]
-                else:
-                    developer_message = "Invalid value: {field_value}'".format(field_value=update[key])
-                field_errors[key] = {
-                    "developer_message": developer_message,
-                    "user_message": _("Value '{field_value}' is not valid for field '{field_name}'.".format(
-                        field_value=update[key], field_name=key)
-                    )
-                }
-
-            validation_errors['field_errors'] = field_errors
-        return validation_errors

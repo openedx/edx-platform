@@ -672,7 +672,7 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
             # TODO: remove circular dependency on openedx from common
             from openedx.core.djangoapps.user_api.api import profile
             opt_in = email_opt_in.lower() == 'true'
-            profile.update_email_opt_in(user.username, course_id.org, opt_in)
+            profile.update_email_opt_in(user, course_id.org, opt_in)
 
         # Check whether we're blocked from enrolling by a
         # country access rule.

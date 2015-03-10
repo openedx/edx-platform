@@ -67,11 +67,23 @@ class AccountNotAuthorized(AccountRequestError):
 
 class AccountUpdateError(AccountRequestError):
     """
-    An update to the account failed. More detailed information is present in error_info (a dict
-    with at least a developer_message, though possibly also a nested field_errors dict).
+    An update to the account failed. More detailed information is present in developer_message,
+    and depending on the type of error encountered, there may also be a non-null user_message field.
     """
-    def __init__(self, error_info):
-        self.error_info = error_info
+    def __init__(self, developer_message, user_message=None):
+        self.developer_message = developer_message
+        self.user_message = user_message
+
+
+class AccountValidationError(AccountRequestError):
+    """
+    Validation issues were found with the supplied data. More detailed information is present in field_errors,
+    a dict with specific information about each field that failed validation. For each field,
+    there will be at least a developer_message describing the validation issue, and possibly
+    also a user_message.
+    """
+    def __init__(self, field_errors):
+        self.field_errors = field_errors
 
 
 @intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])

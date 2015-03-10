@@ -2,6 +2,7 @@
 import unittest
 import ddt
 import json
+from mock import patch
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -9,6 +10,9 @@ from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
 from student.models import UserProfile, PendingEmailChange
+from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KEY
+from openedx.core.djangoapps.user_api.models import UserPreference
+from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 
 TEST_PASSWORD = "test"
 
@@ -73,24 +77,66 @@ class TestAccountAPI(UserAPITestCase):
     """
     Unit tests for the Account API.
     """
-
     def setUp(self):
         super(TestAccountAPI, self).setUp()
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
-    def test_get_account_anonymous_user(self):
+    def _verify_full_shareable_account_response(self, response):
         """
-        Test that an anonymous client (not logged in) cannot call get.
+        Verify that the shareable fields from the account are returned
+        """
+        data = response.data
+        self.assertEqual(6, len(data))
+        self.assertEqual(self.user.username, data["username"])
+        self.assertEqual("US", data["country"])
+        self.assertIsNone(data["profile_image"])
+        self.assertIsNone(data["time_zone"])
+        self.assertIsNone(data["languages"])
+        self.assertIsNone(data["bio"])
+
+    def _verify_private_account_response(self, response):
+        """
+        Verify that only the public fields are returned if a user does not want to share account fields
+        """
+        data = response.data
+        self.assertEqual(2, len(data))
+        self.assertEqual(self.user.username, data["username"])
+        self.assertIsNone(data["profile_image"])
+
+    def _verify_full_account_response(self, response):
+        """
+        Verify that all account fields are returned (even those that are not shareable).
+        """
+        data = response.data
+        self.assertEqual(11, len(data))
+        self.assertEqual(self.user.username, data["username"])
+        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
+        self.assertEqual("US", data["country"])
+        self.assertEqual("", data["language"])
+        self.assertEqual("m", data["gender"])
+        self.assertEqual(1900, data["year_of_birth"])
+        self.assertEqual("m", data["level_of_education"])
+        self.assertEqual("world peace", data["goals"])
+        self.assertEqual("Park Ave", data['mailing_address'])
+        self.assertEqual(self.user.email, data["email"])
+        self.assertIsNotNone(data["date_joined"])
+
+    def test_anonymous_access(self):
+        """
+        Test that an anonymous client (not logged in) cannot call GET or PATCH.
         """
         self.send_get(self.anonymous_client, expected_status=401)
+        self.send_patch(self.anonymous_client, {}, expected_status=401)
 
-    def test_get_account_different_user(self):
+    def test_unsupported_methods(self):
         """
-        Test that a client (logged in) cannot get the account information for a different client.
+        Test that DELETE, POST, and PUT are not supported.
         """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
-        self.send_get(self.different_client, expected_status=404)
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.post(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
 
     @ddt.data(
         ("client", "user"),
@@ -104,6 +150,69 @@ class TestAccountAPI(UserAPITestCase):
         client = self.login_client(api_client, user)
         response = client.get(reverse("accounts_api", kwargs={'username': "does_not_exist"}))
         self.assertEqual(404, response.status_code)
+
+    # Note: using getattr so that the patching works even if there is no configuration.
+    # This is needed when testing CMS as the patching is still executed even though the
+    # suite is skipped.
+    @patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "all_users"})
+    def test_get_account_different_user_visible(self):
+        """
+        Test that a client (logged in) can only get the shareable fields for a different user.
+        This is the case when default_visibility is set to "all_users".
+        """
+        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.create_mock_profile(self.user)
+        response = self.send_get(self.different_client)
+        self._verify_full_shareable_account_response(response)
+
+    # Note: using getattr so that the patching works even if there is no configuration.
+    # This is needed when testing CMS as the patching is still executed even though the
+    # suite is skipped.
+    @patch.dict(getattr(settings, "ACCOUNT_VISIBILITY_CONFIGURATION", {}), {"default_visibility": "private"})
+    def test_get_account_different_user_private(self):
+        """
+        Test that a client (logged in) can only get the shareable fields for a different user.
+        This is the case when default_visibility is set to "private".
+        """
+        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
+        self.create_mock_profile(self.user)
+        response = self.send_get(self.different_client)
+        self._verify_private_account_response(response)
+
+    @ddt.data(
+        ("client", "user", PRIVATE_VISIBILITY),
+        ("different_client", "different_user", PRIVATE_VISIBILITY),
+        ("staff_client", "staff_user", PRIVATE_VISIBILITY),
+        ("client", "user", ALL_USERS_VISIBILITY),
+        ("different_client", "different_user", ALL_USERS_VISIBILITY),
+        ("staff_client", "staff_user", ALL_USERS_VISIBILITY),
+    )
+    @ddt.unpack
+    def test_get_account_private_visibility(self, api_client, requesting_username, preference_visibility):
+        """
+        Test the return from GET based on user visibility setting.
+        """
+        def verify_fields_visible_to_all_users(response):
+            if preference_visibility == PRIVATE_VISIBILITY:
+                self._verify_private_account_response(response)
+            else:
+                self._verify_full_shareable_account_response(response)
+
+        client = self.login_client(api_client, requesting_username)
+
+        # Update user account visibility setting.
+        UserPreference.set_preference(self.user, ACCOUNT_VISIBILITY_PREF_KEY, preference_visibility)
+        self.create_mock_profile(self.user)
+        response = self.send_get(client)
+
+        if requesting_username == "different_user":
+            verify_fields_visible_to_all_users(response)
+        else:
+            self._verify_full_account_response(response)
+
+        # Verify how the view parameter changes the fields that are returned.
+        response = self.send_get(client, query_parameters='view=shared')
+        verify_fields_visible_to_all_users(response)
 
     def test_get_account_default(self):
         """
@@ -126,33 +235,6 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_get_account(self, api_client, user):
-        """
-        Test that a client (logged in) can get her own account information. Also verifies that a "is_staff"
-        user can get the account information for other users.
-        """
-        self.create_mock_profile(self.user)
-        client = self.login_client(api_client, user)
-        response = self.send_get(client)
-        data = response.data
-        self.assertEqual(11, len(data))
-        self.assertEqual(self.user.username, data["username"])
-        self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-        self.assertEqual("US", data["country"])
-        self.assertEqual("", data["language"])
-        self.assertEqual("m", data["gender"])
-        self.assertEqual(1900, data["year_of_birth"])
-        self.assertEqual("m", data["level_of_education"])
-        self.assertEqual("world peace", data["goals"])
-        self.assertEqual("Park Ave", data['mailing_address'])
-        self.assertEqual(self.user.email, data["email"])
-        self.assertIsNotNone(data["date_joined"])
-
     def test_get_account_empty_string(self):
         """
         Test the conversion of empty strings to None for certain fields.
@@ -168,18 +250,18 @@ class TestAccountAPI(UserAPITestCase):
         for empty_field in ("level_of_education", "gender", "country"):
             self.assertIsNone(response.data[empty_field])
 
-    def test_patch_account_anonymous_user(self):
+    @ddt.data(
+        ("different_client", "different_user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_patch_account_disallowed_user(self, api_client, user):
         """
-        Test that an anonymous client (not logged in) cannot call patch.
+        Test that a client cannot call PATCH on a different client's user account (even with
+        is_staff access).
         """
-        self.send_patch(self.anonymous_client, {}, expected_status=401)
-
-    def test_patch_account_different_user(self):
-        """
-        Test that a client (logged in) cannot update the account information for a different client.
-        """
-        self.different_client.login(username=self.different_user.username, password=TEST_PASSWORD)
-        self.send_patch(self.different_client, {}, expected_status=404)
+        client = self.login_client(api_client, user)
+        self.send_patch(client, {}, expected_status=404)
 
     @ddt.data(
         ("client", "user"),
@@ -198,34 +280,23 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(404, response.status_code)
 
     @ddt.data(
-        (
-            "client", "user", "gender", "f", "not a gender",
-            "Select a valid choice. not a gender is not one of the available choices."
-        ),
-        (
-            "client", "user", "level_of_education", "none", "x",
-            "Select a valid choice. x is not one of the available choices."
-        ),
-        ("client", "user", "country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
-        ("client", "user", "year_of_birth", 2009, "not_an_int", "Enter a whole number."),
-        ("client", "user", "name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
-        ("client", "user", "name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
-        ("client", "user", "language", "Creole"),
-        ("client", "user", "goals", "Smell the roses"),
-        ("client", "user", "mailing_address", "Sesame Street"),
-        # All of the fields can be edited by is_staff, but iterating through all of them again seems like overkill.
-        # Just test a representative field.
-        ("staff_client", "staff_user", "goals", "Smell the roses"),
+        ("gender", "f", "not a gender", "Select a valid choice. not a gender is not one of the available choices."),
+        ("level_of_education", "none", "x", "Select a valid choice. x is not one of the available choices."),
+        ("country", "GB", "XY", "Select a valid choice. XY is not one of the available choices."),
+        ("year_of_birth", 2009, "not_an_int", "Enter a whole number."),
+        ("name", "bob", "z" * 256, "Ensure this value has at most 255 characters (it has 256)."),
+        ("name", u"ȻħȺɍłɇs", "z   ", "The name field must be at least 2 characters long."),
+        ("language", "Creole"),
+        ("goals", "Smell the roses"),
+        ("mailing_address", "Sesame Street"),
         # Note that email is tested below, as it is not immediately updated.
     )
     @ddt.unpack
-    def test_patch_account(
-            self, api_client, user, field, value, fails_validation_value=None, developer_validation_message=None
-    ):
+    def test_patch_account(self, field, value, fails_validation_value=None, developer_validation_message=None):
         """
         Test the behavior of patch, when using the correct content_type.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
         self.send_patch(client, {field: value})
 
         get_response = self.send_get(client)
@@ -248,16 +319,12 @@ class TestAccountAPI(UserAPITestCase):
             get_response = self.send_get(client)
             self.assertEqual("", get_response.data[field])
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
     @ddt.unpack
-    def test_patch_account_noneditable(self, api_client, user):
+    def test_patch_account_noneditable(self):
         """
         Tests the behavior of patch when a read-only field is attempted to be edited.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
 
         def verify_error_response(field_name, data):
             self.assertEqual(
@@ -336,25 +403,19 @@ class TestAccountAPI(UserAPITestCase):
         name_change_info = get_name_change_info(1)
         verify_change_info(name_change_info[0], old_name, self.user.username, "Mickey Mouse")
 
-        # Now change the name as a different (staff) user and verify meta information.
-        self.staff_client.login(username=self.staff_user.username, password=TEST_PASSWORD)
-        self.send_patch(self.staff_client, {"name": "Donald Duck"})
+        # Now change the name again and verify meta information.
+        self.send_patch(self.client, {"name": "Donald Duck"})
         name_change_info = get_name_change_info(2)
         verify_change_info(name_change_info[0], old_name, self.user.username, "Donald Duck",)
-        verify_change_info(name_change_info[1], "Mickey Mouse", self.staff_user.username, "Donald Duck")
+        verify_change_info(name_change_info[1], "Mickey Mouse", self.user.username, "Donald Duck")
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_patch_email(self, api_client, user):
+    def test_patch_email(self):
         """
-        Test that the user (and anyone with an is_staff account) can request an email change through the accounts API.
+        Test that the user can request an email change through the accounts API.
         Full testing of the helper method used (do_email_change_request) exists in the package with the code.
         Here just do minimal smoke testing.
         """
-        client = self.login_client(api_client, user)
+        client = self.login_client("client", "user")
         old_email = self.user.email
         new_email = "newemail@example.com"
         self.send_patch(client, {"email": new_email, "goals": "change my email"})
@@ -379,8 +440,23 @@ class TestAccountAPI(UserAPITestCase):
 
         # Finally, try changing to an invalid email just to make sure error messages are appropriately returned.
         error_response = self.send_patch(client, {"email": "not_an_email"}, expected_status=400)
+        field_errors = error_response.data["field_errors"]
         self.assertEqual(
-            "Error thrown from do_email_change_request: 'Valid e-mail address required.'",
+            "Error thrown from validate_new_email: 'Valid e-mail address required.'",
+            field_errors["email"]["developer_message"]
+        )
+        self.assertEqual("Valid e-mail address required.", field_errors["email"]["user_message"])
+
+    @patch('openedx.core.djangoapps.user_api.accounts.serializers.AccountUserSerializer.save')
+    def test_patch_serializer_save_fails(self, serializer_save):
+        """
+        Test that AccountUpdateErrors are passed through to the response.
+        """
+        serializer_save.side_effect = [Exception("bummer"), None]
+        self.client.login(username=self.user.username, password=TEST_PASSWORD)
+        error_response = self.send_patch(self.client, {"goals": "save an account field"}, expected_status=400)
+        self.assertEqual(
+            "Error thrown when saving account updates: 'bummer'",
             error_response.data["developer_message"]
         )
-        self.assertEqual("Valid e-mail address required.", error_response.data["user_message"])
+        self.assertIsNone(error_response.data["user_message"])

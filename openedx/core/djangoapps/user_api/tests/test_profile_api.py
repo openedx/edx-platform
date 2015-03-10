@@ -11,7 +11,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 import datetime
 
-from ..accounts.views import AccountView
+from ..accounts.api import get_account_settings
 from ..api import account as account_api
 from ..api import profile as profile_api
 from ..models import UserProfile, UserOrgTag
@@ -29,7 +29,8 @@ class ProfileApiTest(ModuleStoreTestCase):
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         # Retrieve the account settings
-        account_settings = AccountView.get_serialized_account(self.USERNAME)
+        user = User.objects.get(username=self.USERNAME)
+        account_settings = get_account_settings(user)
 
         # Expect a date joined field but remove it to simplify the following comparison
         self.assertIsNotNone(account_settings['date_joined'])
@@ -87,7 +88,7 @@ class ProfileApiTest(ModuleStoreTestCase):
         profile.year_of_birth = year_of_birth
         profile.save()
 
-        profile_api.update_email_opt_in(self.USERNAME, course.id.org, option)
+        profile_api.update_email_opt_in(user, course.id.org, option)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, expected_result)
 
@@ -99,7 +100,7 @@ class ProfileApiTest(ModuleStoreTestCase):
 
         user = User.objects.get(username=self.USERNAME)
 
-        profile_api.update_email_opt_in(self.USERNAME, course.id.org, True)
+        profile_api.update_email_opt_in(user, course.id.org, True)
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, u"True")
 
@@ -130,8 +131,8 @@ class ProfileApiTest(ModuleStoreTestCase):
         profile.year_of_birth = year_of_birth
         profile.save()
 
-        profile_api.update_email_opt_in(self.USERNAME, course.id.org, option)
-        profile_api.update_email_opt_in(self.USERNAME, course.id.org, second_option)
+        profile_api.update_email_opt_in(user, course.id.org, option)
+        profile_api.update_email_opt_in(user, course.id.org, second_option)
 
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, expected_result)

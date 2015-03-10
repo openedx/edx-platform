@@ -19,7 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import mail
 from bs4 import BeautifulSoup
 
-from openedx.core.djangoapps.user_api.accounts.views import AccountView
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 from xmodule.modulestore.django import modulestore
@@ -1167,7 +1167,7 @@ class TestSubmitPhotosForVerification(TestCase):
             AssertionError
 
         """
-        account_settings = AccountView.get_serialized_account(self.user.username)
+        account_settings = get_account_settings(self.user)
         self.assertEqual(account_settings['name'], full_name)
 
 

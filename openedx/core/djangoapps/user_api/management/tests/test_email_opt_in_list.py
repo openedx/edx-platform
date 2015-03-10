@@ -297,7 +297,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             None
 
         """
-        profile_api.update_email_opt_in(user.username, org, is_opted_in)
+        profile_api.update_email_opt_in(user, org, is_opted_in)
 
     def _latest_pref_set_datetime(self, user):
         """Retrieve the latest opt-in preference for the user,
