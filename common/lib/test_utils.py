@@ -1,6 +1,11 @@
+"""
+This file includes the monkey-patch for requests' PATCH method, as we are using
+older version of django that does not contains the PATCH method in its test client.
+"""
 from __future__ import unicode_literals
-from urlparse import urlparse
+
 from django.test.client import RequestFactory, Client, FakePayload
+from urlparse import urlparse
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
