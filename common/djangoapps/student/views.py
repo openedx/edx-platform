@@ -53,7 +53,7 @@ from shoppingcart.api import order_history
 from student.models import (
     Registration, UserProfile, PendingNameChange,
     PendingEmailChange, CourseEnrollment, unique_id_for_user,
-    CourseEnrollmentAllowed, UserStanding, LoginFailures,
+    CourseEnrollmentAllowed, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration)
 from student.forms import AccountCreationForm, PasswordResetFormNoActive
@@ -1214,82 +1214,6 @@ def logout_user(request):
         path='/', domain=settings.SESSION_COOKIE_DOMAIN,
     )
     return response
-
-
-@require_GET
-@login_required
-@ensure_csrf_cookie
-def manage_user_standing(request):
-    """
-    Renders the view used to manage user standing. Also displays a table
-    of user accounts that have been disabled and who disabled them.
-    """
-    if not request.user.is_staff:
-        raise Http404
-    all_disabled_accounts = UserStanding.objects.filter(
-        account_status=UserStanding.ACCOUNT_DISABLED
-    )
-
-    all_disabled_users = [standing.user for standing in all_disabled_accounts]
-
-    headers = ['username', 'account_changed_by']
-    rows = []
-    for user in all_disabled_users:
-        row = [user.username, user.standing.all()[0].changed_by]
-        rows.append(row)
-
-    context = {'headers': headers, 'rows': rows}
-
-    return render_to_response("manage_user_standing.html", context)
-
-
-@require_POST
-@login_required
-@ensure_csrf_cookie
-def disable_account_ajax(request):
-    """
-    Ajax call to change user standing. Endpoint of the form
-    in manage_user_standing.html
-    """
-    if not request.user.is_staff:
-        raise Http404
-    username = request.POST.get('username')
-    context = {}
-    if username is None or username.strip() == '':
-        context['message'] = _('Please enter a username')
-        return JsonResponse(context, status=400)
-
-    account_action = request.POST.get('account_action')
-    if account_action is None:
-        context['message'] = _('Please choose an option')
-        return JsonResponse(context, status=400)
-
-    username = username.strip()
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        context['message'] = _("User with username {} does not exist").format(username)
-        return JsonResponse(context, status=400)
-    else:
-        user_account, _success = UserStanding.objects.get_or_create(
-            user=user, defaults={'changed_by': request.user},
-        )
-        if account_action == 'disable':
-            user_account.account_status = UserStanding.ACCOUNT_DISABLED
-            context['message'] = _("Successfully disabled {}'s account").format(username)
-            log.info(u"%s disabled %s's account", request.user, username)
-        elif account_action == 'reenable':
-            user_account.account_status = UserStanding.ACCOUNT_ENABLED
-            context['message'] = _("Successfully reenabled {}'s account").format(username)
-            log.info(u"%s reenabled %s's account", request.user, username)
-        else:
-            context['message'] = _("Unexpected account status")
-            return JsonResponse(context, status=400)
-        user_account.changed_by = request.user
-        user_account.standing_last_changed_at = datetime.datetime.now(UTC)
-        user_account.save()
-
-    return JsonResponse(context)
 
 
 @login_required

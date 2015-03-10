@@ -34,11 +34,6 @@ urlpatterns = (
     url(r'^segmentio/event$', 'track.views.segmentio.segmentio_event'),
     url(r'^t/(?P<template>[^/]*)$', 'static_template_view.views.index'),   # TODO: Is this used anymore? What is STATIC_GRAB?
 
-    url(r'^accounts/manage_user_standing', 'student.views.manage_user_standing',
-        name='manage_user_standing'),
-    url(r'^accounts/disable_account_ajax$', 'student.views.disable_account_ajax',
-        name="disable_account_ajax"),
-
     url(r'^logout$', 'student.views.logout_user', name='logout'),
     url(r'^create_account$', 'student.views.create_account', name='create_account'),
     url(r'^activate/(?P<key>[^/]*)$', 'student.views.activate_account', name="activate"),

@@ -179,6 +179,17 @@ class UserStanding(models.Model):
     standing_last_changed_at = models.DateTimeField(auto_now=True)
 
 
+class UserStandingConfig(ConfigurationModel):
+    disabled = models.TextField(
+        help_text="White-space separated list of usernames of users who should be disabled",
+        blank=True,
+    )
+
+    @property
+    def disabled_list(self):
+        return self.disabled.split()
+
+
 class UserProfile(models.Model):
     """This is where we store all the user demographic fields. We have a
     separate table for this rather than extending the built-in Django auth_user.

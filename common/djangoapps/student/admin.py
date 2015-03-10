@@ -4,9 +4,10 @@ django admin pages for courseware model
 from django import forms
 from config_models.admin import ConfigurationModelAdmin
 
-from student.models import UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration
 from student.models import (
-    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration
+    UserProfile, UserTestGroup, CourseEnrollmentAllowed, DashboardConfiguration,
+    CourseEnrollment, Registration, PendingNameChange, CourseAccessRole, LinkedInAddToProfileConfiguration,
+    UserStandingConfig,
 )
 from ratelimitbackend import admin
 from student.roles import REGISTERED_ACCESS_ROLES
@@ -57,3 +58,5 @@ admin.site.register(CourseAccessRole, CourseAccessRoleAdmin)
 admin.site.register(DashboardConfiguration, ConfigurationModelAdmin)
 
 admin.site.register(LinkedInAddToProfileConfiguration, LinkedInAddToProfileConfigurationAdmin)
+
+admin.site.register(UserStandingConfig, ConfigurationModelAdmin)
