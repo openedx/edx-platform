@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Unit tests for profile APIs.
+Unit tests for preference APIs.
 """
 
 import unittest
@@ -12,6 +12,8 @@ from django.conf import settings
 
 from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.djangoapps.user_api.accounts.tests.test_views import UserAPITestCase
+
+TOO_LONG_PREFERENCE_KEY = "x" * 256
 
 
 @ddt.ddt
@@ -104,33 +106,100 @@ class TestPreferencesAPI(UserAPITestCase):
         self.send_patch(self.client, {}, content_type="application/json", expected_status=415)
         self.send_patch(self.client, {}, content_type="application/xml", expected_status=415)
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_create_preferences(self, api_client, user):
+    def test_create_preferences(self):
         """
-        Test that a client (logged in) can create her own preferences information. Also verifies that a "is_staff"
-        user can create the preferences information for other users.
+        Test that a client (logged in) can create her own preferences information.
         """
-        client = self.login_client(api_client, user)
-        self.send_patch(client, {
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.send_patch(self.client, {
             "dict_pref": {"int_key": 10},
             "string_pref": "value",
         })
-        response = self.send_get(client)
-        self.assertEqual({"dict_pref": "{'int_key': 10}", "string_pref": "value"}, response.data)
+        response = self.send_get(self.client)
+        self.assertEqual({u"dict_pref": u"{u'int_key': 10}", u"string_pref": u"value"}, response.data)
 
     @ddt.data(
-        ("client", "user"),
+        ("different_client", "different_user"),
         ("staff_client", "staff_user"),
     )
     @ddt.unpack
-    def test_update_preferences(self, api_client, user):
+    def test_create_preferences_other_user(self, api_client, user):
         """
-        Test that a client (logged in) can update her own preferences information. Also verifies that a "is_staff"
-        user can create the preferences information for other users.
+        Test that a client (logged in) cannot create preferences for another user.
+        """
+        client = self.login_client(api_client, user)
+        self.send_patch(
+            client,
+            {
+                "dict_pref": {"int_key": 10},
+                "string_pref": "value",
+            },
+            expected_status=404,
+        )
+
+    def test_update_preferences(self):
+        """
+        Test that a client (logged in) can update her own preferences information.
+        """
+        # Create some test preferences values.
+        UserPreference.set_preference(self.user, "dict_pref", {"int_key": 10})
+        UserPreference.set_preference(self.user, "string_pref", "value")
+        UserPreference.set_preference(self.user, "extra_pref", "extra_value")
+
+        # Send the patch request
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.send_patch(self.client, {
+            "string_pref": "updated_value",
+            "new_pref": "new_value",
+            "extra_pref": None,
+        })
+
+        # Verify that GET returns the updated preferences
+        response = self.send_get(self.client)
+        expected_preferences = {
+            "dict_pref": "{'int_key': 10}",
+            "string_pref": "updated_value",
+            "new_pref": "new_value",
+        }
+        self.assertEqual(expected_preferences, response.data)
+
+    def test_update_preferences_bad_data(self):
+        """
+        Test that a client (logged in) receives appropriate errors for a bad update.
+        """
+        # Create some test preferences values.
+        UserPreference.set_preference(self.user, "dict_pref", {"int_key": 10})
+        UserPreference.set_preference(self.user, "string_pref", "value")
+        UserPreference.set_preference(self.user, "extra_pref", "extra_value")
+
+        # Send the patch request
+        self.client.login(username=self.user.username, password=self.test_password)
+        response = self.send_patch(
+            self.client,
+            {
+                "string_pref": "updated_value",
+                TOO_LONG_PREFERENCE_KEY: "new_value",
+                "new_pref": "new_value",
+            },
+            expected_status=400
+        )
+
+        # Verify that GET returns the original preferences
+        response = self.send_get(self.client)
+        expected_preferences = {
+            "dict_pref": "{'int_key': 10}",
+            "string_pref": "value",
+        }
+        self.assertEqual(expected_preferences, response.data)
+
+    @ddt.data(
+        ("different_client", "different_user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_update_preferences_other_user(self, api_client, user):
+        """
+        Test that a client (logged in) cannot update preferences for another user.
         """
         # Create some test preferences values.
         UserPreference.set_preference(self.user, "dict_pref", {"int_key": 10})
@@ -139,20 +208,15 @@ class TestPreferencesAPI(UserAPITestCase):
 
         # Send the patch request
         client = self.login_client(api_client, user)
-        self.send_patch(client, {
-            "string_pref": "updated_value",
-            "new_pref": "new_value",
-            "extra_pref": None,
-        })
-
-        # Verify that GET returns the updated preferences
-        response = self.send_get(client)
-        expected_preferences = {
-            "dict_pref": "{'int_key': 10}",
-            "string_pref": "updated_value",
-            "new_pref": "new_value",
-        }
-        self.assertEqual(expected_preferences, response.data)
+        self.send_patch(
+            client,
+            {
+                "string_pref": "updated_value",
+                "new_pref": "new_value",
+                "extra_pref": None,
+            },
+            expected_status=404
+        )
 
 
 @ddt.ddt
@@ -236,56 +300,93 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         response = self.send_get(client)
         self.assertEqual("{'int_key': 10}", response.data)
 
-    @ddt.data(
-        ("client", "user"),
-        ("staff_client", "staff_user"),
-    )
-    @ddt.unpack
-    def test_create_preference(self, api_client, user):
+    def test_create_preference(self):
         """
-        Test that a client (logged in) can create a preference. Also verifies that a "is_staff"
-        user can create a preference for other users.
+        Test that a client (logged in) can create a preference.
         """
-        client = self.login_client(api_client, user)
+        self.client.login(username=self.user.username, password=self.test_password)
 
         # Verify that a new preference can be created
-        self.send_delete(client)
+        self.send_delete(self.client)
         new_value = "new value"
-        self.send_put(client, new_value)
-        response = self.send_get(client)
+        self.send_put(self.client, new_value)
+        response = self.send_get(self.client)
+        self.assertEqual(new_value, response.data)
+
+    def test_create_preference_too_long_key(self):
+        """
+        Test that a client cannot create preferences with bad keys
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+
+        too_long_preference_key = "x" * 256
+        new_value = "new value"
+        self._set_url(too_long_preference_key)
+        response = self.send_put(self.client, new_value, expected_status=400)
         self.assertEqual(new_value, response.data)
 
     @ddt.data(
-        ("client", "user"),
+        ("different_client", "different_user"),
         ("staff_client", "staff_user"),
     )
     @ddt.unpack
-    def test_update_preference(self, api_client, user):
+    def test_create_preference_other_user(self, api_client, user):
         """
-        Test that a client (logged in) can update a preference. Also verifies that a "is_staff"
-        user can update a preference for other users.
+        Test that a client (logged in) cannot create a preference for a different user.
         """
+        # First remove the test preference
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.send_delete(self.client)
+
+        # Verify that a new preference can be created
         client = self.login_client(api_client, user)
         new_value = "new value"
-        self.send_put(client, new_value)
-        response = self.send_get(client)
+        self.send_put(client, new_value, expected_status=404)
+
+    def test_update_preference(self):
+        """
+        Test that a client (logged in) can update a preference.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        new_value = "new value"
+        self.send_put(self.client, new_value)
+        response = self.send_get(self.client)
         self.assertEqual(new_value, response.data)
 
     @ddt.data(
-        ("client", "user"),
+        ("different_client", "different_user"),
         ("staff_client", "staff_user"),
     )
     @ddt.unpack
-    def test_delete_preference(self, api_client, user):
+    def test_update_preference_other_user(self, api_client, user):
         """
-        Test that a client (logged in) can delete her own preference. Also verifies that a "is_staff"
-        user can delete a preference for other users.
+        Test that a client (logged in) cannot update a preference for another user.
         """
         client = self.login_client(api_client, user)
+        new_value = "new value"
+        self.send_put(client, new_value, expected_status=404)
+
+    def test_delete_preference(self):
+        """
+        Test that a client (logged in) can delete her own preference.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
 
         # Verify that a preference can be deleted
-        self.send_delete(client)
-        self.send_get(client, expected_status=404)
+        self.send_delete(self.client)
+        self.send_get(self.client, expected_status=404)
 
         # Verify that deleting a non-existent preference throws a 404
+        self.send_delete(self.client, expected_status=404)
+
+    @ddt.data(
+        ("different_client", "different_user"),
+        ("staff_client", "staff_user"),
+    )
+    @ddt.unpack
+    def test_delete_preference_other_user(self, api_client, user):
+        """
+        Test that a client (logged in) cannot delete a preference for another user.
+        """
+        client = self.login_client(api_client, user)
         self.send_delete(client, expected_status=404)

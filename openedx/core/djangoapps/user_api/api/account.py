@@ -11,7 +11,7 @@ from django.db import transaction, IntegrityError
 from django.core.validators import validate_email, validate_slug, ValidationError
 
 from ..forms import PasswordResetFormNoActive
-from ..models import User, UserProfile, Registration, PendingEmailChange
+from ..models import User, UserProfile, Registration
 from ..helpers import intercept_errors
 
 

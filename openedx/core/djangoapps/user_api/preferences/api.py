@@ -3,20 +3,12 @@ API for managing user preferences.
 """
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.utils.translation import ugettext as _
 
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountNotAuthorized
-from openedx.core.djangoapps.user_api.serializers import UserSerializer
-
-
-class PreferenceRequestError(Exception):
-    """There was a problem with a preference request."""
-    pass
-
-
-class PreferenceNotFound(PreferenceRequestError):
-    """The desired user preference was not found."""
-    pass
+from ..api.account import AccountUserNotFound, AccountNotAuthorized
+from ..models import UserPreference, PreferenceNotFound, PreferenceValidationError, PreferenceUpdateError
+from ..serializers import UserSerializer
 
 
 def _get_user(requesting_user, username, allow_staff=False):
@@ -55,9 +47,8 @@ def get_user_preference(requesting_user, preference_key, username=None):
         PreferenceNotFound: the user does not have a preference with the specified key.
     """
     existing_user = _get_user(requesting_user, username, allow_staff=True)
-    try:
-        preference_value = existing_user.preferences.get(key=preference_key).value
-    except ObjectDoesNotExist:
+    preference_value = UserPreference.get_preference(existing_user, preference_key)
+    if preference_value is None:
         raise PreferenceNotFound()
     return preference_value
 
@@ -94,7 +85,8 @@ def update_user_preferences(requesting_user, update, username=None):
     Arguments:
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
-        update (dict): The updated account field values.
+        update (dict): The updated account field values. Note that null values for a preference will
+            be treated as a request to delete the key in question.
         username (string): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
@@ -103,21 +95,37 @@ def update_user_preferences(requesting_user, update, username=None):
             `username` is not specified)
         AccountNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
-        AccountUpdateError: the update could not be completed. Note that if multiple fields are updated at the same
-            time, some parts of the update may have been successful, even if an AccountUpdateError is returned;
-            in particular, the user account (not including e-mail address) may have successfully been updated,
-            but then the e-mail change request, which is processed last, may throw an error.
+        PreferenceUpdateError: the update could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
-    for preference_key in update.keys():
-        preference_value = update[preference_key]
-        if preference_value:
-            set_user_preference(requesting_user, preference_key, preference_value, username=username)
-        else:
-            delete_user_preference(requesting_user, preference_key, username=username)
+    try:
+        # First validate each preference setting
+        errors = {}
+        for preference_key in update.keys():
+            preference_value = update[preference_key]
+            try:
+                if preference_value is not None:
+                    UserPreference.validate_preference(existing_user, preference_key, preference_value)
+            except ValidationError as error:
+                errors[preference_key] = {
+                    "developer_message": error.message
+                }
+        if errors:
+            raise PreferenceValidationError(errors)
+        # Then perform the patch
+        for preference_key in update.keys():
+            preference_value = update[preference_key]
+            if preference_value is not None:
+                UserPreference.set_preference(existing_user, preference_key, preference_value)
+            else:
+                UserPreference.delete_preference(existing_user, preference_key)
+    except Exception as error:
+        raise PreferenceUpdateError(
+            "Error thrown when updating preferences: '{}'".format(error.message)
+        )
 
 
-def set_user_preference(requesting_user, preference_key, value, username=None):
+def set_user_preference(requesting_user, preference_key, preference_value, username=None):
     """Update a user preference for the given username.
 
     Note:
@@ -128,7 +136,7 @@ def set_user_preference(requesting_user, preference_key, value, username=None):
         requesting_user (User): The user requesting to modify account information. Only the user with username
             'username' has permissions to modify account information.
         preference_key (string): The key for the user preference.
-        value (string): The value to be stored.
+        preference_value (string): The value to be stored.
         username (string): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
@@ -139,15 +147,22 @@ def set_user_preference(requesting_user, preference_key, value, username=None):
             associated with `username`
         AccountValidationError: the update was not attempted because validation errors were found with
             the supplied update
-        AccountUpdateError: the update could not be completed. Note that if multiple fields are updated at the same
-            time, some parts of the update may have been successful, even if an AccountUpdateError is returned;
-            in particular, the user account (not including e-mail address) may have successfully been updated,
-            but then the e-mail change request, which is processed last, may throw an error.
+        PreferenceUpdateError: the update could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
-    user_preference, __ = existing_user.preferences.get_or_create(user=existing_user, key=preference_key)
-    user_preference.value = value
-    user_preference.save()
+    if preference_value is None or preference_value == '':
+        message = _('Preference {preference_key} cannot be set to an empty value').format(
+            preference_key=preference_key
+        )
+        raise PreferenceUpdateError(message, user_message=message)
+    try:
+        UserPreference.set_preference(existing_user, preference_key, preference_value)
+    except PreferenceNotFound:
+        raise PreferenceNotFound()
+    except Exception as error:
+        raise PreferenceUpdateError(
+            "Error thrown when setting preference: '{}'".format(error.message)
+        )
 
 
 def delete_user_preference(requesting_user, preference_key, username=None):
@@ -169,11 +184,15 @@ def delete_user_preference(requesting_user, preference_key, username=None):
             `username` is not specified)
         AccountNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
-        AccountUpdateError: the update could not be completed. Note that if multiple fields are updated at the same
-            time, some parts of the update may have been successful, even if an AccountUpdateError is returned;
-            in particular, the user account (not including e-mail address) may have successfully been updated,
-            but then the e-mail change request, which is processed last, may throw an error.
+        PreferenceNotFound: the user does not have a preference with the specified key.
+        PreferenceUpdateError: the delete could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
-    user_preference = existing_user.preferences.get(key=preference_key)
-    user_preference.delete()
+    try:
+        UserPreference.delete_preference(existing_user, preference_key)
+    except PreferenceNotFound:
+        raise PreferenceNotFound()
+    except Exception as error:
+        raise PreferenceUpdateError(
+            "Error thrown when deleting preference: '{}'".format(error.message)
+        )
