@@ -888,6 +888,12 @@ class MiscCourseTests(ContentStoreTestCase):
         resp = self.client.get_html('/c4x/CDX/123123/asset/invalid.png')
         self.assertEqual(resp.status_code, 404)
 
+        # Now test that 404 response is returned when user tries to access
+        # asset of some invalid course from split ModuleStore
+        with self.store.default_store(ModuleStoreEnum.Type.split):
+            resp = self.client.get_html('/c4x/InvalidOrg/InvalidCourse/asset/invalid.png')
+            self.assertEqual(resp.status_code, 404)
+
     def test_delete_course(self):
         """
         This test creates a course, makes a draft item, and deletes the course. This will also assert that the
