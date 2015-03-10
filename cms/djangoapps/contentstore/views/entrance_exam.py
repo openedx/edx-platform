@@ -21,10 +21,23 @@ from util.milestones_helpers import generate_milestone_namespace, NAMESPACE_CHOI
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore.exceptions import ItemNotFoundError
 from django.conf import settings
+from django.utils.translation import ugettext as _
 
 __all__ = ['entrance_exam', ]
 
 log = logging.getLogger(__name__)
+
+
+# pylint: disable=invalid-name
+def _get_default_entrance_exam_minimum_pct():
+    """
+    Helper method to return the default value from configuration
+    Converts integer values to decimals, since that what we use internally
+    """
+    entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+    if entrance_exam_minimum_score_pct.is_integer():
+        entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+    return entrance_exam_minimum_score_pct
 
 
 @login_required
@@ -60,7 +73,7 @@ def entrance_exam(request, course_key_string):
             ee_min_score = request.POST.get('entrance_exam_minimum_score_pct', None)
 
             # if request contains empty value or none then save the default one.
-            entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+            entrance_exam_minimum_score_pct = _get_default_entrance_exam_minimum_pct()
             if ee_min_score != '' and ee_min_score is not None:
                 entrance_exam_minimum_score_pct = float(ee_min_score)
             return create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
@@ -94,7 +107,7 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     """
     # Provide a default value for the minimum score percent if nothing specified
     if entrance_exam_minimum_score_pct is None:
-        entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
+        entrance_exam_minimum_score_pct = _get_default_entrance_exam_minimum_pct()
 
     # Confirm the course exists
     course = modulestore().get_course(course_key)
@@ -123,10 +136,18 @@ def _create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct=N
     course = modulestore().get_course(course_key)
     metadata = {
         'entrance_exam_enabled': True,
-        'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct / 100,
+        'entrance_exam_minimum_score_pct': unicode(entrance_exam_minimum_score_pct),
         'entrance_exam_id': unicode(created_block.location),
     }
     CourseMetadata.update_from_dict(metadata, course, request.user)
+
+    # Create the entrance exam section item.
+    create_xblock(
+        parent_locator=unicode(created_block.location),
+        user=request.user,
+        category='sequential',
+        display_name=_('Entrance Exam - Subsection')
+    )
 
     # Add an entrance exam milestone if one does not already exist
     milestone_namespace = generate_milestone_namespace(
@@ -179,6 +200,19 @@ def _get_entrance_exam(request, course_key):  # pylint: disable=W0613
             status=200, mimetype='application/json')
     except ItemNotFoundError:
         return HttpResponse(status=404)
+
+
+def update_entrance_exam(request, course_key, exam_data):
+    """
+    Operation to update course fields pertaining to entrance exams
+    The update operation is not currently exposed directly via the API
+    Because the operation is not exposed directly, we do not return a 200 response
+    But we do return a 400 in the error case because the workflow is executed in a request context
+    """
+    course = modulestore().get_course(course_key)
+    if course:
+        metadata = exam_data
+        CourseMetadata.update_from_dict(metadata, course, request.user)
 
 
 def delete_entrance_exam(request, course_key):

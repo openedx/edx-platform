@@ -60,6 +60,14 @@ div.course-wrapper {
       }
     }
 
+    .sequential-status-message {
+      margin-bottom: $baseline;
+      background-color: $gray-l5;
+      padding: ($baseline * 0.75);
+      border-radius: 3px;
+      @include font-size(13);
+    }
+
     ul {
       li {
         margin-bottom: lh(0.5);

@@ -61,7 +61,11 @@ from .component import (
     ADVANCED_COMPONENT_TYPES,
 )
 from contentstore.tasks import rerun_course
-from contentstore.views.entrance_exam import create_entrance_exam, delete_entrance_exam
+from contentstore.views.entrance_exam import (
+    create_entrance_exam,
+    update_entrance_exam,
+    delete_entrance_exam
+)
 
 from .library import LIBRARIES_ENABLED
 from .item import create_xblock_info
@@ -896,9 +900,10 @@ def settings_handler(request, course_key_string):
                 # if pre-requisite course feature is enabled set pre-requisite course
                 if prerequisite_course_enabled:
                     prerequisite_course_keys = request.json.get('pre_requisite_courses', [])
-                    if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
-                        return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
-                    set_prerequisite_courses(course_key, prerequisite_course_keys)
+                    if prerequisite_course_keys:
+                        if not all(is_valid_course_key(course_key) for course_key in prerequisite_course_keys):
+                            return JsonResponseBadRequest({"error": _("Invalid prerequisite course key")})
+                        set_prerequisite_courses(course_key, prerequisite_course_keys)
 
                 # If the entrance exams feature has been enabled, we'll need to check for some
                 # feature-specific settings and handle them accordingly
@@ -908,16 +913,24 @@ def settings_handler(request, course_key_string):
                     course_entrance_exam_present = course_module.entrance_exam_enabled
                     entrance_exam_enabled = request.json.get('entrance_exam_enabled', '') == 'true'
                     ee_min_score_pct = request.json.get('entrance_exam_minimum_score_pct', None)
-
-                    # If the entrance exam box on the settings screen has been checked,
-                    # and the course does not already have an entrance exam attached...
-                    if entrance_exam_enabled and not course_entrance_exam_present:
+                    # If the entrance exam box on the settings screen has been checked...
+                    if entrance_exam_enabled:
                         # Load the default minimum score threshold from settings, then try to override it
                         entrance_exam_minimum_score_pct = float(settings.ENTRANCE_EXAM_MIN_SCORE_PCT)
-                        if ee_min_score_pct and ee_min_score_pct != '':
+                        if ee_min_score_pct:
                             entrance_exam_minimum_score_pct = float(ee_min_score_pct)
-                        # Create the entrance exam
-                        create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
+                        if entrance_exam_minimum_score_pct.is_integer():
+                            entrance_exam_minimum_score_pct = entrance_exam_minimum_score_pct / 100
+                        entrance_exam_minimum_score_pct = unicode(entrance_exam_minimum_score_pct)
+                        # If there's already an entrance exam defined, we'll update the existing one
+                        if course_entrance_exam_present:
+                            exam_data = {
+                                'entrance_exam_minimum_score_pct': entrance_exam_minimum_score_pct
+                            }
+                            update_entrance_exam(request, course_key, exam_data)
+                        # If there's no entrance exam defined, we'll create a new one
+                        else:
+                            create_entrance_exam(request, course_key, entrance_exam_minimum_score_pct)
 
                     # If the entrance exam box on the settings screen has been unchecked,
                     # and the course has an entrance exam attached...
