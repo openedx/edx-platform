@@ -7,6 +7,8 @@ var edx = edx || {};
 
     edx.groups.InlineDiscussionsView = CohortDiscussionsView.extend({
         events: {
+            'change .check-discussion-category': 'setSaveButton',
+            'change .check-discussion-subcategory-inline': 'setSaveButton',
             'click .cohort-inline-discussions-form .action-save': 'saveInlineDiscussionsForm',
             'change .check-all-inline-discussions': 'setAllInlineDiscussions',
             'change .check-cohort-inline-discussions': 'setSomeInlineDiscussions'
@@ -109,6 +111,13 @@ var edx = edx || {};
             this.setDisabled(this.$('.check-discussion-category'), enable_checkboxes);
             this.setDisabled(this.$('.check-discussion-subcategory-inline'), enable_checkboxes);
             this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), enable_save_button);
+        },
+
+        /**
+        Enables the save button for inline discussions.
+        **/
+        setSaveButton: function(event) {
+            this.setDisabled(this.$('.cohort-inline-discussions-form .action-save'), false);
         },
 
         /**
