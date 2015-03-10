@@ -33,3 +33,6 @@ class LmsFieldData(SplitFieldData):
             Scope.user_info: student_data,
             Scope.preferences: student_data,
         })
+
+    def __repr__(self):
+        return "LmsFieldData{!r}".format((self._authored_data, self._student_data))
