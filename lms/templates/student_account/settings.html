@@ -78,6 +78,7 @@
                                 view: new edx.student.account.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Password",
+                                    value_attribute: "password",
                                     link_title: "Reset Password",
                                     link_href: "${reverse('password_reset')}",
                                     message: "To reset your password you'll need to click the reset password link sent to you via email."

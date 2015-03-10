@@ -43,7 +43,9 @@ var edx = edx || {};
 
     edx.student.account.FieldView = Backbone.View.extend({
 
-        className: "account-settings-field",
+        className: function(){
+            return "account-settings-field " + this.options.value_attribute;
+        },
         tagName: "div",
 
         initialize: function(options) {
@@ -52,7 +54,7 @@ var edx = edx || {};
 
         model_value: function() {
             return this.model.get(this.options.value_attribute);
-        },
+        }
 
     });
 

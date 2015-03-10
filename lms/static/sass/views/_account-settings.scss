@@ -57,22 +57,12 @@
 }
 
 .ui-loading-anim {
-  @include animation(fadeIn $tmg-f2 linear 1);
-  @extend %t-copy-base;
-  opacity: .6;
+  @extend .ui-loading-base;
+
   padding-bottom: 16px;
 
   // center horizontally
   @include margin-left(auto);
   @include margin-right(auto);
   width: 10%;
-
-  .spin {
-    @extend %anim-rotateCW;
-    display: inline-block;
-  }
-
-  .copy {
-    padding-left: ($baseline/4);
-  }
 }

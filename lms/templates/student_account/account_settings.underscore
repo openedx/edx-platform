@@ -15,7 +15,7 @@
                 </div>
                 <div class="account-settings-section-body">
                     <div class="ui-loading-anim">
-                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy"><%- gettext("Loading...") %></span></p>
+                        <p><span class="spin"><i class="icon fa fa-refresh"></i></span> <span class="copy"><%- gettext("Loading") %></span></p>
                     </div>
                 </div>
             </div>

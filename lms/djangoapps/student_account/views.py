@@ -317,10 +317,9 @@ def account_settings(request):
 
     Example usage:
 
-        GET /settings
+        GET /account/settings
 
     """
-
     released_languages = DarkLangConfig.current().released_languages_list
 
     # add in the default language if it's not in the list of released languages
