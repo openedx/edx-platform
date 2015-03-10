@@ -3,6 +3,7 @@
 import logging
 import json
 from ipware.ip import get_ip
+from pytz import common_timezones
 
 from django.conf import settings
 from django.http import (
@@ -11,6 +12,7 @@ from django.http import (
 from django.shortcuts import redirect
 from django.http import HttpRequest
 from django.conf import settings
+from django_countries import countries
 from django.core.urlresolvers import reverse, resolve
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
@@ -29,6 +31,7 @@ from external_auth.login_and_register import (
     register as external_auth_register
 )
 from microsite_configuration import microsite
+from student.models import UserProfile
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
@@ -328,9 +331,22 @@ def account_settings(request):
 
     language_options = [language for language in settings.LANGUAGES if language[0] in released_languages]
 
+    country_options = [
+        (country_code, unicode(country_name))
+        for country_code, country_name in sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
+    ]
+
     context = {
         'accounts_api_url': reverse("accounts_api", kwargs={'username': request.user.username}),
-        'language_options': language_options,
+        'country_options': country_options,
+        'gender_options': UserProfile.GENDER_CHOICES,
         'language_default': settings.LANGUAGE_CODE,
+        'language_options': language_options,
+        'level_of_education_options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+        'timezone_options': [(unicode(timezone), unicode(timezone)) for timezone in common_timezones],
+        'year_of_birth_options': [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS],
+        'preferred_language_options': settings.LANGUAGES,
     }
     return render_to_response('student_account/settings.html', context)
