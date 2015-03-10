@@ -636,16 +636,11 @@ def create_order(request):
     course_id = request.POST['course_id']
     course_id = CourseKey.from_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
-    current_donation = donation_for_course.get(unicode(course_id), decimal.Decimal(0))
     contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
     try:
         amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
     except decimal.InvalidOperation:
         return HttpResponseBadRequest(_("Selected price is not valid number."))
-
-    if amount != current_donation:
-        donation_for_course[unicode(course_id)] = amount
-        request.session['donation_for_course'] = donation_for_course
 
     # prefer professional mode over verified_mode
     current_mode = CourseMode.verified_mode_for_course(course_id)
