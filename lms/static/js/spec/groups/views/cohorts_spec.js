@@ -54,18 +54,19 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 ];
             };
 
-            createMockCohortSettingsJson = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettingsJson = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return {
                     id: 0,
                     is_cohorted: isCohorted || false,
-                    cohorted_discussions: cohortedDiscussions || [],
+                    cohorted_inline_discussions: cohortedInlineDiscussions || [],
+                    cohorted_course_wide_discussions: cohortedCourseWideDiscussions || [],
                     always_cohort_inline_discussions: alwaysCohortInlineDiscussions || true
                 };
             };
 
-            createMockCohortSettings = function (isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions) {
+            createMockCohortSettings = function (isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions) {
                 return new CourseCohortSettingsModel(
-                    createMockCohortSettingsJson(isCohorted, cohortedDiscussions, alwaysCohortInlineDiscussions)
+                    createMockCohortSettingsJson(isCohorted, cohortedInlineDiscussions, cohortedCourseWideDiscussions, alwaysCohortInlineDiscussions)
                 );
             };
 
@@ -288,7 +289,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(true, [], true)
+                        createMockCohortSettingsJson(true, [], [], true)
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
@@ -299,7 +300,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.cohorts-state').prop('checked', false).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PUT', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(false, [], true)
+                        createMockCohortSettingsJson(false, [], [], true)
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
