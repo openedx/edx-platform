@@ -18,6 +18,7 @@ from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from edxmako import lookup_template
 
+from courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, \
     is_course_cohorted
 from openedx.core.djangoapps.course_groups.models import CourseUserGroup
@@ -59,9 +60,11 @@ def has_forum_access(uname, course_id, rolename):
     return role.users.filter(username=uname).exists()
 
 
-def _get_discussion_modules(course):
+# pylint: disable=invalid-name
+def get_accessible_discussion_modules(course, user):
     """
-    Return a list of all valid discussion modules in this course.
+    Return a list of all valid discussion modules in this course that
+    are accessible to the given user.
     """
     all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
@@ -72,12 +75,16 @@ def _get_discussion_modules(course):
                 return False
         return True
 
-    return filter(has_required_keys, all_modules)
+    return [
+        module for module in all_modules
+        if has_required_keys(module) and has_access(user, 'load', module, course.id)
+    ]
 
 
-def get_discussion_id_map(course):
+def get_discussion_id_map(course, user):
     """
-    Transform the list of this course's discussion modules into a dictionary of metadata keyed by discussion_id.
+    Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
+    by discussion_id.
     """
     def get_entry(module):  # pylint: disable=missing-docstring
         discussion_id = module.discussion_id
@@ -85,7 +92,7 @@ def get_discussion_id_map(course):
         last_category = module.discussion_category.split("/")[-1].strip()
         return (discussion_id, {"location": module.location, "title": last_category + " / " + title})
 
-    return dict(map(get_entry, _get_discussion_modules(course)))
+    return dict(map(get_entry, get_accessible_discussion_modules(course, user)))
 
 
 def _filter_unstarted_categories(category_map):
@@ -138,14 +145,14 @@ def _sort_map_entries(category_map, sort_alpha):
     category_map["children"] = [x[0] for x in sorted(things, key=lambda x: x[1]["sort_key"])]
 
 
-def get_discussion_category_map(course):
+def get_discussion_category_map(course, user):
     """
     Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
-    to render the discussion category map in the discussion tab sidebar.
+    to render the discussion category map in the discussion tab sidebar for a given user.
     """
     unexpanded_category_map = defaultdict(list)
 
-    modules = _get_discussion_modules(course)
+    modules = get_accessible_discussion_modules(course, user)
 
     is_course_cohorted = course.is_cohorted
     cohorted_discussion_ids = course.cohorted_discussions
@@ -218,21 +225,15 @@ def get_discussion_category_map(course):
     return _filter_unstarted_categories(category_map)
 
 
-def get_discussion_categories_ids(course):
+def get_discussion_categories_ids(course, user):
     """
-    Returns a list of available ids of categories for the course.
+    Returns a list of available ids of categories for the course that
+    are accessible to the given user.
     """
-    ids = []
-    queue = [get_discussion_category_map(course)]
-    while queue:
-        category_map = queue.pop()
-        for child in category_map["children"]:
-            if child in category_map["entries"]:
-                ids.append(category_map["entries"][child]["id"])
-            else:
-                queue.append(category_map["subcategories"][child])
-
-    return ids
+    accessible_discussion_ids = [
+        module.discussion_id for module in get_accessible_discussion_modules(course, user)
+    ]
+    return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
 
 class JsonResponse(HttpResponse):
@@ -382,12 +383,12 @@ def extend_content(content):
     return merge_dict(content, content_info)
 
 
-def add_courseware_context(content_list, course, id_map=None):
+def add_courseware_context(content_list, course, user, id_map=None):
     """
     Decorates `content_list` with courseware metadata.
     """
     if id_map is None:
-        id_map = get_discussion_id_map(course)
+        id_map = get_discussion_id_map(course, user)
 
     for content in content_list:
         commentable_id = content['commentable_id']

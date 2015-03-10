@@ -1,13 +1,15 @@
 import json
+
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
 
-from openedx.core.djangoapps.content.course_structures.models import generate_course_structure, CourseStructure
+from openedx.core.djangoapps.content.course_structures.models import CourseStructure
+from openedx.core.djangoapps.content.course_structures.tasks import generate_course_structure
 
 
-class CourseStructureTests(ModuleStoreTestCase):
+class CourseStructureTaskTests(ModuleStoreTestCase):
     def setUp(self, **kwargs):
-        super(CourseStructureTests, self).setUp()
+        super(CourseStructureTaskTests, self).setUp()
         self.course = CourseFactory.create()
         self.section = ItemFactory.create(parent=self.course, category='chapter', display_name='Test Section')
         CourseStructure.objects.all().delete()
