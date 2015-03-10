@@ -80,7 +80,6 @@
                                     title: "Password",
                                     value_attribute: "password",
                                     link_title: "Reset Password",
-                                    link_href: "${reverse('password_reset')}",
                                     message: "To reset your password you'll need to click the reset password link sent to you via email."
                                 })
                             },
@@ -89,10 +88,11 @@
                                     model: accountSettingsModel,
                                     title: "Language",
                                     value_attribute: "language",
-                                    default_value: "${ language_default }",
+                                    default_value: "${ fields['language']['default'] }",
+                                    required: true,
                                     message: "This setting controls your default edX language.",
                                     options: [
-                                        % for option in language_options:
+                                        % for option in fields['language']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -109,9 +109,10 @@
                                     title: "Educational Background",
                                     value_attribute: "level_of_education",
                                     default_value: null,
+                                    required: false,
                                     message: "",
                                     options: [
-                                        % for option in level_of_education_options:
+                                        % for option in fields['level_of_education']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -123,9 +124,10 @@
                                     title: "Gender",
                                     value_attribute: "gender",
                                     default_value: null,
+                                    required: false,
                                     message: "",
                                     options: [
-                                        % for option in gender_options:
+                                        % for option in fields['gender']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -137,9 +139,10 @@
                                     title: "Year of Birth",
                                     value_attribute: "year_of_birth",
                                     default_value: null,
+                                    required: false,
                                     message: "",
                                     options: [
-                                        % for option in year_of_birth_options:
+                                        % for option in fields['year_of_birth']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -151,9 +154,10 @@
                                     title: "Country",
                                     value_attribute: "null",
                                     default_value: null,
+                                    required: false,
                                     message: "",
                                     options: [
-                                        % for option in country_options:
+                                        % for option in fields['country']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -165,9 +169,10 @@
                                     title: "Timezone",
                                     value_attribute: "timezone",
                                     default_value: null,
+                                    required: false,
                                     message: "",
                                     options: [
-                                        % for option in timezone_options:
+                                        % for option in fields['timezone']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
@@ -179,13 +184,14 @@
                                     title: "Preferred Language",
                                     value_attribute: "preferred_language",
                                     default_value: null,
+                                    required: false,
                                     message: "If your preferred language isn't available as an edX language, you can indicate your preferance here.",
                                     options: [
-                                        % for option in preferred_language_options:
+                                        % for option in fields['preferred_language']['options']:
                                             ["${option[0]}", "${option[1]}"],
                                         % endfor
                                     ],
-                                })
+                               })
                             },
                         ]
                     },
@@ -197,8 +203,7 @@
                                     model: accountSettingsModel,
                                     title: "Facebook",
                                     link_title: "Link",
-                                    link_href: "",
-                                    message: ""
+                                    message: "",
                                 })
                             },
                             {
@@ -206,8 +211,7 @@
                                     model: accountSettingsModel,
                                     title: "Google",
                                     link_title: "Link",
-                                    link_href: "",
-                                    message: ""
+                                    message: "",
                                 })
                             },
                         ]

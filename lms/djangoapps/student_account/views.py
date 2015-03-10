@@ -339,13 +339,23 @@ def account_settings(request):
 
     context = {
         'accounts_api_url': reverse("accounts_api", kwargs={'username': request.user.username}),
-        'country_options': country_options,
-        'gender_options': UserProfile.GENDER_CHOICES,
-        'language_default': settings.LANGUAGE_CODE,
-        'language_options': language_options,
-        'level_of_education_options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
-        'timezone_options': [(unicode(timezone), unicode(timezone)) for timezone in common_timezones],
-        'year_of_birth_options': [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS],
-        'preferred_language_options': settings.LANGUAGES,
+        'fields': {
+            'country': {
+                'options': country_options,
+            }, 'gender': {
+                'options': UserProfile.GENDER_CHOICES,
+            }, 'language': {
+                'default': settings.LANGUAGE_CODE,
+                'options': language_options,
+            }, 'level_of_education': {
+                'options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+            }, 'timezone': {
+                'options': [(unicode(timezone), unicode(timezone)) for timezone in common_timezones],
+            }, 'year_of_birth': {
+                'options': [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS],
+            }, 'preferred_language': {
+                'options': settings.LANGUAGES,
+            }
+        }
     }
-    return render_to_response('student_account/settings.html', context)
+    return render_to_response('student_account/account_settings.html', context)

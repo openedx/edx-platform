@@ -155,6 +155,7 @@ var edx = edx || {};
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
+                required: this.options.required,
                 select_options: this.options.options,
                 message: this.options.message,
             }));
@@ -163,7 +164,13 @@ var edx = edx || {};
         },
 
         update_value: function() {
-            this.$(".account-settings-field-value select").val((this.model_value() || this.options.default_value));
+            var value;
+            if (this.options.required) {
+                value = this.model_value() || this.options.default_value;
+            } else {
+                value = this.model_value() || "";
+            }
+            this.$(".account-settings-field-value select").val((value));
         },
     });
 
