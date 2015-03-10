@@ -288,7 +288,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'PUT', '/mock_service/cohorts/settings',
+                        requests, 'PATCH', '/mock_service/cohorts/settings',
                         createMockCohortSettingsJson(true, [], [], true)
                     );
                     AjaxHelpers.respondWithJson(
@@ -299,7 +299,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                     cohortsView.$('.cohorts-state').prop('checked', false).change();
                     AjaxHelpers.expectJsonRequest(
-                        requests, 'PUT', '/mock_service/cohorts/settings',
+                        requests, 'PATCH', '/mock_service/cohorts/settings',
                         createMockCohortSettingsJson(false, [], [], true)
                     );
                     AjaxHelpers.respondWithJson(
