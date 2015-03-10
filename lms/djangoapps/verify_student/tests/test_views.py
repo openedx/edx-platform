@@ -885,12 +885,7 @@ class TestCreateOrder(ModuleStoreTestCase):
         self.client.post(url, params)
 
         # Verify that the client's session contains the new donation amount
-        self.assertIn('donation_for_course', self.client.session)
-        self.assertIn(unicode(self.course.id), self.client.session['donation_for_course'])
-
-        actual_amount = self.client.session['donation_for_course'][unicode(self.course.id)]
-        expected_amount = decimal.Decimal('1.23')
-        self.assertEqual(actual_amount, expected_amount)
+        self.assertNotIn('donation_for_course', self.client.session)
 
     def _verify_student(self):
         """ Simulate that the student's identity has already been verified. """
