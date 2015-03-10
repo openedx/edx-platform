@@ -1,10 +1,13 @@
 define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpers/template_helpers',
         'js/groups/views/cohorts', 'js/groups/collections/cohort', 'js/groups/models/content_group',
-        'js/groups/models/course_cohort_settings', 'js/utils/animation',
-        'js/groups/views/course_cohort_settings_notification'
+        'js/groups/models/course_cohort_settings', 'js/utils/animation', 'js/vendor/jquery.qubit',
+        'js/groups/views/course_cohort_settings_notification', 'js/groups/models/cohort_discussions',
+        'js/groups/views/cohort_discussions', 'js/groups/views/cohort_discussions_course_wide',
+        'js/groups/views/cohort_discussions_inline'
         ],
     function (Backbone, $, AjaxHelpers, TemplateHelpers, CohortsView, CohortCollection, ContentGroupModel,
-              CourseCohortSettingsModel, AnimationUtil, CourseCohortSettingsNotificationView) {
+              CourseCohortSettingsModel, AnimationUtil, Qubit, CourseCohortSettingsNotificationView, CohortDiscussionsModel,
+              CohortDiscussionsView, CohortCourseWideDiscussionsView, CohortInlineDiscussionsView) {
         'use strict';
 
         describe("Cohorts View", function () {
@@ -14,7 +17,7 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 verifyDetailedMessage, verifyHeader, expectCohortAddRequest, getAddModal, selectContentGroup,
                 clearContentGroup, saveFormAndExpectErrors, createMockCohortSettings, MOCK_COHORTED_USER_PARTITION_ID,
                 MOCK_UPLOAD_COHORTS_CSV_URL, MOCK_STUDIO_ADVANCED_SETTINGS_URL, MOCK_STUDIO_GROUP_CONFIGURATIONS_URL,
-                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT;
+                MOCK_MANUAL_ASSIGNMENT, MOCK_RANDOM_ASSIGNMENT, createMockCohortDiscussionsJson, createMockCohortDiscussions;
 
             MOCK_MANUAL_ASSIGNMENT = 'manual';
             MOCK_RANDOM_ASSIGNMENT = 'random';
@@ -70,8 +73,55 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 );
             };
 
+            createMockCohortDiscussionsJson = function () {
+                return {
+                            course_wide_discussions: {
+                                children: ['Topic_C_1', 'Topic_C_2'],
+                                entries: {
+                                    Topic_C_1: {
+                                       sort_key: null,
+                                       is_cohorted: true,
+                                       id: 'Topic_C_1'
+                                    },
+                                    Topic_C_2: {
+                                        sort_key: null,
+                                        is_cohorted: false,
+                                        id: 'Topic_C_2'
+                                    }
+                                }
+                            },
+                            inline_discussions: {
+                                subcategories: {
+                                    Topic_I_1: {
+                                        subcategories: {},
+                                        children: ['Inline_Discussion_1', 'Inline_Discussion_2'],
+                                        entries: {
+                                            Inline_Discussion_1: {
+                                                sort_key: null,
+                                                is_cohorted: true,
+                                                id: 'Inline_Discussion_1'
+                                            },
+                                            Inline_Discussion_2: {
+                                                sort_key: null,
+                                                is_cohorted: false,
+                                                id: 'Inline_Discussion_2'
+                                            }
+                                        }
+                                    }
+                                },
+                                children: ['Topic_I_1']
+                            }
+                };
+            };
+
+            createMockCohortDiscussions = function () {
+                return new CohortDiscussionsModel(
+                    createMockCohortDiscussionsJson()
+                );
+            };
+
             createCohortsView = function (test, options) {
-                var cohortsJson, cohorts, contentGroups, cohortSettings;
+                var cohortsJson, cohorts, contentGroups, cohortSettings, cohortDiscussions;
                 options = options || {};
                 cohortsJson = options.cohorts ? {cohorts: options.cohorts} : createMockCohorts();
                 cohorts = new CohortCollection(cohortsJson, {parse: true});
@@ -79,12 +129,17 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 cohortSettings = options.cohortSettings || createMockCohortSettings(true);
                 cohortSettings.url = '/mock_service/cohorts/settings';
                 cohorts.url = '/mock_service/cohorts';
+
+                cohortDiscussions = options.cohortDiscussions || createMockCohortDiscussions();
+                cohortDiscussions.url = '/mock_service/cohorts/discussion/topics';
+
                 requests = AjaxHelpers.requests(test);
                 cohortsView = new CohortsView({
                     model: cohorts,
                     contentGroups: contentGroups,
                     cohortSettings: cohortSettings,
                     context: {
+                        discussionTopicsModel: cohortDiscussions,
                         uploadCohortsCsvUrl: MOCK_UPLOAD_COHORTS_CSV_URL,
                         studioAdvancedSettingsUrl: MOCK_STUDIO_ADVANCED_SETTINGS_URL,
                         studioGroupConfigurationsUrl: MOCK_STUDIO_GROUP_CONFIGURATIONS_URL
@@ -209,6 +264,10 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-group-header');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/notification');
                 TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-state');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-category');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-subcategory');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-course-wide');
+                TemplateHelpers.installTemplate('templates/instructor/instructor_dashboard_2/cohort-discussions-inline');
                 TemplateHelpers.installTemplate('templates/file-upload');
             });
 
@@ -222,6 +281,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                 // If no cohorts have been created, can't upload a CSV file.
                 expect(cohortsView.$('.wrapper-cohort-supplemental')).toHaveClass('is-hidden');
+                // if no cohorts have been created, can't show the link to discussion topics.
+                expect(cohortsView.$('.cohort-discussions-nav')).toHaveClass('is-hidden');
             });
 
             it("syncs data when membership tab is clicked", function() {
@@ -261,6 +322,50 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     .toBe("Your file 'upload_file.txt' has been uploaded. Allow a few minutes for processing.");
             });
 
+            it('can show discussion topics if cohort exists', function () {
+                var discussionsToggle ='.toggle-cohort-management-discussions',
+                    inlineDiscussionsFormCss = '.cohort-inline-discussions-form',
+                    courseWideDiscussionsFormCss = '.cohort-course-wide-discussions-form',
+                    courseWideDiscussionsSaveButtonCss = '.cohort-course-wide-discussions-form .action-save',
+                    inlineDiscussionsSaveButtonCss = '.cohort-inline-discussions-form .action-save',
+                    inlineDiscussionsForm, courseWideDiscussionsForm;
+
+                createCohortsView(this);
+
+                // Should see the control to toggle cohort discussions.
+                expect(cohortsView.$(discussionsToggle)).not.toHaveClass('is-hidden');
+                // But discussions form should not be visible until toggle is clicked.
+                expect(cohortsView.$(inlineDiscussionsFormCss).length).toBe(0);
+                expect(cohortsView.$(courseWideDiscussionsFormCss).length).toBe(0);
+
+                expect(cohortsView.$(discussionsToggle).text()).
+                    toContain('Specify whether discussion topics are divided by cohort');
+
+                cohortsView.$(discussionsToggle).click();
+                // After toggle is clicked, it should be hidden.
+                expect(cohortsView.$(discussionsToggle)).toHaveClass('is-hidden');
+
+                // Should see the course wide discussions form and its content
+                courseWideDiscussionsForm = cohortsView.$(courseWideDiscussionsFormCss);
+                expect(courseWideDiscussionsForm.length).toBe(1);
+
+                expect(courseWideDiscussionsForm.text()).
+                    toContain('Course-Wide Discussion Topics');
+                expect(courseWideDiscussionsForm.text()).
+                    toContain('Select the course-wide discussion topics that you want to divide by cohort.');
+
+                cohortsView.$(courseWideDiscussionsSaveButtonCss).val('Save');
+
+                // Should see the inline discussions form and its content
+                inlineDiscussionsForm = cohortsView.$(inlineDiscussionsFormCss);
+                expect(inlineDiscussionsForm.length).toBe(1);
+                expect(inlineDiscussionsForm.text()).
+                    toContain('Content-Specific Discussion Topics');
+                expect(inlineDiscussionsForm.text()).
+                    toContain('Specify whether content-specific discussion topics are divided by cohort.');
+                cohortsView.$(inlineDiscussionsSaveButtonCss).val('Save');
+            });
+
             describe("Cohort Selector", function () {
                 it('has no initial selection', function () {
                     createCohortsView(this);
@@ -289,22 +394,22 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     cohortsView.$('.cohorts-state').prop('checked', true).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PATCH', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(true, [], [], true)
+                        {is_cohorted: true}
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettingsJson(true)
+                        {is_cohorted: true}
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeTruthy();
 
                     cohortsView.$('.cohorts-state').prop('checked', false).change();
                     AjaxHelpers.expectJsonRequest(
                         requests, 'PATCH', '/mock_service/cohorts/settings',
-                        createMockCohortSettingsJson(false, [], [], true)
+                        {is_cohorted: false}
                     );
                     AjaxHelpers.respondWithJson(
                         requests,
-                        createMockCohortSettingsJson(false)
+                        {is_cohorted: false}
                     );
                     expect(cohortsView.$('.cohorts-state').prop('checked')).toBeFalsy();
                 });
@@ -963,3 +1068,10 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
             });
         });
     });
+
+//describe("Cohort Discussion Topics", function() {
+//                it("", function() {
+//
+//                });
+//
+//            )};
