@@ -4,7 +4,27 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
         'use strict';
 
         describe("Account Settings View", function () {
-            var abc=111;
+            var createAccountSettingsView, createMockAccountSettings, createMockAccountSettingsJson,
+                accountSettingsView, requests;
+
+            createMockAccountSettingsJson = function () {
+
+            };
+
+            createMockAccountSettings = function () {
+
+            };
+
+            createAccountSettingsView = function (test, options) {
+                var accountSettings;
+
+                accountSettings.url = '/mock_service/account/settings';
+                requests = AjaxHelpers.requests(test);
+                accountSettingsView = new settingsViews.AccountSettingsView({
+
+                });
+                settingsViews.AccountSettingsView.render();
+            };
 
             beforeEach(function () {
                 setFixtures('<div class="account-settings-container"> </div>');
@@ -15,8 +35,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                 TemplateHelpers.installTemplate('templates/student_account/field_text');
             });
 
-            it("", function() {
-                //TODO!
+            it("can render sections as expected", function() {
+                createAccountSettingsView();
             });
         });
     });

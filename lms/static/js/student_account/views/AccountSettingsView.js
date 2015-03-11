@@ -24,7 +24,7 @@ var edx = edx || {};
 
         render: function() {
             this.$el.html(this.template({
-                sections: this.options.sections,
+                sections: this.options.sections
             }));
             return this;
         },
@@ -39,7 +39,7 @@ var edx = edx || {};
                 });
             });
             return this;
-        },
+        }
     });
 
     edx.student.account.settingsViews.FieldView = Backbone.View.extend({

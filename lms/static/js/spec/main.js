@@ -561,6 +561,7 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
+        'lms/include/js/spec/student_account/account_settings_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',
