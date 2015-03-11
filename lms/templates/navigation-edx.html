@@ -17,7 +17,7 @@ from status.status import get_site_status_msg
 ## Provide a hook for themes to inject branding on top.
 <%block name="navigation_top" />
 
-<%block cached="False">
+<%block>
 <%
 try:
     course_id = course.id.to_deprecated_string()

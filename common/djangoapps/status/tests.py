@@ -1,8 +1,10 @@
 from django.conf import settings
+from django.core.cache import cache
 from django.test import TestCase
 import os
 from django.test.utils import override_settings
 from tempfile import NamedTemporaryFile
+import ddt
 
 from .status import get_site_status_msg
 
@@ -13,6 +15,7 @@ TMP_NAME = TMP_FILE.name
 TMP_FILE.close()
 
 
+@ddt.ddt
 @override_settings(STATUS_MESSAGE_PATH=TMP_NAME)
 class TestStatus(TestCase):
     """Test that the get_site_status_msg function does the right thing"""
@@ -64,6 +67,13 @@ class TestStatus(TestCase):
         with open(settings.STATUS_MESSAGE_PATH, 'w') as f:
             f.write(contents)
 
+    def clear_status_cache(self):
+        """
+        Remove the cached status message, if found
+        """
+        if cache.get('site_status_msg') is not None:
+            cache.delete('site_status_msg')
+
     def remove_status_file(self):
         """Delete the status file if it exists"""
         if os.path.exists(settings.STATUS_MESSAGE_PATH):
@@ -72,18 +82,19 @@ class TestStatus(TestCase):
     def tearDown(self):
         self.remove_status_file()
 
-    def test_get_site_status_msg(self):
+    @ddt.data(*checks)
+    @ddt.unpack
+    def test_get_site_status_msg(self, json_str, exp_none, exp_toy, exp_full):
         """run the tests"""
-        for (json_str, exp_none, exp_toy, exp_full) in self.checks:
 
-            self.remove_status_file()
-            if json_str:
-                self.create_status_file(json_str)
+        self.remove_status_file()
+        if json_str:
+            self.create_status_file(json_str)
 
-            print "checking results for {0}".format(json_str)
-            print "course=None:"
-            self.assertEqual(get_site_status_msg(None), exp_none)
-            print "course=toy:"
-            self.assertEqual(get_site_status_msg(self.toy_id), exp_toy)
-            print "course=full:"
-            self.assertEqual(get_site_status_msg(self.full_id), exp_full)
+        for course_id, expected_msg in [(None, exp_none), (self.toy_id, exp_toy), (self.full_id, exp_full)]:
+            self.assertEqual(get_site_status_msg(course_id), expected_msg)
+            self.assertEqual(cache.get('site_status_msg'), expected_msg)
+            # check that `get_site_status_msg` works as expected when the cache
+            # is warmed, too
+            self.assertEqual(get_site_status_msg(course_id), expected_msg)
+            self.clear_status_cache()
