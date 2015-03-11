@@ -1274,12 +1274,12 @@ class TestModuleInstantiation(TestSubmittingProblems):
         Don't write to StudentModule if instantiating a capa problem
         that isn't randomized
         """
-        self.problem = ItemFactory.create(category='problem')
+        problem = ItemFactory.create(category='problem')
 
-        self.look_at_question(self.problem.url_name)
+        self.look_at_question(problem.url_name)
         self.assertFalse(
             StudentModule.objects.filter(
-                module_state_key=self.problem_location(self.problem.url_name)
+                module_state_key=self.problem_location(problem.url_name)
             ).exists()
         )
 
@@ -1288,14 +1288,14 @@ class TestModuleInstantiation(TestSubmittingProblems):
         Do write to StudentModule if instantiating a capa problem
         that is randomized
         """
-        self.problem = ItemFactory.create(
+        problem = ItemFactory.create(
             category='problem',
             metadata={'rerandomize': RANDOMIZATION.ALWAYS},
         )
 
-        self.look_at_question(self.problem.url_name)
+        self.look_at_question(problem.url_name)
         self.assertTrue(
             StudentModule.objects.filter(
-                module_state_key=self.problem_location(self.problem.url_name)
+                module_state_key=self.problem_location(problem.url_name)
             ).exists()
         )
