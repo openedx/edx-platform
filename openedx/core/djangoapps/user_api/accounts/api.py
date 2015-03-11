@@ -5,16 +5,19 @@ from pytz import UTC
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
-from openedx.core.djangoapps.user_api.api.account import (
-    AccountUserNotFound, AccountUpdateError, AccountNotAuthorized, AccountValidationError
-)
-from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer
 from student.models import UserProfile
 from student.views import validate_new_email, do_email_change_request
+
+from ..api.account import AccountUpdateError, AccountValidationError
+from ..api.user import UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized
+from ..helpers import intercept_errors
 from ..models import UserPreference
+
 from . import ACCOUNT_VISIBILITY_PREF_KEY, ALL_USERS_VISIBILITY
+from .serializers import AccountLegacyProfileSerializer, AccountUserSerializer
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def get_account_settings(requesting_user, username=None, configuration=None, view=None):
     """Returns account information for a user serialized as JSON.
 
@@ -77,6 +80,7 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
     return visible_settings
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def update_account_settings(requesting_user, update, username=None):
     """Update user account information.
 
@@ -92,9 +96,9 @@ def update_account_settings(requesting_user, update, username=None):
             `requesting_user.username` is assumed.
 
     Raises:
-        AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+        UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to change the account
+        UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
         AccountValidationError: the update was not attempted because validation errors were found with
             the supplied update
@@ -110,7 +114,7 @@ def update_account_settings(requesting_user, update, username=None):
     existing_user, existing_user_profile = _get_user_and_profile(username)
 
     if requesting_user.username != username:
-        raise AccountNotAuthorized()
+        raise UserNotAuthorized()
 
     # If user has requested to change email, we must call the multi-step process to handle this.
     # It is not handled by the serializer (which considers email to be read-only).
@@ -161,29 +165,23 @@ def update_account_settings(requesting_user, update, username=None):
     if field_errors:
         raise AccountValidationError(field_errors)
 
-    try:
-        # If everything validated, go ahead and save the serializers.
-        for serializer in user_serializer, legacy_profile_serializer:
-            serializer.save()
+    # If everything validated, go ahead and save the serializers.
+    for serializer in user_serializer, legacy_profile_serializer:
+        serializer.save()
 
-        # If the name was changed, store information about the change operation. This is outside of the
-        # serializer so that we can store who requested the change.
-        if old_name:
-            meta = existing_user_profile.get_meta()
-            if 'old_names' not in meta:
-                meta['old_names'] = []
-            meta['old_names'].append([
-                old_name,
-                "Name change requested through account API by {0}".format(requesting_user.username),
-                datetime.datetime.now(UTC).isoformat()
-            ])
-            existing_user_profile.set_meta(meta)
-            existing_user_profile.save()
-
-    except Exception as err:
-        raise AccountUpdateError(
-            "Error thrown when saving account updates: '{}'".format(err.message)
-        )
+    # If the name was changed, store information about the change operation. This is outside of the
+    # serializer so that we can store who requested the change.
+    if old_name:
+        meta = existing_user_profile.get_meta()
+        if 'old_names' not in meta:
+            meta['old_names'] = []
+        meta['old_names'].append([
+            old_name,
+            "Name change requested through account API by {0}".format(requesting_user.username),
+            datetime.datetime.now(UTC).isoformat()
+        ])
+        existing_user_profile.set_meta(meta)
+        existing_user_profile.save()
 
     # And try to send the email change request if necessary.
     if new_email:
@@ -204,7 +202,7 @@ def _get_user_and_profile(username):
         existing_user = User.objects.get(username=username)
         existing_user_profile = UserProfile.objects.get(user=existing_user)
     except ObjectDoesNotExist:
-        raise AccountUserNotFound()
+        raise UserNotFound()
 
     return existing_user, existing_user_profile
 

@@ -56,7 +56,7 @@ class UserPreference(models.Model):
         unique_together = ("user", "key")
 
     @classmethod
-    def set_preference(cls, user, preference_key, preference_value, save=True):
+    def set_preference(cls, user, preference_key, preference_value):
         """Sets the user preference for a given key, creating it if it doesn't exist.
 
         Arguments:
@@ -71,8 +71,6 @@ class UserPreference(models.Model):
         user_preference, _ = cls.objects.get_or_create(user=user, key=preference_key)
         user_preference.value = preference_value
         user_preference.full_clean()
-        if save:
-            user_preference.save()
 
     @classmethod
     def validate_preference(cls, user, preference_key, preference_value):

@@ -10,11 +10,11 @@ import unittest
 from student.tests.factories import UserFactory
 from django.conf import settings
 from student.models import PendingEmailChange
-from openedx.core.djangoapps.user_api.api.account import (
-    AccountUserNotFound, AccountUpdateError, AccountNotAuthorized, AccountValidationError
+from ...api.account import (
+    AccountUpdateError, AccountValidationError
 )
+from ...api.user import UserNotFound, UserNotAuthorized
 from ..api import get_account_settings, update_account_settings
-from ..serializers import AccountUserSerializer
 
 
 def mock_render_to_string(template_name, context):
@@ -71,11 +71,11 @@ class TestAccountApi(TestCase):
 
     def test_get_user_not_found(self):
         """Test that AccountUserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(AccountUserNotFound):
+        with self.assertRaises(UserNotFound):
             get_account_settings(self.user, username="does_not_exist")
 
         self.user.username = "does_not_exist"
-        with self.assertRaises(AccountUserNotFound):
+        with self.assertRaises(UserNotFound):
             get_account_settings(self.user)
 
     def test_update_username_provided(self):
@@ -88,16 +88,16 @@ class TestAccountApi(TestCase):
         account_settings = get_account_settings(self.user)
         self.assertEqual("Donald Duck", account_settings["name"])
 
-        with self.assertRaises(AccountNotAuthorized):
+        with self.assertRaises(UserNotAuthorized):
             update_account_settings(self.different_user, {"name": "Pluto"}, username=self.user.username)
 
     def test_update_user_not_found(self):
         """Test that AccountUserNotFound is thrown if there is no user with username."""
-        with self.assertRaises(AccountUserNotFound):
+        with self.assertRaises(UserNotFound):
             update_account_settings(self.user, {}, username="does_not_exist")
 
         self.user.username = "does_not_exist"
-        with self.assertRaises(AccountUserNotFound):
+        with self.assertRaises(UserNotFound):
             update_account_settings(self.user, {})
 
     def test_update_error_validating(self):

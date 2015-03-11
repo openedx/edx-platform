@@ -5,7 +5,6 @@ import re
 from unittest import skipUnless
 
 from nose.tools import raises
-from mock import patch
 import ddt
 from dateutil.parser import parse as parse_datetime
 from django.core import mail
@@ -13,7 +12,7 @@ from django.test import TestCase
 from django.conf import settings
 
 from ..api import account as account_api
-from ..models import UserProfile
+from ..api.user import UserNotFound, UserNotAuthorized
 
 
 @ddt.ddt
@@ -117,7 +116,7 @@ class AccountApiTest(TestCase):
     def test_create_account_invalid_username(self, invalid_username):
         account_api.create_account(invalid_username, self.PASSWORD, self.EMAIL)
 
-    @raises(account_api.AccountNotAuthorized)
+    @raises(UserNotAuthorized)
     def test_activate_account_invalid_key(self):
         account_api.activate_account(u'invalid')
 
@@ -141,7 +140,7 @@ class AccountApiTest(TestCase):
 
     @skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in LMS')
     def test_request_password_change_invalid_user(self):
-        with self.assertRaises(account_api.AccountUserNotFound):
+        with self.assertRaises(UserNotFound):
             account_api.request_password_change(self.EMAIL, self.ORIG_HOST, self.IS_SECURE)
 
         # Verify that no email messages have been sent

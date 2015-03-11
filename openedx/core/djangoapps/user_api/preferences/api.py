@@ -4,9 +4,11 @@ API for managing user preferences.
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import transaction
 from django.utils.translation import ugettext as _
 
-from ..api.account import AccountUserNotFound, AccountNotAuthorized
+from ..api.user import UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized
+from ..helpers import intercept_errors
 from ..models import UserPreference, PreferenceNotFound, PreferenceValidationError, PreferenceUpdateError
 from ..serializers import UserSerializer
 
@@ -18,15 +20,16 @@ def _get_user(requesting_user, username, allow_staff=False):
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        raise AccountUserNotFound()
+        raise UserNotFound()
 
     if requesting_user.username != username:
         if not requesting_user.is_staff or not allow_staff:
-            raise AccountNotAuthorized()
+            raise UserNotAuthorized()
 
     return existing_user
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def get_user_preference(requesting_user, preference_key, username=None):
     """Returns the value of the user preference with the specified key.
 
@@ -42,14 +45,15 @@ def get_user_preference(requesting_user, preference_key, username=None):
          None.
 
     Raises:
-         AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to the user preference.
+         UserNotAuthorized: the requesting_user does not have access to the user preference.
     """
     existing_user = _get_user(requesting_user, username, allow_staff=True)
     return UserPreference.get_preference(existing_user, preference_key)
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def get_user_preferences(requesting_user, username=None):
     """Returns all user preferences as a JSON response.
 
@@ -63,15 +67,17 @@ def get_user_preferences(requesting_user, username=None):
          A dict containing account fields.
 
     Raises:
-         AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to the user preference.
+         UserNotAuthorized: the requesting_user does not have access to the user preference.
     """
     existing_user = _get_user(requesting_user, username, allow_staff=True)
     user_serializer = UserSerializer(existing_user)
     return user_serializer.data["preferences"]
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@transaction.commit_on_success
 def update_user_preferences(requesting_user, update, username=None):
     """Update the user preferences for the given username.
 
@@ -88,40 +94,38 @@ def update_user_preferences(requesting_user, update, username=None):
             `requesting_user.username` is assumed.
 
     Raises:
-        AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+        UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to change the account
+        UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
         PreferenceUpdateError: the update could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
-    try:
-        # First validate each preference setting
-        errors = {}
-        for preference_key in update.keys():
-            preference_value = update[preference_key]
-            try:
-                if preference_value is not None:
-                    UserPreference.validate_preference(existing_user, preference_key, preference_value)
-            except ValidationError as error:
-                errors[preference_key] = {
-                    "developer_message": error.message
-                }
-        if errors:
-            raise PreferenceValidationError(errors)
-        # Then perform the patch
-        for preference_key in update.keys():
-            preference_value = update[preference_key]
+
+    # First validate each preference setting
+    errors = {}
+    for preference_key in update.keys():
+        preference_value = update[preference_key]
+        try:
             if preference_value is not None:
-                UserPreference.set_preference(existing_user, preference_key, preference_value)
-            else:
-                UserPreference.delete_preference(existing_user, preference_key)
-    except Exception as error:
-        raise PreferenceUpdateError(
-            "Error thrown when updating preferences: '{}'".format(error.message)
-        )
+                UserPreference.validate_preference(existing_user, preference_key, preference_value)
+        except ValidationError as error:
+            errors[preference_key] = {
+                "developer_message": error.message
+            }
+    if errors:
+        raise PreferenceValidationError(errors)
+    # Then perform the patch
+    for preference_key in update.keys():
+        preference_value = update[preference_key]
+        if preference_value is not None:
+            UserPreference.set_preference(existing_user, preference_key, preference_value)
+        else:
+            UserPreference.delete_preference(existing_user, preference_key)
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@transaction.commit_on_success
 def set_user_preference(requesting_user, preference_key, preference_value, username=None):
     """Update a user preference for the given username.
 
@@ -138,9 +142,9 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
             `requesting_user.username` is assumed.
 
     Raises:
-        AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+        UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to change the account
+        UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
         AccountValidationError: the update was not attempted because validation errors were found with
             the supplied update
@@ -152,16 +156,11 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
             preference_key=preference_key
         )
         raise PreferenceUpdateError(message, user_message=message)
-    try:
-        UserPreference.set_preference(existing_user, preference_key, preference_value)
-    except PreferenceNotFound:
-        raise PreferenceNotFound()
-    except Exception as error:
-        raise PreferenceUpdateError(
-            "Error thrown when setting preference: '{}'".format(error.message)
-        )
+    UserPreference.set_preference(existing_user, preference_key, preference_value)
 
 
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@transaction.commit_on_success
 def delete_user_preference(requesting_user, preference_key, username=None):
     """Deletes a user preference on behalf of a requesting user.
 
@@ -177,19 +176,12 @@ def delete_user_preference(requesting_user, preference_key, username=None):
             `requesting_user.username` is assumed.
 
     Raises:
-        AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
+        UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
-        AccountNotAuthorized: the requesting_user does not have access to change the account
+        UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
         PreferenceNotFound: the user does not have a preference with the specified key.
         PreferenceUpdateError: the delete could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
-    try:
-        UserPreference.delete_preference(existing_user, preference_key)
-    except PreferenceNotFound:
-        raise PreferenceNotFound()
-    except Exception as error:
-        raise PreferenceUpdateError(
-            "Error thrown when deleting preference: '{}'".format(error.message)
-        )
+    UserPreference.delete_preference(existing_user, preference_key)

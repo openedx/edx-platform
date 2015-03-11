@@ -10,9 +10,8 @@ from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
-from openedx.core.djangoapps.user_api.api.account import (
-    AccountUserNotFound, AccountUpdateError, AccountNotAuthorized, AccountValidationError
-)
+from ..api.account import AccountUpdateError, AccountValidationError
+from ..api.user import UserNotFound, UserNotAuthorized
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
 
@@ -105,7 +104,7 @@ class AccountView(APIView):
         """
         try:
             account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
-        except AccountUserNotFound:
+        except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(account_settings)
@@ -120,7 +119,7 @@ class AccountView(APIView):
         """
         try:
             update_account_settings(request.user, request.DATA, username=username)
-        except (AccountUserNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except AccountValidationError as err:
             return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)

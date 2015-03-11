@@ -14,6 +14,8 @@ from ..forms import PasswordResetFormNoActive
 from ..models import User, UserProfile, Registration
 from ..helpers import intercept_errors
 
+from .user import UserApiRequestError, UserApiInternalError, UserNotFound, UserNotAuthorized
+
 
 USERNAME_MIN_LENGTH = 2
 USERNAME_MAX_LENGTH = 30
@@ -25,7 +27,7 @@ PASSWORD_MIN_LENGTH = 2
 PASSWORD_MAX_LENGTH = 75
 
 
-class AccountRequestError(Exception):
+class AccountRequestError(UserApiRequestError):
     """There was a problem with the request to the account API. """
     pass
 
@@ -55,16 +57,6 @@ class AccountPasswordInvalid(AccountRequestError):
     pass
 
 
-class AccountUserNotFound(AccountRequestError):
-    """The requested user does not exist. """
-    pass
-
-
-class AccountNotAuthorized(AccountRequestError):
-    """The user is not authorized to perform the requested action. """
-    pass
-
-
 class AccountUpdateError(AccountRequestError):
     """
     An update to the account failed. More detailed information is present in developer_message,
@@ -86,7 +78,7 @@ class AccountValidationError(AccountRequestError):
         self.field_errors = field_errors
 
 
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 @transaction.commit_on_success
 def create_account(username, password, email):
     """Create a new user account.
@@ -181,7 +173,7 @@ def check_account_exists(username=None, email=None):
     return conflicts
 
 
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def account_info(username):
     """Retrieve information about a user's account.
 
@@ -205,7 +197,7 @@ def account_info(username):
         }
 
 
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def activate_account(activation_key):
     """Activate a user's account.
 
@@ -216,19 +208,19 @@ def activate_account(activation_key):
         None
 
     Raises:
-        AccountNotAuthorized
+        UserNotAuthorized
 
     """
     try:
         registration = Registration.objects.get(activation_key=activation_key)
     except Registration.DoesNotExist:
-        raise AccountNotAuthorized
+        raise UserNotAuthorized
     else:
         # This implicitly saves the registration
         registration.activate()
 
 
-@intercept_errors(AccountInternalError, ignore_errors=[AccountRequestError])
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def request_password_change(email, orig_host, is_secure):
     """Email a single-use link for performing a password reset.
 
@@ -262,7 +254,7 @@ def request_password_change(email, orig_host, is_secure):
         )
     else:
         # No user with the provided email address exists.
-        raise AccountUserNotFound
+        raise UserNotFound
 
 
 def _validate_username(username):

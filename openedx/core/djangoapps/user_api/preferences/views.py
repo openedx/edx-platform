@@ -11,7 +11,7 @@ from rest_framework.authentication import OAuth2Authentication, SessionAuthentic
 from rest_framework import permissions
 
 from openedx.core.lib.api.parsers import MergePatchParser
-from ..api.account import AccountUserNotFound, AccountNotAuthorized
+from ..api.user import UserNotFound, UserNotAuthorized
 from ..models import PreferenceNotFound, PreferenceUpdateError
 from .api import (
     get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
@@ -50,7 +50,7 @@ class PreferencesView(APIView):
         """
         try:
             user_preferences = get_user_preferences(request.user, username=username)
-        except (AccountUserNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response(user_preferences)
@@ -61,7 +61,7 @@ class PreferencesView(APIView):
         """
         try:
             update_user_preferences(request.user, request.DATA, username=username)
-        except (AccountUserNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceUpdateError as error:
             return Response(
@@ -109,7 +109,7 @@ class PreferencesDetailView(APIView):
             # There was no preference with that key, raise a 404.
             if value is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-        except (AccountUserNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(value)
 
@@ -119,7 +119,7 @@ class PreferencesDetailView(APIView):
         """
         try:
             set_user_preference(request.user, preference_key, request.DATA, username=username)
-        except (AccountUserNotFound, PreferenceNotFound, AccountNotAuthorized):
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceUpdateError as error:
             return Response(
@@ -137,7 +137,7 @@ class PreferencesDetailView(APIView):
         """
         try:
             delete_user_preference(request.user, preference_key, username=username)
-        except (AccountUserNotFound, PreferenceNotFound, AccountNotAuthorized):
+        except (UserNotFound, PreferenceNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceUpdateError as error:
             return Response(
