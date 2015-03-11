@@ -77,4 +77,3 @@ class VerticalBlock(StudioEditableBlock, XBlock):
             VerticalBlock.due,
         ])
         return non_editable_fields
-
