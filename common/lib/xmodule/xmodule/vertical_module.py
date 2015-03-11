@@ -3,7 +3,7 @@ from xblock.fragment import Fragment
 from xmodule.x_module import STUDENT_VIEW
 from xmodule.seq_module import SequenceDescriptor
 from xmodule.progress import Progress
-from xmodule.studio_editable import StudioEditableModule, StudioEditableDescriptor
+from xmodule.studio_editable import StudioEditableBlock
 from pkg_resources import resource_string
 from copy import copy
 
@@ -13,7 +13,7 @@ from copy import copy
 class_priority = ['video', 'problem']
 
 
-class VerticalBlock(XBlock):
+class VerticalBlock(StudioEditableBlock, XBlock):
     ''' Layout module for laying out submodules vertically.'''
 
     has_children = True
@@ -69,9 +69,6 @@ class VerticalBlock(XBlock):
             if c in child_classes:
                 new_class = c
         return new_class
-
-    # TODO (victor): Does this need its own definition_to_xml method?  Otherwise it looks
-    # like verticals will get exported as sequentials...
 
     @property
     def non_editable_metadata_fields(self):
