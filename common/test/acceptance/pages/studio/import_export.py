@@ -10,6 +10,19 @@ from .course_page import CoursePage
 from . import BASE_URL
 
 
+class TemplateCheckMixin(object):
+    """
+    Mixin for verifying that a template is loading the correct text.
+    """
+    @property
+    def header_text(self):
+        """
+        Get the header text of the page.
+        """
+        # There are prefixes like 'Tools' and '>', but the text itself is not in a span.
+        return self.q(css='h1.page-header')[0].text.split('\n')[-1]
+
+
 class ExportMixin(object):
     """
     Export page Mixin.
@@ -86,13 +99,13 @@ class LibraryLoader(object):
         return "/".join([BASE_URL, self.url_path, unicode(self.locator)])
 
 
-class ExportCoursePage(ExportMixin, CoursePage):
+class ExportCoursePage(ExportMixin, TemplateCheckMixin, CoursePage):
     """
     Export page for Courses
     """
 
 
-class ExportLibraryPage(ExportMixin, LibraryLoader, LibraryPage):
+class ExportLibraryPage(ExportMixin, TemplateCheckMixin, LibraryLoader, LibraryPage):
     """
     Export page for Libraries
     """
@@ -226,13 +239,13 @@ class ImportMixin(object):
         return self.q(css='.action.action-primary')[0].get_attribute('href')
 
 
-class ImportCoursePage(ImportMixin, CoursePage):
+class ImportCoursePage(ImportMixin, TemplateCheckMixin, CoursePage):
     """
     Import page for Courses
     """
 
 
-class ImportLibraryPage(ImportMixin, LibraryLoader, LibraryPage):
+class ImportLibraryPage(ImportMixin, TemplateCheckMixin, LibraryLoader, LibraryPage):
     """
     Import page for Libraries
     """
