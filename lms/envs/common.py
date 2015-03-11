@@ -1560,6 +1560,8 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'oauth2_provider',
 
+    'oauth_exchange',
+
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
