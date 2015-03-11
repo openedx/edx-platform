@@ -85,7 +85,6 @@ from external_auth.login_and_register import (
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from lang_pref import LANGUAGE_KEY
-from notification_prefs.views import enable_notifications
 
 import track.views
 
@@ -801,12 +800,12 @@ def _update_email_opt_in(request, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
 
     # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.api import profile as profile_api
+    from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
     email_opt_in = request.POST.get('email_opt_in')
     if email_opt_in is not None:
         email_opt_in_boolean = email_opt_in == 'true'
-        profile_api.update_email_opt_in(request.user, org, email_opt_in_boolean)
+        update_email_opt_in(request.user, org, email_opt_in_boolean)
 
 
 @require_POST
@@ -1474,6 +1473,9 @@ def create_account_with_params(request, params):
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
+            # TODO: dependency on LMS from common
+            from notification_prefs.views import enable_notifications
+
             enable_notifications(user)
         except Exception:
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))

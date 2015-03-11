@@ -28,9 +28,11 @@ from edxmako.shortcuts import marketing_link
 from student.views import create_account_with_params, set_marketing_cookie
 from util.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
-from .api import account as account_api, profile as profile_api
+from .preferences.api import update_email_opt_in
+from .api import account as account_api
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
+from .accounts import NAME_MAX_LENGTH
 from .serializers import UserSerializer, UserPreferenceSerializer
 
 
@@ -350,7 +352,7 @@ class RegistrationView(APIView):
             label=name_label,
             instructions=name_instructions,
             restrictions={
-                "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                "max_length": NAME_MAX_LENGTH,
             },
             required=required
         )
@@ -870,5 +872,5 @@ class UpdateEmailOptInPreference(APIView):
             )
         # Only check for true. All other values are False.
         email_opt_in = request.DATA['email_opt_in'].lower() == 'true'
-        profile_api.update_email_opt_in(request.user, org, email_opt_in)
+        update_email_opt_in(request.user, org, email_opt_in)
         return HttpResponse(status=status.HTTP_200_OK)

@@ -25,7 +25,8 @@ from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from third_party_auth.tests.testutil import simulate_running_pipeline
 
 from ..accounts.api import get_account_settings
-from ..api import account as account_api, profile as profile_api
+from ..api import account as account_api
+from ..accounts import NAME_MAX_LENGTH
 from ..models import UserOrgTag
 from ..tests.factories import UserPreferenceFactory
 from ..tests.test_constants import SORTED_COUNTRIES
@@ -842,7 +843,7 @@ class RegistrationViewTest(ApiTestCase):
                 u"label": u"Full name",
                 u"instructions": u"The name that will appear on your certificates",
                 u"restrictions": {
-                    "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                    "max_length": NAME_MAX_LENGTH,
                 },
             }
         )
@@ -922,7 +923,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"label": u"Full name",
                     u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
-                        "max_length": profile_api.FULL_NAME_MAX_LENGTH,
+                        "max_length": NAME_MAX_LENGTH,
                     }
                 }
             )

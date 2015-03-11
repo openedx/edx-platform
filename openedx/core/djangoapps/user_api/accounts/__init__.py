@@ -4,6 +4,7 @@ Account constants
 
 # The minimum acceptable length for the name account field
 NAME_MIN_LENGTH = 2
+NAME_MAX_LENGTH = 255
 
 ACCOUNT_VISIBILITY_PREF_KEY = 'account_privacy'
 
