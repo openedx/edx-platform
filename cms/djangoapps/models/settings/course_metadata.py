@@ -60,6 +60,10 @@ class CourseMetadata(object):
         if not settings.FEATURES.get('ENABLE_EDXNOTES'):
             filtered_list.append('edxnotes')
 
+        # Do not show video_upload_pipeline if the feature is disabled.
+        if not settings.FEATURES.get('ENABLE_VIDEO_UPLOAD_PIPELINE'):
+            filtered_list.append('video_upload_pipeline')
+
         return filtered_list
 
     @classmethod
