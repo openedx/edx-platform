@@ -141,7 +141,10 @@ class ContainerModuleRuntimeFactory(ModuleSystemFactory):
         if depth == 0:
             self.get_module.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.get_module.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalBlock, depth=depth - 1)
+            self.get_module.side_effect = lambda x: ContainerModuleFactory(
+                descriptor_cls=VerticalBlock,
+                depth=depth - 1
+            )
 
     @post_generation
     def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden
@@ -166,7 +169,10 @@ class ContainerDescriptorRuntimeFactory(DescriptorSystemFactory):
         if depth == 0:
             self.load_item.side_effect = lambda x: LeafModuleFactory(descriptor_cls=HtmlDescriptor)
         else:
-            self.load_item.side_effect = lambda x: ContainerModuleFactory(descriptor_cls=VerticalBlock, depth=depth - 1)
+            self.load_item.side_effect = lambda x: ContainerModuleFactory(
+                descriptor_cls=VerticalBlock,
+                depth=depth - 1
+            )
 
     @post_generation
     def position(self, create, position=2, **kwargs):  # pylint: disable=unused-argument, method-hidden

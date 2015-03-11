@@ -1,3 +1,6 @@
+"""
+VerticalBlock - a pure XBlock.
+"""
 from xblock.core import XBlock
 from xblock.fragment import Fragment
 from xmodule.x_module import STUDENT_VIEW
@@ -10,7 +13,7 @@ from copy import copy
 
 # HACK: This shouldn't be hard-coded to two types
 # OBSOLETE: This obsoletes 'type'
-class_priority = ['video', 'problem']
+CLASS_PRIORITY = ['video', 'problem']
 
 
 class VerticalBlock(StudioEditableBlock, XBlock):
@@ -65,13 +68,16 @@ class VerticalBlock(StudioEditableBlock, XBlock):
     def get_icon_class(self):
         child_classes = set(child.get_icon_class() for child in self.get_children())
         new_class = 'other'
-        for c in class_priority:
-            if c in child_classes:
-                new_class = c
+        for higher_class in CLASS_PRIORITY:
+            if higher_class in child_classes:
+                new_class = higher_class
         return new_class
 
     @property
     def non_editable_metadata_fields(self):
+        """
+        Gather all fields which can't be edited.
+        """
         non_editable_fields = super(VerticalBlock, self).non_editable_metadata_fields
         non_editable_fields.extend([
             VerticalBlock.due,
