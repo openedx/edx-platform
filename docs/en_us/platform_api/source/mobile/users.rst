@@ -1,10 +1,9 @@
-#########################
-User API Module
-#########################
+####################################
+Mobile User API Module
+####################################
 
-.. module:: mobile_api
-
-This page describes how to use the mobile user API to:
+This page describes how to use the Mobile User API to complete
+these actions:
 
 * `Get User Details`_
 * `Get a User's Course Enrollments`_
@@ -16,35 +15,7 @@ This page describes how to use the mobile user API to:
 Get User Details
 *******************
 
-.. .. autoclass:: mobile_api.users.views.UserDetail
-..    :members:
-
-**Use Case**
-
-Get information about the specified user and access other resources the user
-has permissions for.
-
-Users are redirected to this endpoint after logging in.
-
-You can use the **course_enrollments** value in the response to get a list of
-courses the user is enrolled in.
-
-**Example request**
-
-``GET /api/mobile/v0.5/users/{username}``
-
-**Response Values**
-
-* id: The ID of the user.
-
-* username: The username of the currently logged in user.
-
-* email: The email address of the currently logged in user.
-
-* name: The full name of the currently logged in user.
-
-* course_enrollments: The URI to list the courses the currently logged in user
-  is enrolled in.
+.. autoclass:: mobile_api.users.views.UserDetail
 
 **Example response**
 
@@ -69,52 +40,7 @@ courses the user is enrolled in.
 Get a User's Course Enrollments
 **************************************
 
-.. .. autoclass:: users.views.UserCourseEnrollmentsList
-..    :members:
-
-**Use Case**
-
-Get information about the courses the currently logged in user is enrolled in.
-
-**Example request**:
-
-``GET /api/mobile/v0.5/users/{username}/course_enrollments/``
-
-**Response Values**
-
-* created: The date the course was created.
-        
-* mode: The type of certificate registration for this course:  honor or
-  certified.
-        
-* is_active: Whether the course is currently active; true or false.
-    
-* course: A collection of data about the course:
-        
-* course_about: The URI to get the data for the course About page.
-          
-* course_updates: The URI to get data for course updates.
-          
-* number: The course number.
-          
-* org: The organization that created the course.
-          
-* video_outline: The URI to get the list of all vides the user can access in
-  the course.
-          
-* id: The unique ID of the course.
-          
-* latest_updates:  Reserved for future use.
-          
-* end: The end date of the course.
-          
-* name: The name of the course.
-          
-* course_handouts: The URI to get data for course handouts.
-          
-* start: The data and time the course starts.
-          
-* course_image: The path to the course image.
+.. autoclass:: mobile_api.users.views.UserCourseEnrollmentsList
 
 **Example response**
 
@@ -174,36 +100,7 @@ Get information about the courses the currently logged in user is enrolled in.
 Get or Change User Status in a Course
 **************************************
 
-.. .. autoclass:: mobile_api.users.views.UserCourseStatus
-..    :members:
-
-**Use Case**
-
-Get or update the ID of the module that the specified user last visited in the
-specified course.
-
-**Example request**
-
-``GET /api/mobile/v0.5/users/{username}/course_status_info/{course_id}``
-
-.. code-block:: http
-  
-  PATCH /api/mobile/v0.5/users/{username}/course_status_info/{course_id}
-      body:
-          last_visited_module_id={module_id}
-          modification_date={date}
-
-          The modification_date is optional. If it is present, the update will
-          only take effect if the modification_date is later than the
-          modification_date saved on the server.
-
-**Response Values**
-
-* last_visited_module_id: The ID of the last module visited by the user in the
-  course.
-
-* last_visited_module_path: The ID of the modules in the path from the last
-  visited module to the course module.
+.. autoclass:: mobile_api.users.views.UserCourseStatus
 
 **Example Response**
 

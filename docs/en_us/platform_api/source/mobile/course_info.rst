@@ -1,10 +1,9 @@
 ##################################################
-Course Information API Module
+Mobile Course Information API Module
 ##################################################
 
-.. module:: mobile_api
-
-This page contains docstrings and example responses for:
+This page describes how to use the Mobile Course Information API
+to complete these actions:
 
 * `Get Course Updates`_
 * `Get Course Handouts`_
@@ -17,28 +16,7 @@ This page contains docstrings and example responses for:
 Get Course Updates
 *******************
 
-.. .. autoclass:: course_info.views.CourseUpdatesList
-
-**Use Case**
-
-Get the content for course updates.
-
-**Example request**:
-
-``GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/updates``
-
-**Response Values**
-
-A array of course updates. Each course update contains:
-
-* date: The date of the course update.
-
-* content: The content, as a string, of the course update. HTML tags are not
-  included in the string.
-
-* status: Whether the update is visible or not.
-
-* id: The unique identifier of the update.
+.. autoclass:: mobile_api.course_info.views.CourseUpdatesList
 
 **Example response**
 
@@ -71,7 +49,7 @@ A array of course updates. Each course update contains:
 Get Course Handouts
 *******************
 
-.. .. autoclass:: course_info.views.CourseHandoutsList
+.. autoclass:: mobile_api.course_info.views.CourseHandoutsList
 
 **Use Case**
 
@@ -107,20 +85,7 @@ Get the HTML for course handouts.
 Get the Course About Page
 **************************
 
-.. .. autoclass:: course_info.views.CourseAboutDetail
-..    :members:
-
-**Use Case**
-
-Get the HTML for the course about page.
-
-**Example request**:
-
-``GET /api/mobile/v0.5/course_info/{organization}/{course_number}/{course_run}/about``
-
-**Response Values**
-
-* overview: The HTML for the course About page.
+.. autoclass:: mobile_api.course_info.views.CourseAboutDetail
 
 **Example response**
 

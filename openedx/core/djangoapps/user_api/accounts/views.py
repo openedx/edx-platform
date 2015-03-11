@@ -20,79 +20,97 @@ class AccountView(APIView):
     """
         **Use Cases**
 
-            Get or update the user's account information. Updates are only supported through merge patch.
+            Get or update a user's account information. Updates are supported only through merge patch.
 
         **Example Requests**:
 
             GET /api/user/v0/accounts/{username}/[?view=shared]
 
-            PATCH /api/user/v0/accounts/{username}/ with content_type "application/merge-patch+json"
+            PATCH /api/user/v0/accounts/{username}/{"key":"value"} "application/merge-patch+json"
 
         **Response Values for GET**
 
-            If the user making the request has username "username", or has "is_staff" access, the following
-            fields will be returned:
+            If the user makes the request for her own account, or makes a
+            request for another account and has "is_staff" access, the response
+            contains:
 
-                * username: username associated with the account (not editable)
+                * username: The username associated with the account.
 
-                * name: full name of the user (must be at least two characters)
+                * name: The full name of the user.
 
-                * email: email for the user (the new email address must be confirmed via a confirmation email, so GET will
-                    not reflect the change until the address has been confirmed)
+                * email: The confirmed email address for the user. The request
+                  will not return an unconfirmed email address.
 
-                * date_joined: date this account was created (not editable), in the string format provided by
-                    datetime (for example, "2014-08-26T17:52:11Z")
+                * date_joined: The date the account was created, in
+                  the string format provided by datetime (for example,
+                  "2014-08-26T17:52:11Z").
 
-                * gender: null (not set), "m", "f", or "o"
+                * gender: One of the fullowing values:
 
-                * year_of_birth: null or integer year
+                  * "m" 
+                  * "f"
+                  * "o"
+                  * null
 
-                * level_of_education: null (not set), or one of the following choices:
+                * year_of_birth: The year the user was born, as an integer, or
+                  null.
 
-                    * "p" signifying "Doctorate"
-                    * "m" signifying "Master's or professional degree"
-                    * "b" signifying "Bachelor's degree"
-                    * "a" signifying "Associate degree"
-                    * "hs" signifying "Secondary/high school"
-                    * "jhs" signifying "Junior secondary/junior high/middle school"
-                    * "el" signifying "Elementary/primary school"
-                    * "none" signifying "None"
-                    * "o" signifying "Other"
+                * level_of_education: One of the following values:
 
-                * language: null or name of preferred language
+                    * "p": PhD or Doctorate
+                    * "m": Master's or professional degree
+                    * "b": Bachelor's degree
+                    * "a": Associate's degree
+                    * "hs": Secondary/high school
+                    * "jhs": Junior secondary/junior high/middle school
+                    * "el": Elementary/primary school
+                    * "none": "None"
+                    * "o": "Other"
+                    * null: The user did not enter a value.
 
-                * country: null (not set), or a Country corresponding to one of the ISO 3166-1 countries
+                * language: The user's preferred language, or null.
 
-                * mailing_address: null or textual representation of mailing address
+                * country: A ISO 3166 country code or null.
 
-                * goals: null or textual representation of goals
+                * mailing_address: The textual representation of the user's
+                  mailing address, or null.
 
-            If a user without "is_staff" access has requested account information for a different user,
-            only a subset of these fields will be returned. The actual fields returned depend on the configuration
-            setting ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of the user with username
-            "username".
+                * goals: The textual representation of the user's goals, or null.
 
-            Note that a user can view which account fields they have shared with other users by requesting their
-            own username and providing the url parameter "view=shared".
+            If a user who does not have "is_staff" access requests account
+            information for a different user, only a subset of these fields is
+            returned. The fields returned depend on the configuration setting
+            ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of
+            the user for whom data is requested.
 
-            This method will return a 404 if no user exists with username "username".
+            Note that a user can view which account fields they have shared with
+            other users by requesting their own username and providing the url
+            parameter "view=shared".
 
-        **Response for PATCH**
+            If no user exists with the specified username, a 404 error is
+            returned.
 
-            Users can only modify their own account information. If the requesting user does not have username
-            "username", this method will return with a status of 404.
+        **Response Values for PATCH**
 
-            This method will also return a 404 if no user exists with username "username".
+            Users can modify only their own account information. If the user
+            attempts to modify another user's account, a 404 error is returned.
 
-            If "application/merge-patch+json" is not the specified content_type, this method returns a 415 status.
+            If no user exists with the specified username, a 404 error is
+            returned.
 
-            If the update could not be completed due to validation errors, this method returns a 400 with all
-            field-specific error messages in the "field_errors" field of the returned JSON.
+            If "application/merge-patch+json" is not the specified content type,
+            a 415 error is returned.
 
-            If the update could not be completed due to failure at the time of update, this method returns a 400 with
-            specific errors in the returned JSON.
+            If the update could not be completed due to validation errors, this
+            method returns a 400 error with all error messages in the
+            "field_errors" field of the returned JSON.
 
-            If the update is successful, a 204 status is returned with no additional content.
+            If the update could not be completed due to a failure at the time of
+            the update, a 400 error is returned with specific errors in the
+            returned JSON collection.
+
+            If the update is successful, a 204 status is returned with no
+            additional content.
     """
     authentication_classes = (OAuth2AuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser)
     permission_classes = (permissions.IsAuthenticated,)
