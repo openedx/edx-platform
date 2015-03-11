@@ -19,7 +19,7 @@ from ..helpers import intercept_errors
 
 from ..accounts.api import get_account_settings
 from ..errors import (
-    UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized,
+    UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceNotFound, PreferenceRequestError, PreferenceValidationError, PreferenceUpdateError
 )
 from ..helpers import intercept_errors
@@ -49,7 +49,7 @@ def _get_user(requesting_user, username=None, allow_staff=False):
     return existing_user
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def get_user_preference(requesting_user, preference_key, username=None):
     """Returns the value of the user preference with the specified key.
 
@@ -73,7 +73,7 @@ def get_user_preference(requesting_user, preference_key, username=None):
     return UserPreference.get_preference(existing_user, preference_key)
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def get_user_preferences(requesting_user, username=None):
     """Returns all user preferences as a JSON response.
 
@@ -96,7 +96,7 @@ def get_user_preferences(requesting_user, username=None):
     return user_serializer.data["preferences"]
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 @transaction.commit_on_success
 def update_user_preferences(requesting_user, update, username=None):
     """Update the user preferences for the given username.
@@ -145,7 +145,7 @@ def update_user_preferences(requesting_user, update, username=None):
             UserPreference.delete_preference(existing_user, preference_key)
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 @transaction.commit_on_success
 def set_user_preference(requesting_user, preference_key, preference_value, username=None):
     """Update a user preference for the given username.
@@ -179,7 +179,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
     UserPreference.set_preference(existing_user, preference_key, preference_value)
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 @transaction.commit_on_success
 def delete_user_preference(requesting_user, preference_key, username=None):
     """Deletes a user preference on behalf of a requesting user.
@@ -212,7 +212,7 @@ def delete_user_preference(requesting_user, preference_key, username=None):
     return True
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def update_email_opt_in(user, org, optin):
     """Updates a user's preference for receiving org-wide emails.
 

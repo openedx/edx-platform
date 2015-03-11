@@ -13,7 +13,7 @@ from student.views import validate_new_email, do_email_change_request
 from ..errors import (
     AccountUpdateError, AccountValidationError, AccountUsernameInvalid, AccountPasswordInvalid,
     AccountEmailInvalid, AccountUserAlreadyExists,
-    UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized
+    UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized
 )
 from ..helpers import intercept_errors
 from ..models import UserPreference
@@ -27,7 +27,7 @@ from . import (
 )
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def get_account_settings(requesting_user, username=None, configuration=None, view=None):
     """Returns account information for a user serialized as JSON.
 
@@ -93,7 +93,7 @@ def get_account_settings(requesting_user, username=None, configuration=None, vie
 
 
 @transaction.commit_on_success
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def update_account_settings(requesting_user, update, username=None):
     """Update user account information.
 
@@ -248,7 +248,7 @@ def _add_serializer_errors(update, serializer, field_errors):
     return field_errors
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 @transaction.commit_on_success
 def create_account(username, password, email):
     """Create a new user account.
@@ -343,7 +343,7 @@ def check_account_exists(username=None, email=None):
     return conflicts
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def activate_account(activation_key):
     """Activate a user's account.
 
@@ -366,7 +366,7 @@ def activate_account(activation_key):
         registration.activate()
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
+@intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
 def request_password_change(email, orig_host, is_secure):
     """Email a single-use link for performing a password reset.
 
