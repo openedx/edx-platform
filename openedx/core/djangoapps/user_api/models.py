@@ -5,8 +5,6 @@ from model_utils.models import TimeStampedModel
 
 from xmodule_django.models import CourseKeyField
 
-from .api.user import UserApiRequestError
-
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
 # We are trying to move some of this functionality into separate apps,
@@ -15,36 +13,7 @@ from .api.user import UserApiRequestError
 # create an alias in "user_api".
 from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
 
-
-class PreferenceRequestError(UserApiRequestError):
-    """There was a problem with a preference request."""
-    pass
-
-
-class PreferenceNotFound(PreferenceRequestError):
-    """The desired user preference was not found."""
-    pass
-
-
-class PreferenceValidationError(PreferenceRequestError):
-    """
-    Validation issues were found with the supplied data. More detailed information is present
-    in preference_errors, a dict with specific information about each preference that failed
-    validation. For each preference, there will be at least a developer_message describing
-    the validation issue, and possibly also a user_message.
-    """
-    def __init__(self, preference_errors):
-        self.preference_errors = preference_errors
-
-
-class PreferenceUpdateError(PreferenceRequestError):
-    """
-    An update to the account failed. More detailed information is present in developer_message,
-    and depending on the type of error encountered, there may also be a non-null user_message field.
-    """
-    def __init__(self, developer_message, user_message=None):
-        self.developer_message = developer_message
-        self.user_message = user_message
+from .errors import PreferenceNotFound
 
 
 class UserPreference(models.Model):

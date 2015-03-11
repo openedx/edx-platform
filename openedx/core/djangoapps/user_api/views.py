@@ -29,10 +29,13 @@ from student.views import create_account_with_params, set_marketing_cookie
 from util.authentication import SessionAuthenticationAllowInactiveUser
 from util.json_request import JsonResponse
 from .preferences.api import update_email_opt_in
-from .api import account as account_api
 from .helpers import FormDescription, shim_student_view, require_post_params
 from .models import UserPreference, UserProfile
-from .accounts import NAME_MAX_LENGTH
+from .accounts import (
+    NAME_MAX_LENGTH, EMAIL_MIN_LENGTH, EMAIL_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH,
+    USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH
+)
+from .accounts.api import check_account_exists
 from .serializers import UserSerializer, UserPreferenceSerializer
 
 
@@ -81,8 +84,8 @@ class LoginSessionView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             }
         )
 
@@ -95,8 +98,8 @@ class LoginSessionView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": account_api.PASSWORD_MIN_LENGTH,
-                "max_length": account_api.PASSWORD_MAX_LENGTH,
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
             }
         )
 
@@ -253,7 +256,7 @@ class RegistrationView(APIView):
         username = data.get('username')
 
         # Handle duplicate email/username
-        conflicts = account_api.check_account_exists(email=email, username=username)
+        conflicts = check_account_exists(email=email, username=username)
         if conflicts:
             conflict_messages = {
                 # Translators: This message is shown to users who attempt to create a new
@@ -323,8 +326,8 @@ class RegistrationView(APIView):
             label=email_label,
             placeholder=email_placeholder,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             },
             required=required
         )
@@ -382,8 +385,8 @@ class RegistrationView(APIView):
             label=username_label,
             instructions=username_instructions,
             restrictions={
-                "min_length": account_api.USERNAME_MIN_LENGTH,
-                "max_length": account_api.USERNAME_MAX_LENGTH,
+                "min_length": USERNAME_MIN_LENGTH,
+                "max_length": USERNAME_MAX_LENGTH,
             },
             required=required
         )
@@ -407,8 +410,8 @@ class RegistrationView(APIView):
             label=password_label,
             field_type="password",
             restrictions={
-                "min_length": account_api.PASSWORD_MIN_LENGTH,
-                "max_length": account_api.PASSWORD_MAX_LENGTH,
+                "min_length": PASSWORD_MIN_LENGTH,
+                "max_length": PASSWORD_MAX_LENGTH,
             },
             required=required
         )
@@ -777,8 +780,8 @@ class PasswordResetView(APIView):
             placeholder=email_placeholder,
             instructions=email_instructions,
             restrictions={
-                "min_length": account_api.EMAIL_MIN_LENGTH,
-                "max_length": account_api.EMAIL_MAX_LENGTH,
+                "min_length": EMAIL_MIN_LENGTH,
+                "max_length": EMAIL_MAX_LENGTH,
             }
         )
 

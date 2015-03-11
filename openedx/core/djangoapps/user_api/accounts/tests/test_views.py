@@ -125,7 +125,7 @@ class TestAccountAPI(UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(11, len(data))
+        self.assertEqual(12, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
@@ -136,6 +136,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual("world peace", data["goals"])
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
+        self.assertTrue(data["is_active"])
         self.assertIsNotNone(data["date_joined"])
 
     def test_anonymous_access(self):
@@ -238,7 +239,7 @@ class TestAccountAPI(UserAPITestCase):
         self.client.login(username=self.user.username, password=self.test_password)
         response = self.send_get(self.client)
         data = response.data
-        self.assertEqual(11, len(data))
+        self.assertEqual(12, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         for empty_field in ("year_of_birth", "level_of_education", "mailing_address"):
@@ -250,6 +251,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual("World domination", data["goals"])
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
+        self.assertTrue(data["is_active"])
 
     def test_get_account_empty_string(self):
         """
@@ -350,7 +352,7 @@ class TestAccountAPI(UserAPITestCase):
                 "Field '{0}' cannot be edited.".format(field_name), data["field_errors"][field_name]["user_message"]
             )
 
-        for field_name in ["username", "date_joined"]:
+        for field_name in ["username", "date_joined", "is_active"]:
             response = self.send_patch(client, {field_name: "will_error", "gender": "f"}, expected_status=400)
             verify_error_response(field_name, response.data)
 

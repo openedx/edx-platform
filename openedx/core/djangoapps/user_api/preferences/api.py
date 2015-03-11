@@ -18,11 +18,12 @@ from ..models import UserOrgTag
 from ..helpers import intercept_errors
 
 from ..accounts.api import get_account_settings
-from ..api.user import UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized
-from ..helpers import intercept_errors
-from ..models import (
-    UserPreference, PreferenceNotFound, PreferenceRequestError, PreferenceValidationError, PreferenceUpdateError
+from ..errors import (
+    UserApiInternalError, UserApiRequestError, UserNotFound, UserNotAuthorized,
+    PreferenceNotFound, PreferenceRequestError, PreferenceValidationError, PreferenceUpdateError
 )
+from ..helpers import intercept_errors
+from ..models import UserPreference
 from ..serializers import UserSerializer
 
 log = logging.getLogger(__name__)
@@ -211,7 +212,7 @@ def delete_user_preference(requesting_user, preference_key, username=None):
     return True
 
 
-@intercept_errors(UserApiInternalError, ignore_errors=[PreferenceRequestError])
+@intercept_errors(UserApiInternalError, ignore_errors=[UserApiRequestError])
 def update_email_opt_in(user, org, optin):
     """Updates a user's preference for receiving org-wide emails.
 

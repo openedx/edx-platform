@@ -14,7 +14,7 @@ from django.contrib.auth.models import User
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory
 
-from openedx.core.djangoapps.user_api.api import account as account_api
+from openedx.core.djangoapps.user_api.accounts.api import create_account
 from openedx.core.djangoapps.user_api.models import UserProfile, UserOrgTag
 from openedx.core.djangoapps.user_api.preferences.api import (
     update_email_opt_in, set_user_preference, get_user_preferences, update_user_preferences
@@ -30,7 +30,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
     def test_update_and_retrieve_preference_info(self):
         # TODO: move test into preferences API test.
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
         set_user_preference(user, 'preference_key', 'preference_value')
@@ -59,7 +59,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     def test_update_email_optin(self, age, option, expected_result):
         # Create the course and account.
         course = CourseFactory.create()
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
@@ -76,7 +76,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
         # Test that the API still works if no age is specified.
         # Create the course and account.
         course = CourseFactory.create()
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         user = User.objects.get(username=self.USERNAME)
 
@@ -102,7 +102,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
     def test_change_email_optin(self, age, option, second_option, expected_result):
         # Create the course and account.
         course = CourseFactory.create()
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
         # Set year of birth
         user = User.objects.get(username=self.USERNAME)
@@ -119,7 +119,7 @@ class UpdateEmailOptInTests(ModuleStoreTestCase):
 
     def test_update_and_retrieve_preference_info_unicode(self):
         # TODO: cover in preference API unit test.
-        account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
         user = User.objects.get(username=self.USERNAME)
         update_user_preferences(user, {u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ': u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'})
 

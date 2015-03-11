@@ -30,8 +30,8 @@ from student.views import (
     register_user as old_register_view
 )
 
-from openedx.core.djangoapps.user_api.api import account as account_api
-from openedx.core.djangoapps.user_api.api.user import UserNotFound
+from openedx.core.djangoapps.user_api.accounts.api import request_password_change
+from openedx.core.djangoapps.user_api.errors import UserNotFound
 from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from student_account.helpers import auth_pipeline_urls
@@ -134,7 +134,7 @@ def password_change_request_handler(request):
 
     if email:
         try:
-            account_api.request_password_change(email, request.get_host(), request.is_secure())
+            request_password_change(email, request.get_host(), request.is_secure())
         except UserNotFound:
             AUDIT_LOG.info("Invalid password reset attempt")
             # Increment the rate limit counter

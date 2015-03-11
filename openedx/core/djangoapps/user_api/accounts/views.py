@@ -10,8 +10,7 @@ from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
-from ..api.account import AccountUpdateError, AccountValidationError
-from ..api.user import UserNotFound, UserNotAuthorized
+from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
 

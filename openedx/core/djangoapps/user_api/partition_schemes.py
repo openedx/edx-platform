@@ -3,7 +3,7 @@ Provides partition support to the user service.
 """
 import logging
 import random
-import api.course_tag as course_tag_api
+import course_tag.api as course_tag_api
 
 from xmodule.partitions.partitions import UserPartitionError, NoSuchUserPartitionGroupError
 

@@ -11,8 +11,7 @@ from rest_framework.authentication import OAuth2Authentication, SessionAuthentic
 from rest_framework import permissions
 
 from openedx.core.lib.api.parsers import MergePatchParser
-from ..api.user import UserNotFound, UserNotAuthorized
-from ..models import PreferenceNotFound, PreferenceValidationError
+from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError
 from .api import (
     get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
 )

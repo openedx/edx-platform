@@ -29,8 +29,7 @@ from django.core.mail import send_mail
 
 from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.api.account import AccountValidationError
-from openedx.core.djangoapps.user_api.api.user import UserNotFound
+from openedx.core.djangoapps.user_api.errors import UserNotFound, AccountValidationError
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
