@@ -1,15 +1,17 @@
 <label class="account-settings-field-title">
     <%- gettext(title) %>
 </label>
-<select name="select" class="account-settings-field-value">
-    <% if (!required) { %>
-        <option value=""></option>
-    <% } %>
-    <% _.each(select_options, function(select_option) { %>
-        <option value="<%- select_option[0] %>"><%- select_option[1] %></option>
-    <% }); %>
-</select>
-<small class="account-settings-field-message">
+<span class="account-settings-field-value">
+    <select name="select">
+        <% if (!required) { %>
+            <option value=""></option>
+        <% } %>
+        <% _.each(select_options, function(select_option) { %>
+            <option value="<%- select_option[0] %>"><%- select_option[1] %></option>
+        <% }); %>
+    </select>
+</span>
+<span class="account-settings-field-message">
     <%- gettext(message) %>
-</small>
+</span>
 <hr class="divider">
