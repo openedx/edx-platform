@@ -62,7 +62,6 @@ class CohortTestMixin(object):
         response = course_fixture.session.patch(url, data=data, headers=course_fixture.headers)
         self.assertTrue(response.ok, "Failed to disable cohorts")
 
-
     def add_manual_cohort(self, course_fixture, cohort_name):
         """
         Adds a cohort by name, returning its ID.
