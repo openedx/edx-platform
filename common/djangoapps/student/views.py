@@ -633,10 +633,10 @@ def dashboard(request):
         language_options.sort()
 
     # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.models import UserPreference
+    from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
 
-    # try to get the prefered language for the user
-    cur_pref_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    # try to get the preferred language for the user
+    cur_pref_lang_code = get_user_preference(request.user, LANGUAGE_KEY)
     # try and get the current language of the user
     cur_lang_code = get_language()
     if cur_pref_lang_code and cur_pref_lang_code in settings.LANGUAGE_DICT:
@@ -1392,9 +1392,9 @@ def _do_create_account(form):
         raise
 
     # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.models import UserPreference
+    from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 
-    UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+    set_user_preference(user, LANGUAGE_KEY, get_language())
 
     return (user, profile, registration)
 

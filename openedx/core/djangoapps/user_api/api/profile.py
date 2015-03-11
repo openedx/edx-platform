@@ -16,7 +16,7 @@ import analytics
 from eventtracking import tracker
 from ..accounts import NAME_MIN_LENGTH
 from ..accounts.api import get_account_settings
-from ..models import User, UserPreference, UserOrgTag
+from ..models import UserOrgTag
 from ..helpers import intercept_errors
 
 log = logging.getLogger(__name__)
@@ -39,54 +39,6 @@ class ProfileInternalError(Exception):
 
 FULL_NAME_MAX_LENGTH = 255
 FULL_NAME_MIN_LENGTH = NAME_MIN_LENGTH
-
-
-@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def preference_info(username):
-    """Retrieve information about a user's preferences.
-
-    Arguments:
-        username (unicode): The username of the account to retrieve.
-
-    Returns:
-        dict: Empty if there is no user
-
-    """
-    preferences = UserPreference.objects.filter(user__username=username)
-
-    preferences_dict = {}
-    for preference in preferences:
-        preferences_dict[preference.key] = preference.value
-
-    return preferences_dict
-
-
-@intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])
-def update_preferences(username, **kwargs):
-    """Update a user's preferences.
-
-    Sets the provided preferences for the given user.
-
-    Arguments:
-        username (unicode): The username of the account to retrieve.
-
-    Keyword Arguments:
-        **kwargs (unicode): Arbitrary key-value preference pairs
-
-    Returns:
-        None
-
-    Raises:
-        ProfileUserNotFound
-
-    """
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        raise ProfileUserNotFound
-    else:
-        for key, value in kwargs.iteritems():
-            UserPreference.set_preference(user, key, value)
 
 
 @intercept_errors(ProfileInternalError, ignore_errors=[ProfileRequestError])

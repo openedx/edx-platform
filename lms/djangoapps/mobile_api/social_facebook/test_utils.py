@@ -12,7 +12,7 @@ from social.apps.django_app.default.models import UserSocialAuth
 
 from student.models import CourseEnrollment
 from student.views import login_oauth_token
-from openedx.core.djangoapps.user_api.api.profile import preference_info, update_preferences
+from openedx.core.djangoapps.user_api.preferences.api import get_user_preference, set_user_preference
 
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from courseware.tests.factories import UserFactory
@@ -132,8 +132,9 @@ class SocialFacebookTestCase(ModuleStoreTestCase, APITestCase):
         """
         Sets self.user's share settings to boolean_value
         """
-        update_preferences(user.username, share_with_facebook_friends=boolean_value)
-        self.assertEqual(preference_info(user.username)['share_with_facebook_friends'], unicode(boolean_value))
+        # Note that setting the value to boolean will result in the conversion to the unicode form of the boolean.
+        set_user_preference(user, 'share_with_facebook_friends', boolean_value)
+        self.assertEqual(get_user_preference(user, 'share_with_facebook_friends'), unicode(boolean_value))
 
     def _change_enrollment(self, action, course_id=None, email_opt_in=None):
         """

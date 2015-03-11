@@ -9,7 +9,7 @@ from student.models import anonymous_id_for_user
 from student.models import UserProfile
 from student.roles import CourseStaffRole, CourseInstructorRole
 from student.tests.factories import UserFactory, UserProfileFactory
-from openedx.core.djangoapps.user_api.models import UserPreference
+from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 # Will also run default tests for IDTokens and UserInfo
@@ -68,7 +68,7 @@ class IDTokenTest(BaseTestMixin, IDTokenTestCase):
 
     def test_user_with_locale_claim(self):
         language = 'en'
-        UserPreference.set_preference(self.user, LANGUAGE_KEY, language)
+        set_user_preference(self.user, LANGUAGE_KEY, language)
         scopes, claims = self.get_id_token_values('openid profile')
 
         self.assertIn('profile', scopes)

@@ -16,6 +16,7 @@ from ..serializers import UserSerializer
 def _get_user(requesting_user, username=None, allow_staff=False):
     """
     Helper method to return the user for a given username.
+    If username is not provided, requesting_user.username is assumed.
     """
     if username is None:
         username = requesting_user.username
@@ -178,12 +179,18 @@ def delete_user_preference(requesting_user, preference_key, username=None):
         username (string): Optional username specifying which account should be updated. If not specified,
             `requesting_user.username` is assumed.
 
+    Returns:
+        True if the preference was deleted, False if the user did not have a preference with the supplied key
+
     Raises:
         UserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
         UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
-        PreferenceNotFound: the user does not have a preference with the specified key.
     """
     existing_user = _get_user(requesting_user, username)
-    UserPreference.delete_preference(existing_user, preference_key)
+    try:
+        UserPreference.delete_preference(existing_user, preference_key)
+    except PreferenceNotFound:
+        return False
+    return True

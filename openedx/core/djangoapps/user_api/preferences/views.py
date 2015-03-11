@@ -167,7 +167,11 @@ class PreferencesDetailView(APIView):
         DELETE /api/user/v0/preferences/{username}/{preference_key}
         """
         try:
-            delete_user_preference(request.user, preference_key, username=username)
-        except (UserNotFound, PreferenceNotFound, UserNotAuthorized):
+            preference_existed = delete_user_preference(request.user, preference_key, username=username)
+        except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if not preference_existed:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
         return Response(status=status.HTTP_204_NO_CONTENT)

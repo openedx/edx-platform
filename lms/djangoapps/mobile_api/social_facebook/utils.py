@@ -8,7 +8,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
 from social.apps.django_app.default.models import UserSocialAuth
-from openedx.core.djangoapps.user_api.api.profile import preference_info
+from openedx.core.djangoapps.user_api.models import UserPreference
 
 
 # TODO
@@ -64,5 +64,11 @@ def share_with_facebook_friends(friend):
     """
     Return true if the user's share_with_facebook_friends preference is set to true.
     """
-    share_fb_friends_settings = preference_info(friend['edX_username'])
-    return share_fb_friends_settings.get('share_with_facebook_friends', None) == 'True'
+
+    # Calling UserPreference directly because the requesting user may be different (and not is_staff).
+    share_fb_friends = UserPreference.objects.filter(
+        user__username=friend['edX_username'],
+        key='share_with_facebook_friends'
+    )
+
+    return len(share_fb_friends) > 0 and list(share_fb_friends)[0].value == 'True'

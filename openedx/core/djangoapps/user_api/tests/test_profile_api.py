@@ -14,6 +14,9 @@ import datetime
 from ..accounts.api import get_account_settings
 from ..api import account as account_api
 from ..api import profile as profile_api
+from ..preferences.api import (
+    set_user_preference, get_user_preference, get_user_preferences, update_user_preferences
+)
 from ..models import UserProfile, UserOrgTag
 
 
@@ -51,11 +54,13 @@ class ProfileApiTest(ModuleStoreTestCase):
         })
 
     def test_update_and_retrieve_preference_info(self):
+        # TODO: move test into preferences API test.
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
 
-        profile_api.update_preferences(self.USERNAME, preference_key='preference_value')
+        user = User.objects.get(username=self.USERNAME)
+        set_user_preference(user, 'preference_key', 'preference_value')
 
-        preferences = profile_api.preference_info(self.USERNAME)
+        preferences = get_user_preferences(user)
         self.assertEqual(preferences['preference_key'], 'preference_value')
 
     @ddt.data(
@@ -137,19 +142,13 @@ class ProfileApiTest(ModuleStoreTestCase):
         result_obj = UserOrgTag.objects.get(user=user, org=course.id.org, key='email-optin')
         self.assertEqual(result_obj.value, expected_result)
 
-    @raises(profile_api.ProfileUserNotFound)
-    def test_retrieve_and_update_preference_info_no_user(self):
-        preferences = profile_api.preference_info(self.USERNAME)
-        self.assertEqual(preferences, {})
-
-        profile_api.update_preferences(self.USERNAME, preference_key='preference_value')
-
     def test_update_and_retrieve_preference_info_unicode(self):
+        # TODO: cover in preference API unit test.
         account_api.create_account(self.USERNAME, self.PASSWORD, self.EMAIL)
+        user = User.objects.get(username=self.USERNAME)
+        update_user_preferences(user, {u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ': u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'})
 
-        profile_api.update_preferences(self.USERNAME, **{u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ': u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd'})
-
-        preferences = profile_api.preference_info(self.USERNAME)
+        preferences = get_user_preferences(user)
         self.assertEqual(preferences[u'ⓟⓡⓔⓕⓔⓡⓔⓝⓒⓔ_ⓚⓔⓨ'], u'ǝnןɐʌ_ǝɔuǝɹǝɟǝɹd')
 
     def _assert_is_datetime(self, timestamp):

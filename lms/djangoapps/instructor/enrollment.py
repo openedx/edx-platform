@@ -79,6 +79,8 @@ def get_user_email_language(user):
     Return the language most appropriate for writing emails to user. Returns
     None if the preference has not been set, or if the user does not exist.
     """
+    # Calling UserPreference directly instead of get_user_preference because the user requesting the
+    # information is not "user" and also may not have is_staff access.
     return UserPreference.get_preference(user, LANGUAGE_KEY)
 
 
