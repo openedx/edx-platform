@@ -5,8 +5,9 @@ var edx = edx || {};
 
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
+    edx.student.account.settingsViews = edx.student.account.settingsViews || {};
 
-    edx.student.account.AccountSettingsView = Backbone.View.extend({
+    edx.student.account.settingsViews.AccountSettingsView = Backbone.View.extend({
 
         template: _.template($('#account_settings-tpl').text()),
 
@@ -41,7 +42,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.FieldView = Backbone.View.extend({
+    edx.student.account.settingsViews.FieldView = Backbone.View.extend({
 
         className: function(){
             return "account-settings-field " + this.options.value_attribute;
@@ -58,7 +59,7 @@ var edx = edx || {};
 
     });
 
-    edx.student.account.ReadonlyFieldView = edx.student.account.FieldView.extend({
+    edx.student.account.settingsViews.ReadonlyFieldView = edx.student.account.settingsViews.FieldView.extend({
 
         template: _.template($('#field_readonly-tpl').text()),
 
@@ -85,7 +86,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.TextFieldView = edx.student.account.FieldView.extend({
+    edx.student.account.settingsViews.TextFieldView = edx.student.account.settingsViews.FieldView.extend({
 
         template: _.template($('#field_text-tpl').text()),
 
@@ -112,7 +113,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.LinkFieldView = edx.student.account.FieldView.extend({
+    edx.student.account.settingsViews.LinkFieldView = edx.student.account.settingsViews.FieldView.extend({
 
         template: _.template($('#field_link-tpl').text()),
 
@@ -139,7 +140,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.DropdownFieldView = edx.student.account.FieldView.extend({
+    edx.student.account.settingsViews.DropdownFieldView = edx.student.account.settingsViews.FieldView.extend({
 
         template: _.template($('#field_dropdown-tpl').text()),
 

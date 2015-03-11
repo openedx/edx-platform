@@ -40,7 +40,7 @@
             var accountSettingsModel = new edx.student.account.AccountSettingsModel();
             accountSettingsModel.url = accountSettingsElement.data('accounts-api-url');
 
-            var accountSettingsView = new edx.student.account.AccountSettingsView({
+            var accountSettingsView = new edx.student.account.settingsViews.AccountSettingsView({
                 el: accountSettingsElement,
                 model: accountSettingsModel,
                 context: {
@@ -51,7 +51,7 @@
                         title: "Basic Account Information",
                         fields: [
                             {
-                                view: new edx.student.account.ReadonlyFieldView({
+                                view: new edx.student.account.settingsViews.ReadonlyFieldView({
                                     model: accountSettingsModel,
                                     title: "Username",
                                     value_attribute: "username",
@@ -59,7 +59,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.TextFieldView({
+                                view: new edx.student.account.settingsViews.TextFieldView({
                                     model: accountSettingsModel,
                                     title: "Full Name",
                                     value_attribute: "name",
@@ -67,7 +67,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.TextFieldView({
+                                view: new edx.student.account.settingsViews.TextFieldView({
                                     model: accountSettingsModel,
                                     title: "Email",
                                     value_attribute: "email",
@@ -75,7 +75,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.LinkFieldView({
+                                view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Password",
                                     value_attribute: "password",
@@ -84,7 +84,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Language",
                                     value_attribute: "language",
@@ -104,7 +104,7 @@
                         title: "Demographics and Additional Details",
                         fields: [
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Educational Background",
                                     value_attribute: "level_of_education",
@@ -119,7 +119,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Gender",
                                     value_attribute: "gender",
@@ -134,7 +134,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Year of Birth",
                                     value_attribute: "year_of_birth",
@@ -149,7 +149,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Country",
                                     value_attribute: "null",
@@ -164,7 +164,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Timezone",
                                     value_attribute: "timezone",
@@ -179,7 +179,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.DropdownFieldView({
+                                view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Preferred Language",
                                     value_attribute: "preferred_language",
@@ -199,7 +199,7 @@
                         title: "Connected Accounts",
                         fields: [
                             {
-                                view: new edx.student.account.LinkFieldView({
+                                view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Facebook",
                                     link_title: "Link",
@@ -207,7 +207,7 @@
                                 })
                             },
                             {
-                                view: new edx.student.account.LinkFieldView({
+                                view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Google",
                                     link_title: "Link",

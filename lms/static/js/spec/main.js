@@ -80,8 +80,9 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_account/models/AccountSettingsModel': 'js/student_account/models/AccountSettingsModel',
+            'js/student_account/views/AccountSettingsView': 'js/student_account/views/AccountSettingsView',
             'js/student_profile/profile': 'js/student_profile/profile',
-
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
@@ -416,6 +417,14 @@
                     'js/student_account/enrollment',
                     'js/student_account/shoppingcart',
                 ]
+            },
+            'js/student_account/models/AccountSettingsModel': {
+                exports: 'edx.student.account.AccountSettingsModel',
+                deps: ['backbone']
+            },
+            'js/student_account/views/AccountSettingsView': {
+                exports: 'edx.student.account.settingsViews',
+                deps: [ 'jquery', 'underscore', 'backbone',  'gettext']
             },
             'js/verify_student/models/verification_model': {
                 exports: 'edx.verify_student.VerificationModel',
