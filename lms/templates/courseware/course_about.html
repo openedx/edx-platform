@@ -148,9 +148,6 @@
               <a href="#">${get_course_about_section(course, "university")}</a>
             % endif
           </h1>
-	  % if self.carnegie_theme_enabled():
-	    <br /><h2>learn to use this user-friendly technology from experts</h2>
-	  % endif
         </hgroup>
 
         <div class="main-cta">
@@ -229,11 +226,7 @@
   </header>
 
   <section class="container">
-      % if self.carnegie_theme_enabled():
-        <section class="details" style="float: none; width: 100%; margin: 0 auto;">
-      % else:
-        <section class="details">
-      % endif
+      <section class="details">
       % if staff_access and studio_url is not None:
         <div class="wrap-instructor-info studio-view">
           <a class="instructor-info-action" href="${studio_url}">${_("View About Page in studio")}</a>
@@ -263,7 +256,6 @@
       % endif
     </section>
 
-    % if not self.carnegie_theme_enabled():
     <section class="course-sidebar">
       <section class="course-summary">
         <header>
@@ -390,7 +382,6 @@
             </section>
         %endif
     </section>
-    % endif
   </section>
 </section>
 

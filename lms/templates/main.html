@@ -41,10 +41,6 @@
   %>
 </%def>
 
-<%def name="carnegie_theme_enabled()">
-  <% return theme_enabled() and getattr(settings, "THEME_NAME") == "carnegie" %>
-</%def>
-
 ## this needs to be here to prevent the title from mysteriously appearing in the body, in one case
 <%def name="pagetitle()" />
   <%block name="title">
