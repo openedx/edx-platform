@@ -356,6 +356,8 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
             blacklist=blacklist
         )
 
+        self._flag_publish_event(location.course_key, location)
+
         # Now it's been published, add the object to the courseware search index so that it appears in search results
         CoursewareSearchIndexer.add_to_search_index(self, location)
 
@@ -366,9 +368,14 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         Deletes the published version of the item.
         Returns the newly unpublished item.
         """
+        latest_draft = None
         with self.bulk_operations(location.course_key):
             self.delete_item(location, user_id, revision=ModuleStoreEnum.RevisionOption.published_only)
-            return self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)
+            latest_draft = self.get_item(location.for_branch(ModuleStoreEnum.BranchName.draft), **kwargs)
+
+        self._flag_publish_event(location.course_key)
+
+        return latest_draft
 
     def revert_to_published(self, location, user_id):
         """

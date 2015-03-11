@@ -457,7 +457,7 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
             if emit_signals and self.signal_handler:
-                self.signal_handler.send("course_published", course_key=course_id)
+                self.send_bulk_published_signal(bulk_ops_record, course_id)
 
             bulk_ops_record.dirty = False  # brand spanking clean now
 
