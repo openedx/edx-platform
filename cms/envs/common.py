@@ -215,6 +215,13 @@ from lms.envs.common import (
     COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
 
+
+######################### CSRF #########################################
+
+# Forwards-compatibility with Django 1.7
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
+
+
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {
     'url': 'http://localhost:8888',
