@@ -38,19 +38,16 @@ def get_user_preference(requesting_user, preference_key, username=None):
             `requesting_user.username` is assumed.
 
     Returns:
-         The value for the user preference.
+         The value for the user preference. If no preference exists with key `preference_key`, returns
+         None.
 
     Raises:
          AccountUserNotFound: no user with username `username` exists (or `requesting_user.username` if
             `username` is not specified)
         AccountNotAuthorized: the requesting_user does not have access to the user preference.
-        PreferenceNotFound: the user does not have a preference with the specified key.
     """
     existing_user = _get_user(requesting_user, username, allow_staff=True)
-    preference_value = UserPreference.get_preference(existing_user, preference_key)
-    if preference_value is None:
-        raise PreferenceNotFound()
-    return preference_value
+    return UserPreference.get_preference(existing_user, preference_key)
 
 
 def get_user_preferences(requesting_user, username=None):

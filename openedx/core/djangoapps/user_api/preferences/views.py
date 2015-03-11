@@ -106,7 +106,10 @@ class PreferencesDetailView(APIView):
         """
         try:
             value = get_user_preference(request.user, preference_key, username=username)
-        except (AccountUserNotFound, PreferenceNotFound, AccountNotAuthorized):
+            # There was no preference with that key, raise a 404.
+            if value is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        except (AccountUserNotFound, AccountNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         return Response(value)
 
