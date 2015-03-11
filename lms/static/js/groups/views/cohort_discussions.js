@@ -48,8 +48,9 @@ var edx = edx || {};
 
          Args:
             $element (JQuery element): Messages would be shown before this element.
+            fieldData ( dict ) : Data to update on the server.
         **/
-        saveForm: function ($element) {
+        saveForm: function ($element, fieldData) {
             var self = this,
                 cohortSettingsModel = this.cohortSettings,
                 saveOperation = $.Deferred(),
@@ -61,7 +62,7 @@ var edx = edx || {};
             this.removeNotification();
 
             cohortSettingsModel.save(
-                cohortSettingsModel.changedAttributes(), {patch: true, wait: true}
+                fieldData, {patch: true, wait: true}
             ).done(function () {
                     saveOperation.resolve();
                 }).fail(function (result) {

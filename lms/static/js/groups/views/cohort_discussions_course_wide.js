@@ -65,19 +65,19 @@ var edx = edx || {};
         saveCourseWideDiscussionsForm: function (event) {
             event.preventDefault();
 
-            var self = this;
-            var courseWideCohortedDiscussions = self.getCohortedDiscussions(
-                '.check-discussion-subcategory-course-wide:checked'
-            );
+            var self = this,
+                courseWideCohortedDiscussions = self.getCohortedDiscussions(
+                    '.check-discussion-subcategory-course-wide:checked'
+                ),
+                fieldData = { cohorted_course_wide_discussions: courseWideCohortedDiscussions };
 
-            this.cohortSettings.set({cohorted_course_wide_discussions:courseWideCohortedDiscussions});
-            self.saveForm(self.$('.course-wide-discussion-topics'))
-                .done(function () {
-                    self.model.fetch().done(function () {
-                         self.render();
-                        self.showMessage(gettext('Changes Saved.'), self.$('.course-wide-discussion-topics'));
-                    });
+            self.saveForm(self.$('.course-wide-discussion-topics'),fieldData)
+            .done(function () {
+                self.model.fetch().done(function () {
+                     self.render();
+                    self.showMessage(gettext('Changes Saved.'), self.$('.course-wide-discussion-topics'));
                 });
+            });
         }
 
     });

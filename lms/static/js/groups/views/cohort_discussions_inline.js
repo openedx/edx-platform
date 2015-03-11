@@ -126,17 +126,16 @@ var edx = edx || {};
         saveInlineDiscussionsForm: function (event) {
             event.preventDefault();
 
-            var self = this;
-            var cohortedInlineDiscussions = self.getCohortedDiscussions(
-                '.check-discussion-subcategory-inline:checked'
-            );
+            var self = this,
+                cohortedInlineDiscussions = self.getCohortedDiscussions(
+                    '.check-discussion-subcategory-inline:checked'
+                ),
+                fieldData= {
+                    cohorted_inline_discussions: cohortedInlineDiscussions,
+                    always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')
+                };
 
-            this.cohortSettings.set({
-                cohorted_inline_discussions: cohortedInlineDiscussions,
-                always_cohort_inline_discussions: self.$('.check-all-inline-discussions').prop('checked')
-            });
-
-            self.saveForm(self.$('.inline-discussion-topics'))
+            self.saveForm(self.$('.inline-discussion-topics'), fieldData)
                 .done(function () {
                     self.model.fetch().done(function () {
                         self.render();
