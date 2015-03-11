@@ -100,7 +100,7 @@ def is_cross_domain_request_allowed(request):
             # request or not.
             log.debug(u"Referrer hostname is `None`, so it is not on the whitelist.")
         elif referer_hostname != request.get_host():
-            log.warning(
+            log.info(
                 (
                     u"Domain '%s' is not on the cross domain whitelist.  "
                     u"Add the domain to `CORS_ORIGIN_WHITELIST` or set "
