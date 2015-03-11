@@ -76,6 +76,8 @@
   <%block name="headextra"/>
 
 <%
+  self.course_about_sidebar_extra_file = None
+
   if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
     header_file = 'theme-header.html'
@@ -83,6 +85,7 @@
     footer_file = 'theme-footer.html'
 
     style_overrides_file = None
+    self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
 
   else:
     header_extra_file = None
