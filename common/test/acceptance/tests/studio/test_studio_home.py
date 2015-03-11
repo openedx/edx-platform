@@ -24,7 +24,6 @@ class CreateLibraryTest(WebAppTest):
         self.auth_page = AutoAuthPage(self.browser, staff=True)
         self.dashboard_page = DashboardPage(self.browser)
 
-    @skip("Flaky test. See SOL-430")
     def test_create_library(self):
         """
         From the home page:
