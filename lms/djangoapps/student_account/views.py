@@ -349,6 +349,8 @@ def account_settings(request):
                 'options': language_options,
             }, 'level_of_education': {
                 'options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+            }, 'password': {
+                'url': reverse('password_reset'),
             }, 'timezone': {
                 'options': [(unicode(timezone), unicode(timezone)) for timezone in common_timezones],
             }, 'year_of_birth': {
