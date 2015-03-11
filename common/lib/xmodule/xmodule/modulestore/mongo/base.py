@@ -472,8 +472,8 @@ class MongoBulkOpsMixin(BulkOperationsMixin):
         if bulk_ops_record.dirty:
             self.refresh_cached_metadata_inheritance_tree(course_id)
 
-            if emit_signals and self.signal_handler:
-                self.signal_handler.send("course_published", course_key=course_id)
+            if emit_signals:
+                self.send_bulk_published_signal(bulk_ops_record, course_id)
 
             bulk_ops_record.dirty = False  # brand spanking clean now
 
@@ -1307,7 +1307,7 @@ class MongoModuleStore(ModuleStoreDraftAndPublished, ModuleStoreWriteBase, Mongo
             else:
                 parent.children.insert(kwargs.get('position'), xblock.location)
 
-            self.update_item(parent, user_id)
+            self.update_item(parent, user_id, child_update=True)
 
         return xblock
 
