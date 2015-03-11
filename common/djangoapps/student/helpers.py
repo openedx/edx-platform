@@ -121,7 +121,7 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         # as verified, then the course won't display state related to its
         # verification status.
         if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
-            deadline = verified_mode.expiration_datetime
+            deadline = verified_mode.verification_deadline
             relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
 
             # By default, don't show any status related to verification

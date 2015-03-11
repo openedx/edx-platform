@@ -2,7 +2,7 @@
 Add and create new modes for running courses on this particular LMS
 """
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.db import models
 from collections import namedtuple, defaultdict
@@ -21,6 +21,7 @@ Mode = namedtuple('Mode',
                       'expiration_datetime',
                       'description',
                       'sku',
+                      'verification_deadline'
                   ])
 
 
@@ -65,11 +66,13 @@ class CourseMode(models.Model):
         help_text="This is the SKU(stock keeping unit) of this mode in external services."
     )
 
-    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None, None)
+    DEFAULT_MODE = Mode('honor', _('Honor Code Certificate'), 0, '', 'usd', None, None, None, None)
     DEFAULT_MODE_SLUG = 'honor'
 
     # Modes that allow a student to pursue a verified certificate
     VERIFIED_MODES = ["verified", "professional"]
+
+    DAYS_GOOD_FOR_RE_VERIFICATION = 20
 
     class Meta:
         """ meta attributes of this model """
@@ -375,6 +378,13 @@ class CourseMode(models.Model):
         modes = cls.modes_for_course(course_id)
         return min(mode.min_price for mode in modes if mode.currency == currency)
 
+    @property
+    def verification_deadline(self):
+        """Get the verification deadline for the user to resubmit verification
+        """
+        # TODO: this DAYS_GOOD_FOR_RE_VERIFICATION should be attribute of course mode to make it course specific
+        return self.expiration_datetime + timedelta(days=self.DAYS_GOOD_FOR_RE_VERIFICATION) if self.expiration_datetime else None
+
     def to_tuple(self):
         """
         Takes a mode model and turns it into a model named tuple.
@@ -391,7 +401,8 @@ class CourseMode(models.Model):
             self.currency,
             self.expiration_datetime,
             self.description,
-            self.sku
+            self.sku,
+            self.verification_deadline
         )
 
     def __unicode__(self):
