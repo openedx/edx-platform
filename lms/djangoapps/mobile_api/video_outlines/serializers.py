@@ -218,5 +218,6 @@ def video_summary(course, course_id, video_descriptor, request, local_cache):
         "transcripts": transcripts,
         "language": video_descriptor.get_default_transcript_language(),
         "category": video_descriptor.category,
+        "only_on_web" : video_descriptor.unavailable_on_mobile,
         "id": unicode(video_descriptor.scope_ids.usage_id),
     }

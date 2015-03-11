@@ -156,6 +156,7 @@ def correct_video_settings(_step):
         ['Video File URLs', '', False],
         ['Video Start Time', '00:00:00', False],
         ['Video Stop Time', '00:00:00', False],
+        ['Unavailable in Mobile Apps', 'False', False],
         ['YouTube ID', '3_yD_cEKoCk', False],
         ['YouTube ID for .75x speed', '', False],
         ['YouTube ID for 1.25x speed', '', False],

@@ -362,6 +362,29 @@ class TestVideoSummaryList(TestVideoAPITestCase, MobileAuthTestMixin, MobileEnro
     """
     REVERSE_INFO = {'name': 'video-summary-list', 'params': ['course_id']}
 
+    def test_only_on_web(self):
+        self.login_and_enroll()
+
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 0)
+        ItemFactory.create(
+            parent=self.unit,
+            category="video",
+            display_name=u"test video",
+        )
+
+        ItemFactory.create(
+            parent=self.unit,
+            category="video",
+            display_name=u"test video 2",
+            unavailable_on_mobile=True
+        )
+        course_outline = self.api_response().data
+        self.assertEqual(len(course_outline), 2)
+        self.assertEqual(course_outline[0]["summary"]["only_on_web"], False)
+        self.assertEqual(course_outline[1]["summary"]["only_on_web"], True)
+
+
     def test_course_list(self):
         self.login_and_enroll()
         self._create_video_with_subs()
