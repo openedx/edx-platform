@@ -6,8 +6,8 @@
         <% if (!required) { %>
             <option value=""></option>
         <% } %>
-        <% _.each(select_options, function(select_option) { %>
-            <option value="<%- select_option[0] %>"><%- select_option[1] %></option>
+        <% _.each(selectOptions, function(selectOption) { %>
+            <option value="<%- selectOption[0] %>"><%- selectOption[1] %></option>
         <% }); %>
     </select>
 </span>

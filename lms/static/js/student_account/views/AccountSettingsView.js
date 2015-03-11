@@ -15,11 +15,11 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            _.bindAll(this, 'render', 'setup_fields');
+            _.bindAll(this, 'render', 'setupFields');
         },
 
-        model_value: function() {
-            return this.model.get(this.options.value_attribute);
+        modelValue: function() {
+            return this.model.get(this.options.valueAttribute);
         },
 
         render: function() {
@@ -29,13 +29,13 @@ var edx = edx || {};
             return this;
         },
 
-        setup_fields: function() {
+        setupFields: function() {
             this.$('.ui-loading-anim').addClass('is-hidden');
 
             var view = this;
-            _.each(this.$('.account-settings-section-body'), function(section_el, index) {
+            _.each(this.$('.account-settings-section-body'), function(sectionEl, index) {
                 _.each(view.options.sections[index].fields, function(field, index) {
-                    $(section_el).append(field.view.render().el);
+                    $(sectionEl).append(field.view.render().el);
                 });
             });
             return this;
@@ -45,16 +45,16 @@ var edx = edx || {};
     edx.student.account.settingsViews.FieldView = Backbone.View.extend({
 
         className: function(){
-            return "account-settings-field " + this.options.value_attribute;
+            return "account-settings-field " + this.options.valueAttribute;
         },
         tagName: "div",
 
         initialize: function(options) {
-            _.bindAll(this, 'model_value');
+            _.bindAll(this, 'modelValue');
         },
 
-        model_value: function() {
-            return this.model.get(this.options.value_attribute);
+        modelValue: function() {
+            return this.model.get(this.options.valueAttribute);
         }
 
     });
@@ -68,21 +68,21 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            _.bindAll(this, 'render', 'update_value');
-            this.listenTo(this.model, "change:" + this.options.value_attribute, this.update_value);
+            _.bindAll(this, 'render', 'updateValue');
+            this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateValue);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
-                value: this.model_value(),
+                value: this.modelValue(),
                 message: this.options.message,
             }));
             return this;
         },
 
-        update_value: function() {
-            this.$('.account-settings-field-value').html(this.model_value());
+        updateValue: function() {
+            this.$('.account-settings-field-value').html(this.modelValue());
         },
     });
 
@@ -95,21 +95,21 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            _.bindAll(this, 'render', 'update_value');
-            this.listenTo(this.model, "change:" + this.options.value_attribute, this.update_value);
+            _.bindAll(this, 'render', 'updateValue');
+            this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateValue);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
-                value: this.model_value(),
+                value: this.modelValue(),
                 message: this.options.message,
             }));
             return this;
         },
 
-        update_value: function() {
-            this.$('.account-settings-field-value input').val(this.model_value());
+        updateValue: function() {
+            this.$('.account-settings-field-value input').val(this.modelValue());
         },
     });
 
@@ -122,21 +122,21 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            _.bindAll(this, 'render', 'update_value');
-            this.listenTo(this.model, "change", this.update_value);
+            _.bindAll(this, 'render', 'updateValue');
+            this.listenTo(this.model, "change", this.updateValue);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
-                link_title: this.options.link_title,
-                link_href: this.options.link_href,
+                linkTitle: this.options.linkTitle,
+                linkHref: this.options.linkHref,
                 message: this.options.message,
             }));
             return this;
         },
 
-        update_value: function() {
+        updateValue: function() {
         },
     });
 
@@ -149,27 +149,27 @@ var edx = edx || {};
         },
 
         initialize: function(options) {
-            _.bindAll(this, 'render', 'update_value');
-            this.listenTo(this.model, "change:" + this.options.value_attribute, this.update_value);
+            _.bindAll(this, 'render', 'updateValue');
+            this.listenTo(this.model, "change:" + this.options.valueAttribute, this.updateValue);
         },
 
         render: function() {
             this.$el.html(this.template({
                 title: this.options.title,
                 required: this.options.required,
-                select_options: this.options.options,
+                selectOptions: this.options.options,
                 message: this.options.message,
             }));
-            this.update_value()
+            this.updateValue()
             return this;
         },
 
-        update_value: function() {
+        updateValue: function() {
             var value;
             if (this.options.required) {
-                value = this.model_value() || this.options.default_value;
+                value = this.modelValue() || this.options.defaultValue;
             } else {
-                value = this.model_value() || "";
+                value = this.modelValue() || "";
             }
             this.$(".account-settings-field-value select").val((value));
         },

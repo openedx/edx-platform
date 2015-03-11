@@ -2,7 +2,7 @@
     <%- gettext(title) %>
 </label>
 <span class="account-settings-field-value">
-    <a href="<%- gettext(link_href) %>"><%- gettext(link_title) %></a>
+    <a href="<%- gettext(linkHref) %>"><%- gettext(linkTitle) %></a>
 </span>
 <span class="account-settings-field-message">
     <%- gettext(message) %>

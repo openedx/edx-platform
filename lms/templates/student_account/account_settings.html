@@ -54,7 +54,7 @@
                                 view: new edx.student.account.settingsViews.ReadonlyFieldView({
                                     model: accountSettingsModel,
                                     title: "Username",
-                                    value_attribute: "username",
+                                    valueAttribute: "username",
                                     message: ""
                                 })
                             },
@@ -62,7 +62,7 @@
                                 view: new edx.student.account.settingsViews.TextFieldView({
                                     model: accountSettingsModel,
                                     title: "Full Name",
-                                    value_attribute: "name",
+                                    valueAttribute: "name",
                                     message: "This is used on your edX certificates, and all changes are reviewed."
                                 })
                             },
@@ -70,7 +70,7 @@
                                 view: new edx.student.account.settingsViews.TextFieldView({
                                     model: accountSettingsModel,
                                     title: "Email",
-                                    value_attribute: "email",
+                                    valueAttribute: "email",
                                     message: "You account email is used as a login mechanism and for course communications."
                                 })
                             },
@@ -78,8 +78,8 @@
                                 view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Password",
-                                    value_attribute: "password",
-                                    link_title: "Reset Password",
+                                    valueAttribute: "password",
+                                    linkTitle: "Reset Password",
                                     message: "To reset your password you'll need to click the reset password link sent to you via email."
                                 })
                             },
@@ -87,8 +87,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Language",
-                                    value_attribute: "language",
-                                    default_value: "${ fields['language']['default'] }",
+                                    valueAttribute: "language",
+                                    defaultValue: "${ fields['language']['default'] }",
                                     required: true,
                                     message: "This setting controls your default edX language.",
                                     options: [
@@ -107,8 +107,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Educational Background",
-                                    value_attribute: "level_of_education",
-                                    default_value: null,
+                                    valueAttribute: "level_of_education",
+                                    defaultValue: null,
                                     required: false,
                                     message: "",
                                     options: [
@@ -122,8 +122,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Gender",
-                                    value_attribute: "gender",
-                                    default_value: null,
+                                    valueAttribute: "gender",
+                                    defaultValue: null,
                                     required: false,
                                     message: "",
                                     options: [
@@ -137,8 +137,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Year of Birth",
-                                    value_attribute: "year_of_birth",
-                                    default_value: null,
+                                    valueAttribute: "year_of_birth",
+                                    defaultValue: null,
                                     required: false,
                                     message: "",
                                     options: [
@@ -152,8 +152,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Country",
-                                    value_attribute: "country",
-                                    default_value: null,
+                                    valueAttribute: "null",
+                                    defaultValue: null,
                                     required: false,
                                     message: "",
                                     options: [
@@ -167,8 +167,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Timezone",
-                                    value_attribute: "timezone",
-                                    default_value: null,
+                                    valueAttribute: "timezone",
+                                    defaultValue: null,
                                     required: false,
                                     message: "",
                                     options: [
@@ -182,8 +182,8 @@
                                 view: new edx.student.account.settingsViews.DropdownFieldView({
                                     model: accountSettingsModel,
                                     title: "Preferred Language",
-                                    value_attribute: "preferred_language",
-                                    default_value: null,
+                                    valueAttribute: "preferred_language",
+                                    defaultValue: null,
                                     required: false,
                                     message: "If your preferred language isn't available as an edX language, you can indicate your preferance here.",
                                     options: [
@@ -202,7 +202,7 @@
                                 view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Facebook",
-                                    link_title: "Link",
+                                    linkTitle: "Link",
                                     message: "",
                                 })
                             },
@@ -210,7 +210,7 @@
                                 view: new edx.student.account.settingsViews.LinkFieldView({
                                     model: accountSettingsModel,
                                     title: "Google",
-                                    link_title: "Link",
+                                    linkTitle: "Link",
                                     message: "",
                                 })
                             },
@@ -221,7 +221,7 @@
 
             accountSettingsView.render();
             accountSettingsModel.fetch().done(function(data, textStatus, jqXHR) {
-                accountSettingsView.setup_fields();
+                accountSettingsView.setupFields();
             });
         });
     </script>
