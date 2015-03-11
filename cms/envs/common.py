@@ -133,19 +133,19 @@ FEATURES = {
     # only supported in courses using split mongo. Change the setting
     # DEFAULT_STORE_FOR_NEW_COURSE to be 'split' to have future courses
     # and libraries created with split.
-    'ENABLE_CONTENT_LIBRARIES': False,
+    'ENABLE_CONTENT_LIBRARIES': True,
 
     # Milestones application flag
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Prerequisite courses feature flag
     'ENABLE_PREREQUISITE_COURSES': False,
 
     # Toggle course milestones app/feature
-    'MILESTONES_APP': False,
+    'MILESTONES_APP': True,
 
     # Toggle course entrance exams feature
-    'ENTRANCE_EXAMS': False,
+    'ENTRANCE_EXAMS': True,
 }
 
 ENABLE_JASMINE = False
