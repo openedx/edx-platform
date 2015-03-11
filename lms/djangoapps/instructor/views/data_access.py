@@ -64,12 +64,15 @@ def delete_group_temp_queries_and_students(group_id):
     old_queries.delete()
     subqueries.delete()
 
-def save_query(course_id, queries):
+
+def save_query(course_id, saved_name, queries):
     """
     Makes a new grouped query by saving the individual subqueries and then associating them to a grouped query
     """
+    if saved_name is None:
+        saved_name = ""
     temp_queries = TemporaryQuery.objects.filter(id__in=queries)
-    group = GroupedQuery(course_id=course_id, title="")
+    group = GroupedQuery(course_id=course_id, title=saved_name)
     group.save()
     for temp_query in temp_queries:
         perm_query = SavedQuery(
@@ -84,6 +87,16 @@ def save_query(course_id, queries):
         relation = SubqueryForGroupedQuery(grouped=group, query=perm_query)
         relation.save()
     return group
+
+
+def save_group_name(group_id, group_name):
+    """
+    Assigns group_name to an already-saved group with id = group_id
+    """
+    group = GroupedQuery.objects.get(id=group_id)
+    group.title = group_name
+    group.save()
+    return True
 
 
 def get_group_query_students(course_id, group_id):

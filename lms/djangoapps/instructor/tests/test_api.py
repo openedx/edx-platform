@@ -314,7 +314,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         self.assertEquals(len(StudentsForQuery.objects.all()), 0)
         return query_id
 
-    def _save_query(self, existing):
+    def _save_query(self, existing, name=""):
         """
         Save a group query
         """
@@ -322,8 +322,9 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         save_url = reverse('save_query', kwargs={'course_id': self.course_key})
         save_args = {
             'existing': ','.join(existing),
+            'savedName': name,
         }
-        response = self.client.get(save_url, save_args)
+        response = self.client.post(save_url, save_args)
         return response
 
     def _delete_saved_query(self, query_id):
@@ -343,6 +344,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
         get_saved_url = reverse('get_saved_queries', kwargs={'course_id': self.course_key})
         temp_response = self.client.get(get_saved_url)
+        # this call returns groups, queries, and relations. we return queries upstream
         queries = json.loads(temp_response.content)['queries']
         return queries
 
@@ -412,7 +414,7 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
 
     def test_saving_queries(self):
         """
-        Ensures we can save grouped queries
+        Ensures we can save and rename grouped queries correctly
         """
 
         self._make_query(self.OPEN)
@@ -422,9 +424,47 @@ class TestEmailQueries(ModuleStoreTestCase, LoginEnrollmentTestCase):
         saved_queries = self._get_saved_queries()
         self.assertEquals(len(saved_queries), 2)
         query_group = saved_queries[0]['group']
+        query_title = saved_queries[0]['group_title']
+        self.assertEquals(query_title, '')
+        # save another set of queries
+        self._save_query(temp_ids)
+        new_group_name = "new_name"
+        #rename the query
+        rename_url = reverse('save_group_name', kwargs={'course_id': self.course_key})
+        save_args = {
+            'group_id': query_group,
+            'group_name': new_group_name,
+        }
+        response = json.loads(self.client.post(rename_url, save_args).content)
+        self.assertTrue(response["success"])
+        saved_queries = self._get_saved_queries()
+        for query in saved_queries:
+            if query['group'] == query_group:
+                self.assertEquals(query['group_title'], new_group_name)
+            else:
+                self.assertEquals(query['group_title'], u'')
         self._delete_saved_query(query_group)
-        post_delete_queries = self._get_saved_queries()
-        self.assertEquals(len(post_delete_queries), 0)
+        self.assertEquals(len(self._get_saved_queries()), 2)
+        query_left = self._get_saved_queries()[0]
+        self._delete_saved_query(query_left['group'])
+        self.assertEquals(len(self._get_saved_queries()), 0)
+
+    def test_saving_queries_named(self):
+        """
+        Ensures we can save named grouped queries correctly
+        """
+        self._make_query(self.OPEN)
+        self._make_query(self.NOT_COMPLETED)
+        temp_ids = self._get_temp_query_ids()
+        query_title = "named"
+        self._save_query(temp_ids, query_title)
+        saved_queries = self._get_saved_queries()
+        self.assertEquals(len(saved_queries), 2)
+        query_group = saved_queries[0]['group']
+        self.assertEquals(saved_queries[0]['group_title'], query_title)
+        # save another set of queries
+        self._delete_saved_query(query_group)
+        self.assertEquals(len(self._get_saved_queries()), 0)
 
     def test_get_group_query(self):
         """

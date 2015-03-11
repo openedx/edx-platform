@@ -263,6 +263,7 @@ def _section_membership(course, access):
         'get_single_query': reverse('get_single_query', kwargs={'course_id': course_key.to_deprecated_string()}),
         'save_query': reverse('save_query', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_saved_queries': reverse('get_saved_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
+        'save_group_name': reverse('save_group_name', kwargs={'course_id': course_key.to_deprecated_string()}),
         'get_temp_queries': reverse('get_temp_queries', kwargs={'course_id': course_key.to_deprecated_string()}),
         "delete_saved_query": reverse("delete_saved_query", kwargs={'course_id': course_key.to_deprecated_string()}),
         "delete_temp_query": reverse("delete_temp_query", kwargs={'course_id': course_key.to_deprecated_string()}),
