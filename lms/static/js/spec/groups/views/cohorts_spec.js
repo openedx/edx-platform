@@ -1082,8 +1082,8 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                     courseWideView = new CohortCourseWideDiscussionsView({
                         el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
-                        model: createMockCohortDiscussions(),
-                        cohortSettings:  createMockCohortSettings(true, [], [], true)
+                        model: cohortsView.context.discussionTopicsModel,
+                        cohortSettings: cohortsView.cohortSettings
                     });
                     courseWideView.render();
                 };
@@ -1093,16 +1093,15 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
 
                     inlineView = new CohortInlineDiscussionsView({
                         el: cohortsView.$('.cohort-discussions-nav').removeClass('is-hidden'),
-                        model: createMockCohortDiscussions(),
-                        cohortSettings:  createMockCohortSettings(true, [], [], true)
+                        model: cohortsView.context.discussionTopicsModel,
+                        cohortSettings: cohortsView.cohortSettings
                     });
                     inlineView.render();
                 };
-                assertCohortedTopics = function(view, type) {
 
+                assertCohortedTopics = function(view, type) {
                     expect(view.$('.check-discussion-subcategory-' + type).length).toBe(2);
                     expect(view.$('.check-discussion-subcategory-' + type + ':checked').length).toBe(1);
-
                 };
 
                 it("view renders properly", function() {
@@ -1128,30 +1127,78 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                     it("save button enabled after changing checkbox", function() {
                         createCourseWideView(this);
 
+                        // save button is disabled.
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+
                         $(courseWideView.$('.check-discussion-subcategory-course-wide')[0]).prop('checked', false).change();
 
+                        // save button is enabled.
                         expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
                     });
-                    it("saves the topics", function() {
+
+                    it("save the topics", function() {
                         createCourseWideView(this);
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
 
                         // Save the updated settings
                         courseWideView.$('.action-save').click();
+
+                        // fake requests for cohort settings with PATCH method.
                         AjaxHelpers.expectJsonRequest(
                             requests, 'PATCH', '/mock_service/cohorts/settings',
-                            {cohorted_inline_discussions : []}
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
                         );
                         AjaxHelpers.respondWithJson(
                             requests,
-                            createMockCohort(newCohortName, 1, 0, null, null)
+                            {cohorted_course_wide_discussions: ['Topic_C_1', 'Topic_C_2']}
                         );
+
+                        // fake request for discussion/topics with GET method.
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'GET', '/mock_service/cohorts/discussion/topics'
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            createMockCohortDiscussions()
+                        );
+
+                        // verify the success message.
+                        expect(courseWideView.$(courseWideDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                        verifyMessage('Changes Saved.', 'confirmation');
+                    });
+
+                    it('shows an appropriate error message for HTTP500', function () {
+                        createCourseWideView(this);
+
+                        $(courseWideView.$('.check-discussion-subcategory-course-wide')[1]).prop('checked', 'checked').change();
+                        courseWideView.$('.action-save').click();
+
+                        AjaxHelpers.respondWithError(requests, 500);
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again."
+                        expect(courseWideView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
                 });
 
                 describe("Inline", function() {
+
                     it("save button is disabled initially", function() {
                         createInlineView(this);
                         expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeTruthy();
+                    });
+
+                    it("always cohort radio button is selected", function() {
+                        createInlineView(this);
+                        // verify always cohort inline discussions is being selected.
+                        expect(inlineView.$('.check-all-inline-discussions').prop('checked')).toBeTruthy();
+
+                        // verify that inline topics are disabled
+                        expect(inlineView.$('.check-discussion-subcategory-inline').prop('disabled')).toBeTruthy();
+                        expect(inlineView.$('.check-discussion-category').prop('disabled')).toBeTruthy();
+
+                        // verify that cohort some topics are not being selected.
+                        expect(inlineView.$('.check-cohort-inline-discussions').prop('checked')).toBeFalsy();
                     });
 
                     it("has one cohorted and one non-cohorted topic", function() {
@@ -1169,6 +1216,36 @@ define(['backbone', 'jquery', 'js/common_helpers/ajax_helpers', 'js/common_helpe
                         inlineView.$('.check-discussion-category').prop('checked', 'checked').change();
 
                         expect(inlineView.$(inlineDiscussionsSaveButtonCss).prop('disabled')).toBeFalsy();
+                    });
+
+                    it("save the topics", function() {
+                        createCourseWideView(this);
+
+                        $(inlineView.$('.check-discussion-subcategory-inline')[0]).prop('checked', false).change();
+                        expect(inlineView.$('.action-save').prop('disabled')).toBeFalsy();
+
+                        // Save the updated settings
+                        inlineView.$('.action-save').click();
+
+                        AjaxHelpers.expectJsonRequest(
+                            requests, 'PATCH', '/mock_service/cohorts/settings',
+                            {cohorted_inline_discussions: ['Topic_C_2']}
+                        );
+                        AjaxHelpers.respondWithJson(
+                            requests,
+                            {cohorted_inline_discussions: ['Topic_C_2']}
+                        );
+                    });
+
+                    it('shows an appropriate error message for HTTP500', function () {
+                        createCourseWideView(this);
+
+                        $(inlineView.$('.check-discussion-subcategory-inline')[1]).prop('checked', 'checked').change();
+                        inlineView.$('.action-save').click();
+
+                        AjaxHelpers.respondWithError(requests, 500);
+                        var expectedTitle = "We've encountered an error. Refresh your browser and then try again."
+                        expect(inlineView.$('.message-title').text().trim()).toBe(expectedTitle);
                     });
 
 

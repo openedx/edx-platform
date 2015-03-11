@@ -74,7 +74,7 @@ var edx = edx || {};
             self.saveForm(self.$('.course-wide-discussion-topics'),fieldData)
             .done(function () {
                 self.model.fetch().done(function () {
-                     self.render();
+                    self.render();
                     self.showMessage(gettext('Changes Saved.'), self.$('.course-wide-discussion-topics'));
                 });
             });
