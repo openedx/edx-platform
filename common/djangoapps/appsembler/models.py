@@ -1,5 +1,6 @@
 import os
 
+from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
@@ -17,9 +18,9 @@ from course_action_state.models import CourseRerunState
 #     # `course_creators` app is included only in the Studio
 #     CourseCreator = None
 
-intercom.Intercom.app_id = os.environ.get("INTERCOM_APP_ID", "")
-intercom.Intercom.api_key = os.environ.get("INTERCOM_API_KEY", "")
-INTERCOM_USER_EMAIL = os.environ.get("INTERCOM_USER_EMAIL", "")
+intercom.Intercom.app_id = settings.INTERCOM_APP_ID
+intercom.Intercom.api_key = settings.INTERCOM_API_KEY
+INTERCOM_USER_EMAIL = settings.INTERCOM_USER_EMAIL
 
 
 def intercom_update(custom_data, verbose):
