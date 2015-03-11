@@ -5,8 +5,9 @@ For more information, see:
 https://openedx.atlassian.net/wiki/display/TNL/User+API
 """
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, get_language
 import datetime
 from pytz import UTC
 
@@ -16,8 +17,10 @@ from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
+from lang_pref import LANGUAGE_KEY
 from openedx.core.djangoapps.user_api.accounts.serializers import AccountLegacyProfileSerializer, AccountUserSerializer
 from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
+from openedx.core.djangoapps.user_api.models import UserPreference
 from openedx.core.lib.api.parsers import MergePatchParser
 from openedx.core.lib.api.permissions import IsUserInUrlOrStaff
 from student.models import UserProfile
@@ -114,6 +117,21 @@ class AccountView(APIView):
         user_serializer = AccountUserSerializer(existing_user)
         legacy_profile_serializer = AccountLegacyProfileSerializer(existing_user_profile)
 
+        # try to get the prefered language for the user
+        cur_pref_lang_code = UserPreference.get_preference(existing_user, LANGUAGE_KEY)
+        # try and get the current language of the user
+        cur_lang_code = get_language()
+        if cur_pref_lang_code and cur_pref_lang_code in settings.LANGUAGE_DICT:
+            # if the user has a preference, get the name from the code
+            current_language = cur_pref_lang_code
+        elif cur_lang_code in settings.LANGUAGE_DICT:
+            # if the user's browser is showing a particular language,
+            # use that as the current language
+            current_language = cur_lang_code
+        else:
+            # otherwise, use the default language
+            current_language = settings.LANGUAGE_CODE
+        legacy_profile_serializer.data['language'] = current_language
         return dict(user_serializer.data, **legacy_profile_serializer.data)
 
     def patch(self, request, username):
@@ -166,6 +184,9 @@ class AccountView(APIView):
         old_name = None
         if "name" in update:
             old_name = existing_user_profile.name
+
+        if 'language' in update:
+            UserPreference.set_preference(requesting_user, LANGUAGE_KEY, update['language'])
 
         # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
         read_only_fields = set(update.keys()).intersection(
