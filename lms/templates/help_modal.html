@@ -76,15 +76,9 @@
 % else:
 	<p>${_('Here are some of the most popular articles from the Help Center:')}</p>
 	<ul class="help-buttons">
-	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/202275024-How-do-I-create-an-account-" target="_blank">
-		${_('How to register an account')}
-	  </a></li>
-	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/201864484-How-do-I-reset-my-password-" target="_blank">
-		${_('How to reset a password')}
-	  </a></li>
-	  <li><a href="https://stanfordonline.zendesk.com/hc/en-us/articles/203009244-How-do-I-enroll-in-a-course-" id="howto-enroll-link" target="_blank">
-		${_('How to enroll in a course')}
-	  </a></li>
+          % for link in settings.HELP_MODAL_LINKS:
+            <li><a href="${link['url']}" target="_blank" ${'class="last-link"' if loop.last else ''}>${_(link['text'])}</a></li>
+          % endfor
 	</ul>
 % endif
   </div>
@@ -208,7 +202,7 @@
     cycle_modal_tab("#feedback_submit", "#feedback_form_wrapper .close-modal");
     cycle_modal_tab("#feedback-faq-link", "#feedback_success_wrapper .close-modal");
 % else:
-    cycle_modal_tab("#howto-enroll-link", "#help_wrapper .close-modal");
+    cycle_modal_tab("#help_wrapper .last-link", "#help_wrapper .close-modal");
 % endif
     $("#help-modal").on("keydown", function(e) {
         var keyCode = e.keyCode || e.which;

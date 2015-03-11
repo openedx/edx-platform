@@ -37,7 +37,7 @@ def delete_temporary_query(query_to_delete):
     queries_to_delete.delete()
 
 
-def delete_bulk_temporary_queries(query_to_delete):
+def delete_temporary_queries_batch(query_to_delete):
     """
     Removes many queries from the temporary query table
     """
@@ -49,6 +49,20 @@ def delete_bulk_temporary_queries(query_to_delete):
     saved_students.delete()
     temp_query.delete()
 
+
+def delete_group_temp_queries_and_students(group_id):
+    """
+    Deletes "temporary" students and "temporary" subqueries associated with a group query for efficiency.
+    Meant to be called after get_group_query_students has finished and the results are consumed.
+    This call is not strictly necessary because the temporary entries are periodically purged.
+    """
+    subqueries = GroupedTempQueryForSubquery.objects.filter(grouped_id=group_id).distinct()
+    subqueries_ids = subqueries.values_list('query', flat=True)
+    old_queries = TemporaryQuery.objects.filter(id__in=list(subqueries_ids))
+    saved_students = StudentsForQuery.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
+    saved_students.delete()
+    old_queries.delete()
+    subqueries.delete()
 
 def save_query(course_id, queries):
     """
@@ -79,13 +93,8 @@ def get_group_query_students(course_id, group_id):
     _group, queries, _relation = get_saved_queries(course_id, group_id)
     # wait for the queries to finish before proceeding
     make_subqueries.apply_async(args=(course_id, group_id, queries)).get()
-    subqueries_qs = GroupedTempQueryForSubquery.objects.filter(grouped_id=group_id).distinct().values_list('query',
-                                                                                                           flat=True)
-    if subqueries_qs:
-        queried_students = retrieve_grouped_query(course_id, group_id)
-        return queried_students
-    # return empty otherwise
-    return StudentsForQuery.objects.none()
+    queried_students = retrieve_grouped_query(course_id, group_id)
+    return queried_students
 
 
 def retrieve_grouped_query(course_id, group_id):
@@ -100,16 +109,8 @@ def retrieve_grouped_query(course_id, group_id):
         existing.append(sub.query_id)
     student_info = make_existing_query(course_id, existing)
     if not student_info:
-        return StudentsForQuery.objects.none()
+        return User.objects.none()
     students = student_info.distinct()
-    # forcing evaluation on students because we'll be deleting the intermediate queries
-    len(students)
-    subqueries_ids = subqueries.values_list('query', flat=True)
-    old_queries = TemporaryQuery.objects.filter(id__in=list(subqueries_ids))
-    saved_students = StudentsForQuery.objects.filter(query_id__in=old_queries.values_list(DatabaseFields.ID))
-    saved_students.delete()
-    old_queries.delete()
-    subqueries.delete()
     return students
 
 

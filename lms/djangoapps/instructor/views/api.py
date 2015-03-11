@@ -800,7 +800,7 @@ def _process_new_query(course_id, query_incl, query_type, query_id, query_filter
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_query_params(existing="Ids of previously issued queries")
-def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argument
+def delete_temp_query_batch(request, course_id):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
@@ -812,7 +812,7 @@ def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argume
         })
     cleaned_queries = [query.strip() for query in existing_queries]
     if len(cleaned_queries) > 0:
-        data_access.delete_bulk_temporary_queries(cleaned_queries)
+        data_access.delete_temporary_queries_batch(cleaned_queries)
     response_payload = {
         'success': True,
     }
@@ -2067,6 +2067,31 @@ def list_forum_members(request, course_id):
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
+def get_student_forums_usage(request, course_id):
+    """
+    Pushes a Celery task which will aggregate student forums usage statistics for a course into a .csv
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_student_forums_usage_task(request, course_key)
+        success_status = _("The student forums usage report is being generated.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A student forums usage report task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
+
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
 def get_ora2_responses(request, course_id):
     """
     Pushes a Celery task which will aggregate ora2 responses for a course into a .csv
@@ -2084,6 +2109,30 @@ def get_ora2_responses(request, course_id):
             "will be available for download in the table below."
         )
 
+        return JsonResponse({
+            "status": already_running_status
+        })
+
+
+@ensure_csrf_cookie
+@cache_control(no_cache=True, no_store=True, must_revalidate=True)
+@require_level('staff')
+def get_course_forums_usage(request, course_id):
+    """
+    Pushes a Celery task which will aggregate course forums statistics into a .csv
+    """
+    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    try:
+        instructor_task.api.submit_course_forums_usage_task(request, course_key)
+        success_status = _("The course forums usage report is being generated.")
+        return JsonResponse({"status": success_status})
+    except AlreadyRunningError:
+        already_running_status = _(
+            "A course forums usage report task is already in "
+            "progress. Check the 'Pending Instructor Tasks' table "
+            "for the status of the task. When completed, the report "
+            "will be available for download in the table below."
+        )
         return JsonResponse({
             "status": already_running_status
         })
@@ -2381,6 +2430,7 @@ def _split_input_list(str_list):
 
     return new_list
 
+
 #---- Gradebook (shown to small courses only) ----
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
@@ -2420,6 +2470,7 @@ def spoc_gradebook(request, course_id):
         'ordered_grades': sorted(course.grade_cutoffs.items(), key=lambda i: i[1], reverse=True),
     })
 
+
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 def irc_instructor_auth_token(request, course_id):
@@ -2429,6 +2480,6 @@ def irc_instructor_auth_token(request, course_id):
     course = get_course_by_id(course_key, depth=None)
     is_instructor_here = has_access(request.user, 'staff', course)
     if is_instructor_here:
-        extras_key = hashlib.sha1(course_id+"happy fish").hexdigest()
+        extras_key = hashlib.sha1(course_id + "happy fish").hexdigest()
         return JsonResponse({'extras': extras_key, 'error': ''})
     return JsonResponse({'extras': '', 'error': 'NotInstructor'})

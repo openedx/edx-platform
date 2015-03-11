@@ -41,8 +41,8 @@ urlpatterns = patterns('',  # nopep8
     # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
     url(r'^delete_saved_query',
         'instructor.views.api.delete_saved_query', name="delete_saved_query"),
-    url(r'^delete_bulk_temp_query',
-        'instructor.views.api.delete_bulk_temp_query', name="delete_bulk_temp_query"),
+    url(r'^delete_temp_query_batch',
+        'instructor.views.api.delete_temp_query_batch', name="delete_temp_query_batch"),
     url(r'^delete_temp_query/(?P<query_to_delete>\d+)$',
         'instructor.views.api.delete_temp_query', name="delete_temp_query"),
     # the parameter-less url is here as a convenience because we don't know the params at the time of calling 'reverse
@@ -122,7 +122,15 @@ urlpatterns = patterns('',  # nopep8
     url(r'^gradebook$',
         'instructor.views.api.spoc_gradebook', name='spoc_gradebook'),
 
+    # Collect student forums data
+    url(r'get_student_forums_usage',
+        'instructor.views.api.get_student_forums_usage', name='get_student_forums_usage'),
+
     # Collect ora2 data
     url(r'get_ora2_responses',
         'instructor.views.api.get_ora2_responses', name="get_ora2_responses"),
+
+    # Collect course forums data
+    url(r'get_course_forums_usage',
+        'instructor.views.api.get_course_forums_usage', name="get_course_forums_usage"),
 )

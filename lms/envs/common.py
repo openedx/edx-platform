@@ -848,6 +848,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
 
+#### Help Modal Links ####
+# List of dict objects representing links
+# For example:
+# HELP_MODAL_LINKS = [
+#     {'url': 'https://help.com', 'text': 'How to register an account'}
+# ]
+HELP_MODAL_LINKS = []
+
 ##### Zendesk #####
 ZENDESK_URL = None
 ZENDESK_USER = None
@@ -1696,6 +1704,11 @@ MAX_FAILED_LOGIN_ATTEMPTS_LOCKOUT_PERIOD_SECS = 15 * 60
 ##### LMS DEADLINE DISPLAY TIME_ZONE #######
 TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 
+# Course Forums Download
+COURSE_FORUMS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
+
+# Student Forums Download
+STUDENT_FORUMS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
@@ -1983,3 +1996,7 @@ FORUM_MONGO_PARAMS = {
     'user': '',
     'database': 'forum',
 }
+
+################### branding - for database driven tiles ##################
+INSTALLED_APPS += ('branding_stanford',)
+DISPLAY_COURSE_TILES = True

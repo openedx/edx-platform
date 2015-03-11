@@ -29,10 +29,14 @@ from instructor_task.tasks import (
     reset_problem_attempts,
     delete_problem_state,
     get_ora2_responses,
+    get_course_forums_usage,
+    get_student_forums_usage,
 )
 from instructor_task.tasks_helper import (
     UpdateProblemModuleStateError,
     push_ora2_responses_to_s3,
+    push_course_forums_data_to_s3,
+    push_student_forums_data_to_s3,
 )
 
 PROBLEM_URL_NAME = "test_urlname"
@@ -474,5 +478,60 @@ class TestOra2ResponsesInstructorTask(TestInstructorTasks):
 
             action_name = ugettext_noop('generated')
             task_fn = partial(push_ora2_responses_to_s3, task_xmodule_args)
+
+            mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)
+
+
+class TestCourseForumsUsageInstructorTask(TestInstructorTasks):
+    """Tests instructor task that fetches ora2 response data."""
+
+    def test_course_forums_missing_current_task(self):
+        self._test_missing_current_task(get_course_forums_usage)
+
+    def test_course_forums_with_failure(self):
+        self._test_run_with_failure(get_course_forums_usage, 'We expected this to fail')
+
+    def test_course_forums_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(get_course_forums_usage)
+
+    def test_course_forums_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(get_course_forums_usage)
+
+    def test_course_forums_runs_task(self):
+        task_entry = self._create_input_entry()
+        task_xmodule_args = self._get_xmodule_instance_args()
+
+        with patch('instructor_task.tasks.run_main_task') as mock_main_task:
+            get_course_forums_usage(task_entry.id, task_xmodule_args)
+
+            action_name = ugettext_noop('generated')
+            task_fn = partial(push_course_forums_data_to_s3, task_xmodule_args)
+
+            mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)
+
+
+class TestStudentForumsUsageInstructorTask(TestInstructorTasks):
+    """Tests instructor task that fetches student forums data."""
+
+    def test_student_forums_missing_current_task(self):
+        self._test_missing_current_task(get_student_forums_usage)
+
+    def test_student_forums_with_failure(self):
+        self._test_run_with_failure(get_student_forums_usage, 'We expected this to fail')
+
+    def test_student_forums_with_long_error_msg(self):
+        self._test_run_with_long_error_msg(get_student_forums_usage)
+
+    def test_student_forums_with_short_error_msg(self):
+        self._test_run_with_short_error_msg(get_student_forums_usage)
+
+    def test_student_forums_runs_task(self):
+        task_entry = self._create_input_entry()
+        task_xmodule_args = self._get_xmodule_instance_args()
+
+        with patch('instructor_task.tasks.run_main_task') as mock_main_task:
+            get_student_forums_usage(task_entry.id, task_xmodule_args)
+            action_name = ugettext_noop('generated')
+            task_fn = partial(push_student_forums_data_to_s3, task_xmodule_args)
 
             mock_main_task.assert_called_once_with_args(task_entry.id, task_fn, action_name)

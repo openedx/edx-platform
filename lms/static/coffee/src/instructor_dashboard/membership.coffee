@@ -763,8 +763,8 @@ class EmailWidget
       .data('delete-saved-endpoint')
     @$deleteTempEndpoint = $('.email-lists-management')
       .data('delete-temp-endpoint')
-    @$deleteBulkTempEndpoint = $('.email-lists-management')
-      .data('delete-bulk-temp-endpoint')
+    @$deleteBatchTempEndpoint = $('.email-lists-management')
+      .data('delete-batch-temp-endpoint')
     for emailList in emailLists
       emailList.$container.addClass('active')
 
@@ -965,7 +965,7 @@ class EmailWidget
       if row.hasAttribute('query')
         queryToDelete = row.getAttribute('query')
         queriesToDelete.push(queryToDelete)
-    @delete_bulk_temp_query(queriesToDelete)
+    @delete_temp_query_batch(queriesToDelete)
     $('.emailWidget.queryTableBody tr').remove()
 
   # adds a row to saved queries
@@ -1083,8 +1083,8 @@ class EmailWidget
       url: send_url
     )
 
-  delete_bulk_temp_query: (queryIds) ->
-    sendUrl = @$deleteBulkTempEndpoint
+  delete_temp_query_batch: (queryIds) ->
+    sendUrl = @$deleteBatchTempEndpoint
     sendData =
       existing: queryIds.join(',')
     $.ajax(

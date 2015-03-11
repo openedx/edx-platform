@@ -121,6 +121,10 @@ class DataDownload
             @$reports_request_response_error.text gettext("Error getting student responses. Please try again.")
           else if e.target.name == 'ora2-response-btn'
             @$reports_request_response_error.text gettext("Error getting ORA2 responses. Please try again.")
+          else if e.target.name == 'course-forums-btn'
+            @$reports_request_response_error.text gettext("Error getting Course Forums data. Please try again.")
+          else if e.target.name == 'student-forums-btn'
+            @$reports_request_response_error.text gettext("Error getting Student Forums data. Please try again.")
           $(".msg-error").css({"display":"block"})
         success: (data) =>
           @$reports_request_response.text data['status']
