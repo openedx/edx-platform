@@ -14,7 +14,7 @@ from xmodule.assetstore import AssetMetadata
 from xmodule.contentstore.content import StaticContent
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from django.test.utils import override_settings
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 import mock
@@ -65,7 +65,7 @@ class BasicAssetsTestCase(AssetsTestCase):
 
     def test_pdf_asset(self):
         module_store = modulestore()
-        course_items = import_from_xml(
+        course_items = import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
@@ -349,7 +349,7 @@ class LockAssetTestCase(AssetsTestCase):
 
         # Load the toy course.
         module_store = modulestore()
-        course_items = import_from_xml(
+        course_items = import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,

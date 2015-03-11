@@ -3,7 +3,7 @@ Acceptance tests for Studio related to edit/save peer grading interface.
 """
 
 from ...fixtures.course import XBlockFixtureDesc
-from ...pages.studio.export import ExportPage
+from ...pages.studio.import_export import ExportCoursePage
 from ...pages.studio.component_editor import ComponentEditorView
 from ...pages.studio.overview import CourseOutlinePage
 from base_studio_test import StudioCourseTest
@@ -22,7 +22,10 @@ class ORAComponentTest(StudioCourseTest):
         self.course_outline_page = CourseOutlinePage(
             self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run']
         )
-        self.export_page = ExportPage(self.browser, self.course_info['org'], self.course_info['number'], self.course_info['run'])
+        self.export_page = ExportCoursePage(
+            self.browser,
+            self.course_info['org'], self.course_info['number'], self.course_info['run']
+        )
 
     def populate_course_fixture(self, course_fixture):
         """

@@ -108,6 +108,9 @@ define(
                     $(elem).find('p.copy').show();
                     updateCog($(elem), false);
                 });
+                all.find('.fa-check-square-o'). // Replace checkmark with unchecked box
+                    removeClass('fa-check-square-o').
+                    addClass('fa-square-o');
                 this.stopGetStatus = false;
             },
 
@@ -119,12 +122,16 @@ define(
                 this.stopGetStatus = true;
                 var all = $('ol.status-progress').children();
                 _.map(all, function (elem){
+                    elem = $(elem);
                     $(elem).
                         removeClass("is-not-started").
                         removeClass("is-started").
                         addClass("is-complete");
                     updateCog($(elem), false);
                 });
+                all.find('.fa-square-o').
+                    removeClass('fa-square-o').
+                    addClass('fa-check-square-o');
             },
 
             /**

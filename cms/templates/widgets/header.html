@@ -132,6 +132,9 @@
        <%
             library_key = context_library.location.course_key
             index_url = reverse('contentstore.views.library_handler', kwargs={'library_key_string': unicode(library_key)})
+            import_url = reverse('contentstore.views.import_handler', kwargs={'course_key_string': unicode(library_key)})
+            lib_users_url = reverse('contentstore.views.manage_library_users', kwargs={'library_key_string': unicode(library_key)})
+            export_url = reverse('contentstore.views.export_handler', kwargs={'course_key_string': unicode(library_key)})
       %>
       <h2 class="info-course">
         <span class="sr">${_("Current Library:")}</span>
@@ -147,12 +150,27 @@
 
           <li class="nav-item nav-library-settings">
             <h3 class="title"><span class="label"><span class="label-prefix sr">${_("Library")} </span>${_("Settings")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
-
             <div class="wrapper wrapper-nav-sub">
               <div class="nav-sub">
                 <ul>
                   <li class="nav-item nav-library-settings-team">
                     <a href="${lib_users_url}">${_("User Access")}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item nav-course-tools">
+            <h3 class="title"><span class="label">${_("Tools")}</span> <i class="icon fa fa-caret-down ui-toggle-dd"></i></h3>
+
+            <div class="wrapper wrapper-nav-sub">
+              <div class="nav-sub">
+                <ul>
+                  <li class="nav-item nav-course-tools-import">
+                    <a href="${import_url}">${_("Import")}</a>
+                  </li>
+                  <li class="nav-item nav-course-tools-export">
+                    <a href="${export_url}">${_("Export")}</a>
                   </li>
                 </ul>
               </div>

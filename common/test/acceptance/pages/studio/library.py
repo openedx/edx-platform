@@ -13,11 +13,10 @@ from .utils import confirm_prompt, wait_for_notification
 from . import BASE_URL
 
 
-class LibraryPage(PageObject, PaginatedMixin):
+class LibraryPage(PageObject):
     """
-    Library page in Studio
+    Base page for Library pages. Defaults URL to the edit page.
     """
-
     def __init__(self, browser, locator):
         super(LibraryPage, self).__init__(browser)
         self.locator = locator
@@ -34,6 +33,12 @@ class LibraryPage(PageObject, PaginatedMixin):
         Returns True iff the browser has loaded the library edit page.
         """
         return self.q(css='body.view-library').present
+
+
+class LibraryEditPage(LibraryPage, PaginatedMixin):
+    """
+    Library edit page in Studio
+    """
 
     def get_header_title(self):
         """
