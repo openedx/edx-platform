@@ -238,7 +238,7 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         html_id = self.location.html_id()
         if getattr(settings, 'PERFORMANCE_GRAPHITE_URL', '') != '' and \
                 self.system.user_location == 'CN' and \
-                getattr(settings.FEATURES, 'ENABLE_VIDEO_BEACON', False) and \
+                settings.FEATURES.get('ENABLE_VIDEO_BEACON', False) and \
                 html_id in getattr(settings, 'CDN_VIDEO_URLS', {}).keys():
             cdn_urls = getattr(settings, 'CDN_VIDEO_URLS', {})[html_id]
             cdn_exp_group, new_source = random.choice(zip(range(len(cdn_urls)), cdn_urls))
