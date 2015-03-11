@@ -109,6 +109,7 @@ class LoginEnrollmentTestCase(TestCase):
         self.assert_request_status_code(200, url)
         # Now make sure that the user is now actually activated
         self.assertTrue(User.objects.get(email=email).is_active)
+        self.assertTrue(Registration.objects.get(user__email=email).was_used)
 
     def enroll(self, course, verify=False):
         """

@@ -5,7 +5,7 @@ import unittest
 
 from student.tests.factories import UserFactory, RegistrationFactory, PendingEmailChangeFactory
 from student.views import (
-    reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change
+    reactivation_response, send_reactivation_email_for_user, change_email_request, do_email_change_request, confirm_email_change
 )
 from student.models import UserProfile, PendingEmailChange
 from django.contrib.auth.models import User, AnonymousUser
@@ -72,13 +72,6 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
         self.unregisteredUser = UserFactory.create()
         self.registration = RegistrationFactory.create(user=self.user)
 
-    def reactivation_email(self, user):
-        """
-        Send the reactivation email to the specified user,
-        and return the response as json data.
-        """
-        return json.loads(reactivation_email_for_user(user).content)
-
     def assertReactivateEmailSent(self, email_user):
         """Assert that the correct reactivation email has been sent"""
         context = {
@@ -108,25 +101,25 @@ class ReactivationEmailTests(EmailTestMixin, TestCase):
 
     def test_reactivation_email_failure(self, email_user):
         self.user.email_user.side_effect = Exception
-        response_data = self.reactivation_email(self.user)
+        response = reactivation_response(self.user)
 
         self.assertReactivateEmailSent(email_user)
-        self.assertFalse(response_data['success'])
+        self.assertFalse(json.loads(response.content)["success"])
 
     def test_reactivation_for_unregistered_user(self, email_user):
         """
         Test that trying to send a reactivation email to an unregistered
         user fails without throwing a 500 error.
         """
-        response_data = self.reactivation_email(self.unregisteredUser)
+        response = send_reactivation_email_for_user(self.unregisteredUser)
 
-        self.assertFalse(response_data['success'])
+        self.assertFalse(response)
 
     def test_reactivation_email_success(self, email_user):
-        response_data = self.reactivation_email(self.user)
+        response = send_reactivation_email_for_user(self.user)
 
         self.assertReactivateEmailSent(email_user)
-        self.assertTrue(response_data['success'])
+        self.assertTrue(response)
 
 
 class EmailChangeRequestTests(TestCase):
@@ -232,7 +225,8 @@ class EmailChangeRequestTests(TestCase):
 @patch('student.views.render_to_response', Mock(side_effect=mock_render_to_response, autospec=True))
 @patch('student.views.render_to_string', Mock(side_effect=mock_render_to_string, autospec=True))
 class EmailChangeConfirmationTests(EmailTestMixin, TransactionTestCase):
-    """Test that confirmation of email change requests function even in the face of exceptions thrown while sending email"""
+    """Test that confirmation of email change requests function even in the
+    face of exceptions thrown while sending email"""
     def setUp(self):
         self.user = UserFactory.create()
         self.profile = UserProfile.objects.get(user=self.user)

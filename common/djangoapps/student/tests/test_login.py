@@ -6,7 +6,6 @@ import unittest
 
 from django.test import TestCase
 from django.test.client import Client
-from django.test.utils import override_settings
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -20,7 +19,7 @@ from student.tests.factories import UserFactory, RegistrationFactory, UserProfil
 from student.views import login_oauth_token
 
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase, TEST_DATA_MOCK_MODULESTORE
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 
 class LoginTest(TestCase):
@@ -35,7 +34,7 @@ class LoginTest(TestCase):
         self.user.save()
 
         # Create a registration for the user
-        RegistrationFactory(user=self.user)
+        self.registration = RegistrationFactory(user=self.user)
 
         # Create a profile for the user
         UserProfileFactory(user=self.user)
@@ -119,6 +118,17 @@ class LoginTest(TestCase):
         self._assert_response(response, success=False,
                               value="This account has not been activated")
         self._assert_audit_log(mock_audit_log, 'warning', [u'Login failed', u'Account not active for user'])
+
+    def test_deactivated_users_cannot_login(self):
+        # Deactivate user and flag registration as used
+        self.registration.was_used = True
+        self.registration.save()
+        self.user.is_active = False
+        self.user.save()
+
+        response, _mock_audit_log = self._login_response('test@edx.org', 'test_password')
+        self._assert_response(response, success=False,
+                              value='No active user account')
 
     @patch.dict("django.conf.settings.FEATURES", {'SQUELCH_PII_IN_LOGS': True})
     def test_login_not_activated_no_pii(self):
