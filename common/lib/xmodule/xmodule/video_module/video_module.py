@@ -236,9 +236,8 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
         # CDN_VIDEO_URLS is only to be used here and will be deleted
         # TODO(ali@edx.org): Delete this after the CDN experiment has completed.
         html_id = self.location.html_id()
-        if getattr(settings, 'PERFORMANCE_GRAPHITE_URL', '') != '' and \
-                self.system.user_location == 'CN' and \
-                getattr(settings.FEATURES, 'ENABLE_VIDEO_BEACON', False) and \
+        if self.system.user_location == 'CN' and \
+                settings.FEATURES.get('ENABLE_VIDEO_BEACON', False) and \
                 html_id in getattr(settings, 'CDN_VIDEO_URLS', {}).keys():
             cdn_urls = getattr(settings, 'CDN_VIDEO_URLS', {})[html_id]
             cdn_exp_group, new_source = random.choice(zip(range(len(cdn_urls)), cdn_urls))
@@ -254,7 +253,6 @@ class VideoModule(VideoFields, VideoTranscriptsMixin, VideoStudentViewHandlers, 
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'branding_info': branding_info,
             'cdn_eval': cdn_eval,
-            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
             'cdn_exp_group': cdn_exp_group,
             # This won't work when we move to data that
             # isn't on the filesystem
