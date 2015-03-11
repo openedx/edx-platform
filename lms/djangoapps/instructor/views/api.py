@@ -800,7 +800,7 @@ def _process_new_query(course_id, query_incl, query_type, query_id, query_filter
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
 @require_level('staff')
 @require_query_params(existing="Ids of previously issued queries")
-def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argument
+def delete_temp_query_batch(request, course_id):  # pylint: disable=unused-argument
     """
     Deletes a temporary query that the user has entered along with the corresponding students
     """
@@ -812,7 +812,7 @@ def delete_bulk_temp_query(request, course_id):  # pylint: disable=unused-argume
         })
     cleaned_queries = [query.strip() for query in existing_queries]
     if len(cleaned_queries) > 0:
-        data_access.delete_bulk_temporary_queries(cleaned_queries)
+        data_access.delete_temporary_queries_batch(cleaned_queries)
     response_payload = {
         'success': True,
     }
