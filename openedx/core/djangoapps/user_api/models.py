@@ -5,6 +5,8 @@ from model_utils.models import TimeStampedModel
 
 from xmodule_django.models import CourseKeyField
 
+from .api.user import UserApiRequestError
+
 # Currently, the "student" app is responsible for
 # accounts, profiles, enrollments, and the student dashboard.
 # We are trying to move some of this functionality into separate apps,
@@ -14,7 +16,7 @@ from xmodule_django.models import CourseKeyField
 from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
 
 
-class PreferenceRequestError(Exception):
+class PreferenceRequestError(UserApiRequestError):
     """There was a problem with a preference request."""
     pass
 
@@ -71,6 +73,7 @@ class UserPreference(models.Model):
         user_preference, _ = cls.objects.get_or_create(user=user, key=preference_key)
         user_preference.value = preference_value
         user_preference.full_clean()
+        user_preference.save()
 
     @classmethod
     def validate_preference(cls, user, preference_key, preference_value):

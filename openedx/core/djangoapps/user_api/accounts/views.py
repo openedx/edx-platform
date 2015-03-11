@@ -92,7 +92,7 @@ class AccountView(APIView):
             If the update could not be completed due to failure at the time of update, this method returns a 400 with
             specific errors in the returned JSON.
 
-            If the updated is successful, a 204 status is returned with no additional content.
+            If the update is successful, a 204 status is returned with no additional content.
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
     permission_classes = (permissions.IsAuthenticated,)

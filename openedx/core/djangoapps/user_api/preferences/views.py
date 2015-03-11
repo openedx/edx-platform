@@ -12,7 +12,7 @@ from rest_framework import permissions
 
 from openedx.core.lib.api.parsers import MergePatchParser
 from ..api.user import UserNotFound, UserNotAuthorized
-from ..models import PreferenceNotFound, PreferenceUpdateError
+from ..models import PreferenceNotFound, PreferenceValidationError
 from .api import (
     get_user_preference, get_user_preferences, set_user_preference, update_user_preferences, delete_user_preference
 )
@@ -23,6 +23,7 @@ class PreferencesView(APIView):
         **Use Cases**
 
             Get or update the user's preference information. Updates are only supported through merge patch.
+            Preference values of null in a patch request are treated as requests to remove the preference.
 
         **Example Requests**:
 
@@ -32,12 +33,29 @@ class PreferencesView(APIView):
 
         **Response Value for GET**
 
-            A dict will be returned with key/value pairs (all of type String).
+            A JSON dictionary will be returned with key/value pairs (all of type String).
+
+            If a user without "is_staff" access has requested preferences for a different user,
+            this method returns a 404.
+
+            If the specified username does not exist, this method returns a 404.
 
         **Response for PATCH**
 
-             Returns a 204 status if successful, with no additional content.
-             If "application/merge-patch+json" is not the specified content_type, returns a 415 status.
+            Users can only modify their own preferences. If the requesting user does not have username
+            "username", this method will return with a status of 404.
+
+            This method will also return a 404 if no user exists with username "username".
+
+            If "application/merge-patch+json" is not the specified content_type, this method returns a 415 status.
+
+            If the update could not be completed due to validation errors, this method returns a 400 with all
+            preference-specific error messages in the "preference_errors" field of the returned JSON.
+
+            If the update could not be completed due to failure at the time of update, this method returns a 400 with
+            specific errors in the returned JSON.
+
+            If the update is successful, a 204 status is returned with no additional content.
 
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
@@ -63,7 +81,7 @@ class PreferencesView(APIView):
             update_user_preferences(request.user, request.DATA, username=username)
         except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except PreferenceUpdateError as error:
+        except PreferenceValidationError as error:
             return Response(
                 {
                     "developer_message": error.developer_message,
@@ -88,13 +106,26 @@ class PreferencesDetailView(APIView):
 
             DELETE /api/user/v0/preferences/{username}/{preference_key}
 
+        **Response Values for GET**
+
+            The preference value will be returned as a JSON string.
+
+            If a user without "is_staff" access has requested preferences for a different user,
+            this method returns a 404.
+
+            If the specified username or preference does not exist, this method returns a 404.
+
         **Response Values for PUT**
 
-            TODO
+            A successful put returns a 204 and no content.
 
-        **Response for PUT**
+            If the specified username or preference does not exist, this method returns a 404.
 
-             TODO
+        **Response for DELETE**
+
+            A successful delete returns a 204 and no content.
+
+            If the specified username or preference does not exist, this method returns a 404.
 
     """
     authentication_classes = (OAuth2Authentication, SessionAuthentication)
@@ -121,7 +152,7 @@ class PreferencesDetailView(APIView):
             set_user_preference(request.user, preference_key, request.DATA, username=username)
         except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except PreferenceUpdateError as error:
+        except PreferenceValidationError as error:
             return Response(
                 {
                     "developer_message": error.developer_message,
@@ -139,12 +170,4 @@ class PreferencesDetailView(APIView):
             delete_user_preference(request.user, preference_key, username=username)
         except (UserNotFound, PreferenceNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
-        except PreferenceUpdateError as error:
-            return Response(
-                {
-                    "developer_message": error.developer_message,
-                    "user_message": error.user_message
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         return Response(status=status.HTTP_204_NO_CONTENT)

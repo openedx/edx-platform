@@ -14,7 +14,7 @@ from openedx.core.djangoapps.user_api.accounts import ACCOUNT_VISIBILITY_PREF_KE
 from openedx.core.djangoapps.user_api.models import UserPreference
 from .. import PRIVATE_VISIBILITY, ALL_USERS_VISIBILITY
 
-@ddt.ddt
+
 class UserAPITestCase(APITestCase):
     """
     The base class for all tests of the User API

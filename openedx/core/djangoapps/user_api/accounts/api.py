@@ -165,23 +165,29 @@ def update_account_settings(requesting_user, update, username=None):
     if field_errors:
         raise AccountValidationError(field_errors)
 
-    # If everything validated, go ahead and save the serializers.
-    for serializer in user_serializer, legacy_profile_serializer:
-        serializer.save()
+    try:
+        # If everything validated, go ahead and save the serializers.
+        for serializer in user_serializer, legacy_profile_serializer:
+            serializer.save()
 
-    # If the name was changed, store information about the change operation. This is outside of the
-    # serializer so that we can store who requested the change.
-    if old_name:
-        meta = existing_user_profile.get_meta()
-        if 'old_names' not in meta:
-            meta['old_names'] = []
-        meta['old_names'].append([
-            old_name,
-            "Name change requested through account API by {0}".format(requesting_user.username),
-            datetime.datetime.now(UTC).isoformat()
-        ])
-        existing_user_profile.set_meta(meta)
-        existing_user_profile.save()
+        # If the name was changed, store information about the change operation. This is outside of the
+        # serializer so that we can store who requested the change.
+        if old_name:
+            meta = existing_user_profile.get_meta()
+            if 'old_names' not in meta:
+                meta['old_names'] = []
+            meta['old_names'].append([
+                old_name,
+                "Name change requested through account API by {0}".format(requesting_user.username),
+                datetime.datetime.now(UTC).isoformat()
+            ])
+            existing_user_profile.set_meta(meta)
+            existing_user_profile.save()
+
+    except Exception as err:
+        raise AccountUpdateError(
+            "Error thrown when saving account updates: '{}'".format(err.message)
+        )
 
     # And try to send the email change request if necessary.
     if new_email:

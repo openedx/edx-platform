@@ -13,10 +13,13 @@ from ..models import UserPreference, PreferenceNotFound, PreferenceValidationErr
 from ..serializers import UserSerializer
 
 
-def _get_user(requesting_user, username, allow_staff=False):
+def _get_user(requesting_user, username=None, allow_staff=False):
     """
     Helper method to return the user for a given username.
     """
+    if username is None:
+        username = requesting_user.username
+
     try:
         existing_user = User.objects.get(username=username)
     except ObjectDoesNotExist:
@@ -98,6 +101,7 @@ def update_user_preferences(requesting_user, update, username=None):
             `username` is not specified)
         UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
+        PreferenceValidationError: the update was not attempted because validation errors were found
         PreferenceUpdateError: the update could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
@@ -146,8 +150,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
             `username` is not specified)
         UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
-        AccountValidationError: the update was not attempted because validation errors were found with
-            the supplied update
+        PreferenceValidationError: the update was not attempted because validation errors were found
         PreferenceUpdateError: the update could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
@@ -181,7 +184,6 @@ def delete_user_preference(requesting_user, preference_key, username=None):
         UserNotAuthorized: the requesting_user does not have access to change the account
             associated with `username`
         PreferenceNotFound: the user does not have a preference with the specified key.
-        PreferenceUpdateError: the delete could not be completed.
     """
     existing_user = _get_user(requesting_user, username)
     UserPreference.delete_preference(existing_user, preference_key)

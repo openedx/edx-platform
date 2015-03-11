@@ -34,6 +34,15 @@ class TestPreferencesAPI(UserAPITestCase):
         self.send_get(self.anonymous_client, expected_status=401)
         self.send_patch(self.anonymous_client, {}, expected_status=401)
 
+    def test_unsupported_methods(self):
+        """
+        Test that DELETE, POST, and PUT are not supported.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.assertEqual(405, self.client.put(self.url).status_code)
+        self.assertEqual(405, self.client.post(self.url).status_code)
+        self.assertEqual(405, self.client.delete(self.url).status_code)
+
     def test_get_different_user(self):
         """
         Test that a client (logged in) cannot get the preferences information for a different client.
@@ -246,6 +255,14 @@ class TestPreferencesDetailAPI(UserAPITestCase):
         self.send_get(self.anonymous_client, expected_status=401)
         self.send_put(self.anonymous_client, "new_value", expected_status=401)
         self.send_delete(self.anonymous_client, expected_status=401)
+
+    def test_unsupported_methods(self):
+        """
+        Test that POST and PATCH are not supported.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        self.assertEqual(405, self.client.post(self.url).status_code)
+        self.assertEqual(405, self.client.patch(self.url).status_code)
 
     def test_different_user_access(self):
         """
