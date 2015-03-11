@@ -577,8 +577,13 @@ REQUIRE_EXCLUDE = ("build.txt",)
 REQUIRE_ENVIRONMENT = "node"
 
 # If you want to enable Tender integration (http://tenderapp.com/),
-# put in the domain where Tender hosts tender_widget.js. For example,
-# TENDER_DOMAIN = "example.tenderapp.com"
+# put in the subdomain where Tender hosts tender_widget.js. For example,
+# if you want to use the URL https://example.tenderapp.com/tender_widget.js,
+# you should use "example".
+TENDER_SUBDOMAIN = None
+# If you want to have a vanity domain that points to Tender, put that here.
+# For example, "help.myapp.com". Otherwise, should should be your full
+# tenderapp domain name: for example, "example.tenderapp.com".
 TENDER_DOMAIN = None
 
 ################################# CELERY ######################################
