@@ -77,6 +77,7 @@
 
 <%
   self.course_about_sidebar_extra_file = None
+  self.course_about_social_sharing_file = None
 
   if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
@@ -85,7 +86,9 @@
     footer_file = 'theme-footer.html'
 
     style_overrides_file = None
+
     self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
+    self.course_about_social_sharing_file = 'theme-course_about-social_sharing.html'
 
   else:
     header_extra_file = None
