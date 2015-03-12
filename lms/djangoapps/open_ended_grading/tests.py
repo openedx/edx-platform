@@ -31,7 +31,7 @@ from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MOCK_MODULESTORE, TEST_DATA_MIXED_TOY_MODULESTORE
 )
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.open_ended_grading_classes import peer_grading_service, controller_query_service
 from xmodule.tests import test_util_open_ended
 
@@ -453,7 +453,7 @@ class TestPanel(ModuleStoreTestCase):
         super(TestPanel, self).setUp()
         self.user = factories.UserFactory()
         store = modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
+        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
         self.course = course_items[0]
         self.course_key = self.course.id
 
@@ -497,7 +497,7 @@ class TestPeerGradingFound(ModuleStoreTestCase):
         super(TestPeerGradingFound, self).setUp()
         self.user = factories.UserFactory()
         store = modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended_nopath'])  # pylint: disable=maybe-no-member
+        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended_nopath'])  # pylint: disable=maybe-no-member
         self.course = course_items[0]
         self.course_key = self.course.id
 
@@ -521,7 +521,7 @@ class TestStudentProblemList(ModuleStoreTestCase):
         # Load an open ended course with several problems.
         self.user = factories.UserFactory()
         store = modulestore()
-        course_items = import_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
+        course_items = import_course_from_xml(store, self.user.id, TEST_DATA_DIR, ['open_ended'])  # pylint: disable=maybe-no-member
         self.course = course_items[0]
         self.course_key = self.course.id
 

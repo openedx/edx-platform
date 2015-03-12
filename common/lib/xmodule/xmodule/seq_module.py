@@ -204,6 +204,6 @@ class SequenceDescriptor(SequenceFields, MakoModuleDescriptor, XmlDescriptor):
             xblock_body["content"].update(html_body)
         else:
             xblock_body["content"] = html_body
-        xblock_body["content_type"] = self.category.title()
+        xblock_body["content_type"] = "Sequence"
 
         return xblock_body

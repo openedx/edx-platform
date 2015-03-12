@@ -25,7 +25,7 @@ from xmodule.modulestore.inheritance import InheritanceMixin
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import MongoContentstoreBuilder
 from xmodule.contentstore.content import StaticContent
 from opaque_keys.edx.keys import CourseKey
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.django import SignalHandler
 
 if not settings.configured:
@@ -2031,9 +2031,9 @@ class TestMixedModuleStore(CourseComparisonTest):
                     # Note: The signal is fired once when the course is created and
                     # a second time after the actual data import.
                     receiver.reset_mock()
-                    import_from_xml(
+                    import_course_from_xml(
                         self.store, self.user_id, DATA_DIR, ['toy'], load_error_modules=False,
                         static_content_store=contentstore,
-                        create_course_if_not_present=True,
+                        create_if_not_present=True,
                     )
                     self.assertEqual(receiver.call_count, 2)

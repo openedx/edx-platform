@@ -24,7 +24,7 @@ ${page_title_breadcrumbs(course_name())}
 </script>
 % endfor
 
-% for template_name in ["search_item", "search_list", "search_loading", "search_error"]:
+% for template_name in ["search_item", "search_item_seq", "search_list", "search_loading", "search_error"]:
 <script type="text/template" id="${template_name}-tpl">
     <%static:include path="courseware_search/${template_name}.underscore" />
 </script>
@@ -234,6 +234,26 @@ ${fragment.foot_html()}
     </div>
 % endif
     <section class="course-content" id="course-content">
+        % if getattr(course, 'entrance_exam_enabled') and \
+           getattr(course, 'entrance_exam_minimum_score_pct') and \
+           entrance_exam_current_score is not UNDEFINED:
+            % if not entrance_exam_passed:
+            <p class="sequential-status-message">
+                ${_('To access course materials, you must score {required_score}% or higher on this \
+                exam. Your current score is {current_score}%.').format(
+                    required_score=int(course.entrance_exam_minimum_score_pct * 100),
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % else:
+              <p class="sequential-status-message">
+                ${_('Your score is {current_score}%. You have passed the entrance exam.').format(
+                    current_score=int(entrance_exam_current_score * 100)
+                )}
+            </p>
+            % endif
+      % endif
+
       ${fragment.body_html()}
     </section>
     % if settings.FEATURES.get('ENABLE_COURSEWARE_SEARCH'):

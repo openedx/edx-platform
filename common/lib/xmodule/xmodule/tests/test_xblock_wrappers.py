@@ -383,7 +383,7 @@ class TestXModuleHandler(TestCase):
 
 class TestXmlExport(XBlockWrapperTestMixin, TestCase):
     """
-    This tests that XModuleDescriptor.export_to_xml and add_xml_to_node produce the same results.
+    This tests that XModuleDescriptor.export_course_to_xml and add_xml_to_node produce the same results.
     """
     def skip_if_invalid(self, descriptor_cls):
         if descriptor_cls.add_xml_to_node != XModuleDescriptor.add_xml_to_node:

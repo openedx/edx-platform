@@ -36,7 +36,7 @@ from lms.djangoapps.lms_xblock.models import XBlockAsidesConfig
 from edxmako.shortcuts import render_to_string
 from eventtracking import tracker
 from psychometrics.psychoanalyze import make_psychometrics_data_update_handler
-from student.models import anonymous_id_for_user, user_by_anonymous_id, EntranceExamConfiguration
+from student.models import anonymous_id_for_user, user_by_anonymous_id
 from xblock.core import XBlock
 from xblock.fields import Scope
 from xblock.runtime import KvsFieldData, KeyValueStore
@@ -65,8 +65,7 @@ from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
 if settings.FEATURES.get('MILESTONES_APP', False):
     from milestones import api as milestones_api
-    from milestones.exceptions import InvalidMilestoneRelationshipTypeException
-    from util.milestones_helpers import serialize_user, calculate_entrance_exam_score
+    from util.milestones_helpers import calculate_entrance_exam_score, get_required_content
     from util.module_utils import yield_dynamic_descriptor_descendents
 
 log = logging.getLogger(__name__)
@@ -107,40 +106,6 @@ def make_track_function(request):
     return function
 
 
-def _get_required_content(course, user):
-    """
-    Queries milestones subsystem to see if the specified course is gated on one or more milestones,
-    and if those milestones can be fulfilled via completion of a particular course content module
-    """
-    required_content = []
-    if settings.FEATURES.get('MILESTONES_APP', False):
-        # Get all of the outstanding milestones for this course, for this user
-        try:
-            milestone_paths = milestones_api.get_course_milestones_fulfillment_paths(
-                unicode(course.id),
-                serialize_user(user)
-            )
-        except InvalidMilestoneRelationshipTypeException:
-            return required_content
-
-        # For each outstanding milestone, see if this content is one of its fulfillment paths
-        for path_key in milestone_paths:
-            milestone_path = milestone_paths[path_key]
-            if milestone_path.get('content') and len(milestone_path['content']):
-                for content in milestone_path['content']:
-                    required_content.append(content)
-
-    can_skip_entrance_exam = EntranceExamConfiguration.user_can_skip_entrance_exam(user, course.id)
-    # check if required_content has any entrance exam and user is allowed to skip it
-    # then remove it from required content
-    if required_content and getattr(course, 'entrance_exam_enabled', False) and can_skip_entrance_exam:
-        descriptors = [modulestore().get_item(UsageKey.from_string(content)) for content in required_content]
-        entrance_exam_contents = [unicode(descriptor.location)
-                                  for descriptor in descriptors if descriptor.is_entrance_exam]
-        required_content = list(set(required_content) - set(entrance_exam_contents))
-    return required_content
-
-
 def toc_for_course(request, course, active_chapter, active_section, field_data_cache):
     '''
     Create a table of contents from the module store
@@ -170,8 +135,8 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
         if course_module is None:
             return None
 
-        # Check to see if the course is gated on required content (such as an Entrance Exam)
-        required_content = _get_required_content(course, request.user)
+        # Check to see if the course is gated on milestone-required content (such as an Entrance Exam)
+        required_content = get_required_content(course, request.user)
 
         chapters = list()
         for chapter in course_module.get_display_items():

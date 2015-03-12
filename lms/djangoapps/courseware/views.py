@@ -33,8 +33,9 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
-from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
-from courseware.courses import sort_by_start_date
+from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement,\
+    get_entrance_exam_content_info
+from courseware.courses import sort_by_start_date, get_entrance_exam_score
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
@@ -411,6 +412,19 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             # Show empty courseware for a course with no units
             return render_to_response('courseware/courseware.html', context)
         elif chapter is None:
+            # Check first to see if we should instead redirect the user to an Entrance Exam
+            if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
+                exam_chapter, __ = get_entrance_exam_content_info(request, course)
+                if exam_chapter is not None:
+                    exam_section = None
+                    if exam_chapter.get_children():
+                        exam_section = exam_chapter.get_children()[0]
+                        if exam_section:
+                            return redirect('courseware_section',
+                                            course_id=unicode(course_key),
+                                            chapter=exam_chapter.url_name,
+                                            section=exam_section.url_name)
+
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
             return redirect_to_course_position(course_module, CONTENT_DEPTH)
@@ -440,6 +454,14 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 log.debug('staff masquerading as student: no chapter %s', chapter)
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             raise Http404
+
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
+            # Message should not appear outside the context of entrance exam subsection.
+            # if section is none then we don't need to show message on welcome back screen also.
+            if getattr(chapter_module, 'is_entrance_exam', False) and section is not None:
+                __, is_exam_passed = get_entrance_exam_content_info(request, course)
+                context['entrance_exam_current_score'] = get_entrance_exam_score(request, course)
+                context['entrance_exam_passed'] = is_exam_passed
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)

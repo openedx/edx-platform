@@ -781,10 +781,18 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         visibility_state = None
     published = modulestore().has_published_version(xblock) if not is_library_block else None
 
-    #instead of adding a new feature directly into xblock-info, we should add them into override_type.
-    override_type = {}
-    if getattr(xblock, "is_entrance_exam", None):
-        override_type['is_entrance_exam'] = xblock.is_entrance_exam
+    # defining the default value 'True' for delete, drag and add new child actions in xblock_actions for each xblock.
+    xblock_actions = {'deletable': True, 'draggable': True, 'childAddable': True}
+    explanatory_message = None
+    # is_entrance_exam is inherited metadata.
+    if xblock.category == 'chapter' and getattr(xblock, "is_entrance_exam", None):
+        # Entrance exam section should not be deletable, draggable and not have 'New Subsection' button.
+        xblock_actions['deletable'] = xblock_actions['childAddable'] = xblock_actions['draggable'] = False
+        if parent_xblock is None:
+            parent_xblock = get_parent_xblock(xblock)
+
+        explanatory_message = _('Students must score {score}% or higher to access course materials.').format(
+            score=int(parent_xblock.entrance_exam_minimum_score_pct * 100))
 
     xblock_info = {
         "id": unicode(xblock.location),
@@ -805,8 +813,14 @@ def create_xblock_info(xblock, data=None, metadata=None, include_ancestor_info=F
         "format": xblock.format,
         "course_graders": json.dumps([grader.get('type') for grader in graders]),
         "has_changes": has_changes,
-        "override_type": override_type,
+        "actions": xblock_actions,
+        "explanatory_message": explanatory_message
     }
+
+    # Entrance exam subsection should be hidden. in_entrance_exam is inherited metadata, all children will have it.
+    if xblock.category == 'sequential' and getattr(xblock, "in_entrance_exam", False):
+        xblock_info["is_header_visible"] = False
+
     if data is not None:
         xblock_info["data"] = data
     if metadata is not None:

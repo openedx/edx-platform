@@ -31,7 +31,7 @@ class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda dir: MemoryFS())
     def __init__(self, load_error_modules):
 
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[],
+        xmlstore = XMLModuleStore("data_dir", source_dirs=[],
                                   load_error_modules=load_error_modules)
         course_id = SlashSeparatedCourseKey(ORG, COURSE, 'test_run')
         course_dir = "test_dir"

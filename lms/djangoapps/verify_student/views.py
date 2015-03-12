@@ -27,9 +27,9 @@ from django.utils.translation import ugettext as _, ugettext_lazy
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 
-from openedx.core.djangoapps.user_api.accounts.views import AccountView
+from openedx.core.djangoapps.user_api.accounts.api import get_account_settings, update_account_settings
 from openedx.core.djangoapps.user_api.accounts import NAME_MIN_LENGTH
-from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountUpdateError
+from openedx.core.djangoapps.user_api.api.account import AccountUserNotFound, AccountValidationError
 
 from course_modes.models import CourseMode
 from student.models import CourseEnrollment
@@ -636,16 +636,11 @@ def create_order(request):
     course_id = request.POST['course_id']
     course_id = CourseKey.from_string(course_id)
     donation_for_course = request.session.get('donation_for_course', {})
-    current_donation = donation_for_course.get(unicode(course_id), decimal.Decimal(0))
     contribution = request.POST.get("contribution", donation_for_course.get(unicode(course_id), 0))
     try:
         amount = decimal.Decimal(contribution).quantize(decimal.Decimal('.01'), rounding=decimal.ROUND_DOWN)
     except decimal.InvalidOperation:
         return HttpResponseBadRequest(_("Selected price is not valid number."))
-
-    if amount != current_donation:
-        donation_for_course[unicode(course_id)] = amount
-        request.session['donation_for_course'] = donation_for_course
 
     # prefer professional mode over verified_mode
     current_mode = CourseMode.verified_mode_for_course(course_id)
@@ -714,16 +709,14 @@ def submit_photos_for_verification(request):
     if SoftwareSecurePhotoVerification.user_has_valid_or_pending(request.user):
         return HttpResponseBadRequest(_("You already have a valid or pending verification."))
 
-    username = request.user.username
-
     # If the user wants to change his/her full name,
     # then try to do that before creating the attempt.
     if request.POST.get('full_name'):
         try:
-            AccountView.update_account(request.user, username, {"name": request.POST.get('full_name')})
+            update_account_settings(request.user, {"name": request.POST.get('full_name')})
         except AccountUserNotFound:
             return HttpResponseBadRequest(_("No profile found for user"))
-        except AccountUpdateError:
+        except AccountValidationError:
             msg = _(
                 "Name must be at least {min_length} characters long."
             ).format(min_length=NAME_MIN_LENGTH)
@@ -743,7 +736,7 @@ def submit_photos_for_verification(request):
     attempt.mark_ready()
     attempt.submit()
 
-    account_settings = AccountView.get_serialized_account(username)
+    account_settings = get_account_settings(request.user)
 
     # Send a confirmation email to the user
     context = {

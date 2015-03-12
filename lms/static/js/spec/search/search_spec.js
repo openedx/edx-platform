@@ -89,6 +89,7 @@ define([
 
         beforeEach(function () {
             TemplateHelpers.installTemplate('templates/courseware_search/search_item');
+            TemplateHelpers.installTemplate('templates/courseware_search/search_item_seq');
             this.model = {
                 attributes: {
                     location: ['section', 'subsection', 'unit'],
@@ -279,6 +280,7 @@ define([
 
             TemplateHelpers.installTemplates([
                 'templates/courseware_search/search_item',
+                'templates/courseware_search/search_item_seq',
                 'templates/courseware_search/search_list',
                 'templates/courseware_search/search_loading',
                 'templates/courseware_search/search_error'
@@ -416,6 +418,7 @@ define([
             );
             TemplateHelpers.installTemplates([
                 'templates/courseware_search/search_item',
+                'templates/courseware_search/search_item_seq',
                 'templates/courseware_search/search_list',
                 'templates/courseware_search/search_loading',
                 'templates/courseware_search/search_error'

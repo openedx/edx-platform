@@ -23,7 +23,7 @@ class DummySystem(ImportSystem):
     @patch('xmodule.modulestore.xml.OSFS', lambda directory: MemoryFS())
     def __init__(self, load_error_modules):
 
-        xmlstore = XMLModuleStore("data_dir", course_dirs=[], load_error_modules=load_error_modules)
+        xmlstore = XMLModuleStore("data_dir", source_dirs=[], load_error_modules=load_error_modules)
 
         super(DummySystem, self).__init__(
             xmlstore=xmlstore,
@@ -186,7 +186,7 @@ class ConditionalModuleXmlTest(unittest.TestCase):
         """Get a test course by directory name.  If there's more than one, error."""
         print "Importing {0}".format(name)
 
-        modulestore = XMLModuleStore(DATA_DIR, course_dirs=[name])
+        modulestore = XMLModuleStore(DATA_DIR, source_dirs=[name])
         courses = modulestore.get_courses()
         self.modulestore = modulestore
         self.assertEquals(len(courses), 1)

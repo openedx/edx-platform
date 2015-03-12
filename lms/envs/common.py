@@ -1003,7 +1003,13 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
+
+    # CORS and CSRF
+    'corsheaders.middleware.CorsMiddleware',
+    'cors_csrf.middleware.CorsCSRFMiddleware',
+    'cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'splash.middleware.SplashMiddleware',
 
     # Allows us to dark-launch particular languages
@@ -1642,7 +1648,17 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
+
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'cors_csrf'
 )
+
+######################### CSRF #########################################
+
+# Forwards-compatibility with Django 1.7
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
+
 
 ######################### MARKETING SITE ###############################
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
@@ -1696,11 +1712,6 @@ if FEATURES.get('AUTH_USE_CAS'):
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False
@@ -2055,14 +2066,14 @@ SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
 
-# The configuration for learner profiles
-PROFILE_CONFIGURATION = {
+# The configuration visibility of account fields.
+ACCOUNT_VISIBILITY_CONFIGURATION = {
     # Default visibility level for accounts without a specified value
     # The value is one of: 'all_users', 'private'
     "default_visibility": "private",
 
-    # The list of all fields that can be shown on a learner's profile
-    "all_fields": [
+    # The list of all fields that can be shared with other users
+    "shareable_fields": [
         'username',
         'profile_image',
         'country',
@@ -2071,7 +2082,7 @@ PROFILE_CONFIGURATION = {
         'bio',
     ],
 
-    # The list of fields that are always public on a learner's profile
+    # The list of account fields that are always public
     "public_fields": [
         'username',
         'profile_image',

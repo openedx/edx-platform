@@ -216,6 +216,7 @@ THEME_NAME = ENV_TOKENS.get('THEME_NAME', None)
 # Marketing link overrides
 MKTG_URL_LINK_MAP.update(ENV_TOKENS.get('MKTG_URL_LINK_MAP', {}))
 
+
 # Mobile store URL overrides
 MOBILE_STORE_URLS = ENV_TOKENS.get('MOBILE_STORE_URLS', MOBILE_STORE_URLS)
 
@@ -305,15 +306,44 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 
 ############# CORS headers for cross-domain requests #################
 
-if FEATURES.get('ENABLE_CORS_HEADERS'):
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
+if FEATURES.get('ENABLE_CORS_HEADERS') or FEATURES.get('ENABLE_CROSS_DOMAIN_CSRF_COOKIE'):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ENV_TOKENS.get('CORS_ORIGIN_WHITELIST', ())
     CORS_ORIGIN_ALLOW_ALL = ENV_TOKENS.get('CORS_ORIGIN_ALLOW_ALL', False)
+    CORS_ALLOW_INSECURE = ENV_TOKENS.get('CORS_ALLOW_INSECURE', False)
+
+    # If setting a cross-domain cookie, it's really important to choose
+    # a name for the cookie that is DIFFERENT than the cookies used
+    # by each subdomain.  For example, suppose the applications
+    # at these subdomains are configured to use the following cookie names:
+    #
+    # 1) foo.example.com --> "csrftoken"
+    # 2) baz.example.com --> "csrftoken"
+    # 3) bar.example.com --> "csrftoken"
+    #
+    # For the cross-domain version of the CSRF cookie, you need to choose
+    # a name DIFFERENT than "csrftoken"; otherwise, the new token configured
+    # for ".example.com" could conflict with the other cookies,
+    # non-deterministically causing 403 responses.
+    #
+    # Because of the way Django stores cookies, the cookie name MUST
+    # be a `str`, not unicode.  Otherwise there will `TypeError`s will be raised
+    # when Django tries to call the unicode `translate()` method with the wrong
+    # number of parameters.
+    CROSS_DOMAIN_CSRF_COOKIE_NAME = str(ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_NAME'))
+
+    # When setting the domain for the "cross-domain" version of the CSRF
+    # cookie, you should choose something like: ".example.com"
+    # (note the leading dot), where both the referer and the host
+    # are subdomains of "example.com".
+    #
+    # Browser security rules require that
+    # the cookie domain matches the domain of the server; otherwise
+    # the cookie won't get set.  And once the cookie gets set, the client
+    # needs to be on a domain that matches the cookie domain, otherwise
+    # the client won't be able to read the cookie.
+    CROSS_DOMAIN_CSRF_COOKIE_DOMAIN = ENV_TOKENS.get('CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
+
 
 ############################## SECURE AUTH ITEMS ###############
 # Secret things: passwords, access keys, etc.

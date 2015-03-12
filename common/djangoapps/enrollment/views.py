@@ -4,25 +4,24 @@ consist primarily of authentication, request validation, and serialization.
 
 """
 from ipware.ip import get_ip
-from django.conf import settings
+from django.utils.decorators import method_decorator
 from opaque_keys import InvalidKeyError
-from opaque_keys.edx.locator import CourseLocator
 from openedx.core.djangoapps.user_api import api as user_api
 from openedx.core.lib.api.permissions import ApiKeyHeaderPermission, ApiKeyHeaderPermissionIsAuthenticated
 from rest_framework import status
-from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 from rest_framework.views import APIView
 from opaque_keys.edx.keys import CourseKey
-from opaque_keys import InvalidKeyError
-from enrollment import api
-from enrollment.errors import (
-    CourseNotFoundError, CourseEnrollmentError, CourseModeNotFoundError, CourseEnrollmentExistsError
-)
 from embargo import api as embargo_api
+from cors_csrf.decorators import ensure_csrf_cookie_cross_domain
 from util.authentication import SessionAuthenticationAllowInactiveUser, OAuth2AuthenticationAllowInactiveUser
 from util.disable_rate_limit import can_disable_rate_limit
+from enrollment import api
+from enrollment.errors import (
+    CourseNotFoundError, CourseEnrollmentError,
+    CourseModeNotFoundError, CourseEnrollmentExistsError
+)
 
 
 class EnrollmentUserThrottle(UserRateThrottle):
@@ -96,6 +95,10 @@ class EnrollmentView(APIView, ApiKeyPermissionMixIn):
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
+    # Since the course about page on the marketing site
+    # uses this API to auto-enroll users, we need to support
+    # cross-domain CSRF.
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request, course_id=None, user=None):
         """Create, read, or update enrollment information for a user.
 
@@ -268,6 +271,10 @@ class EnrollmentListView(APIView, ApiKeyPermissionMixIn):
     permission_classes = ApiKeyHeaderPermissionIsAuthenticated,
     throttle_classes = EnrollmentUserThrottle,
 
+    # Since the course about page on the marketing site
+    # uses this API to auto-enroll users, we need to support
+    # cross-domain CSRF.
+    @method_decorator(ensure_csrf_cookie_cross_domain)
     def get(self, request):
         """
             Gets a list of all course enrollments for the currently logged in user.

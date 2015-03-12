@@ -1,0 +1,275 @@
+"""
+Tests for the CORS CSRF middleware
+"""
+
+from mock import patch, Mock
+import ddt
+
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.core.exceptions import MiddlewareNotUsed, ImproperlyConfigured
+from django.http import HttpResponse
+from django.middleware.csrf import CsrfViewMiddleware
+
+from cors_csrf.middleware import CorsCSRFMiddleware, CsrfCrossDomainCookieMiddleware
+
+
+SENTINEL = object()
+
+
+class TestCorsMiddlewareProcessRequest(TestCase):
+    """
+    Test processing a request through the middleware
+    """
+    def get_request(self, is_secure, http_referer):
+        """
+        Build a test request
+        """
+        request = Mock()
+        request.META = {'HTTP_REFERER': http_referer}
+        request.is_secure = lambda: is_secure
+        return request
+
+    @override_settings(FEATURES={'ENABLE_CORS_HEADERS': True})
+    def setUp(self):
+        super(TestCorsMiddlewareProcessRequest, self).setUp()
+        self.middleware = CorsCSRFMiddleware()
+
+    def check_not_enabled(self, request):
+        """
+        Check that the middleware does NOT process the provided request
+        """
+        with patch.object(CsrfViewMiddleware, 'process_view') as mock_method:
+            res = self.middleware.process_view(request, None, None, None)
+
+        self.assertIsNone(res)
+        self.assertFalse(mock_method.called)
+
+    def check_enabled(self, request):
+        """
+        Check that the middleware does process the provided request
+        """
+        def cb_check_req_is_secure_false(request, callback, args, kwargs):
+            """
+            Check that the request doesn't pass (yet) the `is_secure()` test
+            """
+            self.assertFalse(request.is_secure())
+            return SENTINEL
+
+        with patch.object(CsrfViewMiddleware, 'process_view') as mock_method:
+            mock_method.side_effect = cb_check_req_is_secure_false
+            res = self.middleware.process_view(request, None, None, None)
+
+        self.assertIs(res, SENTINEL)
+        self.assertTrue(request.is_secure())
+
+    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    def test_enabled(self):
+        request = self.get_request(is_secure=True, http_referer='https://foo.com/bar')
+        self.check_enabled(request)
+
+    @override_settings(
+        FEATURES={'ENABLE_CORS_HEADERS': False},
+        CORS_ORIGIN_WHITELIST=['foo.com']
+    )
+    def test_disabled_no_cors_headers(self):
+        with self.assertRaises(MiddlewareNotUsed):
+            CorsCSRFMiddleware()
+
+    @override_settings(CORS_ORIGIN_WHITELIST=['bar.com'])
+    def test_disabled_wrong_cors_domain(self):
+        request = self.get_request(is_secure=True, http_referer='https://foo.com/bar')
+        self.check_not_enabled(request)
+
+    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    def test_disabled_wrong_cors_domain_reversed(self):
+        request = self.get_request(is_secure=True, http_referer='https://bar.com/bar')
+        self.check_not_enabled(request)
+
+    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    def test_disabled_http_request(self):
+        request = self.get_request(is_secure=False, http_referer='https://foo.com/bar')
+        self.check_not_enabled(request)
+
+    @override_settings(CORS_ORIGIN_WHITELIST=['foo.com'])
+    def test_disabled_http_referer(self):
+        request = self.get_request(is_secure=True, http_referer='http://foo.com/bar')
+        self.check_not_enabled(request)
+
+
+@ddt.ddt
+class TestCsrfCrossDomainCookieMiddleware(TestCase):
+    """Tests for `CsrfCrossDomainCookieMiddleware`. """
+
+    REFERER = 'https://www.example.com'
+    COOKIE_NAME = 'shared-csrftoken'
+    COOKIE_VALUE = 'abcd123'
+    COOKIE_DOMAIN = '.edx.org'
+
+    @override_settings(
+        FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True},
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN
+    )
+    def setUp(self):
+        super(TestCsrfCrossDomainCookieMiddleware, self).setUp()
+        self.middleware = CsrfCrossDomainCookieMiddleware()
+
+    @override_settings(FEATURES={'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': False})
+    def test_disabled_by_feature_flag(self):
+        with self.assertRaises(MiddlewareNotUsed):
+            CsrfCrossDomainCookieMiddleware()
+
+    @ddt.data('CROSS_DOMAIN_CSRF_COOKIE_NAME', 'CROSS_DOMAIN_CSRF_COOKIE_DOMAIN')
+    def test_improperly_configured(self, missing_setting):
+        settings = {
+            'FEATURES': {'ENABLE_CROSS_DOMAIN_CSRF_COOKIE': True},
+            'CROSS_DOMAIN_CSRF_COOKIE_NAME': self.COOKIE_NAME,
+            'CROSS_DOMAIN_CSRF_COOKIE_DOMAIN': self.COOKIE_DOMAIN
+        }
+        del settings[missing_setting]
+
+        with override_settings(**settings):
+            with self.assertRaises(ImproperlyConfigured):
+                CsrfCrossDomainCookieMiddleware()
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_not_secure(self):
+        response = self._get_response(is_secure=False)
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_not_sending_csrf_token(self):
+        response = self._get_response(csrf_cookie_used=False)
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_not_cross_domain_decorator(self):
+        response = self._get_response(cross_domain_decorator=False)
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_WHITELIST=['other.example.com']
+    )
+    def test_skip_if_referer_not_whitelisted(self):
+        response = self._get_response()
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN
+    )
+    def test_skip_if_not_cross_domain(self):
+        response = self._get_response(
+            referer="https://courses.edx.org/foo",
+            host="courses.edx.org"
+        )
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_no_referer(self):
+        response = self._get_response(delete_referer=True)
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_referer_not_https(self):
+        response = self._get_response(referer="http://www.example.com")
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_ALLOW_ALL=True
+    )
+    def test_skip_if_referer_no_protocol(self):
+        response = self._get_response(referer="example.com")
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ALLOW_INSECURE=True
+    )
+    def test_skip_if_no_referer_insecure(self):
+        response = self._get_response(delete_referer=True)
+        self._assert_cookie_sent(response, False)
+
+    @override_settings(
+        CROSS_DOMAIN_CSRF_COOKIE_NAME=COOKIE_NAME,
+        CROSS_DOMAIN_CSRF_COOKIE_DOMAIN=COOKIE_DOMAIN,
+        CORS_ORIGIN_WHITELIST=['www.example.com']
+    )
+    def test_set_cross_domain_cookie(self):
+        response = self._get_response()
+        self._assert_cookie_sent(response, True)
+
+    def _get_response(self,
+                      is_secure=True,
+                      csrf_cookie_used=True,
+                      cross_domain_decorator=True,
+                      referer=None,
+                      host=None,
+                      delete_referer=False):
+        """Process a request using the middleware. """
+        request = Mock()
+        request.META = {
+            'HTTP_REFERER': (
+                referer if referer is not None
+                else self.REFERER
+            )
+        }
+        request.is_secure = lambda: is_secure
+
+        if host is not None:
+            request.get_host = lambda: host
+
+        if delete_referer:
+            del request.META['HTTP_REFERER']
+
+        if csrf_cookie_used:
+            request.META['CSRF_COOKIE_USED'] = True
+            request.META['CSRF_COOKIE'] = self.COOKIE_VALUE
+
+        if cross_domain_decorator:
+            request.META['CROSS_DOMAIN_CSRF_COOKIE_USED'] = True
+
+        return self.middleware.process_response(request, HttpResponse())
+
+    def _assert_cookie_sent(self, response, is_set):
+        """Check that the cross-domain CSRF cookie was sent. """
+        if is_set:
+            self.assertIn(self.COOKIE_NAME, response.cookies)
+            cookie_header = str(response.cookies[self.COOKIE_NAME])
+
+            expected = 'Set-Cookie: {name}={value}; Domain={domain};'.format(
+                name=self.COOKIE_NAME,
+                value=self.COOKIE_VALUE,
+                domain=self.COOKIE_DOMAIN
+            )
+            self.assertIn(expected, cookie_header)
+            self.assertIn('Max-Age=31449600; Path=/; secure', cookie_header)
+
+        else:
+            self.assertNotIn(self.COOKIE_NAME, response.cookies)

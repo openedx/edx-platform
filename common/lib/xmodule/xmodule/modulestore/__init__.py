@@ -39,6 +39,9 @@ new_contract('AssetKey', AssetKey)
 new_contract('AssetMetadata', AssetMetadata)
 new_contract('XBlock', XBlock)
 
+LIBRARY_ROOT = 'library.xml'
+COURSE_ROOT = 'course.xml'
+
 
 class ModuleStoreEnum(object):
     """
