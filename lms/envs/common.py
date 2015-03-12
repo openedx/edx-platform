@@ -2073,14 +2073,14 @@ SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSea
 PERFORMANCE_GRAPHITE_URL = ''
 CDN_VIDEO_URLS = {}
 
-# The configuration for learner profiles
-PROFILE_CONFIGURATION = {
+# The configuration visibility of account fields.
+ACCOUNT_VISIBILITY_CONFIGURATION = {
     # Default visibility level for accounts without a specified value
     # The value is one of: 'all_users', 'private'
     "default_visibility": "private",
 
-    # The list of all fields that can be shown on a learner's profile
-    "all_fields": [
+    # The list of all fields that can be shared with other users
+    "shareable_fields": [
         'username',
         'profile_image',
         'country',
@@ -2089,7 +2089,7 @@ PROFILE_CONFIGURATION = {
         'bio',
     ],
 
-    # The list of fields that are always public on a learner's profile
+    # The list of account fields that are always public
     "public_fields": [
         'username',
         'profile_image',

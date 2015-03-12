@@ -2,7 +2,7 @@
 Script for exporting all courseware from Mongo to a directory and listing the courses which failed to export
 """
 from django.core.management.base import BaseCommand, CommandError
-from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 
@@ -49,7 +49,7 @@ def export_courses_to_output_path(output_path):
         print(u"Exporting course id = {0} to {1}".format(course_id, output_path))
         try:
             course_dir = course_id.to_deprecated_string().replace('/', '...')
-            export_to_xml(module_store, content_store, course_id, root_dir, course_dir)
+            export_course_to_xml(module_store, content_store, course_id, root_dir, course_dir)
         except Exception as err:  # pylint: disable=broad-except
             failed_export_courses.append(unicode(course_id))
             print(u"=" * 30 + u"> Oops, failed to export {0}".format(course_id))

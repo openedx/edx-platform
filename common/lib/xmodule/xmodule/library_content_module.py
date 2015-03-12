@@ -2,6 +2,8 @@
 """
 LibraryContent: The XBlock used to include blocks from a library in a course.
 """
+import json
+from lxml import etree
 from bson.objectid import ObjectId, InvalidId
 from collections import namedtuple
 from copy import copy
@@ -306,6 +308,10 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
         this block is up to date or not.
         """
         lib_tools = self.runtime.service(self, 'library_tools')
+        if not lib_tools:
+            # This error is diagnostic. The user won't see it, but it may be helpful
+            # during debugging.
+            return Response(_(u"Course does not support Library tools."), status=400)
         user_service = self.runtime.service(self, 'user')
         user_perms = self.runtime.service(self, 'studio_user_permissions')
         if user_service:
@@ -477,18 +483,27 @@ class LibraryContentDescriptor(LibraryContentFields, MakoModuleDescriptor, XmlDe
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
+        children = [
+            # pylint: disable=no-member
+            system.process_xml(etree.tostring(child)).scope_ids.usage_id
+            for child in xml_object.getchildren()
+        ]
+        definition = {
+            attr_name: json.loads(attr_value)
+            for attr_name, attr_value in xml_object.attrib
+        }
+        return definition, children
 
     def definition_to_xml(self, resource_fs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
-
-    @classmethod
-    def from_xml(cls, xml_data, system, id_generator):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
-
-    def export_to_xml(self, resource_fs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
+        """ Exports Library Content Module to XML """
+        # pylint: disable=no-member
+        xml_object = etree.Element('library_content')
+        for child in self.get_children():
+            self.runtime.add_block_as_child_node(child, xml_object)
+        # Set node attributes based on our fields.
+        for field_name, field in self.fields.iteritems():
+            if field_name in ('children', 'parent', 'content'):
+                continue
+            if field.is_set_on(self):
+                xml_object.set(field_name, unicode(field.read_from(self)))
+        return xml_object

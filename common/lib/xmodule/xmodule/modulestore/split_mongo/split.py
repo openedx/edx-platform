@@ -1601,7 +1601,8 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
             super(SplitMongoModuleStore, self).clone_course(source_course_id, dest_course_id, user_id, fields, **kwargs)
             return new_course
 
-    DEFAULT_ROOT_BLOCK_ID = 'course'
+    DEFAULT_ROOT_COURSE_BLOCK_ID = 'course'
+    DEFAULT_ROOT_LIBRARY_BLOCK_ID = 'library'
 
     def create_course(
         self, org, course, run, user_id, master_branch=None, fields=None,
@@ -1687,7 +1688,7 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
                 user_id,
                 BlockKey(
                     root_category,
-                    root_block_id or SplitMongoModuleStore.DEFAULT_ROOT_BLOCK_ID,
+                    root_block_id or SplitMongoModuleStore.DEFAULT_ROOT_COURSE_BLOCK_ID,
                 ),
                 block_fields,
                 definition_id
@@ -2474,7 +2475,15 @@ class SplitMongoModuleStore(SplitBulkWriteMixin, ModuleStoreWriteBase):
         """
         Split specific lookup
         """
-        return self._lookup_course(course_key).structure.get('assets', {})
+        try:
+            course_assets = self._lookup_course(course_key).structure.get('assets', {})
+        except (InsufficientSpecificationError, VersionConflictError) as err:
+            log.warning(u'Error finding assets for org "%s" course "%s" on asset '
+                        u'request. Either version of course_key is None or invalid.',
+                        course_key.org, course_key.course)
+            return {}
+
+        return course_assets
 
     def _update_course_assets(self, user_id, asset_key, update_function):
         """

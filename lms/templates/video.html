@@ -10,8 +10,12 @@
 
     data-streams="${youtube_streams}"
 
-    ${'data-sub="{}"'.format(sub) if sub else ''}
-    ${'data-autoplay="{}"'.format(autoplay) if autoplay else ''}
+    % if sub:
+      data-sub="${sub}"
+    % endif
+    % if autoplay:
+      data-autoplay="${autoplay}"
+    % endif
 
     data-sources='${sources}'
     data-save-state-url="${ajax_url}"
@@ -104,14 +108,13 @@
   <ul class="wrapper-downloads">
     % if download_video_link:
         <li class="video-sources video-download-button">
-            ${('<a href="%s">' + _('Download video') + '</a>') % download_video_link}
+            <a href="${download_video_link}">${_('Download video')}</a>
         </li>
     % endif
     % if track:
         <li class="video-tracks video-download-button">
           % if transcript_download_format:
-            ${('<a href="%s">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}">${_('Download transcript')}</a>
             <div class="a11y-menu-container">
                 <a class="a11y-menu-button" href="#" title="${'.' + transcript_download_format}">${'.' + transcript_download_format}</a>
                 <ol class="a11y-menu-list">
@@ -131,14 +134,13 @@
                 </ol>
             </div>
           % else:
-            ${('<a href="%s" class="external-track">' + _('Download transcript') + '</a>') % track
-            }
+            <a href="${track}" class="external-track">${_('Download transcript')}</a>
           % endif
         </li>
     % endif
     % if handout:
         <li class="video-handout video-download-button">
-            ${('<a href="%s" target="_blank">' + _('Download Handout') + '</a>') % handout}
+            <a href="${handout}" target="_blank">${_('Download Handout')}</a>
         </li>
     % endif
 

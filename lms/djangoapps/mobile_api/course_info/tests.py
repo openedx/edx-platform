@@ -8,7 +8,7 @@ from django.conf import settings
 from xmodule.html_module import CourseInfoModule
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 from ..testutils import (
     MobileAPITestCase, MobileCourseAccessTestMixin, MobileEnrolledCourseAccessTestMixin, MobileAuthTestMixin
@@ -126,7 +126,7 @@ class TestHandouts(MobileAPITestCase, MobileAuthTestMixin, MobileEnrolledCourseA
         self.store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
 
         # use toy course with handouts, and make it mobile_available
-        course_items = import_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
+        course_items = import_course_from_xml(self.store, self.user.id, settings.COMMON_TEST_DATA_ROOT, ['toy'])
         self.course = course_items[0]
         self.course.mobile_available = True
         self.store.update_item(self.course, self.user.id)

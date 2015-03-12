@@ -5,7 +5,7 @@ Script for importing courseware from XML format
 from django.core.management.base import BaseCommand, CommandError, make_option
 from django_comment_common.utils import (seed_permissions_roles,
                                          are_permissions_roles_seeded)
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
@@ -31,20 +31,20 @@ class Command(BaseCommand):
         data_dir = args[0]
         do_import_static = not (options.get('nostatic', False))
         if len(args) > 1:
-            course_dirs = args[1:]
+            source_dirs = args[1:]
         else:
-            course_dirs = None
-        self.stdout.write("Importing.  Data_dir={data}, course_dirs={courses}\n".format(
+            source_dirs = None
+        self.stdout.write("Importing.  Data_dir={data}, source_dirs={courses}\n".format(
             data=data_dir,
-            courses=course_dirs,
-            dis=do_import_static))
+            courses=source_dirs,
+        ))
         mstore = modulestore()
 
-        course_items = import_from_xml(
-            mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, course_dirs, load_error_modules=False,
+        course_items = import_course_from_xml(
+            mstore, ModuleStoreEnum.UserID.mgmt_command, data_dir, source_dirs, load_error_modules=False,
             static_content_store=contentstore(), verbose=True,
             do_import_static=do_import_static,
-            create_course_if_not_present=True,
+            create_if_not_present=True,
         )
 
         for course in course_items:

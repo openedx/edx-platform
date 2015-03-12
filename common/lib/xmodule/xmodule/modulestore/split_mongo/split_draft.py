@@ -487,7 +487,9 @@ class DraftVersioningModuleStore(SplitMongoModuleStore, ModuleStoreDraftAndPubli
         with self.bulk_operations(course_key):
             # hardcode course root block id
             if block_type == 'course':
-                block_id = self.DEFAULT_ROOT_BLOCK_ID
+                block_id = self.DEFAULT_ROOT_COURSE_BLOCK_ID
+            elif block_type == 'library':
+                block_id = self.DEFAULT_ROOT_LIBRARY_BLOCK_ID
             new_usage_key = course_key.make_usage_key(block_type, block_id)
 
             if self.get_branch_setting() == ModuleStoreEnum.Branch.published_only:

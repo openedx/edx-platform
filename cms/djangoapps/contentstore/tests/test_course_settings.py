@@ -150,7 +150,7 @@ class CourseDetailsTestCase(CourseTestCase):
             MilestoneRelationshipType.objects.create(name='fulfills')
 
     @patch.dict(settings.FEATURES, {'ENTRANCE_EXAMS': True})
-    def test_entrance_exam_created_and_deleted_successfully(self):
+    def test_entrance_exam_created_updated_and_deleted_successfully(self):
         self._seed_milestone_relationship_types()
         settings_details_url = get_url(self.course.id)
         data = {
@@ -168,6 +168,20 @@ class CourseDetailsTestCase(CourseTestCase):
         course = modulestore().get_course(self.course.id)
         self.assertTrue(course.entrance_exam_enabled)
         self.assertEquals(course.entrance_exam_minimum_score_pct, .60)
+
+        # Update the entrance exam
+        data['entrance_exam_enabled'] = "true"
+        data['entrance_exam_minimum_score_pct'] = "80"
+        response = self.client.post(
+            settings_details_url,
+            data=json.dumps(data),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json'
+        )
+        self.assertEquals(response.status_code, 200)
+        course = modulestore().get_course(self.course.id)
+        self.assertTrue(course.entrance_exam_enabled)
+        self.assertEquals(course.entrance_exam_minimum_score_pct, .80)
 
         # Delete the entrance exam
         data['entrance_exam_enabled'] = "false"
