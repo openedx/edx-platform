@@ -249,6 +249,7 @@ class UserProfile(models.Model):
     country = CountryField(blank=True, null=True)
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
+    bio = models.TextField(blank=True, null=True)
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta
