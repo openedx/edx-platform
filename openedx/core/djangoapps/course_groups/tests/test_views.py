@@ -10,7 +10,7 @@ from datetime import datetime
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import RequestFactory
-import test_utils
+import django_test_client_utils  # monkey-patch for PATCH request method.
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase

@@ -448,15 +448,15 @@ class CohortManagementSection(PageObject):
         # If the discussion topic section has not yet been toggled on, click on the toggle link.
         self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).click()
 
+    def discussion_topics_visible(self):
+        """
+        Returns the visibility status of cohort discussion controls.
+        """
         EmptyPromise(
             lambda: self.q(css=self._bounded_selector('.cohort-discussions-nav')).results != 0,
             "Waiting for discussion section to show"
         ).fulfill()
 
-    def discussion_topics_visible(self):
-        """
-        Returns the visibility status of cohort discussion controls.
-        """
         return (self.q(css=self._bounded_selector('.cohort-course-wide-discussions-nav')).visible and
                 self.q(css=self._bounded_selector('.cohort-inline-discussions-nav')).visible)
 

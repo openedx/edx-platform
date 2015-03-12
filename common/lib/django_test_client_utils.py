@@ -4,8 +4,10 @@ older version of django that does not contains the PATCH method in its test clie
 """
 from __future__ import unicode_literals
 
-from django.test.client import RequestFactory, Client, FakePayload
 from urlparse import urlparse
+
+from django.test.client import RequestFactory, Client, FakePayload
+
 
 BOUNDARY = 'BoUnDaRyStRiNg'
 MULTIPART_CONTENT = 'multipart/form-data; boundary=%s' % BOUNDARY
@@ -20,11 +22,11 @@ def request_factory_patch(self, path, data={}, content_type=MULTIPART_CONTENT, *
     parsed = urlparse(path)
     r = {
         'CONTENT_LENGTH': len(patch_data),
-        'CONTENT_TYPE':   content_type,
-        'PATH_INFO':      self._get_path(parsed),
-        'QUERY_STRING':   parsed[4],
+        'CONTENT_TYPE': content_type,
+        'PATH_INFO': self._get_path(parsed),
+        'QUERY_STRING': parsed[4],
         'REQUEST_METHOD': 'PATCH',
-        'wsgi.input':     FakePayload(patch_data),
+        'wsgi.input': FakePayload(patch_data),
     }
     r.update(extra)
     return self.request(**r)
@@ -38,6 +40,7 @@ def client_patch(self, path, data={}, content_type=MULTIPART_CONTENT, follow=Fal
     if follow:
         response = self._handle_redirects(response, **extra)
     return response
+
 
 setattr(RequestFactory, 'patch', request_factory_patch)
 setattr(Client, 'patch', client_patch)

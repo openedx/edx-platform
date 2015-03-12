@@ -124,7 +124,7 @@ def course_cohort_settings_handler(request, course_key_string):
     This will raise 404 if user is not staff.
     GET
         Returns the JSON representation of cohort settings for the course.
-    PUT, POST or PATCH
+    PATCH
         Updates the cohort settings for the course. Returns the JSON representation of updated settings.
     """
     course_key = CourseKey.from_string(course_key_string)
