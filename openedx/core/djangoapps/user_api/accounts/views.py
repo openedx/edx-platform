@@ -38,12 +38,13 @@ class AccountView(APIView):
 
                 * name: The full name of the user.
 
-                * email: The confirmed email address for the user. The request
-                  will not return an unconfirmed email address.
+                * email: email for the user (the new email address must be
+                    confirmed via a confirmation email, so GET will not reflect
+                    the change until the address has been confirmed).
 
-                * date_joined: The date the account was created, in
-                  the string format provided by datetime (for example,
-                  "2014-08-26T17:52:11Z").
+                * date_joined: The date the account was created, in the string
+                    format provided by datetime.
+                    For example, "2014-08-26T17:52:11Z".
 
                 * gender: One of the fullowing values:
 
@@ -76,6 +77,14 @@ class AccountView(APIView):
                   mailing address, or null.
 
                 * goals: The textual representation of the user's goals, or null.
+
+                * bio: null or textural representation of user biographical
+                    information ("about me")
+
+            For all text fields, clients rendering the values should take care
+            to HTML escape them to avoid script injections, as the data is
+            stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
 
             If a user who does not have "is_staff" access requests account
             information for a different user, only a subset of these fields is
