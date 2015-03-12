@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 
 from courseware.courses import course_image_url
 from student.models import CourseEnrollment, User
+from certificates.models import certificate_status_for_student, CertificateStatuses
 
 
 class CourseField(serializers.RelatedField):
@@ -64,10 +65,21 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     Serializes CourseEnrollment models
     """
     course = CourseField()
+    certificate = serializers.SerializerMethodField('get_certificate')
+
+    def get_certificate(self, model):
+        """Returns the information about the user's certificate in the course."""
+        certificate_info = certificate_status_for_student(model.user, model.course_id)
+        if certificate_info['status'] == CertificateStatuses.downloadable:
+            return {
+                "url": certificate_info['download_url'],
+            }
+        else:
+            return {}
 
     class Meta:  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course')
+        fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
 
 
