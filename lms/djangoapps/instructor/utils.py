@@ -159,7 +159,7 @@ def generate_course_forums_query(course_id, query_type, parent_id_check=None):
         {'$sort': SON([('_id.year', 1), ('_id.month', 1), ('_id.day', 1)])},
     ]
     if query_type == 'Comment':
-        if parent_id_check is not None:
+        if parent_id_check:
             query[0]['$match']['parent_id'] = {'$exists': parent_id_check}
     return query
 
