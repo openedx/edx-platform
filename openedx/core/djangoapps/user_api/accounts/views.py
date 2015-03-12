@@ -14,6 +14,7 @@ from rest_framework import permissions
 from ..errors import UserNotFound, UserNotAuthorized, AccountUpdateError, AccountValidationError
 from openedx.core.lib.api.parsers import MergePatchParser
 from .api import get_account_settings, update_account_settings
+from .serializers import PROFILE_IMAGE_KEY_PREFIX
 
 
 class AccountView(APIView):
@@ -110,6 +111,10 @@ class AccountView(APIView):
         """
         try:
             account_settings = get_account_settings(request.user, username, view=request.QUERY_PARAMS.get('view'))
+            # Account for possibly relative URLs.
+            for key, value in account_settings['profile_image'].items():
+                if key.startswith(PROFILE_IMAGE_KEY_PREFIX):
+                    account_settings['profile_image'][key] = request.build_absolute_uri(value)
         except UserNotFound:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

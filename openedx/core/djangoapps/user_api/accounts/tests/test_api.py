@@ -117,6 +117,12 @@ class TestAccountApi(TestCase):
         with self.assertRaises(AccountValidationError):
             update_account_settings(self.user, {"gender": "undecided"})
 
+        with self.assertRaises(AccountValidationError):
+            update_account_settings(
+                self.user,
+                {"profile_image": {"has_image": "not_allowed", "image_url": "not_allowed"}}
+            )
+
     def test_update_multiple_validation_errors(self):
         """Test that all validation errors are built up and returned at once"""
         # Send a read-only error, serializer error, and email validation error.
