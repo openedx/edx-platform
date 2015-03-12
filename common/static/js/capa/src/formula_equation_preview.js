@@ -169,4 +169,11 @@ formulaEquationPreview.enable = function () {
     $('.formulaequationinput input').each(setupInput);
 };
 
-formulaEquationPreview.enable();
+try {
+    require(['jquery', 'mathjax'], function() {
+        formulaEquationPreview.enable();
+    });
+} catch(error) {
+    // Mathjax already loaded in LMS
+    formulaEquationPreview.enable();
+}

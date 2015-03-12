@@ -145,3 +145,12 @@ messages = json.dumps(xblock.validate().to_json())
         </div>
     % endif
 % endif
+
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+        require(['jquery', 'mathjax'], function() {
+            window.MathJax = MathJax;
+        });
+    });
+</script>
