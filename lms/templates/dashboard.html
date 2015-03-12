@@ -162,8 +162,8 @@
 
       </ul>
     </section>
-    % if self.stanford_theme_enabled():
-        <%include file='theme-dashboard-research.html' />
+    % if self.dashboard_extra_file:
+        <%include file='${self.dashboard_extra_file}' />
     % endif
   </section>
 
