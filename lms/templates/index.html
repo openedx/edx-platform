@@ -13,7 +13,6 @@
   homepage_promo_video_youtube_id = microsite.get_value('homepage_promo_video_youtube_id', "XNaiOGxWeto")
 
   show_partners = microsite.get_value('show_partners', True)
-
 %>
 
 <section class="home">
@@ -23,12 +22,10 @@
         <hgroup>
           % if homepage_overlay_html:
             ${homepage_overlay_html}
+          % elif self.homepage_overlay_file:
+            <%include file="${self.homepage_overlay_file}" />
           % else:
-            % if self.stanford_theme_enabled():
-              <h1>${_("Free courses from <strong>{university_name}</strong>").format(university_name="Stanford")}</h1>
-            % else:
-              <h1>${_("The Future of Online Education")}</h1>
-            % endif
+            <h1>${_("The Future of Online Education")}</h1>
             <h2>${_("For anyone, anywhere, anytime")}</h2>
           % endif
         </hgroup>
