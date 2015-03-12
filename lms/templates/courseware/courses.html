@@ -16,22 +16,18 @@
 
   logo_file = microsite.get_value(
     'course_index_overlay_logo_file', settings.STATIC_URL + 'images/edx-logo-bw.png'
-   )
+  )
 %>
 
   <header class="search">
     <div class="inner-wrapper main-search">
       <hgroup>
-        <div class="logo">
-          % if self.stanford_theme_enabled():
-            <img src="${static.url('themes/stanford/images/seal.png')}" alt="Stanford Seal Logo" />
-          % else:
-            <img src='${logo_file}' alt="${microsite.get_value('platform_name', settings.PLATFORM_NAME)} Logo" />
-          % endif
-        </div>
-        % if self.stanford_theme_enabled():
-          <h2>${_("Public courses from {university_name}!").format(university_name="Stanford University")}</h2>
+        % if self.course_index_overlay_file:
+          <%include file="${self.course_index_overlay_file}" />
         % else:
+          <div class="logo">
+            <img src='${logo_file}' alt="${microsite.get_value('platform_name', settings.PLATFORM_NAME)} Logo" />
+          </div>
           <h2>${course_index_overlay_text}</h2>
         % endif
       </hgroup>
