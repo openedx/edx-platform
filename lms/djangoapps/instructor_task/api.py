@@ -22,7 +22,6 @@ from instructor_task.tasks import (
     calculate_students_features_csv,
     get_student_responses,
     get_ora2_responses,
-    get_course_forums_usage,
 )
 from instructor_task.api_helper import (
     check_arguments_for_rescoring,
@@ -246,18 +245,6 @@ def submit_ora2_request_task(request, course_key):
     """
     task_type = 'ora2_responses'
     task_class = get_ora2_responses
-    task_input = {}
-    task_key = ''
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-def submit_course_forums_usage_task(request, course_key):
-    """
-    AlreadyRunningError is raised if an course forums usage report is already being generated.
-    """
-    task_type = 'course_forums'
-    task_class = get_course_forums_usage
     task_input = {}
     task_key = ''
 

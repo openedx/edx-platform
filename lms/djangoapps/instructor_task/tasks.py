@@ -32,7 +32,6 @@ from instructor_task.tasks_helper import (
     delete_problem_module_state,
     push_student_responses_to_s3,
     push_ora2_responses_to_s3,
-    push_course_forums_data_to_s3,
     upload_grades_csv,
     upload_students_csv
 )
@@ -176,15 +175,4 @@ def get_ora2_responses(entry_id, xmodule_instance_args):
     """
     action_name = ugettext_noop('generated')
     task_fn = partial(push_ora2_responses_to_s3, xmodule_instance_args)
-    return run_main_task(entry_id, task_fn, action_name)
-
-
-# pylint: disable=not-callable
-@task(base=BaseInstructorTask, routing_key=settings.COURSE_FORUMS_DOWNLOAD_ROUTING_KEY)
-def get_course_forums_usage(entry_id, xmodule_instance_args):
-    """
-    Generate a CSV of course forums usage and push it to S3.
-    """
-    action_name = ugettext_noop('generated')
-    task_fn = partial(push_course_forums_data_to_s3, xmodule_instance_args)
     return run_main_task(entry_id, task_fn, action_name)
