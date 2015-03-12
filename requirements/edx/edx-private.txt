@@ -2,8 +2,8 @@
 
 -e git+https://github.com/gsehub/xblock-mentoring.git@4d1cce78dc232d5da6ffd73817b5c490e87a6eee#egg=xblock-mentoring
 
-# Prototype XBlocks from edX learning sciences limited roll-outs and user testing. 
-# Concept XBlock, in particular, is nowhere near finished and an early prototype. 
+# Prototype XBlocks from edX learning sciences limited roll-outs and user testing.
+# Concept XBlock, in particular, is nowhere near finished and an early prototype.
 # Profile XBlock is there so we can play with XBlock arguments in the platform, but isn't ready for use outside of
 # edX.
 
@@ -15,4 +15,4 @@
 
 # This repository contains schoolyourself-xblock, which is used in
 # edX's "AlgebraX" and "GeometryX" courses.
--e git+https://github.com/schoolyourself/schoolyourself-xblock.git@24897124a75b2eaf68dbaa79059ad7468e6de78a#egg=schoolyourself-xblock
+-e git+https://github.com/schoolyourself/schoolyourself-xblock.git@64186170d11db477b25e9b811c25b8bcd2afb1b7#egg=schoolyourself-xblock
