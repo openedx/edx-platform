@@ -5,44 +5,9 @@ var edx = edx || {};
 
     edx.student = edx.student || {};
     edx.student.account = edx.student.account || {};
-    edx.student.account.settingsViews = edx.student.account.settingsViews || {};
+    edx.student.account.fieldViews = edx.student.account.fieldViews || {};
 
-    edx.student.account.settingsViews.AccountSettingsView = Backbone.View.extend({
-
-        template: _.template($('#account_settings-tpl').text()),
-
-        events: {
-        },
-
-        initialize: function(options) {
-            _.bindAll(this, 'render', 'setupFields');
-        },
-
-        modelValue: function() {
-            return this.model.get(this.options.valueAttribute);
-        },
-
-        render: function() {
-            this.$el.html(this.template({
-                sections: this.options.sections
-            }));
-            return this;
-        },
-
-        setupFields: function() {
-            this.$('.ui-loading-anim').addClass('is-hidden');
-
-            var view = this;
-            _.each(this.$('.account-settings-section-body'), function(sectionEl, index) {
-                _.each(view.options.sections[index].fields, function(field, index) {
-                    $(sectionEl).append(field.view.render().el);
-                });
-            });
-            return this;
-        }
-    });
-
-    edx.student.account.settingsViews.FieldView = Backbone.View.extend({
+    edx.student.account.fieldViews.FieldView = Backbone.View.extend({
 
         className: function(){
             return "account-settings-field " + this.options.valueAttribute;
@@ -81,7 +46,7 @@ var edx = edx || {};
         }
     });
 
-    edx.student.account.settingsViews.ReadonlyFieldView = edx.student.account.settingsViews.FieldView.extend({
+    edx.student.account.fieldViews.ReadonlyFieldView = edx.student.account.fieldViews.FieldView.extend({
 
         template: _.template($('#field_readonly-tpl').text()),
 
@@ -108,7 +73,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.settingsViews.TextFieldView = edx.student.account.settingsViews.FieldView.extend({
+    edx.student.account.fieldViews.TextFieldView = edx.student.account.fieldViews.FieldView.extend({
 
         template: _.template($('#field_text-tpl').text()),
 
@@ -147,7 +112,7 @@ var edx = edx || {};
         },
     });
 
-    edx.student.account.settingsViews.LinkFieldView = edx.student.account.settingsViews.FieldView.extend({
+    edx.student.account.fieldViews.LinkFieldView = edx.student.account.fieldViews.FieldView.extend({
 
         template: _.template($('#field_link-tpl').text()),
 
@@ -185,7 +150,7 @@ var edx = edx || {};
 
     });
 
-    edx.student.account.settingsViews.DropdownFieldView = edx.student.account.settingsViews.FieldView.extend({
+    edx.student.account.fieldViews.DropdownFieldView = edx.student.account.fieldViews.FieldView.extend({
 
         template: _.template($('#field_dropdown-tpl').text()),
 

@@ -1,3 +1,4 @@
+<%! import json %>
 <%! from django.core.urlresolvers import reverse %>
 <%! from django.utils.translation import ugettext as _ %>
 
@@ -12,8 +13,10 @@
     <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
     <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
 
-     <script type="text/javascript" src="${static.url('js/student_account/views/AccountSettingsView.js')}"></script>
-     <script type="text/javascript" src="${static.url('js/student_account/models/AccountSettingsModel.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/models/account_settings_models.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_fields.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_view.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_factory.js')}"></script>
 
     <%static:js group='student_account'/>
 </%block>
@@ -35,196 +38,8 @@
 
     <script>
         $(document).ready(function() {
-
-            var accountSettingsElement = $('.account-settings-container');
-            var accountSettingsModel = new edx.student.account.AccountSettingsModel();
-            accountSettingsModel.url = accountSettingsElement.data('accounts-api-url');
-
-            var accountSettingsView = new edx.student.account.settingsViews.AccountSettingsView({
-                el: accountSettingsElement,
-                model: accountSettingsModel,
-                context: {
-                    accountSettingsModelUrl: accountSettingsModel.url
-                },
-                sections : [
-                    {
-                        title: "Basic Account Information",
-                        fields: [
-                            {
-                                view: new edx.student.account.settingsViews.ReadonlyFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Username",
-                                    valueAttribute: "username",
-                                    message: ""
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.TextFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Full Name",
-                                    valueAttribute: "name",
-                                    message: "This is used on your edX certificates, and all changes are reviewed."
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.TextFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Email",
-                                    valueAttribute: "email",
-                                    message: "You account email is used as a login mechanism and for course communications."
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.LinkFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Password",
-                                    dataAttribute: "email",
-                                    valueAttribute: "password",
-                                    linkTitle: "Reset Password",
-                                    linkHref: "${ fields['password']['url'] }",
-                                    message: "To reset your password you'll need to click the reset password link sent to you via email."
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Language",
-                                    valueAttribute: "language",
-                                    defaultValue: "${ fields['language']['default'] }",
-                                    required: true,
-                                    message: "This setting controls your default edX language.",
-                                    options: [
-                                        % for option in fields['language']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                        ]
-                    },
-                    {
-                        title: "Demographics and Additional Details",
-                        fields: [
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Educational Background",
-                                    valueAttribute: "level_of_education",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "",
-                                    options: [
-                                        % for option in fields['level_of_education']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Gender",
-                                    valueAttribute: "gender",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "",
-                                    options: [
-                                        % for option in fields['gender']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Year of Birth",
-                                    valueAttribute: "year_of_birth",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "",
-                                    options: [
-                                        % for option in fields['year_of_birth']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Country",
-                                    valueAttribute: "null",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "",
-                                    options: [
-                                        % for option in fields['country']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Timezone",
-                                    valueAttribute: "timezone",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "",
-                                    options: [
-                                        % for option in fields['timezone']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.DropdownFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Preferred Language",
-                                    valueAttribute: "preferred_language",
-                                    defaultValue: null,
-                                    required: false,
-                                    message: "If your preferred language isn't available as an edX language, you can indicate your preferance here.",
-                                    options: [
-                                        % for option in fields['preferred_language']['options']:
-                                            ["${option[0]}", "${option[1]}"],
-                                        % endfor
-                                    ],
-                               })
-                            },
-                        ]
-                    },
-                    {
-                        title: "Connected Accounts",
-                        fields: [
-                            {
-                                view: new edx.student.account.settingsViews.LinkFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Facebook",
-                                    linkTitle: "Link",
-                                    message: "",
-                                })
-                            },
-                            {
-                                view: new edx.student.account.settingsViews.LinkFieldView({
-                                    model: accountSettingsModel,
-                                    title: "Google",
-                                    linkTitle: "Link",
-                                    message: "",
-                                })
-                            },
-                        ]
-                    }
-                ]
-            });
-
-            accountSettingsView.render();
-            accountSettingsModel.fetch().done(function(data, textStatus, jqXHR) {
-                accountSettingsView.setupFields();
-            });
+            var fields = ${ json.dumps(fields) };
+            edx.student.account.setupAccountSettingsViews(fields);
         });
     </script>
 
