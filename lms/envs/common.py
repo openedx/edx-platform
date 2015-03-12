@@ -348,6 +348,9 @@ FEATURES = {
 
     # log all information from cybersource callbacks
     'LOG_POSTPAY_CALLBACKS': True,
+
+    # enable beacons for video timing statistics
+    'ENABLE_VIDEO_BEACON': False,
 }
 
 # Ignore static asset files on import which match this pattern
@@ -2065,6 +2068,10 @@ PDF_RECEIPT_COBRAND_LOGO_HEIGHT_MM = 12
 SEARCH_ENGINE = None
 # Use the LMS specific result processor
 SEARCH_RESULT_PROCESSOR = "lms.lib.courseware_search.lms_result_processor.LmsSearchResultProcessor"
+
+##### CDN EXPERIMENT/MONITORING FLAGS #####
+PERFORMANCE_GRAPHITE_URL = ''
+CDN_VIDEO_URLS = {}
 
 # The configuration visibility of account fields.
 ACCOUNT_VISIBILITY_CONFIGURATION = {
