@@ -41,6 +41,15 @@ class TestCourseExport(ExportTestMixin, StudioCourseTest):
         )
         self.export_page.visit()
 
+    def test_header(self):
+        """
+        Scenario: I should see the correct text when exporting a course.
+            Given that I have a course to export from
+            When I visit the export page
+            The correct header should be shown
+        """
+        self.assertEqual(self.export_page.header_text, 'Course Export')
+
 
 class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
     """
@@ -53,6 +62,15 @@ class TestLibraryExport(ExportTestMixin, StudioLibraryTest):
         super(TestLibraryExport, self).setUp()
         self.export_page = ExportLibraryPage(self.browser, self.library_key)
         self.export_page.visit()
+
+    def test_header(self):
+        """
+        Scenario: I should see the correct text when exporting a library.
+            Given that I have a library to export from
+            When I visit the export page
+            The correct header should be shown
+        """
+        self.assertEqual(self.export_page.header_text, 'Library Export')
 
 
 # pylint: disable=no-member
@@ -243,6 +261,15 @@ class TestCourseImport(ImportTestMixin, StudioCourseTest):
         # There's a section named 'Section' in the tarball.
         self.landing_page.section("Section")
 
+    def test_header(self):
+        """
+        Scenario: I should see the correct text when importing a course.
+            Given that I have a course to import to
+            When I visit the import page
+            The correct header should be shown
+        """
+        self.assertEqual(self.import_page.header_text, 'Course Import')
+
 
 class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
     """
@@ -276,3 +303,12 @@ class TestLibraryImport(ImportTestMixin, StudioLibraryTest):
         self.landing_page.wait_until_ready()
         # There are three blocks in the tarball.
         self.assertEqual(len(self.landing_page.xblocks), 3)
+
+    def test_header(self):
+        """
+        Scenario: I should see the correct text when importing a library.
+            Given that I have a library to import to
+            When I visit the import page
+            The correct header should be shown
+        """
+        self.assertEqual(self.import_page.header_text, 'Library Import')

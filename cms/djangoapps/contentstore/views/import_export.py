@@ -304,6 +304,7 @@ def _import_handler(request, courselike_key, root_name, successful_url, context_
             context_name: courselike_module,
             'successful_import_redirect_url': successful_url,
             'import_status_url': status_url,
+            'library': isinstance(courselike_key, LibraryLocator)
         })
     else:
         return HttpResponseNotFound()
