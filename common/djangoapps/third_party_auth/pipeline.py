@@ -89,6 +89,9 @@ from logging import getLogger
 
 from . import provider
 
+# Note that this lives in openedx, so this dependency should be refactored.
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
+
 
 # These are the query string params you can pass
 # to the URL that starts the authentication process.
@@ -669,8 +672,6 @@ def change_enrollment(strategy, user=None, is_dashboard=False, *args, **kwargs):
         # If the email opt in parameter is found, set the preference.
         email_opt_in = strategy.session_get(AUTH_EMAIL_OPT_IN_KEY)
         if email_opt_in:
-            # TODO: remove circular dependency on openedx from common
-            from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
             opt_in = email_opt_in.lower() == 'true'
             update_email_opt_in(user, course_id.org, opt_in)
 

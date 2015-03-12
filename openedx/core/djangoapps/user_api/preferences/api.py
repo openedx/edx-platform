@@ -13,7 +13,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction, IntegrityError
 from django.utils.translation import ugettext as _
 
-from ..accounts.api import get_account_settings
+from student.models import UserProfile
+
 from ..errors import (
     UserAPIInternalError, UserAPIRequestError, UserNotFound, UserNotAuthorized,
     PreferenceNotFound, PreferenceRequestError, PreferenceValidationError, PreferenceUpdateError
@@ -206,8 +207,14 @@ def update_email_opt_in(user, org, optin):
         None
 
     """
-    account_settings = get_account_settings(user)
-    year_of_birth = account_settings['year_of_birth']
+    # Avoid calling get_account_settings because it introduces circularity for many callers who need both
+    # preferences and account information.
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except ObjectDoesNotExist:
+        raise UserNotFound()
+
+    year_of_birth = user_profile.year_of_birth
     of_age = (
         year_of_birth is None or  # If year of birth is not set, we assume user is of age.
         datetime.datetime.now(UTC).year - year_of_birth >  # pylint: disable=maybe-no-member

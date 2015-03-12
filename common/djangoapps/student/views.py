@@ -117,6 +117,14 @@ from embargo import api as embargo_api
 import analytics
 from eventtracking import tracker
 
+# Note that this lives in LMS, so this dependency should be refactored.
+from notification_prefs.views import enable_notifications
+
+# Note that this lives in openedx, so this dependency should be refactored.
+from openedx.core.djangoapps.user_api.preferences.api import (
+    update_email_opt_in, get_user_preference, set_user_preference
+)
+
 
 log = logging.getLogger("edx.student")
 AUDIT_LOG = logging.getLogger("audit")
@@ -631,9 +639,6 @@ def dashboard(request):
         # Re-alphabetize language options
         language_options.sort()
 
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.preferences.api import get_user_preference
-
     # try to get the preferred language for the user
     cur_pref_lang_code = get_user_preference(request.user, LANGUAGE_KEY)
     # try and get the current language of the user
@@ -798,9 +803,6 @@ def try_change_enrollment(request):
 
 def _update_email_opt_in(request, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
-
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 
     email_opt_in = request.POST.get('email_opt_in')
     if email_opt_in is not None:
@@ -1390,9 +1392,6 @@ def _do_create_account(form):
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.preferences.api import set_user_preference
-
     set_user_preference(user, LANGUAGE_KEY, get_language())
 
     return (user, profile, registration)
@@ -1473,9 +1472,6 @@ def create_account_with_params(request, params):
 
     if settings.FEATURES.get('ENABLE_DISCUSSION_EMAIL_DIGEST'):
         try:
-            # TODO: dependency on LMS from common
-            from notification_prefs.views import enable_notifications
-
             enable_notifications(user)
         except Exception:
             log.exception("Enable discussion notifications failed for user {id}.".format(id=user.id))
