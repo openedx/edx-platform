@@ -9,7 +9,7 @@ var edx = edx || {};
     edx.student.account.EnrollmentInterface = {
 
         urls: {
-            enrollment: '/api/enrollment/v1/enrollment',
+            orders: '/commerce/orders/',
             trackSelection: '/course_modes/choose/'
         },
 
@@ -23,14 +23,11 @@ var edx = edx || {};
          * @param  {string} courseKey  Slash-separated course key.
          */
         enroll: function( courseKey ) {
-            var data_obj = {
-                course_details: {
-                    course_id: courseKey
-                }
-            };
-            var data = JSON.stringify(data_obj);
+            var data_obj = {course_id: courseKey},
+                data = JSON.stringify(data_obj);
+
             $.ajax({
-                url: this.urls.enrollment,
+                url: this.urls.orders,
                 type: 'POST',
                 contentType: 'application/json; charset=utf-8',
                 data: data,
