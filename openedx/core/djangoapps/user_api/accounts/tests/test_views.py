@@ -84,6 +84,7 @@ class UserAPITestCase(APITestCase):
         legacy_profile.year_of_birth = 1900
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
+        legacy_profile.bio = "Tired mother of twins"
         legacy_profile.save()
 
 
@@ -109,7 +110,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertIsNone(data["profile_image"])
         self.assertIsNone(data["time_zone"])
         self.assertIsNone(data["languages"])
-        self.assertIsNone(data["bio"])
+        self.assertEqual("Tired mother of twins", data["bio"])
 
     def _verify_private_account_response(self, response):
         """
@@ -138,6 +139,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(self.user.email, data["email"])
         self.assertTrue(data["is_active"])
         self.assertIsNotNone(data["date_joined"])
+        self.assertEqual("Tired mother of twins", data["bio"])
 
     def test_anonymous_access(self):
         """
@@ -242,7 +244,7 @@ class TestAccountAPI(UserAPITestCase):
             self.assertEqual(12, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-            for empty_field in ("year_of_birth", "level_of_education", "mailing_address"):
+            for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
                 self.assertIsNone(data[empty_field])
             self.assertIsNone(data["country"])
             # TODO: what should the format of this be?
@@ -315,6 +317,10 @@ class TestAccountAPI(UserAPITestCase):
         ("language", "Creole"),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
+        ("bio", "Lacrosse-playing superhero"),
+        ("bio", u"壓是進界推日不復女"),
+        # Note that we store the raw data, so it is up to client to escape the HTML.
+        ("bio", "<html>fancy text</html>"),
         # Note that email is tested below, as it is not immediately updated.
     )
     @ddt.unpack
