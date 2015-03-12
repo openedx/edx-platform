@@ -314,7 +314,7 @@ def index(request, course_id, chapter=None, section=None,
      - HTTPresponse
     """
 
-    course_key = SlashSeparatedCourseKey.from_deprecated_string(course_id)
+    course_key = CourseKey.from_string(course_id)
 
     user = User.objects.prefetch_related("groups").get(id=request.user.id)
 
