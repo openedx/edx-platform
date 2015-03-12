@@ -35,13 +35,13 @@
                     <div class="cohort-management-assignment-type-settings field field-radio">
                 <% } %>
                     <h4 class="form-label">
-                        <%- gettext('Students in this cohort are') %>
+                        <%- gettext('Cohort Assignment Method') %>
                     </h4>
                     <label>
-                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Automatically Assigned") %>
+                        <input type="radio" class="type-random" name="cohort-assignment-type" value="random"  <%- assignment_type == 'random' ? 'checked="checked"' : '' %>/> <%- gettext("Automatic") %>
                     </label>
                     <label>
-                        <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manually Assigned") %>
+                        <input type="radio" class="type-manual" name="cohort-assignment-type" value="manual"  <%- assignment_type == 'manual' || isNewCohort ? 'checked="checked"' : '' %>/> <%- gettext("Manual") %>
                     </label>
                 </div>
                 <% if (isDefaultCohort) { %>

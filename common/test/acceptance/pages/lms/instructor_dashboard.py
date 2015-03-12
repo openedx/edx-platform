@@ -96,6 +96,10 @@ class CohortManagementSection(PageObject):
     no_content_group_button_css = '.cohort-management-details-association-course input.radio-no'
     select_content_group_button_css = '.cohort-management-details-association-course input.radio-yes'
     assignment_type_buttons_css = '.cohort-management-assignment-type-settings input'
+    selectors_dict = {
+        'course_wide': '.cohort-course-wide-discussions-form .action-save',
+        'inline': '.cohort-inline-discussions-form .action-save'
+    }
 
     def is_browser_on_page(self):
         return self.q(css='.cohort-management').present
@@ -436,6 +440,70 @@ class CohortManagementSection(PageObject):
         file_input = self.q(css=self._bounded_selector(self.csv_browse_button_selector_css)).results[0]
         file_input.send_keys(path)
         self.q(css=self._bounded_selector(self.csv_upload_button_selector_css)).first.click()
+
+    def toggle_discussion_topics(self):
+        """
+        Shows the discussion topics.
+        """
+        # If the discussion topic section has not yet been toggled on, click on the toggle link.
+        self.q(css=self._bounded_selector(".toggle-cohort-management-discussions")).click()
+
+    def discussion_topics_visible(self):
+        """
+        Returns the visibility status of cohort discussion controls.
+        """
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector('.cohort-discussions-nav')).results != 0,
+            "Waiting for discussion section to show"
+        ).fulfill()
+
+        return (self.q(css=self._bounded_selector('.cohort-course-wide-discussions-nav')).visible and
+                self.q(css=self._bounded_selector('.cohort-inline-discussions-nav')).visible)
+
+    def select_course_wide_discussion(self):
+        """
+
+        :return:
+        """
+        self.q(css=self._bounded_selector(".check-discussion-subcategory-course-wide")).first.click()
+
+    def is_save_button_disabled(self, key):
+        """
+        Check if save button is disabled.
+        """
+        disabled = self.q(css=self._bounded_selector(self.selectors_dict[key])).attrs('disabled')
+        if disabled[0] == 'true':
+            return True
+
+        return False
+
+    def save_discussion_topics(self, key):
+        """
+
+        :return:
+        """
+        self.q(css=self._bounded_selector(self.selectors_dict[key])).first.click()
+
+    def get_cohort_discussions_message(self, msg_type="confirmation"):
+        """
+        Returns an array of messages related to modifying cohort settings. If wait_for_messages
+        is True, will wait for a message to appear.
+        """
+        title_css = ".cohort-course-wide-discussions-form .message-" + msg_type + " .message-title"
+
+        EmptyPromise(
+            lambda: self.q(css=self._bounded_selector(title_css)),
+            "Waiting for message to appear"
+        ).fulfill()
+
+        message_title = self.q(css=self._bounded_selector(title_css))
+
+        if len(message_title.results) == 0:
+            return ''
+        return message_title.first.text[0]
+
+
+
 
     @property
     def is_cohorted(self):

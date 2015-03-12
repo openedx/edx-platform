@@ -6,6 +6,7 @@ End-to-end tests related to the cohort management on the LMS Instructor Dashboar
 from datetime import datetime
 
 from pymongo import MongoClient
+import uuid
 
 from pytz import UTC, utc
 from bok_choy.promise import EmptyPromise
@@ -13,13 +14,12 @@ from nose.plugins.attrib import attr
 from .helpers import CohortTestMixin
 from ..helpers import UniqueCourseTest, create_user_partition_json
 from xmodule.partitions.partitions import Group
-from ...fixtures.course import CourseFixture
+from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ...pages.lms.auto_auth import AutoAuthPage
 from ...pages.lms.instructor_dashboard import InstructorDashboardPage, DataDownloadPage
 from ...pages.studio.settings_advanced import AdvancedSettingsPage
 from ...pages.studio.settings_group_configurations import GroupConfigurationsPage
 
-import uuid
 
 
 @attr('shard_3')
@@ -637,6 +637,90 @@ class CohortConfigurationTest(UniqueCourseTest, CohortTestMixin):
         ).fulfill()
         messages = self.cohort_management_page.get_csv_messages()
         self.assertEquals(expected_message, messages[0])
+
+
+@attr('shard_3')
+class CohortDiscussionTopicsTest(UniqueCourseTest, CohortTestMixin):
+    """
+    Tests for cohort the course-wide and inline discussion topics.
+    """
+    def setUp(self):
+        """
+        Set up a discussion topics
+        """
+        super(CohortDiscussionTopicsTest, self).setUp()
+
+        self.discussion_id = "test_discussion_{}".format(uuid.uuid4().hex)
+        self.course_fixture = CourseFixture(**self.course_info).add_children(
+            XBlockFixtureDesc("chapter", "Test Section").add_children(
+                XBlockFixtureDesc("sequential", "Test Subsection").add_children(
+                    XBlockFixtureDesc("vertical", "Test Unit").add_children(
+                        XBlockFixtureDesc(
+                            "discussion",
+                            "Test Discussion",
+                            metadata={"discussion_id": self.discussion_id}
+                        )
+                    )
+                )
+            )
+        ).install()
+
+        # create course with single cohort and two content groups (user_partition of type "cohort")
+        self.cohort_name = "OnlyCohort"
+        self.setup_cohort_config(self.course_fixture)
+        self.cohort_id = self.add_manual_cohort(self.course_fixture, self.cohort_name)
+
+        # login as an instructor
+        self.instructor_name = "instructor_user"
+        self.instructor_id = AutoAuthPage(
+            self.browser, username=self.instructor_name, email="instructor_user@example.com",
+            course_id=self.course_id, staff=True
+        ).visit().get_user_id()
+
+        # go to the membership page on the instructor dashboard
+        self.instructor_dashboard_page = InstructorDashboardPage(self.browser, self.course_id)
+        self.instructor_dashboard_page.visit()
+        self.cohort_management_page = self.instructor_dashboard_page.select_cohort_management()
+
+    def test_cohort_discussion_topics_are_available(self):
+        """
+        Scenario: a link and list of discussion topics is present in management tab.
+
+        Given I have a course with a cohort defined
+        When I view the cohort in the LMS instructor dashboard
+        There is a link to show me the discussion topics, clicking
+        on link shows me a list.
+        """
+        self.cohort_management_page.toggle_discussion_topics()
+        self.assertTrue(self.cohort_management_page.discussion_topics_visible())
+
+    def test_cohort_course_wide_discussion_topic(self):
+        """
+        Scenario: cohort a course-wide discussion.
+
+        Given I have a course with a cohort defined,
+        And a course-wide discussion with disabled Save button.
+        When I view the course-wide discussion topics in
+        the LMS instructor dashboard
+        There is a link to show me the discussion topics.
+        """
+        self.cohort_management_page.toggle_discussion_topics()
+        self.assertTrue(self.cohort_management_page.discussion_topics_visible())
+
+        self.assertTrue(self.cohort_management_page.is_save_button_disabled('course_wide'))
+
+        self.cohort_management_page.select_course_wide_discussion()
+
+        self.assertFalse(self.cohort_management_page.is_save_button_disabled('course_wide'))
+
+        # click on the save button.
+        self.cohort_management_page.save_discussion_topics('course_wide')
+
+        self._verify_changes_saved()
+
+    def _verify_changes_saved(self):
+        confirmation_message = self.cohort_management_page.get_cohort_discussions_message()
+        self.assertEqual("Changes Saved.", confirmation_message)
 
 
 @attr('shard_3')
