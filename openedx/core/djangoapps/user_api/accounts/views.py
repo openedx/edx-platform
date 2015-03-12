@@ -68,6 +68,8 @@ class AccountView(APIView):
 
                 * goals: null or textual representation of goals
 
+                * bio: null or textural representation of user biographical information ("about me")
+
             If a user without "is_staff" access has requested account information for a different user,
             only a subset of these fields will be returned. The actual fields returned depend on the configuration
             setting ACCOUNT_VISIBILITY_CONFIGURATION, and the visibility preference of the user with username
