@@ -8,8 +8,8 @@ from shutil import rmtree
 from unittest import TestCase, skip
 import ddt
 
-from xmodule.modulestore.xml_importer import import_from_xml
-from xmodule.modulestore.xml_exporter import export_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
+from xmodule.modulestore.xml_exporter import export_course_to_xml
 from xmodule.modulestore.tests.factories import check_mongo_calls
 from xmodule.modulestore.tests.test_cross_modulestore_import_export import (
     MixedModulestoreBuilder, VersioningModulestoreBuilder,
@@ -47,19 +47,19 @@ class CountMongoCallsXMLRoundtrip(TestCase):
                 # the course id and the wiki_slug in the test XML course. The course must be updated
                 # with the correct wiki_slug during import.
                 with check_mongo_calls(import_reads, first_import_writes):
-                    import_from_xml(
+                    import_course_from_xml(
                         source_store,
                         'test_user',
                         TEST_DATA_DIR,
-                        course_dirs=['manual-testing-complete'],
+                        source_dirs=['manual-testing-complete'],
                         static_content_store=source_content,
-                        target_course_id=source_course_key,
-                        create_course_if_not_present=True,
+                        target_id=source_course_key,
+                        create_if_not_present=True,
                         raise_on_failure=True,
                     )
 
                 with check_mongo_calls(export_reads):
-                    export_to_xml(
+                    export_course_to_xml(
                         source_store,
                         source_content,
                         source_course_key,
@@ -68,14 +68,14 @@ class CountMongoCallsXMLRoundtrip(TestCase):
                     )
 
                 with check_mongo_calls(import_reads, second_import_writes):
-                    import_from_xml(
+                    import_course_from_xml(
                         dest_store,
                         'test_user',
                         self.export_dir,
-                        course_dirs=['exported_source_course'],
+                        source_dirs=['exported_source_course'],
                         static_content_store=dest_content,
-                        target_course_id=dest_course_key,
-                        create_course_if_not_present=True,
+                        target_id=dest_course_key,
+                        create_if_not_present=True,
                         raise_on_failure=True,
                     )
 
@@ -125,14 +125,14 @@ class CountMongoCallsCourseTraversal(TestCase):
             source_course_key = source_store.make_course_key('a', 'course', 'course')
 
             # First, import a course.
-            import_from_xml(
+            import_course_from_xml(
                 source_store,
                 'test_user',
                 TEST_DATA_DIR,
-                course_dirs=['manual-testing-complete'],
+                source_dirs=['manual-testing-complete'],
                 static_content_store=source_content,
-                target_course_id=source_course_key,
-                create_course_if_not_present=True,
+                target_id=source_course_key,
+                create_if_not_present=True,
                 raise_on_failure=True,
             )
 

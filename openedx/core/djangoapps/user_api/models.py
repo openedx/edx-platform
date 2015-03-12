@@ -13,6 +13,8 @@ from xmodule_django.models import CourseKeyField
 # create an alias in "user_api".
 from student.models import UserProfile, Registration, PendingEmailChange  # pylint: disable=unused-import
 
+from .errors import PreferenceNotFound
+
 
 class UserPreference(models.Model):
     """A user's preference, stored as generic text to be processed by client"""
@@ -26,26 +28,55 @@ class UserPreference(models.Model):
 
     @classmethod
     def set_preference(cls, user, preference_key, preference_value):
+        """Sets the user preference for a given key, creating it if it doesn't exist.
+
+        Arguments:
+            user (User): The user whose preference should be set.
+            preference_key (string): The key for the user preference.
+            preference_value (object): The value to be stored.
+
+        Raises:
+            ValidationError: the update was rejected because it was invalid
         """
-        Sets the user preference for a given key
-        """
-        user_pref, _ = cls.objects.get_or_create(user=user, key=preference_key)
-        user_pref.value = preference_value
-        user_pref.save()
+        user_preference, _ = cls.objects.get_or_create(user=user, key=preference_key)
+        user_preference.value = preference_value
+        user_preference.full_clean()
+        user_preference.save()
 
     @classmethod
     def get_preference(cls, user, preference_key, default=None):
-        """
-        Gets the user preference value for a given key
+        """Gets the user preference value for a given key
 
-        Returns the given default if there isn't a preference for the given key
-        """
+        Arguments:
+            user (User): The user whose preference should be set.
+            preference_key (string): The key for the user preference.
+            default (object): The default value to return if the preference is not set.
 
+        Returns:
+            The user preference value, or the specified default if one is not set.
+        """
         try:
-            user_pref = cls.objects.get(user=user, key=preference_key)
-            return user_pref.value
+            user_preference = cls.objects.get(user=user, key=preference_key)
+            return user_preference.value
         except cls.DoesNotExist:
             return default
+
+    @classmethod
+    def delete_preference(cls, user, preference_key):
+        """Deletes the user preference value for a given key
+
+        Arguments:
+            user (User): The user whose preference should be set.
+            preference_key (string): The key for the user preference.
+
+        Raises:
+            PreferenceNotFound: No preference was found with the given key.
+        """
+        try:
+            user_preference = cls.objects.get(user=user, key=preference_key)
+        except cls.DoesNotExist:
+            raise PreferenceNotFound()
+        user_preference.delete()
 
 
 class UserCourseTag(models.Model):

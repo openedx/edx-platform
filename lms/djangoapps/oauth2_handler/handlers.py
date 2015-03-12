@@ -69,6 +69,7 @@ class ProfileHandler(object):
 
         """
 
+        # Calling UserPreference directly because it is not clear which user made the request.
         language = UserPreference.get_preference(data['user'], LANGUAGE_KEY)
 
         # If the user has no language specified, return the default one.

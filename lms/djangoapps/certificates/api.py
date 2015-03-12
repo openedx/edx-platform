@@ -22,6 +22,10 @@ def generate_user_certificates(student, course_key, course=None):
     """
     It will add the add-cert request into the xqueue.
 
+    A new record will be created to track the certificate
+    generation task.  If an error occurs while adding the certificate
+    to the queue, the task will have status 'error'.
+
     Args:
         student (User)
         course_key (CourseKey)
@@ -29,24 +33,9 @@ def generate_user_certificates(student, course_key, course=None):
     Keyword Arguments:
         course (Course): Optionally provide the course object; if not provided
             it will be loaded.
-
-    Returns:
-        returns status of generated certificate
-
     """
     xqueue = XQueueCertInterface()
-    ret = xqueue.add_cert(student, course_key, course=course)
-    log.info(
-        (
-            u"Added a certificate generation task to the XQueue "
-            u"for student %s in course '%s'. "
-            u"The new certificate status is '%s'."
-        ),
-        student.id,
-        unicode(course_key),
-        ret
-    )
-    return ret
+    xqueue.add_cert(student, course_key, course=course)
 
 
 def certificate_downloadable_status(student, course_key):
@@ -162,8 +151,6 @@ def generate_example_certificates(course_key):
     xqueue = XQueueCertInterface()
     for cert in ExampleCertificateSet.create_example_set(course_key):
         xqueue.add_example_cert(cert)
-
-    log.info(u"Started generated example certificates for course '%s'.", course_key)
 
 
 def example_certificates_status(course_key):

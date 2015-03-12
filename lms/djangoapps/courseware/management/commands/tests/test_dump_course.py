@@ -12,7 +12,6 @@ import factory
 
 from django.conf import settings
 from django.core.management import call_command
-from django.test.utils import override_settings
 
 from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
@@ -21,7 +20,7 @@ from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MONGO_MODULESTORE, TEST_DATA_SPLIT_MODULESTORE
 )
 from xmodule.modulestore.tests.factories import CourseFactory
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 
 DATA_DIR = settings.COMMON_TEST_DATA_ROOT
 XML_COURSE_DIRS = ['toy', 'simple', 'open_ended']
@@ -32,7 +31,7 @@ MAPPINGS = {
 }
 
 TEST_DATA_MIXED_XML_MODULESTORE = mixed_store_config(
-    DATA_DIR, MAPPINGS, include_xml=True, xml_course_dirs=XML_COURSE_DIRS
+    DATA_DIR, MAPPINGS, include_xml=True, xml_source_dirs=XML_COURSE_DIRS,
 )
 
 
@@ -67,8 +66,8 @@ class CommandsTestBase(ModuleStoreTestCase):
         courses = store.get_courses()
         # NOTE: if xml store owns these, it won't import them into mongo
         if self.test_course_key not in [c.id for c in courses]:
-            import_from_xml(
-                store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, XML_COURSE_DIRS, create_course_if_not_present=True
+            import_course_from_xml(
+                store, ModuleStoreEnum.UserID.mgmt_command, DATA_DIR, XML_COURSE_DIRS, create_if_not_present=True
             )
 
         return [course.id for course in store.get_courses()]

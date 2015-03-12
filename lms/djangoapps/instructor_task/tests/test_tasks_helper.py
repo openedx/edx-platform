@@ -18,7 +18,7 @@ from xmodule.partitions.partitions import Group, UserPartition
 
 from openedx.core.djangoapps.course_groups.models import CourseUserGroupPartitionGroup
 from openedx.core.djangoapps.course_groups.tests.helpers import CohortFactory
-import openedx.core.djangoapps.user_api.api.course_tag as course_tag_api
+import openedx.core.djangoapps.user_api.course_tag.api as course_tag_api
 from openedx.core.djangoapps.user_api.partition_schemes import RandomUserPartitionScheme
 from instructor_task.models import ReportStore
 from instructor_task.tasks_helper import cohort_students_and_upload, upload_grades_csv, upload_students_csv

@@ -432,6 +432,7 @@
 
         .fa-unlock-alt {
           display: inline-block;
+          pointer-events: none;
         }
       }
 
@@ -441,6 +442,7 @@
 
         .fa-lock {
           display: inline-block;
+          pointer-events: none;
         }
 
        .fa-unlock-alt {

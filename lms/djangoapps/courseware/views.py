@@ -23,8 +23,7 @@ from django.utils.timezone import UTC
 from django.views.decorators.http import require_GET, require_POST
 from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
-from certificates.api import certificate_downloadable_status, generate_user_certificates
-from certificates.models import CertificateGenerationConfiguration
+from certificates import api as certs_api
 from edxmako.shortcuts import render_to_response, render_to_string, marketing_link
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.cache import cache_control
@@ -34,8 +33,9 @@ from markupsafe import escape
 
 from courseware import grades
 from courseware.access import has_access, _adjust_start_date_for_beta_testers
-from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement
-from courseware.courses import sort_by_start_date
+from courseware.courses import get_courses, get_course, get_studio_url, get_course_with_access, sort_by_announcement,\
+    get_entrance_exam_content_info
+from courseware.courses import sort_by_start_date, get_entrance_exam_score
 from courseware.masquerade import setup_masquerade
 from courseware.model_data import FieldDataCache
 from .module_render import toc_for_course, get_module_for_descriptor, get_module
@@ -412,6 +412,19 @@ def _index_bulk_op(request, course_key, chapter, section, position):
             # Show empty courseware for a course with no units
             return render_to_response('courseware/courseware.html', context)
         elif chapter is None:
+            # Check first to see if we should instead redirect the user to an Entrance Exam
+            if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
+                exam_chapter, __ = get_entrance_exam_content_info(request, course)
+                if exam_chapter is not None:
+                    exam_section = None
+                    if exam_chapter.get_children():
+                        exam_section = exam_chapter.get_children()[0]
+                        if exam_section:
+                            return redirect('courseware_section',
+                                            course_id=unicode(course_key),
+                                            chapter=exam_chapter.url_name,
+                                            section=exam_section.url_name)
+
             # passing CONTENT_DEPTH avoids returning 404 for a course with an
             # empty first section and a second section with content
             return redirect_to_course_position(course_module, CONTENT_DEPTH)
@@ -441,6 +454,14 @@ def _index_bulk_op(request, course_key, chapter, section, position):
                 log.debug('staff masquerading as student: no chapter %s', chapter)
                 return redirect(reverse('courseware', args=[course.id.to_deprecated_string()]))
             raise Http404
+
+        if settings.FEATURES.get('ENTRANCE_EXAMS', False) and course.entrance_exam_enabled:
+            # Message should not appear outside the context of entrance exam subsection.
+            # if section is none then we don't need to show message on welcome back screen also.
+            if getattr(chapter_module, 'is_entrance_exam', False) and section is not None:
+                __, is_exam_passed = get_entrance_exam_content_info(request, course)
+                context['entrance_exam_current_score'] = get_entrance_exam_score(request, course)
+                context['entrance_exam_passed'] = is_exam_passed
 
         if section is not None:
             section_descriptor = chapter_descriptor.get_child_by(lambda m: m.location.name == section)
@@ -1013,7 +1034,7 @@ def _progress(request, course_key, student_id):
         raise Http404
 
     # checking certificate generation configuration
-    show_generate_cert_btn = CertificateGenerationConfiguration.current().enabled
+    show_generate_cert_btn = certs_api.cert_generation_enabled(course_key)
 
     context = {
         'course': course,
@@ -1023,12 +1044,12 @@ def _progress(request, course_key, student_id):
         'staff_access': staff_access,
         'student': student,
         'reverifications': fetch_reverify_banner_info(request, course_key),
-        'passed': is_course_passed(course, grade_summary) if show_generate_cert_btn else False,
+        'passed': is_course_passed(course, grade_summary),
         'show_generate_cert_btn': show_generate_cert_btn
     }
 
     if show_generate_cert_btn:
-        context.update(certificate_downloadable_status(student, course_key))
+        context.update(certs_api.certificate_downloadable_status(student, course_key))
 
     with grades.manual_transaction():
         response = render_to_response('courseware/progress.html', context)
@@ -1301,10 +1322,10 @@ def generate_user_cert(request, course_id):
     if not is_course_passed(course, None, student, request):
         return HttpResponseBadRequest(_("Your certificate will be available when you pass the course."))
 
-    certificate_status = certificate_downloadable_status(student, course.id)
+    certificate_status = certs_api.certificate_downloadable_status(student, course.id)
 
     if not certificate_status["is_downloadable"] and not certificate_status["is_generating"]:
-        generate_user_certificates(student, course.id, course=course)
+        certs_api.generate_user_certificates(student, course.id)
         _track_successful_certificate_generation(student.id, course.id)
         return HttpResponse(_("Creating certificate"))
 

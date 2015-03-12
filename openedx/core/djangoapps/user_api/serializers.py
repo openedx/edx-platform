@@ -29,3 +29,13 @@ class UserPreferenceSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = UserPreference
         depth = 1
+
+
+class RawUserPreferenceSerializer(serializers.ModelSerializer):
+    """Serializer that generates a raw representation of a user preference.
+    """
+    user = serializers.PrimaryKeyRelatedField()
+
+    class Meta:
+        model = UserPreference
+        depth = 1

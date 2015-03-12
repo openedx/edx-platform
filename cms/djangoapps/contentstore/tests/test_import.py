@@ -2,7 +2,7 @@
 # pylint: disable=no-member
 # pylint: disable=protected-access
 """
-Tests for import_from_xml using the mongo modulestore.
+Tests for import_course_from_xml using the mongo modulestore.
 """
 
 from django.test.client import Client
@@ -16,7 +16,7 @@ from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.django import modulestore
 from xmodule.contentstore.django import contentstore
 from xmodule.modulestore.tests.factories import check_exact_number_of_calls, check_number_of_calls
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.exceptions import NotFoundError
 from uuid import uuid4
 
@@ -39,7 +39,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         self.client = Client()
         self.client.login(username=self.user.username, password=password)
 
-    def load_test_import_course(self, target_course_id=None, create_course_if_not_present=True, module_store=None):
+    def load_test_import_course(self, target_id=None, create_if_not_present=True, module_store=None):
         '''
         Load the standard course used to test imports
         (for do_import_static=False behavior).
@@ -47,7 +47,7 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
         if module_store is None:
             module_store = modulestore()
-        import_from_xml(
+        import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
@@ -55,8 +55,8 @@ class ContentStoreImportTest(ModuleStoreTestCase):
             static_content_store=content_store,
             do_import_static=False,
             verbose=True,
-            target_course_id=target_course_id,
-            create_course_if_not_present=create_course_if_not_present,
+            target_id=target_id,
+            create_if_not_present=create_if_not_present,
         )
         course_id = module_store.make_course_key('edX', 'test_import_course', '2012_Fall')
         course = module_store.get_course(course_id)
@@ -69,12 +69,12 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         # edx/course can be imported into a namespace with an org/course
         # like edx/course_name
         module_store, __, course = self.load_test_import_course()
-        course_items = import_from_xml(
+        course_items = import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
             ['test_import_course_2'],
-            target_course_id=course.id,
+            target_id=course.id,
             verbose=True,
         )
         self.assertEqual(len(course_items), 1)
@@ -87,13 +87,13 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         with modulestore().default_store(ModuleStoreEnum.Type.split):
             module_store = modulestore()
             course_id = module_store.make_course_key(u'Юникода', u'unicode_course', u'échantillon')
-            import_from_xml(
+            import_course_from_xml(
                 module_store,
                 self.user.id,
                 TEST_DATA_DIR,
                 ['2014_Uni'],
-                target_course_id=course_id,
-                create_course_if_not_present=True
+                target_id=course_id,
+                create_if_not_present=True
             )
 
             course = module_store.get_course(course_id)
@@ -134,10 +134,10 @@ class ContentStoreImportTest(ModuleStoreTestCase):
         content_store = contentstore()
 
         module_store = modulestore()
-        import_from_xml(
+        import_course_from_xml(
             module_store, self.user.id, TEST_DATA_DIR, ['toy'],
             static_content_store=content_store, do_import_static=False,
-            create_course_if_not_present=True, verbose=True
+            create_if_not_present=True, verbose=True
         )
 
         course = module_store.get_course(module_store.make_course_key('edX', 'toy', '2012_Fall'))
@@ -149,9 +149,9 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def test_no_static_link_rewrites_on_import(self):
         module_store = modulestore()
-        courses = import_from_xml(
+        courses = import_course_from_xml(
             module_store, self.user.id, TEST_DATA_DIR, ['toy'], do_import_static=False, verbose=True,
-            create_course_if_not_present=True
+            create_if_not_present=True
         )
         course_key = courses[0].id
 
@@ -179,63 +179,63 @@ class ContentStoreImportTest(ModuleStoreTestCase):
                 # NOTE: On Jenkins, with memcache enabled, the number of calls here is only 1.
                 #       Locally, without memcache, the number of calls is actually 2 (once more during the publish step)
                 with check_number_of_calls(store, '_compute_metadata_inheritance_tree', 2):
-                    self.load_test_import_course(create_course_if_not_present=False, module_store=store)
+                    self.load_test_import_course(create_if_not_present=False, module_store=store)
 
     @ddt.data(ModuleStoreEnum.Type.mongo, ModuleStoreEnum.Type.split)
     def test_reimport(self, default_ms_type):
         with modulestore().default_store(default_ms_type):
-            __, __, course = self.load_test_import_course(create_course_if_not_present=True)
-            self.load_test_import_course(target_course_id=course.id)
+            __, __, course = self.load_test_import_course(create_if_not_present=True)
+            self.load_test_import_course(target_id=course.id)
 
     def test_rewrite_reference_list(self):
         # This test fails with split modulestore (the HTML component is not in "different_course_id" namespace).
         # More investigation needs to be done.
         module_store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)
-        target_course_id = module_store.make_course_key('testX', 'conditional_copy', 'copy_run')
-        import_from_xml(
+        target_id = module_store.make_course_key('testX', 'conditional_copy', 'copy_run')
+        import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
             ['conditional'],
-            target_course_id=target_course_id
+            target_id=target_id
         )
         conditional_module = module_store.get_item(
-            target_course_id.make_usage_key('conditional', 'condone')
+            target_id.make_usage_key('conditional', 'condone')
         )
         self.assertIsNotNone(conditional_module)
         different_course_id = module_store.make_course_key('edX', 'different_course', None)
         self.assertListEqual(
             [
-                target_course_id.make_usage_key('problem', 'choiceprob'),
+                target_id.make_usage_key('problem', 'choiceprob'),
                 different_course_id.make_usage_key('html', 'for_testing_import_rewrites')
             ],
             conditional_module.sources_list
         )
         self.assertListEqual(
             [
-                target_course_id.make_usage_key('html', 'congrats'),
-                target_course_id.make_usage_key('html', 'secret_page')
+                target_id.make_usage_key('html', 'congrats'),
+                target_id.make_usage_key('html', 'secret_page')
             ],
             conditional_module.show_tag_list
         )
 
     def test_rewrite_reference(self):
         module_store = modulestore()
-        target_course_id = module_store.make_course_key('testX', 'peergrading_copy', 'copy_run')
-        import_from_xml(
+        target_id = module_store.make_course_key('testX', 'peergrading_copy', 'copy_run')
+        import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
             ['open_ended'],
-            target_course_id=target_course_id,
-            create_course_if_not_present=True
+            target_id=target_id,
+            create_if_not_present=True
         )
         peergrading_module = module_store.get_item(
-            target_course_id.make_usage_key('peergrading', 'PeerGradingLinked')
+            target_id.make_usage_key('peergrading', 'PeerGradingLinked')
         )
         self.assertIsNotNone(peergrading_module)
         self.assertEqual(
-            target_course_id.make_usage_key('combinedopenended', 'SampleQuestion'),
+            target_id.make_usage_key('combinedopenended', 'SampleQuestion'),
             peergrading_module.link_to_location
         )
 
@@ -263,22 +263,22 @@ class ContentStoreImportTest(ModuleStoreTestCase):
 
     def _verify_split_test_import(self, target_course_name, source_course_name, split_test_name, groups_to_verticals):
         module_store = modulestore()
-        target_course_id = module_store.make_course_key('testX', target_course_name, 'copy_run')
-        import_from_xml(
+        target_id = module_store.make_course_key('testX', target_course_name, 'copy_run')
+        import_course_from_xml(
             module_store,
             self.user.id,
             TEST_DATA_DIR,
             [source_course_name],
-            target_course_id=target_course_id,
-            create_course_if_not_present=True
+            target_id=target_id,
+            create_if_not_present=True
         )
         split_test_module = module_store.get_item(
-            target_course_id.make_usage_key('split_test', split_test_name)
+            target_id.make_usage_key('split_test', split_test_name)
         )
         self.assertIsNotNone(split_test_module)
 
         remapped_verticals = {
-            key: target_course_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
+            key: target_id.make_usage_key('vertical', value) for key, value in groups_to_verticals.iteritems()
         }
 
         self.assertEqual(remapped_verticals, split_test_module.group_id_to_child)

@@ -19,7 +19,7 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from student.tests.factories import UserFactory, CourseEnrollmentFactory
 from student.models import CourseEnrollment
 
-import openedx.core.djangoapps.user_api.api.profile as profile_api
+from openedx.core.djangoapps.user_api.preferences.api import update_email_opt_in
 from openedx.core.djangoapps.user_api.models import UserOrgTag
 from openedx.core.djangoapps.user_api.management.commands import email_opt_in_list
 
@@ -297,7 +297,7 @@ class EmailOptInListTest(ModuleStoreTestCase):
             None
 
         """
-        profile_api.update_email_opt_in(user, org, is_opted_in)
+        update_email_opt_in(user, org, is_opted_in)
 
     def _latest_pref_set_datetime(self, user):
         """Retrieve the latest opt-in preference for the user,

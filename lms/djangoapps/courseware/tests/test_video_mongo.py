@@ -29,6 +29,9 @@ class TestVideoYouTube(TestVideo):
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'autoplay': settings.FEATURES.get('AUTOPLAY_VIDEOS', False),
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'display_name': u'A Name',
             'end': 3610.0,
@@ -93,6 +96,9 @@ class TestVideoNonYouTube(TestVideo):
         expected_context = {
             'ajax_url': self.item_descriptor.xmodule_runtime.ajax_url + '/save_user_state',
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -197,6 +203,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         expected_context = {
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -314,6 +323,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
 
         initial_context = {
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -454,6 +466,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # Video found for edx_video_id
         initial_context = {
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -572,6 +587,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
         # Video found for edx_video_id
         initial_context = {
             'branding_info': None,
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,
@@ -691,6 +709,9 @@ class TestGetHtmlMethod(BaseTestXmodule):
                 'logo_tag': 'Video hosted by XuetangX.com',
                 'url': 'http://www.xuetangx.com'
             },
+            'cdn_eval': False,
+            'cdn_eval_endpoint': getattr(settings, 'PERFORMANCE_GRAPHITE_URL', ''),
+            'cdn_exp_group': None,
             'data_dir': getattr(self, 'data_dir', None),
             'show_captions': 'true',
             'handout': None,

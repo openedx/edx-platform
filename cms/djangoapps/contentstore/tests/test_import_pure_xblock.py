@@ -7,7 +7,7 @@ from xblock.fields import String
 
 from xmodule.modulestore.django import modulestore
 from xmodule.modulestore import ModuleStoreEnum
-from xmodule.modulestore.xml_importer import import_from_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.mongo.draft import as_draft
 from django.conf import settings
@@ -65,8 +65,8 @@ class XBlockImportTest(ModuleStoreTestCase):
         # It is necessary to use the "old mongo" modulestore because split doesn't work
         # with the "has_draft" logic below.
         store = modulestore()._get_modulestore_by_type(ModuleStoreEnum.Type.mongo)  # pylint: disable=protected-access
-        courses = import_from_xml(
-            store, self.user.id, TEST_DATA_DIR, [course_dir], create_course_if_not_present=True
+        courses = import_course_from_xml(
+            store, self.user.id, TEST_DATA_DIR, [course_dir], create_if_not_present=True
         )
 
         xblock_location = courses[0].id.make_usage_key('stubxblock', 'xblock_test')

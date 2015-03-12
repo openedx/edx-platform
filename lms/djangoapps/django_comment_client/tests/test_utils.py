@@ -203,7 +203,7 @@ class CategoryMapTestCase(CategoryMapTestMixin, ModuleStoreTestCase):
             "Topic C": {"id": "Topic_C"}
         }
 
-        def check_cohorted_topics(expected_ids):
+        def check_cohorted_topics(expected_ids):  # pylint: disable=missing-docstring
             self.assert_category_map_equals(
                 {
                     "entries": {

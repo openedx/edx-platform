@@ -126,7 +126,7 @@ FEATURES = {
 
     # Enable support for content libraries. Note that content libraries are
     # only supported in courses using split mongo.
-    'ENABLE_CONTENT_LIBRARIES': False,
+    'ENABLE_CONTENT_LIBRARIES': True,
 
     # Milestones application flag
     'MILESTONES_APP': False,
@@ -214,6 +214,13 @@ LMS_BASE = None
 from lms.envs.common import (
     COURSE_KEY_PATTERN, COURSE_ID_PATTERN, USAGE_KEY_PATTERN, ASSET_KEY_PATTERN
 )
+
+
+######################### CSRF #########################################
+
+# Forwards-compatibility with Django 1.7
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
+
 
 #################### CAPA External Code Evaluation #############################
 XQUEUE_INTERFACE = {

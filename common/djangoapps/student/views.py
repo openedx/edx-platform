@@ -85,7 +85,6 @@ from external_auth.login_and_register import (
 from bulk_email.models import Optout, CourseAuthorization
 import shoppingcart
 from lang_pref import LANGUAGE_KEY
-from notification_prefs.views import enable_notifications
 
 import track.views
 
@@ -117,6 +116,14 @@ from embargo import api as embargo_api
 
 import analytics
 from eventtracking import tracker
+
+# Note that this lives in LMS, so this dependency should be refactored.
+from notification_prefs.views import enable_notifications
+
+# Note that this lives in openedx, so this dependency should be refactored.
+from openedx.core.djangoapps.user_api.preferences.api import (
+    update_email_opt_in, get_user_preference, set_user_preference
+)
 
 
 log = logging.getLogger("edx.student")
@@ -632,11 +639,8 @@ def dashboard(request):
         # Re-alphabetize language options
         language_options.sort()
 
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.models import UserPreference
-
-    # try to get the prefered language for the user
-    cur_pref_lang_code = UserPreference.get_preference(request.user, LANGUAGE_KEY)
+    # try to get the preferred language for the user
+    cur_pref_lang_code = get_user_preference(request.user, LANGUAGE_KEY)
     # try and get the current language of the user
     cur_lang_code = get_language()
     if cur_pref_lang_code and cur_pref_lang_code in settings.LANGUAGE_DICT:
@@ -800,13 +804,10 @@ def try_change_enrollment(request):
 def _update_email_opt_in(request, org):
     """Helper function used to hit the profile API if email opt-in is enabled."""
 
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.api import profile as profile_api
-
     email_opt_in = request.POST.get('email_opt_in')
     if email_opt_in is not None:
         email_opt_in_boolean = email_opt_in == 'true'
-        profile_api.update_email_opt_in(request.user, org, email_opt_in_boolean)
+        update_email_opt_in(request.user, org, email_opt_in_boolean)
 
 
 @require_POST
@@ -1391,10 +1392,7 @@ def _do_create_account(form):
         log.exception("UserProfile creation failed for user {id}.".format(id=user.id))
         raise
 
-    # TODO: remove circular dependency on openedx from common
-    from openedx.core.djangoapps.user_api.models import UserPreference
-
-    UserPreference.set_preference(user, LANGUAGE_KEY, get_language())
+    set_user_preference(user, LANGUAGE_KEY, get_language())
 
     return (user, profile, registration)
 

@@ -329,3 +329,5 @@ VIDEO_CDN_URL = ENV_TOKENS.get('VIDEO_CDN_URL', {})
 if FEATURES['ENABLE_COURSEWARE_INDEX']:
     # Use ElasticSearch for the search engine
     SEARCH_ENGINE = "search.elastic.ElasticSearchEngine"
+
+XBLOCK_SETTINGS = ENV_TOKENS.get('XBLOCK_SETTINGS', {})

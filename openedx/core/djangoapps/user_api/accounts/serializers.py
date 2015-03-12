@@ -10,8 +10,8 @@ class AccountUserSerializer(serializers.HyperlinkedModelSerializer):
     """
     class Meta:
         model = User
-        fields = ("username", "email", "date_joined")
-        read_only_fields = ("username", "email", "date_joined")
+        fields = ("username", "email", "date_joined", "is_active")
+        read_only_fields = ("username", "email", "date_joined", "is_active")
 
 
 class AccountLegacyProfileSerializer(serializers.HyperlinkedModelSerializer):

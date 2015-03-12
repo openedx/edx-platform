@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 
 import django.contrib.auth.views
 from microsite_configuration import microsite
+import oauth_exchange.views
 
 # Uncomment the next two lines to enable the admin:
 if settings.DEBUG or settings.FEATURES.get('ENABLE_DJANGO_ADMIN_SITE'):
@@ -60,10 +61,8 @@ urlpatterns = (
 
     url(r'^heartbeat$', include('heartbeat.urls')),
 
-    url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
-
     # Note: these are older versions of the User API that will eventually be
-    # subsumed by api/user.
+    # subsumed by api/user listed below.
     url(r'^user_api/', include('openedx.core.djangoapps.user_api.legacy_urls')),
 
     url(r'^notifier_api/', include('notifier_api.urls')),
@@ -87,6 +86,11 @@ urlpatterns = (
     # Course content API
     url(r'^api/course_structure/', include('course_structure_api.urls', namespace='course_structure_api')),
 )
+
+if settings.FEATURES["ENABLE_USER_REST_API"]:
+    urlpatterns += (
+        url(r'^api/user/', include('openedx.core.djangoapps.user_api.urls')),
+    )
 
 if settings.FEATURES["ENABLE_COMBINED_LOGIN_REGISTRATION"]:
     # Backwards compatibility with old URL structure, but serve the new views
@@ -585,6 +589,11 @@ if settings.FEATURES.get('AUTOMATIC_AUTH_FOR_TESTING'):
 if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
     urlpatterns += (
         url(r'', include('third_party_auth.urls')),
+        url(
+            r'^oauth2/exchange_access_token/(?P<backend>[^/]+)/$',
+            oauth_exchange.views.AccessTokenExchangeView.as_view(),
+            name="exchange_access_token"
+        ),
         url(r'^login_oauth_token/(?P<backend>[^/]+)/$', 'student.views.login_oauth_token'),
     )
 

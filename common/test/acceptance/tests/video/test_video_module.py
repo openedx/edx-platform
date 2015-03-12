@@ -14,6 +14,8 @@ from ...pages.lms.course_info import CourseInfoPage
 from ...fixtures.course import CourseFixture, XBlockFixtureDesc
 from ..helpers import skip_if_browser
 
+from flaky import flaky
+
 
 VIDEO_SOURCE_PORT = 8777
 
@@ -684,6 +686,7 @@ class YouTubeHtml5VideoTest(VideoBaseTest):
     def setUp(self):
         super(YouTubeHtml5VideoTest, self).setUp()
 
+    @flaky  # TODO fix this, see TNL-1642
     def test_youtube_video_rendering_with_unsupported_sources(self):
         """
         Scenario: Video component is rendered in the LMS in Youtube mode

@@ -161,6 +161,7 @@ class VideoTimesTest(VideoBaseTest):
 
         self.assertIn(self.video.position, ('0:35', '0:36'))
 
+    @flaky  # TODO fix this, see TNL-1619
     def test_video_finish_time_with_seek(self):
         """
         Scenario: Finish Time works for Youtube video.

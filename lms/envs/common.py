@@ -303,6 +303,9 @@ FEATURES = {
     # Set to True to change the course sorting behavior by their start dates, latest first.
     'ENABLE_COURSE_SORTING_BY_START_DATE': False,
 
+    # Flag to enable new user account APIs.
+    'ENABLE_USER_REST_API': False,
+
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
     'ENABLE_MOBILE_REST_API': False,
@@ -1000,7 +1003,13 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'track.middleware.TrackMiddleware',
+
+    # CORS and CSRF
+    'corsheaders.middleware.CorsMiddleware',
+    'cors_csrf.middleware.CorsCSRFMiddleware',
+    'cors_csrf.middleware.CsrfCrossDomainCookieMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+
     'splash.middleware.SplashMiddleware',
 
     # Allows us to dark-launch particular languages
@@ -1094,7 +1103,10 @@ rwd_header_footer_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/common_he
 staff_grading_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/staff_grading/**/*.js'))
 open_ended_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/open_ended/**/*.js'))
 notes_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/notes/**/*.js'))
-instructor_dash_js = sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js'))
+instructor_dash_js = (
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'coffee/src/instructor_dashboard/**/*.js')) +
+    sorted(rooted_glob(PROJECT_ROOT / 'static', 'js/instructor_dashboard/**/*.js'))
+)
 
 # JavaScript used by the student account and profile pages
 # These are not courseware, so they do not need many of the courseware-specific
@@ -1548,6 +1560,8 @@ INSTALLED_APPS = (
     'provider.oauth2',
     'oauth2_provider',
 
+    'oauth_exchange',
+
     # For the wiki
     'wiki',  # The new django-wiki from benjaoming
     'django_notify',
@@ -1634,7 +1648,17 @@ INSTALLED_APPS = (
 
     'openedx.core.djangoapps.content.course_structures',
     'course_structure_api',
+
+    # CORS and cross-domain CSRF
+    'corsheaders',
+    'cors_csrf'
 )
+
+######################### CSRF #########################################
+
+# Forwards-compatibility with Django 1.7
+CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
+
 
 ######################### MARKETING SITE ###############################
 EDXMKTG_COOKIE_NAME = 'edxloggedin'
@@ -1688,11 +1712,6 @@ if FEATURES.get('AUTH_USE_CAS'):
 ############# CORS headers for cross-domain requests #################
 
 if FEATURES.get('ENABLE_CORS_HEADERS'):
-    INSTALLED_APPS += ('corsheaders', 'cors_csrf')
-    MIDDLEWARE_CLASSES = (
-        'corsheaders.middleware.CorsMiddleware',
-        'cors_csrf.middleware.CorsCSRFMiddleware',
-    ) + MIDDLEWARE_CLASSES
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = ()
     CORS_ORIGIN_ALLOW_ALL = False

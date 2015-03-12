@@ -31,8 +31,8 @@ from xmodule.modulestore.draft import DraftModuleStore
 from opaque_keys.edx.locations import SlashSeparatedCourseKey, AssetLocation
 from opaque_keys.edx.locator import LibraryLocator, CourseLocator
 from opaque_keys.edx.keys import UsageKey
-from xmodule.modulestore.xml_exporter import export_to_xml
-from xmodule.modulestore.xml_importer import import_from_xml, perform_xlint
+from xmodule.modulestore.xml_exporter import export_course_to_xml
+from xmodule.modulestore.xml_importer import import_course_from_xml, perform_xlint
 from xmodule.contentstore.mongo import MongoContentStore
 
 from nose.tools import assert_in
@@ -127,7 +127,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
             xblock_mixins=(EditInfoMixin,)
 
         )
-        import_from_xml(
+        import_course_from_xml(
             draft_store,
             999,
             DATA_DIR,
@@ -136,7 +136,7 @@ class TestMongoModuleStoreBase(unittest.TestCase):
         )
 
         # also test a course with no importing of static content
-        import_from_xml(
+        import_course_from_xml(
             draft_store,
             999,
             DATA_DIR,
@@ -514,7 +514,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
+            export_course_to_xml(self.draft_store, self.content_store, course_key, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_true(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
@@ -530,7 +530,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+            export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
             assert_true(path(root_dir / 'test_export/static/just_a_test.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
         finally:
@@ -544,7 +544,7 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
         course = self.draft_store.get_course(SlashSeparatedCourseKey('edX', 'simple_with_draft', '2012_Fall'))
         root_dir = path(mkdtemp())
         try:
-            export_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
+            export_course_to_xml(self.draft_store, self.content_store, course.id, root_dir, 'test_export')
             assert_false(path(root_dir / 'test_export/static/images/course_image.jpg').isfile())
             assert_false(path(root_dir / 'test_export/static/images_course_image.jpg').isfile())
         finally:
@@ -670,9 +670,12 @@ class TestMongoModuleStore(TestMongoModuleStoreBase):
 
         root_dir = path(mkdtemp())
 
-        # export_to_xml should work.
+        # export_course_to_xml should work.
         try:
-            export_to_xml(self.draft_store, self.content_store, interface_location.course_key, root_dir, 'test_export')
+            export_course_to_xml(
+                self.draft_store, self.content_store, interface_location.course_key,
+                root_dir, 'test_export'
+            )
         finally:
             shutil.rmtree(root_dir)
 

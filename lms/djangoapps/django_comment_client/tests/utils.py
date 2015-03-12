@@ -2,7 +2,6 @@
 Utilities for tests within the django_comment_client module.
 """
 from datetime import datetime
-from django.test.utils import override_settings
 from mock import patch
 from pytz import UTC
 
@@ -25,10 +24,6 @@ class CohortedTestCase(ModuleStoreTestCase):
         super(CohortedTestCase, self).setUp()
 
         self.course = CourseFactory.create(
-            discussion_topics={
-                "cohorted topic": {"id": "cohorted_topic"},
-                "non-cohorted topic": {"id": "non_cohorted_topic"},
-            },
             cohort_config={
                 "cohorted": True,
                 "cohorted_discussions": ["cohorted_topic"]
@@ -42,6 +37,9 @@ class CohortedTestCase(ModuleStoreTestCase):
             name="moderator_cohort",
             course_id=self.course.id
         )
+        self.course.discussion_topics["cohorted topic"] = {"id": "cohorted_topic"}
+        self.course.discussion_topics["non-cohorted topic"] = {"id": "non_cohorted_topic"}
+        self.store.update_item(self.course, self.user.id)
 
         seed_permissions_roles(self.course.id)
         self.student = UserFactory.create()

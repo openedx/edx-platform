@@ -7,7 +7,7 @@ from .base_studio_test import StudioLibraryTest
 from ...fixtures.course import XBlockFixtureDesc
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.utils import add_component
-from ...pages.studio.library import LibraryPage
+from ...pages.studio.library import LibraryEditPage
 from ...pages.studio.users import LibraryUsersPage
 
 
@@ -21,7 +21,7 @@ class LibraryEditPageTest(StudioLibraryTest):
         Ensure a library exists and navigate to the library edit page.
         """
         super(LibraryEditPageTest, self).setUp()
-        self.lib_page = LibraryPage(self.browser, self.library_key)
+        self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
 
@@ -193,7 +193,7 @@ class LibraryNavigationTest(StudioLibraryTest):
         Ensure a library exists and navigate to the library edit page.
         """
         super(LibraryNavigationTest, self).setUp()
-        self.lib_page = LibraryPage(self.browser, self.library_key)
+        self.lib_page = LibraryEditPage(self.browser, self.library_key)
         self.lib_page.visit()
         self.lib_page.wait_until_ready()
 

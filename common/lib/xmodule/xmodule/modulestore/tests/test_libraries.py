@@ -4,8 +4,10 @@ Basic unit tests related to content libraries.
 
 Higher-level tests are in `cms/djangoapps/contentstore`.
 """
-from bson.objectid import ObjectId
+
 import ddt
+
+from bson.objectid import ObjectId
 from opaque_keys.edx.locator import LibraryLocator
 
 from xmodule.modulestore.exceptions import DuplicateCourseError

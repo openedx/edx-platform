@@ -1,8 +1,14 @@
 define([
     'js/views/import', 'jquery', 'gettext', 'jquery.fileupload', 'jquery.cookie'
-], function(CourseImport, $, gettext) {
+], function(Import, $, gettext) {
     'use strict';
-    return function (feedbackUrl) {
+    return function (feedbackUrl, library) {
+        var dbError;
+        if (library) {
+            dbError = gettext('There was an error while importing the new library to our database.');
+        } else {
+            dbError = gettext('There was an error while importing the new course to our database.');
+        }
         var bar = $('.progress-bar'),
             fill = $('.progress-fill'),
             submitBtn = $('.submit-button'),
@@ -11,14 +17,14 @@ define([
                 gettext('There was an error during the upload process.') + '\n',
                 gettext('There was an error while unpacking the file.') + '\n',
                 gettext('There was an error while verifying the file you submitted.') + '\n',
-                gettext('There was an error while importing the new course to our database.') + '\n'
+                dbError + '\n'
             ],
             // Display the status of last file upload on page load
             lastFileUpload = $.cookie('lastfileupload'),
             file;
 
         if (lastFileUpload){
-            CourseImport.getAndStartUploadFeedback(feedbackUrl.replace('fillerName', lastFileUpload), lastFileUpload);
+            Import.getAndStartUploadFeedback(feedbackUrl.replace('fillerName', lastFileUpload), lastFileUpload);
         }
 
         $('#fileupload').fileupload({
@@ -27,8 +33,8 @@ define([
             maxChunkSize: 20 * 1000000, // 20 MB
             autoUpload: false,
             add: function(e, data) {
-                CourseImport.clearImportDisplay();
-                CourseImport.okayToNavigateAway = false;
+                Import.clearImportDisplay();
+                Import.okayToNavigateAway = false;
                 submitBtn.unbind('click');
                 file = data.files[0];
                 if (file.name.match(/tar\.gz$/)) {
@@ -36,7 +42,7 @@ define([
                         event.preventDefault();
                         $.cookie('lastfileupload', file.name);
                         submitBtn.hide();
-                        CourseImport.startUploadFeedback();
+                        Import.startUploadFeedback();
                         data.submit().complete(function(result, textStatus, xhr) {
                             window.onbeforeunload = null;
                             if (xhr.status != 200) {
@@ -49,7 +55,7 @@ define([
                                 errMsg = serverMsg.hasOwnProperty('ErrMsg') ?  serverMsg.ErrMsg : '' ;
                                 if (serverMsg.hasOwnProperty('Stage')) {
                                     stage = Math.abs(serverMsg.Stage);
-                                    CourseImport.stageError(stage, defaults[stage] + errMsg);
+                                    Import.stageError(stage, defaults[stage] + errMsg);
                                 }
                                 else {
                                     alert(gettext('Your import has failed.') + '\n\n' + errMsg);
@@ -57,7 +63,7 @@ define([
                                 chooseBtn.html(gettext('Choose new file')).show();
                                 bar.hide();
                             }
-                            CourseImport.stopGetStatus = true;
+                            Import.stopGetStatus = true;
                             chooseBtn.html(gettext('Choose new file')).show();
                             bar.hide();
                         });
@@ -83,7 +89,7 @@ define([
                     bar.hide();
                     // Start feedback with delay so that current stage of import properly updates in session
                     setTimeout(
-                        function () { CourseImport.startServerFeedback(feedbackUrl.replace('fillerName', file.name));},
+                        function () { Import.startServerFeedback(feedbackUrl.replace('fillerName', file.name));},
                         3000
                     );
                 } else {
@@ -94,11 +100,11 @@ define([
             done: function(event, data){
                 bar.hide();
                 window.onbeforeunload = null;
-                CourseImport.displayFinishedImport();
+                Import.displayFinishedImport();
             },
             start: function(event) {
                 window.onbeforeunload = function() {
-                    if (!CourseImport.okayToNavigateAway) {
+                    if (!Import.okayToNavigateAway) {
                         return "${_('Your import is in progress; navigating away will abort it.')}";
                     }
                 };

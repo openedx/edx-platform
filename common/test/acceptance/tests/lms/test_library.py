@@ -9,7 +9,7 @@ from nose.plugins.attrib import attr
 from ..helpers import UniqueCourseTest
 from ...pages.studio.auto_auth import AutoAuthPage
 from ...pages.studio.overview import CourseOutlinePage
-from ...pages.studio.library import StudioLibraryContentXBlockEditModal, StudioLibraryContainerXBlockWrapper
+from ...pages.studio.library import StudioLibraryContentEditor, StudioLibraryContainerXBlockWrapper
 from ...pages.lms.courseware import CoursewarePage
 from ...pages.lms.library import LibraryContentXBlockWrapper
 from ...pages.common.logout import LogoutPage
@@ -65,7 +65,7 @@ class LibraryContentTestBase(UniqueCourseTest):
         )
 
         library_content_metadata = {
-            'source_libraries': [self.library_key],
+            'source_library_id': unicode(self.library_key),
             'mode': 'random',
             'max_count': 1,
             'has_score': False
@@ -90,12 +90,13 @@ class LibraryContentTestBase(UniqueCourseTest):
         Performs library block refresh in Studio, configuring it to show {count} children
         """
         unit_page = self._go_to_unit_page(True)
-        library_container_block = StudioLibraryContainerXBlockWrapper.from_xblock_wrapper(unit_page.xblocks[0])
-        modal = StudioLibraryContentXBlockEditModal(library_container_block.edit())
-        modal.count = count
+        library_container_block = StudioLibraryContainerXBlockWrapper.from_xblock_wrapper(unit_page.xblocks[1])
+        library_container_block.edit()
+        editor = StudioLibraryContentEditor(self.browser, library_container_block.locator)
+        editor.count = count
         if capa_type is not None:
-            modal.capa_type = capa_type
-        library_container_block.save_settings()
+            editor.capa_type = capa_type
+        editor.save()
         self._go_to_unit_page(change_login=False)
         unit_page.wait_for_page()
         unit_page.publish_action.click()

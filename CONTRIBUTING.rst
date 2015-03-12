@@ -199,5 +199,4 @@ Expectations You Have of Us
 3. Once we have determined through visual review that your code is not
    malicious, we will run a Jenkins build on your branch.
 
-.. _individual contributor agreement: http://code.edx.org/individual-contributor-agreement.pdf
-
+.. _individual contributor agreement: http://open.edx.org/sites/default/files/wysiwyg/individual-contributor-agreement.pdf

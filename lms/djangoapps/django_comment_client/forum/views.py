@@ -86,13 +86,10 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
         'group_id': get_group_id_for_comments_service(request, course.id, discussion_id),  # may raise ValueError
     }
 
+    # If provided with a discussion id, filter by discussion id in the
+    # comments_service.
     if discussion_id is not None:
         default_query_params['commentable_id'] = discussion_id
-    else:
-        default_query_params['commentable_ids'] = ','.join(
-            course.top_level_discussion_topic_ids +
-            utils.get_discussion_id_map(course, request.user).keys()
-        )
 
     if not request.GET.get('sort_key'):
         # If the user did not select a sort key, use their last used sort key
@@ -130,6 +127,15 @@ def get_threads(request, course, discussion_id=None, per_page=THREADS_PER_PAGE):
     )
 
     threads, page, num_pages, corrected_text = cc.Thread.search(query_params)
+
+    # If not provided with a discussion id, filter threads by commentable ids
+    # which are accessible to the current user.
+    if discussion_id is None:
+        discussion_category_ids = set(utils.get_discussion_categories_ids(course, request.user))
+        threads = [
+            thread for thread in threads
+            if thread.get('commentable_id') in discussion_category_ids
+        ]
 
     for thread in threads:
         # patch for backward compatibility to comments service
@@ -274,10 +280,7 @@ def single_thread(request, course_key, discussion_id, thread_id):
     is_moderator = cached_has_permission(request.user, "see_all_cohorts", course_key)
 
     # Verify that the student has access to this thread if belongs to a discussion module
-    accessible_discussion_ids = [
-        module.discussion_id for module in utils.get_accessible_discussion_modules(course, request.user)
-    ]
-    if discussion_id not in set(course.top_level_discussion_topic_ids + accessible_discussion_ids):
+    if discussion_id not in utils.get_discussion_categories_ids(course, request.user):
         raise Http404
 
     # Currently, the front end always loads responses via AJAX, even for this

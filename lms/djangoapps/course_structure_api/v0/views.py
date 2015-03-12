@@ -14,7 +14,7 @@ from opaque_keys.edx.keys import CourseKey
 from course_structure_api.v0 import serializers
 from courseware import courses
 from courseware.access import has_access
-from openedx.core.djangoapps.content.course_structures import models
+from openedx.core.djangoapps.content.course_structures import models, tasks
 from openedx.core.lib.api.permissions import IsAuthenticatedOrDebug
 from openedx.core.lib.api.serializers import PaginationSerializer
 from student.roles import CourseInstructorRole, CourseStaffRole
@@ -191,7 +191,7 @@ class CourseStructure(CourseViewMixin, RetrieveAPIView):
             return super(CourseStructure, self).retrieve(request, *args, **kwargs)
         except models.CourseStructure.DoesNotExist:
             # If we don't have data stored, generate it and return a 503.
-            models.update_course_structure.delay(unicode(self.course.id))
+            tasks.update_course_structure.delay(unicode(self.course.id))
             return Response(status=503, headers={'Retry-After': '120'})
 
     def get_object(self, queryset=None):

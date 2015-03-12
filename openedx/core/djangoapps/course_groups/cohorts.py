@@ -6,6 +6,7 @@ forums, and to the cohort admin views.
 import logging
 import random
 
+from django.db import transaction
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.http import Http404
@@ -197,6 +198,7 @@ def get_cohorted_commentables(course_key):
     return ans
 
 
+@transaction.commit_on_success
 def get_cohort(user, course_key, assign=True):
     """
     Given a Django user and a CourseKey, return the user's cohort in that

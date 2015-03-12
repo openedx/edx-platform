@@ -17,6 +17,7 @@ from xmodule.modulestore.django import modulestore
 from django_comment_common.models import Role, FORUM_ROLE_STUDENT
 from django_comment_client.permissions import check_permissions_by_view, cached_has_permission
 from edxmako import lookup_template
+
 from courseware.access import has_access
 from openedx.core.djangoapps.course_groups.cohorts import get_cohort_by_id, get_cohort_id, is_commentable_cohorted, \
     is_course_cohorted
@@ -62,8 +63,8 @@ def has_forum_access(uname, course_id, rolename):
 # pylint: disable=invalid-name
 def get_accessible_discussion_modules(course, user):
     """
-    Get all discussion modules within a course which are accessible to
-    the user.
+    Return a list of all valid discussion modules in this course that
+    are accessible to the given user.
     """
     all_modules = modulestore().get_items(course.id, qualifiers={'category': 'discussion'})
 
@@ -82,9 +83,10 @@ def get_accessible_discussion_modules(course, user):
 
 def get_discussion_id_map(course, user):
     """
-    Get metadata about discussion modules visible to the user in a course.
+    Transform the list of this course's discussion modules (visible to a given user) into a dictionary of metadata keyed
+    by discussion_id.
     """
-    def get_entry(module):
+    def get_entry(module):  # pylint: disable=missing-docstring
         discussion_id = module.discussion_id
         title = module.discussion_target
         last_category = module.discussion_category.split("/")[-1].strip()
@@ -145,8 +147,8 @@ def _sort_map_entries(category_map, sort_alpha):
 
 def get_discussion_category_map(course, user):
     """
-    Get a mapping of categories and subcategories that are visible to
-    the user within a course.
+    Transform the list of this course's discussion modules into a recursive dictionary structure.  This is used
+    to render the discussion category map in the discussion tab sidebar for a given user.
     """
     unexpanded_category_map = defaultdict(list)
 
@@ -225,19 +227,13 @@ def get_discussion_category_map(course, user):
 
 def get_discussion_categories_ids(course, user):
     """
-    Returns a list of available ids of categories for the course.
+    Returns a list of available ids of categories for the course that
+    are accessible to the given user.
     """
-    ids = []
-    queue = [get_discussion_category_map(course, user)]
-    while queue:
-        category_map = queue.pop()
-        for child in category_map["children"]:
-            if child in category_map["entries"]:
-                ids.append(category_map["entries"][child]["id"])
-            else:
-                queue.append(category_map["subcategories"][child])
-
-    return ids
+    accessible_discussion_ids = [
+        module.discussion_id for module in get_accessible_discussion_modules(course, user)
+    ]
+    return course.top_level_discussion_topic_ids + accessible_discussion_ids
 
 
 class JsonResponse(HttpResponse):

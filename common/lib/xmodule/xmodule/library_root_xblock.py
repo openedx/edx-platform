@@ -29,7 +29,8 @@ class LibraryRoot(XBlock):
     advanced_modules = List(
         display_name=_("Advanced Module List"),
         help=_("Enter the names of the advanced components to use in your library."),
-        scope=Scope.settings
+        scope=Scope.settings,
+        xml_node=True,
     )
     has_children = True
     has_author_view = True
@@ -105,12 +106,3 @@ class LibraryRoot(XBlock):
         Always returns the raw 'library' field from the key.
         """
         return self.scope_ids.usage_id.course_key.library
-
-    @classmethod
-    def parse_xml(cls, xml_data, system, id_generator, **kwargs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
-
-    def add_xml_to_node(self, resource_fs):
-        """ XML support not yet implemented. """
-        raise NotImplementedError
