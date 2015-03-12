@@ -38,8 +38,8 @@ class AccountView(APIView):
 
                 * name: full name of the user (must be at least two characters)
 
-                * email: email for the user (the new email address must be confirmed via a confirmation email, so GET will
-                    not reflect the change until the address has been confirmed)
+                * email: email for the user (the new email address must be confirmed via a confirmation email, so GET
+                    will not reflect the change until the address has been confirmed)
 
                 * date_joined: date this account was created (not editable), in the string format provided by
                     datetime (for example, "2014-08-26T17:52:11Z")
@@ -67,6 +67,12 @@ class AccountView(APIView):
                 * mailing_address: null or textual representation of mailing address
 
                 * goals: null or textual representation of goals
+
+                * bio: null or textural representation of user biographical information ("about me")
+
+            For all text fields, clients rendering the values should take care to HTML escape them to avoid
+            script injections, as the data is stored exactly as specified. The intention is that plain text is
+            supported, not HTML.
 
             If a user without "is_staff" access has requested account information for a different user,
             only a subset of these fields will be returned. The actual fields returned depend on the configuration

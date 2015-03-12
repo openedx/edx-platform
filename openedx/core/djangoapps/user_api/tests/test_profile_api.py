@@ -48,6 +48,7 @@ class ProfileApiTest(ModuleStoreTestCase):
             'mailing_address': None,
             'year_of_birth': None,
             'country': None,
+            'bio': None
         })
 
     def test_update_and_retrieve_preference_info(self):
