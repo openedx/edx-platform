@@ -1513,7 +1513,6 @@ class RegistrationViewTest(ApiTestCase):
         form_desc = json.loads(response.content)
         self.assertIn(expected_field, form_desc["fields"])
 
-
 @ddt.ddt
 class UpdateEmailOptInTestCase(ApiTestCase, ModuleStoreTestCase):
     """Tests the UpdateEmailOptInPreference view. """

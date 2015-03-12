@@ -316,7 +316,7 @@ FEATURES = {
     'ENABLE_COURSE_SORTING_BY_START_DATE': False,
 
     # Flag to enable new user account APIs.
-    'ENABLE_USER_REST_API': False,
+    'ENABLE_USER_REST_API': True,
 
     # Expose Mobile REST API. Note that if you use this, you must also set
     # ENABLE_OAUTH2_PROVIDER to True
@@ -2117,3 +2117,19 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
 ECOMMERCE_API_URL = None
 ECOMMERCE_API_SIGNING_KEY = None
 ECOMMERCE_API_TIMEOUT = 5
+
+# PROFILE IMAGE CONFIG
+# TODO: add these settings to aws.py as well
+PROFILE_IMAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
+# PROFILE_IMAGE_DOMAIN points to the domain from which we serve image
+# files from.  When this is '/', it refers to the same domain as the
+# app server.  If serving from a different domain, specify that here
+# i.e. 'http://www.example-image-server.com/'
+PROFILE_IMAGE_DOMAIN = '/'
+PROFILE_IMAGE_URL_PATH = 'media/profile_images/'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'default_profile_image'  # TODO: determine final name
+# This secret key is used in generating unguessable URLs to users'
+# profile images.  Once it has been set, changing it will make the
+# platform unaware of current image URLs, resulting in reverting all
+# users' profile images to the default placeholder image.
+PROFILE_IMAGE_SECRET_KEY = 'placeholder secret key'
