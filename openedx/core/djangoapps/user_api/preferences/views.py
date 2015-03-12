@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.authentication import OAuth2Authentication, SessionAuthentication
 from rest_framework import permissions
 
+from django.utils.translation import ugettext as _
+
 from openedx.core.lib.api.parsers import MergePatchParser
 from ..errors import UserNotFound, UserNotAuthorized, PreferenceValidationError
 from .api import (
@@ -81,10 +83,11 @@ class PreferencesView(APIView):
         except (UserNotFound, UserNotAuthorized):
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PreferenceValidationError as error:
+            user_message = _('Invalid patch request')
             return Response(
                 {
-                    "developer_message": error.developer_message,
-                    "user_message": error.user_message
+                    "developer_message": user_message,
+                    "user_message": user_message
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

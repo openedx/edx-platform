@@ -5,17 +5,13 @@ import datetime
 import logging
 import analytics
 from eventtracking import tracker
-
-from django.contrib.auth.models import User
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import transaction
-from django.utils.translation import ugettext as _
-from django.conf import settings
-from django.db import IntegrityError
 from pytz import UTC
 
-from ..models import UserOrgTag
-from ..helpers import intercept_errors
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction, IntegrityError
+from django.utils.translation import ugettext as _
 
 from ..accounts.api import get_account_settings
 from ..errors import (
@@ -23,30 +19,10 @@ from ..errors import (
     PreferenceNotFound, PreferenceRequestError, PreferenceValidationError, PreferenceUpdateError
 )
 from ..helpers import intercept_errors
-from ..models import UserPreference
-from ..serializers import UserSerializer
+from ..models import UserOrgTag, UserPreference, PreferenceNotFound
+from ..serializers import UserSerializer, RawUserPreferenceSerializer
 
 log = logging.getLogger(__name__)
-
-
-def _get_user(requesting_user, username=None, allow_staff=False):
-    """
-    Helper method to return the user for a given username.
-    If username is not provided, requesting_user.username is assumed.
-    """
-    if username is None:
-        username = requesting_user.username
-
-    try:
-        existing_user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise UserNotFound()
-
-    if requesting_user.username != username:
-        if not requesting_user.is_staff or not allow_staff:
-            raise UserNotAuthorized()
-
-    return existing_user
 
 
 @intercept_errors(UserAPIInternalError, ignore_errors=[UserAPIRequestError])
@@ -127,13 +103,13 @@ def update_user_preferences(requesting_user, update, username=None):
     errors = {}
     for preference_key in update.keys():
         preference_value = update[preference_key]
-        try:
-            if preference_value is not None:
-                UserPreference.validate_preference(existing_user, preference_key, preference_value)
-        except ValidationError as error:
-            errors[preference_key] = {
-                "developer_message": error.message
-            }
+        if preference_value is not None:
+            try:
+                _validate_user_preference(existing_user, preference_key, preference_key)
+            except PreferenceValidationError as error:
+                errors[preference_key] = {
+                    "developer_message": error.errors
+                }
     if errors:
         raise PreferenceValidationError(errors)
     # Then perform the patch
@@ -176,6 +152,7 @@ def set_user_preference(requesting_user, preference_key, preference_value, usern
             preference_key=preference_key
         )
         raise PreferenceUpdateError(message, user_message=message)
+    _validate_user_preference(existing_user, preference_key, preference_key)
     UserPreference.set_preference(existing_user, preference_key, preference_value)
 
 
@@ -279,3 +256,43 @@ def _track_update_email_opt_in(user_id, organization, opt_in):
             }
         }
     )
+
+
+def _get_user(requesting_user, username=None, allow_staff=False):
+    """
+    Helper method to return the user for a given username.
+    If username is not provided, requesting_user.username is assumed.
+    """
+    if username is None:
+        username = requesting_user.username
+
+    try:
+        existing_user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise UserNotFound()
+
+    if requesting_user.username != username:
+        if not requesting_user.is_staff or not allow_staff:
+            raise UserNotAuthorized()
+
+    return existing_user
+
+
+def _validate_user_preference(user, preference_key, preference_value):
+    """Helper method to ensure that a user preference is valid.
+    """
+    try:
+        user_preference = UserPreference.objects.get(user=user, key=preference_key)
+    except ObjectDoesNotExist:
+        user_preference = None
+    new_data = {
+        "user": user.id,
+        "key": preference_key,
+        "value": preference_value,
+    }
+    if user_preference:
+        serializer = RawUserPreferenceSerializer(user_preference, data=new_data)
+    else:
+        serializer = RawUserPreferenceSerializer(data=new_data)
+    if not serializer.is_valid():
+        raise PreferenceValidationError(serializer.errors)

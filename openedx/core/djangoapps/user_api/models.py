@@ -33,8 +33,7 @@ class UserPreference(models.Model):
         Arguments:
             user (User): The user whose preference should be set.
             preference_key (string): The key for the user preference.
-            preference_value (string): The value to be stored.
-            save (boolean): If true then save the model (defaults to True).
+            preference_value (object): The value to be stored.
 
         Raises:
             ValidationError: the update was rejected because it was invalid
@@ -43,26 +42,6 @@ class UserPreference(models.Model):
         user_preference.value = preference_value
         user_preference.full_clean()
         user_preference.save()
-
-    @classmethod
-    def validate_preference(cls, user, preference_key, preference_value):
-        """Validates the combination of preference key and value.
-
-        Arguments:
-            user (User): The user whose preference should be validated.
-            preference_key (string): The key for the user preference.
-            preference_value (string): The value to be stored.
-
-        Raises:
-            ValidationError: returned if the key and/or value is invalid.
-        """
-        user_preference, _ = cls.objects.get_or_create(user=user, key=preference_key)
-        old_value = user_preference.value
-        user_preference.value = preference_value
-        try:
-            user_preference.full_clean()
-        finally:
-            user_preference.value = old_value
 
     @classmethod
     def get_preference(cls, user, preference_key, default=None):
