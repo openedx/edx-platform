@@ -296,6 +296,19 @@ def queue_subtasks_for_query(entry, action_name, create_subtask_fcn, item_querys
     task_id = entry.task_id
     total_num_items = item_queryset.count()
 
+    if total_num_items == 0:
+        TASK_LOG.info("Task %s: 0 items to process, no subtasks to queue", task_id)
+        return {
+            'action_name': action_name,
+            'attempted': 0,
+            'failed': 0,
+            'skipped': 0,
+            'succeeded': 0,
+            'total': total_num_items,
+            'duration_ms': 0,
+            'start_time': time(),
+        }
+
     # Calculate the number of tasks that will be created, and create a list of ids for each task.
     total_num_subtasks = _get_number_of_subtasks(total_num_items, items_per_task)
     subtask_id_list = [str(uuid4()) for _ in range(total_num_subtasks)]
