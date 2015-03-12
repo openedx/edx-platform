@@ -164,7 +164,7 @@
     $("#video_${id}").bind("html5:canplaythrough", null, function() {
       if (!beaconSent) {
         timeElapsed = Date.now() - cdnStartTime;
-        sendMetricToGraphite("loadtime_${cdn_exp_group}", timeElapsed);
+        sendMetricToGraphite("videocdnexp.${id}.${cdn_exp_group}.loadtime", timeElapsed);
       }
       beaconSent = true;
     });
