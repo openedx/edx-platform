@@ -55,17 +55,15 @@
           % endif
       </div>
 
-          % if self.stanford_theme_enabled():
-            <a href="http://online.stanford.edu" class="media" >
-              <div class="hero"></div>
-            </a>
-          % elif show_homepage_promo_videos:
+        % if self.homepage_promo_video_file:
+            <%include file="${self.homepage_promo_video_file}" />
+        % elif show_homepage_promo_video:
             <a href="#video-modal" class="media" rel="leanModal">
               <div class="hero">
                 <div class="play-intro"></div>
               </div>
             </a>
-          % endif
+        % endif
 
     </div>
   </header>
