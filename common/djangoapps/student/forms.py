@@ -20,6 +20,8 @@ from util.password_policy_validators import (
     validate_password_dictionary,
 )
 
+from .models import UserProfile
+
 
 class PasswordResetFormNoActive(PasswordResetForm):
     def clean_email(self):
@@ -234,3 +236,41 @@ class AccountCreationForm(forms.Form):
             for key, value in self.cleaned_data.items()
             if key in self.extended_profile_fields and value is not None
         }
+
+
+class EditUserInformationForm(forms.ModelForm):
+
+    class Meta:
+        model = UserProfile
+        fields = ('city', 'country', 'level_of_education', 'gender', 'year_of_birth', 'mailing_address', 'goals',)
+
+    def clean_city(self):
+        return self.clean_field('city')
+
+    def clean_country(self):
+        return self.clean_field('country')
+
+    def clean_level_of_education(self):
+        return self.clean_field('level_of_education')
+
+    def clean_gender(self):
+        return self.clean_field('gender')
+
+    def clean_year_of_birth(self):
+        return self.clean_field('year_of_birth')
+
+    def clean_mailing_address(self):
+        return self.clean_field('mailing_address')
+
+    def clean_goals(self):
+        return self.clean_field('goals')
+
+    def clean_field(self, field):
+        if field in self.data and settings.REGISTRATION_EXTRA_FIELDS[field] == 'hidden':
+            raise forms.ValidationError(_("This field is not editable"))
+        if field not in self.data:
+            # Data was not submitted
+            self.cleaned_data[field] = getattr(self.instance, field)
+        if settings.REGISTRATION_EXTRA_FIELDS[field] == 'required' and not self.cleaned_data[field]:
+            raise forms.ValidationError(_("This field is required"))
+        return self.cleaned_data[field]

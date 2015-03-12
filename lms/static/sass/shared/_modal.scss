@@ -225,6 +225,12 @@
         }
       }
 
+      .field-large {
+        select {
+          width: 100%;
+        }
+      }
+
       .citizenship, .gender {
         margin-right: flex-gutter();
       }

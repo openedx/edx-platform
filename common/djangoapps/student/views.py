@@ -3,7 +3,6 @@ Student Views
 """
 import datetime
 import logging
-import re
 import uuid
 import time
 import json
@@ -46,7 +45,6 @@ from social.apps.django_app import utils as social_utils
 from social.backends import oauth as social_oauth
 
 from edxmako.shortcuts import render_to_response, render_to_string
-from mako.exceptions import TopLevelLookupException
 
 from course_modes.models import CourseMode
 from shoppingcart.api import order_history
@@ -56,7 +54,7 @@ from student.models import (
     CourseEnrollmentAllowed, UserStanding, LoginFailures,
     create_comments_service_user, PasswordHistory, UserSignupSource,
     DashboardConfiguration, LinkedInAddToProfileConfiguration)
-from student.forms import AccountCreationForm, PasswordResetFormNoActive
+from student.forms import AccountCreationForm, PasswordResetFormNoActive, EditUserInformationForm
 
 from verify_student.models import SoftwareSecurePhotoVerification, MidcourseReverificationWindow
 from certificates.models import CertificateStatuses, certificate_status_for_student
@@ -1761,6 +1759,21 @@ def activate_account(request, key):
             {'csrf': csrf(request)['csrf_token']}
         )
     return HttpResponse(_("Unknown error. Please e-mail us to let us know how it happened."))
+
+
+@require_POST
+@login_required
+def edit_user_information(request):
+    form = EditUserInformationForm(request.POST, instance=request.user.profile)
+    if form.is_valid():
+        form.save()
+    errors = {
+        field.label: field.errors for field in form if len(field.errors) > 0
+    }
+    return JsonResponse({
+        'success': (len(errors) == 0),
+        'errors': errors
+    })
 
 
 @csrf_exempt
