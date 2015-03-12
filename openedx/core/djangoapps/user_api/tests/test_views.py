@@ -840,7 +840,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Full name",
-                u"instructions": u"The name that will appear on your certificates",
+                u"placeholder": u"Jane Doe",
+                u"instructions": u"Needed for any certificates you may earn",
                 u"restrictions": {
                     "max_length": profile_api.FULL_NAME_MAX_LENGTH,
                 },
@@ -854,7 +855,8 @@ class RegistrationViewTest(ApiTestCase):
                 u"type": u"text",
                 u"required": True,
                 u"label": u"Public username",
-                u"instructions": u"The name that will identify you in your courses",
+                u"placeholder": u"JaneDoe",
+                u"instructions": u"The name that will identify you in your courses - {bold_start}(cannot be changed later){bold_end}",
                 u"restrictions": {
                     "min_length": account_api.USERNAME_MIN_LENGTH,
                     "max_length": account_api.USERNAME_MAX_LENGTH
@@ -920,6 +922,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Full name",
+                    u"placeholder": u"Jane Doe",
                     u"instructions": u"The name that will appear on your certificates",
                     u"restrictions": {
                         "max_length": profile_api.FULL_NAME_MAX_LENGTH,
@@ -936,7 +939,7 @@ class RegistrationViewTest(ApiTestCase):
                     u"type": u"text",
                     u"required": True,
                     u"label": u"Public username",
-                    u"placeholder": u"",
+                    u"placeholder": u"JaneDoe",
                     u"instructions": u"The name that will identify you in your courses",
                     u"restrictions": {
                         "min_length": account_api.USERNAME_MIN_LENGTH,

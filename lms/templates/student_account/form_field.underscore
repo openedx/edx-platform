@@ -50,7 +50,9 @@
             <%  });
             } %>
             value="<%- defaultValue %>"
+            <% if ( placeholder ) { %> placeholder="<%= placeholder %>"<% } %>
         />
+        <% if ( instructions ) { %> <span class="tip tip-input" id="<%= form %>-<%= name %>"><%= instructions %></span><% } %>
     <% } %>
 
     <% if ( type === 'checkbox' ) { %>
