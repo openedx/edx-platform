@@ -169,10 +169,6 @@ FEATURES = {
     #   for all Mongo-backed courses.
     'REQUIRE_COURSE_EMAIL_AUTH': True,
 
-    # Analytics experiments - shows instructor analytics tab in LMS instructor dashboard.
-    # Enabling this feature depends on installation of a separate analytics server.
-    'ENABLE_INSTRUCTOR_ANALYTICS': False,
-
     # enable analytics server.
     # WARNING: THIS SHOULD ALWAYS BE SET TO FALSE UNDER NORMAL
     # LMS OPERATION. See analytics.py for details about what
@@ -341,7 +337,7 @@ FEATURES = {
     # Display demographic data on the analytics tab in the instructor dashboard.
     'DISPLAY_ANALYTICS_DEMOGRAPHICS': True,
 
-    # Enable display of enrollment counts in instructor and legacy analytics dashboard
+    # Enable display of enrollment counts in instructor dash, analytics section
     'DISPLAY_ANALYTICS_ENROLLMENTS': True,
 
     # Show the mobile app links in the footer
