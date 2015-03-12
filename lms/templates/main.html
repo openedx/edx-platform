@@ -82,6 +82,7 @@
   self.course_about_sidebar_extra_file = None
   self.course_about_social_sharing_file = None
   self.course_index_overlay_file = None
+  self.course_info_extra_file = None
 
   if theme_enabled() and not is_microsite():
     header_extra_file = 'theme-head-extra.html'
@@ -97,6 +98,7 @@
     self.course_about_sidebar_extra_file = 'theme-course_about-sidebar_extra.html'
     self.course_about_social_sharing_file = 'theme-course_about-social_sharing.html'
     self.course_index_overlay_file = 'theme-course_index_overlay.html'
+    self.course_info_extra_file = 'theme-course_info_extra.html'
 
   else:
     header_extra_file = None
