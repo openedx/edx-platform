@@ -1707,9 +1707,6 @@ TIME_ZONE_DISPLAYED_FOR_DEADLINES = 'UTC'
 # Course Forums Download
 COURSE_FORUMS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
 
-# Student Forums Download
-STUDENT_FORUMS_DOWNLOAD_ROUTING_KEY = HIGH_MEM_QUEUE
-
 # Source:
 # http://loc.gov/standards/iso639-2/ISO-639-2_utf-8.txt according to http://en.wikipedia.org/wiki/ISO_639-1
 ALL_LANGUAGES = (

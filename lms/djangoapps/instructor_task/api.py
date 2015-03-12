@@ -21,7 +21,6 @@ from instructor_task.tasks import (
     calculate_grades_csv,
     calculate_students_features_csv,
     get_student_responses,
-    get_student_forums_usage,
     get_ora2_responses,
     get_course_forums_usage,
 )
@@ -265,7 +264,6 @@ def submit_course_forums_usage_task(request, course_key):
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)
 
 
-# pylint: disable=invalid-name
 def submit_calculate_students_features_csv(request, course_key, features):
     """
     Submits a task to generate a CSV containing student profile info.
@@ -276,18 +274,5 @@ def submit_calculate_students_features_csv(request, course_key, features):
     task_class = calculate_students_features_csv
     task_input = {'features': features}
     task_key = ""
-
-    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
-
-
-# pylint: disable=invalid-name
-def submit_student_forums_usage_task(request, course_key):
-    """
-    AlreadyRunningError is raised if a student forums usage report is already being generated.
-    """
-    task_type = 'student_forums'
-    task_class = get_student_forums_usage
-    task_input = {}
-    task_key = ''
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

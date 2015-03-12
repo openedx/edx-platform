@@ -33,7 +33,7 @@ class Command(BaseCommand):
         except InvalidKeyError:
             raise CommandError("The course ID given was invalid")
 
-        file_name = "{course_id}-course-forums.csv".format(course_id=args[0].replace("/", "-"))
+        file_name = "{course_id}-course-forums.csv".format(course_id=course_id.replace("/", "-"))
 
         if options['output_dir']:
             csv_file = open(os.path.join(options['output_dir'], file_name), 'wb')
