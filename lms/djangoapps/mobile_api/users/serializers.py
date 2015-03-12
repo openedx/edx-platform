@@ -6,6 +6,7 @@ from rest_framework.reverse import reverse
 
 from courseware.courses import course_image_url
 from student.models import CourseEnrollment, User
+from certificates.models import certificate_status_for_student, CertificateStatuses
 
 
 class CourseField(serializers.RelatedField):
@@ -49,6 +50,9 @@ class CourseField(serializers.RelatedField):
             "start": course.start,
             "end": course.end,
             "course_image": course_image_url(course),
+            "social_urls": {
+                "facebook": course.facebook_url,
+            },
             "latest_updates": {
                 "video": None
             },
@@ -56,6 +60,8 @@ class CourseField(serializers.RelatedField):
             "course_updates": course_updates_url,
             "course_handouts": course_handouts_url,
             "course_about": course_about_url,
+            # TODO Placeholder value until we get the correct API from the Drupal site to the actual course' URL
+            "course_url": "https://www.edx.org/course?search_query=" + course.display_name,
         }
 
 
@@ -64,10 +70,20 @@ class CourseEnrollmentSerializer(serializers.ModelSerializer):
     Serializes CourseEnrollment models
     """
     course = CourseField()
+    certificate = serializers.SerializerMethodField('get_certificate')
+
+    def get_certificate(self, model):
+        certificate_info = certificate_status_for_student(model.user, model.course_id)
+        if certificate_info['status'] == CertificateStatuses.downloadable:
+            return {
+                "url": certificate_info['download_url'],
+            }
+        else:
+            return {}
 
     class Meta:  # pylint: disable=missing-docstring
         model = CourseEnrollment
-        fields = ('created', 'mode', 'is_active', 'course')
+        fields = ('created', 'mode', 'is_active', 'course', 'certificate')
         lookup_field = 'username'
 
 

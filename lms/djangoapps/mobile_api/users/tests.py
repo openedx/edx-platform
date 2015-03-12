@@ -6,8 +6,9 @@ import datetime
 from django.utils import timezone
 
 from xmodule.modulestore.tests.factories import ItemFactory, CourseFactory
-from xmodule.modulestore.django import modulestore
 from student.models import CourseEnrollment
+from certificates.models import CertificateStatuses
+from certificates.tests.factories import GeneratedCertificateFactory
 
 from .. import errors
 from ..testutils import MobileAPITestCase, MobileAuthTestMixin, MobileAuthUserTestMixin, MobileEnrolledCourseAccessTestMixin
@@ -82,6 +83,52 @@ class TestUserEnrollmentApi(MobileAPITestCase, MobileAuthUserTestMixin, MobileEn
                 response.data[course_num]['course']['id'],  # pylint: disable=no-member
                 unicode(courses[num_courses - course_num - 1].id)
             )
+
+    def test_course_url(self):
+        self.login_and_enroll()
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertIsNotNone(course_data['course_url'])
+
+    def test_no_facebook_url(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertIsNone(course_data['social_urls']['facebook'])
+
+    def test_facebook_url(self):
+        self.login_and_enroll()
+
+        self.course.facebook_url = "http://facebook.com/test_group_page"
+        self.store.update_item(self.course, self.user.id)
+
+        response = self.api_response()
+        course_data = response.data[0]['course']
+        self.assertEquals(course_data['social_urls']['facebook'], self.course.facebook_url)
+
+    def test_no_certificate(self):
+        self.login_and_enroll()
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertDictEqual(certificate_data, {})
+
+    def test_certificate(self):
+        self.login_and_enroll()
+
+        certificate_url = "http://test_certificate_url"
+        GeneratedCertificateFactory.create(
+            user=self.user,
+            course_id=self.course.id,
+            status=CertificateStatuses.downloadable,
+            mode='verified',
+            download_url=certificate_url,
+        )
+
+        response = self.api_response()
+        certificate_data = response.data[0]['certificate']
+        self.assertEquals(certificate_data['url'], certificate_url)
 
 
 class CourseStatusAPITestCase(MobileAPITestCase):
@@ -256,7 +303,7 @@ class TestCourseEnrollmentSerializer(MobileAPITestCase):
 
         self.course.display_coursenumber = "overridden_number"
         self.course.display_organization = "overridden_org"
-        modulestore().update_item(self.course, self.user.id)
+        self.store.update_item(self.course, self.user.id)
 
         serialized = CourseEnrollmentSerializer(CourseEnrollment.enrollments_for_user(self.user)[0]).data  # pylint: disable=no-member
         self.assertEqual(serialized['course']['number'], self.course.display_coursenumber)
