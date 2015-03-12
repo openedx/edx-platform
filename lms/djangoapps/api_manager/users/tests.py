@@ -1390,6 +1390,15 @@ class UsersApiTests(ModuleStoreTestCase):
         self.assertEqual(response.data['current_grade'], 0.7)
         self.assertEqual(response.data['proforma_grade'], 0.9375)
 
+        test_uri = '{}/{}/courses/grades'.format(self.users_base_uri, user_id)
+
+        response = self.do_get(test_uri)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]['course_id'], unicode(course.id))
+        self.assertEqual(response.data[0]['current_grade'], 0.73)
+        self.assertEqual(response.data[0]['proforma_grade'], 0.9375)
+        self.assertEqual(response.data[0]['complete_status'], False)
+
     def is_user_profile_created_updated(self, response, data):
         """This function compare response with user profile data """
 
