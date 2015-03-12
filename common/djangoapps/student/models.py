@@ -256,6 +256,7 @@ class UserProfile(models.Model):
     goals = models.TextField(blank=True, null=True)
     allow_certificate = models.BooleanField(default=1)
     bio = models.TextField(blank=True, null=True)
+    has_profile_image = models.BooleanField(default=0)
 
     def get_meta(self):  # pylint: disable=missing-docstring
         js_str = self.meta

@@ -466,3 +466,10 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
+
+# Set dummy values for profile image settings.
+PROFILE_IMAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
+PROFILE_IMAGE_DOMAIN = 'http://example-storage.com/'
+PROFILE_IMAGE_URL_PATH = 'profile_images/'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
+PROFILE_IMAGE_SECRET_KEY = 'secret'
