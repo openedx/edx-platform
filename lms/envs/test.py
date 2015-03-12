@@ -473,3 +473,10 @@ FEATURES['CERTIFICATES_HTML_VIEW'] = True
 INSTALLED_APPS += ('ccx',)
 MIDDLEWARE_CLASSES += ('ccx.overrides.CcxMiddleware',)
 FEATURES['CUSTOM_COURSES_EDX'] = True
+
+# Set dummy values for profile image settings.
+PROFILE_IMAGE_BACKEND = 'django.core.files.storage.FileSystemStorage'
+PROFILE_IMAGE_DOMAIN = 'http://example-storage.com/'
+PROFILE_IMAGE_URL_PATH = 'profile_images/'
+PROFILE_IMAGE_DEFAULT_FILENAME = 'default'
+PROFILE_IMAGE_SECRET_KEY = 'secret'
