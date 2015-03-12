@@ -122,7 +122,17 @@ def check_verify_status_by_course(user, course_enrollment_pairs, all_course_mode
         # verification status.
         if verified_mode is not None and enrollment.mode in CourseMode.VERIFIED_MODES:
             deadline = verified_mode.verification_deadline
-            relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(deadline, verifications)
+            grace_verification = verifications.exclude(status__in=['error', 'denied'])
+            relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(
+                deadline,
+                grace_verification
+            )
+            if not relevant_verification:
+                deadline = verified_mode.expiration_datetime
+                relevant_verification = SoftwareSecurePhotoVerification.verification_for_datetime(
+                    deadline,
+                    verifications
+                )
 
             # By default, don't show any status related to verification
             status = None
