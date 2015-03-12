@@ -83,6 +83,10 @@
       % endif
 
     </section>
+
+    % if self.homepage_extra_content_file:
+        <%include file="${self.homepage_extra_content_file}" />
+    % endif
   </section>
 </section>
 
