@@ -145,7 +145,7 @@ def update_account_settings(requesting_user, update, username=None):
 
     # Check for fields that are not editable. Marking them read-only causes them to be ignored, but we wish to 400.
     read_only_fields = set(update.keys()).intersection(
-        AccountUserSerializer.Meta.read_only_fields + AccountLegacyProfileSerializer.Meta.read_only_fields
+        AccountUserSerializer.get_read_only_fields() + AccountLegacyProfileSerializer.get_read_only_fields()
     )
 
     # Build up all field errors, whether read-only, validation, or email errors.

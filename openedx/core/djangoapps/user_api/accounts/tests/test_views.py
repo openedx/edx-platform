@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-import unittest
 import ddt
+import hashlib
 import json
 from mock import patch
+import unittest
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from rest_framework.test import APITestCase, APIClient
 
 from student.tests.factories import UserFactory
@@ -85,11 +87,16 @@ class UserAPITestCase(APITestCase):
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
         legacy_profile.bio = "Tired mother of twins"
+        legacy_profile.has_profile_image = True
         legacy_profile.save()
 
 
 @ddt.ddt
 @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Account APIs are only supported in LMS')
+@patch('openedx.core.djangoapps.user_api.accounts.helpers._PROFILE_IMAGE_SIZES', [50, 10])
+@patch.dict(
+    'openedx.core.djangoapps.user_api.accounts.helpers.PROFILE_IMAGE_SIZES_MAP', {'full': 50, 'small': 10}, clear=True
+)
 class TestAccountAPI(UserAPITestCase):
     """
     Unit tests for the Account API.
@@ -99,6 +106,25 @@ class TestAccountAPI(UserAPITestCase):
 
         self.url = reverse("accounts_api", kwargs={'username': self.user.username})
 
+    def _verify_profile_image_data(self, data, has_profile_image):
+        """
+        Verify the profile image data in a GET response for self.user
+        corresponds to whether the user has or hasn't set a profile
+        image.
+        """
+        if has_profile_image:
+            filename = hashlib.md5('secret' + self.user.username).hexdigest()
+        else:
+            filename = 'default'
+        self.assertEqual(
+            data['profile_image'],
+            {
+                'has_image': has_profile_image,
+                'image_url_full': 'http://example-storage.com/profile_images/{}_50.jpg'.format(filename),
+                'image_url_small': 'http://example-storage.com/profile_images/{}_10.jpg'.format(filename)
+            }
+        )
+
     def _verify_full_shareable_account_response(self, response):
         """
         Verify that the shareable fields from the account are returned
@@ -107,7 +133,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual(6, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual("US", data["country"])
-        self.assertIsNone(data["profile_image"])
+        self._verify_profile_image_data(data, True)
         self.assertIsNone(data["time_zone"])
         self.assertIsNone(data["languages"])
         self.assertEqual("Tired mother of twins", data["bio"])
@@ -119,14 +145,14 @@ class TestAccountAPI(UserAPITestCase):
         data = response.data
         self.assertEqual(2, len(data))
         self.assertEqual(self.user.username, data["username"])
-        self.assertIsNone(data["profile_image"])
+        self._verify_profile_image_data(data, True)
 
     def _verify_full_account_response(self, response):
         """
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(12, len(data))
+        self.assertEqual(13, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
@@ -140,6 +166,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertTrue(data["is_active"])
         self.assertIsNotNone(data["date_joined"])
         self.assertEqual("Tired mother of twins", data["bio"])
+        self._verify_profile_image_data(data, True)
 
     def test_anonymous_access(self):
         """
@@ -241,7 +268,7 @@ class TestAccountAPI(UserAPITestCase):
         def verify_get_own_information():
             response = self.send_get(self.client)
             data = response.data
-            self.assertEqual(12, len(data))
+            self.assertEqual(13, len(data))
             self.assertEqual(self.user.username, data["username"])
             self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
             for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
@@ -254,6 +281,7 @@ class TestAccountAPI(UserAPITestCase):
             self.assertEqual(self.user.email, data["email"])
             self.assertIsNotNone(data["date_joined"])
             self.assertEqual(self.user.is_active, data["is_active"])
+            self._verify_profile_image_data(data, False)
 
         self.client.login(username=self.user.username, password=self.test_password)
         verify_get_own_information()
@@ -515,3 +543,22 @@ class TestAccountAPI(UserAPITestCase):
             error_response.data["developer_message"]
         )
         self.assertIsNone(error_response.data["user_message"])
+
+    @override_settings(PROFILE_IMAGE_DOMAIN='/')
+    def test_convert_relative_profile_url(self):
+        """
+        Test that when PROFILE_IMAGE_DOMAIN is set to '/', the API
+        generates the full URL to profile images based on the URL
+        of the request.
+        """
+        self.client.login(username=self.user.username, password=self.test_password)
+        response = self.send_get(self.client)
+        # pylint: disable=no-member
+        self.assertEqual(
+            response.data["profile_image"],
+            {
+                "has_image": False,
+                "image_url_full": "http://testserver/profile_images/default_50.jpg",
+                "image_url_small": "http://testserver/profile_images/default_10.jpg"
+            }
+        )
