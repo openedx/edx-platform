@@ -320,8 +320,8 @@
           % endif
         </ol>
       </div>
-      % if self.stanford_theme_enabled():
-          <%include file='theme-register-research.html' />
+      % if self.register_extra_file:
+          <%include file='${self.register_extra_file}' />
       % endif
       <div class="group group-form group-form-accountacknowledgements">
         <h2 class="sr">${_("Account Acknowledgements")}</h2>
