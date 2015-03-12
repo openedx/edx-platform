@@ -63,10 +63,8 @@ from xmodule.x_module import XModuleDescriptor
 from xblock_django.user_service import DjangoXBlockUserService
 from util.json_request import JsonResponse
 from util.sandboxing import can_execute_unsafe_code, get_python_lib_zip
-if settings.FEATURES.get('MILESTONES_APP', False):
-    from milestones import api as milestones_api
-    from util.milestones_helpers import calculate_entrance_exam_score, get_required_content
-    from util.module_utils import yield_dynamic_descriptor_descendents
+from util import milestones_helpers
+from util.module_utils import yield_dynamic_descriptor_descendents
 
 log = logging.getLogger(__name__)
 
@@ -136,14 +134,14 @@ def toc_for_course(request, course, active_chapter, active_section, field_data_c
             return None
 
         # Check to see if the course is gated on milestone-required content (such as an Entrance Exam)
-        required_content = get_required_content(course, request.user)
+        required_content = milestones_helpers.get_required_content(course, request.user)
 
         chapters = list()
         for chapter in course_module.get_display_items():
             # Only show required content, if there is required content
             # chapter.hide_from_toc is read-only (boo)
             local_hide_from_toc = False
-            if len(required_content):
+            if required_content:
                 if unicode(chapter.location) not in required_content:
                     local_hide_from_toc = True
 
@@ -375,7 +373,7 @@ def get_module_system_for_user(user, field_data_cache,
             inner_get_module
         )
         exam_modules = [module for module in exam_module_generators]
-        exam_score = calculate_entrance_exam_score(user, course_descriptor, exam_modules)
+        exam_score = milestones_helpers.calculate_entrance_exam_score(user, course_descriptor, exam_modules)
         return exam_score
 
     def _fulfill_content_milestones(user, course_key, content_key):
@@ -394,8 +392,8 @@ def get_module_system_for_user(user, field_data_cache,
                 exam_pct = _calculate_entrance_exam_score(user, course)
                 if exam_pct >= course.entrance_exam_minimum_score_pct:
                     exam_key = UsageKey.from_string(course.entrance_exam_id)
-                    relationship_types = milestones_api.get_milestone_relationship_types()
-                    content_milestones = milestones_api.get_course_content_milestones(
+                    relationship_types = milestones_helpers.get_milestone_relationship_types()
+                    content_milestones = milestones_helpers.get_course_content_milestones(
                         course_key,
                         exam_key,
                         relationship=relationship_types['FULFILLS']
@@ -403,7 +401,7 @@ def get_module_system_for_user(user, field_data_cache,
                     # Add each milestone to the user's set...
                     user = {'id': user.id}
                     for milestone in content_milestones:
-                        milestones_api.add_user_milestone(user, milestone)
+                        milestones_helpers.add_user_milestone(user, milestone)
 
     def handle_grade_event(block, event_type, event):  # pylint: disable=unused-argument
         """
