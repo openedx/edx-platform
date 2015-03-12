@@ -38,7 +38,7 @@ class ProblemPage(PageObject):
         """
         Click the Check button!
         """
-        self.q(css='div.problem input.check').click()
+        self.q(css='div.problem button.check').click()
         self.wait_for_ajax()
 
     def is_correct(self):
