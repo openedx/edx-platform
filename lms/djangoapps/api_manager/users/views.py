@@ -917,6 +917,39 @@ class UsersCoursesDetail(SecureAPIView):
         return Response({}, status=status.HTTP_204_NO_CONTENT)
 
 
+class UsersCoursesGradesList(SecureAPIView):
+    """
+    ### The UsersCoursesGradesList view allows clients to interact with the User's gradebook across courses
+    - URI: ```/api/users/{user_id}/courses/grades?courses={course_id1,course_id2}```
+    - GET: Returns a JSON representation of the matched set from the gradebook
+        * courses (optional): Set filtering parameter consisting of comma-separated course identifiers
+
+    ### Use Cases/Notes:
+    * Use the UsersCoursesGradesList view to interact with the User's gradebook across multiple Course enrollments
+    * Use GET to retrieve all of the Course gradebook entries for the specified User
+    """
+    def get(self, request, user_id):  # pylint: disable=unused-argument
+        """
+        GET /api/users/{user_id}/courses/grades
+        """
+        grade_complete_match_range = getattr(settings, 'GRADEBOOK_GRADE_COMPLETE_PROFORMA_MATCH_RANGE', 0.01)
+        queryset = StudentGradebook.objects.filter(user=user_id)
+        response_data = []
+        for record in queryset:
+            complete_status = False
+            if record.proforma_grade <= record.grade + grade_complete_match_range:
+                complete_status = True
+            response_data.append(
+                {
+                    'course_id': unicode(record.course_id),
+                    'current_grade': record.grade,
+                    'proforma_grade': record.proforma_grade,
+                    'complete_status': complete_status
+                }
+            )
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
 class UsersCoursesGradesDetail(SecureAPIView):
     """
     ### The UsersCoursesGradesDetail view allows clients to interact with the User's gradebook for a particular Course
