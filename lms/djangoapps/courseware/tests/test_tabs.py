@@ -15,15 +15,13 @@ from xmodule import tabs
 from xmodule.modulestore.tests.django_utils import (
     TEST_DATA_MIXED_TOY_MODULESTORE, TEST_DATA_MIXED_CLOSED_MODULESTORE
 )
+
+from courseware.tabs import get_course_tab_list
 from courseware.views import get_static_tab_contents, static_tab
 from student.tests.factories import UserFactory
+from util import milestones_helpers
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 from xmodule.modulestore.tests.factories import CourseFactory, ItemFactory
-
-if settings.FEATURES.get('MILESTONES_APP', False):
-    from courseware.tabs import get_course_tab_list
-    from milestones import api as milestones_api
-    from milestones.models import MilestoneRelationshipType
 
 
 class StaticTabDateTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
@@ -140,9 +138,8 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             self.setup_user()
             self.enroll(self.course)
             self.user.is_staff = True
-            self.relationship_types = milestones_api.get_milestone_relationship_types()
-            MilestoneRelationshipType.objects.create(name='requires')
-            MilestoneRelationshipType.objects.create(name='fulfills')
+            self.relationship_types = milestones_helpers.get_milestone_relationship_types()
+            milestones_helpers.seed_milestone_relationship_types()
 
         def test_get_course_tabs_list_entrance_exam_enabled(self):
             """
@@ -160,13 +157,13 @@ class EntranceExamsTabsTestCase(LoginEnrollmentTestCase, ModuleStoreTestCase):
             }
             self.course.entrance_exam_enabled = True
             self.course.entrance_exam_id = unicode(entrance_exam.location)
-            milestone = milestones_api.add_milestone(milestone)
-            milestones_api.add_course_milestone(
+            milestone = milestones_helpers.add_milestone(milestone)
+            milestones_helpers.add_course_milestone(
                 unicode(self.course.id),
                 self.relationship_types['REQUIRES'],
                 milestone
             )
-            milestones_api.add_course_content_milestone(
+            milestones_helpers.add_course_content_milestone(
                 unicode(self.course.id),
                 unicode(entrance_exam.location),
                 self.relationship_types['FULFILLS'],

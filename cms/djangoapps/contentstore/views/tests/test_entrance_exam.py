@@ -2,6 +2,7 @@
 Test module for Entrance Exams AJAX callback handler workflows
 """
 import json
+from mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,17 +10,13 @@ from django.test.client import RequestFactory
 
 from contentstore.tests.utils import AjaxEnabledTestClient, CourseTestCase
 from contentstore.utils import reverse_url
-from contentstore.views.entrance_exam import create_entrance_exam
+from contentstore.views.entrance_exam import create_entrance_exam, update_entrance_exam, delete_entrance_exam
 from models.settings.course_grading import CourseGradingModel
 from models.settings.course_metadata import CourseMetadata
 from opaque_keys.edx.keys import UsageKey
 from student.tests.factories import UserFactory
+from util import milestones_helpers
 from xmodule.modulestore.django import modulestore
-
-if settings.FEATURES.get('MILESTONES_APP', False):
-    from milestones import api as milestones_api
-    from milestones.models import MilestoneRelationshipType
-    from util.milestones_helpers import serialize_user
 
 
 class EntranceExamHandlerTests(CourseTestCase):
@@ -36,9 +33,8 @@ class EntranceExamHandlerTests(CourseTestCase):
             self.usage_key = self.course.location
             self.course_url = '/course/{}'.format(unicode(self.course.id))
             self.exam_url = '/course/{}/entrance_exam/'.format(unicode(self.course.id))
-            MilestoneRelationshipType.objects.create(name='requires', active=True)
-            MilestoneRelationshipType.objects.create(name='fulfills', active=True)
-            self.milestone_relationship_types = milestones_api.get_milestone_relationship_types()
+            milestones_helpers.seed_milestone_relationship_types()
+            self.milestone_relationship_types = milestones_helpers.get_milestone_relationship_types()
 
         def test_contentstore_views_entrance_exam_post(self):
             """
@@ -55,8 +51,8 @@ class EntranceExamHandlerTests(CourseTestCase):
             self.assertTrue(metadata['entrance_exam_enabled'])
             self.assertIsNotNone(metadata['entrance_exam_minimum_score_pct'])
             self.assertIsNotNone(metadata['entrance_exam_id']['value'])
-            self.assertTrue(len(milestones_api.get_course_milestones(unicode(self.course.id))))
-            content_milestones = milestones_api.get_course_content_milestones(
+            self.assertTrue(len(milestones_helpers.get_course_milestones(unicode(self.course.id))))
+            content_milestones = milestones_helpers.get_course_content_milestones(
                 unicode(self.course.id),
                 metadata['entrance_exam_id']['value'],
                 self.milestone_relationship_types['FULFILLS']
@@ -123,12 +119,12 @@ class EntranceExamHandlerTests(CourseTestCase):
             )
             user.set_password('test')
             user.save()
-            milestones = milestones_api.get_course_milestones(unicode(self.course_key))
+            milestones = milestones_helpers.get_course_milestones(unicode(self.course_key))
             self.assertEqual(len(milestones), 1)
             milestone_key = '{}.{}'.format(milestones[0]['namespace'], milestones[0]['name'])
-            paths = milestones_api.get_course_milestones_fulfillment_paths(
+            paths = milestones_helpers.get_course_milestones_fulfillment_paths(
                 unicode(self.course_key),
-                serialize_user(user)
+                milestones_helpers.serialize_user(user)
             )
 
             # What we have now is a course milestone requirement and no valid fulfillment
@@ -250,3 +246,22 @@ class EntranceExamHandlerTests(CourseTestCase):
 
             resp = create_entrance_exam(request, self.course.id, None)
             self.assertEqual(resp.status_code, 201)
+
+        @patch.dict('django.conf.settings.FEATURES', {'ENTRANCE_EXAMS': False})
+        def test_entrance_exam_feature_flag_gating(self):
+            user = UserFactory()
+            user.is_staff = True
+            request = RequestFactory()
+            request.user = user
+
+            resp = self.client.get(self.exam_url)
+            self.assertEqual(resp.status_code, 400)
+
+            resp = create_entrance_exam(request, self.course.id, None)
+            self.assertEqual(resp.status_code, 400)
+
+            resp = delete_entrance_exam(request, self.course.id)
+            self.assertEqual(resp.status_code, 400)
+
+            # No return, so we'll just ensure no exception is thrown
+            update_entrance_exam(request, self.course.id, {})
