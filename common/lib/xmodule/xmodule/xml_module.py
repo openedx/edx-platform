@@ -51,16 +51,6 @@ def is_pointer_tag(xml_obj):
     return len(xml_obj) == 0 and actual_attr == expected_attr and not has_text
 
 
-def get_metadata_from_xml(xml_object, remove=True):
-    meta = xml_object.find('meta')
-    if meta is None:
-        return ''
-    dmdata = meta.text
-    if remove:
-        xml_object.remove(meta)
-    return dmdata
-
-
 def serialize_field(value):
     """
     Return a string version of the value (where value is the JSON-formatted, internally stored value).
@@ -106,16 +96,13 @@ def deserialize_field(field, value):
         return value
 
 
-class XmlDescriptor(XModuleDescriptor):
+class XmlParserUtilMixin(object):
     """
-    Mixin class for standardized parsing of from xml
+    Class containing XML parsing functionality shared between XBlock and XModuleDescriptor.
     """
 
     xml_attributes = Dict(help="Map of unhandled xml attributes, used only for storage between import and export",
                           default={}, scope=Scope.settings)
-
-    # Extension to append to filename paths
-    filename_extension = 'xml'
 
     # The attributes will be removed from the definition xml passed
     # to definition_from_xml, and from the xml returned by definition_to_xml
@@ -132,6 +119,16 @@ class XmlDescriptor(XModuleDescriptor):
                          'xml_attributes')
 
     metadata_to_export_to_policy = ('discussion_topics', 'checklists')
+
+    @staticmethod
+    def _get_metadata_from_xml(xml_object, remove=True):
+        meta = xml_object.find('meta')
+        if meta is None:
+            return ''
+        dmdata = meta.text
+        if remove:
+            xml_object.remove(meta)
+        return dmdata
 
     @classmethod
     def definition_from_xml(cls, xml_object, system):
@@ -165,12 +162,12 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def load_file(cls, filepath, fs, def_id):  # pylint: disable=invalid-name
-        '''
+        """
         Open the specified file in fs, and call cls.file_to_xml on it,
         returning the lxml object.
 
         Add details and reraise on error.
-        '''
+        """
         try:
             with fs.open(filepath) as xml_file:
                 return cls.file_to_xml(xml_file)
@@ -182,7 +179,7 @@ class XmlDescriptor(XModuleDescriptor):
 
     @classmethod
     def load_definition(cls, xml_object, system, def_id, id_generator):
-        '''
+        """
         Load a descriptor definition from the specified xml_object.
         Subclasses should not need to override this except in special
         cases (e.g. html module)
@@ -192,7 +189,7 @@ class XmlDescriptor(XModuleDescriptor):
             system: the modulestore system (aka, runtime) which accesses data and provides access to services
             def_id: the definition id for the block--used to compute the usage id and asides ids
             id_generator: used to generate the usage_id
-        '''
+        """
 
         # VS[compat] -- the filename attr should go away once everything is
         # converted.  (note: make sure html files still work once this goes away)
@@ -209,6 +206,7 @@ class XmlDescriptor(XModuleDescriptor):
             # again in the correct format.  This should go away once the CMS is
             # online and has imported all current (fall 2012) courses from xml
             if not system.resources_fs.exists(filepath) and hasattr(cls, 'backcompat_paths'):
+                # Put in a dogstats call here - get rid of this horseshit.
                 candidates = cls.backcompat_paths(filepath)
                 for candidate in candidates:
                     if system.resources_fs.exists(candidate):
@@ -222,7 +220,7 @@ class XmlDescriptor(XModuleDescriptor):
             # Add the attributes from the pointer node
             definition_xml.attrib.update(xml_object.attrib)
 
-        definition_metadata = get_metadata_from_xml(definition_xml)
+        definition_metadata = cls._get_metadata_from_xml(definition_xml)
         cls.clean_metadata_from_xml(definition_xml)
         definition, children = cls.definition_from_xml(definition_xml, system)
         if definition_metadata:
@@ -426,6 +424,22 @@ class XmlDescriptor(XModuleDescriptor):
 
     @property
     def non_editable_metadata_fields(self):
-        non_editable_fields = super(XmlDescriptor, self).non_editable_metadata_fields
-        non_editable_fields.append(XmlDescriptor.xml_attributes)
+        non_editable_fields = super(XmlParserUtilMixin, self).non_editable_metadata_fields
+        non_editable_fields.append(XmlParserUtilMixin.xml_attributes)
         return non_editable_fields
+
+
+class XmlParserMixin(XmlParserUtilMixin):
+    """
+    Mixin class for standardized parsing of XBlock xml.
+    """
+    pass
+
+
+class XmlDescriptor(XmlParserUtilMixin, XModuleDescriptor):
+    """
+    Mixin class for standardized parsing of XModule xml.
+    """
+    # Extension to append to filename paths
+    filename_extension = 'xml'
+
