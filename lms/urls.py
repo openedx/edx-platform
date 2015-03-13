@@ -598,6 +598,11 @@ if settings.FEATURES.get('ENABLE_THIRD_PARTY_AUTH'):
         url(r'^login_oauth_token/(?P<backend>[^/]+)/$', 'student.views.login_oauth_token'),
     )
 
+# Certificates Web/HTML View
+if settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+    urlpatterns += (
+        url(r'^certificates/html', 'certificates.views.render_html_view', name='cert_html_view'),
+    )
 
 urlpatterns = patterns(*urlpatterns)
 

@@ -351,6 +351,9 @@ FEATURES = {
 
     # enable beacons for video timing statistics
     'ENABLE_VIDEO_BEACON': False,
+
+    # Certificates Web/HTML Views
+    'CERTIFICATES_HTML_VIEW': False,
 }
 
 # Ignore static asset files on import which match this pattern

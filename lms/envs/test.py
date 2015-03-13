@@ -466,3 +466,6 @@ SEARCH_ENGINE = "search.tests.mock_search_engine.MockSearchEngine"
 FACEBOOK_APP_SECRET = "Test"
 FACEBOOK_APP_ID = "Test"
 FACEBOOK_API_VERSION = "v2.2"
+
+# Certificates Views
+FEATURES['CERTIFICATES_HTML_VIEW'] = True

@@ -1,10 +1,14 @@
 """URL handlers related to certificate handling by LMS"""
+from datetime import datetime
 import dogstats_wrapper as dog_stats_api
 import json
 import logging
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse, Http404, HttpResponseForbidden
+from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
@@ -13,13 +17,17 @@ from certificates.models import (
     certificate_status_for_student,
     CertificateStatuses,
     GeneratedCertificate,
-    ExampleCertificate
+    ExampleCertificate,
+    CertificateHtmlViewConfiguration
 )
 from certificates.queue import XQueueCertInterface
+from edxmako.shortcuts import render_to_response
 from xmodule.modulestore.django import modulestore
+from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.locations import SlashSeparatedCourseKey
 from util.json_request import JsonResponse, JsonResponseBadRequest
 from util.bad_request_rate_limiter import BadRequestRateLimiter
-from opaque_keys.edx.locations import SlashSeparatedCourseKey
 
 logger = logging.getLogger(__name__)
 
@@ -224,3 +232,215 @@ def update_example_certificate(request):
 
     # Let the XQueue know that we handled the response
     return JsonResponse({'return_code': 0})
+
+
+# pylint: disable=too-many-statements, bad-continuation
+@login_required
+def render_html_view(request):
+    """
+    This view generates an HTML representation of the specified student's certificate
+    If a certificate is not available, we display a "Sorry!" screen instead
+    """
+    invalid_template_path = 'certificates/invalid.html'
+
+    # Feature Flag check
+    if not settings.FEATURES.get('CERTIFICATES_HTML_VIEW', False):
+        return render_to_response(invalid_template_path)
+
+    context = {}
+    course_id = request.GET.get('course', None)
+    context['course'] = course_id
+    if not course_id:
+        return render_to_response(invalid_template_path, context)
+
+    # Course Lookup
+    try:
+        course_key = CourseKey.from_string(course_id)
+    except InvalidKeyError:
+        return render_to_response(invalid_template_path, context)
+    course = modulestore().get_course(course_key)
+    if not course:
+        return render_to_response(invalid_template_path, context)
+
+    # Certificate Lookup
+    try:
+        certificate = GeneratedCertificate.objects.get(
+            user=request.user,
+            course_id=course_key
+        )
+    except GeneratedCertificate.DoesNotExist:
+        return render_to_response(invalid_template_path, context)
+
+    # Load static output values from configuration,
+    configuration = CertificateHtmlViewConfiguration.get_config()
+    context = configuration.get('default', {})
+    # Override the defaults with any mode-specific static values
+    context.update(configuration.get(certificate.mode, {}))
+    # Override further with any course-specific static values
+    context.update(course.cert_html_view_overrides)
+
+    # Populate dynamic output values using the course/certificate data loaded above
+    user_fullname = request.user.profile.name
+    platform_name = context.get('platform_name')
+    context['accomplishment_copy_name'] = user_fullname
+    context['accomplishment_copy_course_org'] = course.org
+    context['accomplishment_copy_course_name'] = course.display_name
+    context['certificate_id_number'] = certificate.verify_uuid
+    context['certificate_verify_url'] = "{prefix}{uuid}{suffix}".format(
+        prefix=context.get('certificate_verify_url_prefix'),
+        uuid=certificate.verify_uuid,
+        suffix=context.get('certificate_verify_url_suffix')
+    )
+    context['logo_alt'] = platform_name
+
+    accd_course_org_html = '<span class="detail--xuniversity">{partner_name}</span>'.format(partner_name=course.org)
+    accd_platform_name_html = '<span class="detail--company">{platform_name}</span>'.format(platform_name=platform_name)
+    # Translators: This line appears on the certificate after the name of a course, and provides more
+    # information about the organizations providing the course material to platform users
+    context['accomplishment_copy_course_description'] = _('a course of study offered by {partner_name}, '
+                                                          'through {platform_name}.').format(
+        partner_name=accd_course_org_html,
+        platform_name=accd_platform_name_html
+    )
+
+    context['accomplishment_more_title'] = _("More Information About {user_name}'s Certificate:").format(
+        user_name=user_fullname
+    )
+
+    # Translators:  This line appears on the page just before the generation date for the certificate
+    context['certificate_date_issued_title'] = _("Issued On:")
+
+    # Translators:  The format of the date includes the full name of the month
+    context['certificate_date_issued'] = _('{month} {day}, {year}').format(
+        month=certificate.modified_date.strftime("%B"),
+        day=certificate.modified_date.day,
+        year=certificate.modified_date.year
+    )
+
+    # Translators:  The Certificate ID Number is an alphanumeric value unique to each individual certificate
+    context['certificate_id_number_title'] = _('Certificate ID Number')
+
+    context['certificate_info_title'] = _('About {platform_name} Certificates').format(
+        platform_name=platform_name
+    )
+
+    # Translators: This text describes the purpose (and therefore, value) of a course certificate
+    # 'verifying your identity' refers to the process for establishing the authenticity of the student
+    context['certificate_info_description'] = _("{platform_name} acknowledges achievements through certificates, which "
+                                                "are awarded for various activities {platform_name} students complete "
+                                                "under the <a href='{tos_url}'>{platform_name} Honor Code</a>.  Some "
+                                                "certificates require completing additional steps, such as "
+                                                "<a href='{verified_cert_url}'> verifying your identity</a>.").format(
+        platform_name=platform_name,
+        tos_url=context.get('company_tos_url'),
+        verified_cert_url=context.get('company_verified_certificate_url')
+    )
+
+    # Translators:  Certificate Types correspond to the different enrollment options available for a given course
+    context['certificate_type_title'] = _('{certificate_type} Certfificate').format(
+        certificate_type=context.get('certificate_type')
+    )
+
+    context['certificate_verify_title'] = _("How {platform_name} Validates Student Certificates").format(
+        platform_name=platform_name
+    )
+
+    # Translators:  This text describes the validation mechanism for a certificate file (known as GPG security)
+    context['certificate_verify_description'] = _('Certificates issued by {platform_name} are signed by a gpg key so '
+                                                  'that they can be validated independently by anyone with the '
+                                                  '{platform_name} public key. For independent verification, '
+                                                  '{platform_name} uses what is called a '
+                                                  '"detached signature"&quot;".').format(platform_name=platform_name)
+
+    context['certificate_verify_urltext'] = _("Validate this certificate for yourself")
+
+    # Translators:  This text describes (at a high level) the mission and charter the edX platform and organization
+    context['company_about_description'] = _("{platform_name} offers interactive online classes and MOOCs from the "
+                                             "world's best universities, including MIT, Harvard, Berkeley, University "
+                                             "of Texas, and many others.  {platform_name} is a non-profit online "
+                                             "initiative created by founding partners Harvard and MIT.").format(
+        platform_name=platform_name
+    )
+
+    context['company_about_title'] = _("About {platform_name}").format(platform_name=platform_name)
+
+    context['company_about_urltext'] = _("Learn more about {platform_name}").format(platform_name=platform_name)
+
+    context['company_courselist_urltext'] = _("Learn with {platform_name}").format(platform_name=platform_name)
+
+    context['company_careers_urltext'] = _("Work at {platform_name}").format(platform_name=platform_name)
+
+    context['company_contact_urltext'] = _("Contact {platform_name}").format(platform_name=platform_name)
+
+    context['company_privacy_urltext'] = _("Privacy Policy")
+
+    context['company_tos_urltext'] = _("Terms of Service &amp; Honor Code")
+
+    # Translators:  This text appears near the top of the certficate and describes the guarantee provided by edX
+    context['document_banner'] = _("{platform_name} acknowledges the following student accomplishment").format(
+        platform_name=platform_name
+    )
+
+    context['logo_subtitle'] = _("Certificate Validation")
+
+    if certificate.mode == 'honor':
+        # Translators:  This text describes the 'Honor' course certificate type.
+        context['certificate_type_description'] = _("An {cert_type} Certificate signifies that an {platform_name} "
+                                                    "learner has agreed to abide by {platform_name}'s honor code and "
+                                                    "completed all of the required tasks for this course under its "
+                                                    "guidelines.").format(
+            cert_type=context.get('certificate_type'),
+            platform_name=platform_name
+        )
+    elif certificate.mode == 'verified':
+        # Translators:  This text describes the 'ID Verified' course certificate type, which is a higher level of
+        # verification offered by edX.  This type of verification is useful for professional education/certifications
+        context['certificate_type_description'] = _("An {cert_type} Certificate signifies that an {platform_name} "
+                                                    "learner has agreed to abide by {platform_name}'s honor code and "
+                                                    "completed all of the required tasks for this course under its "
+                                                    "guidelines, as well as having their photo ID checked to verify "
+                                                    "their identity.").format(
+            cert_type=context.get('certificate_type'),
+            platform_name=platform_name
+        )
+    elif certificate.mode == 'xseries':
+        # Translators:  This text describes the 'XSeries' course certificate type.  An XSeries is a collection of
+        # courses related to each other in a meaningful way, such as a specific topic or theme, or even an organization
+        context['certificate_type_description'] = _("An {cert_type} Certificate demonstrates a high level of "
+                                                    "achievement in a program of study, and includes verification of "
+                                                    "the student's identity.").format(
+            cert_type=context.get('certificate_type')
+        )
+
+    # Translators:  This is the copyright line which appears at the bottom of the certificate page/screen
+    context['copyright_text'] = _('&copy; {year} {platform_name}. All rights reserved.').format(
+        year=datetime.now().year,
+        platform_name=platform_name
+    )
+
+    # Translators:  This text represents the verification of the certificate
+    context['document_meta_description'] = _('This is a valid {platform_name} certificate for {user_name}, '
+                                             'who participated in {partner_name} {course_number}').format(
+        platform_name=platform_name,
+        user_name=user_fullname,
+        partner_name=course.org,
+        course_number=course.number
+    )
+
+    # Translators:  This text is bound to the HTML 'title' element of the page and appears in the browser title bar
+    context['document_title'] = _("Valid {partner_name} {course_number} Certificate | {platform_name}").format(
+        partner_name=course.org,
+        course_number=course.number,
+        platform_name=platform_name
+    )
+
+    # Translators:  This text fragment appears after the student's name (displayed in a large font) on the certificate
+    # screen.  The text describes the accomplishment represented by the certificate information displayed to the user
+    context['accomplishment_copy_description_full'] = _("successfully completed, received a passing grade, and was "
+                                                        "awarded a {platform_name} {certificate_type} "
+                                                        "Certificate of Completion in ").format(
+        platform_name=platform_name,
+        certificate_type=context.get("certificate_type")
+    )
+
+    return render_to_response("certificates/valid.html", context)

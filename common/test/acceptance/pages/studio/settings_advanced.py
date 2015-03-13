@@ -150,6 +150,7 @@ class AdvancedSettingsPage(CoursePage):
             'allow_anonymous',
             'allow_anonymous_to_peers',
             'allow_public_wiki_access',
+            'cert_html_view_overrides',
             'cert_name_long',
             'cert_name_short',
             'certificates_display_behavior',
