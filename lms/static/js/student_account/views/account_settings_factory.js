@@ -26,7 +26,7 @@ var edx = edx || {};
                                 model: accountSettingsModel,
                                 title: "Username",
                                 valueAttribute: "username",
-                                message: ""
+                                helpMessage: ""
                             })
                         },
                         {
@@ -34,7 +34,7 @@ var edx = edx || {};
                                 model: accountSettingsModel,
                                 title: "Full Name",
                                 valueAttribute: "name",
-                                message: "This is used on your edX certificates, and all changes are reviewed."
+                                helpMessage: "This is used on your edX certificates, and all changes are reviewed."
                             })
                         },
                         {
@@ -42,18 +42,18 @@ var edx = edx || {};
                                 model: accountSettingsModel,
                                 title: "Email",
                                 valueAttribute: "email",
-                                message: "You account email is used as a login mechanism and for course communications."
+                                helpMessage: "You account email is used as a login mechanism and for course communications."
                             })
                         },
                         {
-                            view: new edx.student.account.fieldViews.LinkFieldView({
+                            view: new edx.student.account.fieldViews.PasswordFieldView({
                                 model: accountSettingsModel,
+                                id: "password",
                                 title: "Password",
                                 dataAttribute: "email",
-                                valueAttribute: "password",
                                 linkTitle: "Reset Password",
                                 linkHref: fields_data['password']['url'],
-                                message: "To reset your password you'll need to click the reset password link sent to you via email."
+                                helpMessage: "To reset your password you'll need to click the reset password link sent to you via email."
                             })
                         },
                         {
@@ -63,7 +63,7 @@ var edx = edx || {};
                                 valueAttribute: "language",
                                 defaultValue: fields_data['language']['default'],
                                 required: true,
-                                message: "This setting controls your default edX language.",
+                                helpMessage: "This setting controls your default edX language.",
                                 options: fields_data['language']['options'],
                             })
                         },
@@ -79,7 +79,6 @@ var edx = edx || {};
                                 valueAttribute: "level_of_education",
                                 defaultValue: null,
                                 required: false,
-                                message: "",
                                 options: fields_data['level_of_education']['options'],
                             })
                         },
@@ -90,7 +89,6 @@ var edx = edx || {};
                                 valueAttribute: "gender",
                                 defaultValue: null,
                                 required: false,
-                                message: "",
                                 options: fields_data['gender']['options'],
                             })
                         },
@@ -101,7 +99,6 @@ var edx = edx || {};
                                 valueAttribute: "year_of_birth",
                                 defaultValue: null,
                                 required: false,
-                                message: "",
                                 options: fields_data['year_of_birth']['options'],
                             })
                         },
@@ -112,18 +109,16 @@ var edx = edx || {};
                                 valueAttribute: "null",
                                 defaultValue: null,
                                 required: false,
-                                message: "",
                                 options: fields_data['country']['options'],
                             })
                         },
                         {
                             view: new edx.student.account.fieldViews.DropdownFieldView({
                                 model: accountSettingsModel,
-                                title: "Timezone",
+                                title: "Time Zone",
                                 valueAttribute: "timezone",
                                 defaultValue: null,
                                 required: false,
-                                message: "",
                                 options: fields_data['timezone']['options'],
                             })
                         },
@@ -134,7 +129,7 @@ var edx = edx || {};
                                 valueAttribute: "preferred_language",
                                 defaultValue: null,
                                 required: false,
-                                message: "If your preferred language isn't available as an edX language, you can indicate your preferance here.",
+                                helpMessage: "If your preferred language isn't available as an edX language, you can indicate your preferance here.",
                                 options: fields_data['preferred_language']['options'],
                             })
                         },
@@ -145,18 +140,18 @@ var edx = edx || {};
                     fields: [
                         {
                             view: new edx.student.account.fieldViews.LinkFieldView({
+                                id: 'auth-facebook',
                                 model: accountSettingsModel,
                                 title: "Facebook",
                                 linkTitle: "Link",
-                                message: "",
                             })
                         },
                         {
                             view: new edx.student.account.fieldViews.LinkFieldView({
+                                id: 'auth-google',
                                 model: accountSettingsModel,
                                 title: "Google",
                                 linkTitle: "Link",
-                                message: "",
                             })
                         },
                     ]
