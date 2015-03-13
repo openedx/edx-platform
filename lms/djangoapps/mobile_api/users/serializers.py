@@ -50,6 +50,9 @@ class CourseField(serializers.RelatedField):
             "start": course.start,
             "end": course.end,
             "course_image": course_image_url(course),
+            "social_urls": {
+                "facebook": course.facebook_url,
+            },
             "latest_updates": {
                 "video": None
             },
