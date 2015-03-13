@@ -848,6 +848,14 @@ WIKI_LINK_DEFAULT_LEVEL = 2
 ##### Feedback submission mechanism #####
 FEEDBACK_SUBMISSION_EMAIL = None
 
+#### Help Modal Links ####
+# List of dict objects representing links
+# For example:
+# HELP_MODAL_LINKS = [
+#     {'url': 'https://help.com', 'text': 'How to register an account'}
+# ]
+HELP_MODAL_LINKS = []
+
 ##### Zendesk #####
 ZENDESK_URL = None
 ZENDESK_USER = None
@@ -1983,3 +1991,7 @@ FORUM_MONGO_PARAMS = {
     'user': '',
     'database': 'forum',
 }
+
+################### branding - for database driven tiles ##################
+INSTALLED_APPS += ('branding_stanford',)
+DISPLAY_COURSE_TILES = True
