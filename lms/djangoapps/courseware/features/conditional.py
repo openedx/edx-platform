@@ -92,7 +92,12 @@ class ConditionalSteps(object):
             assert_true(world.css_visible('.hidden-contents'))
         else:
             assert_true(world.is_css_not_present('.hidden-contents'))
-            assert_true(world.css_contains_text('.conditional-message', 'must be attempted before this will become visible.'))  # sarina
+            assert_true(
+                world.css_contains_text(
+                    '.conditional-message',
+                    'must be attempted before this will become visible.'
+                )
+            )
 
     def answer_poll(self, step, answer):
         r' I answer the conditioned poll "([^"]*)"$'
