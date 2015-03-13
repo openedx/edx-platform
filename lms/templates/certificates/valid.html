@@ -2,153 +2,70 @@
 <%! import mako.runtime %>
 <% mako.runtime.UNDEFINED = '' %>
 
-<!DOCTYPE html>
-<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
-<!--[if IE 7]><html class="no-js lt-ie10 lt-ie9 lt-ie8"><![endif]-->
-<!--[if IE 8]><html class="no-js lt-ie10 lt-ie9"><![endif]-->
-<!--[if IE 9]><html class="no-js lt-ie10"><![endif]-->
-<!--[if gt IE 9]><!--><html class="no-js"><!--<![endif]-->
-<head>
-  <title>${document_title}</title>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="${document_meta_description}">
-  <link rel="stylesheet" href="${document_stylesheet_url_normalize}" />
-  <link rel="stylesheet" href="${document_stylesheet_url_fontawesome}" />
-  <link rel="stylesheet" href="${document_stylesheet_url_application}" />
-  <script src="${document_script_src_modernizr}"></script>
-</head>
+<%inherit file="certificate-base.html" />
 
-<body class="view--valid-certificate ${document_body_class_append}" data-view="valid-certificate">
+<nav class="nav--skip sr">
+  <h2>${_("Skip to This Page's Content")}</h2>
+  <ol>
+    <li class="nav__item"><a class="action" href="#validation-status">${_("Validation Status")}</a></li>
+    <li class="nav__item"><a class="action" href="#validation-accomplishment">${_("Student Accomplishment")}</a></li>
+    <li class="nav__item"><a class="action" href="#validation-info">${_("More Information")}</a></li>
+    <li class="nav__item"><a class="action" href="#company-info">${_("About")} ${platform_name}</a></li>
+  </ol>
+</nav>
 
-  <!--[if lt IE 9]>
-      <p class="msg msg--browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-  <![endif]-->
+<div class="wrapper--view">
+  <%include file="_certificate-header.html" />
 
-  <nav class="nav--skip sr">
-    <h2>${_("Skip to This Page's Content")}</h2>
-    <ol>
-      <li class="nav__item"><a class="action" href="#validation-status">${_("Validation Status")}</a></li>
-      <li class="nav__item"><a class="action" href="#validation-accomplishment">${_("Student Accomplishment")}</a></li>
-      <li class="nav__item"><a class="action" href="#validation-info">${_("More Information")}</a></li>
-      <li class="nav__item"><a class="action" href="#company-info">${_("About")} ${platform_name}</a></li>
-    </ol>
-  </nav>
-  <div class="wrapper--view">
-    <div class="wrapper--header">
-      <header class="header--app" role="banner">
-        <h1 class="title title--logo">
-          <span class="logo">
-            <a href="${logo_url}"><img class="img--logo" src="" alt="${logo_alt}" /></a>
-          </span>
-          <span class="title title--sub">${logo_subtitle}</span>
-        </h1>
-      </header>
-    </div>
-    <hr class="divider /">
-    <div class="wrapper--content">
-      <section class="content content--main" role="main">
-        <div class="status status--valid" id="validation-status">
-          <h2 class="title title--lvl2">${document_banner}<span class="sr">:</span></h2>
+  <hr class="divider" />
+
+  <div class="wrapper--content">
+
+    <section class="content content--main" role="main">
+      <div class="status status--valid" id="validation-status">
+        <h2 class="title title--lvl2">${document_banner}<span class="sr">:</span></h2>
+      </div>
+      <article class="accomplishment ${accomplishment_class_append}" id="validation-accomplishment">
+        <div class="accomplishment__statement">
+          <p class="copy">
+            <span class="copy__name">${accomplishment_copy_name}</span>
+            <span class="copy__context">${accomplishment_copy_description_full}</span>
+            <span class="copy__course">
+              <span class="copy__course__org">${accomplishment_copy_course_org}</span>
+              <span class="copy__course__name">${accomplishment_copy_course_name}</span>
+            </span>
+            <span class="copy__context">${accomplishment_copy_course_description}</span>
+          </p>
         </div>
-        <article class="accomplishment ${accomplishment_class_append}" id="validation-accomplishment">
-          <div class="accomplishment__statement">
-            <p class="copy">
-              <span class="copy__name">${accomplishment_copy_name}</span>
-              <span class="copy__context">${accomplishment_copy_description_full}</span>
-              <span class="copy__course">
-                <span class="copy__course__org">${accomplishment_copy_course_org}</span>
-                <span class="copy__course__name">${accomplishment_copy_course_name}</span>
+        <div class="accomplishment__details">
+          <h3 class="title title--lvl2 sr">${accomplishment_more_title}</h3>
+          <ul class="list list--metadata">
+            <li class="item certificate--type">
+              <span class="label">_(Certificate Type)</span>
+              <span class="value">
+                ${certificate_type_title}
+                <span class="explanation">${certificate_type_description} </span>
               </span>
-              <span class="copy__context">${accomplishment_copy_course_description}</span>
-            </p>
-          </div>
-          <div class="accomplishment__details">
-            <h3 class="title title--lvl2 sr">${accomplishment_more_title}</h3>
-            <ul class="list list--metadata">
-              <li class="item certificate--type">
-                <span class="label">_(Certificate Type)</span>
-                <span class="value">
-                  ${certificate_type_title}
-                  <span class="explanation">${certificate_type_description} </span>
-                </span>
-              </li>
-              <li class="item certificate--id">
-                <span class="label">${certificate_id_number_title}</span>
-                <span class="value">${certificate_id_number}</span>
-              </li>
-              <li class="item certificate--date">
-                <span class="label">${certificate_date_issued_title}</span>
-                <span class="value">${certificate_date_issued}</span>
-              </li>
-            </ul>
-          </div>
-        </article>
-      </section>
-      <hr class="divider /">
-      <aside class="content content--supplemental" role="complimentary"  id="validation-info">
-        <div class="supplemental__about">
-          <h2 class="title">${company_about_title}</h2>
-          <div class="copy">
-            <p>${company_about_description}</p>
-          </div>
-          <ul class="list list--actions">
-            <li class="item item--action">
-              <a class="action action--primary action--moreinfo" href="${company_about_url}">${company_about_urltext}</a>
+            </li>
+            <li class="item certificate--id">
+              <span class="label">${certificate_id_number_title}</span>
+              <span class="value">${certificate_id_number}</span>
+            </li>
+            <li class="item certificate--date">
+              <span class="label">${certificate_date_issued_title}</span>
+              <span class="value">${certificate_date_issued}</span>
             </li>
           </ul>
         </div>
-        <div class="supplemental__how">
-          <h2 class="title">${certificate_verify_title}</h2>
-          <div class="copy">
-            <p>${certificate_verify_description}</p>
-          </div>
-          <ul class="list list--actions">
-            <li class="item item--action">
-              <a class="action action--moreinfo" href="${certificate_verify_url}">${certificate_verify_urltext}</a>
-            </li>
-          </ul>
-        </div>
-        <div class="supplemental__certificates">
-          <h2 class="title">${certificate_info_title}</h2>
-          <div class="copy">
-            <p>${certificate_info_description}</p>
-          </div>
-        </div>
-      </aside>
-    </div>
-    <hr class="divider /">
-    <div class="wrapper--footer">
-      <footer class="footer--app" role="contentinfo" id="company-info">
-        <div class="copyright">
-          <p>${copyright_text}</p>
-        </div>
-        <nav class="nav--footer">
-          <ul class="list list--legal">
-            <li class="nav__item">
-              <a class="action" href="${company_tos_url}">${company_tos_urltext}</a>
-            </li>
-            <li class="nav__item">
-              <a class="action" href="${company_privacy_url}">${company_privacy_urltext}</a>
-            </li>
-          </ul>
-          <ul class="list list--actions">
-            <li class="nav__item">
-              <a class="action" href="${company_courselist_url}">${company_courselist_urltext}</a>
-            </li>
-            <li class="nav__item">
-              <a class="action" href="${company_careers_url}">${company_careers_urltext}</a>
-            </li>
-            <li class="nav__item">
-              <a class="action" href="${company_contact_url}">${company_contact_urltext}</a>
-            </li>
-          </ul>
-        </nav>
-      </footer>
-    </div>
+      </article>
+    </section>
+
+    <hr class="divider" />
+
+    <%include file="_certificate-supplemental.html" />
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="/v2/static/jsjs/vendor/jquery-1.10.2.min.js"><\/script>')</script>
-</body>
-</html>
+
+  <hr class="divider" />
+
+  <%include file="_certificate-footer.html" />
+</div>

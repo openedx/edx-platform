@@ -1,0 +1,34 @@
+<%! from django.utils.translation import ugettext as _ %>
+<%! import mako.runtime %>
+<% mako.runtime.UNDEFINED = '' %>
+
+<aside class="content content--supplemental" role="complimentary"  id="validation-info">
+  <div class="supplemental__about">
+    <h2 class="title">${company_about_title}</h2>
+    <div class="copy">
+      <p>${company_about_description}</p>
+    </div>
+    <ul class="list list--actions">
+      <li class="item item--action">
+        <a class="action action--primary action--moreinfo" href="${company_about_url}">${company_about_urltext}</a>
+      </li>
+    </ul>
+  </div>
+  <div class="supplemental__how">
+    <h2 class="title">${certificate_verify_title}</h2>
+    <div class="copy">
+      <p>${certificate_verify_description}</p>
+    </div>
+    <ul class="list list--actions">
+      <li class="item item--action">
+        <a class="action action--moreinfo" href="${certificate_verify_url}">${certificate_verify_urltext}</a>
+      </li>
+    </ul>
+  </div>
+  <div class="supplemental__certificates">
+    <h2 class="title">${certificate_info_title}</h2>
+    <div class="copy">
+      <p>${certificate_info_description}</p>
+    </div>
+  </div>
+</aside>
