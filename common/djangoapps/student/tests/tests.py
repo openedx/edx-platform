@@ -485,13 +485,59 @@ class DashboardTest(ModuleStoreTestCase):
         self.assertContains(response, expected_url)
 
 
-class EnrollInCourseTest(TestCase):
-    """Tests enrolling and unenrolling in courses."""
+class EnrollmentEventTestMixin(object):
+    """ Mixin with assertions for validating enrollment events. """
 
     def setUp(self):
+        super(EnrollmentEventTestMixin, self).setUp()
         patcher = patch('student.models.tracker')
         self.mock_tracker = patcher.start()
         self.addCleanup(patcher.stop)
+
+    def assert_no_events_were_emitted(self):
+        """Ensures no events were emitted since the last event related assertion"""
+        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
+        self.mock_tracker.reset_mock()
+
+    def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
+        """Ensures an enrollment mode change event was emitted"""
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.mode_changed',
+            {
+                'course_id': course_key.to_deprecated_string(),
+                'user_id': user.pk,
+                'mode': mode
+            }
+        )
+        self.mock_tracker.reset_mock()
+
+    def assert_enrollment_event_was_emitted(self, user, course_key):
+        """Ensures an enrollment event was emitted since the last event related assertion"""
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.activated',
+            {
+                'course_id': course_key.to_deprecated_string(),
+                'user_id': user.pk,
+                'mode': 'honor'
+            }
+        )
+        self.mock_tracker.reset_mock()
+
+    def assert_unenrollment_event_was_emitted(self, user, course_key):
+        """Ensures an unenrollment event was emitted since the last event related assertion"""
+        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
+            'edx.course.enrollment.deactivated',
+            {
+                'course_id': course_key.to_deprecated_string(),
+                'user_id': user.pk,
+                'mode': 'honor'
+            }
+        )
+        self.mock_tracker.reset_mock()
+
+
+class EnrollInCourseTest(EnrollmentEventTestMixin, TestCase):
+    """Tests enrolling and unenrolling in courses."""
 
     @unittest.skipUnless(settings.ROOT_URLCONF == 'lms.urls', 'Test only valid in lms')
     def test_enrollment(self):
@@ -539,47 +585,6 @@ class EnrollInCourseTest(TestCase):
         enrollment = CourseEnrollment.enroll(user, course_id, "audit")
         self.assertTrue(CourseEnrollment.is_enrolled(user, course_id))
         self.assertEquals(enrollment.mode, "audit")
-
-    def assert_no_events_were_emitted(self):
-        """Ensures no events were emitted since the last event related assertion"""
-        self.assertFalse(self.mock_tracker.emit.called)  # pylint: disable=maybe-no-member
-        self.mock_tracker.reset_mock()
-
-    def assert_enrollment_mode_change_event_was_emitted(self, user, course_key, mode):
-        """Ensures an enrollment mode change event was emitted"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.mode_changed',
-            {
-                'course_id': course_key.to_deprecated_string(),
-                'user_id': user.pk,
-                'mode': mode
-            }
-        )
-        self.mock_tracker.reset_mock()
-
-    def assert_enrollment_event_was_emitted(self, user, course_key):
-        """Ensures an enrollment event was emitted since the last event related assertion"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.activated',
-            {
-                'course_id': course_key.to_deprecated_string(),
-                'user_id': user.pk,
-                'mode': 'honor'
-            }
-        )
-        self.mock_tracker.reset_mock()
-
-    def assert_unenrollment_event_was_emitted(self, user, course_key):
-        """Ensures an unenrollment event was emitted since the last event related assertion"""
-        self.mock_tracker.emit.assert_called_once_with(  # pylint: disable=maybe-no-member
-            'edx.course.enrollment.deactivated',
-            {
-                'course_id': course_key.to_deprecated_string(),
-                'user_id': user.pk,
-                'mode': 'honor'
-            }
-        )
-        self.mock_tracker.reset_mock()
 
     def test_enrollment_non_existent_user(self):
         # Testing enrollment of newly unsaved user (i.e. no database entry)

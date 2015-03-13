@@ -18,6 +18,7 @@ from course_modes.models import CourseMode
 from enrollment.api import add_enrollment
 from student.models import CourseEnrollment
 from student.tests.factories import UserFactory, CourseModeFactory
+from student.tests.tests import EnrollmentEventTestMixin
 
 
 ECOMMERCE_API_URL = 'http://example.com/api'
@@ -28,7 +29,7 @@ ECOMMERCE_API_SUCCESSFUL_BODY = json.dumps({'status': OrderStatus.COMPLETE, 'num
 
 @ddt
 @override_settings(ECOMMERCE_API_URL=ECOMMERCE_API_URL, ECOMMERCE_API_SIGNING_KEY=ECOMMERCE_API_SIGNING_KEY)
-class OrdersViewTests(ModuleStoreTestCase):
+class OrdersViewTests(EnrollmentEventTestMixin, ModuleStoreTestCase):
     """
     Tests for the commerce orders view.
     """
@@ -70,6 +71,16 @@ class OrdersViewTests(ModuleStoreTestCase):
         """ Asserts the response is a valid response sent when the E-Commerce API is unavailable. """
         self.assertEqual(response.status_code, 503)
         self.assertResponseMessage(response, 'Call to E-Commerce API failed. Order creation failed.')
+
+    def assertUserEnrolled(self):
+        """ Asserts that the user is enrolled in the course, and that an enrollment event was fired. """
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assert_enrollment_event_was_emitted(self.user, self.course.id)
+
+    def assertUserNotEnrolled(self):
+        """ Asserts that the user is NOT enrolled in the course, and that an enrollment event was NOT fired. """
+        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assert_no_events_were_emitted()
 
     def setUp(self):
         super(OrdersViewTests, self).setUp()
@@ -128,7 +139,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         self._mock_ecommerce_api(status=status, body=json.dumps({'user_message': 'FAIL!'}))
         response = self._post_to_view()
         self.assertValidEcommerceApiErrorResponse(response)
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserNotEnrolled()
 
     @httpretty.activate
     def test_ecommerce_api_timeout(self):
@@ -143,7 +154,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         self._mock_ecommerce_api(body=request_callback)
         response = self._post_to_view()
         self.assertValidEcommerceApiErrorResponse(response)
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserNotEnrolled()
 
     @httpretty.activate
     def test_ecommerce_api_bad_data(self):
@@ -153,7 +164,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         self._mock_ecommerce_api(body='TOTALLY NOT JSON!')
         response = self._post_to_view()
         self.assertValidEcommerceApiErrorResponse(response)
-        self.assertFalse(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserNotEnrolled()
 
     @data(True, False)
     @httpretty.activate
@@ -179,7 +190,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         msg = Messages.ORDER_COMPLETED.format(order_number=ORDER_NUMBER)
         self.assertResponseMessage(response, msg)
 
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserEnrolled()
 
         # Verify the correct information was passed to the E-Commerce API
         request = httpretty.last_request()
@@ -201,7 +212,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         self.assertResponseMessage(response, msg)
 
         # TODO Eventually we should NOT be enrolling users directly from this view.
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserEnrolled()
 
     @httpretty.activate
     def test_course_without_sku(self):
@@ -225,7 +236,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         self.assertResponseMessage(response, msg)
 
         # The user should be enrolled, and no calls made to the E-Commerce API
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserEnrolled()
         self.assertIsInstance(httpretty.last_request(), HTTPrettyRequestEmpty)
 
     @httpretty.activate
@@ -243,5 +254,5 @@ class OrdersViewTests(ModuleStoreTestCase):
         self.assertResponseMessage(response, msg)
 
         # Ensure that the user is not enrolled and that no calls were made to the E-Commerce API
-        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course.id))
+        self.assertUserEnrolled()
         self.assertIsInstance(httpretty.last_request(), HTTPrettyRequestEmpty)
