@@ -1,41 +1,9 @@
 // edX: Certificates - View: DIY Validation
 // ====================
 .view-validate-certificate {
-  background: $bg-view;
-
-  // layout
-  .wrapper-view {
-    background: transparent url('../images/bg-paperfibers.png') 0 0 repeat-both;
-    padding-bottom: ($baseline-v*3);
-
-    @include media($bp-ds) {
-      padding-bottom: $baseline-h;
-    }
-
-    @include media($bp-m) {
-      padding-bottom: $baseline-h;
-    }
-  }
-
-  .wrapper-content {
-    padding: $baseline-v ($baseline-h*2);
-
-    @include media($bp-ds) {
-      padding: $baseline-v $baseline-h;
-    }
-
-    @include media($bp-m) {
-      padding: $baseline-v $baseline-h;
-    }
-  }
 
   // general
   .content {
-    @include outer-container;
-
-    a {
-      @extend %link-copy;
-    }
 
     .title-lvl1 {
       @extend %t-title-3;

@@ -31,6 +31,7 @@
 @import 'elements/footer';                  // view/app footers
 
 // BASE - specific views/areas of app
+@import 'views/certificate';                      // certificate/achievement view
 @import 'views/valid';                      // valid certificate/achievement view
 @import 'views/invalid';                    // invvalid certificate view
 @import 'views/validate';                   // DIY validation
