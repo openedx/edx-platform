@@ -1,0 +1,36 @@
+<%! import json %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<!--<%namespace name='static' file='/static_content.html'/>-->
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Account Settings")}</%block>
+
+<%block name="header_extras">
+    % for template_name in ["account_settings", "field_dropdown", "field_link", "field_readonly", "field_text"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
+
+<div class="account-settings-container"
+     data-accounts-api-url="${accounts_api_url}">
+</div>
+
+<%block name="headextra">
+    <%static:css group='style-course'/>
+
+    <script>
+          (function (require) {
+            require(['js/student_account/views/account_settings_factory',], function(setupAccountSettingsSection) {
+                var fieldsData = ${ json.dumps(fields) };
+                setupAccountSettingsSection(fieldsData);
+            });
+          }).call(this, require || RequireJS.require);
+    </script>
+
+</%block>
