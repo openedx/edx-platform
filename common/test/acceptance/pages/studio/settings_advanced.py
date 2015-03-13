@@ -153,6 +153,7 @@ class AdvancedSettingsPage(CoursePage):
             'cert_html_view_overrides',
             'cert_name_long',
             'cert_name_short',
+            'cert_html_view_overrides',
             'certificates_display_behavior',
             'cohort_config',
             'course_image',
