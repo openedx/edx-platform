@@ -1,0 +1,9 @@
+<label class="u-field-title" for="u-field-input-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+    <%- gettext(title) %>
+</label>
+<span class="u-field-value">
+    <input id="u-field-input-<%- id %>" type="text" name="input" value="<%- gettext(value) %>">
+</span>
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <%- gettext(message) %>
+</span>

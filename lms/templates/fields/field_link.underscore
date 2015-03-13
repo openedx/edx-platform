@@ -1,0 +1,9 @@
+<label class="u-field-title" for="u-field-link-<%- id %>" aria-describedby="u-field-message-<%- id %>">
+    <%- gettext(title) %>
+</label>
+<span class="u-field-value">
+    <a id="u-field-link-<%- id %>" href="<%- gettext(linkHref) %>"><%- gettext(linkTitle) %></a>
+</span>
+<span class="u-field-message" id="u-field-message-<%- id %>">
+    <%- gettext(message) %>
+</span>
