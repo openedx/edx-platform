@@ -801,6 +801,29 @@ class CertificateItemTest(ModuleStoreTestCase):
         ret_val = CourseEnrollment.unenroll(self.user, self.course_key)
         self.assertFalse(ret_val)
 
+    def test_no_id_prof_confirm_email(self):
+        # Pay for a no-id-professional course
+        course_mode = CourseMode(course_id=self.course_key,
+                                 mode_slug="no-id-professional",
+                                 mode_display_name="No Id Professional Cert",
+                                 min_price=self.cost)
+        course_mode.save()
+        CourseEnrollment.enroll(self.user, self.course_key)
+        cart = Order.get_cart_for_user(user=self.user)
+        CertificateItem.add_to_order(cart, self.course_key, self.cost, 'no-id-professional')
+        # verify that we are still enrolled
+        self.assertTrue(CourseEnrollment.is_enrolled(self.user, self.course_key))
+        self.mock_tracker.reset_mock()
+        cart.purchase()
+        enrollment = CourseEnrollment.objects.get(user=self.user, course_id=self.course_key)
+        self.assertEquals(enrollment.mode, u'no-id-professional')
+
+        # Check that the tax-deduction information appears in the confirmation email
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEquals('Order Payment Confirmation', email.subject)
+        self.assertNotIn("If you haven't verified your identity yet, please start the verification process", email.body)
+
 
 class DonationTest(ModuleStoreTestCase):
     """Tests for the donation order item type. """

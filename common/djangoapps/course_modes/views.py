@@ -72,9 +72,9 @@ class ChooseModeView(View):
 
         # We assume that, if 'professional' is one of the modes, it is the *only* mode.
         # If we offer more modes alongside 'professional' in the future, this will need to route
-        # to the usual "choose your track" page.
-        has_enrolled_professional = (enrollment_mode == "professional" and is_active)
-        if "professional" in modes and not has_enrolled_professional:
+        # to the usual "choose your track" page same is true for no-id-professional mode.
+        has_enrolled_professional = (CourseMode.is_professional_slug(enrollment_mode) and is_active)
+        if CourseMode.has_professional_mode(modes) and not has_enrolled_professional:
             return redirect(
                 reverse(
                     'verify_student_start_flow',
@@ -90,7 +90,7 @@ class ChooseModeView(View):
             return redirect(reverse('dashboard'))
 
         # If a user has already paid, redirect them to the dashboard.
-        if is_active and enrollment_mode in CourseMode.VERIFIED_MODES:
+        if is_active and (enrollment_mode in CourseMode.VERIFIED_MODES + [CourseMode.NO_ID_PROFESSIONAL_MODE]):
             return redirect(reverse('dashboard'))
 
         donation_for_course = request.session.get("donation_for_course", {})
