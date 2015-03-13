@@ -1654,7 +1654,9 @@ INSTALLED_APPS = (
 
     # CORS and cross-domain CSRF
     'corsheaders',
-    'cors_csrf'
+    'cors_csrf',
+
+    'commerce',
 )
 
 ######################### CSRF #########################################
@@ -2095,3 +2097,8 @@ ACCOUNT_VISIBILITY_CONFIGURATION = {
         'profile_image',
     ],
 }
+
+# E-Commerce API Configuration
+ECOMMERCE_API_URL = None
+ECOMMERCE_API_SIGNING_KEY = None
+ECOMMERCE_API_TIMEOUT = 5
