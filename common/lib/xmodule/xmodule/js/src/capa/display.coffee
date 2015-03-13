@@ -379,7 +379,6 @@ class @Problem
 
         `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
         @$('.show-label').text gettext('Hide Answer')
-        @$('.show-label .sr').text gettext('Hide Answer')
         @el.addClass 'showed'
         @updateProgress response
         window.SR.readElts(answer_text)
@@ -389,7 +388,6 @@ class @Problem
       @el.removeClass 'showed'
       `// Translators: the word Answer here refers to the answer to a problem the student must solve.`
       @$('.show-label').text gettext('Show Answer')
-      @$('.show-label .sr').text gettext('Reveal Answer')
       window.SR.readText(gettext('Answer hidden'))
 
       @el.find(".capa_inputtype").each (index, inputtype) =>
