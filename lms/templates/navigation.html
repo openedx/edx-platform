@@ -79,9 +79,7 @@ site_status_msg = get_site_status_msg(course_id)
         <a href="#" class="dropdown" aria-haspopup="true" aria-expanded="false"><span class="sr">${_("More options dropdown")}</span><i class="fa fa-sort-desc" aria-hidden="true"></i></a>
         <ul class="dropdown-menu" aria-label="More Options" role="menu">
           <%block name="navigation_dropdown_menu_links" >
-            % if settings.MKTG_URL_LINK_MAP.get('FAQ'):
-              <li><a href="${marketing_link('FAQ')}">${_("Help")}</a></li>
-            % endif
+            <li><a href="${reverse('account_settings')}">${_("Account Settings")}</a></li>
           </%block>
           <li><a href="${reverse('logout')}" role="menuitem">${_("Sign out")}</a></li>
         </ul>

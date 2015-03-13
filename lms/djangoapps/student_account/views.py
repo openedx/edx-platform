@@ -5,30 +5,37 @@ import json
 from ipware.ip import get_ip
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 )
 from django.shortcuts import redirect
 from django.http import HttpRequest
+from django_countries import countries
 from django.core.urlresolvers import reverse, resolve
 from django.utils.translation import ugettext as _
 from django_future.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 
-from opaque_keys.edx.keys import CourseKey
+from lang_pref.api import released_languages
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
 from edxmako.shortcuts import render_to_response
 from microsite_configuration import microsite
+
 from embargo import api as embargo_api
-import third_party_auth
 from external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
+from student.models import UserProfile
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
+from student_account.helpers import auth_pipeline_urls
+import third_party_auth
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.accounts.api import request_password_change
 from openedx.core.djangoapps.user_api.errors import UserNotFound
@@ -294,3 +301,68 @@ def _external_auth_intercept(request, mode):
         return external_auth_login(request)
     elif mode == "register":
         return external_auth_register(request)
+
+
+@login_required
+@require_http_methods(['GET'])
+def account_settings(request):
+    """Render the current user's account settings page.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the page was sent successfully
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        GET /account/settings
+
+    """
+    return render_to_response('student_account/account_settings.html', account_settings_context(request.user))
+
+
+def account_settings_context(user):
+    """ Context for the account settings page.
+
+    Args:
+        user (User): The user for whom the context is required.
+
+    Returns:
+        dict
+
+    """
+    country_options = [
+        (country_code, unicode(country_name))
+        for country_code, country_name in sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
+    ]
+
+    year_of_birth_options = [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS]
+
+    context = {
+        'user_accounts_api_url': reverse("accounts_api", kwargs={'username': user.username}),
+        'user_preferences_api_url': reverse('preferences_api', kwargs={'username': user.username}),
+        'fields': {
+            'country': {
+                'options': country_options,
+            }, 'gender': {
+                'options': UserProfile.GENDER_CHOICES,
+            }, 'language': {
+                'options': released_languages(),
+            }, 'level_of_education': {
+                'options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+            }, 'password': {
+                'url': reverse('password_reset'),
+            }, 'year_of_birth': {
+                'options': year_of_birth_options,
+            }, 'preferred_language': {
+                'options': settings.ALL_LANGUAGES,
+            }
+        }
+    }
+
+    return context
