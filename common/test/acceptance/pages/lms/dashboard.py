@@ -183,3 +183,22 @@ class DashboardPage(PageObject):
     def get_course_social_sharing_widget(self, widget_name):
         """ Retrieves the specified social sharing widget by its classification """
         return self.q(css='a.action-{}'.format(widget_name))
+
+    def click_username_dropdown(self):
+        """
+        Click username dropdown.
+        """
+        self.q(css='.dropdown').first.click()
+
+    @property
+    def username_dropdown_link_text(self):
+        """
+        Return list username dropdown links.
+        """
+        return self.q(css='.dropdown-menu li a').text
+
+    def click_account_settings_link(self):
+        """
+        Click on `Account Settings` link.
+        """
+        self.q(css='.dropdown-menu li a').first.click()
