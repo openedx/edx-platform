@@ -114,8 +114,9 @@ def update_account_settings(requesting_user, update, username=None):
 
     # If user has requested to change email, we must call the multi-step process to handle this.
     # It is not handled by the serializer (which considers email to be read-only).
-    new_email = None
+    changing_email = False
     if "email" in update:
+        changing_email = True
         new_email = update["email"]
         del update["email"]
 
@@ -148,7 +149,7 @@ def update_account_settings(requesting_user, update, username=None):
         field_errors = _add_serializer_errors(update, serializer, field_errors)
 
     # If the user asked to change email, validate it.
-    if new_email:
+    if changing_email:
         try:
             validate_new_email(existing_user, new_email)
         except ValueError as err:
@@ -186,7 +187,7 @@ def update_account_settings(requesting_user, update, username=None):
         )
 
     # And try to send the email change request if necessary.
-    if new_email:
+    if changing_email:
         try:
             do_email_change_request(existing_user, new_email)
         except ValueError as err:
