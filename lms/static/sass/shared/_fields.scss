@@ -1,0 +1,69 @@
+// lms - shared - fields
+// ====================
+
+
+.u-field {
+    padding: $baseline 0;
+    border-bottom: 1px solid $gray-l5;
+
+    .message-error {
+        color: $alert-color;
+    }
+
+    .message-validation-error {
+        color: $warning-color;
+    }
+
+    .message-in-progress {
+        color: $gray-d2;
+    }
+
+    .message-success {
+        color: $success-color;
+    }
+}
+
+.u-field-readonly {
+    input[type="text"],
+    input[type="text"]:focus {
+        background-color: transparent;
+        padding: 0px;
+        border: none;
+        box-shadow: none;
+    }
+}
+
+.u-field-title {
+    width: flex-grid(3, 12);
+    display: inline-block;
+    color: $dark-gray1;
+    vertical-align: top;
+    margin-bottom: 0;
+
+    label {
+        @include margin-left($baseline/2);
+    }
+}
+
+.u-field-value {
+    width: flex-grid(3, 12);
+    display: inline-block;
+    vertical-align: top;
+
+    select, input {
+        width: 100%;
+    }
+}
+
+.u-field-message {
+    @extend small;
+    @include padding-left($baseline/2);
+    width: flex-grid(6, 12);
+    display: inline-block;
+    vertical-align: top;
+    color: $dark-gray1;
+
+    i {
+        @include margin-right($baseline/4);
+    }
+}
