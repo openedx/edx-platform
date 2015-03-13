@@ -68,6 +68,7 @@ class UserAPITestCase(APITestCase):
         legacy_profile.year_of_birth = 1900
         legacy_profile.goals = "world peace"
         legacy_profile.mailing_address = "Park Ave"
+        legacy_profile.bio = "Tired mother of twins"
         legacy_profile.save()
 
 
@@ -93,7 +94,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertIsNone(data["profile_image"])
         self.assertIsNone(data["time_zone"])
         self.assertIsNone(data["languages"])
-        self.assertIsNone(data["bio"])
+        self.assertEqual("Tired mother of twins", data["bio"])
 
     def _verify_private_account_response(self, response):
         """
@@ -109,7 +110,7 @@ class TestAccountAPI(UserAPITestCase):
         Verify that all account fields are returned (even those that are not shareable).
         """
         data = response.data
-        self.assertEqual(11, len(data))
+        self.assertEqual(12, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
         self.assertEqual("US", data["country"])
@@ -121,6 +122,7 @@ class TestAccountAPI(UserAPITestCase):
         self.assertEqual("Park Ave", data['mailing_address'])
         self.assertEqual(self.user.email, data["email"])
         self.assertIsNotNone(data["date_joined"])
+        self.assertEqual("Tired mother of twins", data["bio"])
 
     def test_anonymous_access(self):
         """
@@ -222,10 +224,10 @@ class TestAccountAPI(UserAPITestCase):
         self.client.login(username=self.user.username, password=TEST_PASSWORD)
         response = self.send_get(self.client)
         data = response.data
-        self.assertEqual(11, len(data))
+        self.assertEqual(12, len(data))
         self.assertEqual(self.user.username, data["username"])
         self.assertEqual(self.user.first_name + " " + self.user.last_name, data["name"])
-        for empty_field in ("year_of_birth", "level_of_education", "mailing_address"):
+        for empty_field in ("year_of_birth", "level_of_education", "mailing_address", "bio"):
             self.assertIsNone(data[empty_field])
         self.assertIsNone(data["country"])
         # TODO: what should the format of this be?
@@ -289,6 +291,7 @@ class TestAccountAPI(UserAPITestCase):
         ("language", "Creole"),
         ("goals", "Smell the roses"),
         ("mailing_address", "Sesame Street"),
+        ("bio", "Lacrosse-playing superhero"),
         # Note that email is tested below, as it is not immediately updated.
     )
     @ddt.unpack
