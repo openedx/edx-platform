@@ -23,7 +23,7 @@ var edx = edx || {};
 
         initialize: function(options) {
 
-            this.template = _.template($(this.templateSelector).text()),
+            this.template = _.template($(this.templateSelector).text());
 
             this.helpMessage = this.options.helpMessage || '';
 

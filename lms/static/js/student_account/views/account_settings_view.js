@@ -8,12 +8,11 @@ var edx = edx || {};
 
     edx.student.account.AccountSettingsView = Backbone.View.extend({
 
-        template: _.template($('#account_settings-tpl').text()),
-
         events: {
         },
 
         initialize: function(options) {
+            this.template = _.template($('#account_settings-tpl').text());
             _.bindAll(this, 'render', 'setupFields');
         },
 
