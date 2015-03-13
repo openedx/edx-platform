@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -8,27 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'EntranceExamConfiguration'
-        db.create_table('student_entranceexamconfiguration', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('course_id', self.gf('xmodule_django.models.CourseKeyField')(max_length=255, db_index=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, null=True, db_index=True, blank=True)),
-            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, db_index=True, blank=True)),
-            ('skip_entrance_exam', self.gf('django.db.models.fields.BooleanField')(default=True)),
-        ))
-        db.send_create_signal('student', ['EntranceExamConfiguration'])
-
-        # Adding unique constraint on 'EntranceExamConfiguration', fields ['user', 'course_id']
-        db.create_unique('student_entranceexamconfiguration', ['user_id', 'course_id'])
+        # Adding field 'UserProfile.bio'
+        db.add_column('auth_userprofile', 'bio',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        # Removing unique constraint on 'EntranceExamConfiguration', fields ['user', 'course_id']
-        db.delete_unique('student_entranceexamconfiguration', ['user_id', 'course_id'])
-
-        # Deleting model 'EntranceExamConfiguration'
-        db.delete_table('student_entranceexamconfiguration')
+        # Deleting field 'UserProfile.bio'
+        db.delete_column('auth_userprofile', 'bio')
 
 
     models = {
@@ -164,6 +152,7 @@ class Migration(SchemaMigration):
         'student.userprofile': {
             'Meta': {'object_name': 'UserProfile', 'db_table': "'auth_userprofile'"},
             'allow_certificate': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'bio': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'city': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'country': ('django_countries.fields.CountryField', [], {'max_length': '2', 'null': 'True', 'blank': 'True'}),
             'courseware': ('django.db.models.fields.CharField', [], {'default': "'course.xml'", 'max_length': '255', 'blank': 'True'}),
