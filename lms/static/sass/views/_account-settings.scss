@@ -1,0 +1,107 @@
+.account-settings-container {
+    @extend .container;
+    padding-top: $baseline*2;
+
+    > div {
+      background-color: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .ui-loading-indicator {
+         @extend .ui-loading-base;
+
+         padding-bottom: $baseline;
+
+         // center horizontally
+         @include margin-left(auto);
+         @include margin-right(auto);
+         width: $baseline*5;
+    }
+
+    .message-error {
+        color: $alert-color;
+    }
+
+    .message-invalid-input {
+        color: $warning-color;
+    }
+
+    .message-in-progress {
+        color: $gray-d2;
+    }
+
+    .message-success {
+        color: $success-color;
+    }
+}
+
+.account-settings-header {
+    margin: 0 $baseline;
+
+    .account-settings-header-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: $baseline/2;
+    }
+
+    .account-settings-header-subtitle {
+        color: $gray-l2;
+    }
+}
+
+.account-settings-section-header {
+    margin: $baseline 0 $baseline/2;
+    font-weight: bold;
+}
+
+.account-settings-section {
+    background-color: $white;
+    padding: 0 $baseline 0 $baseline;
+    margin-top: $baseline;
+    border: 1px solid $border-color-1;
+
+    box-shadow:         0 0 1px 1px $shadow-l2;
+    -moz-box-shadow:    0 0 1px 1px $shadow-l2;
+    -webkit-box-shadow: 0 0 1px 1px $shadow-l2;
+
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+
+.account-settings-field {
+    @include margin-right(flex-gutter());
+}
+
+.account-settings-field-title {
+    width: flex-grid(3, 12);
+    display: inline-block;
+    color: $gray-d2;
+
+    label {
+        @include margin-left($baseline/2);
+    }
+}
+
+.account-settings-field-value {
+    width: flex-grid(3, 12);
+    display: inline-block;
+
+    select, input {
+        width: 100%;
+    }
+}
+
+.account-settings-field-message {
+    @extend small;
+    width: flex-grid(6, 12);
+    display: inline-block;
+    color: $gray-l2;
+
+    @include padding-left($baseline/2);
+
+    i {
+        @include margin-right($baseline/4);
+    }
+}
