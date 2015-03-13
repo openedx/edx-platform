@@ -1,5 +1,5 @@
 """ Commerce views. """
-
+import json
 import logging
 from simplejson import JSONDecodeError
 
@@ -111,7 +111,8 @@ class OrdersView(APIView):
 
         try:
             timeout = getattr(settings, 'ECOMMERCE_API_TIMEOUT', 5)
-            response = requests.post(url, data={'sku': course_modes[0].sku}, headers=headers, timeout=timeout)
+            response = requests.post(url, data=json.dumps({'sku': course_modes[0].sku}), headers=headers,
+                                     timeout=timeout)
         except Exception as ex:  # pylint: disable=broad-except
             log.exception('Call to E-Commerce API failed: %s.', ex.message)
             return ApiErrorResponse()

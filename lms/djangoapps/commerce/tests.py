@@ -184,7 +184,7 @@ class OrdersViewTests(ModuleStoreTestCase):
         # Verify the correct information was passed to the E-Commerce API
         request = httpretty.last_request()
         sku = CourseMode.objects.filter(course_id=self.course.id, mode_slug='honor', sku__isnull=False)[0].sku
-        self.assertEqual(request.body, 'sku={}'.format(sku))
+        self.assertEqual(request.body, '{{"sku": "{}"}}'.format(sku))
         self.assertEqual(request.headers['Content-Type'], 'application/json')
 
         # Verify the JWT is correct
