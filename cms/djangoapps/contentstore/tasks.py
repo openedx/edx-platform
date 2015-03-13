@@ -3,16 +3,22 @@ This file contains celery tasks for contentstore views
 """
 
 from celery.task import task
+from celery.utils.log import get_task_logger
 from django.contrib.auth.models import User
 import json
 import logging
 from xmodule.modulestore.django import modulestore
 from xmodule.course_module import CourseFields
 
+from xmodule.modulestore.courseware_index import CoursewareSearchIndexer, SearchIndexingError
 from xmodule.modulestore.exceptions import DuplicateCourseError, ItemNotFoundError
 from course_action_state.models import CourseRerunState
 from contentstore.utils import initialize_permissions
-from opaque_keys.edx.keys import CourseKey
+from opaque_keys.edx.keys import CourseKey, UsageKey
+
+
+LOGGER = get_task_logger(__name__)
+FULL_COURSE_REINDEX_THRESHOLD = 1
 
 from edxval.api import copy_course_videos
 
@@ -72,3 +78,36 @@ def deserialize_fields(json_fields):
     for field_name, value in fields.iteritems():
         fields[field_name] = getattr(CourseFields, field_name).from_json(value)
     return fields
+
+
+@task()
+def update_search_index(course_id, item_ids=None):
+    """ Updates course search index. """
+    def index_location(location):
+        """ Adds location to the courseware search index """
+        CoursewareSearchIndexer.add_to_search_index(modulestore(), location, delete=False, raise_on_error=True)
+
+    try:
+        course_key = CourseKey.from_string(course_id)
+        if item_ids and len(item_ids) <= FULL_COURSE_REINDEX_THRESHOLD:
+            for item_id in item_ids:
+                item_key = UsageKey.from_string(item_id).replace(run=course_key.run)
+                index_location(item_key)
+        else:
+            index_location(course_key)
+
+    except SearchIndexingError as exc:
+        if item_ids:
+            LOGGER.error(
+                'Search indexing error for items %s in course %s - %s',
+                ','.join(item_ids),
+                course_id,
+                unicode(exc)
+            )
+        else:
+            LOGGER.error('Search indexing error for complete course %s - %s', course_id, unicode(exc))
+    else:
+        if item_ids:
+            LOGGER.debug('Search indexing successful for items %s in course %s', ','.join(item_ids), course_id)
+        else:
+            LOGGER.debug('Search indexing successful for complete course %s', course_id)

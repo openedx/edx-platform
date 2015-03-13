@@ -87,9 +87,6 @@ from util.milestones_helpers import (
     is_valid_course_key
 )
 
-# register a signal handler to index course when a course is published
-import contentstore.search_index_task
-
 MINIMUM_GROUP_ID = 100
 
 RANDOM_SCHEME = "random"
