@@ -47,7 +47,7 @@ class BlockOutline(object):
             Factory method for creating and binding a module for the given descriptor.
             """
             field_data_cache = FieldDataCache.cache_for_descriptor_descendents(
-                self.course_id, self.request.user, descriptor
+                self.course_id, self.request.user, descriptor, depth=0,
             )
             return get_module_for_descriptor(
                 self.request.user, self.request, descriptor, field_data_cache, self.course_id
