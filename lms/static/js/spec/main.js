@@ -55,6 +55,7 @@
             'capa/display': 'xmodule_js/src/capa/display',
             'string_utils': 'xmodule_js/common_static/js/src/string_utils',
             'logger': 'xmodule_js/common_static/js/src/logger',
+            'js/vendor/backbone-super.min': 'js/vendor/backbone-super.min',
 
             // Manually specify LMS files that are not converted to RequireJS
             'history': 'js/vendor/history',
@@ -80,8 +81,10 @@
             'js/student_account/models/RegisterModel': 'js/student_account/models/RegisterModel',
             'js/student_account/views/RegisterView': 'js/student_account/views/RegisterView',
             'js/student_account/views/AccessView': 'js/student_account/views/AccessView',
+            'js/student_account/models/account_settings_models': 'js/student_account/models/account_settings_models',
+            'js/student_account/views/account_settings_view': 'js/student_account/views/account_settings_view',
+            'js/student_account/views/account_settings_fields': 'js/student_account/views/account_settings_fields',
             'js/student_profile/profile': 'js/student_profile/profile',
-
             // edxnotes
             'annotator_1.2.9': 'xmodule_js/common_static/js/vendor/edxnotes/annotator-full.min'
         },
@@ -417,6 +420,18 @@
                     'js/student_account/shoppingcart',
                 ]
             },
+            'js/student_account/models/account_settings_models': {
+                exports: 'edx.student.account.AccountSettingsModel',
+                deps: ['backbone']
+            },
+            'js/student_account/views/account_settings_view': {
+                exports: 'edx.student.account.AccountSettingsView',
+                deps: [ 'jquery', 'underscore', 'backbone',  'gettext']
+            },
+            'js/student_account/views/account_settings_fields': {
+                exports: 'edx.student.account.fieldViews',
+                deps: [ 'jquery', 'underscore', 'backbone', 'gettext', 'js/vendor/backbone-super.min' ]
+            },
             'js/verify_student/models/verification_model': {
                 exports: 'edx.verify_student.VerificationModel',
                 deps: [ 'jquery', 'underscore', 'backbone', 'jquery.cookie' ]
@@ -552,6 +567,7 @@
         'lms/include/js/spec/student_account/enrollment_spec.js',
         'lms/include/js/spec/student_account/emailoptin_spec.js',
         'lms/include/js/spec/student_account/shoppingcart_spec.js',
+        'lms/include/js/spec/student_account/account_settings_spec.js',
         'lms/include/js/spec/student_profile/profile_spec.js',
         'lms/include/js/spec/verify_student/pay_and_verify_view_spec.js',
         'lms/include/js/spec/verify_student/webcam_photo_view_spec.js',

@@ -1,0 +1,47 @@
+<%! import json %>
+<%! from django.core.urlresolvers import reverse %>
+<%! from django.utils.translation import ugettext as _ %>
+
+<!--<%namespace name='static' file='/static_content.html'/>-->
+
+<%inherit file="/main.html" />
+<%namespace name='static' file='/static_content.html'/>
+
+<%block name="pagetitle">${_("Account Settings")}</%block>
+
+<%block name="js_extra">
+    <script type="text/javascript" src="${static.url('js/vendor/underscore-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-min.js')}"></script>
+    <script type="text/javascript" src="${static.url('js/vendor/backbone-super.min.js')}"></script>
+
+     <script type="text/javascript" src="${static.url('js/student_account/models/account_settings_models.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_fields.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_view.js')}"></script>
+     <script type="text/javascript" src="${static.url('js/student_account/views/account_settings_factory.js')}"></script>
+
+    <%static:js group='student_account'/>
+</%block>
+
+<%block name="header_extras">
+    % for template_name in ["account_settings", "field_dropdown", "field_link", "field_readonly", "field_text"]:
+        <script type="text/template" id="${template_name}-tpl">
+            <%static:include path="student_account/${template_name}.underscore" />
+        </script>
+    % endfor
+</%block>
+
+<div class="account-settings-container"
+     data-accounts-api-url="${accounts_api_url}">
+</div>
+
+<%block name="headextra">
+    <%static:css group='style-course'/>
+
+    <script>
+        $(document).ready(function() {
+            var fields = ${ json.dumps(fields) };
+            edx.student.account.setupAccountSettingsViews(fields);
+        });
+    </script>
+
+</%block>

@@ -200,6 +200,20 @@ class StudentAccountUpdateTest(UrlResetMixin, TestCase):
 
         return self.client.post(path=reverse('password_change_request'), data=data)
 
+    def test_account_settings_view(self):
+        """
+        Verify that account settings view is rendered with correct data.
+        """
+        settings_path = reverse('account_settings')
+        response = self.client.get(path=settings_path)
+        accounts_api_url = reverse("accounts_api", kwargs={'username': self.USERNAME})
+        lang_code = settings.LANGUAGE_CODE
+
+        self.assertTrue('href="{}"'.format(settings_path) in response.content)
+        self.assertTrue('data-accounts-api-url="{}"'.format(accounts_api_url) in response.content)
+        self.assertTrue('default_value: "{}"'.format(lang_code) in response.content)
+        self.assertTrue('["{}", "{}"]'.format(lang_code, settings.LANGUAGE_DICT[lang_code]) in response.content)
+
 
 @ddt.ddt
 class StudentAccountLoginAndRegistrationTest(UrlResetMixin, ModuleStoreTestCase):

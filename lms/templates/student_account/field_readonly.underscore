@@ -1,0 +1,10 @@
+<label class="account-settings-field-title">
+    <%- gettext(title) %>
+</label>
+<span class="account-settings-field-value">
+    <%- gettext(value) %>
+</span>
+<span class="account-settings-field-message">
+    <%- gettext(message) %>
+</span>
+<hr class="divider">

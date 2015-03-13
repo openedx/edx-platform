@@ -177,3 +177,16 @@ class DashboardPage(PageObject):
         Verify if pre-requisite course messages are being displayed.
         """
         return self.q(css='section.prerequisites > .tip').visible
+
+    def click_username_dropdown(self):
+        """Click username dropdown"""
+        self.q(css='.dropdown').first.click()
+
+    @property
+    def username_dropdown_links(self):
+        """Return list username dropdown links"""
+        return self.q(css='.dropdown-menu li a').text
+
+    def click_account_settings_link(self):
+        """Click on `Account Settings` link"""
+        self.q(css='.dropdown-menu li a').first.click()

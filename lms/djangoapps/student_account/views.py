@@ -3,6 +3,7 @@
 import logging
 import json
 from ipware.ip import get_ip
+from pytz import common_timezones
 
 from django.conf import settings
 from django.http import (
@@ -10,6 +11,8 @@ from django.http import (
 )
 from django.shortcuts import redirect
 from django.http import HttpRequest
+from django.conf import settings
+from django_countries import countries
 from django.core.urlresolvers import reverse, resolve
 from django.core.mail import send_mail
 from django.utils.translation import ugettext as _
@@ -17,26 +20,28 @@ from django_future.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 
-from opaque_keys.edx.keys import CourseKey
 from opaque_keys import InvalidKeyError
+from opaque_keys.edx.keys import CourseKey
+
+from dark_lang.models import DarkLangConfig
 from edxmako.shortcuts import render_to_response, render_to_string
-from microsite_configuration import microsite
 from embargo import api as embargo_api
-import third_party_auth
 from external_auth.login_and_register import (
     login as external_auth_login,
     register as external_auth_register
 )
+from microsite_configuration import microsite
+from student.models import UserProfile
 from student.views import (
     signin_user as old_login_view,
     register_user as old_register_view
 )
+from student_account.helpers import auth_pipeline_urls
+import third_party_auth
+from util.bad_request_rate_limiter import BadRequestRateLimiter
 
 from openedx.core.djangoapps.user_api.api import account as account_api
 from openedx.core.djangoapps.user_api.api import profile as profile_api
-from util.bad_request_rate_limiter import BadRequestRateLimiter
-
-from student_account.helpers import auth_pipeline_urls
 
 
 AUDIT_LOG = logging.getLogger("audit")
@@ -295,3 +300,64 @@ def _external_auth_intercept(request, mode):
         return external_auth_login(request)
     elif mode == "register":
         return external_auth_register(request)
+
+
+@login_required
+@require_http_methods(['GET'])
+def account_settings(request):
+    """Render the students account settings page.
+
+    Args:
+        request (HttpRequest)
+
+    Returns:
+        HttpResponse: 200 if the page was sent successfully
+        HttpResponse: 302 if not logged in (redirect to login page)
+        HttpResponse: 405 if using an unsupported HTTP method
+
+    Example usage:
+
+        GET /account/settings
+
+    """
+    released_languages = DarkLangConfig.current().released_languages_list
+
+    # add in the default language if it's not in the list of released languages
+    if settings.LANGUAGE_CODE not in released_languages:
+        released_languages.append(settings.LANGUAGE_CODE)
+        # Re-alphabetize language options
+        released_languages.sort()
+
+    language_options = [language for language in settings.LANGUAGES if language[0] in released_languages]
+
+    country_options = [
+        (country_code, unicode(country_name))
+        for country_code, country_name in sorted(
+            countries.countries, key=lambda(__, name): unicode(name)
+        )
+    ]
+
+    context = {
+        'accounts_api_url': reverse("accounts_api", kwargs={'username': request.user.username}),
+        'fields': {
+            'country': {
+                'options': country_options,
+            }, 'gender': {
+                'options': UserProfile.GENDER_CHOICES,
+            }, 'language': {
+                'default': settings.LANGUAGE_CODE,
+                'options': language_options,
+            }, 'level_of_education': {
+                'options': UserProfile.LEVEL_OF_EDUCATION_CHOICES,
+            }, 'password': {
+                'url': reverse('password_reset'),
+            }, 'timezone': {
+                'options': [(unicode(timezone), unicode(timezone)) for timezone in common_timezones],
+            }, 'year_of_birth': {
+                'options': [(unicode(year), unicode(year)) for year in UserProfile.VALID_YEARS],
+            }, 'preferred_language': {
+                'options': settings.LANGUAGES,
+            }
+        }
+    }
+    return render_to_response('student_account/account_settings.html', context)

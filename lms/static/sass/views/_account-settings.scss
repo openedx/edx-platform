@@ -1,0 +1,83 @@
+.account-settings-container {
+  @extend .container;
+
+  > div {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.account-settings {
+    padding: 40px 40px 0 40px;
+}
+
+.account-settings-header {
+    @include margin-left(5px);
+
+    .account-settings-header-title {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .account-settings-header-subtitle {
+        color: $gray-l2;
+    }
+}
+
+.account-settings-section-header {
+    margin: 25px 0 10px;
+    font-weight: bold;
+}
+
+.account-settings-section {
+    background-color: $white;
+    padding: 0 20px 0 20px;
+    margin-top: 20px;
+    border: 1px solid $light-gray;
+
+    box-shadow:         0 0 1px 1px $shadow-l2;
+    -moz-box-shadow:    0 0 1px 1px $shadow-l2;
+    -webkit-box-shadow: 0 0 1px 1px $shadow-l2;
+
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+
+.account-settings-field > label {
+    @include margin-left(15px);
+}
+
+.account-settings-field-title {
+    color: $gray-d2;
+    display: inline-block;
+    width: 220px;
+}
+
+.account-settings-field-value {
+    display: inline-block;
+    @include margin-right(40px);
+    width: 200px;
+
+    select {
+      width: 100%;
+    }
+}
+
+.account-settings-field-message {
+    @extend small;
+    color: $gray-l2;
+}
+
+.ui-loading-anim {
+  @extend .ui-loading-base;
+
+  padding-bottom: 16px;
+
+  // center horizontally
+  @include margin-left(auto);
+  @include margin-right(auto);
+  width: 10%;
+}
